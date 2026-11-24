@@ -3956,13 +3956,20 @@ def _assay_candidate(
     *,
     origin: str,
     terminal: bool = False,
+    inherit_parent_role: bool = True,
 ) -> AssayCandidate:
     state = (
         State.of(recipe)
         if recipe is not None
         else State.unknown(error or "missing_condition:melt_composition")
     )
-    return AssayCandidate(state, source=origin, label=source, terminal=terminal)
+    return AssayCandidate(
+        state,
+        source=origin,
+        label=source,
+        terminal=terminal,
+        inherit_parent_role=inherit_parent_role,
+    )
 
 
 def _resolve_melt_recipe(
@@ -3995,6 +4002,9 @@ def _resolve_melt_recipe(
                     point_source != "none"
                     or _point_claims_printed_assay(point)
                 ),
+                # Flat columns are the run. The parent's role describes the
+                # parent. An explicit role on the point is still read.
+                inherit_parent_role=point_source != "extract flat run composition",
             ),
             _assay_candidate(
                 parent_recipe, parent_source, parent_error, origin="parent"

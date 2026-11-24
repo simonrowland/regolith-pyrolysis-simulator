@@ -153,16 +153,22 @@ def test_role_resolution_matrix(shape, token, tier, status, flags) -> None:
         values["composition_wt_pct"] = {"SiO2": 50, "MgO": 50}
     else:
         point = {"composition_wt_pct": amounts, "T_K": 1500, "p_Pa": 1.0}
+    # Flat columns are the run. A role on the parent does not describe them.
+    if shape == "flat" and tier != "refused":
+        status = composition_roles.RoleStatus.UNKNOWN
+        flags = ()
+        tier = "clean"
     role, source = _resolve_melt_recipe(
         SimpleNamespace(values=values, units=None), point=point
     )
     assert role.status is status
     assert role.flags == flags
     assert ("refused" if not role.callable else "flagged" if role.flags else "clean") == tier
+    if shape == "flat":
+        assert role.role is None
+        assert source == "extract flat run composition"
     if not role.callable:
         assert role.composition.is_unknown
-    elif shape == "flat":
-        assert source == "extract flat run composition"
     if status is composition_roles.RoleStatus.DEFAULTED:
         assert role.initial_charge_only
         assert "default=initial_charge_only" in role.reason
@@ -170,7 +176,10 @@ def test_role_resolution_matrix(shape, token, tier, status, flags) -> None:
     if token is None:
         assert role.role is None
         assert role.original_reason is None
-    if token == composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG:
+    if (
+        token == composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG
+        and shape != "flat"
+    ):
         assert role.initial_charge_only
         assert role.status is composition_roles.RoleStatus.DECLARED
 
@@ -261,6 +270,144 @@ def test_explicit_datum_is_not_overridden_by_a_discarded_identity_proxy() -> Non
     assert kept.composition.value.proxy_flag == (
         composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG
     )
+
+
+def test_flat_columns_do_not_inherit_a_parent_role() -> None:
+    from types import SimpleNamespace
+
+    parent = {
+        "composition_role": "initial_charge_only",
+        "composition_wt_pct": {"SiO2": 50, "MgO": 50},
+    }
+    point = {"SiO2": 60, "MgO": 40}
+    role, source = _resolve_melt_recipe(
+        SimpleNamespace(values=parent, units=None), point=point
+    )
+    assert source == "extract flat run composition"
+    assert role.status is composition_roles.RoleStatus.UNKNOWN
+    assert role.role is None
+    assert role.flags == ()
+    assert role.callable
+    parent_recipe, _parent_source, parent_error = _melt_recipe_mol(
+        SimpleNamespace(values=parent, units=None)
+    )
+    assert parent_error is None
+    assert role.composition.value != parent_recipe
+
+
+def test_inheriting_a_parent_role_onto_flat_columns_breaks_the_pin(
+    monkeypatch,
+) -> None:
+    real = composition_roles.resolve_point_composition
+
+    def force_inherit(row, parent=None, candidates=(), **kwargs):
+        forced = tuple(
+            replace(candidate, inherit_parent_role=True) for candidate in candidates
+        )
+        return real(row, parent, forced, **kwargs)
+
+    monkeypatch.setattr(composition_roles, "resolve_point_composition", force_inherit)
+    with pytest.raises(AssertionError):
+        test_flat_columns_do_not_inherit_a_parent_role()
+
+
+def test_explicit_flat_point_role_is_not_the_parent_role() -> None:
+    from types import SimpleNamespace
+
+    parent = {
+        "composition_role": "datum_state",
+        "composition_wt_pct": {"SiO2": 50, "MgO": 50},
+    }
+    point = {"SiO2": 60, "MgO": 40, "composition_role": "initial_charge_only"}
+    role, source = _resolve_melt_recipe(
+        SimpleNamespace(values=parent, units=None), point=point
+    )
+    assert source == "extract flat run composition"
+    assert role.role == composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert role.status is composition_roles.RoleStatus.DECLARED
+    assert role.flags == (composition_roles.INITIAL_CHARGE_ONLY_PROXY_FLAG,)
+    assert role.callable
+
+
+def test_located_mole_fraction_is_not_read_as_weight_percent() -> None:
+    from decimal import Decimal
+
+    from simulator.battery.enums import AmountBasis
+
+    payload = {
+        "state": {
+            "tag": "value",
+            "value": {
+                "basis": "oxide_mole_fraction_as_published",
+                "amount_basis": "mole_fraction",
+                "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+            },
+        }
+    }
+    located = battery_migrate._composition_located_from_plain(payload)
+    assert located.state.is_value
+    composition = located.state.value
+    assert composition.amount_basis is AmountBasis.MOLE_FRACTION
+    assert {name: amount for name, amount in composition.components} == {
+        "SiO2": Decimal("0.6"),
+        "MgO": Decimal("0.4"),
+    }
+
+
+def test_nested_wt_pct_context_is_not_a_flat_run_column() -> None:
+    parent = {"composition_wt_pct": {"SiO2": 55.0, "MgO": 45.0}}
+    point = {
+        "T_K": 1366.12,
+        "sample_alkali_content_wt_pct": {"Na2O": 0.36, "K2O": 0.068},
+        "point_conditions": {
+            "composition": {"state": {"tag": "value", "value": {}}}
+        },
+    }
+    assert (
+        battery_migrate._flat_run_composition_columns(point, parent, None)
+        is False
+    )
+
+
+def test_counting_a_nested_wt_pct_map_as_a_flat_column_breaks_the_pin(
+    monkeypatch,
+) -> None:
+    real = battery_migrate._flat_run_composition_columns
+
+    def count_any_wt_pct_key(point, parent, units):
+        if (
+            isinstance(point, dict)
+            and battery_migrate._declared_wt_composition_point_map(parent, units)
+            and any(
+                battery_migrate._mass_percent_component_key(str(key))[1]
+                for key in point
+            )
+        ):
+            return True
+        return real(point, parent, units)
+
+    monkeypatch.setattr(
+        battery_migrate, "_flat_run_composition_columns", count_any_wt_pct_key
+    )
+    with pytest.raises(AssertionError):
+        test_nested_wt_pct_context_is_not_a_flat_run_column()
+
+
+def test_reading_mole_fraction_as_mass_percent_breaks_the_pin(monkeypatch) -> None:
+    from copy import deepcopy
+
+    real = battery_migrate._composition_located_from_plain
+
+    def rewrite(payload, **kwargs):
+        body = deepcopy(payload)
+        body["state"]["value"]["amount_basis"] = "mass_percent"
+        return real(body, **kwargs)
+
+    monkeypatch.setattr(
+        battery_migrate, "_composition_located_from_plain", rewrite
+    )
+    with pytest.raises(AssertionError):
+        test_located_mole_fraction_is_not_read_as_weight_percent()
 
 
 def test_explicit_gap_beats_parent_flat_columns_at_pressure_boundary(monkeypatch) -> None:
@@ -1013,7 +1160,15 @@ def test_demaria_k_composition_points_use_scorer_effusion_closure(
     datum_coverage = extract_reproduction.coverage_summary([datum_evaluation])
     datum_entry = datum_coverage["entries"][0]
 
-    assert len(closure_calls) == 2
+    assert len(closure_calls) == 2, [
+        (
+            runtime.get("temperature_K"),
+            runtime.get("refusal"),
+            runtime.get("melt_recipe_source"),
+        )
+        for runtime in runtimes
+        if runtime.get("temperature_K") in {1366.12, 1314.06}
+    ]
     assert len(melt_calls) == 2
     assert all(
         observation.identity.composition.is_value

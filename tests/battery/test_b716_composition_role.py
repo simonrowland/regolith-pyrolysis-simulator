@@ -42,6 +42,7 @@ from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 from simulator.battery.migrate import (
     _catalogue_composition_located_from_values,
     _initial_charge_only_composition_proxy,
+    effective_run_composition,
     REPO_ROOT,
     migrate,
     sample_from_equipment,
@@ -295,14 +296,15 @@ def test_undeclared_partial_point_oxide_map_is_refused(tmp_path) -> None:
 
 def test_proxy_selects_the_assay_and_resolves_its_role_once(monkeypatch) -> None:
     calls = []
-    real = resolve_composition_role
+    real = composition_roles.resolve_point_composition
 
-    def spy(*args, **kwargs):
-        calls.append(args)
-        return real(*args, **kwargs)
+    def spy(row, parent=None, candidates=(), **kwargs):
+        calls.append((row, candidates))
+        return real(row, parent, candidates, **kwargs)
 
     monkeypatch.setattr(
-        "simulator.battery.migrate.composition_roles.resolve_composition_role", spy
+        "simulator.battery.migrate.composition_roles.resolve_point_composition",
+        spy,
     )
     composition = _composition(None)
     identity = F.activity_identity(composition=composition)
@@ -347,34 +349,32 @@ def test_ordinary_assay_without_a_role_keeps_its_provenance() -> None:
 def test_stamping_before_the_resolver_breaks_the_ordinary_assay_pin(
     monkeypatch,
 ) -> None:
-    real = composition_roles.resolve_composition_role
+    real = composition_roles.resolve_point_composition
 
-    def prestamp(row, parent=None, *, composition=None, point_composition=None, **kwargs):
-        def _stamp(state):
+    def prestamp(row, parent=None, candidates=(), **kwargs):
+        stamped = []
+        for candidate in candidates:
+            state = candidate.state
             if (
                 state is not None
                 and state.is_value
                 and isinstance(state.value, Composition)
             ):
-                return State.of(
-                    replace(
-                        state.value,
-                        proxy_flag=INITIAL_CHARGE_ONLY,
-                        input_provenance=PRINTED_STARTING_BULK,
-                    )
+                candidate = replace(
+                    candidate,
+                    state=State.of(
+                        replace(
+                            state.value,
+                            proxy_flag=INITIAL_CHARGE_ONLY,
+                            input_provenance=PRINTED_STARTING_BULK,
+                        )
+                    ),
                 )
-            return state
-
-        return real(
-            row,
-            parent,
-            composition=_stamp(composition),
-            point_composition=_stamp(point_composition),
-            **kwargs,
-        )
+            stamped.append(candidate)
+        return real(row, parent, tuple(stamped), **kwargs)
 
     monkeypatch.setattr(
-        "simulator.battery.migrate.composition_roles.resolve_composition_role",
+        "simulator.battery.migrate.composition_roles.resolve_point_composition",
         prestamp,
     )
     with pytest.raises(AssertionError):
@@ -440,16 +440,20 @@ def test_datum_state_binds_the_same_assay_migration_and_reproduction_use() -> No
 
 
 def test_skipping_the_datum_write_breaks_the_identity_pin(monkeypatch) -> None:
-    real = composition_roles.resolve_composition_role
+    real = composition_roles.resolve_point_composition
 
-    def clear_datum(row, parent=None, **kwargs):
-        result = real(row, parent, **kwargs)
+    def clear_datum(row, parent=None, candidates=(), **kwargs):
+        result = real(row, parent, candidates, **kwargs)
         if result.role == DATUM_STATE:
-            return replace(result, role=None, status=composition_roles.RoleStatus.UNKNOWN)
+            return replace(
+                result,
+                role=None,
+                status=composition_roles.RoleStatus.UNKNOWN,
+            )
         return result
 
     monkeypatch.setattr(
-        "simulator.battery.migrate.composition_roles.resolve_composition_role",
+        "simulator.battery.migrate.composition_roles.resolve_point_composition",
         clear_datum,
     )
     with pytest.raises(AssertionError):
@@ -476,14 +480,15 @@ def test_exploded_point_is_resolved_once(monkeypatch, tmp_path: Path) -> None:
 
 def test_unusable_declared_map_keeps_a_usable_located_composition(monkeypatch) -> None:
     calls = []
-    real = resolve_composition_role
+    real = composition_roles.resolve_point_composition
 
-    def spy(*args, **kwargs):
-        calls.append(args)
-        return real(*args, **kwargs)
+    def spy(row, parent=None, candidates=(), **kwargs):
+        calls.append((row, candidates))
+        return real(row, parent, candidates, **kwargs)
 
     monkeypatch.setattr(
-        "simulator.battery.migrate.composition_roles.resolve_composition_role", spy
+        "simulator.battery.migrate.composition_roles.resolve_point_composition",
+        spy,
     )
     usable = _composition(None)
     other = Composition(
@@ -929,3 +934,162 @@ def test_initial_charge_proxy_prediction_stays_flagged() -> None:
     assert FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT in flagged_strata(
         residual.notices
     )
+
+
+def _oxide_assay(silica: str, magnesia: str, *, proxy: str | None) -> Composition:
+    return Composition(
+        basis="oxide_mole_fraction_as_published",
+        components=(("SiO2", Decimal(silica)), ("MgO", Decimal(magnesia))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+        proxy_flag=proxy,
+    )
+
+
+def _owner_candidate_components(monkeypatch, *, preselect: bool):
+    printed = _oxide_assay("0.6", "0.4", proxy=None)
+    identity_assay = _oxide_assay("0.7", "0.3", proxy=None)
+    seen = []
+    real = composition_roles.resolve_point_composition
+
+    def spy(row, parent=None, candidates=(), **kwargs):
+        offered = tuple(candidates)[:1] if preselect else tuple(candidates)
+        seen.append(
+            [
+                (item.source, item.state.value.components)
+                for item in offered
+                if item.state is not None and item.state.is_value
+            ]
+        )
+        return real(row, parent, offered, **kwargs)
+
+    monkeypatch.setattr(composition_roles, "resolve_point_composition", spy)
+    identity = F.activity_identity(composition=identity_assay)
+    _initial_charge_only_composition_proxy(
+        identity,
+        {"composition": Located(State.of(printed))},
+        (),
+        row={"composition_role": DATUM_STATE},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="owner-probe",
+    )
+    return seen, printed, identity_assay
+
+
+def test_owner_gets_both_located_and_identity_assays(monkeypatch) -> None:
+    seen, printed, identity_assay = _owner_candidate_components(
+        monkeypatch, preselect=False
+    )
+    assert len(seen) == 1
+    assert {components for _source, components in seen[0]} == {
+        printed.components,
+        identity_assay.components,
+    }, seen
+
+
+def test_preselecting_one_candidate_breaks_the_owner_pin(monkeypatch) -> None:
+    with pytest.raises(AssertionError):
+        seen, printed, identity_assay = _owner_candidate_components(
+            monkeypatch, preselect=True
+        )
+        assert len(seen) == 1
+        assert {components for _source, components in seen[0]} == {
+            printed.components,
+            identity_assay.components,
+        }, seen
+
+
+def _competing_assay_observation(
+    *,
+    identity_proxy: str | None,
+    point_proxy: str | None = None,
+    point_unknown: str | None = None,
+):
+    experiment = F.kems_experiment()
+    ordinary = F.activity_identity()
+    identity_composition = ordinary.composition.value
+    if identity_proxy is not None:
+        identity_composition = replace(identity_composition, proxy_flag=identity_proxy)
+    identity = replace(ordinary, composition=State.of(identity_composition))
+    if point_unknown is not None:
+        point_state = State.unknown(point_unknown)
+    else:
+        point_value = replace(ordinary.composition.value, proxy_flag=point_proxy)
+        point_state = State.of(point_value)
+    return replace(
+        F.observation(
+            "competing-assay",
+            experiment.experiment_id,
+            identity,
+            Decimal("0.2"),
+        ),
+        notices=(),
+        point_conditions={"composition": Located(point_state)},
+    )
+
+
+def test_charge_identity_qualification_matches_the_engine_assay() -> None:
+    row = _competing_assay_observation(identity_proxy=INITIAL_CHARGE_ONLY)
+    used = effective_run_composition(row.identity, row.point_conditions)
+    assert used is not None and used.is_value
+    assert used.value.proxy_flag == INITIAL_CHARGE_ONLY
+    notice = _initial_charge_composition_notice(row)
+    assert notice is not None
+    assert INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+
+
+def test_ordinary_identity_is_not_qualified_by_a_point_charge() -> None:
+    row = _competing_assay_observation(
+        identity_proxy=None,
+        point_proxy=INITIAL_CHARGE_ONLY,
+    )
+    used = effective_run_composition(row.identity, row.point_conditions)
+    assert used is not None and used.is_value
+    assert used.value.proxy_flag is None
+    assert _initial_charge_composition_notice(row) is None
+
+
+def test_unknown_point_is_not_replaced_by_a_charge_identity() -> None:
+    row = _competing_assay_observation(
+        identity_proxy=INITIAL_CHARGE_ONLY,
+        point_unknown="partial analysis contains unsupported component(s): XxO",
+    )
+    used = effective_run_composition(row.identity, row.point_conditions)
+    assert used is not None and used.is_unknown
+    assert "XxO" in (used.reason or "")
+    assert _initial_charge_composition_notice(row) is None
+
+
+def test_an_unmapped_identity_hides_the_missing_charge_refusal(
+    monkeypatch, tmp_path
+) -> None:
+    real = composition_roles.resolve_point_composition
+
+    def hide_missing_charge(row, parent=None, candidates=(), **kwargs):
+        rewritten = tuple(
+            replace(
+                candidate,
+                state=State.unknown("no composition mapped from source"),
+            )
+            if candidate.source == "none" and candidate.state.is_unknown
+            else candidate
+            for candidate in candidates
+        )
+        return real(row, parent, rewritten, **kwargs)
+
+    monkeypatch.setattr(
+        composition_roles, "resolve_point_composition", hide_missing_charge
+    )
+    with pytest.raises(AssertionError):
+        test_initial_charge_role_without_printed_charge_still_refuses(tmp_path)
+
+
+def test_point_first_choice_breaks_the_charge_qualification_pin(monkeypatch) -> None:
+    monkeypatch.setattr(
+        composition_roles,
+        "choose_stored_run",
+        composition_roles._choose_assay,
+    )
+    with pytest.raises(AssertionError):
+        test_charge_identity_qualification_matches_the_engine_assay()

@@ -12,6 +12,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 
+import pytest
 import yaml
 
 from simulator.battery.migrate import (
@@ -2166,6 +2167,51 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
 }
     ''')
     assert actual == expected, json.dumps(actual, sort_keys=True, separators=(",", ":"), default=str)
+
+
+def test_storing_a_charge_conversion_derivation_breaks_the_baseline(
+    monkeypatch,
+    tmp_path: Path,
+) -> None:
+    """A starting-charge conversion derivation is not part of the snapshot."""
+
+    from dataclasses import replace
+
+    from simulator.battery.composition_roles import INITIAL_CHARGE_ONLY_PROXY_FLAG
+    from simulator.battery.records import Derivation, Located
+    import simulator.battery.migrate as migrate_module
+
+    sentinel = Derivation(
+        relation="mutation:charge-conversion-inference",
+        inputs=(),
+        parameters=(),
+        output_unit="mole_fraction",
+    )
+    real = migrate_module._initial_charge_only_composition_proxy
+
+    def store_charge_inference(*args, **kwargs):
+        identity, conditions, notices = real(*args, **kwargs)
+        composition = (
+            conditions.get("composition") if isinstance(conditions, dict) else None
+        )
+        if (
+            isinstance(composition, Located)
+            and composition.state.is_value
+            and getattr(composition.state.value, "proxy_flag", None)
+            == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            and composition.inference is None
+        ):
+            conditions = dict(conditions)
+            conditions["composition"] = replace(composition, inference=sentinel)
+        return identity, conditions, notices
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_initial_charge_only_composition_proxy",
+        store_charge_inference,
+    )
+    with pytest.raises(AssertionError):
+        test_representative_migration_rows_match_literal_baseline(tmp_path)
 
 
 def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:

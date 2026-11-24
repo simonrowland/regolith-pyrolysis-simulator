@@ -16,6 +16,7 @@ from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     Composition,
+    Derivation,
     Located,
     Notice,
     Observation,
@@ -49,6 +50,7 @@ class RoleResolution(Generic[_Composition]):
     notices: tuple[Notice, ...] = ()
     source_label: str | None = None
     locator: object | None = None
+    inference: Derivation | None = None
 
     @property
     def callable(self) -> bool:
@@ -68,6 +70,10 @@ class AssayCandidate:
     label: str | None = None
     locator: object | None = None
     terminal: bool = False
+    inference: Derivation | None = None
+    # False when this assay is a flat run: the parent's role describes the
+    # parent, not these columns. An explicit role on the row still applies.
+    inherit_parent_role: bool = True
 
 
 def is_initial_charge_composition(state: State[object] | None) -> bool:
@@ -140,6 +146,49 @@ def _choose_assay(candidates: Sequence[AssayCandidate]) -> AssayCandidate:
     return candidates[0]
 
 
+def choose_stored_run(candidates: Sequence[AssayCandidate]) -> AssayCandidate:
+    """Assay a stored observation's engine call uses.
+
+    An unknown point outranks a charge identity, so a refused run map is not
+    scored as the printed charge. Otherwise a usable identity outranks a
+    usable point. The stored state is returned unchanged.
+    """
+
+    point = next((candidate for candidate in candidates if candidate.source == "point"), None)
+    identity = next(
+        (candidate for candidate in candidates if candidate.source == "identity"),
+        None,
+    )
+
+    def usable(candidate: AssayCandidate | None) -> bool:
+        return (
+            candidate is not None
+            and candidate.state is not None
+            and candidate.state.is_value
+        )
+
+    if (
+        identity is not None
+        and is_initial_charge_composition(identity.state)
+        and point is not None
+        and point.state is not None
+        and point.state.is_unknown
+    ):
+        return point
+    if usable(identity):
+        return identity
+    if usable(point):
+        return point
+    if identity is not None:
+        return identity
+    if point is not None:
+        return point
+    return AssayCandidate(
+        State.unknown("missing_condition:melt_composition"),
+        source="none",
+    )
+
+
 def _stamp_decided_initial_charge(state: State[Any]) -> State[Any]:
     """Write the charge flag and starting-bulk provenance onto a decided assay."""
 
@@ -182,17 +231,28 @@ def resolve_point_composition(
             point = (row.point_conditions or {}).get("composition")
             if isinstance(point, Located):
                 packed.append(
-                    AssayCandidate(point.state, source="point", locator=point.locator)
+                    AssayCandidate(
+                        point.state,
+                        source="point",
+                        locator=point.locator,
+                        inference=point.inference,
+                    )
                 )
             identity_composition = getattr(identity, "composition", None)
             if identity_composition is not None:
                 packed.append(AssayCandidate(identity_composition, source="identity"))
             candidates = tuple(packed)
-
-    chosen = _choose_assay(candidates)
+            # No explicit candidates: the engine and the qualification read
+            # the same stored assay. Explicit candidates keep point-first order.
+            chosen = choose_stored_run(candidates)
+        else:
+            chosen = _choose_assay(candidates)
+    else:
+        chosen = _choose_assay(candidates)
     composition = chosen.state
     arrived_proxy = is_initial_charge_composition(composition)
-    role, original_reason = read_composition_role_field(row, parent)
+    role_contexts = (row, parent) if chosen.inherit_parent_role else (row,)
+    role, original_reason = read_composition_role_field(*role_contexts)
     role_notices = tuple(
         notice
         for notice in notices
@@ -267,6 +327,7 @@ def resolve_point_composition(
         role_notices,
         chosen.label,
         chosen.locator,
+        chosen.inference,
     )
 
 

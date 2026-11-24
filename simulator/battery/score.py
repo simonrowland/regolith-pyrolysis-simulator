@@ -10488,6 +10488,9 @@ def _borrow_internal_analytical_effusion(
     notices[:] = union_notices(tuple(notices), prediction.notices)
     bar = _solved_effusion_po2_bar(prediction)
     if bar is None or not math.isfinite(bar) or bar <= 0.0:
+        # The handoff used to drop the inner prediction. Keep it so a refused
+        # closure names the engine failure instead of only this wrapper.
+        inner = dict(prediction.refusal_detail or {})
         return _input_refusal(
             engine=engine,
             channel=channel,
@@ -10498,6 +10501,12 @@ def _borrow_internal_analytical_effusion(
             detail={
                 "reason": "internal_analytical_oxygen_balance_unavailable",
                 "engine": engine.value,
+                "inner_refusal_reason": (
+                    None
+                    if prediction.refusal_reason is None
+                    else prediction.refusal_reason.value
+                ),
+                "inner_detail": inner,
             },
             notices=tuple(notices),
         )

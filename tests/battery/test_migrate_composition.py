@@ -439,6 +439,9 @@ def test_flemetakis_starting_glass_within_mass_closure_window_converts(tmp_path)
     assert point_composition.state.is_value
     assert isinstance(point_composition.state.value, Composition)
     assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+
+    assert point_composition.state.value.input_provenance == PRINTED_STARTING_BULK
     raw_composition = source_row["values"]["composition_wt_pct"]
     # The published starting glass totals 99.37 wt%, within b-704's 95–102 interval.
     expected = wt_pct_to_mole_fraction(
@@ -452,10 +455,26 @@ def test_flemetakis_starting_glass_within_mass_closure_window_converts(tmp_path)
     assert initial.locator.section == "2.1 Starting material"
     assert isinstance(initial.state.value, Composition)
     assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    # The sample assay applies the declared role token. Provenance is stamped
+    # on the point the resolver chose, which is the assert above.
     assert initial.state.value.components == expected.components
     assert not migrate_module._initial_compositions_conflict(
         initial, point_composition
     )
+
+
+def test_omitting_starting_bulk_provenance_breaks_the_pin(monkeypatch, tmp_path):
+    from simulator.battery import composition_roles
+
+    monkeypatch.setattr(
+        composition_roles,
+        "composition_with_provenance",
+        lambda composition, _provenance: composition,
+    )
+    with pytest.raises(AssertionError):
+        test_flemetakis_starting_glass_within_mass_closure_window_converts(
+            tmp_path
+        )
 
 
 def test_plante_hastie_fit_coefficients_are_not_composition_evidence() -> None:
@@ -6400,8 +6419,14 @@ def test_swept_source_maps_refused_to_converted_and_populate_identity() -> None:
                 for observation in rows:
                     composition = observation.identity.composition
                     assert composition is not None and composition.is_value
-                    # This sweep pins composition conversion; the typed initial-charge proxy is asserted by its owner test.
-                    assert replace(composition.value, proxy_flag=None) == expected, (
+                    # This sweep pins composition conversion. The charge flag and
+                    # starting-bulk provenance are the resolver's stamp; the
+                    # flemetakis owner test pins both. Components already match.
+                    assert replace(
+                        composition.value,
+                        proxy_flag=None,
+                        input_provenance=None,
+                    ) == expected, (
                         observation.observation_id
                     )
                     if label == "LPI" and "S" in raw_composition:

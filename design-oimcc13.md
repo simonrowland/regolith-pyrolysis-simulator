@@ -1,8 +1,7 @@
 # OpenIMCC fold 13 — one composition resolver
 
 Seat tip at design time: `7f75d9f6fa1789efb3832f415fa3ccab5b5830d2`.
-Review of record: `docs-private/reviews/2026-11-23-ror-oimcc12x1123.md` (FIX-FIRST).
-Fold 11 and fold 12 notes named in the brief are not in `docs-private/reviews/` on this machine. The review of record is the source for the defects below.
+The fold-12 review of record (FIX-FIRST) is the source for the defects below.
 
 The failure this design prevents: a caller stamps `proxy_flag=initial_charge_only` and `input_provenance=printed_starting_bulk` onto an ordinary assay, then asks the role owner whether that assay is a starting charge. The owner treats the stamp it was just handed as a declaration (`composition_roles.py`, the `role is None and has_proxy` branch). The stamp authorizes itself. Twelve rounds of per-call-site patches left that loop, and left a second resolution of the same point before its assays exist.
 
@@ -13,21 +12,21 @@ Decision means the site chooses a role, a proxy flag, or which assay is the engi
 | Site | What it does today |
 |---|---|
 | `simulator/battery/composition_roles.py::resolve_composition_role` | Decides. Reads `composition_role` from the row then the parent. Defaults an unrecognized token to `initial_charge_only` when the chosen assay is usable. Treats an existing `proxy_flag` as a declaration when the field is absent. That last step is the self-authorization. |
-| `simulator/battery/migrate.py::_initial_charge_only_composition_proxy` | Decides, then asks the owner. The non-flat path stamps `initial_charge_only` and `printed_starting_bulk` on whatever assay it found (`~9691`) before `resolve_composition_role` (`~9722`). An absent role then comes back declared. A `datum_state` result takes the outside-scope return (`~9768`) and drops the selected datum. |
-| `simulator/battery/migrate.py` point explosion `~30486` | Decides before any candidate assay exists. `point_composition_role` then directs located-composition parsing (`~30724`), the omitted-component issue (`~30867`), and the missing-major gate (`~30981`). The same row and parent are resolved again inside the proxy (`~32198`). |
-| `simulator/battery/migrate.py::_migrate_extract_observation` `~26725` and `~27080` | Two decisions for one parent. The second reads `equipment` only when `values` has no token and no error and no declared wt% map. Neither call has an assay yet. The recognized token is what the later branches use; defaulting cannot fire because no assay was passed. |
-| `simulator/battery/migrate.py::_composition_located_from_values` `~8529` and `~8588` | Decides from `values` with no assay, then stamps `proxy_flag` itself when the token is `initial_charge_only`. Provenance is left to `_finalize_input_provenance`. |
-| `simulator/battery/migrate.py` sample parse `~3723` | Decides from the sample payload, then stamps `printed_starting_bulk` when the role is the charge token or the composition already carries the flag (`~3744`). |
-| `simulator/battery/migrate.py::_printed_map_is_typed_initial` `~19663` | Decides. Uses `.role` with no assay, so the result is the printed token. |
-| `simulator/battery/migrate.py::sample_from_equipment` `~20172` | Same token read, through the full resolver. |
-| `simulator/diagnostic_helpers/extract_reproduction.py::_resolve_melt_recipe` `~3907` | Decides the assay in `_melt_recipe_mol` (point, then flat, then parent), then asks the role owner about that one recipe. |
+| `simulator/battery/migrate.py::_initial_charge_only_composition_proxy` | Decides, then asks the owner. The non-flat path stamps `initial_charge_only` and `printed_starting_bulk` on whatever assay it found before `resolve_composition_role`. An absent role then comes back declared. A `datum_state` result takes the outside-scope return and drops the selected datum. |
+| `simulator/battery/migrate.py::_emit_exploded_point` | Field read before any candidate assay exists. The printed token directs located-composition parsing, the omitted-component issue, and the missing-major gate. Those gates stay field reads: they run before an assay exists. The same row and parent are resolved once inside the proxy. |
+| `simulator/battery/migrate.py::_migrate_extract_observation` | Two decisions for one parent. The second reads `equipment` only when `values` has no token and no error and no declared wt% map. Neither call has an assay yet. The recognized token is what the later branches use; defaulting cannot fire because no assay was passed. |
+| `simulator/battery/migrate.py::_composition_located_from_values` | Decides from `values` with no assay, then stamps `proxy_flag` itself when the token is `initial_charge_only`. Provenance is left to `_finalize_input_provenance`. |
+| `simulator/battery/migrate.py` sample parse | Decides from the sample payload, then stamps `printed_starting_bulk` when the role is the charge token or the composition already carries the flag. |
+| `simulator/battery/migrate.py::_printed_map_is_typed_initial` | Decides. Uses `.role` with no assay, so the result is the printed token. |
+| `simulator/battery/migrate.py::sample_from_equipment` | Same token read, through the full resolver. |
+| `simulator/diagnostic_helpers/extract_reproduction.py::_resolve_melt_recipe` | Decides the assay in `_melt_recipe_mol` (point, then flat, then parent), then asks the role owner about that one recipe. |
 | `simulator/diagnostic_helpers/extract_reproduction.py::_record_composition_role` | Consumer with a knob that drops the decision. `include_declared` defaults false, so a declared charge flag is discarded unless the caller opts in. |
-| `simulator/diagnostic_helpers/extract_reproduction.py::_evaluate_rate` `~3575` | HKL reader. Calls `_record_composition_role` without `include_declared`. A declared starting-charge point with a numeric flux is scored clean. The pressure reader at `~3173` already passes `include_declared=True`. Ordering (`~4868`), relative volatility (`~5016`), and activity (`~5215`) use the default and drop declared flags too. |
-| `simulator/battery/score.py::_initial_charge_composition_notice` and `_flagged_stratum_notices` `~2040`, `~2349` | Consumers. They read `resolve_composition_role(observation).notices`. |
-| `simulator/battery/score.py` `~19082` `is_initial_charge_composition` | Consumer of the persisted `proxy_flag` on a stored identity. |
-| `simulator/battery/migrate.py::effective_run_composition` `~8690` | Consumer of the persisted flag. An unknown point composition outranks a charge proxy. |
-| `simulator/battery/migrate.py::_finalize_input_provenance` `~9224` | Consumer of a flag already on the composition: a charge flag selects `printed_starting_bulk` instead of the locator class. It does not choose the role. |
-| `simulator/battery/migrate.py::_apply_equilibrium_starting_bulk` `~9395` | Different rule. Closed-system equilibrium rows copy the experiment's printed start. Not a `composition_role` decision. Left. |
+| `simulator/diagnostic_helpers/extract_reproduction.py::_evaluate_rate` | HKL reader. Calls `_record_composition_role` without `include_declared`. A declared starting-charge point with a numeric flux is scored clean. The pressure reader already passes `include_declared=True`. Ordering, relative volatility, and activity use the default and drop declared flags too. |
+| `simulator/battery/score.py::_initial_charge_composition_notice` and `simulator/battery/score.py::_flagged_stratum_notices` | Consumers. They read `resolve_composition_role(observation).notices`. |
+| `simulator/battery/score.py::is_initial_charge_composition` | Consumer of the persisted `proxy_flag` on a stored identity. |
+| `simulator/battery/migrate.py::effective_run_composition` | Consumer of the persisted flag. An unknown point composition outranks a charge proxy. |
+| `simulator/battery/migrate.py::_finalize_input_provenance` | Consumer of a flag already on the composition: a charge flag selects `printed_starting_bulk` instead of the locator class. It does not choose the role. |
+| `simulator/battery/migrate.py::_apply_equilibrium_starting_bulk` | Different rule. Closed-system equilibrium rows copy the experiment's printed start. Not a `composition_role` decision. Left. |
 | `simulator/battery/input_provenance.py::phase_map_provenance` | Different rule. Locator and phase text choose `printed_starting_bulk`. Left. |
 | `simulator/battery/composition.py` charge-provenance writer | Different rule. Equilibrium bulk provenance, not the role token. Left. |
 
@@ -87,8 +86,8 @@ A caller that stamps a candidate and then calls the resolver has reintroduced th
 Delete:
 
 - The pre-resolver `replace(..., proxy_flag=initial_charge_only, input_provenance=printed_starting_bulk)` in `_initial_charge_only_composition_proxy`.
-- The full `resolve_composition_role` at point explosion `~30486`. The printed token comes from `read_composition_role_field`.
-- The pair of parent resolves at `~26725` and `~27080`. One field read, with the equipment context only under the existing wt%-map gate.
+- The full `resolve_composition_role` in `migrate.py::_emit_exploded_point`. The printed token comes from `read_composition_role_field`.
+- The pair of parent resolves in `migrate.py::_migrate_extract_observation`. One field read, with the equipment context only under the existing wt%-map gate.
 - The `include_declared` knob on `_record_composition_role`. Every reader records declared flags. HKL included. A declared starting-charge rate point stays `assumed-input`, never `match`.
 
 Reroute:
@@ -107,9 +106,9 @@ Left, with a reason:
 ## Other fixes in this fold
 
 - P1 HKL. Removing `include_declared` is the fix. The rate regression carries a declared charge point between the defaulted point and the measured point.
-- P1 De Maria Figure 2 closure. Not run. The CI hold forbids a new remote job. Node ids are in the handoff under VERIFICATION PENDING.
+- P1 De Maria Figure 2 closure. The identity match and the effusion handoff are the production fix. The two callable potassium points stay flagged predictions; the eight points with no composition stay refusals.
 - P2 three red tests. The De Maria notice constant is read from `simulator.battery.records`. The ordering hash-seed fixture gains `values`. The Fe main-cell row is pinned as `out-of-domain` with `actual is None`, the missing-composition reason, and zero provider calls. The complete fixture still expects one `FeO` call and `assumed-input`.
-- P2 rollup. Not regenerated. The committed gap pin stays 2029 until the train runs `RPS_T512_REGEN_ROLLUP`. The fold-12 trial measured 2056 on the self-authorizing tree. The corrected count is not 2029 and not 2056: it loses predictions that existed only because an ordinary assay was stamped, and it gains a flagged prediction only where a located datum becomes callable. The number is unmeasured under the hold.
+- P2 rollup. Not regenerated. The committed gap pin stays 2029 until the train runs `RPS_T512_REGEN_ROLLUP`. A Studio run of the self-authorizing tree measured 2056. The corrected count after the closure and ownership fixes is unmeasured. It is not that 2056 measurement.
 
 ## Store delta this fold expects
 
@@ -127,3 +126,14 @@ One mutation per fix, in the test file, each expected to fail the pin:
 - Pre-resolver stamping: wrap the resolver so the ordinary assay is stamped before the decision. The provenance pin must fail.
 - Dropping declared HKL flags: `_record_composition_role` ignores non-defaulted roles. The declared rate point must fall into the clean tier and the rate pin must fail.
 - Skipping the datum write: the resolver result's `datum_state` is cleared before the proxy binds. Migration's identity must diverge from the reproduction recipe and the pin must fail.
+
+## Fold 14
+
+The resolver still chooses. Callers decode and apply `RoleResolution`.
+
+- `composition_roles.py::choose_stored_run` is the stored-observation rule shared by `migrate.py::effective_run_composition` and the empty-candidate `Observation` path inside `resolve_point_composition`. A usable identity outranks a usable point. An unknown point outranks a charge identity, so a refused run is not scored as the printed charge. Explicit candidates stay point-first in `_choose_assay`.
+- A flat-run candidate sets `inherit_parent_role` false. The parent's token does not describe those columns. An explicit token on the point is still read.
+- An invalid printed point (unsupported component, malformed amount, unusable mass-percent map) is a terminal candidate. A later starting charge does not replace it. A map that is not a composition, such as multiple untyped columns, still leaves a decoded point available.
+- `datum_state` stores the chosen assay's `Located`, including its inference. Migration does not build a fresh state that drops the derivation.
+- `_emit_exploded_point` still uses `read_composition_role_field` for the partial-pressure decode gate and the missing-major identity hold. Those run before an assay exists. They are field reads, not a second role decision.
+- No store is regenerated. Costa's declared charge qualifications stay. De Maria 1971 and 1973 lose the self-authorized stamps; declared roles and the retained catalogue proxies stay. Ordinary non-flat assays with no role are not new starting-charge rows. A `datum_state` point stores the located datum with no charge flag.

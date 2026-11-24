@@ -21635,6 +21635,31 @@ def test_residue_series_emits_numeric_component_cells_with_component_identity(
     assert pressure["kind"] == "about_nominal_by_temperature"
 
 
+def test_storing_a_flat_residue_assay_breaks_the_charge_pin(
+    monkeypatch, tmp_path: Path
+) -> None:
+    """Treating residue oxide columns as an ordinary flat run replaces the charge."""
+
+    from simulator.battery.enums import Quantity
+    from simulator.battery import migrate as migrate_module
+
+    real = migrate_module._initial_charge_only_composition_proxy
+
+    def hide_residue_quantity(*args, **kwargs):
+        if kwargs.get("quantity") is Quantity.RESIDUE_COMPONENT_COMPOSITION:
+            kwargs["quantity"] = Quantity.P_PARTIAL
+            kwargs["quantity_as_printed"] = None
+        return real(*args, **kwargs)
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_initial_charge_only_composition_proxy",
+        hide_residue_quantity,
+    )
+    with pytest.raises(AssertionError):
+        test_residue_cells_keep_run_identity_and_printed_conditions(tmp_path)
+
+
 def _same_work_observation_duplicate_pairs(observations: list[dict]) -> list[tuple[str, str, str]]:
     """Return equal admitted values for one work that came from separate extracts."""
     grouped: dict[tuple[object, ...], list[dict]] = {}
