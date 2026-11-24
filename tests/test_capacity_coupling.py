@@ -851,15 +851,39 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             )
             assert activity.reason == "out_of_gamma_domain"
             assert answer.is_flux_active
+        elif species_id == "Ca":
+            # d-207 routes this all-liquid CaO activity through OpenIMCC.
+            # Its numeric value remains the reported activity, but the pack
+            # identity is provider provenance rather than an external DOI, so
+            # the activity API correctly keeps it status-bearing.
+            assert (
+                activity.verdict
+                is ActivityVerdictKind.STATUS_BEARING_VALUE
+            )
+            assert activity.reason == "producer_self_reference_rejected"
+            assert activity.value == pytest.approx(
+                original_activities[species_id], rel=0.0, abs=0.0
+            )
+            reported_provenance = activity.derivation[
+                "reported_activity_provenance"
+            ]
+            assert any(
+                flag.startswith("paper-demonstrated-window:")
+                for flag in reported_provenance["openimcc_flags"]
+            )
         else:
             assert activity.verdict is ActivityVerdictKind.POINT
             assert activity.value == pytest.approx(
                 original_activities[species_id], rel=0.0, abs=0.0
             )
-        assert activity.evidence_ref is not None
-        # Structured external-evidence provenance (INCOMING activity landing).
-        assert "DOI " in activity.evidence_ref
-        assert "_last_vapor_pressure_diagnostic" not in activity.evidence_ref
+        if species_id == "Ca":
+            assert activity.evidence_ref is None
+        else:
+            assert activity.evidence_ref is not None
+            # Structured external-evidence provenance (INCOMING activity landing).
+            assert "DOI " in activity.evidence_ref
+        if activity.evidence_ref is not None:
+            assert "_last_vapor_pressure_diagnostic" not in activity.evidence_ref
         evaluator = sim.vapour_rail_catalog.species[species_id].evaluator
         assert evaluator is not None
         activity_exponents[species_id] = evaluator.activity_exponent
