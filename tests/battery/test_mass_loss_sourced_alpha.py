@@ -1359,9 +1359,14 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
         ),
     )
     original_bounds = residue._mass_loss_corner_bounds
+    endpoint_channels = []
 
     def supply_controlled_bounds(*args, **kwargs):
         bounds, corners = original_bounds(*args, **kwargs)
+        if kwargs.get("check_neighbours"):
+            endpoint_channels.append(
+                (dict(args[0]), tuple(channel.species for channel in args[1]))
+            )
         # The same controlled mass envelope is supplied for each geometry
         # callback; the production cap then allocates it against each parent.
         # The second case makes finite silica demand exceed its ceiling, so
@@ -1379,6 +1384,12 @@ def test_inventory_cap_records_actual_mixed_parent_debit_when_other_parent_is_ti
         )
 
     assert failure.value.reason == "alpha_not_sourced"
+    assert any(
+        final_inventory.get("Al2O3", 0.0) > 0.0
+        and final_inventory.get("SiO2", 0.0) > 0.0
+        and "AlSiO" in species
+        for final_inventory, species in endpoint_channels
+    )
     bound = json.loads(failure.value.detail)
     by_channel = bound["unsourced_bound_kg_by_channel"]
     caps = bound["inventory_bound_kg_by_parent"]

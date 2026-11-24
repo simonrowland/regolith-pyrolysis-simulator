@@ -3694,6 +3694,8 @@ def predict_mass_loss_fraction(
                     alpha_source=provenance,
                 )
             )
+        terms = _channel_terms(channels)
+        terms_by_species = {term.source.species: term for term in terms}
         pressure_model = _make_residue_pressure_model(
             engine, gas_channels, gas_pack, temperature_K=at_K,
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
@@ -3752,7 +3754,7 @@ def predict_mass_loss_fraction(
                     channel for channel in channels
                     if all(
                         float(final_inventory.get(parent, 0.0)) > 0.0
-                        for parent in template_by_species[
+                        for parent in terms_by_species[
                             channel.species
                         ].parent_moles_per_product
                     )
@@ -3792,7 +3794,6 @@ def predict_mass_loss_fraction(
                 arm_diagnostics[diagnostic.species] = replace(
                     diagnostic, arm=arm,
                 )
-            terms = _channel_terms(channels)
             parent_loss = {}
             for term in terms:
                 if not term.parent_moles_per_product:
