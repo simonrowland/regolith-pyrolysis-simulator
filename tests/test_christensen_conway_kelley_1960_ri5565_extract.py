@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import NoticeKind, Phase
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import validate_extract_file
 
@@ -217,10 +218,11 @@ def test_validator_and_isolated_migration() -> None:
         if not observation.identity.quantity.is_value
     }
     assert unknown_quantities == TYPED_REFUSALS
-    unknown_phases = {
+    unspecified_phases = {
         observation.observation_id
         for observation in migrator.result.observations.values()
-        if not observation.identity.species.phase.is_value
+        if observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.UNSPECIFIED
     }
     melting_range_rows = [
         observation
@@ -228,7 +230,12 @@ def test_validator_and_isolated_migration() -> None:
         if "cck60_nafeo2_table7_melting_range_heat_content" in observation.observation_id
     ]
     assert len(melting_range_rows) == 7
-    assert unknown_phases == {row.observation_id for row in melting_range_rows}
+    assert unspecified_phases == {row.observation_id for row in melting_range_rows}
+    assert all(
+        {notice.kind for notice in row.notices}
+        == {NoticeKind.PHASE_INFERRED, NoticeKind.METHOD_UNSTATED}
+        for row in melting_range_rows
+    )
     assert {
         float(row.identity.temperature_K.value)
         for row in melting_range_rows

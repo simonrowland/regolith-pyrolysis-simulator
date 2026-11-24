@@ -148,6 +148,12 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
             if roman and re.search(r"\b" + label_kind + r"\s*" + roman + r"\b", normalized, re.I):
                 return True
 
+    row_label = locator.get("row")
+    if isinstance(row_label, str) and row_label.strip():
+        row_pattern = rf"^\s*{re.escape(row_label.strip())}(?=\s|$)"
+        if re.search(row_pattern, text, re.I | re.M):
+            return True
+
     # Numeric data elsewhere in the cited range cannot stand in for a missing
     # table or figure label (for example, a shared sample ID).
     if has_table_or_figure:
@@ -252,6 +258,10 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     table_8 = {"table": "8", "paragraph": "Table 8 reports sample 12065 results."}
     assert _citation_matches(table_8, "Table 7 sample 12065 results.") is False
     assert _citation_matches(table_8, "Table 8 sample 12065 results.") is True
+
+    table_row = {"table": "1", "row": "FUN1-3"}
+    assert _citation_matches(table_row, "FUN1-3 0 0.0161 0.0148") is True
+    assert _citation_matches(table_row, "FUN1-4 0 0.0161 0.0148") is False
 
     text_only = {"paragraph": "Sample 12065 was heated to 2360 K."}
     assert _citation_matches(text_only, "Sample 12065 was held for a separate experiment.") is False

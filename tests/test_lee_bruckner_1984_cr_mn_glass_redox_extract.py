@@ -37,7 +37,9 @@ def test_lee_bruckner_table_values_migrate_as_species_bound_points():
             assert observation.identity.quantity.value is Quantity.DENSITY
             assert observation.identity.species.formula == "unknown"
             assert observation.derivation.output_unit == "kg_per_m3"
-            assert observation.notices == ()
+            assert tuple(notice.kind for notice in observation.notices) == (
+                NoticeKind.METHOD_UNSTATED,
+            )
         assert observation.point_conditions["T_C"].state.tag.value == "unknown"
         assert observation.point_conditions["T_C"].locator is not None
         assert observation.point_conditions["composition"].state.tag.value == "unknown"
@@ -70,7 +72,9 @@ def test_lee_bruckner_table_values_migrate_as_species_bound_points():
     )
     assert density.value.point == Decimal("2388")
     assert density.derivation.output_unit == "kg_per_m3"
-    assert density.notices == ()
+    assert tuple(notice.kind for notice in density.notices) == (
+        NoticeKind.METHOD_UNSTATED,
+    )
     assert density.identity.species.formula == "unknown"
     printed_density = source["species"]["Cr"]["observations"][0]["values"][
         "points"

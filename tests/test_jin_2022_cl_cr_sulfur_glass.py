@@ -86,7 +86,10 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         assert oxygen_log.state.reason == (
             "missing input: printed air fO2 requires stated total pressure"
         )
-        assert len(row.notices) == 1
+        assert {notice.kind for notice in row.notices} == {
+            NoticeKind.INPUT_OMITTED,
+            NoticeKind.METHOD_UNSTATED,
+        }
         assert row.notices[0].kind is NoticeKind.INPUT_OMITTED
         assert row.notices[0].reason == (
             "missing input: printed air fO2 requires stated total pressure"

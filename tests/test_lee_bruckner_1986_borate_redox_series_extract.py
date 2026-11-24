@@ -6,7 +6,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import NoticeKind, Quantity
 from simulator.battery.migrate import Migrator
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -161,7 +161,11 @@ def test_table_1_grid_migrates_all_render_pinned_points_and_conditions() -> None
     assert not migrator.result.validation.hard_issues
     assert sum(row.value.kind.value == "point" for row in observations) == 52
     assert not any(row.value.kind.value == "unavailable" for row in observations)
-    assert all(row.notices == () for row in observations)
+    assert all(
+        tuple(notice.kind for notice in row.notices)
+        == (NoticeKind.METHOD_UNSTATED,)
+        for row in observations
+    )
 
     for element, grid in RATIO_GRID.items():
         key = element.lower()
