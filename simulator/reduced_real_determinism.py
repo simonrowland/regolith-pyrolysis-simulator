@@ -122,6 +122,7 @@ _EQUILIBRIUM_RESULT_FIELD_TYPES = get_type_hints(EquilibriumResult)
 @dataclasses.dataclass(frozen=True)
 class _DecodedEquilibriumReplayPayload:
     result: EquilibriumResult
+    authority: dict[str, Any]
     vapor_pressures_source: dict[str, Any]
     vapor_pressure_diagnostic: dict[str, Any]
 
@@ -165,29 +166,15 @@ _SOURCE_MODULE_PATTERNS = (
 )
 
 
-def _payload_codec_version(artifact: str) -> int | None:
-    if artifact == "freeze_gate_curve":
-        return PT0_GATE_CURVE_CODEC_VERSION
-    if artifact == "equilibrium_post_record":
-        return PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
-    return None
-
-
 def _decode_payload_for_admission(
     artifact: str,
     payload: Any,
     *,
     keys: Sequence[Mapping[str, Any]] = (),
 ) -> Any | None:
-    expected_version = _payload_codec_version(artifact)
-    if expected_version is None:
+    if artifact not in {"freeze_gate_curve", "equilibrium_post_record"}:
         return payload
     if not isinstance(payload, Mapping):
-        return None
-    # Current payloads stay markerless to preserve their reviewed bytes. If a
-    # row carries a codec marker, admission compares that row value directly.
-    row_version = payload.get("payload_codec_version", expected_version)
-    if type(row_version) is not int or row_version != expected_version:
         return None
     if artifact == "freeze_gate_curve":
         curve_payload = payload.get("curve")
@@ -195,6 +182,9 @@ def _decode_payload_for_admission(
             return None
         try:
             curve = _curve_from_payload(curve_payload)
+            encoded = {"curve": _curve_payload(curve)}
+            if canonical_json_bytes(encoded) != canonical_json_bytes(payload):
+                return None
         except Exception:
             return None
         for key in keys:
@@ -257,20 +247,10 @@ def _decode_payload_for_admission(
     if artifact == "equilibrium_post_record":
         try:
             decoded = _decode_equilibrium_replay_payload(payload)
+            encoded = _encode_equilibrium_replay_payload(decoded)
+            if canonical_json_bytes(encoded) != canonical_json_bytes(payload):
+                return None
         except Exception:
-            return None
-        equilibrium_result = payload.get("equilibrium_result")
-        diagnostics = (
-            equilibrium_result.get("diagnostics")
-            if isinstance(equilibrium_result, Mapping)
-            else None
-        )
-        feo_activity = (
-            diagnostics.get("a_FeO_calphad")
-            if isinstance(diagnostics, Mapping)
-            else None
-        )
-        if isinstance(feo_activity, Mapping) and "notices" in feo_activity:
             return None
         return decoded
     return None
@@ -4287,27 +4267,10 @@ def _row_provider_matches_family(
     return False
 
 
-def canonical_replay_output_projection(
-    artifact: str,
-    sim: Any,
-    result: Any,
+def _encode_equilibrium_replay_payload(
+    decoded: _DecodedEquilibriumReplayPayload,
 ) -> dict[str, Any]:
-    if artifact == "freeze_gate_curve":
-        curve_payload = _curve_payload(
-            result,
-            include_liquidus_floor=False,
-        )
-        for domain_key in GATE_CURVE_DOMAIN_KEYS:
-            curve_payload.pop(domain_key, None)
-        return {"curve": curve_payload}
-    if artifact != "equilibrium_post_record":
-        raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
-    transition = getattr(result, "ledger_transition", None)
-    if transition is not None:
-        raise PT0CacheCollision(
-            "PT-0 equilibrium replay does not support cached ledger transitions"
-        )
-    intent = _equilibrium_payload_intent(sim)
+    result = decoded.result
     temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
     result_diagnostics = dict(getattr(result, "diagnostics", {}) or {})
     feo_activity = result_diagnostics.get("a_FeO_calphad")
@@ -4316,7 +4279,7 @@ def canonical_replay_output_projection(
         captured_feo_activity.pop("notices", None)
         result_diagnostics["a_FeO_calphad"] = captured_feo_activity
     payload = {
-        "authority": _equilibrium_record_authority(sim, intent),
+        "authority": dict(decoded.authority),
         "equilibrium_result": {
             field.name: (
                 _cache_payload_diagnostic(
@@ -4338,11 +4301,9 @@ def canonical_replay_output_projection(
                 and getattr(result, field.name) is None
             )
         },
-        "last_vapor_pressures_source": dict(
-            getattr(sim, "_last_vapor_pressures_source", {}) or {}
-        ),
+        "last_vapor_pressures_source": dict(decoded.vapor_pressures_source),
         "last_vapor_pressure_diagnostic": _cache_payload_diagnostic(
-            getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {},
+            decoded.vapor_pressure_diagnostic,
             temperature_K=temperature_K,
         ),
     }
@@ -4359,6 +4320,40 @@ def canonical_replay_output_projection(
             else _json_ready(alphamelts_diagnostics)
         )
     return payload
+
+
+def canonical_replay_output_projection(
+    artifact: str,
+    sim: Any,
+    result: Any,
+) -> dict[str, Any]:
+    if artifact == "freeze_gate_curve":
+        curve_payload = _curve_payload(
+            result,
+            include_liquidus_floor=False,
+        )
+        for domain_key in GATE_CURVE_DOMAIN_KEYS:
+            curve_payload.pop(domain_key, None)
+        return {"curve": curve_payload}
+    if artifact != "equilibrium_post_record":
+        raise ValueError(f"unsupported PT-1 replay artifact: {artifact}")
+    if getattr(result, "ledger_transition", None) is not None:
+        raise PT0CacheCollision(
+            "PT-0 equilibrium replay does not support cached ledger transitions"
+        )
+    intent = _equilibrium_payload_intent(sim)
+    return _encode_equilibrium_replay_payload(
+        _DecodedEquilibriumReplayPayload(
+            result=result,
+            authority=_equilibrium_record_authority(sim, intent),
+            vapor_pressures_source=dict(
+                getattr(sim, "_last_vapor_pressures_source", {}) or {}
+            ),
+            vapor_pressure_diagnostic=dict(
+                getattr(sim, "_last_vapor_pressure_diagnostic", {}) or {}
+            ),
+        )
+    )
 
 
 def equilibrium_payload(sim: Any, result: EquilibriumResult) -> dict[str, Any]:
@@ -4506,9 +4501,8 @@ def _decode_equilibrium_replay_payload(
     ):
         raise TypeError("equilibrium result diagnostics must be a mapping")
     authority = payload.get("authority")
-    if authority is not None and (
-        not isinstance(authority, Mapping)
-        or any(not isinstance(key, str) for key in authority)
+    if not isinstance(authority, Mapping) or any(
+        not isinstance(key, str) for key in authority
     ):
         raise TypeError("equilibrium replay authority must be a mapping")
 
@@ -4574,6 +4568,11 @@ def _decode_equilibrium_replay_payload(
         pressure = diagnostic["pO2_bar"]
         if pressure is not None and not matches_type(pressure, float):
             raise TypeError("equilibrium vapor diagnostic pO2_bar must be finite")
+    provenance = diagnostic.get("vapor_pressure_numerator_provenance")
+    if provenance is not None and not isinstance(provenance, Mapping):
+        raise TypeError(
+            "equilibrium vapor diagnostic provenance must be a mapping"
+        )
     alphamelts_diagnostics = payload.get("alphamelts_diagnostics")
     if alphamelts_diagnostics is not None and not isinstance(
         alphamelts_diagnostics, Mapping
@@ -4603,6 +4602,7 @@ def _decode_equilibrium_replay_payload(
         )
     return _DecodedEquilibriumReplayPayload(
         result=result,
+        authority=dict(authority),
         vapor_pressures_source=dict(source),
         vapor_pressure_diagnostic=replay_diagnostic,
     )
@@ -4862,14 +4862,14 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             raise TypeError("gate-curve path points must contain finite numbers")
         path.append(
             (
-                float(point["temperature_C"]),
-                float(point["liquid_fraction"]),
+                point["temperature_C"],
+                point["liquid_fraction"],
             )
         )
     curve = {
         "source": payload["source"],
-        "solidus_T_C": float(solidus),
-        "liquidus_T_C": float(liquidus),
+        "solidus_T_C": solidus,
+        "liquidus_T_C": liquidus,
         "path": tuple(path),
     }
     if is_liquidus_floor:

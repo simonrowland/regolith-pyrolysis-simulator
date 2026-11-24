@@ -5252,7 +5252,9 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version() -> None
         }),
     }
     stale_payload = copy.deepcopy(current_payload)
-    stale_payload["curve"].pop("is_liquidus_floor")
+    stale_payload["payload_codec_version"] = (
+        rrd.PT0_GATE_CURVE_CODEC_VERSION - 1
+    )
     store._store("freeze_gate_curve", key, stale_payload, law_disclosures=[])
 
     with pytest.raises(PT0CacheMiss):
@@ -5287,6 +5289,7 @@ def test_unreadable_equilibrium_replay_side_row_misses_and_is_replaceable(
     with pytest.raises(PT0CacheMiss):
         capture._lookup("equilibrium_post_record", key)
     assert capture.hits == 0
+    assert capture._accepted_hit_disclosures == []
 
     capture._store(
         "equilibrium_post_record",
@@ -5328,6 +5331,7 @@ def test_unreadable_equilibrium_result_field_misses_and_is_replaceable(
     with pytest.raises(PT0CacheMiss):
         capture._lookup("equilibrium_post_record", key)
     assert capture.hits == 0
+    assert capture._accepted_hit_disclosures == []
 
     capture._store(
         "equilibrium_post_record",
@@ -5380,6 +5384,7 @@ def test_equilibrium_round_trip_rejects_and_replaces_noncanonical_rows(
     with pytest.raises(PT0CacheMiss):
         capture._lookup("equilibrium_post_record", key)
     assert capture.hits == 0
+    assert capture._accepted_hit_disclosures == []
 
     capture._store(
         "equilibrium_post_record",
