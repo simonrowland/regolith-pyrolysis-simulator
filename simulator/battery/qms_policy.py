@@ -1,4 +1,4 @@
-"""Proposed, explicit defaults used by relative QMS comparisons."""
+"""Explicit defaults and ratified assumptions for relative QMS comparisons."""
 
 from __future__ import annotations
 
@@ -6,20 +6,20 @@ from types import MappingProxyType
 
 QMS_POLICY_REGISTRY = MappingProxyType(
     {
-        "qms_run_group_assumed": MappingProxyType(
-            {"status": "proposed", "basis": "located panel, experiment, and channel"}
+        "qms_boundary_assumed": MappingProxyType(
+            {
+                "status": "proposed",
+                "basis": "one shared known boundary, or shared-unreported when none is known",
+            }
         ),
         "qms_clock_anchor_assumed": MappingProxyType(
-            {"status": "proposed", "basis": "first shared positive sample; no fitted shift or scale"}
+            {"status": "ratified", "basis": "first shared positive sample above a printed floor, otherwise raw > 0; native time and index retained; no fitted shift or scale"}
         ),
         "qms_signal_response_assumed": MappingProxyType(
-            {"status": "proposed", "basis": "proportional signal with no extra background or fragment correction"}
+            {"status": "ratified", "basis": "assume only unverified proportionality, background treatment, or isolation"}
         ),
         "qms_provenance_assumed": MappingProxyType(
-            {"status": "proposed", "basis": "located parent panel supplies a missing child locator"}
-        ),
-        "qms_oxygen_lineage_unverified": MappingProxyType(
-            {"status": "proposed", "basis": "fresh prediction uses independent oxygen or DP-010"}
+            {"status": "ratified", "basis": "located parent panel supplies a missing child locator"}
         ),
     }
 )

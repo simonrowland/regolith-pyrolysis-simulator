@@ -35,6 +35,7 @@ from simulator.battery.records import (
     Experiment,
     Observation,
     RelativeSeriesAnchor,
+    RelativeSeriesAssumption,
     RelativeSeriesClock,
     RelativeSeriesComparison,
     RelativeSeriesEvidence,
@@ -149,10 +150,48 @@ def relative_channel_point_residuals(
         return unavailable(RelativeSeriesUnavailableReason.AMBIGUOUS_RUN_IDENTITY)
     if evidence.model_quantity is not Quantity.P_PARTIAL:
         return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
+    unknown_boundaries = tuple(
+        (series, index, point.boundary)
+        for series, points in (("source", observed_series), ("model", model_series))
+        for index, point in enumerate(points)
+        if point.boundary in {"unknown", "unreported"}
+    )
+    unknown_comparison_boundary = evidence.boundary in {"unknown", "unreported"}
+    assumed_boundary = evidence.boundary
+    if unknown_boundaries or unknown_comparison_boundary:
+        known_boundaries = {
+            point.boundary
+            for point in (*observed_series, *model_series)
+            if point.boundary not in {"unknown", "unreported"}
+        }
+        if not unknown_comparison_boundary:
+            known_boundaries.add(evidence.boundary)
+        if len(known_boundaries) > 1:
+            return unavailable(RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH)
+        assumed_boundary = (
+            next(iter(known_boundaries))
+            if known_boundaries
+            else "shared_unreported_boundary"
+        )
     if not _relative_series_boundaries_match(
-        observed_series, model_series, evidence.boundary
+        observed_series, model_series, assumed_boundary
     ):
         return unavailable(RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH)
+    assumptions: list[RelativeSeriesAssumption] = []
+    if unknown_boundaries or unknown_comparison_boundary:
+        assumptions.append(
+            RelativeSeriesAssumption(
+                "qms_boundary_assumed",
+                {
+                    "boundary": assumed_boundary,
+                    "comparison_boundary": evidence.boundary,
+                    "unknown_samples": unknown_boundaries,
+                },
+                "Unknown or unreported boundaries use the one shared known boundary; if none is known, use a shared-unreported boundary.",
+            )
+        )
+    native_observed_series = tuple(observed_series)
+    native_model_series = tuple(model_series)
     normalized_series = _relative_series_time_coordinates(
         observed_series, model_series, anchor
     )
@@ -165,6 +204,49 @@ def relative_channel_point_residuals(
     if not _relative_series_source_located(evidence):
         return unavailable(
             RelativeSeriesUnavailableReason.SOURCE_EVIDENCE_UNLOCATED
+        )
+    unverified_signal: dict[str, str] = {}
+    for field, state, default in (
+        (
+            "isolation",
+            evidence.target_isolated_or_interferences_corrected,
+            "assume the target is isolated or interferences are corrected",
+        ),
+        (
+            "background",
+            evidence.background_treatment_supported,
+            "assume the stated background treatment supports comparison",
+        ),
+        (
+            "proportionality",
+            evidence.response_proportional_over_interval,
+            "assume response is proportional over the comparison interval",
+        ),
+    ):
+        if state is None:
+            unverified_signal[field] = default
+    if unverified_signal:
+        assumptions.append(
+            RelativeSeriesAssumption(
+                "qms_signal_response_assumed",
+                {"unverified": unverified_signal},
+                "The source does not verify each listed signal-response premise.",
+            )
+        )
+    missing_children = {
+        "source_point_indices": tuple(
+            index for index, point in enumerate(observed_series) if point.locator is None
+        ),
+        "clock": clock.locator is None,
+        "parent_locator": evidence.locator,
+    }
+    if missing_children["source_point_indices"] or missing_children["clock"]:
+        assumptions.append(
+            RelativeSeriesAssumption(
+                "qms_provenance_assumed",
+                missing_children,
+                "A located parent panel supplies the missing child locator information.",
+            )
         )
     observed_by_coordinate: dict[Decimal, RelativeSeriesPoint] = {}
     for point in observed_series:
@@ -195,6 +277,39 @@ def relative_channel_point_residuals(
             return unavailable(RelativeSeriesUnavailableReason.SOURCE_ANCHOR_MISSING)
         if model_anchor is None:
             return unavailable(RelativeSeriesUnavailableReason.MODEL_ANCHOR_MISSING)
+        source_anchor_index = next(
+            index
+            for index, point in enumerate(observed_series)
+            if point is source_anchor
+        )
+        model_anchor_index = next(
+            index for index, point in enumerate(model_series) if point is model_anchor
+        )
+        native_source_anchor = native_observed_series[source_anchor_index]
+        native_model_anchor = native_model_series[model_anchor_index]
+        assumptions.append(
+            RelativeSeriesAssumption(
+                "qms_clock_anchor_assumed",
+                {
+                    "index_base": 0,
+                    "source_sample": {
+                        "index": source_anchor_index,
+                        "time": str(native_source_anchor.coordinate),
+                        "unit": native_source_anchor.coordinate_unit,
+                        "observation_id": native_source_anchor.observation_id,
+                    },
+                    "model_sample": {
+                        "index": model_anchor_index,
+                        "time": str(native_model_anchor.coordinate),
+                        "unit": native_model_anchor.coordinate_unit,
+                        "observation_id": native_model_anchor.observation_id,
+                    },
+                    "noise_floor": "not supplied; raw values > 0 select the anchor",
+                    "clock_mapping": "no fitted shift or scale",
+                },
+                "Elapsed zero is the first shared positive sample; no noise floor was supplied, so raw > 0 is used; no fitted shift or scale is applied.",
+            )
+        )
         anchor = RelativeSeriesAnchor(
             source_coordinate=source_anchor.coordinate,
             model_coordinate=model_anchor.coordinate,
@@ -281,7 +396,9 @@ def relative_channel_point_residuals(
                 uncertainty=observed.uncertainty,
             )
         )
-    return RelativeSeriesComparison(points=tuple(point_residuals))
+    return RelativeSeriesComparison(
+        points=tuple(point_residuals), assumptions=tuple(assumptions)
+    )
 
 
 _RELATIVE_TIME_SECONDS: dict[str, Decimal] = {
@@ -432,15 +549,14 @@ def _untied_physical_run(
     model_series: Sequence[RelativeSeriesPoint],
     evidence: RelativeSeriesEvidence,
 ) -> bool:
-    """Require the evidence and both supplied series to identify one run."""
+    """Require model and evidence run IDs to match the already-validated source."""
 
-    observed = {point.run_id for point in observed_series}
     model = {point.run_id for point in model_series}
     reference = evidence.reference_run_id
     model_run = evidence.model_run_id
-    if len(observed) != 1 or len(model) != 1:
+    if len(model) != 1:
         return True
-    observed_run = next(iter(observed))
+    observed_run = observed_series[0].run_id
     modeled_run = next(iter(model))
     return (
         observed_run != modeled_run

@@ -14,6 +14,7 @@ from pathlib import Path
 
 import pytest
 
+from simulator.battery import validity
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -3775,9 +3776,21 @@ def test_mf_f04_f16_scoped_notices_and_explicit_apparatus_gate() -> None:
     # millibar kinetic / yield is outside this gate
     assert background_pressure_high(kinetic, Quantity.MASS_LOSS_FRACTION).passed
     unknown_kn = F.kems_experiment(kn=None)
-    assert effusion_regime_unverified(unknown_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assumed = effusion_regime_unverified(unknown_kn, Quantity.P_SAT)
+    assert assumed.passed
+    assumed_policy = next(
+        check for check in assumed.checks if check.name == "effusion_regime_policy"
+    )
+    assert assumed_policy.detail["flag"] == "effusion_regime_assumed"
+    assert "molecular regime assumed" in assumed_policy.detail["reason"]
     low_kn = F.kems_experiment(kn=Decimal("0.5"))
-    assert effusion_regime_unverified(low_kn, Quantity.P_SAT).reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    violated = effusion_regime_unverified(low_kn, Quantity.P_SAT)
+    assert violated.passed
+    violated_policy = next(
+        check for check in violated.checks if check.name == "effusion_regime_policy"
+    )
+    assert violated_policy.detail["flag"] == "effusion_regime_violated"
+    assert violated_policy.detail["thresholds"]["orifice_knudsen"]["threshold"] == "10.0"
     stated = F.kems_experiment(total_P=Decimal("1e-6"))
     assert effusion_regime_unverified(stated, Quantity.P_SAT).passed
     assert background_pressure_high(stated, Quantity.P_SAT).passed
@@ -3904,22 +3917,24 @@ def _kems_without_background(experiment):
 
 
 @pytest.mark.parametrize(
-    ("evidence_class", "expected_pass", "expect_not_applicable"),
+    ("evidence_class", "expected_policy_flag", "expect_not_applicable"),
     (
-        (EvidenceClass.MEASURED_DIRECT, True, False),
-        (EvidenceClass.MEASURED_TABULATED, True, False),
-        (EvidenceClass.MEASURED_REDUCED, True, False),
-        (EvidenceClass.QUOTED_ATTRIBUTED, True, True),
-        (EvidenceClass.QUOTED_UNATTRIBUTED, True, True),
-        (EvidenceClass.MODEL_DERIVED, True, True),
-        (EvidenceClass.AUTHOR_ESTIMATE, True, True),
-        (EvidenceClass.FIGURE_ONLY, False, False),
-        (EvidenceClass.COMPILATION_ASSESSED, True, True),
-        (EvidenceClass.ENGINE_PREDICTION, True, True),
+        (EvidenceClass.MEASURED_DIRECT, None, False),
+        (EvidenceClass.MEASURED_TABULATED, None, False),
+        (EvidenceClass.MEASURED_REDUCED, None, False),
+        (EvidenceClass.QUOTED_ATTRIBUTED, None, True),
+        (EvidenceClass.QUOTED_UNATTRIBUTED, None, True),
+        (EvidenceClass.MODEL_DERIVED, None, True),
+        (EvidenceClass.AUTHOR_ESTIMATE, None, True),
+        (EvidenceClass.FIGURE_ONLY, "effusion_regime_assumed", False),
+        (EvidenceClass.COMPILATION_ASSESSED, None, True),
+        (EvidenceClass.ENGINE_PREDICTION, None, True),
     ),
 )
 def test_mf_f04_pressure_sum_evidence_class_golden_pin(
-    evidence_class: EvidenceClass, expected_pass: bool, expect_not_applicable: bool
+    evidence_class: EvidenceClass,
+    expected_policy_flag: str | None,
+    expect_not_applicable: bool,
 ) -> None:
     composition = Composition(
         basis="printed_mole_fraction",
@@ -3947,17 +3962,24 @@ def test_mf_f04_pressure_sum_evidence_class_golden_pin(
         point_observations=pressures,
     )
 
-    assert result.passed is expected_pass
+    assert result.passed
     if expect_not_applicable:
         check = next(check for check in result.checks if check.name == "apparatus_applicability")
         assert check.detail["reason"] == "apparatus gate not applicable: non-measured evidence"
-    elif expected_pass:
+    elif expected_policy_flag is not None:
+        policy = next(
+            check for check in result.checks if check.name == "effusion_regime_policy"
+        )
+        assert policy.detail["flag"] == expected_policy_flag
+        assert "molecular regime assumed" in policy.detail["reason"]
+        assert policy.detail["thresholds"]["in_cell_partial_pressure_sum"][
+            "pressure_limit_Pa"
+        ] == "10"
+    else:
         pressure_check = next(
             check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
         )
         assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.7"
-    else:
-        assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
 
 def test_mf_f04_in_cell_pressure_sum_passes_with_unstated_background_flagged() -> None:
@@ -4037,7 +4059,7 @@ def test_mf_f04_calibrated_cell_falls_through_to_printed_pressure_sum() -> None:
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "0.7"
 
 
-def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
+def test_mf_f04_in_cell_pressure_sum_above_limit_predicts_with_violation_flag() -> None:
     composition = Composition(
         basis="printed_mole_fraction",
         components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
@@ -4060,16 +4082,23 @@ def test_mf_f04_in_cell_pressure_sum_above_limit_refuses() -> None:
         pressures[0],
         point_observations=pressures,
     )
-    assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert result.passed
     pressure_check = next(
         check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
     )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "12"
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    policy = next(check for check in result.checks if check.name == "effusion_regime_policy")
+    assert policy.detail["flag"] == "effusion_regime_violated"
+    assert "printed in-cell pressure sum exceeds" in policy.detail["reason"]
+    assert "biased LOW" in policy.detail["reason"]
+    assert policy.detail["thresholds"]["in_cell_partial_pressure_sum"][
+        "pressure_limit_Pa"
+    ] == "10"
 
 
-def test_mf_f04_uncalibrated_in_cell_pressure_sum_above_limit_still_refuses() -> None:
+def test_mf_f04_uncalibrated_in_cell_pressure_sum_above_limit_predicts_flagged() -> None:
     composition = Composition(
         basis="printed_mole_fraction",
         components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
@@ -4096,17 +4125,18 @@ def test_mf_f04_uncalibrated_in_cell_pressure_sum_above_limit_still_refuses() ->
         point_observations=pressures,
     )
 
-    assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
-    assert result.primary_check == "in_cell_partial_pressure_sum"
+    assert result.passed
     pressure_check = next(
         check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
     )
     assert pressure_check.passed is False
     assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "12"
     assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    policy = next(check for check in result.checks if check.name == "effusion_regime_policy")
+    assert policy.detail["flag"] == "effusion_regime_violated"
 
 
-def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
+def test_mf_f04_in_cell_pressure_sum_flags_missing_dominant_species() -> None:
     composition = Composition(
         basis="printed_mole_fraction",
         components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
@@ -4121,7 +4151,7 @@ def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
         oxygen,
         point_observations=(oxygen,),
     )
-    assert result.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert result.passed
     pressure_check = next(
         check for check in result.checks if check.name == "in_cell_partial_pressure_sum"
     )
@@ -4130,6 +4160,8 @@ def test_mf_f04_in_cell_pressure_sum_refuses_missing_dominant_species() -> None:
     assert pressure_check.detail["reason"] == (
         "incomplete printed species coverage; pressure sum is only a lower bound"
     )
+    policy = next(check for check in result.checks if check.name == "effusion_regime_policy")
+    assert policy.detail["flag"] == "effusion_regime_assumed"
 
     calcium_oxide = Composition(
         basis="printed_mole_fraction",
@@ -4172,11 +4204,15 @@ def test_mf_f04_in_cell_pressure_sum_requires_every_composition_cation() -> None
         aluminium,
         point_observations=(aluminium, aluminium_oxide),
     )
-    assert incomplete.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert incomplete.passed
     incomplete_check = next(
         check for check in incomplete.checks if check.name == "in_cell_partial_pressure_sum"
     )
     assert incomplete_check.detail["missing_species"] == ["Ca"]
+    incomplete_policy = next(
+        check for check in incomplete.checks if check.name == "effusion_regime_policy"
+    )
+    assert incomplete_policy.detail["flag"] == "effusion_regime_assumed"
 
     calcium = _printed_kems_partial_pressure(
         "complete-ca", experiment.experiment_id, "Ca", "0.3", composition
@@ -4187,6 +4223,68 @@ def test_mf_f04_in_cell_pressure_sum_requires_every_composition_cation() -> None
         point_observations=(calcium, aluminium, aluminium_oxide),
     )
     assert complete.passed
+
+
+@pytest.mark.parametrize("case", ("unverified", "printed_kn_violation", "sum_violation"))
+def test_probe_kems_regime_prediction_policy_is_required(case, monkeypatch) -> None:
+    if case == "unverified":
+        experiment = F.kems_experiment(kn=None)
+        observation = None
+        points = ()
+    elif case == "printed_kn_violation":
+        experiment = F.kems_experiment(kn=Decimal("0.5"))
+        observation = None
+        points = ()
+    else:
+        composition = Composition(
+            basis="printed_mole_fraction",
+            components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        experiment = _kems_without_background(F.kems_experiment(kn=None))
+        points = tuple(
+            _printed_kems_partial_pressure(
+                f"probe-{species.lower()}",
+                experiment.experiment_id,
+                species,
+                pressure,
+                composition,
+            )
+            for species, pressure in (("O2", "6"), ("Ca", "1"), ("SiO", "5"))
+        )
+        observation = points[0]
+    expected = (
+        "effusion_regime_assumed"
+        if case == "unverified"
+        else "effusion_regime_violated"
+    )
+
+    def policy_contract():
+        outcome = effusion_regime_unverified(
+            experiment,
+            Quantity.P_PARTIAL if observation is not None else Quantity.P_SAT,
+            observation=observation,
+            point_observations=points,
+        )
+        assert outcome.passed
+        policy = next(
+            check for check in outcome.checks if check.name == "effusion_regime_policy"
+        )
+        assert policy.detail["flag"] == expected
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            validity,
+            "_effusion_policy_outcome",
+            lambda checks, _flag, **_kwargs: validity.GateOutcome(
+                passed=False,
+                reason=RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                checks=tuple(checks),
+                primary_check="in_cell_partial_pressure_sum",
+            ),
+        )
+        with pytest.raises(AssertionError):
+            policy_contract()
 
 
 def test_mf_f04_printed_orifice_kn_path_is_unchanged() -> None:

@@ -9,20 +9,32 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity
+from simulator.battery.enums import (
+    AmountBasis,
+    Engine,
+    EvidenceClass,
+    Phase,
+    Quantity,
+    RefusalReason,
+)
 from simulator.battery.identity import atm_to_pa, quantity_token
-from simulator.battery.records import Located, Species, State
+from simulator.battery.records import Composition, Located, Species, State
 from simulator.battery.score import (
+    ScoreContext,
     _has_ungrounded_kems_partial_pressure_calibration,
     _kems_replicate_groups,
     _unverified_apparatus_notices,
+    compile_residual,
 )
 from simulator.battery.validity import (
     GateCheck,
     GateOutcome,
     _calibration_grounded,
+    effusion_regime_unverified,
     _partial_pressure_observations_by_experiment,
+    underdetermined_apparatus,
 )
+from simulator.battery import validity
 from tests.battery import factories as F
 from tests.battery.factories import migrate_one_extract
 
@@ -168,13 +180,28 @@ def test_reduced_kems_policy_flags_are_visible_as_scoring_notices() -> None:
             GateCheck(
                 "effusion_regime_policy",
                 True,
-                {"flag": "effusion_regime_assumed", "reason": "no regime check"},
+                {
+                    "flag": "effusion_regime_assumed",
+                    "reason": "molecular regime assumed because no printed check is available",
+                    "covered_checks": ("in_cell_partial_pressure_sum",),
+                    "thresholds": {
+                        "in_cell_partial_pressure_sum": {"pressure_limit_Pa": "10"}
+                    },
+                    "authority": "extrapolated",
+                },
             ),
             calibration,
         ),
     )
     assumption_notices = _unverified_apparatus_notices(row, experiment, assumed)
-    assert any(notice.reason == "effusion_regime_assumed" for notice in assumption_notices)
+    assumed_notice = next(
+        notice
+        for notice in assumption_notices
+        if notice.reason.startswith("effusion_regime_assumed:")
+    )
+    assert "molecular regime assumed" in assumed_notice.reason
+    assert assumed_notice.band == "in_cell_partial_pressure_sum: pressure_limit_Pa=10"
+    assert assumed_notice.authority.value == "extrapolated"
     assert any(
         notice.reason.startswith("calibration_not_grounded: kems_calibration_by_source:")
         for notice in assumption_notices
@@ -191,7 +218,13 @@ def test_reduced_kems_policy_flags_are_visible_as_scoring_notices() -> None:
             GateCheck(
                 "effusion_regime_policy",
                 True,
-                {"flag": "effusion_regime_violated", "reason": "printed Kn is low"},
+                {
+                    "flag": "effusion_regime_violated",
+                    "reason": "printed Kn is low",
+                    "covered_checks": ("orifice_knudsen",),
+                    "thresholds": {"orifice_knudsen": {"threshold": "10"}},
+                    "authority": "extrapolated",
+                },
             ),
         ),
     )
@@ -202,7 +235,167 @@ def test_reduced_kems_policy_flags_are_visible_as_scoring_notices() -> None:
     violation_notices = _unverified_apparatus_notices(
         reported_row, experiment, violated
     )
-    assert any(notice.reason == "effusion_regime_violated" for notice in violation_notices)
+    violation_notice = next(
+        notice
+        for notice in violation_notices
+        if notice.reason.startswith("effusion_regime_violated:")
+    )
+    assert "printed Kn is low" in violation_notice.reason
+    assert violation_notice.band == "orifice_knudsen: threshold=10"
+    assert violation_notice.authority.value == "extrapolated"
+
+    reduced_row = replace(
+        row,
+        evidence=replace(
+            row.evidence,
+            class_=State.of(EvidenceClass.MEASURED_REDUCED),
+            original_method_class="measured_reduced",
+        ),
+    )
+    assert any(
+        notice.reason.startswith("effusion_regime_assumed:")
+        for notice in _unverified_apparatus_notices(reduced_row, experiment, assumed)
+    )
+
+
+def test_printed_kn_and_cell_sum_violations_keep_distinct_scorer_reasons() -> None:
+    kn_experiment = F.kems_experiment(kn=Decimal("0.5"))
+    kn_row = _pressure_row(kn_experiment.experiment_id, "printed-low-kn")
+    kn_row = replace(
+        kn_row,
+        evidence=replace(kn_row.evidence, original_method_class="measured_direct"),
+    )
+    kn_gate = effusion_regime_unverified(
+        kn_experiment, Quantity.P_PARTIAL, observation=kn_row
+    )
+    kn_notice = next(
+        notice
+        for notice in _unverified_apparatus_notices(kn_row, kn_experiment, kn_gate)
+        if notice.reason.startswith("effusion_regime_violated:")
+    )
+
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    sum_experiment = F.kems_experiment(kn=None)
+    sum_rows = []
+    for species, pressure in (("O2", "6"), ("Ca", "1"), ("SiO", "5")):
+        row = _pressure_row(
+            sum_experiment.experiment_id,
+            f"printed-high-sum-{species.lower()}",
+            species=species,
+            value=pressure,
+        )
+        identity = replace(
+            row.identity,
+            composition=State.of(composition),
+            temperature_K=State.of(Decimal("1500")),
+        )
+        sum_rows.append(
+            replace(
+                row,
+                identity=identity,
+                evidence=replace(row.evidence, original_method_class="measured_direct"),
+                point_conditions={
+                    "temperature_K": F.located(Decimal("1500")),
+                    "composition": F.located(composition),
+                },
+            )
+        )
+    sum_gate = effusion_regime_unverified(
+        sum_experiment,
+        Quantity.P_PARTIAL,
+        observation=sum_rows[0],
+        point_observations=tuple(sum_rows),
+    )
+    sum_notice = next(
+        notice
+        for notice in _unverified_apparatus_notices(
+            sum_rows[0], sum_experiment, sum_gate
+        )
+        if notice.reason.startswith("effusion_regime_violated:")
+    )
+    sum_notices = _unverified_apparatus_notices(sum_rows[0], sum_experiment, sum_gate)
+
+    assert "printed orifice Knudsen number is below" in kn_notice.reason
+    assert "printed in-cell pressure sum exceeds" in sum_notice.reason
+    assert "biased LOW" in kn_notice.reason
+    assert "biased LOW" in sum_notice.reason
+    assert kn_notice.reason != sum_notice.reason
+    assert kn_notice.band != sum_notice.band
+    assert sum_notices == (sum_notice,)
+
+
+def test_demaria_conditional_o_calibration_predicts_with_located_default(
+    published_pressure_rows,
+) -> None:
+    demaria, series = published_pressure_rows["kems-022-demaria-1971"]
+    rows = series["demaria_1971_o_atomic_psat_table5"][2]
+    assert len(rows) == 13
+    context = ScoreContext(
+        works=demaria.works,
+        experiments=demaria.experiments,
+        observations=demaria.observations,
+        extract_review={"kems-022-demaria-1971": "reviewed"},
+        root=ROOT,
+    )
+    for row in rows:
+        experiment = demaria.experiments[row.experiment_id]
+        gate = underdetermined_apparatus(
+            experiment, Quantity.P_PARTIAL, observation=row
+        )
+        assert gate.passed
+        check = next(item for item in gate.checks if item.name == "kems_calibration")
+        assert check.detail["flag"] == "calibration_not_grounded"
+        assert check.detail["calibration_record_status"] == (
+            "conditional_procedure_unverified"
+        )
+        assert check.detail["calibration_default"] == "conditional_o_o2_applied"
+        assert "used whenever possible" in check.detail["reason"]
+        notices = _unverified_apparatus_notices(row, experiment, gate)
+        calibration_notice = next(
+            notice for notice in notices if "calibration_not_grounded:" in notice.reason
+        )
+        assert "used whenever possible" in calibration_notice.reason
+        residual, _candidate = compile_residual(
+            row,
+            Engine.INTERNAL_ANALYTICAL,
+            context=context,
+            point_observations=tuple(context.observations.values()),
+        )
+        if residual.refusal is not None:
+            assert residual.refusal.reason is not RefusalReason.UNDERDETERMINED_APPARATUS
+        residual_notice = next(
+            notice
+            for notice in residual.notices
+            if notice.reason.startswith("calibration_not_grounded:")
+        )
+        assert "conditional_o_o2_applied" in residual_notice.reason
+        assert "used whenever possible" in residual_notice.reason
+
+
+def test_probe_demaria_conditional_default_is_required(
+    published_pressure_rows, monkeypatch
+) -> None:
+    demaria, series = published_pressure_rows["kems-022-demaria-1971"]
+    rows = series["demaria_1971_o_atomic_psat_table5"][2]
+
+    def conditional_contract():
+        for row in rows:
+            experiment = demaria.experiments[row.experiment_id]
+            gate = underdetermined_apparatus(
+                experiment, Quantity.P_PARTIAL, observation=row
+            )
+            assert gate.passed
+            check = next(item for item in gate.checks if item.name == "kems_calibration")
+            assert check.detail["calibration_default"] == "conditional_o_o2_applied"
+
+    with monkeypatch.context() as patch:
+        patch.setattr(validity, "_calibration_not_grounded_detail", lambda *_a, **_k: None)
+        with pytest.raises(AssertionError):
+            conditional_contract()
 
 
 def test_current_only_observation_is_excluded_from_pressure_comparators() -> None:

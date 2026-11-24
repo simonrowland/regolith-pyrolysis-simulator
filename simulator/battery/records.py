@@ -1957,9 +1957,17 @@ class RelativeSeriesPointResidual:
 
 
 @dataclass(frozen=True)
+class RelativeSeriesAssumption:
+    policy_id: str
+    value: Mapping[str, Any]
+    reason: str
+
+
+@dataclass(frozen=True)
 class RelativeSeriesComparison:
     points: tuple[RelativeSeriesPointResidual, ...] = ()
     unavailable_reason: RelativeSeriesUnavailableReason | None = None
+    assumptions: tuple[RelativeSeriesAssumption, ...] = ()
 
 
 @dataclass(frozen=True)

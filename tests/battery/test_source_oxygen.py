@@ -1765,9 +1765,33 @@ def test_relative_qms_oxygen_inputs_cannot_validate_themselves(
         source_trace=trace,
     )
     assert mixed_run.unavailable_reason is (
-        RelativeSeriesUnavailableReason.QMS_PRODUCER_UNIMPLEMENTED
+        RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
     )
     assert mixed_run.points == ()
+
+    def mixed_run_contract():
+        result = _score_relative_qms_series(
+            observed,
+            mixed_model,
+            anchor,
+            clock,
+            evidence,
+            context=scoring_context,
+            reference=melt_row,
+            source_trace=trace,
+        )
+        assert result.unavailable_reason is (
+            RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            battery_score_metrics,
+            "_relative_series_model_oxygen_unavailable_reason",
+            lambda *_args, **_kwargs: None,
+        )
+        with pytest.raises(AssertionError):
+            mixed_run_contract()
 
     unrelated_id = replace(observed[0], observation_id=melt_row.observation_id)
     unrelated = (unrelated_id, *observed[1:])

@@ -4344,9 +4344,8 @@ def test_compile_mutates_each_conjunct_off() -> None:
         _predict(Decimal("0.1"), ident_p),
     )
     assert residual.score_eligible is False
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert "validity_gates_pass" in residual.exclusions
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.refusal is None
 
     parent = F.observation(
         "raw-parent",
@@ -6646,7 +6645,7 @@ def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
 @pytest.mark.parametrize(
     "composition_source", ("proxy", "sample_only", "malformed_own")
 )
-def test_d274_over_limit_pressure_still_refuses_without_run_composition(
+def test_d274_over_limit_pressure_predicts_with_violation_without_run_composition(
     composition_source: str,
 ) -> None:
     composition = Composition(
@@ -6734,16 +6733,24 @@ def test_d274_over_limit_pressure_still_refuses_without_run_composition(
         ),
         point_observations=point_observations,
     )
-    assert residual.status is not ResidualStatus.REFUSED
-    assert residual.numeric is not None
+    if composition_source == "sample_only":
+        # The initial charge is not a run composition, so the engine result
+        # cannot be matched to this row even though the regime gate predicts.
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        assert residual.numeric is None
+    else:
+        assert residual.status is not ResidualStatus.REFUSED
+        assert residual.numeric is not None
     assert any(
-        notice.reason == "effusion_regime_violated"
+        notice.reason.startswith("effusion_regime_violated:")
         for notice in residual.notices
     )
 
 
 @pytest.mark.parametrize("incomplete_coverage", (False, True))
-def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
+def test_d274_uncalibrated_partial_pressure_over_limit_predicts_with_violation(
     incomplete_coverage: bool,
 ) -> None:
     components = (
@@ -6801,7 +6808,7 @@ def test_d274_uncalibrated_partial_pressure_over_limit_refuses(
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert any(
-        notice.reason == "effusion_regime_violated"
+        notice.reason.startswith("effusion_regime_violated:")
         for notice in residual.notices
     )
 
@@ -6850,7 +6857,7 @@ def test_d274_uncalibrated_kems_psat_missing_sum_scores_with_flags() -> None:
     assert residual.status is not ResidualStatus.REFUSED
     assert residual.numeric is not None
     assert any(
-        notice.reason == "effusion_regime_assumed"
+        notice.reason.startswith("effusion_regime_assumed:")
         for notice in residual.notices
     )
     assert any(
@@ -6916,12 +6923,11 @@ def test_unverified_kems_value_scores_flagged_without_printed_in_cell_pressures(
         "original_reason=incomplete printed species coverage; pressure sum is only a lower bound"
         in notice.reason
     )
-    assert "authority=extrapolated" in notice.reason
+    assert "molecular regime assumed" in notice.reason
     pressure_limit = pressure_check.detail["pressure_limit_Pa"]
-    assert f"regime_limit={pressure_limit} Pa" in notice.reason
     assert notice.authority is Authority.EXTRAPOLATED
     assert notice.band == (
-        f"free-molecular in-cell pressure sum <= {pressure_limit} Pa"
+        f"in_cell_partial_pressure_sum: pressure_limit_Pa={pressure_limit}"
     )
 
     from simulator.battery.score import (
@@ -7111,11 +7117,11 @@ def test_only_binary_complement_point_compositions_score_and_flag(
 
 
 @pytest.mark.parametrize(
-    ("quantity", "effusion_refusal"),
+    ("quantity", "effusion_violation"),
     ((Quantity.ION_INTENSITY, False), (Quantity.P_PARTIAL, True)),
 )
 def test_binary_complement_notice_requires_composition_consumption(
-    quantity: Quantity, effusion_refusal: bool
+    quantity: Quantity, effusion_violation: bool
 ) -> None:
     composition = Composition(
         basis="binary_complement",
@@ -7151,7 +7157,7 @@ def test_binary_complement_notice_requires_composition_consumption(
 
     experiment = (
         F.kems_experiment(orifice_area=None, clausing=None, kn=None, calibrated=False)
-        if effusion_refusal
+        if effusion_violation
         else F.tabulation_experiment()
     )
     identity = replace(
@@ -7159,16 +7165,16 @@ def test_binary_complement_notice_requires_composition_consumption(
         quantity=quantity,
         composition=State.unknown("composition is recorded on the source point"),
         total_pressure_Pa=(
-            State.of(Decimal("1e-6")) if effusion_refusal else None
+            State.of(Decimal("1e-6")) if effusion_violation else None
         ),
     )
     reference = point_observation(
         experiment,
-        "binary-complement-effusion-refusal"
-        if effusion_refusal
+        "binary-complement-effusion-violation"
+        if effusion_violation
         else "binary-complement-ion-intensity",
         identity,
-        Decimal("11") if effusion_refusal else Decimal("1"),
+        Decimal("11") if effusion_violation else Decimal("1"),
     )
     residual, _ = compile_residual(
         reference,
@@ -7177,19 +7183,29 @@ def test_binary_complement_notice_requires_composition_consumption(
             F.work(), experiment, reference, review="reviewed"
         ),
     )
-    assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
-    assert residual.refusal.reason is (
-        RefusalReason.EFFUSION_REGIME_UNVERIFIED
-        if effusion_refusal
-        else RefusalReason.UNSUPPORTED
-    )
-    if not effusion_refusal:
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.refusal.reason is RefusalReason.UNSUPPORTED
+    if effusion_violation:
+        assert residual.refusal.detail["reason"] == "species_unmatched_in_engine_output"
+        assert any(
+            notice.reason.startswith("effusion_regime_violated:")
+            for notice in residual.notices
+        )
+    else:
         assert residual.refusal.detail["reason"] == "not_a_vapour_quantity"
-    assert all(
-        notice.kind is not NoticeKind.COMPOSITION_BINARY_COMPLEMENT
+    complement_notices = tuple(
+        notice
         for notice in residual.notices
+        if notice.kind is NoticeKind.COMPOSITION_BINARY_COMPLEMENT
     )
+    if effusion_violation:
+        # The regime default admits the pressure path to the engine, which
+        # requests the located binary-complement composition before refusing
+        # the unmatched species output.
+        assert len(complement_notices) == 1
+    else:
+        assert not complement_notices
 
 
 def _oxide_from_element_inference(oxide_sum: str) -> Derivation:
@@ -8326,9 +8342,23 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         ) is not None
         and point.series == "stolyarova_1996_table2_pCa_1933k"
     ]
-    assert len(selected) == 29
-    # c2-effusion's d-274 printed-pressure fallback makes these seven
-    # existing Table 2 pCa points scoreable with an apparatus notice.
+    assert len(selected) == 30
+    newly_admitted = [
+        residual
+        for residual, _point in selected
+        if residual.reference.endswith(":h=337916c30ca0")
+    ]
+    assert len(newly_admitted) == 1
+    # The printed same-point pressure sum exceeds the limit, so the residual
+    # predicts with the transitional-regime LOW bias stated by the owner.
+    violation = next(
+        notice
+        for notice in newly_admitted[0].notices
+        if notice.reason.startswith("effusion_regime_violated:")
+    )
+    assert "printed in-cell pressure sum exceeds" in violation.reason
+    assert "biased LOW" in violation.reason
+    assert violation.authority is Authority.EXTRAPOLATED
     unverified_keys = {
         residual.reference.rsplit(":", 1)[-1]
         for residual, _point in selected
@@ -8338,16 +8368,17 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         )
     }
     # The :h= suffixes moved when the Table 2 run conditions were recorded.
-    # len(selected) is 29 and the slope below is still 5.19.
+    # The source's scored point count and regression are pinned below.
     assert unverified_keys == {
         "h=15e3aebeca85",
         "h=1b65d2b9485a",
         "h=29181d3aa8bb",
         "h=306f8c55d11e",
+        "h=337916c30ca0",
         "h=485a267bf37a",
         "h=63f27b05b715",
         "h=e37db2ee7220",
-    }
+    }, sorted(unverified_keys)
     e15_residual = selected[0][0]
     e15_observation = context.observations[e15_residual.reference]
     assert (
@@ -8366,12 +8397,10 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
     shape = score_mod._e15_level_shape_rows(points)[1]
     assert shape["x_axis"] == "x(CaO)"
     # t-1534 (742704443) labels Table 2's 55 calculated oxygen columns
-    # quoted_attributed (eqs 7–9; d-110). The 29 measured pCa rows are
-    # unchanged. resolve_source_oxygen then commands that printed cell pO
-    # as fO2, so this residual slope is 5.19 dex per x(CaO). 6.76 was the
-    # engine oxygen-balance slope while those columns were model_derived
-    # (e54df70c40). The paper prints the pressures, not this slope.
-    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("5.19")
+    # quoted_attributed (eqs 7–9; d-110). The updated 30-point scorer shape,
+    # including the newly admitted flagged pressure, is 4.82 dex per x(CaO).
+    # The paper prints the pressures, not this regression slope.
+    assert shape["slope_dex_per_x"].quantize(Decimal("0.01")) == Decimal("4.82")
 
     from simulator.battery.score import (
         _ScorePayloadAccumulator,
@@ -8390,12 +8419,12 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         and row["series"] == "stolyarova_1996_table2_pCa_1933k"
         and row["statistic"] == "shape"
     )
-    assert production_shape["n"] == 29
+    assert production_shape["n"] == 30
     assert production_shape["population"] == "liquid"
     assert production_shape["x_axis"] == "x(CaO)"
     assert production_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("5.19")
+    ) == Decimal("4.82")
     assert (
         score_mod.FLAGGED_STRATUM_CELL_MATERIAL_INFERRED
         in production_shape["flags"]
@@ -8413,11 +8442,12 @@ def test_e15_stolyarova_1996_real_axis_slope_and_report_path(tmp_path: Path) -> 
         for residual, point in selected
     )
     wrong_axis_shape = score_mod._e15_level_shape_rows(si_axis_points)[1]
-    # Same residuals on x(SiO2). -4.34 replaces -5.58 for the same
+    # Same residuals on x(SiO2). -4.21 reflects the newly admitted flagged
+    # pressure row and replaces the previous -4.34 shape.
     # oxygen-condition change.
     assert wrong_axis_shape["slope_dex_per_x"].quantize(
         Decimal("0.01")
-    ) == Decimal("-4.34")
+    ) == Decimal("-4.21")
 
     contested_payload = next(
         payload
@@ -8617,7 +8647,6 @@ def test_flagged_stratum_classifiers_pin_order_and_combined_output() -> None:
             {"kind": kind.value, "reason": reason} for kind, reason in facts
         ]
     }
-
     assert flagged_strata(notices) == expected
     assert _flagged_payload_strata(payload) == expected
 

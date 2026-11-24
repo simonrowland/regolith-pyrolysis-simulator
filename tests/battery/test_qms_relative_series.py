@@ -102,6 +102,10 @@ def _inputs():
     return observed, model, anchor, clock, evidence
 
 
+def _assumption(result, policy_id):
+    return next(item for item in result.assumptions if item.policy_id == policy_id)
+
+
 def test_constant_current_multiplier_cancels_after_eligible_anchor_normalization():
     observed, model, anchor, clock, evidence = _inputs()
     model = (
@@ -362,7 +366,7 @@ def test_qms_channel_rules_have_one_owner():
         )
     ]
     assert mixed_owners == ["_relative_series_model_oxygen_unavailable_reason"]
-    assert score_mixed == []
+    assert score_mixed == ["_score_relative_qms_series"]
 
     helper = _function(
         metrics_tree, "_relative_series_model_oxygen_unavailable_reason"
@@ -606,10 +610,11 @@ def test_dp013_converts_clock_units_and_anchor_coordinates_exactly():
 
 def test_unmapped_clock_uses_first_shared_positive_sample_without_fitting():
     observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, coordinate_unit="min") for point in observed)
     model = tuple(
         replace(
             point,
-            coordinate=observed[index].coordinate,
+            coordinate=observed[index].coordinate * Decimal("60"),
             value=(
                 Value(ValueKind.POINT, point=Decimal("0"))
                 if index == 0
@@ -637,22 +642,46 @@ def test_unmapped_clock_uses_first_shared_positive_sample_without_fitting():
 
     assert result.unavailable_reason is None
     assert tuple(point.model_coordinate for point in result.points) == (
-        Decimal("0"), Decimal("1"), Decimal("2")
+        Decimal("0"), Decimal("60"), Decimal("120")
     )
     assert result.points[0].unavailable_reason is (
         RelativeSeriesUnavailableReason.MODEL_VALUE_NOT_POSITIVE_POINT
     )
     assert result.points[1].residual_dex == Decimal("0")
+    clock_flag = _assumption(result, "qms_clock_anchor_assumed")
+    assert clock_flag.value["index_base"] == 0
+    assert clock_flag.value["source_sample"] == {
+        "index": 1,
+        "time": "1",
+        "unit": "min",
+        "observation_id": None,
+    }
+    assert clock_flag.value["model_sample"] == {
+        "index": 1,
+        "time": "60",
+        "unit": "s",
+        "observation_id": None,
+    }
+    assert clock_flag.value["noise_floor"] == (
+        "not supplied; raw values > 0 select the anchor"
+    )
+    assert "no fitted shift or scale" in clock_flag.reason
+    signal_flag = _assumption(result, "qms_signal_response_assumed")
+    assert set(signal_flag.value["unverified"]) == {
+        "isolation",
+        "background",
+        "proportionality",
+    }
     assert set(QMS_POLICY_REGISTRY) == {
-        "qms_run_group_assumed",
+        "qms_boundary_assumed",
         "qms_clock_anchor_assumed",
         "qms_signal_response_assumed",
         "qms_provenance_assumed",
-        "qms_oxygen_lineage_unverified",
     }
-    assert all(
-        entry["status"] == "proposed" for entry in QMS_POLICY_REGISTRY.values()
-    )
+    assert QMS_POLICY_REGISTRY["qms_clock_anchor_assumed"]["status"] == "ratified"
+    assert QMS_POLICY_REGISTRY["qms_signal_response_assumed"]["status"] == "ratified"
+    assert QMS_POLICY_REGISTRY["qms_provenance_assumed"]["status"] == "ratified"
+    assert QMS_POLICY_REGISTRY["qms_boundary_assumed"]["status"] == "proposed"
 
 
 def test_located_parent_covers_missing_child_locators():
@@ -665,12 +694,105 @@ def test_located_parent_covers_missing_child_locators():
     )
 
     assert result.unavailable_reason is None
-    assert QMS_POLICY_REGISTRY["qms_provenance_assumed"]["status"] == "proposed"
+    provenance_flag = _assumption(result, "qms_provenance_assumed")
+    assert provenance_flag.value == {
+        "source_point_indices": (0, 1, 2),
+        "clock": True,
+        "parent_locator": evidence.locator,
+    }
+    assert "located parent panel" in provenance_flag.reason
+
+
+def test_unknown_boundary_is_assumed_and_reported_on_comparison_residual():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (replace(observed[0], boundary="unknown"), *observed[1:])
+    model = (*model[:-1], replace(model[-1], boundary="unreported"))
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    flag = _assumption(result, "qms_boundary_assumed")
+    assert flag.value["boundary"] == "cell-exit"
+    assert flag.value["comparison_boundary"] == "cell-exit"
+    assert flag.value["unknown_samples"] == (
+        ("source", 0, "unknown"),
+        ("model", 2, "unreported"),
+    )
+    assert "one shared known boundary" in flag.reason
+
+
+def test_unknown_comparison_boundary_uses_one_shared_known_point_boundary():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (replace(observed[0], boundary="unknown"), *observed[1:])
+    evidence = replace(evidence, boundary="unreported")
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    flag = _assumption(result, "qms_boundary_assumed")
+    assert flag.value["boundary"] == "cell-exit"
+    assert flag.value["comparison_boundary"] == "unreported"
+    assert flag.value["unknown_samples"] == (("source", 0, "unknown"),)
+
+
+def test_unknown_comparison_boundary_inherits_shared_known_point_boundary():
+    observed, model, anchor, clock, evidence = _inputs()
+    evidence = replace(evidence, boundary="unknown")
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    flag = _assumption(result, "qms_boundary_assumed")
+    assert flag.value == {
+        "boundary": "cell-exit",
+        "comparison_boundary": "unknown",
+        "unknown_samples": (),
+    }
+
+
+def test_all_unreported_boundaries_use_shared_unreported_assumption():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = tuple(replace(point, boundary="unknown") for point in observed)
+    model = tuple(replace(point, boundary="unreported") for point in model)
+    evidence = replace(evidence, boundary="unreported")
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is None
+    flag = _assumption(result, "qms_boundary_assumed")
+    assert flag.value["boundary"] == "shared_unreported_boundary"
+    assert flag.value["comparison_boundary"] == "unreported"
+    assert flag.reason == (
+        "Unknown or unreported boundaries use the one shared known boundary; "
+        "if none is known, use a shared-unreported boundary."
+    )
 
 
 def test_known_boundary_mismatch_remains_category_a():
     observed, model, anchor, clock, evidence = _inputs()
     model = tuple(replace(point, boundary="chamber") for point in model)
+
+    result = relative_channel_point_residuals(
+        observed, model, anchor, clock, evidence
+    )
+
+    assert result.unavailable_reason is (
+        RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH
+    )
+
+
+def test_unknown_point_cannot_hide_conflicting_known_comparison_boundary():
+    observed, model, anchor, clock, evidence = _inputs()
+    observed = (replace(observed[0], boundary="unknown"), *observed[1:])
+    model = (*model[:-1], replace(model[-1], boundary="chamber"))
 
     result = relative_channel_point_residuals(
         observed, model, anchor, clock, evidence
@@ -889,6 +1011,82 @@ def test_probe_conflicting_boundary_guard(monkeypatch):
         patch.setattr(score_metrics, "_relative_series_boundaries_match", lambda *_args: True)
         with pytest.raises(AssertionError):
             boundary_contract()
+
+
+@pytest.mark.parametrize(
+    ("policy_id", "change"),
+    (
+        (
+            "qms_clock_anchor_assumed",
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                tuple(
+                    replace(point, coordinate=observed[index].coordinate)
+                    for index, point in enumerate(model)
+                ),
+                anchor,
+                replace(clock, mapping_supported=False),
+                evidence,
+            ),
+        ),
+        (
+            "qms_signal_response_assumed",
+            lambda observed, model, anchor, clock, evidence: (
+                observed,
+                model,
+                anchor,
+                clock,
+                replace(
+                    evidence,
+                    target_isolated_or_interferences_corrected=None,
+                    background_treatment_supported=None,
+                    response_proportional_over_interval=None,
+                ),
+            ),
+        ),
+        (
+            "qms_provenance_assumed",
+            lambda observed, model, anchor, clock, evidence: (
+                tuple(replace(point, locator=None) for point in observed),
+                model,
+                anchor,
+                replace(clock, locator=None),
+                evidence,
+            ),
+        ),
+        (
+            "qms_boundary_assumed",
+            lambda observed, model, anchor, clock, evidence: (
+                (replace(observed[0], boundary="unknown"), *observed[1:]),
+                model,
+                anchor,
+                clock,
+                evidence,
+            ),
+        ),
+    ),
+)
+def test_probe_assumption_flag_is_required(policy_id, change, monkeypatch):
+    args = change(*_inputs())
+    original = score_metrics.relative_channel_point_residuals
+
+    def assumption_contract():
+        result = score_metrics.relative_channel_point_residuals(*args)
+        assert policy_id in {item.policy_id for item in result.assumptions}
+
+    def omit_flag(*call_args):
+        result = original(*call_args)
+        return replace(
+            result,
+            assumptions=tuple(
+                item for item in result.assumptions if item.policy_id != policy_id
+            ),
+        )
+
+    with monkeypatch.context() as patch:
+        patch.setattr(score_metrics, "relative_channel_point_residuals", omit_flag)
+        with pytest.raises(AssertionError):
+            assumption_contract()
 
 
 def test_probe_nonpositive_anchor_guard(monkeypatch):

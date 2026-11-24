@@ -2200,7 +2200,12 @@ def _unverified_apparatus_notices(
         experiment.method.is_value
         and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
         and reference.evidence.original_method_class
-        in {"measured", "measured_direct", "measured_tabulated"}
+        in {
+            "measured",
+            "measured_direct",
+            "measured_reduced",
+            "measured_tabulated",
+        }
     )
     author_reported_activity = (
         (
@@ -2289,27 +2294,51 @@ def _unverified_apparatus_notices(
         or calibration_flagged_activity
     )
     checked_gates = tuple(_require_gate_check(candidate) for candidate in gates.checks)
-    regime_flags = {
-        check.detail.get("flag")
+    typed_policy_checks = tuple(
+        check
         for check in checked_gates
-        if isinstance(check.detail, Mapping)
-        and check.name == "effusion_regime_policy"
-    }
-    policy_notices = [
-        Notice(
-            kind=NoticeKind.UNVERIFIED_APPARATUS,
-            affected_quantities=(quantity,),
-            reason=str(flag),
-            origin=reference.observation_id,
+        if isinstance(check.detail, Mapping) and "covered_checks" in check.detail
+    )
+    covered_checks: set[str] = set()
+    policy_notices: list[Notice] = []
+    for check in typed_policy_checks:
+        detail = check.detail
+        flag = detail.get("flag")
+        reason = detail.get("reason")
+        if not isinstance(flag, str) or not isinstance(reason, str):
+            continue
+        names = detail.get("covered_checks")
+        if isinstance(names, (tuple, list)):
+            covered_checks.update(name for name in names if isinstance(name, str))
+        thresholds = detail.get("thresholds")
+        threshold_band = None
+        if isinstance(thresholds, Mapping):
+            threshold_band = "; ".join(
+                f"{name}: "
+                + ", ".join(f"{key}={value}" for key, value in values.items())
+                for name, values in thresholds.items()
+                if isinstance(values, Mapping)
+            ) or None
+        authority_value = detail.get("authority")
+        authority = (
+            Authority(authority_value)
+            if isinstance(authority_value, str)
+            else None
         )
-        for flag in sorted(
-            regime_flags
-            & {"effusion_regime_assumed", "effusion_regime_violated"}
+        policy_notices.append(
+            Notice(
+                kind=NoticeKind.UNVERIFIED_APPARATUS,
+                affected_quantities=(quantity,),
+                reason=f"{flag}: {reason}",
+                origin=reference.observation_id,
+                band=threshold_band,
+                authority=authority,
+            )
         )
-    ]
     missing: dict[str, Mapping] = {}
     calibration_notice = None
     calibration_reason = None
+    calibration_default = None
     for check in checked_gates:
         detail = check.detail
         if not isinstance(detail, Mapping):
@@ -2326,6 +2355,11 @@ def _unverified_apparatus_notices(
                     reason = detail.get("reason")
                     if isinstance(reason, str):
                         calibration_reason = reason
+                    default = detail.get("calibration_default")
+                    if isinstance(default, str):
+                        calibration_default = default
+            continue
+        if check.name in covered_checks:
             continue
         fact = _missing_apparatus_fact(
             check,
@@ -2335,19 +2369,6 @@ def _unverified_apparatus_notices(
             allow_unknown_method=unknown_method_activity,
         )
         if fact is None:
-            if (
-                bool(
-                    regime_flags
-                    & {"effusion_regime_assumed", "effusion_regime_violated"}
-                )
-                and check.name
-                in {
-                    "orifice_knudsen",
-                    "orifice_pressure_to_diameter",
-                    "in_cell_partial_pressure_sum",
-                }
-            ):
-                continue
             return ()
         missing[fact] = detail
     if not missing:
@@ -2402,7 +2423,12 @@ def _unverified_apparatus_notices(
             )
             reason = (
                 f"calibration_not_grounded: {calibration_policy}"
-                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (
+                    f"calibration_default={calibration_default}; "
+                    if calibration_default is not None
+                    else ""
+                )
+                + f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (f" ({calibration_reason})" if calibration_reason else "")
             )
         elif fact == "method_unknown" and unknown_method_activity:
@@ -17682,7 +17708,10 @@ def _score_relative_qms_series(
             expected_input_ids=expected_inputs,
         )
         if input_reason is not None:
-            if input_reason is not RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT:
+            if input_reason not in {
+                RelativeSeriesUnavailableReason.OXYGEN_SELF_AGREEMENT,
+                RelativeSeriesUnavailableReason.MIXED_MODEL_RUNS,
+            }:
                 return _qms_store_producer_unavailable()
             return unavailable(input_reason)
         if model_inputs is not None and any(

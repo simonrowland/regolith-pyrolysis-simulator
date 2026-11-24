@@ -137,11 +137,47 @@ def _effusion_policy_outcome(
     checks: list[GateCheck], flag: str, *, reason: str
 ) -> GateOutcome:
     """Keep a numeric KEMS comparison and record its regime policy flag."""
+    covered_checks = tuple(check.name for check in checks if not check.passed)
+    original_reasons = tuple(
+        check.detail["reason"]
+        for check in checks
+        if not check.passed and isinstance(check.detail.get("reason"), str)
+    )
+    thresholds = {
+        check.name: {
+            key: check.detail[key]
+            for key in (
+                "threshold",
+                "threshold_Pa_per_mm",
+                "pressure_limit_Pa",
+            )
+            if key in check.detail
+        }
+        for check in checks
+        if check.name in covered_checks
+    }
+    if original_reasons:
+        reason = f"{reason}; original_reason={'; '.join(original_reasons)}"
+    if flag == "effusion_regime_violated":
+        reason = (
+            f"{reason}; in the transitional regime, the effusion pressure "
+            "is biased LOW relative to the true cell pressure"
+        )
     return GateOutcome(
         passed=True,
         checks=(
             *checks,
-            GateCheck("effusion_regime_policy", True, {"flag": flag, "reason": reason}),
+            GateCheck(
+                "effusion_regime_policy",
+                True,
+                {
+                    "flag": flag,
+                    "reason": reason,
+                    "covered_checks": covered_checks,
+                    "thresholds": thresholds,
+                    "authority": "extrapolated",
+                },
+            ),
         ),
     )
 
@@ -465,6 +501,24 @@ def _calibration_not_grounded_detail(
             }
         calibration = scoped_entries
     if isinstance(calibration, Mapping):
+        procedure = calibration.get("procedure_kind")
+        standard = calibration.get("standard")
+        if (
+            isinstance(procedure, Located)
+            and procedure.state.is_value
+            and procedure.state.value == "conditional_o_o2"
+            and isinstance(standard, Located)
+            and standard.state.is_unknown
+        ):
+            return {
+                "flag": "calibration_not_grounded",
+                "calibration_record_status": "conditional_procedure_unverified",
+                "calibration_notice": (
+                    "Conditional O/O2 calibration applied as the stated default."
+                ),
+                "calibration_default": "conditional_o_o2_applied",
+                "reason": standard.state.reason or "conditional calibration use is unverified",
+            }
         printed_standard = any(
             field in _CALIBRATION_STANDARD_FIELDS
             and isinstance(located, Located)
@@ -845,7 +899,7 @@ def underdetermined_apparatus(
             None if calibrated else _calibration_not_grounded_detail(calibration)
         )
         calibration_flagged = (
-            activity_quantity and ungrounded_detail is not None
+            quantity is Quantity.ACTIVITY and ungrounded_detail is not None
         )
         if activity_quantity:
             checks.append(
@@ -1152,7 +1206,10 @@ def effusion_regime_unverified(
             return _effusion_policy_outcome(
                 checks,
                 "effusion_regime_assumed",
-                reason="no printed regime check is available for this reduced KEMS value",
+                reason=(
+                    "molecular regime assumed because no printed regime check "
+                    "is available for this reduced KEMS value"
+                ),
             )
         checks.append(
             GateCheck(

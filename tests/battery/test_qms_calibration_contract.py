@@ -30,6 +30,8 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
         "standard@all_species",
         "standard@species=O",
         "standard@species=O2",
+        "procedure_kind@species=O",
+        "procedure_kind@species=O2",
         "method@all_species",
         "sensitivity_factor@all_species",
         "sensitivity_factor_units@all_species",
@@ -94,6 +96,11 @@ def test_demaria_qms_calibration_migrates_with_scoped_located_fields() -> None:
     assert "P = I_i^+ T / (S sigma gamma a_i)" in str(method.state.value)
     assert "fragment_correction_state@all_species" not in calibration
     for species in ("O", "O2"):
+        procedure = calibration[f"procedure_kind@species={species}"]
+        assert procedure.state.is_value
+        assert procedure.state.value == "conditional_o_o2"
+        assert procedure.locator is not None
+        assert "conditional O/O2 procedure" in str(procedure.locator.paragraph)
         fragment = calibration[f"fragment_correction_state@species={species}"]
         assert fragment.state.is_unknown
         assert "conditional O/O2 procedure" in str(fragment.state.reason)

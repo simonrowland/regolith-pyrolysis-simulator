@@ -5,6 +5,9 @@ from __future__ import annotations
 from dataclasses import replace
 from pathlib import Path
 
+import pytest
+
+from simulator.battery import validity
 from simulator.battery.enums import (
     AdmissionStatus,
     Engine,
@@ -237,6 +240,49 @@ def test_hastie_unknown_kms_regime_rows_still_refuse_with_their_reason(
             assert residual.numeric is None
             assert residual.refusal is not None
             assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+def test_probe_activity_coefficient_does_not_inherit_activity_calibration_default(
+    tmp_path, monkeypatch
+) -> None:
+    works, experiments, observations = _hastie_store(tmp_path)
+    row = next(
+        row
+        for row in observations.values()
+        if row.source_id == SOURCE_ID
+        and quantity_token(row.identity) is Quantity.ACTIVITY_COEFFICIENT
+        and experiments[row.experiment_id].method.is_value
+        and experiments[row.experiment_id].method.value
+        is MethodToken.KNUDSEN_EFFUSION
+    )
+    context = ScoreContext(
+        works=works,
+        experiments=experiments,
+        observations=observations,
+        extract_review={SOURCE_ID: "reviewed"},
+        root=ROOT,
+    )
+    original = validity.underdetermined_apparatus
+
+    def broad_activity_default(experiment, quantity, *, observation=None):
+        if quantity is Quantity.ACTIVITY_COEFFICIENT:
+            return original(experiment, Quantity.ACTIVITY, observation=observation)
+        return original(experiment, quantity, observation=observation)
+
+    def production_contract():
+        residual, _candidate = compile_residual(
+            row,
+            SCORING_ENGINES[0],
+            context=context,
+            point_observations=tuple(observations.values()),
+        )
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+    with monkeypatch.context() as patch:
+        patch.setattr(validity, "underdetermined_apparatus", broad_activity_default)
+        with pytest.raises(AssertionError):
+            production_contract()
 
 
 def test_hastie_fig5_points_use_the_printed_initial_glass_proxy(tmp_path) -> None:
