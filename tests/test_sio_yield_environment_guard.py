@@ -1,19 +1,23 @@
+import json
 from types import SimpleNamespace
 
 import pytest
 
 from simulator import runner
+from tests.condensation_test_support import assert_no_sio_gate_environment_holds
 
 
-def test_sio_cli_environment_gate_refusal_is_not_golden_drift(
+def test_sio_cli_projects_environment_gate_hold_and_completes(
     monkeypatch,
     tmp_path,
 ):
     fake_execution = {
         "status": "partial",
-        "record": {
-            "snapshots": [
-                {
+        "per_hour_summary": [
+            {
+                "hour": 4,
+                "campaign": "C2A",
+                "oxygen_reservoir": {
                     "liquid_fraction_gate": {
                         "redox": {
                             "gate_provider_refusal": {
@@ -23,9 +27,9 @@ def test_sio_cli_environment_gate_refusal_is_not_golden_drift(
                             }
                         }
                     }
-                }
-            ]
-        },
+                },
+            }
+        ],
         "final_state": {
             "status": "unavailable",
             "section": "fake_sio_execution",
@@ -60,15 +64,39 @@ def test_sio_cli_environment_gate_refusal_is_not_golden_drift(
         lambda *_args, **_kwargs: None,
     )
 
-    with pytest.raises(
-        runner.RunnerError,
-        match="environment: gate_provider_refusal.*not a golden mismatch",
-    ):
-        runner.main_sio_yield(
-            [
-                "--feedstock",
-                "lunar_mare_low_ti",
-                "--output",
-                str(tmp_path / "sio-report.json"),
-            ]
-        )
+    output_path = tmp_path / "sio-report.json"
+    assert runner.main_sio_yield(
+        [
+            "--feedstock",
+            "lunar_mare_low_ti",
+            "--output",
+            str(output_path),
+        ]
+    ) == 0
+    report = json.loads(output_path.read_text())
+    assert report["gate_environment_holds"] == [
+        {
+            "hour": 4,
+            "campaign": "C2A",
+            "reason": "engine_worker_timeout",
+            "disposition": "environment",
+        }
+    ]
+
+
+def test_sio_golden_evidence_refuses_environment_gate_hold():
+    from simulator.reduced_real_determinism import ENVIRONMENT_GATE_HOLD_MESSAGE
+
+    report = {
+        "gate_environment_holds": [
+            {
+                "hour": 4,
+                "campaign": "C2A",
+                "reason": "engine_worker_timeout",
+                "disposition": "environment",
+            }
+        ]
+    }
+    with pytest.raises(AssertionError) as error:
+        assert_no_sio_gate_environment_holds(report)
+    assert str(error.value) == ENVIRONMENT_GATE_HOLD_MESSAGE

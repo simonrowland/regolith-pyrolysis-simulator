@@ -2,6 +2,19 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from simulator.reduced_real_determinism import (
+    ENVIRONMENT_GATE_HOLD_MESSAGE,
+    find_environment_gate_refusal,
+)
+
+
+def assert_no_sio_gate_environment_holds(report: Mapping) -> None:
+    for hold in report.get("gate_environment_holds", ()) or ():
+        if find_environment_gate_refusal(
+            {"gate_provider_refusal": hold}
+        ) is not None:
+            raise AssertionError(ENVIRONMENT_GATE_HOLD_MESSAGE)
+
 
 def assert_pfree_wall_prediction(route, species: str) -> None:
     """Require the d-402 flagged bound when the wall pO2 is unknown."""

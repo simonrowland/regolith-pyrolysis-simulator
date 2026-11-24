@@ -549,8 +549,11 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     from tests.chemistry.test_condensation_green_pins import (
         deterministic_gate_payload,
     )
+    from tests.condensation_test_support import assert_no_sio_gate_environment_holds
 
-    actual = deterministic_gate_payload(json.loads(output_path.read_text()))
+    actual_document = json.loads(output_path.read_text())
+    assert_no_sio_gate_environment_holds(actual_document)
+    actual = deterministic_gate_payload(actual_document)
     expected = deterministic_gate_payload(
         json.loads((FIXTURE_DIR / golden_name).read_text())
     )

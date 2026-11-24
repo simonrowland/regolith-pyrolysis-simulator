@@ -4735,23 +4735,52 @@ def build_sio_yield_report(
     result = base_run._run_session(session)
     if result.get("status") in {"failed", "refused"}:
         raise RunnerError(str(result.get("error_message", "SiO run failed")))
-    from simulator.reduced_real_determinism import (
-        ENVIRONMENT_GATE_HOLD_MESSAGE,
-        find_environment_gate_refusal,
-    )
+    from simulator.reduced_real_determinism import find_environment_gate_refusal
 
-    if find_environment_gate_refusal(result) is not None:
-        raise RunnerError(ENVIRONMENT_GATE_HOLD_MESSAGE)
+    gate_environment_holds: list[dict[str, Any]] = []
+    environment_refusal = find_environment_gate_refusal(result)
+    if environment_refusal is not None:
+        hourly_holds: list[tuple[Mapping, Mapping]] = []
+        for hour_summary in result.get("per_hour_summary", ()) or ():
+            if not isinstance(hour_summary, Mapping):
+                continue
+            refusal = find_environment_gate_refusal(hour_summary)
+            if refusal is not None:
+                hourly_holds.append((hour_summary, refusal))
+        if not hourly_holds:
+            hourly_holds.append(({}, environment_refusal))
+        for hour_summary, refusal in hourly_holds:
+            gate_environment_holds.append(
+                {
+                    "hour": hour_summary.get("hour", refusal.get("hour")),
+                    "campaign": hour_summary.get(
+                        "campaign", refusal.get("campaign")
+                    ),
+                    "reason": refusal.get("reason"),
+                    "disposition": (
+                        refusal.get("disposition")
+                        or refusal.get("backend_failure_disposition")
+                    ),
+                }
+            )
+    gate_environment_hold_fields = (
+        {"gate_environment_holds": gate_environment_holds}
+        if gate_environment_holds
+        else {}
+    )
 
     final_state = result.get("final_state", {})
     if (
         isinstance(final_state, Mapping)
         and final_state.get("status") == "unavailable"
     ):
-        report = _unavailable_report_from_upstream(
-            final_state,
-            section="sio_yield_report",
-        )
+        report = {
+            **_unavailable_report_from_upstream(
+                final_state,
+                section="sio_yield_report",
+            ),
+            **gate_environment_hold_fields,
+        }
         if include_diagnostics:
             return (
                 report,
@@ -4882,6 +4911,7 @@ def build_sio_yield_report(
         )
 
     report = {
+        **gate_environment_hold_fields,
         "feedstock_id": feedstock_id,
         "campaign": SIO_YIELD_CAMPAIGN,
         "alpha_SiO": _clean_report_float(sio_alpha_value),
