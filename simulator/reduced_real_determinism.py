@@ -24,7 +24,8 @@ from decimal import InvalidOperation
 from enum import Enum
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, ClassVar
+from types import UnionType
+from typing import Any, ClassVar, Union, get_args, get_origin, get_type_hints
 
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_CLASS_DISPLAY_NAME,
@@ -115,6 +116,7 @@ GATE_CURVE_NOTICE_KEYS = (
 GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
 PT0_GATE_CURVE_CODEC_VERSION = 3
 PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION = 2
+_EQUILIBRIUM_RESULT_FIELD_TYPES = get_type_hints(EquilibriumResult)
 
 
 @dataclasses.dataclass(frozen=True)
@@ -1709,7 +1711,7 @@ class PT0DeterminismStore:
             return None
         self._accepted_hit_disclosures = published
         if decoded_payload is not None:
-            return decoded_payload
+            return copy.deepcopy(decoded_payload)
         return copy.deepcopy(entry["payload"])
 
     def _merged_neighbor_disclosures(
@@ -4504,18 +4506,83 @@ def _decode_equilibrium_replay_payload(
     ):
         raise TypeError("equilibrium result diagnostics must be a mapping")
     authority = payload.get("authority")
-    if authority is not None and not isinstance(authority, Mapping):
+    if authority is not None and (
+        not isinstance(authority, Mapping)
+        or any(not isinstance(key, str) for key in authority)
+    ):
         raise TypeError("equilibrium replay authority must be a mapping")
+
+    def matches_type(value: Any, annotation: Any) -> bool:
+        if annotation is Any:
+            return True
+        if annotation is type(None):
+            return value is None
+        origin = get_origin(annotation)
+        if origin in (Union, UnionType):
+            return any(matches_type(value, option) for option in get_args(annotation))
+        if origin is list:
+            (item_type,) = get_args(annotation)
+            return isinstance(value, list) and all(
+                matches_type(item, item_type) for item in value
+            )
+        if origin is dict:
+            key_type, value_type = get_args(annotation)
+            return isinstance(value, Mapping) and all(
+                matches_type(key, key_type)
+                and matches_type(item, value_type)
+                for key, item in value.items()
+            )
+        if annotation is float:
+            if not isinstance(value, (int, float)) or isinstance(value, bool):
+                return False
+            try:
+                return math.isfinite(float(value))
+            except (OverflowError, TypeError, ValueError):
+                return False
+        if annotation is int:
+            return type(value) is int
+        if annotation is bool:
+            return type(value) is bool
+        if annotation is str:
+            return isinstance(value, str)
+        try:
+            return isinstance(value, annotation)
+        except TypeError:
+            return False
+
+    for field_name, value in result_data.items():
+        field_type = _EQUILIBRIUM_RESULT_FIELD_TYPES.get(field_name)
+        if field_type is not None and not matches_type(value, field_type):
+            raise TypeError(
+                f"equilibrium result field {field_name} has an invalid type"
+            )
     result = equilibrium_from_payload(payload)
     source = payload.get("last_vapor_pressures_source", {})
     diagnostic = payload.get("last_vapor_pressure_diagnostic", {})
-    if not isinstance(source, Mapping) or not isinstance(diagnostic, Mapping):
+    if (
+        not isinstance(source, Mapping)
+        or not isinstance(diagnostic, Mapping)
+        or any(not isinstance(key, str) for key in diagnostic)
+    ):
         raise TypeError("equilibrium replay diagnostics must be mappings")
+    if any(
+        not isinstance(species, str) or not isinstance(source_id, str)
+        for species, source_id in source.items()
+    ):
+        raise TypeError("equilibrium vapor pressure sources must map strings to strings")
+    if "pO2_bar" in diagnostic:
+        pressure = diagnostic["pO2_bar"]
+        if pressure is not None and not matches_type(pressure, float):
+            raise TypeError("equilibrium vapor diagnostic pO2_bar must be finite")
     alphamelts_diagnostics = payload.get("alphamelts_diagnostics")
     if alphamelts_diagnostics is not None and not isinstance(
         alphamelts_diagnostics, Mapping
     ):
         raise TypeError("AlphaMELTS replay diagnostics must be a mapping")
+    if isinstance(alphamelts_diagnostics, Mapping) and any(
+        not isinstance(key, str) for key in alphamelts_diagnostics
+    ):
+        raise TypeError("AlphaMELTS replay diagnostic keys must be strings")
     replay_diagnostic = dict(diagnostic)
     if replay_diagnostic and _payload_consumes_melt_envelope(payload, result):
         temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET

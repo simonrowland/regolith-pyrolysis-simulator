@@ -3367,8 +3367,18 @@ def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
         lambda *_args, **_kwargs: None,
     )
 
+    decoded_payload = rrd._decode_payload_for_admission(
+        "equilibrium_post_record",
+        source_entry["payload"],
+        keys=(source_entry["key"], query_key),
+    )
+
     def ladder_entry(_artifact, candidate_rung, *_args, **_kwargs):
-        return source_entry if candidate_rung == rung_tag else None
+        return (
+            (source_entry, decoded_payload)
+            if candidate_rung == rung_tag
+            else None
+        )
 
     monkeypatch.setattr(
         capture,
@@ -4607,9 +4617,13 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
     accepted = []
     original_accept = replay._accept_cached_hit
 
-    def record_accepted(entry, *, owner=None):
+    def record_accepted(entry, *, owner=None, decoded_payload=None):
         accepted.append(entry)
-        return original_accept(entry, owner=owner)
+        return original_accept(
+            entry,
+            owner=owner,
+            decoded_payload=decoded_payload,
+        )
 
     replay._accept_cached_hit = record_accepted
     payload = replay._lookup_first_available(
@@ -5211,6 +5225,90 @@ def test_unreadable_equilibrium_replay_side_row_misses_and_is_replaceable(
     )
     replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
     assert replay._lookup("equilibrium_post_record", key) == current_payload
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    ("field", "bad_value"),
+    (("vapor_pressures_Pa", 7), ("warnings", 7)),
+)
+def test_unreadable_equilibrium_result_field_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    field: str,
+    bad_value: Any,
+) -> None:
+    db_path = tmp_path / "unreadable-equilibrium-result.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    unreadable_payload = copy.deepcopy(current_payload)
+    unreadable_payload["equilibrium_result"][field] = bad_value
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        unreadable_payload,
+        law_disclosures=[],
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", key)
+    assert capture.hits == 0
+
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
+    assert replay._lookup("equilibrium_post_record", key) == current_payload
+
+
+def test_equilibrium_replay_result_is_deep_copied_from_cached_payload() -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    result.warnings = ["captured warning"]
+    result.vapor_pressures_Pa = {"SiO": 2.5}
+    key = capture._equilibrium_key(sim)
+    payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        payload,
+        law_disclosures=[],
+    )
+    entry = capture._entries[_key_hash(key)]
+    stored_bytes = canonical_json_bytes(entry["payload"])
+
+    first = capture._equilibrium_from_payload(
+        sim,
+        capture._lookup(
+            "equilibrium_post_record",
+            key,
+            return_decoded=True,
+        ),
+    )
+    first.warnings.append("caller mutation")
+    first.vapor_pressures_Pa["SiO"] = 999.0
+
+    assert canonical_json_bytes(entry["payload"]) == stored_bytes
+    second = capture._equilibrium_from_payload(
+        sim,
+        capture._lookup(
+            "equilibrium_post_record",
+            key,
+            return_decoded=True,
+        ),
+    )
+    assert second.warnings == ["captured warning"]
+    assert second.vapor_pressures_Pa == {"SiO": 2.5}
+    assert canonical_json_bytes(entry["payload"]) == stored_bytes
 
 
 def test_pt1_stale_replacement_publishes_fresh_measured_disclosure(

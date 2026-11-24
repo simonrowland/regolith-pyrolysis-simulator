@@ -14,6 +14,7 @@ from simulator.account_ids import SPENT_REDUCTANT_RESIDUE_ACCOUNT
 from simulator.chemistry.langmuir_knudsen import hertz_knudsen_k_kg_s_m2_pa
 from simulator.optimize import study
 import simulator.optimize.objective as objective_module
+import simulator.reduced_real_determinism as rrd
 from scripts import sso_r_validation_map as validation_map
 from simulator.cost_parameters import CostParameters
 from simulator.core import PyrolysisSimulator
@@ -8375,11 +8376,25 @@ def _consume_cached_equilibrium(
 
     from simulator.reduced_real_determinism import PT0DeterminismStore
 
+    def lookup(
+        artifact,
+        key,
+        *,
+        sim=None,
+        return_decoded=False,
+        **kwargs,
+    ):
+        return (
+            rrd._decode_equilibrium_replay_payload(payload)
+            if return_decoded
+            else payload
+        )
+
     if entry == "replay":
         store = PT0DeterminismStore("replay")
         setattr(store, "_authorize_cached_real_replay", lambda sim, **kwargs: None)
         setattr(store, "_equilibrium_key", lambda sim: {"namespace_id": "stamp"})
-        setattr(store, "_lookup", lambda artifact, key, sim=None: payload)
+        setattr(store, "_lookup", lookup)
         return store.replay_equilibrium(host)
     if entry != "write_through":
         raise AssertionError(entry)
@@ -8387,7 +8402,7 @@ def _consume_cached_equilibrium(
     assert store.write_through_enabled
     setattr(store, "_cached_real_binding_eligible", lambda sim, **kwargs: True)
     setattr(store, "_equilibrium_key", lambda sim: {"namespace_id": "stamp"})
-    setattr(store, "_lookup_optional", lambda artifact, key, **kwargs: payload)
+    setattr(store, "_lookup_optional", lookup)
     result = store.cached_equilibrium(host)
     assert result is not None
     return result

@@ -1085,17 +1085,15 @@ def test_gate_replay_skips_unadmitted_optional_fallback_candidate(
         keys,
         *,
         sim,
-        require_gate_curve_domain_diagnostic=False,
+        return_decoded=False,
     ):
         lookup_keys.extend(keys)
         return {
-            "curve": {
-                "source": "gate_liquid_fraction",
-                "solidus_T_C": 1000.0,
-                "liquidus_T_C": 1300.0,
-                "is_liquidus_floor": False,
-                "path": [],
-            }
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1000.0,
+            "liquidus_T_C": 1300.0,
+            "is_liquidus_floor": False,
+            "path": ((1000.0, 0.0), (1300.0, 1.0)),
         }
 
     monkeypatch.setattr(store, "_authorize_cached_real_replay", authorize)
