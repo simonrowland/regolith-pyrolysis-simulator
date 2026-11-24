@@ -11,12 +11,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-Cu_and_Fe-P-Mn' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -39,7 +38,18 @@ observations:
   admission:
     status: pending
     reason: source admission_status=true_absence is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-Cu_and_Fe-P-Mn'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_Fe_P_Cu_Mn_not_measurable
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -68,12 +78,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140,6 +149,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_Al_body_4p0_printed
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -180,12 +201,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -253,6 +273,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_Si_fruehan_aFe_12p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -322,12 +354,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -402,7 +433,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -445,12 +488,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -525,7 +567,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -568,12 +622,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -648,7 +701,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -691,12 +756,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -771,7 +835,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -814,12 +890,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -894,7 +969,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -937,12 +1024,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1017,7 +1103,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -1060,12 +1158,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1140,7 +1237,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -1183,12 +1292,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1263,7 +1371,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -1306,12 +1426,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1386,7 +1505,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_epsilon_P_i_this_work_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -1429,12 +1560,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1458,6 +1588,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_fig1_Si_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -1490,12 +1631,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1519,6 +1659,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_fig2_Al_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -1551,12 +1702,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1580,6 +1730,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_fig3_3d_metals_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -1612,12 +1773,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1641,6 +1801,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_fig4_Nb_Mo_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -1673,12 +1844,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1702,6 +1872,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_fig5a_epsilon_vs_atomic_number_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -1736,12 +1917,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-S-i_quoted' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1766,6 +1946,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-S-i_quoted'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_fig5b_epsilon_S_quoted_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -1798,12 +1989,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1829,7 +2019,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -1858,12 +2059,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1883,7 +2083,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -1912,12 +2123,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1937,7 +2147,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -1966,12 +2187,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1991,7 +2211,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2020,12 +2251,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2045,7 +2275,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2074,12 +2315,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2099,7 +2339,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2128,12 +2379,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2153,7 +2403,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2182,12 +2443,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2207,7 +2467,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2236,12 +2507,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2261,7 +2531,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2290,12 +2571,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2315,7 +2595,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2344,12 +2635,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2369,7 +2659,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table1_source_and_purity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 51
@@ -2398,12 +2699,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2468,7 +2768,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -2510,12 +2822,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2580,7 +2891,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -2622,12 +2945,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2692,7 +3014,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -2734,12 +3068,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2804,7 +3137,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -2846,12 +3191,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2916,7 +3260,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54
@@ -2958,12 +3314,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P-i_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3028,7 +3383,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P-i_alloy'' is not in the closed automatic map'
+    origin: kems-105-yamada-1983::yamada_1983_table2_quoted_interaction_coefficients
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-105-yamada-1983
   locator:
     published_page: 54

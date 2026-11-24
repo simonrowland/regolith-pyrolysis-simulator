@@ -11,12 +11,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,7 +39,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_glass'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_analytical_measurement_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_analytical_measurement_conditions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 175
@@ -66,12 +86,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -98,7 +117,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=2e78aff879b4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -117,12 +157,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -149,7 +188,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=683f7b01fcfd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -168,12 +228,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -200,7 +259,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=bee9045597dd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -219,12 +299,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -251,7 +330,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_evaporation_rate_constants::rows:h=dcc2fa8c8b93
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -299,7 +399,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_hsc_boron_gas_speciation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 178
@@ -325,12 +435,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -357,7 +466,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=0a73b91662a4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -412,12 +542,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -444,7 +573,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=148f1c957d9d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -499,12 +649,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -531,7 +680,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=2af32d923a65
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -586,12 +756,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -618,7 +787,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=62d96003dac9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -673,12 +863,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -705,7 +894,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=70fd2f94633f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -760,12 +970,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -792,7 +1001,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=c0bf7bb540cf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -847,12 +1077,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -879,7 +1108,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=c6cfd0eada92
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -934,12 +1184,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -966,7 +1215,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=c930f1c32c2c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -1021,12 +1291,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1053,7 +1322,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=cf922c791a28
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -1108,12 +1398,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1140,7 +1429,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=d946d52368d0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -1195,12 +1505,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1227,7 +1536,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=f0689c1377bb
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -1282,12 +1612,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1314,7 +1643,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_radius_loss_time_model::rows:h=f07acb400284
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 180
@@ -1369,12 +1719,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1398,7 +1747,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_glass'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_sample_and_furnace_apparatus
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_sample_and_furnace_apparatus
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 174
@@ -1424,12 +1794,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_glass' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1466,7 +1835,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_glass'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_starting_glass_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_starting_glass_composition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 174
@@ -1635,12 +2025,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1662,7 +2051,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=12df5a282809
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1681,12 +2091,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1708,7 +2117,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=18712a0966ed
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1727,12 +2157,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1754,7 +2183,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=2993279913ce
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1773,12 +2223,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1800,7 +2249,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=3e94c160c2be
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1819,12 +2289,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1846,7 +2315,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=4329f74d33b5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1865,12 +2355,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1892,7 +2381,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=4fa2a80c75b7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1911,12 +2421,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1938,7 +2447,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=5356a2f4a1ad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -1957,12 +2487,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1984,7 +2513,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=5c807f721b34
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2003,12 +2553,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2030,7 +2579,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=6bb886666cf3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2049,12 +2619,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2076,7 +2645,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=6d5ce37905ec
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2095,12 +2685,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2122,7 +2711,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=7d7ddcadd6d1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2141,12 +2751,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2168,7 +2777,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=816dbccb346c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2187,12 +2817,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2214,7 +2843,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=825ff70d6052
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2233,12 +2883,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2260,7 +2909,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=92215d94e299
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2279,12 +2949,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2306,7 +2975,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=981326326f73
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2325,12 +3015,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2352,7 +3041,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=9d2382567523
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2371,12 +3081,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2398,7 +3107,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=9ee4b255ae63
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2417,12 +3147,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2444,7 +3173,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=a31df2d09230
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2463,12 +3213,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2490,7 +3239,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=a38c9cf64da5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2509,12 +3279,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2536,7 +3305,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=ab6ca3b0996e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2555,12 +3345,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2582,7 +3371,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=ac872373cf2e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2601,12 +3411,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2628,7 +3437,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=b1b8d732b9d4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2647,12 +3477,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2674,7 +3503,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=b9078a6dba66
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2693,12 +3543,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2720,7 +3569,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=be4454dde8a6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2739,12 +3609,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2766,7 +3635,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=c1e361c26947
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2785,12 +3675,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2812,7 +3701,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=c96ff0be4e62
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2831,12 +3741,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2858,7 +3767,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=cc0c8edc0e0e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2877,12 +3807,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2904,7 +3833,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_b2o3_concentrations::rows:h=e338cfa3abe5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2923,12 +3873,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2950,7 +3899,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=06113078fc18
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -2969,12 +3939,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2996,7 +3965,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=080b0e17d92b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3015,12 +4005,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3042,7 +4031,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=0d83b41b3aad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3061,12 +4071,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3088,7 +4097,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=13311fd27fe9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3107,12 +4137,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3134,7 +4163,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=13b1930baa6f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3153,12 +4203,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3180,7 +4229,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=161c2f3baffa
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3199,12 +4269,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3226,7 +4295,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=170ff86f01c2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3245,12 +4335,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3272,7 +4361,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=2f0a49583f07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3291,12 +4401,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3318,7 +4427,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=4734a2dcbbf3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3337,12 +4467,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3364,7 +4493,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=4e2927a14a7f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3383,12 +4533,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3410,7 +4559,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=663956c2dfd1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3429,12 +4599,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3456,7 +4625,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=69cfc0ce1b89
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3475,12 +4665,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3502,7 +4691,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=80bfdc0ab74f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3521,12 +4731,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3548,7 +4757,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=82ea5a78dbe4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3567,12 +4797,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3594,7 +4823,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=8d39ed689c0f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3613,12 +4863,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3640,7 +4889,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=9963114cde18
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3659,12 +4929,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3686,7 +4955,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=ada85c62a3b9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3705,12 +4995,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3732,7 +5021,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=b1c6afeae9aa
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3751,12 +5061,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3778,7 +5087,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=b41e2d4c94af
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3797,12 +5127,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3824,7 +5153,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=c663a1e537c4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3843,12 +5193,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3870,7 +5219,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=d0d8fdde1aa0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3889,12 +5259,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3916,7 +5285,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=ded18877d489
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3935,12 +5325,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3962,7 +5351,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=e0a2aaa31e33
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176
@@ -3981,12 +5391,11 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'aluminoborosilicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4008,7 +5417,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''aluminoborosilicate_melt'' is not in the closed automatic map'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ta-flemetakis-2024::flemetakis_2024_table2_normalized_boron_loss::rows:h=e4e0fa14f450
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ta-flemetakis-2024
   locator:
     published_page: 176

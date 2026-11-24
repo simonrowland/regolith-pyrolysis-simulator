@@ -11,12 +11,11 @@ observations:
     species:
       formula: Bennu_QL_fines
       phase:
-        tag: unknown
-        reason: phase string 'Bennu_returned_QL_fines_OREX-500002-0' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Bennu_returned_QL_fines_OREX-500002-0'' is not in the closed automatic map'
+    origin: lpsc-2024-bennu-pyrolysis-vandam::mojarro_2024_ql_alanine_glycine_vs_murchison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpsc-2024-bennu-pyrolysis-vandam
   locator:
     pdf_page_index: 1

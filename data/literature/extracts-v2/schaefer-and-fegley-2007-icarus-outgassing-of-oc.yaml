@@ -11,12 +11,11 @@ observations:
     species:
       formula: CH4
       phase:
-        tag: unknown
-        reason: phase string 'equilibrium_gas_over_average_ordinary_chondrite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -43,7 +42,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''equilibrium_gas_over_average_ordinary_chondrite'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_ch4_major_gas_model_claim
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 1
@@ -90,12 +100,11 @@ observations:
     species:
       formula: H_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'equilibrium_gas_over_average_ordinary_chondrite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -129,7 +138,18 @@ observations:
         published_page: 466–479
         figure: 2–17
         note: All calculated gas-chemistry / mineralogy / fO2 plots; not digitised; pdf_page_index=5–18
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''equilibrium_gas_over_average_ordinary_chondrite'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_gas_chemistry_figures_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     published_page: 466–479
@@ -175,12 +195,11 @@ observations:
     species:
       formula: H_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'asteroid_6_Hebe_thermal_profile' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -209,7 +228,18 @@ observations:
   admission:
     status: pending
     reason: source admission_status=model_input_not_measurement is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''asteroid_6_Hebe_thermal_profile'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_hebe_tp_program_printed
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 4
@@ -260,12 +290,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'ordinary_chondrite_solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -291,7 +320,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ordinary_chondrite_solid'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_brett_sato_1984_fo2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 11
@@ -322,12 +362,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'Holbrook_L6_quoted_stepwise_vacuum_heating' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -352,7 +391,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Holbrook_L6_quoted_stepwise_vacuum_heating'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_gooding_muenow_1977_holbrook
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 5
@@ -373,12 +423,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'ordinary_chondrite_vacuum_heating_quoted' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -403,7 +452,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''ordinary_chondrite_vacuum_heating_quoted'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_quoted_muenow_1995_heating
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 5
@@ -423,12 +483,11 @@ observations:
     species:
       formula: H_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'average_H_chondrite_falls' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -450,7 +509,18 @@ observations:
   admission:
     status: pending
     reason: source admission_status=authors_average_of_METBASE_falls_not_this_work_instrument is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_H_chondrite_falls'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_h_chondrite_falls
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 3
@@ -470,12 +540,11 @@ observations:
     species:
       formula: L_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'average_L_chondrite_falls' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -497,7 +566,18 @@ observations:
   admission:
     status: pending
     reason: source admission_status=authors_average_of_METBASE_falls_not_this_work_instrument is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_L_chondrite_falls'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_l_chondrite_falls
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 3
@@ -517,12 +597,11 @@ observations:
     species:
       formula: LL_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'average_LL_chondrite_falls' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -544,7 +623,18 @@ observations:
   admission:
     status: pending
     reason: source admission_status=authors_average_of_METBASE_falls_not_this_work_instrument is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_LL_chondrite_falls'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table1_ll_chondrite_falls
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 3
@@ -564,12 +654,11 @@ observations:
     species:
       formula: H_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'olivine_orthopyroxene_plagioclase_solid_solutions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -593,7 +682,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_orthopyroxene_plagioclase_solid_solutions'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_h_solid_solutions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 11
@@ -613,12 +713,11 @@ observations:
     species:
       formula: L_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'olivine_orthopyroxene_plagioclase_solid_solutions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -642,7 +741,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_orthopyroxene_plagioclase_solid_solutions'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_l_solid_solutions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 11
@@ -662,12 +772,11 @@ observations:
     species:
       formula: LL_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'olivine_orthopyroxene_plagioclase_solid_solutions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -691,7 +800,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''olivine_orthopyroxene_plagioclase_solid_solutions'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table2_ll_solid_solutions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 11
@@ -711,12 +831,11 @@ observations:
     species:
       formula: H_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'average_H_chondrite_normative_vs_calculated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -740,7 +859,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_H_chondrite_normative_vs_calculated'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_h_normative_vs_hebe
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 12
@@ -760,12 +890,11 @@ observations:
     species:
       formula: L_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'average_L_chondrite_normative_vs_calculated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -789,7 +918,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_L_chondrite_normative_vs_calculated'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_l_normative_vs_hebe
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 12
@@ -809,12 +949,11 @@ observations:
     species:
       formula: LL_chondrite
       phase:
-        tag: unknown
-        reason: phase string 'average_LL_chondrite_normative_vs_calculated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -838,7 +977,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_LL_chondrite_normative_vs_calculated'' is not in the closed automatic map'
+    origin: schaefer-and-fegley-2007-icarus-outgassing-of-oc::schaefer_2007_table3_ll_normative_vs_hebe
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: schaefer-and-fegley-2007-icarus-outgassing-of-oc
   locator:
     page: 12

@@ -51,14 +51,15 @@ def _residue_adapter_kinds(point, engine, experiment, quantity) -> tuple[object,
     """Residue predictors this pair selects, in assignment order.
 
     Hashimoto and Sossi bind only on openimcc and internal-analytical.
-    Knudsen binds on every engine when the experiment method is Knudsen
-    effusion, and it is last so it overwrites an earlier prediction.
+    Method-specific extent adapters are last so they overwrite an earlier
+    prediction.
     Shard-failure and duplicate guards are not part of this choice: the
     score loop applies those before it calls a predictor.
     """
 
-    from simulator.battery.enums import Engine, MethodToken, Quantity
+    from simulator.battery.enums import Engine, Quantity
     from simulator.battery.identity import Identity
+    from simulator.battery.score import _extent_residue_method
 
     if quantity not in {
         Quantity.RESIDUE_COMPONENT_COMPOSITION,
@@ -79,12 +80,8 @@ def _residue_adapter_kinds(point, engine, experiment, quantity) -> tuple[object,
         Engine.INTERNAL_ANALYTICAL,
     }:
         kinds.append(SOSSI_RESIDUE_PREDICTOR)
-    if (
-        experiment is not None
-        and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-    ):
-        kinds.append(MethodToken.KNUDSEN_EFFUSION)
+    if (extent_method := _extent_residue_method(point, experiment, quantity)) is not None:
+        kinds.append(extent_method)
     return tuple(kinds)
 
 
@@ -416,11 +413,11 @@ def _score_store_with_decisions(
         _compilation_decision_strata,
         _compile_residual_with_lineage,
         _duplicate_observation_refusal_detail,
+        _extent_residue_prediction,
         _group_token,
         _has_duplicate_observation_link,
         _has_intrinsic_redox_activity,
         _hashimoto_residue_prediction,
-        _knudsen_residue_prediction,
         _prepare_score_run,
         _source_alignment_group_key,
         _sossi_residue_prediction,
@@ -664,8 +661,11 @@ def _score_store_with_decisions(
                                 selected_experiment_ids=prepared.sossi_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
-                        if MethodToken.KNUDSEN_EFFUSION in residue_kinds:
-                            prediction = _knudsen_residue_prediction(
+                        if (
+                            MethodToken.KNUDSEN_EFFUSION in residue_kinds
+                            or MethodToken.LANGMUIR_FREE_EVAPORATION in residue_kinds
+                        ):
+                            prediction = _extent_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(

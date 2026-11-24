@@ -440,7 +440,18 @@ observations:
         figure: '4'
         note: Quasi-binary Na2O-SiO2 comparison; experimental points attributed in the legend to prior studies. No numeric
           table is printed.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na2o_fig4_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: witthohn-2000-coal-slag-alkali-vaporisation
   locator:
     page: 17
@@ -551,7 +562,18 @@ observations:
         figure: '5'
         note: Quasi-ternary Na2O-SiO2-CaO comparison; experimental points attributed to Neudorf and Elliott (1980). No numeric
           table is printed.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: witthohn-2000-coal-slag-alkali-vaporisation::witthohn_2000_na2o_fig5_figure_only
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: witthohn-2000-coal-slag-alkali-vaporisation
   locator:
     page: 18

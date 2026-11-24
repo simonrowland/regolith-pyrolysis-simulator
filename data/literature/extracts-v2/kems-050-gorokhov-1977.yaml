@@ -39,7 +39,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_law''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-050-gorokhov-1977::gorokhov_1977_cro2_isomolecular_cited_t4_absent
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-050-gorokhov-1977
   locator:
     table: Cr.T4
@@ -108,7 +119,18 @@ observations:
           '
         source_path: https://www.chem.msu.ru/rus/tsiv/Cr/print-CrO.html
         record: '[77ГОР/ГУС]'
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_law''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_second_law
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-050-gorokhov-1977
   locator:
     table: Cr.T3
@@ -174,7 +196,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''kems_second_law''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-050-gorokhov-1977::gorokhov_1977_t3_cro_alo_exchange_third_law_d0
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-050-gorokhov-1977
   locator:
     table: Cr.T3

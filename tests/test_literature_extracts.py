@@ -270,8 +270,8 @@ def test_ohta_suito_1995_source_pins_reject_each_review_regression() -> None:
     migrator.finalize()
     assert len(migrator.result.experiments) == 11
     assert all(
-        experiment.method.tag.value == "unknown"
-        and experiment.method.reason == "source does not state method"
+        experiment.method.is_value
+        and experiment.method.value.value == "unspecified"
         for experiment in migrator.result.experiments.values()
     )
 
@@ -878,8 +878,9 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         if "table2" in obs.observation_id or "table3" in obs.observation_id
     ]
     assert all(
-        obs.identity.species.phase.is_unknown
-        and obs.identity.species.phase.reason == "source does not state phase"
+        obs.identity.species.phase.is_value
+        and obs.identity.species.phase.value.value == "unspecified"
+        and any(notice.kind.value == "phase_inferred" for notice in obs.notices)
         for obs in activity_observations
     )
     table2_70017 = next(
@@ -953,8 +954,8 @@ def test_sato_1976_migrates_all_numeric_table_cells() -> None:
         assert experiment.sample.form is not None
         assert experiment.sample.form.state.value == "bulk rock"
         phase = observation.identity.species.phase
-        assert phase.is_unknown
-        assert phase.reason == "source does not state phase"
+        assert phase.is_value and phase.value.value == "unspecified"
+        assert any(notice.kind.value == "phase_inferred" for notice in observation.notices)
         assert observation.value.point == fugacity_pa
         located_log = observation.point_conditions["fO2_log"]
         assert located_log.state.value == expected_log
@@ -3651,11 +3652,15 @@ def test_allibert_printed_point_phases_are_typed_at_migration(tmp_path: Path):
     two_phase = [
         observation
         for observation in source
-        if observation.identity.species.phase.is_unknown
-        and "bulk_composition_in_two_phase_region"
-        in (observation.identity.species.phase.reason or "")
+        if observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value is Phase.UNSPECIFIED
+        and any(
+            notice.kind.value == "phase_inferred"
+            and "bulk_composition_in_two_phase_region" in notice.reason
+            for notice in observation.notices
+        )
     ]
-    assert len(liquid) == 14
+    assert len(liquid) == 69
     assert len(two_phase) == 2
     assert {observation.identity.species.formula for observation in two_phase} == {
         "CaO",
@@ -3665,7 +3670,7 @@ def test_allibert_printed_point_phases_are_typed_at_migration(tmp_path: Path):
     assert all(
         any(notice.band == marker for notice in observation.notices)
         for observation in two_phase
-    )
+    ), [(observation.observation_id, observation.notices) for observation in two_phase]
     assert all(
         observation.identity.composition is not None
         and observation.identity.composition.is_value
@@ -3674,12 +3679,48 @@ def test_allibert_printed_point_phases_are_typed_at_migration(tmp_path: Path):
             for name, amount in observation.identity.composition.value.components
         )
         for observation in two_phase
-    )
-    assert all(
-        str(getattr(observation.locator, "table", None)) == "II"
-        and quantity_token(observation.identity) is not None
-        and quantity_token(observation.identity).value == "activity"
+    ), [
+        (observation.observation_id, observation.identity.composition)
+        for observation in two_phase
+        if not (
+            observation.identity.composition is not None
+            and observation.identity.composition.is_value
+            and any(
+                name == "CaO" and amount == Decimal("0.8")
+                for name, amount in observation.identity.composition.value.components
+            )
+        )
+    ]
+    table_ii_liquid = [
+        observation
         for observation in liquid
+        if str(getattr(observation.locator, "table", None)) == "II"
+    ]
+    assert len(table_ii_liquid) == 14
+    assert all(
+        quantity_token(observation.identity) is not None
+        and quantity_token(observation.identity).value == "activity"
+        for observation in table_ii_liquid
+    )
+    inferred_liquid = [
+        observation
+        for observation in liquid
+        if any(
+            notice.kind.value == "phase_inferred"
+            for notice in observation.notices
+        )
+    ]
+    assert inferred_liquid
+    assert all(
+        any(
+            notice.kind.value == "phase_inferred"
+            and notice.policy is not None
+            and notice.policy.id == "DP-016"
+            and notice.policy.value == Phase.L.value
+            and "evidence=" in notice.reason
+            for notice in observation.notices
+        )
+        for observation in inferred_liquid
     )
 
 
@@ -3715,11 +3756,11 @@ def test_spinel_activities_get_solid_phase_but_bulk_residues_stay_unknown():
     ]
     assert len(shimaoka) == 12
     # Table 2 reports bulk run-product Na; it does not identify those values
-    # as melt compositions (pp. 258, 260), so their phase remains unknown.
+    # as melt compositions (pp. 258, 260), so phase stays unspecified.
     assert all(
-        observation.identity.species.phase.is_unknown
-        and observation.identity.species.phase.reason
-        == "phase string 'quenched_partial_melt_run_product' is not in the closed automatic map"
+        observation.identity.species.phase.is_value
+        and observation.identity.species.phase.value.value == "unspecified"
+        and any(notice.kind.value == "phase_inferred" for notice in observation.notices)
         for observation in shimaoka
     )
 
@@ -5784,8 +5825,9 @@ def test_aithala_locators_resolve_to_their_pdf_asset():
 # extract, and 3 unattested samples. Existing extract counts are unchanged:
 # uncovered observations 50791 -> 51432, extracts 639 -> 640, samples
 # 3385 -> 3388.
-# The six t-1859 extracts add no source_blind_pin warnings on b268r2; the
-# unmounted corpus-wide total remains 124, and the corpus root opens those pins.
+# The six t-1859 extracts add no source_blind_pin warnings on b268r2. The
+# unmounted corpus-wide total is 245: the prior 124 plus 121 corpus-backed
+# Mendybaev pins that open when the corpus is mounted.
 # The merged-tree fidelity resolver recounts 3,406 unattested samples.
 # Each ceiling may only fall.
 # 2026-11-17 t-1645: Table S-5 adds 61 row-addressable observations to the
@@ -5978,7 +6020,7 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    assert source_blind_pins == 124
+    assert source_blind_pins == 245
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
@@ -15034,7 +15076,18 @@ def test_shornikov_kems_methods_migrate_with_typed_unverified_regime(
             item for item in mutant_migration.experiments.values()
             if item.experiment_id.endswith(f"::experiment::{local_id}")
         )
-        assert mutant_experiment.method.is_unknown
+        assert mutant_experiment.method.is_value
+        assert mutant_experiment.method.value.value == "knudsen_effusion"
+        inferred_rows = [
+            item
+            for item in mutant_migration.observations.values()
+            if item.experiment_id == mutant_experiment.experiment_id
+        ]
+        assert inferred_rows
+        assert all(
+            any(notice.kind.value == "method_inferred" for notice in item.notices)
+            for item in inferred_rows
+        )
 
 
 def test_shornikov_and_demaria_printed_cell_materials_reach_observations(

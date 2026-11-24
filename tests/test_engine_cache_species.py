@@ -1315,3 +1315,386 @@ def test_migrate_refuses_user_version_2(tmp_path) -> None:
         assert connection.execute("SELECT value FROM engine_outputs").fetchone()[0] == pack(
             {"answer": 1}
         )
+
+
+def _long_composition(oxide: str) -> dict:
+    composition = {f"Ox{index}": float(index + 1) for index in range(40)}
+    composition[oxide] = 1.0
+    return {"composition_mol": composition}
+
+
+def _plant_schema3(path: Path, rows: list[tuple[bytes, bytes, str, str]]) -> None:
+    first = engine_cache.ENGINE_CACHE_BOX_RANGES["laptop"][0]
+    with _schema_v3(path) as connection:
+        for index, (key, value, engine, version) in enumerate(rows):
+            connection.execute(
+                "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
+                (key, value, engine, version, "laptop", first + index, 0),
+            )
+        connection.execute(
+            "INSERT INTO box_sequences VALUES (?,?)",
+            ("laptop", first + len(rows)),
+        )
+
+
+def _enable_write(monkeypatch, path: Path) -> None:
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+
+
+def _side_species(path: Path, key: bytes) -> set[str] | None:
+    """Species text on the side row, or None when that HOT key has no side row."""
+
+    with sqlite3.connect(path) as connection:
+        located = connection.execute(
+            "SELECT source_box, row_seq FROM engine_outputs WHERE key=?", (key,)
+        ).fetchone()
+        if located is None:
+            raise AssertionError("planted key is missing")
+        names = connection.execute(
+            "SELECT species FROM engine_output_species WHERE source_box=? AND row_seq=?",
+            located,
+        ).fetchall()
+    if not names:
+        return None
+    return {name for (name,) in names}
+
+
+def _hit(engine: str, request: dict):
+    return engine_cache.cached_engine_call(
+        engine, request, lambda: pytest.fail("HOT hit recomputed")
+    )
+
+
+def test_hit_backfills_a_migrated_digest_for_every_engine(tmp_path, monkeypatch) -> None:
+    """A blake2b row migrate could not label gets its side row from the request."""
+
+    path = tmp_path / "every-engine.sqlite"
+    planted = []
+    requests = {}
+    for index, engine in enumerate(sorted(engine_cache.ENGINE_CHEMISTRY_VERSION)):
+        request = _long_composition("SiO2")
+        request["composition_mol"]["Marker"] = float(index)
+        version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+        key = engine_cache.engine_cache_key(engine, version, request)
+        assert key[3] == 0xFF
+        assert engine_cache.species_from_natural_key(key) is None
+        requests[engine] = request
+        planted.append((key, pack({"answer": index}), engine, str(version)))
+    _plant_schema3(path, planted)
+    migrated = engine_cache.migrate_cache_file(path, vacuum=False)
+    assert migrated["digest_keys"] == len(planted)
+    assert migrated["species_unknown_by_engine"] == {
+        engine: 1 for engine in requests
+    }
+    before = engine_cache.engine_cache_stats(path)
+    assert before["species_unknown_by_engine"] == {engine: 1 for engine in requests}
+    assert _side_species(path, planted[0][0]) is None
+
+    _enable_write(monkeypatch, path)
+    checks_before = engine_cache._SPECIES_PRESENCE_CHECKS
+    for index, (key, _value, engine, _version) in enumerate(planted):
+        engine_cache._MEMORY_CACHE.clear()
+        assert _hit(engine, requests[engine]) == {"answer": index}
+        assert _side_species(path, key) == set(
+            engine_cache.cache_request_species(requests[engine])
+        )
+    assert engine_cache._SPECIES_PRESENCE_CHECKS == checks_before + len(planted)
+    after = engine_cache.engine_cache_stats(path)
+    assert after["species_unknown_by_engine"] == {engine: 0 for engine in requests}
+
+    # The result cache was cleared. The presence memo still has the key,
+    # so this hit does not probe the side table again and does not write.
+    checks_after = engine_cache._SPECIES_PRESENCE_CHECKS
+    engine_cache._MEMORY_CACHE.clear()
+    connection = engine_cache._connect(path, readonly=False)
+    queries: list[str] = []
+    connection.set_trace_callback(queries.append)
+    engine, request = next(iter(requests.items()))
+    assert _hit(engine, request) == {"answer": 0}
+    assert engine_cache._SPECIES_PRESENCE_CHECKS == checks_after
+    assert not any("engine_output_species" in query for query in queries)
+    assert not any(query.lstrip().upper().startswith("INSERT") for query in queries)
+
+
+@pytest.mark.engine_cache_off
+def test_readonly_hit_does_not_backfill_species(tmp_path, monkeypatch) -> None:
+    """A read-only hit probes and does not write.
+
+    ``engine_cache_off`` clears the runner mode before the snapshot. Setting
+    readonly then differs from that snapshot, so this test file is read-only
+    without becoming the runner file (a runner file will not serve this double).
+    """
+
+    path = tmp_path / "readonly.sqlite"
+    request = _long_composition("MgO")
+    key = engine_cache.engine_cache_key("openimcc", 1, request)
+    assert key[3] == 0xFF
+    _plant_schema3(path, [(key, pack({"answer": 4}), "openimcc", "1")])
+    engine_cache.migrate_cache_file(path, vacuum=False)
+    assert engine_cache.engine_cache_stats(path)["species_unknown_by_engine"] == {
+        "openimcc": 1
+    }
+    snapshot = _output_rows(path), _species_by_row(path)
+
+    _enable_write(monkeypatch, path)
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_MODE", "readonly")
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    connection = engine_cache._connect(path, readonly=True)
+    queries: list[str] = []
+    connection.set_trace_callback(queries.append)
+    checks = engine_cache._SPECIES_PRESENCE_CHECKS
+    assert _hit("openimcc", request) == {"answer": 4}
+    assert engine_cache._SPECIES_PRESENCE_CHECKS == checks + 1
+    assert _side_species(path, key) is None
+    assert not any(query.lstrip().upper().startswith("INSERT") for query in queries)
+    assert (_output_rows(path), _species_by_row(path)) == snapshot
+
+    engine_cache._MEMORY_CACHE.clear()
+    queries.clear()
+    assert _hit("openimcc", request) == {"answer": 4}
+    # Missing on a read-only file is not memoized as present, and it is not written.
+    assert engine_cache._SPECIES_PRESENCE_CHECKS == checks + 2
+    assert _side_species(path, key) is None
+    assert not any(query.lstrip().upper().startswith("INSERT") for query in queries)
+    assert engine_cache.engine_cache_stats(path)["species_unknown_by_engine"] == {
+        "openimcc": 1
+    }
+
+
+def test_hit_does_not_rewrite_an_existing_species_row(tmp_path, monkeypatch) -> None:
+    path = tmp_path / "present.sqlite"
+    request = {"composition_wt_pct": {"SiO2": 1.0}, "marker": 1}
+    _enable_write(monkeypatch, path)
+    _store(monkeypatch, path, "openimcc", request, answer=3)
+    assert _species_by_row(path)[next(iter(_species_by_row(path)))] == {"sio2"}
+    before = _species_by_row(path)
+    engine_cache._MEMORY_CACHE.clear()
+    connection = engine_cache._connect(path, readonly=False)
+    queries: list[str] = []
+    connection.set_trace_callback(queries.append)
+    checks = engine_cache._SPECIES_PRESENCE_CHECKS
+    assert _hit("openimcc", request) == {"answer": 3}
+    assert engine_cache._SPECIES_PRESENCE_CHECKS == checks + 1
+    assert not any(query.lstrip().upper().startswith("INSERT") for query in queries)
+    assert _species_by_row(path) == before
+
+    engine_cache._MEMORY_CACHE.clear()
+    queries.clear()
+    assert _hit("openimcc", request) == {"answer": 3}
+    assert engine_cache._SPECIES_PRESENCE_CHECKS == checks + 1
+    assert queries == [] or not any(
+        "engine_output_species" in query for query in queries
+    )
+    assert not any(query.lstrip().upper().startswith("INSERT") for query in queries)
+
+
+def test_expire_after_backfill_deletes_only_rows_naming_the_species(
+    tmp_path, monkeypatch
+) -> None:
+    """Once a digest has been hit, expire keeps every other species.
+
+    A blake2b request that named nothing is the known-empty marker, not
+    unknown. A natural key that named nothing has no side row and stays.
+    Another engine's row that names the target stays.
+    """
+
+    path = tmp_path / "expire-after.sqlite"
+    silica = _long_composition("SiO2")
+    magnesia = _long_composition("MgO")
+    empty_digest = {"label": "n" * 200}
+    natural_empty = {"temperature_K": 1700.0}
+    other = _long_composition("SiO2")
+    other["composition_mol"]["Marker"] = 9.0
+    rows = {
+        "silica": ("openimcc", silica, 1),
+        "magnesia": ("openimcc", magnesia, 2),
+        "empty": ("openimcc", empty_digest, 3),
+        "natural": ("openimcc", natural_empty, 4),
+        "other": ("magemin", other, 5),
+    }
+    planted = []
+    keys = {}
+    for name, (engine, request, answer) in rows.items():
+        version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+        key = engine_cache.engine_cache_key(engine, version, request)
+        keys[name] = key
+        planted.append((key, pack({"answer": answer}), engine, str(version)))
+    assert keys["silica"][3] == 0xFF
+    assert keys["empty"][3] == 0xFF
+    assert keys["natural"][3] == 0x00
+    assert engine_cache.cache_request_species(empty_digest) == frozenset()
+    assert engine_cache.cache_request_species(natural_empty) == frozenset()
+    _plant_schema3(path, planted)
+    engine_cache.migrate_cache_file(path, vacuum=False)
+    assert _side_species(path, keys["natural"]) is None
+    assert _side_species(path, keys["silica"]) is None
+
+    _enable_write(monkeypatch, path)
+    for name, (engine, request, answer) in rows.items():
+        engine_cache._MEMORY_CACHE.clear()
+        assert _hit(engine, request) == {"answer": answer}
+    assert _side_species(path, keys["silica"]) == set(
+        engine_cache.cache_request_species(silica)
+    )
+    assert _side_species(path, keys["magnesia"]) == set(
+        engine_cache.cache_request_species(magnesia)
+    )
+    assert _side_species(path, keys["empty"]) == {""}
+    assert _side_species(path, keys["natural"]) is None
+    assert _side_species(path, keys["other"]) == set(
+        engine_cache.cache_request_species(other)
+    )
+    assert engine_cache.engine_cache_stats(path)["species_unknown_by_engine"] == {
+        "magemin": 0,
+        "openimcc": 0,
+    }
+
+    expired = engine_cache.expire_cache_file(
+        path, engine="openimcc", species=("SiO2",), apply=True
+    )
+    assert expired["deleted_by_engine"]["openimcc"] == 1
+    assert expired["species_unknown_rows"] == 0
+    left = {bytes(key) for _engine, _seq, key in _output_rows(path)}
+    assert keys["silica"] not in left
+    assert left == {
+        keys["magnesia"],
+        keys["empty"],
+        keys["natural"],
+        keys["other"],
+    }
+    assert _side_species(path, keys["other"]) == set(
+        engine_cache.cache_request_species(other)
+    )
+
+
+def test_refusal_hit_records_the_request_not_the_cached_value(
+    tmp_path, monkeypatch
+) -> None:
+    path = tmp_path / "refusal.sqlite"
+    request = _long_composition("SiO2")
+    key = engine_cache.engine_cache_key("openimcc", 1, request)
+    assert key[3] == 0xFF
+    cached = {
+        "status": "refusal",
+        "refusal_reason": "no_liquid",
+        "species": "Na2O",
+    }
+    _plant_schema3(path, [(key, pack(cached), "openimcc", "1")])
+    engine_cache.migrate_cache_file(path, vacuum=False)
+    _enable_write(monkeypatch, path)
+    assert _hit("openimcc", request) == cached
+    recorded = _side_species(path, key)
+    assert recorded == set(engine_cache.cache_request_species(request))
+    assert "nao2" not in recorded
+    assert "na2o" not in recorded
+
+
+def test_exact_hot_hit_backfills_species_when_a_mask_covers_it(
+    tmp_path, monkeypatch
+) -> None:
+    path = tmp_path / "masked-exact-hit.sqlite"
+    engine = "alphamelts"
+    request = _long_composition("SiO2")
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+    key = engine_cache.engine_cache_key(engine, version, request)
+    assert key[3] == 0xFF
+    cached = {"answer": 42}
+    _plant_schema3(path, [(key, pack(cached), engine, str(version))])
+    engine_cache.migrate_cache_file(path, vacuum=False)
+    _enable_write(monkeypatch, path)
+
+    cell = engine_cache.refusal_mask_cell(request)
+    assert cell is not None
+    connection = engine_cache._connect(path, readonly=False)
+    assert connection is not None
+    engine_cache._learn_mask_cell(
+        connection,
+        engine=engine,
+        version=str(version),
+        cell=cell,
+        refusal_class="refusal:engine_crash",
+        recipe={
+            "kind": "refusal",
+            "hot": {"status": "refusal", "refusal_reason": "engine_crash"},
+        },
+        cache_key=key,
+    )
+    # Learning a mask does not label the existing output row.
+    assert _side_species(path, key) is None
+
+    # A denied in-process mask replay falls through to the exact HOT row.
+    path_value = str(path)
+    engine_cache._MEMORY_CACHE[(path_value, key, False)] = engine_cache._MaskReplay(
+        "refusal:engine_crash",
+        {"kind": "refusal", "hot": {"status": "refusal", "refusal_reason": "engine_crash"}},
+    )
+    engine_cache._deny_mask_cell(path_value, engine, str(version), cell)
+    assert _hit(engine, request) == cached
+    assert _side_species(path, key) == set(engine_cache.cache_request_species(request))
+    with sqlite3.connect(path) as check:
+        assert check.execute("SELECT count(*) FROM engine_refusal_mask").fetchone()[0] == 1
+
+
+def test_unreadable_request_hit_does_not_mark_the_row_known_empty(
+    tmp_path, monkeypatch
+) -> None:
+    path = tmp_path / "unreadable.sqlite"
+    request = {"composition_wt_pct": ["SiO2"]}
+    key = engine_cache.engine_cache_key("openimcc", 1, request)
+    _plant_schema3(path, [(key, pack({"answer": 8}), "openimcc", "1")])
+    report = engine_cache.migrate_cache_file(path, vacuum=False)
+    assert report["skipped_unreadable_keys"] == 1
+    _enable_write(monkeypatch, path)
+    assert _hit("openimcc", request) == {"answer": 8}
+    assert _side_species(path, key) is None
+
+
+def test_stats_reports_species_unknown_per_engine_without_writing(tmp_path) -> None:
+    path = tmp_path / "stats.sqlite"
+    digest = _long_composition("SiO2")
+    natural = {"composition_wt_pct": {"MgO": 1.0}}
+    digest_key = engine_cache.engine_cache_key("openimcc", 1, digest)
+    natural_key = engine_cache.engine_cache_key("magemin", 4, natural)
+    empty_key = engine_cache.engine_cache_key("vaporock", 1, {"temperature_K": 1600.0})
+    assert digest_key[3] == 0xFF
+    assert natural_key[3] == 0x00
+    _plant_schema3(
+        path,
+        [
+            (digest_key, pack({"answer": 1}), "openimcc", "1"),
+            (natural_key, pack({"answer": 2}), "magemin", "4"),
+            (empty_key, pack({"answer": 3}), "vaporock", "1"),
+        ],
+    )
+    engine_cache.migrate_cache_file(path, vacuum=False)
+    # Migrate writes the natural key's species and leaves the digest unknown.
+    # The natural empty key has no side row and is still not unknown.
+    before_rows = _output_rows(path)
+    before_species = _species_by_row(path)
+
+    stats = engine_cache.engine_cache_stats(path)
+    assert stats["species_unknown_by_engine"] == {
+        "magemin": 0,
+        "openimcc": 1,
+        "vaporock": 0,
+    }
+    assert (_output_rows(path), _species_by_row(path)) == (before_rows, before_species)
+
+    from scripts.engine_cache_sync import main
+
+    stdout, stderr = io.StringIO(), io.StringIO()
+    with redirect_stdout(stdout), redirect_stderr(stderr):
+        assert main(["stats", str(path)]) == 0
+    assert json.loads(stdout.getvalue())["species_unknown_by_engine"] == {
+        "magemin": 0,
+        "openimcc": 1,
+        "vaporock": 0,
+    }
+    assert (
+        stderr.getvalue().splitlines()[0]
+        == "species-unknown rows: magemin 0, openimcc 1, vaporock 0 per engine"
+    )
+    assert (_output_rows(path), _species_by_row(path)) == (before_rows, before_species)

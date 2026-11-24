@@ -1,0 +1,285 @@
+source_id: mendybaev-2013-fun-cai-evaporation
+observable:
+  quantity: mass_loss_fraction
+  species: unknown
+  experiment_link: FUN1 and FUN2 remain separate
+  evidence_class: measured_reduced
+  reason: Computed from the authors' printed before/after sample weights.
+transcription:
+  source: text/mendybaev-2013-fun-cai-evaporation/pdftotext-layout.txt
+  source_table: Table 1, Initial weight (g) and Final weight (g)
+  table_directory: text/mendybaev-2013-fun-cai-evaporation/tables/ was absent
+  mineru: No MinerU table input was present in the corpus text directory.
+  pdf_backup_render: PDF page 5, rendered at 600 dpi; all 48 initial/final cells checked.
+  locator:
+    page: 5
+    pdf_page_index: 4
+    published_page: 372
+    table: '1'
+  page_proof:
+    printed_string: 'FUN1-10 15 0.0214 0.0078'
+    found_on_pdf_page: 5
+    published_page: 372
+  locator_proofs:
+    - locator: Experimental section pressure and temperature
+      printed_string: 'temperature was raised to 1900 °C'
+      pdf_page: 4
+      pdf_page_index: 3
+      published_page: 371
+    - locator: FUN1 starting composition row
+      printed_string: 'FUN1 starting 53.14 2.97 41.27 2.36'
+      pdf_page: 5
+      pdf_page_index: 4
+      published_page: 372
+    - locator: FUN2 starting composition row
+      printed_string: 'FUN2 starting 33.03±0.05 15.18±0.05'
+      pdf_page: 5
+      pdf_page_index: 4
+      published_page: 372
+  layout_check: Render confirms Table 1 row and initial/final column assignment.
+  mismatches: none
+row_count:
+  printed_table_sample_rows: 27
+  admitted_bead_rows: 24
+  FUN1: 14
+  FUN2: 10
+  excluded: B133R-10 is a standard; FUN1 starting and FUN2 starting have no run weights.
+starting_charge_links:
+  FUN1:
+    experiment: mendybaev-fun1-vacuum-evaporation
+    table_row: FUN1 starting
+    source_role: initial charge, identified by the Table 1 starting row
+    printed_wt_pct: {MgO: '53.14', Al2O3: '2.97', SiO2: '41.27', CaO: '2.36'}
+    printed_sum_wt_pct: '99.74'
+  FUN2:
+    experiment: mendybaev-fun2-vacuum-evaporation
+    table_row: FUN2 starting
+    source_role: initial charge, identified by the Table 1 starting row
+    printed_wt_pct: {MgO: '33.03', Al2O3: '15.18', SiO2: '38.39', CaO: '13.40'}
+    printed_sum_wt_pct: '100.00'
+  row_linkage: Each bead points to its own experiment and references that experiment's sample.printed_composition with the Table 1 starting-row locator; no run-order index is printed for independent beads. Car 1 design excludes a composition_role field.
+  unresolved: FUN1's four printed oxides sum to 99.74 wt%; no missing 0.26 wt% component is inferred.
+full_cell_audit:
+  printed_numeric_cells: 72
+  stored_numeric_values: 96
+  verification: PDF page 5 render checked the 48 weight cells, 24 duration cells, and row/column assignments. The two starting-composition rows and bead linkage were checked in the rendered table; the 24 fractions are derived from the recorded weights.
+  rows:
+    - sample: FUN1-3
+      run_duration_min: '0'
+      initial_weight_g: '0.0161'
+      final_weight_g: '0.0148'
+      mass_loss_fraction: '0.0807453416149068322981366459627329192546'
+    - sample: FUN1-12
+      run_duration_min: '0'
+      initial_weight_g: '0.0214'
+      final_weight_g: '0.0176'
+      mass_loss_fraction: '0.1775700934579439252336448598130841121495'
+    - sample: FUN1-15
+      run_duration_min: '5'
+      initial_weight_g: '0.0258'
+      final_weight_g: '0.0208'
+      mass_loss_fraction: '0.1937984496124031007751937984496124031007'
+    - sample: FUN1-13
+      run_duration_min: '10'
+      initial_weight_g: '0.0286'
+      final_weight_g: '0.0210'
+      mass_loss_fraction: '0.2657342657342657342657342657342657342657'
+    - sample: FUN1-1
+      run_duration_min: '15'
+      initial_weight_g: '0.0103'
+      final_weight_g: '0.0049'
+      mass_loss_fraction: '0.5242718446601941747572815533980582524271'
+    - sample: FUN1-10
+      run_duration_min: '15'
+      initial_weight_g: '0.0214'
+      final_weight_g: '0.0078'
+      mass_loss_fraction: '0.6355140186915887850467289719626168224299'
+    - sample: FUN1-5
+      run_duration_min: '20'
+      initial_weight_g: '0.0180'
+      final_weight_g: '0.0057'
+      mass_loss_fraction: '0.6833333333333333333333333333333333333333'
+    - sample: FUN1-11
+      run_duration_min: '25'
+      initial_weight_g: '0.0300'
+      final_weight_g: '0.0045'
+      mass_loss_fraction: '0.8500000000000000000000000000000000000000'
+    - sample: FUN1-16
+      run_duration_min: '25'
+      initial_weight_g: '0.0238'
+      final_weight_g: '0.0100'
+      mass_loss_fraction: '0.5798319327731092436974789915966386554621'
+    - sample: FUN1-4
+      run_duration_min: '30'
+      initial_weight_g: '0.0278'
+      final_weight_g: '0.0037'
+      mass_loss_fraction: '0.8669064748201438848920863309352517985611'
+    - sample: FUN1-14
+      run_duration_min: '30'
+      initial_weight_g: '0.0290'
+      final_weight_g: '0.0094'
+      mass_loss_fraction: '0.6758620689655172413793103448275862068965'
+    - sample: FUN1-9
+      run_duration_min: '35'
+      initial_weight_g: '0.0377'
+      final_weight_g: '0.0126'
+      mass_loss_fraction: '0.6657824933687002652519893899204244031830'
+    - sample: FUN1-17
+      run_duration_min: '35'
+      initial_weight_g: '0.0278'
+      final_weight_g: '0.0059'
+      mass_loss_fraction: '0.7877697841726618705035971223021582733812'
+    - sample: FUN1-18
+      run_duration_min: '40'
+      initial_weight_g: '0.0312'
+      final_weight_g: '0.0060'
+      mass_loss_fraction: '0.8076923076923076923076923076923076923076'
+    - sample: FUN2-4
+      run_duration_min: '0'
+      initial_weight_g: '0.0334'
+      final_weight_g: '0.0319'
+      mass_loss_fraction: '0.0449101796407185628742514970059880239520'
+    - sample: FUN2-5
+      run_duration_min: '10'
+      initial_weight_g: '0.0315'
+      final_weight_g: '0.0243'
+      mass_loss_fraction: '0.2285714285714285714285714285714285714285'
+    - sample: FUN2-1
+      run_duration_min: '20'
+      initial_weight_g: '0.0619'
+      final_weight_g: '0.0431'
+      mass_loss_fraction: '0.3037156704361873990306946688206785137318'
+    - sample: FUN2-2
+      run_duration_min: '20'
+      initial_weight_g: '0.0455'
+      final_weight_g: '0.0298'
+      mass_loss_fraction: '0.3450549450549450549450549450549450549450'
+    - sample: FUN2-3
+      run_duration_min: '25'
+      initial_weight_g: '0.0372'
+      final_weight_g: '0.0206'
+      mass_loss_fraction: '0.4462365591397849462365591397849462365591'
+    - sample: FUN2-8
+      run_duration_min: '30'
+      initial_weight_g: '0.0309'
+      final_weight_g: '0.0137'
+      mass_loss_fraction: '0.5566343042071197411003236245954692556634'
+    - sample: FUN2-7
+      run_duration_min: '35'
+      initial_weight_g: '0.0418'
+      final_weight_g: '0.0194'
+      mass_loss_fraction: '0.5358851674641148325358851674641148325358'
+    - sample: FUN2-6
+      run_duration_min: '40'
+      initial_weight_g: '0.0419'
+      final_weight_g: '0.0160'
+      mass_loss_fraction: '0.6181384248210023866348448687350835322195'
+    - sample: FUN2-9
+      run_duration_min: '50'
+      initial_weight_g: '0.0559'
+      final_weight_g: '0.0215'
+      mass_loss_fraction: '0.6153846153846153846153846153846153846153'
+    - sample: FUN2-10
+      run_duration_min: '55'
+      initial_weight_g: '0.0514'
+      final_weight_g: '0.0176'
+      mass_loss_fraction: '0.6575875486381322957198443579766536964980'
+  derivation: >-
+    Each row stores both printed grams and the fraction (initial_weight_g - final_weight_g) / initial_weight_g.
+    The extract's measured_reduced derivation points to the existing Table 1 printed-data context and records each
+    operand with its own column locator.
+  zero_time_beads:
+    samples:
+      - FUN1-3
+      - FUN1-12
+      - FUN2-4
+    positive_mass_loss_fraction: true
+    fun1_fractions_differ: true
+table_tool:
+  status: unavailable
+  reason: No MinerU table blocks or tables index were present to convert or compare.
+  comparison_output: Not generated; the full render audit above covers the stored cells.
+migration:
+  status: isolated_migration_complete_car3_flagged_residue_extent
+  required_mutation: The focused tests change FUN1-10 final_weight_g and require xi to move, then delete both grams while retaining the scalar and require the migrated xi value to become unavailable; pytest is not run under owner hold.
+  code_path_checked:
+    - simulator/battery/enums.py::Quantity.MASS_LOSS_FRACTION
+    - simulator/battery/migrate.py::_MASS_LOSS_YIELD_FIELDS
+    - simulator/battery/migrate.py::_item_mass_loss_field
+    - simulator/battery/identity.py::profile_for
+    - simulator/battery/score.py::_score_identity_equal
+    - simulator/battery/score.py::_predict_mass_loss_with_residue
+    - simulator/battery/residue.py::predict_mass_loss_fraction
+    - simulator/battery/residue.py::_initial_oxide_wt_percent
+    - simulator/battery/migrate.py::_mass_loss_fraction_from_printed_weights
+    - simulator/battery/residue.py::predict_langmuir_residue_composition
+    - simulator/battery/score.py::_extent_residue_prediction
+  finding: The generic extract migrator derives mass_loss_fraction from the two located gram operands and drops a stale scalar when either operand is absent. Table 1's starting assays now migrate through sample.initial_composition; residue point_conditions retain the per-row assay. Both FUN experiments resolve to langmuir_free_evaporation with method_locator.
+  scope_rule: One generic mass-loss operand rule lives in simulator/battery/migrate.py. The residue caller reuses integrate_knudsen_residue_inventory and the existing pressure closure; no second integrator or DP id was added.
+  source_restrictions: >-
+    The weight-derived mass_loss_fraction reducer in simulator/battery/migrate.py
+    is explicitly restricted to source_id mendybaev-2013-fun-cai-evaporation.
+    The scorer's Langmuir residue route in simulator/battery/score.py is also
+    explicitly restricted to that Mendybaev source_id.
+  isolated_migration: Direct in-memory Migrator._migrate_extract plus finalize; 120 observations, 24 mass_loss_fraction and 96 residue_component_composition, 0 hard issues, 0 registry issues, 52 queued locator/source issues. Every row has the correct FUN start composition and 2173.15 K temperature, with its printed row time in point_conditions. This was not a store regeneration.
+  fidelity_counts:
+    pre_car1_green: {uncovered_observation: 2, unattested_sample: 1}
+    car1_base: {uncovered_observation: 26, unattested_sample: 4}
+    tip: {uncovered_observation: 2, unattested_sample: 0}
+    evidence: Production fidelity_source_warnings one-off with REGOLITH_CORPUS_ROOT set; 120 Table 1 xi-field pins are located and attested, including 3 retained pins and 117 additions.
+  uncertainty_counts:
+    printed: 96
+    none: 24
+    confidence_not_stated: 96
+    confidence_not_recorded: 24
+  identity_axes_after_migration:
+    FUN1-3: {composition: FUN1 starting charge, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN1-10: {composition: FUN1 starting charge, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+    FUN2-10: {composition: FUN2 starting charge, total_pressure_Pa: unknown, fO2_Pa: unknown, temperature_K: '2173.15'}
+  identity_composition_d460_finding: >-
+    Page 5 (published page 372), Table 1 caption: “starting materials and evaporation residues from FUN1 and FUN2 experiments.”
+    The starting rows are the true initial charge, and both experiment records now carry that located Table 1 assay
+    in sample.initial_composition through the existing converter. Every FUN1 residue and xi identity uses the FUN1
+    charge; every FUN2 row uses the FUN2 charge. No composition_role is used. Row-local point_conditions.composition
+    continues to hold only the measured residue assay.
+  current_prediction_first_refusal: >-
+    The car-3 score path dispatches only residue_component_composition on langmuir_free_evaporation experiments
+    with no declared cohort predictor. It calls predict_langmuir_residue_composition using the matching Table 1
+    sample row's measured xi. Missing xi returns measured_mass_loss_fraction_missing_or_invalid before any clock
+    predictor can run. The caller scores a one-point isothermal 2173.15 K extent, including positive xi on zero-time
+    diagnostic rows.
+  identity_pressure: >-
+    Keep identity.total_pressure_Pa unknown. The source ceiling remains located in experiment conditions and row
+    point conditions where printed. The paper prints the <0.0001 Pa threshold before the temperature ramp to
+    1900 °C; 0 Pa is the modelled extent assumption within that pre-ramp threshold, not a printed pressure value.
+engine_readiness:
+  observable: mass_loss_fraction, used as the per-bead gravimetric extent anchor by the later residue comparison.
+  rows: 24
+  ready_for_extent_anchor: 24
+  direct_mass_loss_profile_ready: 0
+  prediction_code_path: "simulator/battery/score.py::_extent_residue_prediction -> simulator/battery/score.py::_langmuir_residue_prediction -> simulator/battery/residue.py::predict_langmuir_residue_composition"
+  prediction_first_refusal: measured_mass_loss_fraction_missing_or_invalid when the bead has no matched Table 1 xi anchor.
+  experiment_links: FUN1 and FUN2 remain separate; each residue and xi row uses its experiment's located Table 1 starting composition and 2173.15 K.
+  missing_or_deferred_inputs:
+    identity.total_pressure_Pa: The printed one-sided ceiling remains located as evidence; identity pressure stays unknown because the source gives a bound.
+    identity.fO2_Pa: No imposed fO2 is printed; the scorer uses the existing congruent-vapour zero-storage closure and flags it.
+    sample_mass_and_area: Not read on the extent path; each bead's independent gravimetric xi anchors the comparison.
+    phase: The recovered bulk phase remains unspecified; no liquid phase stamp is added.
+    identity.per: Bound to the printed fraction denominator with simulator/battery/enums.py::PerBasis.INITIAL_MASS.
+  method_token: Both Mendybaev experiment records migrate as langmuir_free_evaporation with method_locator; the alias car is complete.
+  next_car_note: >-
+    Car 3 scores all 96 existing residue rows in the flagged absolute tier; it adds DP-005 relative-alpha sensitivity and melt_well_mixed_assumed notices, the 1900 C isothermal extent-band notice, the congruent-vapour closure notice, and pressure provenance. No new cohort or DP id is added.
+expected_store_delta: >-
+  No store regen was committed. Score-time car 3 changes no stored observations.
+  Relative to the pre-Mendybaev car-1 baseline cbdb6448e, migration retains all
+  120 Mendybaev observation ids and all 24 xi point values; the 24 xi identities
+  bind to their FUN starting charge, and those rows no longer repeat the charge
+  composition or pressure as point conditions. The 96 residue observations
+  retain their FUN-start identities. Relative to green 4a566e411, the corpus
+  gains 24 Mendybaev mass_loss_fraction observations; the audit's in-car
+  observation delta is zero against the already-folded car-1 migration. No
+  Wang extract or store rows change.
+queued_tests:
+  - tests/test_mendybaev_2013_fun_cai_extract.py
+  - tests/test_yaml_flow_scalar_commas.py
+  - tests/test_literature_extracts.py

@@ -786,6 +786,8 @@ from simulator.high_t_melt_activity import (
 # ============================================================================
 
 _PRESERVE_REFERENCE_T_K = object()
+# Provider-input cutoff for species loaded through _ledger_species_kg.
+LEDGER_LOADER_SPECIES_CUTOFF_KG = 1e-12
 _VALID_DECISION_CHOICES = {
     DecisionType.ROOT_BRANCH: ('pyrolysis', 'mre_baseline'),
     DecisionType.PATH_AB: ('A', 'A_staged', 'B'),
@@ -2140,7 +2142,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         return {
             str(species): float(kg)
             for species, kg in values.items()
-            if float(kg) > 1e-12
+            if float(kg) > LEDGER_LOADER_SPECIES_CUTOFF_KG
         }
 
     def _backend_account_policies(self) -> tuple[AccountPolicy, ...]:
@@ -5012,6 +5014,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         curve: Mapping[str, Any],
     ) -> dict[str, Any]:
+        from simulator.reduced_real_determinism import gate_curve_bounds_are_usable
+
         field = 'solidus_T_C'
         try:
             solidus_T_C = float(curve[field])
@@ -5029,7 +5033,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             malformed_bounds.append('solidus_T_C')
         if not math.isfinite(liquidus_T_C):
             malformed_bounds.append('liquidus_T_C')
-        if not malformed_bounds and not solidus_T_C < liquidus_T_C:
+        if not malformed_bounds and not gate_curve_bounds_are_usable(
+            solidus_T_C, liquidus_T_C,
+        ):
             malformed_bounds.extend(('solidus_T_C', 'liquidus_T_C'))
         if malformed_bounds:
             self._refuse_malformed_melt_redox_liquidus_curve(

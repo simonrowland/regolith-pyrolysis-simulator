@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import json
 from pathlib import Path
 import subprocess
+from unittest.mock import Mock
 
 import pytest
 
@@ -276,9 +277,11 @@ def test_gate_order_steps_down_before_hold_or_floor(
             assert solved['numerical_path_warning'] == 'original solved path warning'
 
 
-def test_retry_recovery_preserves_step_down_notice(
+def test_primary_timeout_retries_without_alpha_continuation(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
+    """Mutation note: calling AlphaMELTS before the retry fails the mock assertion."""
+
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -296,43 +299,63 @@ def test_retry_recovery_preserves_step_down_notice(
             'solidus_T_C': 1000, 'liquidus_T_C': 1300,
         })
 
-    def alternate(request):
-        calls.append('alphamelts')
-        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
-            'backend_status_reason': 'incomplete_cooling_path',
-            'backend_diagnostics': {
-                'physical_overhead_pressure_bar': .009,
-                'condensed_phase_reference_pressure_bar': 1,
-                'numerical_path_warning': 'incomplete native path',
-            },
-        })
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='not_converged',
+        diagnostic={'backend_status_reason': 'incomplete_cooling_path'},
+    ))
 
     monkeypatch.setattr(magemin, 'dispatch', primary)
     monkeypatch.setattr(alpha, 'dispatch', alternate)
     curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
-    assert calls == ['magemin', 'alphamelts', 'magemin']
+    assert calls == ['magemin', 'magemin']
+    alternate.assert_not_called()
     assert curve['source'] == 'gate_liquid_fraction:fallback:magemin-shadow'
     assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1300)
-    # The realized curve is the final magemin success. The abandoned
-    # dispatch, including the non-timeout alphamelts notice, is one record.
+    # The retry is the recovery; the skipped continuation has no notice.
     assert 'gate_provider_step_down' not in curve
     assert 'alphamelts_reference_pressure' not in curve
     record = curve['environment_retries']
     assert record['disposition'] == 'environment'
-    notice = record['gate_provider_step_down']
-    assert notice['requested_provider_order'] == ['magemin-shadow', 'alphamelts-diagnostic']
-    assert [p['provider'] for p in notice['failed_providers']] == [
-        'magemin-shadow', 'alphamelts-diagnostic',
-    ]
-    assert 'engine_worker_timeout' in notice['failed_providers'][0]['reason']
-    assert notice['failed_providers'][0]['disposition'] == 'environment'
-    assert 'disposition' not in notice['failed_providers'][1]
-    assert 'incomplete_cooling_path' in notice['failed_providers'][1]['reason']
-    assert record['alphamelts_reference_pressure'] == {
-        'physical_overhead_pressure_bar': .009,
-        'condensed_phase_reference_pressure_bar': 1,
-        'numerical_path_warning': 'incomplete native path',
-    }
+    assert 'gate_provider_step_down' not in record
+    assert 'alphamelts_reference_pressure' not in record
+    attempt = record['provider_attempt']
+    assert attempt['provider'] == 'magemin-shadow'
+    assert attempt['disposition'] == 'environment'
+    assert 'engine_worker_timeout' in attempt['reason']
+
+
+def test_engine_worker_timeout_retries_freeze_gate_dispatch_once(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.magemin import MAGEMIN_WARM_CALL_TIMEOUT_S
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    calls = []
+
+    def dispatch_only(*_args, **_kwargs):
+        calls.append(len(calls) + 1)
+        if len(calls) == 1:
+            raise EngineWorkerTimeout(
+                'fake MAGEMin worker',
+                MAGEMIN_WARM_CALL_TIMEOUT_S,
+                phase='job',
+            )
+        return IntentResult(
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            status='ok',
+            diagnostic={'solidus_T_C': 1000, 'liquidus_T_C': 1300},
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch_only)
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    assert calls == [1, 2]
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert curve['environment_retries']['disposition'] == 'environment'
+    assert curve['environment_retries']['reason'] == 'engine_worker_timeout'
 
 
 def test_magemin_success_does_not_call_alpha(
@@ -361,6 +384,127 @@ def _bind_gate_providers(sim, magemin_dispatch, alpha_dispatch):
     magemin.dispatch = magemin_dispatch
     alpha.dispatch = alpha_dispatch
     return magemin, alpha
+
+
+def test_projected_out_of_domain_bounds_skip_alpha_continuation(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: removing the usable-bounds stop calls the AlphaMELTS mock."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='out_of_domain',
+        diagnostic={
+            'backend_status_reason': 'composition_projected',
+            'solidus_T_C': 1000,
+            'liquidus_T_C': 1400,
+            'composition_projected_notice': {
+                'dropped_components': [
+                    {'component': 'P2O5', 'mass_fraction': 0.001},
+                ],
+            },
+        },
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='ok',
+        diagnostic={'solidus_T_C': 950, 'liquidus_T_C': 1500},
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    primary.assert_called_once()
+    alternate.assert_not_called()
+    assert curve['source'] == (
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
+    )
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1400)
+    assert curve['composition_projected_notice']['authority'] == 'extrapolated'
+    assert 'gate_provider_step_down' not in curve
+
+
+def test_primary_terminal_refusal_does_not_claim_a_step_down(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: a notice before any alternate call fails this assertion."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='unavailable',
+        diagnostic={'reason': 'missing_input'},
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='ok',
+        diagnostic={'solidus_T_C': 950, 'liquidus_T_C': 1500},
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    result = sim._dispatch_only(
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        control_inputs={},
+        fO2_log=-2,
+    )
+
+    primary.assert_called_once()
+    alternate.assert_not_called()
+    assert result.status == 'unavailable'
+    assert result.diagnostic['reason'] == 'missing_input'
+    assert 'gate_provider_step_down' not in result.diagnostic
+
+
+def test_flagged_alpha_bounds_are_published_as_the_step_down_curve(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: dropping flagged bounds or their reason loses publication data."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='not_converged',
+        diagnostic={'backend_status_reason': 'no_convergence'},
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='out_of_domain',
+        diagnostic={
+            'solidus_T_C': 950,
+            'liquidus_T_C': 1420,
+            'backend_status_reason': 'out_of_calibration_range',
+        },
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    primary.assert_called_once()
+    alternate.assert_called_once()
+    assert curve['source'] == 'gate_liquid_fraction:fallback:alphamelts-diagnostic'
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (950, 1420)
+    assert curve['gate_provider_step_down']['realized_provider'] == (
+        'alphamelts-diagnostic'
+    )
+    assert curve['gate_provider_step_down']['failed_providers'][0]['provider'] == (
+        'magemin-shadow'
+    )
+    assert curve['gate_provider_step_down']['realized_provider_reason'] == (
+        'out_of_calibration_range'
+    )
 
 
 def _stripped_gate_bytes(value):
@@ -449,13 +593,19 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
     clean_sim, clean_record, clean_calls = run('clean')
     recovered_sim, recovered_record, recovered_calls = run('recovered')
     assert clean_calls == ['magemin']
-    assert recovered_calls == ['magemin', 'alphamelts', 'magemin']
+    assert recovered_calls == ['magemin', 'magemin']
     assert 'environment_retries' in recovered_record['curve']
     assert 'environment_retries' not in clean_record['curve']
     assert recovered_record['curve']['environment_retries']['disposition'] == 'environment'
-    assert 'incomplete_cooling_path' in recovered_record['curve']['environment_retries'][
-        'gate_provider_step_down'
-    ]['failed_providers'][1]['reason']
+    assert 'gate_provider_step_down' not in recovered_record['curve'][
+        'environment_retries'
+    ]
+    assert 'alphamelts_reference_pressure' not in recovered_record['curve'][
+        'environment_retries'
+    ]
+    assert recovered_record['curve']['environment_retries']['provider_attempt'][
+        'provider'
+    ] == 'magemin-shadow'
     assert _stripped_gate_bytes(clean_record['curve']) == _stripped_gate_bytes(
         recovered_record['curve'],
     )
@@ -471,7 +621,7 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
         'recovered-projected',
     )
     assert projected_calls == ['magemin', 'alphamelts']
-    assert recovered_projected_calls == ['magemin', 'alphamelts', 'magemin', 'alphamelts']
+    assert recovered_projected_calls == ['magemin', 'magemin', 'alphamelts']
     projected_curve = projected_record['curve']
     recovered_projected_curve = recovered_projected_record['curve']
     assert projected_curve['source'] == (
@@ -486,12 +636,10 @@ def test_recovered_dispatch_strips_to_the_clean_dispatch(
     assert 'environment_retries' not in projected_curve
     abandoned = recovered_projected_curve['environment_retries']
     assert abandoned['disposition'] == 'environment'
-    assert abandoned['alphamelts_reference_pressure'][
-        'physical_overhead_pressure_bar'
-    ] == .009
-    assert 'incomplete_cooling_path' in abandoned['gate_provider_step_down'][
-        'failed_providers'
-    ][1]['reason']
+    assert 'alphamelts_reference_pressure' not in abandoned
+    assert 'gate_provider_step_down' not in abandoned
+    assert abandoned['provider_attempt']['provider'] == 'magemin-shadow'
+    assert 'engine_worker_timeout' in abandoned['provider_attempt']['reason']
     assert recovered_projected_curve['alphamelts_reference_pressure'][
         'physical_overhead_pressure_bar'
     ] == .02
@@ -592,7 +740,7 @@ def test_later_hour_memo_hit_omits_environment_retries(
         'recovered', monkeypatch, vapor_pressure_data, feedstocks_data,
         setpoints_data, shared_cache=shared, core=True,
     )
-    assert calls == ['magemin', 'alphamelts', 'magemin']
+    assert calls == ['magemin', 'magemin']
     assert record['curve']['environment_retries']['disposition'] == 'environment'
     assert 'environment_retries' not in (
         sim._freeze_gate_liquid_fraction_cache['curve']
@@ -822,10 +970,10 @@ def test_held_last_good_omits_prior_environment_retries(
     )
 
 
-def test_engine_worker_timeout_outside_planner_keeps_its_row(
+def test_engine_worker_timeout_outside_planner_keeps_primary_attempt(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
-    """A timeout that never reaches the planner still has a visible row."""
+    """An outside-planner timeout is an environment attempt, not a step-down."""
 
     from simulator.engine_pool import EngineWorkerTimeout
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
@@ -849,9 +997,9 @@ def test_engine_worker_timeout_outside_planner_keeps_its_row(
     assert 'gate_provider_step_down' not in curve
     record = curve['environment_retries']
     assert record['disposition'] == 'environment'
-    attempt = record['gate_provider_step_down']['failed_providers'][0]
+    assert 'gate_provider_step_down' not in record
+    attempt = record['provider_attempt']
     assert attempt['provider'] == 'magemin'
     assert attempt['disposition'] == 'environment'
     assert 'engine_worker_timeout' in attempt['reason']
     assert 'gate_provider_step_down' not in attempt['diagnostic']
-    assert record['gate_provider_step_down']['realized_provider'] is None

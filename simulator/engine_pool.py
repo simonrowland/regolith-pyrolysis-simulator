@@ -25,7 +25,6 @@ import subprocess
 import sys
 import threading
 import time
-import traceback
 import uuid
 import weakref
 from concurrent.futures import Future
@@ -329,6 +328,106 @@ def _pool_ready_wait_s(workers: list[Any] | tuple[Any, ...]) -> float:
     return ready_wait_s
 
 
+def _worker_repo_root() -> Path:
+    """Checkout root that owns this module.
+
+    Same directory as ``corpus_version.repo_root``. Kept here so a worker
+    ``except`` handler does not import the corpus config stack to report
+    the failure it just caught.
+    """
+
+    return Path(__file__).resolve().parent.parent
+
+
+def _path_spellings(path: Path) -> tuple[Path, ...]:
+    spellings = [path]
+    try:
+        resolved = path.resolve()
+    except OSError:
+        return tuple(spellings)
+    if resolved != path:
+        spellings.append(resolved)
+    return tuple(spellings)
+
+
+def _repo_relative_frame_path(filename: str, repo_root: Path) -> str:
+    """Frame path relative to the checkout, or a prefix that is not a checkout."""
+
+    if not filename or filename.startswith('<'):
+        return filename
+    path = Path(filename)
+    if not path.is_absolute():
+        return path.as_posix()
+    for candidate in _path_spellings(path):
+        for root in _path_spellings(repo_root):
+            try:
+                relative = candidate.relative_to(root)
+            except ValueError:
+                continue
+            text = relative.as_posix()
+            return text or candidate.name
+    parts = path.parts
+    for marker in ('site-packages', 'dist-packages'):
+        if marker in parts:
+            index = len(parts) - 1 - parts[::-1].index(marker)
+            return Path(*parts[index:]).as_posix()
+    for index, part in enumerate(parts[:-1]):
+        if part == 'lib' and parts[index + 1].startswith('python'):
+            return Path(*parts[index:]).as_posix()
+    return path.name
+
+
+def engine_worker_failure_text(
+    exc: BaseException,
+    *,
+    repo_root: Path | None = None,
+) -> str:
+    """Exception class, message, and repo-relative frames.
+
+    This is the traceback text embedded in a worker refusal. It keeps the
+    message verbatim, including a typed reason, and omits absolute checkout
+    paths, source lines, and caret underlines so two checkouts record the
+    same bytes.
+    """
+
+    root = _worker_repo_root() if repo_root is None else Path(repo_root)
+    return '\n'.join(_engine_worker_failure_lines(exc, root, seen=set()))
+
+
+def _engine_worker_failure_lines(
+    exc: BaseException,
+    repo_root: Path,
+    seen: set[int],
+) -> list[str]:
+    if id(exc) in seen:
+        return [f'{type(exc).__name__}: <chain repeats>']
+    seen.add(id(exc))
+    lines = [f'{type(exc).__name__}: {exc}']
+    notes = getattr(exc, '__notes__', None)
+    if notes:
+        for note in notes:
+            lines.append(str(note))
+    traceback_object = exc.__traceback__
+    while traceback_object is not None:
+        frame = traceback_object.tb_frame
+        code = frame.f_code
+        lines.append(
+            f'{_repo_relative_frame_path(code.co_filename, repo_root)}:'
+            f'{traceback_object.tb_lineno}:{code.co_name}'
+        )
+        traceback_object = traceback_object.tb_next
+    cause = exc.__cause__
+    if cause is not None:
+        lines.append('caused by:')
+        lines.extend(_engine_worker_failure_lines(cause, repo_root, seen))
+    elif exc.__context__ is not None and not exc.__suppress_context__:
+        lines.append('during handling of:')
+        lines.extend(
+            _engine_worker_failure_lines(exc.__context__, repo_root, seen)
+        )
+    return lines
+
+
 def _run_engine_worker(
     connection: Any,
     bootstrap: WorkerBootstrap,
@@ -390,7 +489,7 @@ def _run_engine_worker(
                 counters = engine_cache_counters(reset=True)
                 connection.send((
                     'error', type(exc).__name__, str(exc),
-                    traceback.format_exc(),
+                    engine_worker_failure_text(exc),
                     getattr(exc, 'failure_disposition', None),
                     counters,
                 ))
@@ -410,7 +509,8 @@ def _run_engine_worker(
     except BaseException as exc:  # pragma: no cover - bootstrap/native faults
         try:
             connection.send((
-                'error', type(exc).__name__, str(exc), traceback.format_exc(),
+                'error', type(exc).__name__, str(exc),
+                engine_worker_failure_text(exc),
                 getattr(exc, 'failure_disposition', None),
             ))
         except BaseException:

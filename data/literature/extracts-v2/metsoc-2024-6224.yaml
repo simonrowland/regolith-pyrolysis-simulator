@@ -11,12 +11,11 @@ observations:
     species:
       formula: C_Si_O_inclusion
       phase:
-        tag: unknown
-        reason: phase string 'pyrrhotite_hosted_vesicle' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pyrrhotite_hosted_vesicle'' is not in the closed automatic map'
+    origin: metsoc-2024-6224::metsoc_2024_6224_csi_o_inclusion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: metsoc-2024-6224
   locator:
     pdf_page_index: 1
@@ -55,12 +65,11 @@ observations:
     species:
       formula: Mg_silicate_inclusion
       phase:
-        tag: unknown
-        reason: phase string 'H2O_bearing_vesicle' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -81,7 +90,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2O_bearing_vesicle'' is not in the closed automatic map'
+    origin: metsoc-2024-6224::metsoc_2024_6224_h2o_bearing_vesicle
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: metsoc-2024-6224
   locator:
     pdf_page_index: 1
@@ -100,12 +120,11 @@ observations:
     species:
       formula: Mg_silicate_inclusion
       phase:
-        tag: unknown
-        reason: phase string 'pyrrhotite_hosted_vesicles' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -127,7 +146,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pyrrhotite_hosted_vesicles'' is not in the closed automatic map'
+    origin: metsoc-2024-6224::metsoc_2024_6224_pyrrhotite_vesicle_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: metsoc-2024-6224
   locator:
     pdf_page_index: 1
@@ -146,12 +176,11 @@ observations:
     species:
       formula: Bennu_sample
       phase:
-        tag: unknown
-        reason: phase string 'Bennu_returned_sample' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -171,7 +200,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Bennu_returned_sample'' is not in the closed automatic map'
+    origin: metsoc-2024-6224::metsoc_2024_6224_returned_sample_mass
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: metsoc-2024-6224
   locator:
     pdf_page_index: 1
@@ -190,12 +230,11 @@ observations:
     species:
       formula: Bennu_sample
       phase:
-        tag: unknown
-        reason: phase string 'Bennu_returned_sample_particles' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -217,7 +256,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Bennu_returned_sample_particles'' is not in the closed automatic map'
+    origin: metsoc-2024-6224::metsoc_2024_6224_sample_preparation_and_instrumentation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: metsoc-2024-6224
   locator:
     pdf_page_index: 1

@@ -97,6 +97,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - density
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_density_ABS
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - density
@@ -278,6 +289,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - density
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_density_AS
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - density
@@ -462,7 +484,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_1900C_argon::T=2173.15:row=abs:h=17860278bfc3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -669,6 +702,17 @@ observations:
     - valence_ratio
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1773.15:row=abs:h=34bb0eaab6c2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -896,6 +940,17 @@ observations:
     - valence_ratio
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_abs_pressure_reduction::T=1923.15:row=abs:h=4f157ebe7479
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -1119,6 +1174,17 @@ observations:
     - valence_ratio
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1873.15:row=as:h=e9395ccaa322
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1338,6 +1404,17 @@ observations:
     - valence_ratio
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_air_1600_1700C::T=1973.15:row=as:h=c3177fb0b9ed
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1551,7 +1628,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=1873.15:row=as:h=33c658f7d4a2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -1748,7 +1836,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=2073.15:row=abs:h=4e38776c1fee
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -1949,7 +2048,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_argon_1600_1800C::T=2073.15:row=abs:h=8a64fe0c387e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 5
@@ -2146,7 +2256,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6::T=2173.15:row=as:h=34a2a103c376
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -2339,7 +2460,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_1000_ppmw_fig6::T=2273.15:row=as:h=d9138e8560bc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4
@@ -2529,6 +2661,17 @@ observations:
     - valence_ratio
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ehrt-2008-sn-redox-aluminosilicate::ehrt2008_redox_fraction_as_5000_ppmw_1600C_air::T=1873.15:row=as:h=1babe8ec3659
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ehrt-2008-sn-redox-aluminosilicate
   locator:
     page: 4

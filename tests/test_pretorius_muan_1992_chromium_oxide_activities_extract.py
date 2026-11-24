@@ -239,10 +239,9 @@ def test_isolated_migration_has_no_hard_issues_and_reaches_temperature_and_fugac
         "pretorius-muan-1992-chromium-oxide-activities::"
         "pretorius_muan_1992_chromium_oxide_activities_appendixa_ccrs_12_metal_cr"
     ]
-    assert metal.identity.species.phase.is_unknown
-    assert metal.identity.species.phase.reason == (
-        "phase string 'Metal' is not in the closed automatic map"
-    )
+    assert metal.identity.species.phase.is_value
+    assert metal.identity.species.phase.value.value == "unspecified"
+    assert any(notice.kind.value == "phase_inferred" for notice in metal.notices)
     prefix = "pretorius-muan-1992-chromium-oxide-activities::pretorius_muan_1992_chromium_oxide_activities_"
     formulas = {
         row.identity.species.formula for row in result.observations.values()

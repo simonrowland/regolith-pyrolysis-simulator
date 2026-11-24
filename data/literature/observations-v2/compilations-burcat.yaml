@@ -3456,8 +3456,8 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3484,7 +3484,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: burcat:BU-0001
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=128; header_line=131; end_line=134
@@ -3499,12 +3510,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3668,8 +3678,8 @@ observations:
     species:
       formula: BU-0006
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -3696,7 +3706,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0006
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=164; end_line=168
@@ -4553,8 +4574,8 @@ observations:
     species:
       formula: AlH3
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -4581,7 +4602,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-0027
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=346; header_line=349; end_line=352
@@ -5268,8 +5300,8 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -5296,7 +5328,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-0044
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=511; header_line=514; end_line=517
@@ -5311,8 +5354,8 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -5339,7 +5382,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-0045
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=511; header_line=518; end_line=521
@@ -5902,8 +5956,8 @@ observations:
     species:
       formula: B
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -5930,7 +5984,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-0059
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=620; header_line=623; end_line=626
@@ -7037,8 +7102,8 @@ observations:
     species:
       formula: NaBH4
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -7065,7 +7130,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-0086
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=865; header_line=868; end_line=871
@@ -10443,8 +10519,8 @@ observations:
     species:
       formula: BU-0167
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -10471,7 +10547,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0167
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=1661; end_line=1663
@@ -16326,8 +16413,8 @@ observations:
     species:
       formula: BU-0307
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -16354,7 +16441,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0307
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=3047; end_line=3050
@@ -21115,8 +21213,8 @@ observations:
     species:
       formula: BU-0421
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -21143,7 +21241,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0421
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=4220; end_line=4224
@@ -23258,8 +23367,8 @@ observations:
     species:
       formula: BU-0472
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -23286,7 +23395,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0472
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=4754; end_line=4757
@@ -23595,8 +23715,8 @@ observations:
     species:
       formula: BU-0480
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -23623,7 +23743,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0480
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=4833; end_line=4838
@@ -26914,8 +27045,8 @@ observations:
     species:
       formula: NaCN
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -26942,7 +27073,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-0559
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=5676; header_line=5679; end_line=5682
@@ -29857,12 +29999,11 @@ observations:
     species:
       formula: C2F4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -29885,7 +30026,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-0629
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=6377; header_line=6381; end_line=6384
@@ -33470,8 +33622,8 @@ observations:
     species:
       formula: BU-0715
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -33498,7 +33650,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0715
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=7289; end_line=7292
@@ -42249,8 +42412,8 @@ observations:
     species:
       formula: BU-0924
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -42277,7 +42440,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-0924
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=9665; end_line=9667
@@ -53087,8 +53261,8 @@ observations:
     species:
       formula: BU-1182
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -53115,7 +53289,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1182
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=12625; end_line=12629
@@ -54138,8 +54323,8 @@ observations:
     species:
       formula: BU-1207
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -54166,7 +54351,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1207
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=12880; end_line=12884
@@ -55147,8 +55343,8 @@ observations:
     species:
       formula: BU-1231
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -55175,7 +55371,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1231
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=13153; end_line=13160
@@ -55358,8 +55565,8 @@ observations:
     species:
       formula: BU-1236
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -55386,7 +55593,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1236
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=13207; end_line=13210
@@ -57081,8 +57299,8 @@ observations:
     species:
       formula: BU-1277
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -57109,7 +57327,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1277
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=13700; end_line=13704
@@ -64139,8 +64368,8 @@ observations:
     species:
       formula: BU-1445
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -64167,7 +64396,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1445
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=15764; end_line=15768
@@ -69349,8 +69589,8 @@ observations:
     species:
       formula: BU-1569
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -69377,7 +69617,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1569
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=17310; end_line=17314
@@ -71828,8 +72079,8 @@ observations:
     species:
       formula: BU-1628
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -71856,7 +72107,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1628
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=18012; end_line=18016
@@ -71913,8 +72175,8 @@ observations:
     species:
       formula: BU-1630
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -71941,7 +72203,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1630
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=18031; end_line=18036
@@ -72670,12 +72943,11 @@ observations:
     species:
       formula: C6H7N
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -72698,7 +72970,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-1648
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=18248; header_line=18251; end_line=18254
@@ -73889,8 +74172,8 @@ observations:
     species:
       formula: BU-1677
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -73917,7 +74200,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1677
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=18609; end_line=18612
@@ -73974,8 +74268,8 @@ observations:
     species:
       formula: BU-1679
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -74002,7 +74296,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1679
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=18624; end_line=18627
@@ -80447,12 +80752,11 @@ observations:
     species:
       formula: C7H16
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -80475,7 +80779,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-1833
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=20612; header_line=20615; end_line=20618
@@ -82422,8 +82737,8 @@ observations:
     species:
       formula: BU-1880
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -82450,7 +82765,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1880
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=21182; end_line=21185
@@ -82465,8 +82791,8 @@ observations:
     species:
       formula: BU-1881
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -82493,7 +82819,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1881
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=21186; end_line=21189
@@ -82970,12 +83307,11 @@ observations:
     species:
       formula: C8H18
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82998,7 +83334,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-1893
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=21320; header_line=21323; end_line=21326
@@ -86037,8 +86384,8 @@ observations:
     species:
       formula: BU-1966
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -86065,7 +86412,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1966
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=22221; end_line=22228
@@ -86836,8 +87194,8 @@ observations:
     species:
       formula: BU-1985
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -86864,7 +87222,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-1985
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=22467; end_line=22472
@@ -95489,8 +95858,8 @@ observations:
     species:
       formula: BU-2191
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -95517,7 +95886,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2191
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25250; end_line=25253
@@ -97128,8 +97508,8 @@ observations:
     species:
       formula: BU-2230
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -97156,7 +97536,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2230
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25768; end_line=25775
@@ -97256,8 +97647,8 @@ observations:
     species:
       formula: BU-2233
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -97284,7 +97675,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2233
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25802; end_line=25806
@@ -97384,12 +97786,11 @@ observations:
     species:
       formula: C12H23
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97412,7 +97813,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2236
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25836; header_line=25840; end_line=25843
@@ -97469,12 +97881,11 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -97497,7 +97908,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2238
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25854; header_line=25857; end_line=25860
@@ -97512,8 +97934,8 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -97540,7 +97962,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2239
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25854; header_line=25861; end_line=25864
@@ -97681,8 +98114,8 @@ observations:
     species:
       formula: CaCO3
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -97709,7 +98142,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2243
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25884; header_line=25887; end_line=25890
@@ -97724,8 +98168,8 @@ observations:
     species:
       formula: CaCO3
       phase:
-        tag: unknown
-        reason: phase string 'liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -97752,7 +98196,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liq'' is not in the closed automatic map'
+    origin: burcat:BU-2244
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25884; header_line=25891; end_line=25894
@@ -97810,8 +98265,8 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -97838,7 +98293,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2246
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=25896; header_line=25904; end_line=25907
@@ -99744,8 +100210,8 @@ observations:
     species:
       formula: Co
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -99772,7 +100238,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2292
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26338; header_line=26346; end_line=26349
@@ -99787,8 +100264,8 @@ observations:
     species:
       formula: Co
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -99815,7 +100292,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2293
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26338; header_line=26350; end_line=26353
@@ -99830,8 +100318,8 @@ observations:
     species:
       formula: Co
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -99858,7 +100346,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2294
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26338; header_line=26354; end_line=26357
@@ -100295,8 +100794,8 @@ observations:
     species:
       formula: BU-2305
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100323,7 +100822,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2305
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26431; end_line=26433
@@ -100338,8 +100848,8 @@ observations:
     species:
       formula: BU-2306
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100366,7 +100876,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2306
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26434; end_line=26437
@@ -100423,8 +100944,8 @@ observations:
     species:
       formula: BU-2308
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100451,7 +100972,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2308
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26447; end_line=26449
@@ -100508,8 +101040,8 @@ observations:
     species:
       formula: CrCl3
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100536,7 +101068,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2310
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26459; header_line=26462; end_line=26465
@@ -100593,8 +101136,8 @@ observations:
     species:
       formula: BU-2312
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100621,7 +101164,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2312
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26476; end_line=26478
@@ -100804,8 +101358,8 @@ observations:
     species:
       formula: CrN
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100832,7 +101386,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2317
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26515; header_line=26519; end_line=26522
@@ -100847,8 +101412,8 @@ observations:
     species:
       formula: CrN
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100875,7 +101440,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2318
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26515; header_line=26523; end_line=26526
@@ -100890,8 +101466,8 @@ observations:
     species:
       formula: CrN
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -100918,7 +101494,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2319
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26515; header_line=26527; end_line=26530
@@ -101185,8 +101772,8 @@ observations:
     species:
       formula: Cr2N
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -101213,7 +101800,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2326
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26588; header_line=26591; end_line=26594
@@ -101228,12 +101826,11 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101256,7 +101853,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2327
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26596; header_line=26599; end_line=26602
@@ -101271,8 +101879,8 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -101299,7 +101907,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2328
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26596; header_line=26603; end_line=26606
@@ -101314,8 +101933,8 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -101342,7 +101961,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2329
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26596; header_line=26607; end_line=26610
@@ -101357,8 +101987,8 @@ observations:
     species:
       formula: Cr2O3
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -101385,7 +102015,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2330
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26596; header_line=26611; end_line=26614
@@ -101485,8 +102126,8 @@ observations:
     species:
       formula: C2Cr3
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -101513,7 +102154,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2333
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26628; header_line=26631; end_line=26634
@@ -101528,8 +102180,8 @@ observations:
     species:
       formula: C3Cr7
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -101556,7 +102208,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2334
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=26636; header_line=26639; end_line=26642
@@ -105480,8 +106143,8 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -105508,7 +106171,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2428
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27516; header_line=27519; end_line=27522
@@ -105523,8 +106197,8 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -105551,7 +106225,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2429
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27516; header_line=27523; end_line=27526
@@ -105566,8 +106251,8 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'c' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -105594,7 +106279,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''c'' is not in the closed automatic map'
+    origin: burcat:BU-2430
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27516; header_line=27527; end_line=27530
@@ -105609,8 +106305,8 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'd' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -105637,7 +106333,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''d'' is not in the closed automatic map'
+    origin: burcat:BU-2431
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27516; header_line=27531; end_line=27534
@@ -105946,8 +106653,8 @@ observations:
     species:
       formula: FeCl2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -105974,7 +106681,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2439
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27586; header_line=27589; end_line=27592
@@ -106073,8 +106791,8 @@ observations:
     species:
       formula: FeCl3
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106101,7 +106819,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2442
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27608; header_line=27611; end_line=27614
@@ -106200,8 +106929,8 @@ observations:
     species:
       formula: Fe.95O
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106228,7 +106957,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2445
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27628; header_line=27633; end_line=27636
@@ -106412,8 +107152,8 @@ observations:
     species:
       formula: FeO2H2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106440,7 +107180,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2450
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27669; header_line=27672; end_line=27675
@@ -106497,8 +107248,8 @@ observations:
     species:
       formula: FeO3H3
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106525,7 +107276,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2452
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27687; header_line=27690; end_line=27693
@@ -106540,8 +107302,8 @@ observations:
     species:
       formula: FeS
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106568,7 +107330,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2453
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27695; header_line=27699; end_line=27702
@@ -106583,8 +107356,8 @@ observations:
     species:
       formula: FeS
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106611,7 +107384,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2454
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27695; header_line=27703; end_line=27706
@@ -106626,8 +107410,8 @@ observations:
     species:
       formula: FeS
       phase:
-        tag: unknown
-        reason: phase string 'c' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106654,7 +107438,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''c'' is not in the closed automatic map'
+    origin: burcat:BU-2455
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27695; header_line=27707; end_line=27710
@@ -106753,8 +107548,8 @@ observations:
     species:
       formula: FeSO4
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106781,7 +107576,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2458
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27723; header_line=27726; end_line=27729
@@ -106796,8 +107602,8 @@ observations:
     species:
       formula: FeS2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -106824,7 +107630,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2459
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27731; header_line=27734; end_line=27737
@@ -107052,8 +107869,8 @@ observations:
     species:
       formula: Fe2S3O12
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -107080,7 +107897,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2465
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27775; header_line=27778; end_line=27781
@@ -107563,12 +108391,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -107591,7 +108418,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2477
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27847; header_line=27854; end_line=27857
@@ -108152,8 +108990,8 @@ observations:
     species:
       formula: BU-2491
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -108180,7 +109018,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2491
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=27972; end_line=27974
@@ -108363,8 +109212,8 @@ observations:
     species:
       formula: GeS2
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -108391,7 +109240,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2496
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=28012; header_line=28016; end_line=28019
@@ -108406,8 +109266,8 @@ observations:
     species:
       formula: GeS2
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -108434,7 +109294,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2497
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=28012; header_line=28020; end_line=28023
@@ -110549,12 +111420,11 @@ observations:
     species:
       formula: HT
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -110577,7 +111447,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2548
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=28521; header_line=28526; end_line=28529
@@ -111896,8 +112777,8 @@ observations:
     species:
       formula: BU-2580
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -111924,7 +112805,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2580
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=28829; end_line=28831
@@ -111939,8 +112831,8 @@ observations:
     species:
       formula: BU-2581
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -111967,7 +112859,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2581
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=28832; end_line=28835
@@ -112151,8 +113054,8 @@ observations:
     species:
       formula: Hg
       phase:
-        tag: unknown
-        reason: phase string 'liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -112179,7 +113082,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liq'' is not in the closed automatic map'
+    origin: burcat:BU-2586
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=28861; header_line=28868; end_line=28871
@@ -113332,12 +114246,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -113360,7 +114273,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2614
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29100; header_line=29102; end_line=29105
@@ -113501,12 +114425,11 @@ observations:
     species:
       formula: KNO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -113529,7 +114452,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2618
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29126; header_line=29129; end_line=29132
@@ -113544,12 +114478,11 @@ observations:
     species:
       formula: KNO3
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -113572,7 +114505,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2619
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29126; header_line=29133; end_line=29136
@@ -114555,8 +115499,8 @@ observations:
     species:
       formula: LiNO2
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -114583,7 +115527,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2643
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29315; header_line=29318; end_line=29321
@@ -114598,8 +115553,8 @@ observations:
     species:
       formula: LiNO2
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -114626,7 +115581,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2644
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29315; header_line=29322; end_line=29325
@@ -116836,12 +117802,11 @@ observations:
     species:
       formula: MgF2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -116864,7 +117829,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2697
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29737; header_line=29745; end_line=29748
@@ -117131,8 +118107,8 @@ observations:
     species:
       formula: MgH2
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -117159,7 +118135,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2704
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29800; header_line=29803; end_line=29806
@@ -117385,8 +118372,8 @@ observations:
     species:
       formula: MgI2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -117413,7 +118400,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2710
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29843; header_line=29847; end_line=29850
@@ -117597,8 +118595,8 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -117625,7 +118623,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2715
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29874; header_line=29884; end_line=29887
@@ -117851,8 +118860,8 @@ observations:
     species:
       formula: MgSO4
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -117879,7 +118888,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2721
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29924; header_line=29928; end_line=29931
@@ -117894,8 +118914,8 @@ observations:
     species:
       formula: MgO4S
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -117922,7 +118942,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2722
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29924; header_line=29932; end_line=29935
@@ -117937,8 +118968,8 @@ observations:
     species:
       formula: MgSO4
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -117965,7 +118996,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2723
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29924; header_line=29936; end_line=29939
@@ -118022,8 +119064,8 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -118050,7 +119092,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2725
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29945; header_line=29948; end_line=29951
@@ -118065,8 +119118,8 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -118093,7 +119146,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2726
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29945; header_line=29952; end_line=29955
@@ -118108,8 +119172,8 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -118136,7 +119200,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-2727
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=29945; header_line=29956; end_line=29959
@@ -118874,8 +119949,8 @@ observations:
     species:
       formula: MnO
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -118902,7 +119977,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2745
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30063; header_line=30065; end_line=30068
@@ -118959,8 +120045,8 @@ observations:
     species:
       formula: MnO2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -118987,7 +120073,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2747
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30074; header_line=30076; end_line=30079
@@ -119002,8 +120099,8 @@ observations:
     species:
       formula: Mn2O3
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -119030,7 +120127,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2748
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30081; header_line=30083; end_line=30086
@@ -119131,8 +120239,8 @@ observations:
     species:
       formula: Mn5N2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -119159,7 +120267,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2751
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30099; header_line=30101; end_line=30104
@@ -119259,8 +120378,8 @@ observations:
     species:
       formula: MnS2
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -119287,7 +120406,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2754
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30117; header_line=30119; end_line=30122
@@ -119600,8 +120730,8 @@ observations:
     species:
       formula: Mo2C
       phase:
-        tag: unknown
-        reason: phase string 'S' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -119628,7 +120758,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''S'' is not in the closed automatic map'
+    origin: burcat:BU-2762
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30169; header_line=30171; end_line=30174
@@ -121745,8 +122886,8 @@ observations:
     species:
       formula: NH4Cl
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -121773,7 +122914,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2813
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30673; header_line=30676; end_line=30679
@@ -121788,8 +122940,8 @@ observations:
     species:
       formula: NH4Cl
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -121816,7 +122968,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-2814
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30673; header_line=30680; end_line=30683
@@ -121831,8 +122994,8 @@ observations:
     species:
       formula: NH4ClO4
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -121859,7 +123022,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2815
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30685; header_line=30689; end_line=30692
@@ -121874,8 +123048,8 @@ observations:
     species:
       formula: NH4ClO4
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -121902,7 +123076,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2816
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30685; header_line=30693; end_line=30696
@@ -122589,8 +123774,8 @@ observations:
     species:
       formula: BU-2833
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -122617,7 +123802,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2833
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=30854; end_line=30856
@@ -124144,8 +125340,8 @@ observations:
     species:
       formula: N2H4O3
       phase:
-        tag: unknown
-        reason: phase string 'IV' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -124172,7 +125368,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''IV'' is not in the closed automatic map'
+    origin: burcat:BU-2870
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31215; header_line=31220; end_line=31223
@@ -124187,8 +125394,8 @@ observations:
     species:
       formula: N2H4O3
       phase:
-        tag: unknown
-        reason: phase string 'IV' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -124215,7 +125422,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''IV'' is not in the closed automatic map'
+    origin: burcat:BU-2871
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31215; header_line=31224; end_line=31227
@@ -124230,8 +125448,8 @@ observations:
     species:
       formula: N2H4O3
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -124258,7 +125476,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-2872
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31215; header_line=31228; end_line=31231
@@ -124273,8 +125502,8 @@ observations:
     species:
       formula: N2H4O3
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -124301,7 +125530,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-2873
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31215; header_line=31232; end_line=31235
@@ -124316,8 +125556,8 @@ observations:
     species:
       formula: N2H4O3
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -124344,7 +125584,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-2874
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31215; header_line=31236; end_line=31239
@@ -125661,8 +126912,8 @@ observations:
     species:
       formula: BU-2906
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -125689,7 +126940,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2906
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31540; end_line=31544
@@ -125704,8 +126966,8 @@ observations:
     species:
       formula: BU-2907
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -125732,7 +126994,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-2907
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31545; end_line=31550
@@ -126253,8 +127526,8 @@ observations:
     species:
       formula: NaNO3
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126281,7 +127554,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2920
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31636; header_line=31639; end_line=31642
@@ -126296,8 +127580,8 @@ observations:
     species:
       formula: NaNO3
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126324,7 +127608,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2921
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31636; header_line=31643; end_line=31646
@@ -126339,8 +127634,8 @@ observations:
     species:
       formula: NaNO3
       phase:
-        tag: unknown
-        reason: phase string 'c' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126367,7 +127662,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''c'' is not in the closed automatic map'
+    origin: burcat:BU-2922
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31636; header_line=31647; end_line=31650
@@ -126551,8 +127857,8 @@ observations:
     species:
       formula: Na2CO3
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126579,7 +127885,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2927
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31677; header_line=31681; end_line=31684
@@ -126594,8 +127911,8 @@ observations:
     species:
       formula: Na2CO3
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126622,7 +127939,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2928
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31677; header_line=31685; end_line=31688
@@ -126637,8 +127965,8 @@ observations:
     species:
       formula: Na2CO3
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126665,7 +127993,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: burcat:BU-2929
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31677; header_line=31689; end_line=31692
@@ -126680,8 +128019,8 @@ observations:
     species:
       formula: Na2CO3
       phase:
-        tag: unknown
-        reason: phase string 'liq' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126708,7 +128047,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liq'' is not in the closed automatic map'
+    origin: burcat:BU-2930
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31677; header_line=31693; end_line=31696
@@ -126723,8 +128073,8 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'c' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126751,7 +128101,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''c'' is not in the closed automatic map'
+    origin: burcat:BU-2931
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31698; header_line=31703; end_line=31706
@@ -126766,8 +128127,8 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126794,7 +128155,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2932
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31698; header_line=31707; end_line=31710
@@ -126809,8 +128181,8 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126837,7 +128209,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2933
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31698; header_line=31711; end_line=31714
@@ -126936,8 +128319,8 @@ observations:
     species:
       formula: Na2O2
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -126964,7 +128347,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2936
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31729; header_line=31733; end_line=31736
@@ -126979,8 +128373,8 @@ observations:
     species:
       formula: Na2O2
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -127007,7 +128401,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2937
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31729; header_line=31737; end_line=31740
@@ -127528,12 +128933,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -127556,7 +128960,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2950
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31836; header_line=31839; end_line=31842
@@ -127571,12 +128986,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -127599,7 +129013,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2951
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31836; header_line=31843; end_line=31846
@@ -127614,12 +129039,11 @@ observations:
     species:
       formula: NiO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -127642,7 +129066,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-2952
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31836; header_line=31847; end_line=31850
@@ -127699,8 +129134,8 @@ observations:
     species:
       formula: NiS
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -127727,7 +129162,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2954
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31856; header_line=31859; end_line=31862
@@ -127742,8 +129188,8 @@ observations:
     species:
       formula: NiS
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -127770,7 +129216,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2955
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31856; header_line=31863; end_line=31866
@@ -127912,8 +129369,8 @@ observations:
     species:
       formula: Ni3S2
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -127940,7 +129397,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-2959
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31884; header_line=31887; end_line=31890
@@ -127955,8 +129423,8 @@ observations:
     species:
       formula: Ni3S2
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -127983,7 +129451,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-2960
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=31884; header_line=31891; end_line=31894
@@ -133800,8 +135279,8 @@ observations:
     species:
       formula: BU-3099
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -133828,7 +135307,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-3099
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=33156; end_line=33160
@@ -135320,8 +136810,8 @@ observations:
     species:
       formula: S
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -135348,7 +136838,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-3135
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=33429; header_line=33432; end_line=33435
@@ -135363,8 +136864,8 @@ observations:
     species:
       formula: S
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -135391,7 +136892,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-3136
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=33429; header_line=33436; end_line=33439
@@ -140658,12 +142170,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140686,7 +142197,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3262
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=34632; header_line=34636; end_line=34639
@@ -140701,12 +142223,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140729,7 +142250,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3263
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=34632; header_line=34640; end_line=34643
@@ -144741,8 +146273,8 @@ observations:
     species:
       formula: Th
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -144769,7 +146301,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-3359
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=35598; header_line=35605; end_line=35608
@@ -145376,8 +146919,8 @@ observations:
     species:
       formula: BU-3374
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -145404,7 +146947,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-3374
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=35711; end_line=35713
@@ -145630,12 +147184,11 @@ observations:
     species:
       formula: WOCl4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -145658,7 +147211,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3380
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=35759; header_line=35762; end_line=35765
@@ -145757,8 +147321,8 @@ observations:
     species:
       formula: WCl6
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -145785,7 +147349,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-3383
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=35780; header_line=35783; end_line=35786
@@ -145800,8 +147375,8 @@ observations:
     species:
       formula: WCl6
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -145828,7 +147403,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-3384
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=35780; header_line=35787; end_line=35790
@@ -145843,8 +147429,8 @@ observations:
     species:
       formula: WCl6
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -145871,7 +147457,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-3385
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=35780; header_line=35791; end_line=35794
@@ -146979,8 +148576,8 @@ observations:
     species:
       formula: BU-3412
       phase:
-        tag: unknown
-        reason: phase string 'not_parsed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -147007,7 +148604,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''not_parsed'' is not in the closed automatic map'
+    origin: burcat:BU-3412
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36021; end_line=36024
@@ -147022,12 +148630,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -147050,7 +148657,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3413
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36025; header_line=36028; end_line=36031
@@ -147065,12 +148683,11 @@ observations:
     species:
       formula: ZnO
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -147093,7 +148710,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3414
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36025; header_line=36032; end_line=36035
@@ -147192,12 +148820,11 @@ observations:
     species:
       formula: ZnS
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -147220,7 +148847,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3417
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36049; header_line=36053; end_line=36056
@@ -147235,12 +148873,11 @@ observations:
     species:
       formula: ZnS
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -147263,7 +148900,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3418
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36058; header_line=36063; end_line=36066
@@ -147278,12 +148926,11 @@ observations:
     species:
       formula: ZnS
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -147306,7 +148953,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3419
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36058; header_line=36067; end_line=36070
@@ -147405,8 +149063,8 @@ observations:
     species:
       formula: ZnSO4
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -147433,7 +149091,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-3422
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36085; header_line=36088; end_line=36091
@@ -147448,12 +149117,11 @@ observations:
     species:
       formula: ZnSO4
       phase:
-        tag: unknown
-        reason: phase string 'condensed' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -147476,7 +149144,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source explicitly
+      leaves phase unspecified'
+    origin: burcat:BU-3423
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36085; header_line=36092; end_line=36095
@@ -147491,8 +149170,8 @@ observations:
     species:
       formula: ZnSO4
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -147519,7 +149198,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-3424
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36085; header_line=36096; end_line=36099
@@ -147577,8 +149267,8 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: unknown
-        reason: phase string 'a' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -147605,7 +149295,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''a'' is not in the closed automatic map'
+    origin: burcat:BU-3426
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36109; header_line=36112; end_line=36115
@@ -147620,8 +149321,8 @@ observations:
     species:
       formula: Zr
       phase:
-        tag: unknown
-        reason: phase string 'b' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -147648,7 +149349,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''b'' is not in the closed automatic map'
+    origin: burcat:BU-3427
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36109; header_line=36116; end_line=36119
@@ -148210,8 +149922,8 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -148238,7 +149950,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-3441
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36229; header_line=36234; end_line=36237
@@ -148253,8 +149976,8 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'III' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -148281,7 +150004,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''III'' is not in the closed automatic map'
+    origin: burcat:BU-3442
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36229; header_line=36238; end_line=36241
@@ -148296,8 +150030,8 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'II' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -148324,7 +150058,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''II'' is not in the closed automatic map'
+    origin: burcat:BU-3443
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36229; header_line=36242; end_line=36245
@@ -148339,8 +150084,8 @@ observations:
     species:
       formula: ZrO2
       phase:
-        tag: unknown
-        reason: phase string 'I' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
         tag: unknown
         reason: phase unknown; polymorph unresolved
@@ -148367,7 +150112,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''I'' is not in the closed automatic map'
+    origin: burcat:BU-3444
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: burcat
   locator:
     note: path=data/literature/compilations/burcat/source/BURCAT.THR.txt; cas_line=36229; header_line=36246; end_line=36249

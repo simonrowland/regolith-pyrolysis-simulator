@@ -51,15 +51,10 @@ GOLDEN_TRACE = (
 #   notice instead of omitting it. MnO_gas (domain floor 1519 K) is
 #   the only such row this lunar_mare_low_ti feedstock carries;
 #   CoO_gas is the other typed_refusal row and has no flux here.
-# Byte 2218 is the n_species digit 3 -> 5. The remaining growth is the
-# gate_provider_step_down diagnostic. That object carries host
-# engine_version strings (a local alphaMELTS path among them). The byte
-# compare strips those keys with the condensation green-pin helper and
-# requires each value to be a non-empty string. alphamelts_reference_pressure
-# is written once per hour on the liquid-fraction gate
-# (EvaporationMixin._freeze_gate_curve_from_gate_dispatch) and then echoed
-# with the oxygen-reservoir object onto that hour's tick delta and
-# per_hour_summary. It is not per species and not a second emission per tick.
+# Byte 2218 is the n_species digit 3 -> 5. The prior golden also included
+# gate_provider_step_down and alphamelts_reference_pressure records for the
+# projected MAGEMin result. b-1303 removes those records because its usable
+# projected bounds no longer trigger an AlphaMELTS continuation.
 
 VOLATILE_KEYS = {
     "duration_s",
@@ -78,24 +73,10 @@ class StopRunLoop(Exception):
 
 
 def _without_host_engine_versions(trace):
-    # Each engine_version sits in one failed-provider diagnostic of the
-    # liquid-fraction gate's step-down record
-    # (oxygen_reservoir.liquid_fraction_gate.redox.gate_provider_step_down).
-    # Count = campaigns * oxygen-reservoir copies per campaign * failed
-    # providers per copy, after dropping environment attempts:
-    # - two one-hour campaigns;
-    # - two copies each: the tick's per_hour_summary_delta and the
-    #   per_hour_summary event. The tick used to carry a third, top-level
-    #   copy; 2139b70810 drops it when the delta already carries the
-    #   reservoir (web/events.py, "The per-hour row already carries
-    #   oxygen_reservoir");
-    # - two failed providers per copy: magemin-shadow (composition_projected,
-    #   MnO and P2O5 have no ig endmember) and alphamelts-diagnostic.
-    # 2 * 2 * 2 = 8 (was 2 * 3 * 2 = 12 before that dedup).
-    # A recovered engine_worker_timeout is an environment attempt. It stays
-    # in the production payload and is omitted here, so the count stays 8.
+    # These two projected MAGEMin curves have usable bounds, so neither the
+    # step-down notice nor AlphaMELTS reference-pressure metadata is emitted.
     stripped, count = _without_engine_versions(deterministic_gate_payload(trace))
-    assert count == 8
+    assert count == 0
     return stripped
 
 

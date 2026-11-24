@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -46,7 +45,18 @@ observations:
         page: 43
         figure: '6'
         note: AM HTML caption only; no numeric table
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_fig6_fe_psat_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 43
@@ -97,7 +107,18 @@ observations:
       evidence:
         page: 43
         figure: '6'
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_fig6_mg_psat_figure_only
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 43
@@ -147,7 +168,18 @@ observations:
       evidence:
         page: 43
         figure: '6'
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_fig6_o2_psat_figure_only
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 43
@@ -197,7 +229,18 @@ observations:
       evidence:
         page: 43
         figure: '6'
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_fig6_o_psat_figure_only
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 43
@@ -247,7 +290,18 @@ observations:
       evidence:
         page: 43
         figure: '6'
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_fig6_sio_psat_figure_only
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 43
@@ -264,12 +318,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -298,7 +351,29 @@ observations:
       evidence:
         page: 44
         figure: '7'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_fig7_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_fig7_activities_figure_only
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 44
@@ -315,12 +390,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -349,7 +423,18 @@ observations:
       evidence:
         page: 45
         figure: '8'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_fig8_fe_mg_ratio_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 45
@@ -366,12 +451,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -398,7 +482,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_gamma_fa_regular_solution
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 12
@@ -416,12 +511,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -487,6 +581,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_solidus
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -516,12 +622,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -545,7 +650,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_solution_olivine_Fo95Fa5'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t1_olivine_composition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 33
@@ -564,12 +680,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -595,7 +710,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t2_fe_appearance_potentials
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 33
@@ -615,12 +741,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -644,7 +769,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t2_mg_appearance_potential
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t2_mg_appearance_potential
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 33
@@ -663,12 +810,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -691,7 +837,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t2_o2_appearance_potential
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t2_o2_appearance_potential
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 33
@@ -710,12 +878,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -738,7 +905,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t2_o_appearance_potential
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t2_o_appearance_potential
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 33
@@ -757,12 +946,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_Fo95Fa5_olivine' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -785,7 +973,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_Fo95Fa5_olivine'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t2_sio_appearance_potential
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t2_sio_appearance_potential
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 33
@@ -804,12 +1014,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -834,7 +1043,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_solution_olivine_Fo95Fa5'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t3_feo_partial_molar_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 34
@@ -853,12 +1073,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -882,7 +1101,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_solution_olivine_Fo95Fa5'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t3_mgo_partial_molar_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t3_mgo_partial_molar_enthalpy
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 34
@@ -900,12 +1141,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'solid_solution_olivine_Fo95Fa5' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -929,7 +1169,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_solution_olivine_Fo95Fa5'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t3_sio2_partial_molar_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t3_sio2_partial_molar_enthalpy
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 34
@@ -947,12 +1209,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fo95Fa5_olivine_pseudo_binary' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -979,7 +1240,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fo95Fa5_olivine_pseudo_binary'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t4_fayalite_delta_h_vap
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-133-costa-2017
   locator:
     page: 34
@@ -996,12 +1268,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: phase string 'Fo95Fa5_olivine_pseudo_binary' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1026,7 +1297,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fo95Fa5_olivine_pseudo_binary'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t4_forsterite_delta_h_vap
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t4_forsterite_delta_h_vap
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 34
@@ -1043,12 +1336,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'MAGMA_HRE_silicate_vapor_atmosphere' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1072,7 +1364,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MAGMA_HRE_silicate_vapor_atmosphere'' is not in the closed automatic map'
+    origin: kems-133-costa-2017::costa_2017_t5_hre_fe_mg_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''thermochemical_equilibrium_model''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-133-costa-2017::costa_2017_t5_hre_fe_mg_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-133-costa-2017
   locator:
     page: 35

@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_12_lunar_basalt_12022' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38,7 +37,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_12_lunar_basalt_12022'' is not in the closed automatic map'
+    origin: smales-1971-lpsc-12022::smales_1971_apollo_12022_bulk_composition_tables1_2_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: smales-1971-lpsc-12022
   locator:
     paragraph: Apollo 12 rock 12022 analytical composition
@@ -56,12 +66,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_12_lunar_basalt_12065' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,7 +92,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_12_lunar_basalt_12065'' is not in the closed automatic map'
+    origin: smales-1971-lpsc-12022::smales_1971_apollo_12065_bulk_composition_tables1_2_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: smales-1971-lpsc-12022
   locator:
     paragraph: Apollo 12 rock 12065 analytical composition

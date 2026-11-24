@@ -90,6 +90,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -228,6 +239,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -367,6 +389,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -426,12 +459,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -507,6 +539,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -569,12 +624,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -650,6 +704,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r03_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -791,6 +868,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -929,6 +1017,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1067,6 +1166,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1205,6 +1315,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1344,6 +1465,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1403,12 +1535,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1484,6 +1615,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1546,12 +1700,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1627,6 +1780,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1689,12 +1865,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1770,6 +1945,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r04_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1911,6 +2109,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2049,6 +2258,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2187,6 +2407,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2325,6 +2556,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2464,6 +2706,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2523,12 +2776,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2604,6 +2856,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2666,12 +2941,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2747,6 +3021,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -2809,12 +3106,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2890,6 +3186,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r05_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3031,6 +3350,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3169,6 +3499,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3307,6 +3648,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3445,6 +3797,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3584,6 +3947,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3643,12 +4017,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3724,6 +4097,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3786,12 +4182,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3867,6 +4262,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3929,12 +4347,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4010,6 +4427,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r06_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -4151,6 +4591,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4289,6 +4740,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4427,6 +4889,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4565,6 +5038,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4704,6 +5188,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -4763,12 +5258,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4844,6 +5338,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -4906,12 +5423,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4987,6 +5503,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5049,12 +5588,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5130,6 +5668,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r07_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -5271,6 +5832,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -5409,6 +5981,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -5547,6 +6130,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -5685,6 +6279,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -5824,6 +6429,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -5883,12 +6499,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5964,6 +6579,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6026,12 +6664,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6107,6 +6744,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6169,12 +6829,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6250,6 +6909,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r08_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6391,6 +7073,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -6529,6 +7222,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -6667,6 +7371,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -6805,6 +7520,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -6944,6 +7670,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -7003,12 +7740,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7084,6 +7820,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7146,12 +7905,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7227,6 +7985,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7289,12 +8070,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7370,6 +8150,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r09_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7511,6 +8314,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -7649,6 +8463,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -7787,6 +8612,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -7925,6 +8761,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -8064,6 +8911,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -8123,12 +8981,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8204,6 +9061,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8266,12 +9146,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8347,6 +9226,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8409,12 +9311,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8490,6 +9391,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r10_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8631,6 +9555,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -8769,6 +9704,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -8907,6 +9853,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -9045,6 +10002,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -9184,6 +10152,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -9243,12 +10222,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9324,6 +10302,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9386,12 +10387,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9467,6 +10467,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9529,12 +10552,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9610,6 +10632,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r11_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9751,6 +10796,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -9889,6 +10945,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -10027,6 +11094,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -10165,6 +11243,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -10304,6 +11393,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -10363,12 +11463,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10444,6 +11543,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10506,12 +11628,11 @@ observations:
     species:
       formula: SrO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10587,6 +11708,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c08
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10649,12 +11793,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10730,6 +11873,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r12_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -10871,6 +12037,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c02
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -11009,6 +12186,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c03
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -11147,6 +12335,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c05
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -11286,6 +12485,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -11345,12 +12555,11 @@ observations:
     species:
       formula: BaO
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11426,6 +12635,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c07
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c07
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -11488,12 +12720,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11569,6 +12800,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c09
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: balabanova-lopatin-tyurnina-2025-sro-bao-al2o3-sio2-kems::balabanova_lopatin_tyurnina_2025_sro_bao_al2o3_sio2_kems_p005_t02_r13_c09
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity

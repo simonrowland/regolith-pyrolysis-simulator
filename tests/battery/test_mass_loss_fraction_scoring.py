@@ -9,10 +9,14 @@ import pytest
 import simulator.battery.migrate as migrate_module
 import simulator.battery.score as score_module
 from simulator.battery.enums import (
+    AdmissionStatus,
     Engine,
+    ExecutionState,
     MethodToken,
     MetricOperation,
+    NoticeKind,
     Quantity,
+    Rail,
     RefusalReason,
     ResidualStatus,
     ValueKind,
@@ -34,7 +38,12 @@ from simulator.battery.records import (
     State,
     Value,
 )
-from simulator.battery.residue import _initial_oxide_wt_percent
+from simulator.battery.reproduction_cards import evaluate_card, load_review_scope
+from simulator.battery.residue import (
+    ResidueInventoryRefusal,
+    _initial_oxide_wt_percent,
+    predict_knudsen_residue_composition,
+)
 from simulator.battery.score import (
     QUANTITY_METRIC,
     compile_residual,
@@ -225,6 +234,464 @@ def test_markova_printed_t0_charge_is_accepted_as_initial(
     )
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
     assert prediction.refusal_detail["reason"] == "duration_not_stated"
+    assert prediction.refusal_detail["missing_input"] == "thermal_schedule.total_duration_s"
+
+
+@pytest.mark.parametrize(
+    ("panel", "temperature_K", "extent", "engine"),
+    (
+        ("VI", Decimal("1748.15"), Decimal("0.0146"), Engine.INTERNAL_ANALYTICAL),
+        ("VI", Decimal("1748.15"), Decimal("0.0146"), Engine.OPENIMCC),
+        ("V", Decimal("1749.15"), Decimal("0.0117"), Engine.INTERNAL_ANALYTICAL),
+        ("V", Decimal("1749.15"), Decimal("0.0117"), Engine.OPENIMCC),
+    ),
+    ids=(
+        "VI-internal-analytical",
+        "VI-openimcc",
+        "V-internal-analytical",
+        "V-openimcc",
+    ),
+)
+def test_markova_knudsen_extent_prediction_uses_migrated_panel_and_ignores_scale(
+    fresh_mass_loss_extracts, panel, temperature_K, extent, engine
+) -> None:
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    observations = tuple(markova_result.observations.values())
+    reference = next(
+        row
+        for row in observations
+        if row.experiment_id.endswith(f"::{panel}")
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == temperature_K
+    )
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+    assert reference.engine is None
+    assert reference.locator is not None
+    experiment = markova_result.experiments[reference.experiment_id]
+    assert experiment.sample.mass_kg.state.is_unknown
+    assert experiment.apparatus.geometry.orifice_area_m2.state.is_unknown
+
+    mass_loss_anchor = next(
+        row
+        for row in observations
+        if row.experiment_id == reference.experiment_id
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.identity.temperature_K.is_value
+        and row.identity.temperature_K.value == temperature_K
+    )
+    assert mass_loss_anchor.admission.status is AdmissionStatus.ADMITTED
+    assert mass_loss_anchor.value.point == extent
+
+    result = predict_knudsen_residue_composition(
+        engine.value, reference, experiment, observations
+    )
+    composition = result["composition_wt_pct"]
+    assert set(composition) == {"SiO2", "Al2O3", "FeO", "MgO", "CaO"}
+    assert result["measured_mass_loss_fraction"] == pytest.approx(float(extent))
+    notice_kinds = {notice.kind for notice in result["notices"]}
+    assert {
+        NoticeKind.OUT_OF_CERTIFIED_BAND,
+        NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.INPUT_OMITTED,
+    } <= notice_kinds
+    closure_notice = next(
+        notice
+        for notice in result["notices"]
+        if notice.kind is NoticeKind.INPUT_OMITTED
+        and "SC-360" in notice.reason
+    )
+    assert "congruent vapour-only zero-storage closure" in closure_notice.reason
+    assert "d-142" in closure_notice.reason
+    assert "3 dex (W) / 2.5 dex (Mo)" in closure_notice.reason
+
+    mass_experiment = replace(
+        experiment,
+        sample=replace(
+            experiment.sample,
+            mass_kg=Located(
+                State.of(Value.point_of(Decimal("2.5"))), reference.locator
+            ),
+        ),
+    )
+    mass_result = predict_knudsen_residue_composition(
+        engine.value, reference, mass_experiment, observations
+    )
+    if engine is Engine.INTERNAL_ANALYTICAL:
+        # Before a trace is truncated, only integration roundoff changes
+        # when the analytical loader receives a different charge mass.
+        assert mass_result["composition_wt_pct"] == pytest.approx(composition, rel=1e-8)
+    else:
+        assert mass_result["composition_wt_pct"] == composition
+
+    area_experiment = replace(
+        experiment,
+        apparatus=replace(
+            experiment.apparatus,
+            geometry=replace(
+                experiment.apparatus.geometry,
+                orifice_area_m2=Located(
+                    State.of(Value.point_of(Decimal("0.000123"))), reference.locator
+                ),
+            ),
+        ),
+    )
+    area_result = predict_knudsen_residue_composition(
+        engine.value, reference, area_experiment, observations
+    )
+    assert area_result["composition_wt_pct"] == composition
+
+    without_anchor = tuple(
+        row
+        for row in observations
+        if row.observation_id != mass_loss_anchor.observation_id
+    )
+    with pytest.raises(ResidueInventoryRefusal) as exc:
+        predict_knudsen_residue_composition(
+            engine.value, reference, experiment, without_anchor
+        )
+    assert exc.value.reason == "measured_mass_loss_fraction_missing_or_invalid"
+
+
+@pytest.mark.parametrize("panel", ("V", "VI"))
+def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
+    fresh_mass_loss_extracts, panel, tmp_path, monkeypatch,
+) -> None:
+    _richter_result, markova = fresh_mass_loss_extracts
+    observations = {
+        oid: row for oid, row in markova.observations.items()
+        if quantity_token(row.identity) is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+        or row.experiment_id.endswith(f"::{panel}")
+    }
+    references = {
+        oid: row for oid, row in observations.items()
+        if row.admission.status is AdmissionStatus.ADMITTED
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    }
+    assert len(references) == 55
+    context = score_module.ScoreContext(markova.works, markova.experiments, observations)
+    # Adjacent targets re-evaluate the same early pressure trajectory.
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "engine.sqlite"))
+    residuals, candidates = score_module.score_store(
+        context, engines=(Engine.OPENIMCC,), rail=Rail.RESIDUE_COMPOSITION,
+        work_id=next(iter(context.works)), include_diagnostics=False,
+    )
+    assert len(residuals) == len(references)
+    assert {row.reference for row in residuals} == set(references)
+
+    values = {}
+    by_coordinate = {}
+    for residual in residuals:
+        reference = references[residual.reference]
+        assert residual.status is ResidualStatus.NO_BAND
+        assert residual.numeric is not None
+        assert residual.numeric.operation is MetricOperation.ABSOLUTE
+        assert residual.numeric.decision_band is None
+        assert not residual.score_eligible
+        assert residual.refusal is not None
+        assert residual.refusal.detail["reason"] == "unparseable_printed_uncertainty"
+        assert {
+            NoticeKind.OUT_OF_CERTIFIED_BAND,
+            NoticeKind.UNVERIFIED_APPARATUS,
+            NoticeKind.INPUT_OMITTED,
+        } <= {notice.kind for notice in residual.notices}
+        candidate = candidates[residual.candidate]
+        assert candidate.value.kind is ValueKind.POINT
+        assert candidate.value.point is not None and reference.value.point is not None
+        assert residual.numeric.value == candidate.value.point - reference.value.point
+        values[residual.reference] = candidate.value.point
+        by_coordinate[reference.identity.temperature_K.value, reference.identity.species.formula] = (
+            residual, candidate,
+        )
+
+    if panel == "V":
+        _residual, silica = by_coordinate[Decimal("1749.15"), "SiO2"]
+        assert float(silica.value.point) == pytest.approx(52.3835622735, abs=1e-5)
+    else:
+        residual, silica = by_coordinate[Decimal("2156.15"), "SiO2"]
+        assert references[residual.reference].value.point == Decimal("13.6")
+        assert float(silica.value.point) == pytest.approx(41.9173329526, abs=1e-5)
+        assert [
+            (notice.kind, notice.origin) for notice in residual.notices
+            if notice.reason == "residue_fe_speciation_kress91_fallback"
+        ] == [(NoticeKind.FALLBACK, "simulator.fe_redox:kress91_split")]
+        _residual, alumina = by_coordinate[Decimal("2480.15"), "Al2O3"]
+        assert float(alumina.value.point) == pytest.approx(86.3460797573, abs=1e-4)
+        _residual, silica = by_coordinate[Decimal("2480.15"), "SiO2"]
+        assert silica.value.point == Decimal(0)
+        assert (
+            silica.provenance["linear_temperature_diagnostic"]["refusal"]
+            == "knudsen_extent_evaluation_limit"
+        )
+
+    manifest_path = LITERATURE / "reproduction-cards" / "kems-026-markova-1984.yaml"
+    manifest = load_yaml(manifest_path)
+    review = load_yaml(manifest_path.parent / manifest["review_ref"])
+    scope = load_review_scope(
+        LITERATURE.parents[1], manifest,
+        store=(markova.works, markova.experiments, markova.observations),
+    )
+    run = next(run for run in manifest["runs"] if run["card_id"].endswith(f"-{panel.lower()}"))
+    receipt = evaluate_card(
+        manifest, run, review["runs"][run["card_id"]], scope,
+        markova.observations, candidates=values,
+    )
+    assert receipt["verdict"] == "NOT_PASS"
+    group = next(group for group in receipt["groups"] if group["group_id"] == "residual-melt-series")
+    assert (group["n_required"], group["n_numeric"], group["n_no_band"]) == (55, 55, 55)
+
+
+def test_markova_partial_residue_score_carries_redox_diagnostic(
+    fresh_mass_loss_extracts,
+) -> None:
+    from simulator.battery.score_metrics import metric_operation_for_identity
+
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    context = score_module.ScoreContext(
+        markova_result.works,
+        markova_result.experiments,
+        markova_result.observations,
+    )
+    reference = _markova_vi_silica(context, Decimal("2156.15"))
+    assert reference.admission.status is AdmissionStatus.ADMITTED
+    assert reference.value.point == Decimal("13.6")
+    assert metric_operation_for_identity(reference.identity) is MetricOperation.ABSOLUTE
+    point_composition = reference.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert "kept sum=91.43 wt% is below 95 wt%" in point_composition.state.reason
+
+    residual, candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+    )
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.operation is MetricOperation.ABSOLUTE
+    assert residual.numeric.unit == "subtype_defined"
+    assert residual.numeric.decision_band is None
+    assert candidate is not None
+    assert candidate.value.kind is ValueKind.POINT
+    assert candidate.value.point is not None
+    assert float(candidate.value.point) == pytest.approx(37.8682015273, abs=1e-5)
+    assert float(residual.numeric.value) == pytest.approx(24.2682015273, abs=1e-5)
+    assert (
+        candidate.provenance["linear_temperature_diagnostic"]["refusal"]
+        == "knudsen_extent_evaluation_limit"
+    )
+    fe_diagnostics = []
+    for notice in residual.notices:
+        if (
+            notice.kind is not NoticeKind.ENGINE_MODEL_CAVEAT
+            or notice.reason != "residue_pressure_law_redox_active"
+        ):
+            continue
+        fields = dict(
+            part.strip().split("=", 1)
+            for part in notice.origin.split(";")
+            if "=" in part
+        )
+        if fields.get("species") == "Fe":
+            fe_diagnostics.append((fields, notice))
+    assert len(fe_diagnostics) == 1
+    diagnostic_fields = fe_diagnostics[0][0]
+    assert set(diagnostic_fields) == {"species", "declared", "observed", "expected"}
+    diagnostic_numbers = {
+        key: float(diagnostic_fields[key])
+        for key in ("declared", "observed", "expected")
+    }
+    assert diagnostic_numbers["declared"] == pytest.approx(-0.5)
+    assert diagnostic_numbers["expected"] < diagnostic_numbers["declared"]
+    assert diagnostic_numbers["observed"] == pytest.approx(
+        diagnostic_numbers["expected"], abs=2e-3,
+    )
+    assert score_module.FLAGGED_STRATUM_RESIDUE_REDOX in score_module.flagged_strata(
+        residual.notices
+    )
+    fallback = [
+        notice
+        for notice in residual.notices
+        if notice.reason == "residue_fe_speciation_kress91_fallback"
+    ]
+    assert fallback == []
+    assert {
+        NoticeKind.OUT_OF_CERTIFIED_BAND,
+        NoticeKind.UNVERIFIED_APPARATUS,
+        NoticeKind.INPUT_OMITTED,
+    } <= {notice.kind for notice in residual.notices}
+
+
+def _markova_vi_silica(context, temperature_K):
+    return next(
+        row
+        for row in context.observations.values()
+        if row.experiment_id.endswith("::VI")
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and row.identity.species.formula == "SiO2"
+        and row.identity.temperature_K.value == temperature_K
+    )
+
+
+def test_markova_analytical_vi_2207_scores_after_exhaustion(fresh_mass_loss_extracts) -> None:
+    from simulator.accounting.formulas import parse_formula
+    _richter_result, markova = fresh_mass_loss_extracts
+    context = score_module.ScoreContext(markova.works, markova.experiments, markova.observations)
+    reference = _markova_vi_silica(context, Decimal("2480.15"))
+    residual, candidate = compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=context)
+    assert residual.status is ResidualStatus.NO_BAND
+    assert residual.numeric is not None
+    assert residual.numeric.unit == "subtype_defined"
+    assert residual.numeric.operation is MetricOperation.ABSOLUTE
+    assert residual.numeric.decision_band is None
+    assert candidate is not None and candidate.value.point is not None
+    assert residual.numeric.value == candidate.value.point
+    assert {NoticeKind.OUT_OF_CERTIFIED_BAND, NoticeKind.UNVERIFIED_APPARATUS, NoticeKind.INPUT_OMITTED} <= {
+        notice.kind for notice in residual.notices
+    }
+    assert score_module.FLAGGED_STRATUM_RESIDUE_REDOX in score_module.flagged_strata(residual.notices)
+    assert not any(notice.reason == "residue_fe_speciation_kress91_fallback" for notice in residual.notices)
+
+    provenance = candidate.provenance
+    tail = provenance["trace_tail"]
+    assert tail["material"] is False
+    assert "trace_tail_below_loader_cutoff" not in score_module.flagged_strata(residual.notices)
+    # The source leaves the charge mass unknown, so the stated 1 g default
+    # puts the measured escaped mass at 0.9551 g.
+    retained = tail["retained_kg_by_parent"]
+    assert retained
+    notices = {notice.dropped[0]: notice for notice in residual.notices
+               if notice.reason == "trace_tail_below_loader_cutoff"}
+    assert set(notices) == set(retained)
+    for oxide, mass in retained.items():
+        notice = notices[oxide]
+        assert notice.certification == "immaterial"
+        assert notice.original == Decimal(str(mass))
+        assert float(notice.dropped_mass_fraction) == pytest.approx(mass / 0.0009551, rel=1e-10, abs=0)
+        assert mass == pytest.approx(
+            provenance["final_inventory_mol"][oxide] * parse_formula(oxide).molar_mass_kg_per_mol(),
+            rel=1e-10, abs=0,
+        )
+    assert tail["fraction_of_measured_mass_loss"] == pytest.approx(
+        sum(retained.values()) / 0.0009551, rel=1e-10, abs=0,
+    )
+    assert float(candidate.value.point) <= tail["bound_wt_pct_by_component"]["SiO2"]
+    assert provenance["composition_wt_pct"]["Al2O3"] == pytest.approx(82.3847957590, abs=1e-4)
+    assert provenance["escaped_mass_fraction"] == pytest.approx(0.9551, abs=1e-10)
+    assert max(map(abs, provenance["atom_closure_mol"].values())) < 1e-10
+    assert provenance["linear_temperature_diagnostic"]["refusal"] == "knudsen_extent_evaluation_limit"
+
+
+def test_markova_vi_budget_exit_is_attempted_unavailable(
+    fresh_mass_loss_extracts, monkeypatch,
+) -> None:
+    from simulator.battery import residue
+
+    _richter_result, markova = fresh_mass_loss_extracts
+    context = score_module.ScoreContext(markova.works, markova.experiments, markova.observations)
+    reference = _markova_vi_silica(context, Decimal("1748.15"))
+    monkeypatch.setattr(residue, "_KNUDSEN_MAX_RHS_EVALUATIONS", 1)
+    residual, candidate = compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=context)
+    assert candidate is None
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ATTEMPTED_UNAVAILABLE
+    assert residual.refusal.detail["reason"] == "knudsen_extent_evaluation_limit"
+    assert residual.refusal.detail["detail"] == (
+        "RHS evaluation limit in 1748.15 K interval ending at mass-loss fraction 0.0146"
+    )
+
+
+def test_markova_vi_residue_prediction_moves_when_panel_charges_are_swapped(
+    fresh_mass_loss_extracts,
+) -> None:
+    _richter_result, markova = fresh_mass_loss_extracts
+    context = score_module.ScoreContext(markova.works, markova.experiments, markova.observations)
+    reference = _markova_vi_silica(context, Decimal("1748.15"))
+    vi = context.experiments[reference.experiment_id]
+    v = next(exp for exp in context.experiments.values() if exp.experiment_id.endswith("::V"))
+    swapped = replace(context, experiments={
+        **context.experiments,
+        vi.experiment_id: replace(vi, sample=replace(
+            vi.sample, initial_composition=v.sample.initial_composition,
+        )),
+        v.experiment_id: replace(v, sample=replace(
+            v.sample, initial_composition=vi.sample.initial_composition,
+        )),
+    })
+    for inputs, expected in ((context, 44.6424372094), (swapped, 53.0657509929)):
+        residual, candidate = compile_residual(reference, Engine.INTERNAL_ANALYTICAL, context=inputs)
+        assert residual.status is ResidualStatus.NO_BAND
+        assert candidate is not None and candidate.value.point is not None
+        assert float(candidate.value.point) == pytest.approx(expected, abs=1e-5)
+
+
+def test_bulk_mass_loss_score_keeps_distinct_redox_arms(
+    fresh_mass_loss_extracts, monkeypatch,
+) -> None:
+    from simulator.battery import residue
+    from simulator.vacuum_oxygen_balance import (
+        PressureLawChannelDiagnostic,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
+    _richter_result, markova_result = fresh_mass_loss_extracts
+    row = next(
+        row
+        for row in markova_result.observations.values()
+        if row.experiment_id.endswith("::VI")
+        and quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+        and row.value.point == 0
+    )
+    experiment = markova_result.experiments[row.experiment_id]
+    monkeypatch.setattr(
+        residue,
+        "predict_mass_loss_fraction",
+        lambda *_args, **_kwargs: residue.ResidueMassLossPrediction(
+            mass_loss_fraction=0.0,
+            engine_flags=(),
+            engine_metadata={"alpha_sources": "[]"},
+            pressure_law_diagnostics=(
+                PressureLawChannelDiagnostic(
+                    "Fe", -0.5, -0.601, -0.603,
+                    RESIDUE_PRESSURE_LAW_REDOX_ACTIVE, arm="POINT",
+                ),
+                PressureLawChannelDiagnostic(
+                    "Fe", -0.5, -0.604, -0.606,
+                    RESIDUE_PRESSURE_LAW_REDOX_ACTIVE, arm="JOINT",
+                ),
+            ),
+        ),
+    )
+
+    prediction = score_module._predict_mass_loss_with_residue(
+        Engine.OPENIMCC,
+        row.identity,
+        "bulk_mass_loss",
+        (),
+        experiment,
+        row,
+    )
+
+    fe_notices = [
+        notice for notice in prediction.notices
+        if notice.reason == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        and "species=Fe" in notice.origin
+    ]
+    assert len(fe_notices) == 2
+    fields_by_arm = {
+        part.strip().split("=", 1)[1]: dict(
+            fragment.strip().split("=", 1)
+            for fragment in notice.origin.split(";")
+            if "=" in fragment
+        )
+        for notice in fe_notices
+        for part in notice.origin.split(";")
+        if part.strip().startswith("arm=")
+    }
+    assert set(fields_by_arm) == {"POINT", "JOINT"}
+    assert fields_by_arm["POINT"]["observed"] == "-0.601"
+    assert fields_by_arm["JOINT"]["observed"] == "-0.604"
 
 
 def test_untyped_richter_final_map_never_becomes_initial(mass_loss_rows) -> None:

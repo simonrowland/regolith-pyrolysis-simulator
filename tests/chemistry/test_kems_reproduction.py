@@ -147,12 +147,51 @@ def test_comparison_status_vocabulary_and_precedence() -> None:
     }
 
 
-@pytest.mark.parametrize("status_flags", [{}, {"assumed_input": True}])
+@pytest.mark.parametrize(
+    "status_flags",
+    [
+        {},
+        {"assumed_input": True},
+        {"assumed_input": True, "status_override": "match"},
+    ],
+)
 def test_numeric_comparison_requires_cited_uncertainty(status_flags: dict) -> None:
     with pytest.raises(ValueError, match="cited uncertainty"):
         _comparison(expected_uncertainty=None, **status_flags)
     with pytest.raises(ValueError, match="uncertainty.value"):
         _comparison(expected_uncertainty={}, **status_flags)
+
+
+def test_ungraded_comparison_cannot_override_to_scoring_without_band() -> None:
+    with pytest.raises(
+        ValueError,
+        match="scoring status overrides require cited uncertainty",
+    ):
+        _comparison(
+            expected_uncertainty=None,
+            ungraded=True,
+            status_override="match",
+        )
+
+
+@pytest.mark.parametrize("status_override", ["match", "mismatch", "ordering-pass", "ordering-fail"])
+@pytest.mark.parametrize("band", [None, {}, {"temperature_K": 5.0}])
+def test_scoring_override_on_a_missing_observation_is_refused(status_override, band) -> None:
+    with pytest.raises(ValueError, match="cited uncertainty|uncertainty.value"):
+        _comparison(
+            expected_value=None,
+            expected_uncertainty=band,
+            status_override=status_override,
+        )
+
+
+def test_metadata_only_band_stays_legal_on_a_non_scoring_record() -> None:
+    record = _comparison(
+        expected_value=None,
+        expected_uncertainty={"temperature_K": 5.0},
+        status_override="unsupported-observable",
+    )
+    assert record.status == "unsupported-observable"
 
 
 @pytest.mark.parametrize(

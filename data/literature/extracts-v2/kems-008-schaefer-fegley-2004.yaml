@@ -87,7 +87,19 @@ observations:
         table: '10'
         paragraph: Vaporization coefficients for oxides and silicates
         source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_al2o3_table10_b1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     table: '10'
@@ -180,7 +192,19 @@ observations:
         table: '10'
         line_range: 649-661
         source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mg_forsterite_alpha_s_survey
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     table: '10'
@@ -274,7 +298,19 @@ observations:
         table: '10'
         paragraph: Vaporization coefficients for oxides and silicates
         source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_mgo_table10_b1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     table: '10'
@@ -368,7 +404,19 @@ observations:
         table: '10'
         paragraph: Vaporization coefficients for oxides and silicates
         source_path: text/kems-008-schaefer-fegley-2004/mineru/spool/out/kems-008-schaefer-fegley-2004/vlm/kems-008-schaefer-fegley-2004.md
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::schaefer_fegley_2004_sio2_table10_b1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     table: '10'
@@ -481,12 +529,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -553,7 +600,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r01_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r01_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -572,12 +643,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -644,6 +714,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r02_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r02_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -677,12 +771,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -749,6 +842,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r03_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r03_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -782,12 +899,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -854,6 +970,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r04_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r04_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -887,12 +1027,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -959,7 +1098,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r05_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r05_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -988,12 +1151,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1062,6 +1224,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r06_al2o3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r06_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1095,12 +1281,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1167,6 +1352,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r07_al2o3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1200,12 +1397,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1272,6 +1468,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r08_mgo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r08_mgo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1305,12 +1525,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1377,6 +1596,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r09_mgo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r09_mgo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1410,12 +1653,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1482,7 +1724,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r10_mgo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r10_mgo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -1501,12 +1767,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1573,6 +1838,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r11_mgo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r11_mgo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1606,12 +1895,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1678,7 +1966,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r12_mgo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r12_mgo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -1697,12 +2009,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1771,6 +2082,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r13_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r13_sio2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1794,12 +2129,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1868,6 +2202,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r14_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r14_sio2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1891,12 +2249,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1963,7 +2320,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r15_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r15_sio2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -1982,12 +2363,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2075,12 +2455,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2147,7 +2526,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r16_sio2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -2239,7 +2630,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r17_mg
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -2423,7 +2826,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t10_r18_mg
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 235
@@ -2534,12 +2949,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2561,7 +2975,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 218
@@ -2578,12 +3014,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2605,7 +3040,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 218
@@ -2622,12 +3079,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2649,7 +3105,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 218
@@ -2666,12 +3144,11 @@ observations:
     species:
       formula: K2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2693,7 +3170,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_4
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 218
@@ -2710,12 +3209,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2737,7 +3235,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_5
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 218
@@ -2754,12 +3274,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2781,7 +3300,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t2_reaction_6
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 218
@@ -2798,12 +3339,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2825,7 +3365,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_al
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_al
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -2842,12 +3404,11 @@ observations:
     species:
       formula: Al2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2869,7 +3430,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_al2o
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_al2o
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -2886,12 +3469,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2913,7 +3495,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_alo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_alo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -2930,12 +3534,11 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2957,7 +3560,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_ca
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_ca
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -2974,12 +3599,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3001,7 +3625,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_cao
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_cao
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3018,12 +3664,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3045,7 +3690,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_mg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_mg
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3062,12 +3729,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3089,7 +3755,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_mgo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_mgo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3106,12 +3794,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3133,7 +3820,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_o
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_o
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3150,12 +3859,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3177,7 +3885,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_o2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_o2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3194,12 +3924,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3221,7 +3950,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_sio
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3238,12 +3978,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3265,7 +4004,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_sio2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3282,12 +4043,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3309,7 +4069,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_total
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t4_total
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 221
@@ -3326,12 +4108,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3356,7 +4137,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_alkalis
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_alkalis
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3383,12 +4186,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3413,7 +4215,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_cais
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_cais
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3440,12 +4264,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3470,7 +4293,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_dunite
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_dunite
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3497,12 +4342,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3527,7 +4371,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_komatiites
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_komatiites
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3554,12 +4420,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3584,7 +4449,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_morbs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_morbs
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3611,12 +4498,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3641,7 +4527,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_oibs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_oibs
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3668,12 +4576,11 @@ observations:
     species:
       formula: bulk_lava
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3698,7 +4605,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_tholeiites
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t7_tholeiites
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 226
@@ -3725,12 +4654,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3755,7 +4683,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_al_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_al_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -3782,12 +4732,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3809,7 +4758,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_al_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_al_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -3826,12 +4797,11 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3856,7 +4826,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ca_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ca_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -3883,12 +4875,11 @@ observations:
     species:
       formula: Ca
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3910,7 +4901,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ca_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ca_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -3927,12 +4940,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3957,7 +4969,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_fe_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_fe_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -3984,12 +5018,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4011,7 +5044,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_fe_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_fe_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4028,12 +5083,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4058,7 +5112,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_k_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_k_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4085,12 +5161,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4112,7 +5187,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_k_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_k_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4129,12 +5226,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4159,7 +5255,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_na_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_na_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4186,12 +5304,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4212,7 +5329,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_na_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_na_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4229,12 +5368,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4259,7 +5397,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_si_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_si_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4286,12 +5446,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4313,7 +5472,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_si_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_si_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4330,12 +5511,11 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4360,7 +5540,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ti_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ti_model
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4387,12 +5589,11 @@ observations:
     species:
       formula: Ti
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4414,7 +5615,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ti_observational_comparison
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t8_ti_observational_comparison
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 232
@@ -4431,12 +5654,11 @@ observations:
     species:
       formula: e
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: -1
@@ -4458,7 +5680,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_eminus
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_eminus
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4475,12 +5719,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4502,7 +5745,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_fe
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_fe
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4519,12 +5784,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4546,7 +5810,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_feo
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_feo
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4563,12 +5849,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4590,7 +5875,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_k
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4607,12 +5914,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 1
@@ -4634,7 +5940,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_kplus
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_kplus
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4651,12 +5979,11 @@ observations:
     species:
       formula: Mg
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4678,7 +6005,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_mg
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_mg
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4695,12 +6044,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4722,7 +6070,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_na
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_na
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4739,12 +6109,11 @@ observations:
     species:
       formula: NaO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4766,7 +6135,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_nao
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_nao
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4783,12 +6174,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 1
@@ -4810,7 +6200,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_naplus
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_naplus
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4827,12 +6239,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4854,7 +6265,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_o
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_o
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4871,12 +6304,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4898,7 +6330,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_o2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_o2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4915,12 +6369,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4942,7 +6395,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_sio
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234
@@ -4959,12 +6423,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4986,7 +6449,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_sio2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''kems''; original_reason=regime ''review_compilation''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: kems-008-schaefer-fegley-2004::sf2004_t9_sio2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: kems-008-schaefer-fegley-2004
   locator:
     page: 234

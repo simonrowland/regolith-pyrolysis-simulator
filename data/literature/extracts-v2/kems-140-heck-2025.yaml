@@ -11,12 +11,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,7 +39,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_abstract_reported_ranges
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     paragraph: abstract
@@ -57,12 +67,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -91,7 +100,18 @@ observations:
       evidence:
         figure: '10'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr10_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig10_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '10'
@@ -108,12 +128,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -142,7 +161,18 @@ observations:
       evidence:
         figure: '11'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr11_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig11_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '11'
@@ -159,12 +189,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'magma_ocean_model' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -194,7 +223,18 @@ observations:
       evidence:
         figure: '12'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr12_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''magma_ocean_model'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig12_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '12'
@@ -211,12 +251,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -239,7 +278,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig1_printed_bead_radii
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '1'
@@ -256,12 +306,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -291,7 +340,18 @@ observations:
       evidence:
         figure: '2'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr2_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig2_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '2'
@@ -308,12 +368,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -342,7 +401,18 @@ observations:
       evidence:
         figure: '3'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr3_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig3_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '3'
@@ -359,12 +429,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -393,7 +462,18 @@ observations:
       evidence:
         figure: '4'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr4_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig4_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '4'
@@ -410,12 +490,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -444,7 +523,18 @@ observations:
       evidence:
         figure: '5'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr5_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '5'
@@ -461,12 +551,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -495,7 +584,18 @@ observations:
       evidence:
         figure: '6'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr6_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig6_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '6'
@@ -512,12 +612,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -546,7 +645,18 @@ observations:
       evidence:
         figure: '7'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr7_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig7_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '7'
@@ -563,12 +673,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -597,7 +706,18 @@ observations:
       evidence:
         figure: '8'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr8_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig8_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '8'
@@ -614,12 +734,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -648,7 +767,18 @@ observations:
       evidence:
         figure: '9'
         note: Elsevier CDN high-res JPEG 1-s2.0-S0016703725002406-gr9_lrg.jpg; no numeric table. Not digitised.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_fig9_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     figure: '9'
@@ -665,12 +795,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -694,7 +823,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_s1_experimental_conditions_epma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: S1
@@ -711,12 +851,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_glass_quenched_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -740,7 +879,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_glass_quenched_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_s2_mvce_laicpms_profiles
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: S2
@@ -757,12 +907,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -787,7 +936,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_s3_kstar_fitting_concentrations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: S3
@@ -804,12 +964,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'Pt_or_Re_wire_loop' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -832,7 +991,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Pt_or_Re_wire_loop'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_s4_metal_wire_mvce
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: S4
@@ -849,12 +1019,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -879,7 +1048,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_s5_3L_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: S5
@@ -896,12 +1076,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -924,7 +1103,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -956,12 +1146,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -984,7 +1173,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1016,12 +1216,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1044,7 +1243,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1076,12 +1286,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1104,7 +1313,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1136,12 +1356,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1164,7 +1383,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1196,12 +1426,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1224,7 +1453,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1256,12 +1496,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1284,7 +1523,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1316,12 +1566,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1344,7 +1593,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1376,12 +1636,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1404,7 +1663,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1436,12 +1706,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1464,7 +1733,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1496,12 +1776,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1524,7 +1803,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1556,12 +1846,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1584,7 +1873,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1616,12 +1916,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1644,7 +1943,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1676,12 +1986,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1704,7 +2013,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1736,12 +2056,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1764,7 +2083,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1796,12 +2126,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1824,7 +2153,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1856,12 +2196,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1884,7 +2223,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1916,12 +2266,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1944,7 +2293,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -1976,12 +2336,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2004,7 +2363,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2036,12 +2406,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2064,7 +2433,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2096,12 +2476,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2124,7 +2503,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2156,12 +2546,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2184,7 +2573,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2216,12 +2616,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2244,7 +2643,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2276,12 +2686,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2304,7 +2713,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2336,12 +2756,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2364,7 +2783,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2396,12 +2826,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2424,7 +2853,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2456,12 +2896,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2484,7 +2923,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2516,12 +2966,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2544,7 +2993,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2576,12 +3036,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2604,7 +3063,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2636,12 +3106,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2664,7 +3133,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2696,12 +3176,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2724,7 +3203,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2756,12 +3246,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2784,7 +3273,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2816,12 +3316,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2844,7 +3343,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2876,12 +3386,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2904,7 +3413,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2936,12 +3456,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2964,7 +3483,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -2996,12 +3526,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3024,7 +3553,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3056,12 +3596,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3084,7 +3623,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3116,12 +3666,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3144,7 +3693,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3176,12 +3736,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3204,7 +3763,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3236,12 +3806,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3264,7 +3833,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3296,12 +3876,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3324,7 +3903,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3356,12 +3946,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3384,7 +3973,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3416,12 +4016,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3444,7 +4043,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3476,12 +4086,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3504,7 +4113,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3536,12 +4156,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3564,7 +4183,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3596,12 +4226,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3624,7 +4253,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3656,12 +4296,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3684,7 +4323,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3716,12 +4366,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3744,7 +4393,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3776,12 +4436,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3804,7 +4463,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3836,12 +4506,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3864,7 +4533,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3896,12 +4576,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3924,7 +4603,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -3956,12 +4646,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3984,7 +4673,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4016,12 +4716,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4044,7 +4743,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4076,12 +4786,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4104,7 +4813,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4136,12 +4856,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4164,7 +4883,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4196,12 +4926,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4224,7 +4953,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4256,12 +4996,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4284,7 +5023,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4316,12 +5066,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4344,7 +5093,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4376,12 +5136,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4404,7 +5163,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4436,12 +5206,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4464,7 +5233,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4496,12 +5276,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4524,7 +5303,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4556,12 +5346,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4584,7 +5373,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4616,12 +5416,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4644,7 +5443,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4676,12 +5486,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4704,7 +5513,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4736,12 +5556,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4764,7 +5583,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4796,12 +5626,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4824,7 +5653,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4856,12 +5696,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4884,7 +5723,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4916,12 +5766,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4944,7 +5793,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -4976,12 +5836,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5004,7 +5863,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5036,12 +5906,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5064,7 +5933,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5096,12 +5976,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5124,7 +6003,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5156,12 +6046,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5184,7 +6073,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5216,12 +6116,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5244,7 +6143,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5276,12 +6186,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5304,7 +6213,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5336,12 +6256,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5364,7 +6283,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5396,12 +6326,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5424,7 +6353,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5456,12 +6396,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5484,7 +6423,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5516,12 +6466,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5544,7 +6493,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5576,12 +6536,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5604,7 +6563,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5636,12 +6606,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5664,7 +6633,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5696,12 +6676,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt_glass_bead' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5724,7 +6703,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt_glass_bead'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t1_experimental_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '1'
@@ -5756,12 +6746,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'silicate_glass_starting_materials' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5785,7 +6774,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_glass_starting_materials'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t2_starting_major_compositions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '2'
@@ -5802,12 +6802,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5831,7 +6830,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_ag_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -5848,12 +6858,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5877,7 +6886,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_as_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -5894,12 +6914,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5923,7 +6942,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_cd_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -5940,12 +6970,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5969,7 +6998,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_cu_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -5986,12 +7026,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6015,7 +7054,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_ge_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -6032,12 +7082,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6061,7 +7110,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_in_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -6078,12 +7138,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6107,7 +7166,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_pb_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -6124,12 +7194,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6153,7 +7222,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t3_initial_zn_ppm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '3'
@@ -6170,12 +7250,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6199,7 +7278,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_ag_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6216,12 +7306,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6245,7 +7334,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_ag_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6262,12 +7362,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6291,7 +7390,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_as_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6308,12 +7418,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6337,7 +7446,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_as_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6354,12 +7474,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6383,7 +7502,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_cd_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6400,12 +7530,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6429,7 +7558,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_ge_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6446,12 +7586,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6475,7 +7614,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_pb_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6492,12 +7642,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6521,7 +7670,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t4_zn_diffusivity_inverse_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '4'
@@ -6538,12 +7698,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6567,7 +7726,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6592,12 +7762,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6621,7 +7790,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6646,12 +7826,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6675,7 +7854,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_AgOp5_Agg_ag
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6700,12 +7890,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6729,7 +7918,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6754,12 +7954,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6783,7 +7982,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6808,12 +8018,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6837,7 +8046,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_AsO1p5_AsOg_as
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6862,12 +8082,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6891,7 +8110,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_CdO_Cdg_cd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6916,12 +8146,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6945,7 +8174,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_CdO_Cdg_cd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -6970,12 +8210,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6999,7 +8238,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7024,12 +8274,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7053,7 +8302,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7078,12 +8338,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7107,7 +8366,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_CuOp5_Cug_cu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7132,12 +8402,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7161,7 +8430,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7186,12 +8466,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7215,7 +8494,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7240,12 +8530,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7269,7 +8558,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_GeO2_GeOg_ge
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7294,12 +8594,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7324,7 +8623,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_InOg_in
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7341,12 +8651,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7370,7 +8679,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_Ing_in
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7395,12 +8715,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7424,7 +8743,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_InO1p5_Ing_in
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7449,12 +8779,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7478,7 +8807,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_PbOg_pb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7503,12 +8843,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7532,7 +8871,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_PbOg_pb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7557,12 +8907,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7586,7 +8935,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_Pbg_pb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7611,12 +8971,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7640,7 +8999,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_PbO_Pbg_pb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7665,12 +9035,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7694,7 +9063,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_ZnO_Zng_zn
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7719,12 +9099,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7748,7 +9127,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t5_logKstar_ZnO_Zng_zn
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '5'
@@ -7773,12 +9163,11 @@ observations:
     species:
       formula: Ag
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7807,7 +9196,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_agop5_agg_ag_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -7824,12 +9224,11 @@ observations:
     species:
       formula: As
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7858,7 +9257,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_aso1p5_asog_as_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -7875,12 +9285,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7909,7 +9318,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_cuop5_cug_cu_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -7926,12 +9346,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7960,7 +9379,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_geo2_geog_ge_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -7977,12 +9407,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8011,7 +9440,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_ino1p5_ing_in_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -8028,12 +9468,11 @@ observations:
     species:
       formula: In
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8062,7 +9501,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_ino1p5_inog_in_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -8079,12 +9529,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8113,7 +9562,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_pbo_pbg_pb_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -8130,12 +9590,11 @@ observations:
     species:
       formula: Pb
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8164,7 +9623,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_pbo_pbog_pb_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'
@@ -8181,12 +9651,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'silicate_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8215,7 +9684,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''silicate_melt'' is not in the closed automatic map'
+    origin: kems-140-heck-2025::heck_2025_t6_zno_zng_zn_HS
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-140-heck-2025
   locator:
     table: '6'

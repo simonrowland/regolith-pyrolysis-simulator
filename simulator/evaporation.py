@@ -4342,9 +4342,9 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         """One visible record for the dispatch the retry abandoned.
 
-        Includes every row and notice from that dispatch, physics rows
-        included. A timeout that leaves ``_dispatch_only`` has no planner
-        step-down; the row is synthesized here so the retry does not drop it.
+        A planner step-down is included only when an alternate provider ran.
+        Otherwise the abandoned primary attempt stays under this environment
+        record, without being mislabeled as a step-down.
         """
 
         from simulator.reduced_real_determinism import (
@@ -4357,26 +4357,23 @@ class EvaporationMixin:
         failed = list(step_down.get('failed_providers', ())) if isinstance(
             step_down, Mapping,
         ) else []
+        provider_attempt = None
         if not failed:
             reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
-            attempt = {
+            provider_attempt = {
                 'provider': (
                     diagnostic.get('kernel_fallback_used')
                     or self._liquid_fraction_provider
                 ),
                 'status': status,
                 'reason': '; '.join(reasons) or str(
-                    diagnostic.get('reason') or status
+                    diagnostic.get('reason') or timeout_reason or status
                 ),
                 'diagnostic': dict(diagnostic),
             }
-            if failed_provider_attempt_is_environment(attempt):
-                attempt['disposition'] = 'environment'
-            step_down = {
-                'failed_providers': [attempt],
-                'realized_provider': None,
-            }
-            owned['gate_provider_step_down'] = step_down
+            if failed_provider_attempt_is_environment(provider_attempt):
+                provider_attempt['disposition'] = 'environment'
+            owned.pop('gate_provider_step_down', None)
         record = {
             'disposition': 'environment',
             'reason': timeout_reason,
@@ -4384,6 +4381,8 @@ class EvaporationMixin:
             'hour': int(self.melt.hour),
         }
         record.update(gate_dispatch_curve_notices(owned))
+        if provider_attempt is not None:
+            record['provider_attempt'] = provider_attempt
         return record
 
     def _freeze_gate_curve_from_gate_dispatch(
@@ -4399,6 +4398,7 @@ class EvaporationMixin:
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_outcome_token,
+            gate_curve_bounds_are_usable,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
@@ -4427,11 +4427,9 @@ class EvaporationMixin:
                 )
                 reasons.append(f'gate provider registration failed: {exc}')
         timeout_reason = None
-        # The final dispatch is published as that dispatch produced it.
-        # The abandoned dispatch, including its non-timeout rows and
-        # notices, is one environment record. A second timeout still
-        # publishes the final dispatch, so hold-last-good still sees
-        # alphamelts. d-298/d-299's hold decision is unchanged.
+        # The final dispatch is published as produced. Any abandoned primary
+        # attempt is kept in its environment record; it does not imply that
+        # AlphaMELTS ran. d-298/d-299's hold decision is unchanged.
         abandoned_environment = None
         for attempt_index in range(2):
             try:
@@ -4482,6 +4480,17 @@ class EvaporationMixin:
             status,
             diagnostic,
         )
+        step_down = diagnostic.get('gate_provider_step_down')
+        if (
+            isinstance(step_down, Mapping)
+            and step_down.get('realized_provider')
+            and gate_curve_bounds_are_usable(
+                diagnostic.get('solidus_T_C'), diagnostic.get('liquidus_T_C'),
+            )
+        ):
+            # The planner's step-down provider owns these bounds even when
+            # its status is flagged; publish the curve with its step-down notice.
+            status_outcome = GateCurveProviderOutcome.PRODUCED
         record_gate_curve_provider_outcome(self, status_outcome)
         if (
             status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
@@ -4794,11 +4803,9 @@ class EvaporationMixin:
         source: str,
         reasons: list[str],
     ) -> dict[str, Any] | None:
-        if (
-            solidus_T_C is None
-            or liquidus_T_C is None
-            or not solidus_T_C < liquidus_T_C
-        ):
+        from simulator.reduced_real_determinism import gate_curve_bounds_are_usable
+
+        if not gate_curve_bounds_are_usable(solidus_T_C, liquidus_T_C):
             reasons.append(f'{source} invalid bounds')
             return None
         return {
@@ -4821,7 +4828,10 @@ class EvaporationMixin:
         repair_notices: list[dict[str, Any]] | None = None,
         reasons: list[str] | None = None,
     ) -> dict[str, Any] | None:
-        from simulator.reduced_real_determinism import record_repair_notice
+        from simulator.reduced_real_determinism import (
+            gate_curve_bounds_are_usable,
+            record_repair_notice,
+        )
 
         points: list[tuple[float, float]] = []
         for point in path:
@@ -4865,11 +4875,7 @@ class EvaporationMixin:
             solidus_T_C = min(T for T, _ in points)
         if liquidus_T_C is None and points:
             liquidus_T_C = max(T for T, _ in points)
-        if (
-            solidus_T_C is None
-            or liquidus_T_C is None
-            or not solidus_T_C < liquidus_T_C
-        ):
+        if not gate_curve_bounds_are_usable(solidus_T_C, liquidus_T_C):
             return None
         dedup: dict[float, float] = {}
         for temperature_C, liquid_fraction in sorted(points):

@@ -27,6 +27,71 @@ from simulator.physical_constants import (
 from simulator.scalar_boundary import is_declared_real_scalar
 
 
+def _mapping_float(mapping: Mapping[str, object], key: str) -> float | None:
+    if key not in mapping or mapping[key] is None:
+        return None
+    try:
+        value = float(mapping[key])  # type: ignore[arg-type]
+    except (TypeError, ValueError):
+        return None
+    return value if math.isfinite(value) else None
+
+
+def _engine_fe_speciation(
+    response: object,
+) -> tuple[float | None, float | None]:
+    """Read q and the Fe pressure numerator's activity from this response.
+
+    q is Fe3+/sumFe. A separately attached CALPHAD central estimate is not
+    necessarily the activity used by the Fe pressure law.
+    """
+
+    mappings: list[Mapping[str, object]] = []
+    diagnostics = getattr(response, "diagnostics", None)
+    if isinstance(diagnostics, Mapping):
+        vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
+        if isinstance(vapor_diagnostic, Mapping):
+            numerator_provenance = vapor_diagnostic.get(
+                "vapor_pressure_numerator_provenance"
+            )
+            fe_numerator = (
+                numerator_provenance.get("Fe")
+                if isinstance(numerator_provenance, Mapping)
+                else None
+            )
+            if isinstance(fe_numerator, Mapping):
+                mappings.append(fe_numerator)
+            mappings.append(vapor_diagnostic)
+            activity_record = vapor_diagnostic.get("a_FeO_calphad")
+            if isinstance(activity_record, Mapping):
+                mappings.append(activity_record)
+            kress_split = (
+                activity_record.get("kress91_split")
+                if isinstance(activity_record, Mapping)
+                else vapor_diagnostic.get("kress91_split")
+            )
+            if isinstance(kress_split, Mapping):
+                mappings.append(kress_split)
+        nested = diagnostics.get("fe_redox_split")
+        if isinstance(nested, Mapping):
+            mappings.append(nested)
+        mappings.append(diagnostics)
+    split = getattr(response, "fe_redox_split", None)
+    if isinstance(split, Mapping):
+        mappings.append(split)
+    q = None
+    activity = None
+    for mapping in mappings:
+        if q is None:
+            for key in ("fe3_over_sum_fe", "fe3_over_sigma_fe", "fe3"):
+                q = _mapping_float(mapping, key)
+                if q is not None:
+                    break
+        if activity is None:
+            activity = _mapping_float(mapping, "activity_used_for_pressure")
+    return q, activity
+
+
 def intrinsic_melt_fO2(
     composition_wt_pct: Mapping[str, float],
     temperature_K: float,

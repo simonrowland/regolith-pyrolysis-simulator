@@ -331,18 +331,54 @@ def test_allowlisted_refusal_hits_after_a_disk_round_trip(engine, code, tmp_path
     assert engine_cache.cached_engine_call(engine, {}, lambda: pytest.fail("refusal was not stored")) == expected
 
 
+def _unselected_mask_request(engine, request):
+    """Same refusal shape, on a key the live sample does not re-solve."""
+
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION[engine]
+    candidates = [dict(request)]
+    for marker in range(64):
+        candidate = dict(request)
+        candidate["marker"] = marker
+        candidates.append(candidate)
+    for candidate in candidates:
+        key = engine_cache.engine_cache_key(engine, version, candidate)
+        if not engine_cache.mask_verify_selected(key):
+            return candidate
+    raise AssertionError(f"no unselected mask request for {engine}")
+
+
 @pytest.mark.parametrize("code", ["engine_timeout", "engine_crash", "unavailable", "not_converged", "io_error", "future_refusal"])
 def test_transient_and_unknown_refusals_are_never_stored(code, tmp_path, monkeypatch):
     path = tmp_path / "cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache.engine_cache_counters(reset=True)
+    engine_cache._MEMORY_CACHE.clear()
+    # engine_crash is a learned mask. The other codes stay unmasked, so a
+    # second call still solves. The crash request is kept off the live sample
+    # so the second call is the mask, not another solve.
+    request = {}
+    if code == "engine_crash":
+        request = _unselected_mask_request("alphamelts", request)
     calls = []
     def solve():
         calls.append(1)
         return {"status": "refusal", "refusal_reason": code}
+    results = []
     for _ in range(2):
-        engine_cache.cached_engine_call("alphamelts", {}, solve)
-    assert len(calls) == 2
+        results.append(engine_cache.cached_engine_call("alphamelts", request, solve))
+        engine_cache._MEMORY_CACHE.clear()
+    if code == "engine_crash":
+        assert len(calls) == 1
+        assert "mask_hit" not in results[0]
+        assert results[1]["mask_hit"] == "refusal:engine_crash"
+        assert results[1]["refusal_reason"] == "engine_crash"
+        counts = engine_cache.engine_cache_counters()["alphamelts"]
+        assert counts["misses"] == 1
+        assert counts["mask_hit:refusal:engine_crash"] == 1
+    else:
+        assert len(calls) == 2
+        assert all("mask_hit" not in item for item in results)
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 0
 
@@ -2359,15 +2395,42 @@ def test_thermoengine_other_fo2_cause_is_not_stored(tmp_path, monkeypatch):
     cached_call, handle, calls, solve = _equilibrate_through_cache(
         "thermoengine", backend, kwargs, tmp_path, monkeypatch,
     )
+    from simulator.engine_cache import (
+        ENGINE_CHEMISTRY_VERSION,
+        engine_cache_key,
+        engine_cache_settings,
+        mask_verify_selected,
+    )
+
+    adapter = engine_cache_settings("thermoengine", handle.engine_settings)
+    version = ENGINE_CHEMISTRY_VERSION["thermoengine"]
+    chosen = None
+    for step in range(400):
+        trial = dict(kwargs)
+        trial["temperature_C"] = 1400.0 + step * 0.001
+        request = {"kwargs": trial, "engine_settings": adapter}
+        key = engine_cache_key("thermoengine", version, request)
+        if not mask_verify_selected(key):
+            chosen = trial
+            break
+    assert chosen is not None
+    kwargs = chosen
+    raised = []
     for _ in range(2):
         with pytest.raises(ThermoEngineOutOfDomainError) as caught:
             cached_call(handle, kwargs, solve)
-        assert caught.value.cause is ThermoEngineRefusalCause.FO2_REQUIRES_IRON
+        raised.append(caught.value)
         engine_cache._MEMORY_CACHE.clear()
-    assert len(calls) == 2
+    assert len(calls) == 1
+    assert getattr(raised[0], "mask_hit", None) is None
+    assert raised[1].mask_hit == "exception:ThermoEngineOutOfDomainError"
+    assert raised[0].cause is ThermoEngineRefusalCause.FO2_REQUIRES_IRON
+    assert raised[1].cause is ThermoEngineRefusalCause.FO2_REQUIRES_IRON
     counts = _assert_returned_miss_accounting("thermoengine")
     assert counts["stores"] == 0
-    assert counts["not_stored:exception:ThermoEngineOutOfDomainError"] == 2
+    assert counts["misses"] == 1
+    assert counts["not_stored:exception:ThermoEngineOutOfDomainError"] == 1
+    assert counts["mask_hit:exception:ThermoEngineOutOfDomainError"] == 1
 
 
 def test_magemin_worker_timeout_raises_through_equilibrate(

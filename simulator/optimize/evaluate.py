@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextvars import ContextVar
 from dataclasses import dataclass, field, fields, replace
 from enum import Enum
 import hashlib
@@ -167,7 +168,11 @@ from simulator.pumping_cost import (
     pumping_context_from_sim,
     pumping_environment_for_feedstock,
 )
-from simulator.reduced_real_determinism import PT0NonFinitePayload
+from simulator.reduced_real_determinism import (
+    PT0NonFinitePayload,
+    control_quantization_identity,
+    optimizer_engine_neighbour,
+)
 from simulator.mre_ladder import max_voltage_for_target, parse_ladder_from_setpoints
 from simulator.run_executor import RunExecutor, campaign_stop_record
 from simulator.recipe_errors import MalformedRecipeError
@@ -661,8 +666,23 @@ class ScoredResult:
     failing_gates: tuple[str, ...] = ()
     run_reference: RunReference | None = field(default=None, compare=False)
     notes: tuple[str, ...] = ()
+    neighbour_hits: int = 0
+    neighbour_preset: str | None = None
 
     def __post_init__(self) -> None:
+        stamp = _NEIGHBOUR_STAMP.get()
+        neighbour_hits = stamp.hits if stamp is not None else 0
+        neighbour_preset = stamp.preset if stamp is not None else None
+        if neighbour_hits == 0 and self.run_reference is not None:
+            neighbour_hits, neighbour_preset = neighbour_use_from_carrier(
+                self.run_reference.trace
+            )
+        if (
+            neighbour_hits > 0
+            and self.neighbour_hits == 0
+        ):
+            object.__setattr__(self, "neighbour_hits", int(neighbour_hits))
+            object.__setattr__(self, "neighbour_preset", neighbour_preset)
         object.__setattr__(
             self,
             "feasibility_margins",
@@ -707,6 +727,8 @@ class ScoredResult:
                 self.failing_gates,
                 self.run_reference,
                 self.notes,
+                self.neighbour_hits,
+                self.neighbour_preset,
             ),
         )
 
@@ -748,6 +770,42 @@ class BackendUnavailableAbort(EvaluationAbort):
 
 class EvaluationInputError(ValueError):
     """Raised when optimizer evaluation inputs or config references are invalid."""
+
+
+class _NeighbourStamp:
+    """Hits accumulated for the evaluate() call that is on the stack.
+
+    The cache increments ``hits`` only while a coarse scope is active.
+    evaluate() reads the count after the engine call and stores it on the
+    run trace, so a later ScoredResult can carry it without extending the
+    optimizer scope.
+    """
+
+    __slots__ = ("hits", "preset")
+
+    def __init__(self) -> None:
+        self.hits = 0
+        self.preset: str | None = None
+
+
+_NEIGHBOUR_STAMP: ContextVar[_NeighbourStamp | None] = ContextVar(
+    "optimizer_neighbour_stamp",
+    default=None,
+)
+
+
+def neighbour_use_from_carrier(value: Any) -> tuple[int, str | None]:
+    """Read a neighbour stamp stored on an existing JSON payload."""
+
+    if not isinstance(value, MappingABC):
+        return 0, None
+    raw = value.get("neighbour_hits")
+    if isinstance(raw, bool) or not isinstance(raw, int) or raw <= 0:
+        return 0, None
+    preset = value.get("neighbour_preset")
+    if not isinstance(preset, str) or not preset:
+        return raw, None
+    return raw, preset
 
 
 class _CandidateAdmissionError(EvaluationInputError):
@@ -844,24 +902,49 @@ def evaluate(
     )
 
     try:
-        run_execution = _execute_run(
-            active_executor,
-            run_config,
-            worker_runtime=runtime,
-        )
+        stamp = _NeighbourStamp()
+
+        def stamp_failed_result(result: ScoredResult) -> ScoredResult:
+            if stamp.hits <= 0:
+                return result
+            return replace(
+                result,
+                neighbour_hits=int(stamp.hits),
+                neighbour_preset=stamp.preset,
+            )
+
+        stamp_token = _NEIGHBOUR_STAMP.set(stamp)
+        try:
+            # Coarse presets may reuse a nearby engine result. fine stays exact
+            # and does not write cells. Battery scoring does not enter this scope.
+            with optimizer_engine_neighbour(
+                getattr(run_config, "reduced_real_cache", None),
+                counter=_NEIGHBOUR_STAMP.get(),
+            ):
+                run_execution = _execute_run(
+                    active_executor,
+                    run_config,
+                    worker_runtime=runtime,
+                )
+        finally:
+            _NEIGHBOUR_STAMP.reset(stamp_token)
     except PT0NonFinitePayload as exc:
-        return _non_finite_payload_result(
-            candidate_id,
-            spec,
-            key,
-            str(exc),
+        return stamp_failed_result(
+            _non_finite_payload_result(
+                candidate_id,
+                spec,
+                key,
+                str(exc),
+            )
         )
     except VaporPressureNumericalOverflowError as exc:
-        return _numerical_overflow_result(
-            candidate_id,
-            spec,
-            key,
-            f"{type(exc).__name__}: {exc}",
+        return stamp_failed_result(
+            _numerical_overflow_result(
+                candidate_id,
+                spec,
+                key,
+                f"{type(exc).__name__}: {exc}",
+            )
         )
     except OverflowError as exc:
         raise EngineBugAbort(
@@ -880,11 +963,13 @@ def evaluate(
             cache_key_value=key,
         ) from exc
     except _TYPED_PHYSICS_REFUSAL_EXCEPTION_CLASSES as exc:
-        return _typed_physics_refusal_result(
-            candidate_id,
-            spec,
-            key,
-            exc,
+        return stamp_failed_result(
+            _typed_physics_refusal_result(
+                candidate_id,
+                spec,
+                key,
+                exc,
+            )
         )
     except PoisonedHourError as exc:
         if _is_backend_unavailable(exc):
@@ -896,12 +981,14 @@ def evaluate(
                 cache_key_value=key,
             ) from exc
         if _is_malformed_recipe_error(exc):
-            return _malformed_recipe_result(
-                candidate_id,
-                spec,
-                key,
-                str(exc),
-                profile=profile,
+            return stamp_failed_result(
+                _malformed_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(exc),
+                    profile=profile,
+                )
             )
         candidate_failure = _candidate_simulator_failure_result(
             candidate_id,
@@ -910,7 +997,7 @@ def evaluate(
             exc,
         )
         if candidate_failure is not None:
-            return candidate_failure
+            return stamp_failed_result(candidate_failure)
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
             patch=validated_patch,
@@ -928,25 +1015,31 @@ def evaluate(
                 cache_key_value=key,
             ) from exc
         if _is_numerical_overflow_message(str(exc)):
-            return _numerical_overflow_result(
-                candidate_id,
-                spec,
-                key,
-                f"{type(exc).__name__}: {exc}",
+            return stamp_failed_result(
+                _numerical_overflow_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    f"{type(exc).__name__}: {exc}",
+                )
             )
         if _is_non_finite_payload_message(str(exc)):
-            return _non_finite_payload_result(
-                candidate_id,
-                spec,
-                key,
-                str(exc),
+            return stamp_failed_result(
+                _non_finite_payload_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(exc),
+                )
             )
         if _is_inventory_overdraw_message(str(exc)):
-            return _invalid_recipe_result(
-                candidate_id,
-                spec,
-                key,
-                str(exc),
+            return stamp_failed_result(
+                _invalid_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    str(exc),
+                )
             )
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
@@ -975,7 +1068,7 @@ def evaluate(
                 exc,
             )
             if candidate_failure is not None:
-                return candidate_failure
+                return stamp_failed_result(candidate_failure)
             raise EngineBugAbort(
                 message,
                 patch=validated_patch,
@@ -983,11 +1076,13 @@ def evaluate(
                 eval_spec=spec,
                 cache_key_value=key,
             ) from exc
-        return _invalid_recipe_result(
-            candidate_id,
-            spec,
-            key,
-            message,
+        return stamp_failed_result(
+            _invalid_recipe_result(
+                candidate_id,
+                spec,
+                key,
+                message,
+            )
         )
     except Exception as exc:  # noqa: BLE001 -- crashes abort the study
         if _is_backend_unavailable(exc):
@@ -999,12 +1094,14 @@ def evaluate(
                 cache_key_value=key,
             ) from exc
         if _is_malformed_recipe_error(exc):
-            return _malformed_recipe_result(
-                candidate_id,
-                spec,
-                key,
-                f"{type(exc).__name__}: {exc}",
-                profile=profile,
+            return stamp_failed_result(
+                _malformed_recipe_result(
+                    candidate_id,
+                    spec,
+                    key,
+                    f"{type(exc).__name__}: {exc}",
+                    profile=profile,
+                )
             )
         honest = _result_from_honest_engine_exception(
             candidate_id,
@@ -1014,7 +1111,7 @@ def evaluate(
             profile,
         )
         if honest is not None:
-            return honest
+            return stamp_failed_result(honest)
         raise EngineBugAbort(
             f"{type(exc).__name__}: {exc}",
             patch=validated_patch,
@@ -1022,6 +1119,15 @@ def evaluate(
             eval_spec=spec,
             cache_key_value=key,
         ) from exc
+
+    if stamp.hits > 0:
+        neighbour_trace = {"neighbour_hits": int(stamp.hits)}
+        if stamp.preset:
+            neighbour_trace["neighbour_preset"] = stamp.preset
+        run_execution = _TraceOverrideRunExecution(
+            run_execution,
+            MappingProxyType(neighbour_trace),
+        )
 
     status = str(getattr(run_execution, "status", "ok"))
     error_message = str(getattr(run_execution, "error_message", ""))
@@ -1371,6 +1477,7 @@ def evaluate(
         ),
         notes=_notes_for_executed_campaign_score((), campaign_score),
     )
+
 
 
 def _trace_payload_with_knob_saturation(
@@ -2712,9 +2819,9 @@ def _finite_float_or_none(value: Any) -> float | None:
 
 
 def _replace_trace_snapshots(trace: Any, snapshots: tuple[Any, ...]) -> Any:
-    if isinstance(trace, _TraceAttributeOverlay):
+    if isinstance(trace, (_TraceAttributeOverlay, _TraceOverlay)):
         original_trace = _replace_trace_snapshots(trace.original_trace, snapshots)
-        return _TraceAttributeOverlay(original_trace, trace.overrides)
+        return type(trace)(original_trace, trace.overrides)
     try:
         return replace(trace, snapshots=snapshots)
     except TypeError:
@@ -3430,6 +3537,9 @@ def _build_eval_inputs_impl(
         force_builtin_vapor_pressure=force_builtin_vapor_pressure,
         vapor_pressure_provider_code_fingerprint=(
             _vapor_pressure_provider_code_fingerprint(vapor_pressure_provider_id)
+        ),
+        control_quantization=control_quantization_identity(
+            run_options["reduced_real_cache"]
         ),
         **run_options["lab_overlay_scope"],
         target_spec_id=str(target_metadata["target_spec_id"]),
@@ -6671,6 +6781,13 @@ def _cache_trace_payload(
     payload: dict[str, Any] = {}
     if isinstance(trace_payload, Mapping):
         payload.update(dict(trace_payload))
+    neighbour_hits, neighbour_preset = neighbour_use_from_carrier(
+        getattr(run_execution, "trace", None)
+    )
+    if neighbour_hits > 0:
+        payload["neighbour_hits"] = neighbour_hits
+        if neighbour_preset:
+            payload["neighbour_preset"] = neighbour_preset
 
     payload.update(
         _canonical_backend_trace_fields(

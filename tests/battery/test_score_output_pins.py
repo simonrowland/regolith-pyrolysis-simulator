@@ -2595,7 +2595,10 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
     }
 
 
-def test_assumed_pressure_notice_token_is_pinned() -> None:
+@pytest.mark.parametrize("string_version", [False, True])
+def test_missing_pressure_notice_uses_resolved_policy_and_preserves_version_type(
+    string_version: bool,
+) -> None:
     from simulator.battery.default_policy import resolve
 
     resolved = resolve("DP-001")
@@ -2604,7 +2607,16 @@ def test_assumed_pressure_notice_token_is_pinned() -> None:
         "observation does not carry total_pressure_Pa",
         resolved,
     )
-    assert notice.kind is NoticeKind.ASSUMED_PRESSURE
+    assert notice.policy is not None
+    assert notice.kind is resolved.flag
+    policy_version = resolved.payload["policy"]["version"]
+    assert type(notice.policy.version) is type(policy_version)
+    expected_version = str(policy_version) if string_version else policy_version
+    if string_version:
+        notice = replace(
+            notice,
+            policy=replace(notice.policy, version=expected_version),
+        )
     residual = replace(
         F.residual(
             "assumed-pressure::partial",
@@ -2615,8 +2627,17 @@ def test_assumed_pressure_notice_token_is_pinned() -> None:
     )
     payload = json.loads(score_mod.dumps_residual_line(residual))
 
-    assert payload["notices"][0]["kind"] == NoticeKind.ASSUMED_PRESSURE.value
-    assert payload["notices"][0]["policy"] == resolved.payload["policy"]
+    expected_policy = dict(resolved.payload["policy"])
+    expected_policy["version"] = expected_version
+    assert payload["notices"][0]["kind"] == resolved.flag.value
+    assert payload["notices"][0]["policy"] == expected_policy
     from simulator.battery.migrate import _notice_from_plain
 
-    assert _notice_from_plain(payload["notices"][0]) == notice
+    decoded = _notice_from_plain(payload["notices"][0])
+    assert decoded == notice
+    assert decoded.policy is not None
+    assert type(decoded.policy.version) is type(expected_version)
+
+    payload["notices"][0]["policy"]["version"] = True
+    with pytest.raises(TypeError, match="notice policy version"):
+        _notice_from_plain(payload["notices"][0])

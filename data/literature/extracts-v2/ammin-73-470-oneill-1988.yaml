@@ -11,12 +11,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'Cu2O_plus_CuO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -42,7 +41,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Cu2O_plus_CuO'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_cu2o_cuo_measured_relation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 484
@@ -60,12 +70,11 @@ observations:
     species:
       formula: JANAF
       phase:
-        tag: unknown
-        reason: phase string 'Cu2O_standard_state' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -91,7 +100,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Cu2O_standard_state'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ammin-73-470-oneill-1988::oneill_1988_cu2o_janaf_compilation_fit
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 474
@@ -109,12 +139,11 @@ observations:
     species:
       formula: Cu
       phase:
-        tag: unknown
-        reason: phase string 'pure_Cu_plus_Cu2O' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -140,7 +169,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_Cu_plus_Cu2O'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_cu_cu2o_measured_relation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 476
@@ -158,12 +198,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe3O4_plus_alpha_Fe2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -185,7 +224,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe3O4_plus_alpha_Fe2O3'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_measured_points_and_third_law
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 481
@@ -203,12 +253,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe3O4_plus_alpha_Fe2O3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -232,7 +281,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe3O4_plus_alpha_Fe2O3'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_fe3o4_fe2o3_third_law_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 482
@@ -250,12 +310,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_Fe_plus_Fe3O4' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -281,7 +340,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_Fe_plus_Fe3O4'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_fe_fe3o4_measured_relation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 470
@@ -301,12 +371,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'pure_Fe_plus_nonstoichiometric_FeO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -329,7 +398,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_Fe_plus_nonstoichiometric_FeO'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_fe_feo_measured_relation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 477
@@ -347,12 +427,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'nonstoichiometric_FeO_plus_Fe3O4' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -377,7 +456,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''nonstoichiometric_FeO_plus_Fe3O4'' is not in the closed automatic map'
+    origin: ammin-73-470-oneill-1988::oneill_1988_feo_fe3o4_measured_relation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 480
@@ -395,12 +485,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -423,7 +512,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: ammin-73-470-oneill-1988::oneill_1988_shared_emf_cell_conditions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ammin-73-470-oneill-1988::oneill_1988_shared_emf_cell_conditions
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ammin-73-470-oneill-1988
   locator:
     published_page: 471

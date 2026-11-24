@@ -461,5 +461,5 @@ def test_isolated_migration_refuses_a_point_value(tmp_path: Path, docs) -> None:
     gas = observations["fastchem-v3-1-3:FC-G-0001"]
     condensed = observations["fastchem-v3-1-3:FC-C-0001"]
     assert gas.identity.species.phase.value is Phase.G
-    assert condensed.identity.species.phase.is_unknown
-    assert "condensed" in (condensed.identity.species.phase.reason or "")
+    assert condensed.identity.species.phase.is_value
+    assert condensed.identity.species.phase.value is Phase.UNSPECIFIED

@@ -568,7 +568,17 @@ observations:
         paragraph: sulfur activity coefficient
         equation: '13'
         note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.74
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1250C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: inoue-suito-1982-na-silicate-sulfur-partitions
   locator:
     page: 5
@@ -658,7 +668,17 @@ observations:
         paragraph: sulfur activity coefficient
         equation: '13'
         note: Authors calculate log fS with a regular-solution model; no other conditions are promoted.; printed_cell=.75
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_log_fS_1350C
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: inoue-suito-1982-na-silicate-sulfur-partitions
   locator:
     page: 5
@@ -1859,6 +1879,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - sulfide_capacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio05_denier_log_Cs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - sulfide_capacity
@@ -2034,6 +2065,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - sulfide_capacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio05_nagashima_log_Cs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - sulfide_capacity
@@ -2209,6 +2251,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - sulfide_capacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio10_denier_log_Cs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - sulfide_capacity
@@ -2384,6 +2437,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - sulfide_capacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_prior_ratio10_nagashima_log_Cs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - sulfide_capacity
@@ -2557,6 +2621,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - sulfide_capacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_pure_cao_log_Cs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - sulfide_capacity
@@ -2728,6 +2803,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - sulfide_capacity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: inoue-suito-1982-na-silicate-sulfur-partitions::inoue_suito_1982_pure_na2o_log_Cs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - sulfide_capacity
