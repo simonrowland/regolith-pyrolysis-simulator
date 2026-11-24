@@ -10,11 +10,14 @@ from scripts.vapour_rail_engine_crosscheck import write_reports
 from simulator.silent_zero import ZeroBecause
 from simulator.vapour_rail.engine_crosscheck import (
     CrosscheckComposition,
+    DEFAULT_PRESSURE_BAR,
     EngineCrosscheckError,
     _observation,
+    _run_rail_cell,
     build_crosscheck_report,
     divergence_label,
     load_crosscheck_composition,
+    load_rail_provider,
     render_crosscheck_markdown,
     run_engine_crosscheck,
     validate_fo2_grid,
@@ -225,6 +228,8 @@ def test_runner_reports_magnitude_slopes_and_asymmetries_without_verdict():
         == "in_calibration"
         for cell in report["cell_runs"]
     )
+    assert report["schema_version"] == 3
+    assert report["engines"]["builtin"]["queried"] is True
     for request, call in zip(rail.requests, vaporock.calls, strict=True):
         assert request.fO2_log == call["fO2_log"]
         assert request.control_inputs["intrinsic_fO2_log"] == call["fO2_log"]
@@ -235,6 +240,134 @@ def test_runner_reports_magnitude_slopes_and_asymmetries_without_verdict():
             call["composition_mol"]
         )
         assert "liquid_fraction" not in call
+
+
+def test_builtin_fe_notice_reaches_its_matched_report_observation(tmp_path):
+    feedstocks = {
+        "synthetic_fe_probe": {
+            "composition_wt_pct": {"FeO": 20.0, "Na2O": 20.0, "SiO2": 60.0},
+            "composition_basis": {
+                "FeO": {"method": "synthetic assay", "source": "test"},
+            },
+        }
+    }
+    feedstock_path = tmp_path / "feedstocks.yaml"
+    feedstock_path.write_text(json.dumps(feedstocks), encoding="utf-8")
+    composition = load_crosscheck_composition(
+        "synthetic_fe_probe", feedstock_path=feedstock_path
+    )
+    provider, _payload = load_rail_provider()
+    temperature_K = 1878.15
+    fo2_log10_bar = -8.0
+    builtin = _run_rail_cell(
+        provider,
+        composition_mol=composition.composition_mol,
+        temperature_K=temperature_K,
+        fo2_log10_bar=fo2_log10_bar,
+        pressure_bar=DEFAULT_PRESSURE_BAR,
+    )
+
+    assert builtin["status"] in {"ok", "non_authoritative"}
+    assert builtin["pressures_Pa"]["Fe"] > 0.0
+    fe_notice = builtin["notices_by_species"]["Fe"][0]
+    assert fe_notice["kind"] == "out_of_certified_band"
+    assert fe_notice["authority_level"] == "extrapolated"
+    assert fe_notice["affected_species"] == ["Fe"]
+    assert fe_notice["affected_quantities"] == ["p_partial"]
+
+    report = build_crosscheck_report(
+        composition=composition,
+        temperatures_K=[temperature_K],
+        fo2_log10_bar=[fo2_log10_bar],
+        raw_cells=[
+            {
+                "temperature_K": temperature_K,
+                "fo2_log10_bar": fo2_log10_bar,
+                "rail": builtin,
+                "vaporock": {
+                    "status": "non_authoritative",
+                    "reason": None,
+                    "pressures_Pa": {
+                        "Fe": builtin["pressures_Pa"]["Fe"],
+                        "SiO": builtin["pressures_Pa"]["SiO"],
+                    },
+                    "warnings": [],
+                },
+            }
+        ],
+        rail_declared_species=["Fe", "SiO"],
+        vaporock_declared_species=["Fe", "SiO"],
+        p_floor_Pa=1.0e-30,
+        generated_at="fixed",
+    )
+
+    assert report["schema_version"] == 3
+    fe_row = next(row for row in report["rows"] if row["species"] == "Fe")
+    sio_row = next(row for row in report["rows"] if row["species"] == "SiO")
+    assert fe_row["coverage"] == "matched_point"
+    assert fe_row["rail"]["notices_by_species"] == {"Fe": [fe_notice]}
+    assert sio_row["rail"]["notices_by_species"] == {}
+    assert "notices_by_species" not in fe_row["vaporock"]
+
+
+def test_rail_cell_uses_shared_provider_notice_reader_and_indexes_by_species(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    notice = {
+        "kind": "out_of_certified_band",
+        "authority_level": "extrapolated",
+        "reason": "injected Fe pressure extension",
+    }
+    diagnostic = {
+        "vapor_pressures_Pa": {"Fe": 3.0, "SiO": 4.0},
+        "vapor_pressure_numerator_provenance": {
+            "Fe": {
+                "affected_species": ["Fe"],
+                "affected_quantities": ["p_partial"],
+                "notice": notice,
+            },
+            "SiO": {
+                "affected_species": ["SiO"],
+                "affected_quantities": ["p_partial"],
+            },
+        },
+    }
+    calls: list[object] = []
+    read_provider_notices = binary_pot_battery._provider_notice_flags_from_result
+
+    def observe_reader(result: object) -> list[dict[str, object]]:
+        calls.append(result)
+        return read_provider_notices(result)
+
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_provider_notice_flags_from_result",
+        observe_reader,
+    )
+
+    class Provider:
+        def dispatch(self, _request: object) -> SimpleNamespace:
+            return SimpleNamespace(status="ok", diagnostic=diagnostic)
+
+    cell = _run_rail_cell(
+        Provider(),
+        composition_mol=COMPOSITION.composition_mol,
+        temperature_K=1800.0,
+        fo2_log10_bar=-8.0,
+        pressure_bar=DEFAULT_PRESSURE_BAR,
+    )
+
+    assert len(calls) == 1
+    assert calls[0] == {
+        "diagnostics": {"vapor_pressure_diagnostic": diagnostic}
+    }
+    fe_notice = cell["notices_by_species"]["Fe"][0]
+    assert fe_notice["authority"] == "extrapolated"
+    assert fe_notice["affected_species"] == ["Fe"]
+    assert fe_notice["affected_quantities"] == ["p_partial"]
+    assert cell["notices_by_species"] == {"Fe": [fe_notice]}
 
 
 def test_crosscheck_serializes_extrapolated_h2_envelope_with_existing_status():

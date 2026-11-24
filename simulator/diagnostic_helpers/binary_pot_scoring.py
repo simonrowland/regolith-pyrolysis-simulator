@@ -1229,11 +1229,13 @@ def score_scoring_arm(
     return rows
 
 
-def _envelope_notices(cell) -> tuple[str, ...]:
+def _envelope_notices(cell, *, quantity: str, species: str) -> tuple[str, ...]:
     notices: list[str] = []
     if cell.engine_reason:
         notices.append(cell.engine_reason)
-    notices.extend(cell_score_notice_kinds(cell))
+    notices.extend(
+        cell_score_notice_kinds(cell, quantity=quantity, species=species)
+    )
     return tuple(notices)
 
 
@@ -1266,9 +1268,12 @@ def _cell_envelope(*, pot, cell, envelope, rail_for, comparator) -> dict[str, An
         rail=rail_for(species, "activity_coefficient"),
         evidence="direct experiment",
         source_doi=pot.doi,
-        notices=_envelope_notices(cell),
+        notices=_envelope_notices(cell, quantity="activity", species=species),
         authority=cell_score_authority(
-            cell, refused=refused or predicted is None
+            cell,
+            refused=refused or predicted is None,
+            quantity="activity",
+            species=species,
         ),
         selected=False,
         score_allowed=False,
@@ -1294,7 +1299,11 @@ def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[s
         status = "unsupported-observable"
     else:
         status = "ok"
-    notices = list(_envelope_notices(cell))
+    notices = list(
+        _envelope_notices(
+            cell, quantity=comparator.observable, species=comparator.species
+        )
+    )
     if conversion_note:
         notices.append(conversion_note)
     if admission_reason:
@@ -1341,7 +1350,12 @@ def _comparator_envelope(*, pot, cell, comparator, envelope, rail_for) -> dict[s
         evidence="direct experiment" if scored_method else "derived measurement",
         source_doi=comparator.doi,
         notices=tuple(notices),
-        authority=cell_score_authority(cell, refused=refused),
+        authority=cell_score_authority(
+            cell,
+            refused=refused,
+            quantity=comparator.observable,
+            species=comparator.species,
+        ),
         selected=scored_method,
         score_allowed=scored_method,
         run_id=f"{pot.pot_id}:{cell.engine}",

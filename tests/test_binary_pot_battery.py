@@ -37,6 +37,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     REFUSAL_VALUE_IS_FLOOR,
     _FLOOR_INVERSION_REASON,
     _internal_analytical_vapor_pressure_adapter,
+    _nested_notice_flags,
     BinaryPot,
     BatteryGrid,
     EngineHandle,
@@ -440,6 +441,51 @@ def test_missing_internal_vapor_authority_status_stays_unknown_for_scoring() -> 
     )
 
 
+def test_cell_score_authority_keeps_applicable_extrapolation_independent_of_order():
+    extrapolation = {
+        "authority": AUTHORITY_EXTRAPOLATED,
+        "kind": "out_of_certified_band",
+        "affected_quantities": [QUANTITY_PRESSURE],
+        "affected_species": ["Fe"],
+    }
+    unscoped = {"authority": "bridge", "kind": "fallback"}
+    results = []
+    for notices in ([unscoped, extrapolation], [extrapolation, unscoped]):
+        cell = SimpleNamespace(authority=AUTHORITY_EXTRAPOLATED, notices=notices)
+        results.append(
+            (
+                cell_score_authority(cell, refused=False),
+                cell_score_authority(
+                    cell, refused=False, quantity=QUANTITY_PRESSURE, species="Fe"
+                ),
+                cell_score_authority(
+                    cell, refused=False, quantity=QUANTITY_PRESSURE, species="Si"
+                ),
+            )
+        )
+
+    assert results == [
+        ("bridge", AUTHORITY_EXTRAPOLATED, "bridge"),
+        ("bridge", AUTHORITY_EXTRAPOLATED, "bridge"),
+    ]
+
+
+def test_nested_notice_walker_obeys_empty_quantity_scope():
+    result = {
+        "affected_quantities": [],
+        "authority": {"calphad_weight": 0.7},
+        "gamma_FeO": {
+            "holzheid": {
+                "notice": {
+                    "kind": "out_of_certified_band",
+                    "authority_level": AUTHORITY_EXTRAPOLATED,
+                }
+            }
+        },
+    }
+    assert _nested_notice_flags(result) == []
+
+
 def test_internal_analytical_observation_oxygen_reaches_transport_unchanged(monkeypatch):
     from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
     from engines.vaporock.provider import VapoRockProvider
@@ -491,7 +537,9 @@ def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> Non
         timeout_s=30.0,
         isolated=False,
     )
-    assert extrapolated.authority == AUTHORITY_EXTRAPOLATED, (
+    # The extrapolation is scoped to the affected pressure species, so a
+    # cell-wide authority would overstate the notice's scope.
+    assert extrapolated.authority is None, (
         extrapolated.status,
         extrapolated.refusal_reason,
         extrapolated.engine_status,
@@ -507,6 +555,30 @@ def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> Non
     assert notice["reason"]
     assert notice["authority"] == AUTHORITY_EXTRAPOLATED
     assert notice["band"]
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import cell_notices
+
+    for formula, engine_key in (("Na2O(g)", "Na2O_gas"), ("SiO2(g)", "SiO2_gas")):
+        scoped_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            extrapolated,
+            species=formula,
+        )
+        assert any(
+            row.kind.value == "out_of_certified_band"
+            and f":{engine_key}:" in row.reason
+            for row in scoped_notices
+        )
+        assert (
+            cell_score_authority(
+                extrapolated,
+                refused=False,
+                quantity=Quantity.P_PARTIAL.value,
+                species=formula,
+            )
+            == AUTHORITY_EXTRAPOLATED
+        )
 
     in_band = equilibrate_cell(
         handle,
@@ -520,6 +592,80 @@ def test_internal_analytical_core_out_of_band_flag_reaches_cell_notices() -> Non
         notice.get("kind") in {"out_of_certified_band", "floor_inversion"}
         for notice in in_band.notices
     )
+
+
+def test_internal_holzheid_notice_survives_binary_cell_cache_round_trip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import cell_notices
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        close_battery_engine_handle,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "internal.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    handle = open_battery_engine("internal-analytical")
+    pot = BinaryPot(
+        pot_id="fe-holzheid-cache",
+        kato_1993_table4_system=None,
+        why="scoped builtin Fe pressure notice cache probe",
+        composition_wt_pct={"FeO": 20.0, "Na2O": 20.0, "SiO2": 60.0},
+    )
+    try:
+        cold = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1878.15,
+            po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
+            isolated=False,
+        )
+        engine_cache._MEMORY_CACHE.clear()
+        warm = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1878.15,
+            po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
+            isolated=False,
+        )
+    finally:
+        close_battery_engine_handle(handle)
+
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    for cell in (cold, warm):
+        assert cell.status == "ok", cell.engine_reason
+        assert cell.gas_partial_pressures_Pa["Fe"] > 0.0
+        fe_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            cell,
+            species="Fe",
+        )
+        assert sum(notice.reason == reason for notice in fe_notices) == 1
+        assert not any(
+            notice.reason == reason
+            for notice in cell_notices(
+                Quantity.P_PARTIAL,
+                Engine.INTERNAL_ANALYTICAL,
+                cell,
+                species="SiO",
+            )
+        )
+        assert cell_score_authority(
+            cell,
+            refused=False,
+            quantity=Quantity.P_PARTIAL.value,
+            species="Fe",
+        ) == AUTHORITY_EXTRAPOLATED
+    assert cold.notices == warm.notices
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"][
+        "hits"
+    ] == 1
 
 
 def test_pots_load_and_sum_to_100_wt_pct() -> None:

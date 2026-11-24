@@ -107,6 +107,7 @@ from simulator.chemistry.ellingham_thermo import (  # noqa: E402
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_FIT_RANGE_K,
     ELLINGHAM_THERMO as _ELLINGHAM_THERMO,
+    cap_condensed_metal_activity,
     ellingham_authority_diagnostic,
     ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
@@ -3030,6 +3031,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     f"{notice.get('message', '')}"
                 )
         feo_activity_diagnostic = None
+        from simulator.fe_redox import holzheid_authority_notice
+
         if intrinsic_fO2_log is not None:
             from simulator.fe_redox import (
                 calphad_ferrous_feo_activity_diagnostic,
@@ -3901,13 +3904,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 # Pairing this root with condensed Antoine P_sat would count
                 # vaporization twice: P_wrong/P_right = P_sat/p0.
                 activity_factor = metal_activity_root
+                condensed_activity_cap_bound = False
                 pressure_reference_Pa = ELLINGHAM_STANDARD_PRESSURE_PA
                 pressure_rail = "gas_fugacity"
             else:
                 # Condensed-standard rows solve a Raoultian metal activity.
                 # Only this rail is capped at pure condensed metal and paired
                 # with Antoine P_sat: P_M = min(root, 1) * P_sat.
-                activity_factor = min(metal_activity_root, 1.0)
+                (
+                    activity_factor,
+                    condensed_activity_cap_bound,
+                ) = cap_condensed_metal_activity(metal_activity_root)
                 assert P_reference_Pa is not None
                 pressure_reference_Pa = P_reference_Pa
                 pressure_rail = "condensed_raoult_psat"
@@ -4021,6 +4028,19 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     else:
                         provenance["activity_basis"] = fe_activity_basis
                         provenance["degraded_activity_basis"] = None
+                    calphad_activity_consumed = (
+                        fe_activity_basis == "kress91_ferrous"
+                    )
+                    holzheid_notice = holzheid_authority_notice(
+                        feo_activity_diagnostic,
+                        consumed=calphad_activity_consumed,
+                        additionally_capped=condensed_activity_cap_bound,
+                    )
+                    if holzheid_notice is not None:
+                        scoped_notice = dict(holzheid_notice)
+                        scoped_notice["affected_species"] = [species]
+                        scoped_notice["affected_quantities"] = ["p_partial"]
+                        provenance["notice"] = scoped_notice
                 vapor_pressure_provenance[species] = provenance
                 if oxide_activity is not None:
                     vapor_pressure_provenance[species].update(
@@ -4667,6 +4687,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 high_t_activity_authority
             )
         if feo_activity_diagnostic is not None:
+            feo_activity_diagnostic["affected_species"] = ["FeO"]
+            feo_activity_diagnostic["affected_quantities"] = []
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
         if metal_saturation_floor_notice is not None:
             diagnostic["melt_metal_saturation_floor_notice"] = (

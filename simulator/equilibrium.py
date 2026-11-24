@@ -19,6 +19,7 @@ from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
+    cap_condensed_metal_activity,
     ellingham_authority_diagnostic,
     ellingham_authority_limit,
     ellingham_delta_g_kj_per_mol_o2,
@@ -1341,7 +1342,10 @@ class EquilibriumMixin:
                 P_effective_Pa = metal_activity_root * _ELLINGHAM_STANDARD_PRESSURE_PA
             else:
                 assert P_reference_Pa is not None
-                P_effective_Pa = min(metal_activity_root, 1.0) * P_reference_Pa
+                capped_activity, _ = cap_condensed_metal_activity(
+                    metal_activity_root
+                )
+                P_effective_Pa = capped_activity * P_reference_Pa
 
             P_effective_Pa = _require_finite_vapor_value(
                 P_effective_Pa,
