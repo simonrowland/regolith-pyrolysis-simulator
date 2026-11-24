@@ -1981,6 +1981,78 @@ def test_equilibrium_payload_hash_ignores_melt_regime_divergence_diagnostics():
     assert "future_melt_regime_divergences" in live_diagnostic
 
 
+def test_equilibrium_payload_projection_bytes_are_stable(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        rrd,
+        "_equilibrium_payload_intent",
+        lambda _sim: ChemistryIntent.SILICATE_EQUILIBRIUM,
+    )
+    authority = {"schema": "test-authority-v1"}
+    monkeypatch.setattr(
+        rrd,
+        "_equilibrium_record_authority",
+        lambda _sim, _intent: authority,
+    )
+    result = EquilibriumResult(
+        temperature_C=1600.0,
+        pressure_bar=1.0,
+        liquid_fraction=0.5,
+    )
+    actual = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record",
+        SimpleNamespace(),
+        result,
+    )
+    expected = {
+        "authority": authority,
+        "equilibrium_result": {
+            "temperature_C": 1600.0,
+            "pressure_bar": 1.0,
+            "phases_present": [],
+            "phase_masses_kg": {},
+            "phase_species_mol": {},
+            "phase_species_kg": {},
+            "phase_compositions": {},
+            "liquid_fraction": 0.5,
+            "phase_assemblage_available": True,
+            "liquid_composition_wt_pct": {},
+            "liquid_viscosity_Pa_s": None,
+            "vapor_pressures_Pa": {},
+            "vapor_pressures_source": {},
+            "activity_coefficients": {},
+            "fO2_log": -9.0,
+            "warnings": [],
+            "status": "ok",
+            "sulfur_saturation": None,
+            "liquidus_T_C": None,
+            "diagnostics": {},
+            "requested_temperature_C": None,
+            "liquid_density_kg_m3": None,
+            "system_enthalpy": None,
+            "system_entropy": None,
+            "system_volume": None,
+            "system_heat_capacity_Cp": None,
+            "system_dVdP": None,
+            "system_dVdT": None,
+            "system_fO2_delta_QFM": None,
+            "system_solid_density_rhos": None,
+            "system_phi": None,
+            "system_chisqr": None,
+            "phase_thermo": {},
+            "solid_composition_wt_pct": {},
+            "bulk_composition_wt_pct": {},
+            "chem_potentials": None,
+            "phase_affinities": None,
+            "phase_instances": [],
+        },
+        "last_vapor_pressures_source": {},
+        "last_vapor_pressure_diagnostic": {},
+    }
+    assert canonical_json_bytes(actual) == canonical_json_bytes(expected)
+
+
 def test_equilibrium_replay_restores_requested_fo2_not_printed_echo(
     tmp_path: Path,
 ):
@@ -5141,8 +5213,7 @@ def test_gate_codec_admission_uses_the_row_version() -> None:
     store = PT0DeterminismStore("capture")
     key = _freeze_gate_key()
     payload = {
-        "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
-        "curve": {
+        "curve": rrd._curve_payload({
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
             "liquidus_T_C": 1300.0,
@@ -5151,8 +5222,9 @@ def test_gate_codec_admission_uses_the_row_version() -> None:
                 {"temperature_C": 1300.0, "liquid_fraction": 1.0},
             ],
             "is_liquidus_floor": False,
-        },
+        }),
     }
+    assert "payload_codec_version" not in payload
     store._store("freeze_gate_curve", key, payload, law_disclosures=[])
 
     decoded = store._lookup_first_available(
@@ -5168,8 +5240,7 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version() -> None
     store = PT0DeterminismStore("capture")
     key = _freeze_gate_key()
     current_payload = {
-        "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
-        "curve": {
+        "curve": rrd._curve_payload({
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
             "liquidus_T_C": 1300.0,
@@ -5178,10 +5249,10 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version() -> None
                 {"temperature_C": 1300.0, "liquid_fraction": 1.0},
             ],
             "is_liquidus_floor": False,
-        },
+        }),
     }
     stale_payload = copy.deepcopy(current_payload)
-    stale_payload["payload_codec_version"] -= 1
+    stale_payload["curve"].pop("is_liquidus_floor")
     store._store("freeze_gate_curve", key, stale_payload, law_disclosures=[])
 
     with pytest.raises(PT0CacheMiss):
@@ -5266,6 +5337,89 @@ def test_unreadable_equilibrium_result_field_misses_and_is_replaceable(
     )
     replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
     assert replay._lookup("equilibrium_post_record", key) == current_payload
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "legacy_shape",
+    ("nested-diagnostic-type", "missing-vapor-pressures", "pre-bump"),
+)
+def test_equilibrium_round_trip_rejects_and_replaces_noncanonical_rows(
+    tmp_path: Path,
+    persistent: bool,
+    legacy_shape: str,
+) -> None:
+    db_path = tmp_path / "noncanonical-equilibrium.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    sim._last_vapor_pressure_diagnostic = {
+        "vapor_pressure_numerator_provenance": {
+            "SiO": {"source": "capture"},
+        },
+    }
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    stale_payload = copy.deepcopy(current_payload)
+    if legacy_shape == "nested-diagnostic-type":
+        stale_payload["last_vapor_pressure_diagnostic"][
+            "vapor_pressure_numerator_provenance"
+        ] = 7
+    elif legacy_shape == "missing-vapor-pressures":
+        stale_payload["equilibrium_result"].pop("vapor_pressures_Pa")
+    else:
+        stale_payload.pop("last_vapor_pressure_diagnostic")
+
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        stale_payload,
+        law_disclosures=[],
+    )
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", key)
+    assert capture.hits == 0
+
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
+    assert replay._lookup("equilibrium_post_record", key) == current_payload
+    assert replay.hits == 1
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_equilibrium_current_capture_round_trips_and_hits(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "current-equilibrium.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    key = capture._equilibrium_key(sim)
+
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
+    decoded = replay._lookup(
+        "equilibrium_post_record",
+        key,
+        return_decoded=True,
+    )
+    assert decoded is not None
+    assert decoded.result.vapor_pressures_Pa == result.vapor_pressures_Pa
+    assert replay.hits == 1
 
 
 def test_equilibrium_replay_result_is_deep_copied_from_cached_payload() -> None:
