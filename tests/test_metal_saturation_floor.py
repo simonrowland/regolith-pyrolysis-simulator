@@ -245,3 +245,70 @@ def test_si_saturation_ratio_across_furnace_band() -> None:
     assert max_ratio < 1.51, (
         f"max P_Si/P_sat={max_ratio:.8f} at {max_temperature_K:g} K"
     )
+
+
+def test_internal_publish_path_clamps_extreme_fO2_without_inversion() -> None:
+    from simulator.melt_backend.base import InternalAnalyticalBackend
+    from simulator.physical_constants import CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    from tests.chemistry.conftest import _build_sim, _load_yaml
+
+    feedstocks = {
+        "floor_clamp": {
+            "label": "Fe- and Si-free physical clamp test melt",
+            "source": "synthetic test composition",
+            "composition_wt_pct": {
+                "Al2O3": 35.0,
+                "CaO": 25.0,
+                "MgO": 25.0,
+                "Na2O": 15.0,
+            },
+            "sum_check": 100.0,
+            "body": "Moon",
+            "environment": {
+                "body": "Moon",
+                "atmosphere": "vacuum",
+                "pressure_mbar": 0.0,
+            },
+        }
+    }
+    sim = _build_sim(
+        "floor_clamp",
+        _load_yaml("vapor_pressures.yaml"),
+        feedstocks,
+        _load_yaml("setpoints.yaml"),
+    )
+    assert isinstance(sim.backend, InternalAnalyticalBackend)
+    cleaned_melt = sim.atom_ledger.project_account_mol("process.cleaned_melt")
+    assert not {
+        "FeO", "Fe2O3", "SiO2", "Cr2O3", "TiO2", "MnO", "NiO",
+    } & set(cleaned_melt)
+
+    sim.melt.temperature_C = 500.0 - 273.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -400.0
+    # Keep transport pO2 inside its certified band; this isolates the distinct
+    # melt-dissociation clamp from transport-channel floor extrapolation.
+    sim.melt.oxygen_reservoir.headspace_transport_pO2_bar = 1.0e-8
+    sim.melt.melt_fO2_log = -400.0
+    sim.melt.fO2_log = -400.0
+    result = sim._record_equilibrium_status(
+        sim._internal_analytical_equilibrium(),
+        run_post_equilibrium_sulfsat=False,
+    )
+
+    diagnostic = sim._last_vapor_pressure_diagnostic
+    assert diagnostic[
+        "melt_dissociation_pO2_clamped_to_physical_envelope"
+    ] is True
+    assert diagnostic.get("pO2_floor_inversion_notices_by_species", {}) == {}
+    assert any(
+        str(warning).startswith(
+            "melt_dissociation_pO2_clamped_to_physical_envelope:"
+        )
+        for warning in diagnostic.get("kernel_vapor_pressure_warnings", ())
+    )
+    assert result.vapor_pressures_Pa
+    assert all(
+        math.isfinite(float(pressure))
+        and 0.0 <= float(pressure) <= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+        for pressure in result.vapor_pressures_Pa.values()
+    )
