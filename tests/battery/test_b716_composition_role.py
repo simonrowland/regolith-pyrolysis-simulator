@@ -883,6 +883,46 @@ def test_ignoring_terminal_candidate_breaks_its_pin(monkeypatch) -> None:
         test_resolver_terminal_point_precedes_every_later_assay()
 
 
+def test_resolver_admits_declared_invalid_map_before_other_assays() -> None:
+    point = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="point"
+    )
+    declared = composition_roles.AssayCandidate(
+        State.unknown("unsupported component: XxO"), source="declared"
+    )
+    parent = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="parent"
+    )
+    identity = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="identity"
+    )
+
+    resolved = composition_roles.resolve_point_composition(
+        {"composition_role": DATUM_STATE},
+        {"composition_role": INITIAL_CHARGE_ONLY},
+        (point, declared, parent, identity),
+    )
+
+    assert resolved.composition.is_unknown
+    assert resolved.composition.reason == "unsupported component: XxO"
+
+
+def test_ignoring_declared_map_admission_breaks_its_pin(monkeypatch) -> None:
+    test_resolver_admits_declared_invalid_map_before_other_assays()
+
+    real = composition_roles._choose_assay
+
+    def skip_declared(candidates):
+        retained = tuple(
+            candidate for candidate in candidates if candidate.source != "declared"
+        )
+        return real(retained)
+
+    monkeypatch.setattr(composition_roles, "_choose_assay", skip_declared)
+    with pytest.raises(AssertionError):
+        test_resolver_admits_declared_invalid_map_before_other_assays()
+
+
 def test_catalogue_notice_is_specific_to_the_catalogue_token() -> None:
     experiment = F.kems_experiment()
     for flag, expect_notice in (
