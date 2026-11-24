@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 import tempfile
 from typing import Any, TypeVar
-from urllib.parse import quote, urlsplit
+from urllib.parse import urlsplit
 
 from flask import Blueprint, Response, abort, current_app, render_template, jsonify, request, send_file, send_from_directory, session
 import yaml
@@ -79,6 +79,7 @@ from simulator.optimize.discovery import (
     OPTIMIZER_JOBS_DIR_NAME,
     optimizer_run_dirs as _optimizer_run_dirs,
 )
+from simulator.optimize.sqlite_readonly import connect_readonly
 from simulator.optimize.job_runner import _version_badge
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
@@ -348,14 +349,8 @@ def _submit_optimizer_job(
         return runner.submit(job_request), None
 
 
-def _sqlite_uri(path: Path) -> str:
-    return 'file:' + quote(str(path.resolve()), safe='/') + '?mode=ro'
-
-
 def _connect_result_store(cache_path: Path) -> sqlite3.Connection:
-    conn = sqlite3.connect(_sqlite_uri(cache_path), uri=True)
-    conn.row_factory = sqlite3.Row
-    return conn
+    return connect_readonly(cache_path)
 
 
 def _row_value(row: sqlite3.Row, key: str, default: Any = None) -> Any:

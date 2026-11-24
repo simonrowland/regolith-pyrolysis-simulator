@@ -16,6 +16,7 @@ from simulator.optimize.evalspec import current_code_version
 SAVE_SCHEMA_VERSION = 2
 MEMBER_SCHEMA_VERSION = 1
 ARTIFACT_INDEX_NAME = "artifact.index.json"
+OPTIMIZER_CACHE_NAME = "cache.sqlite"
 TERMINAL_STUDY_STATUSES = frozenset(
     {"completed", "completed-no-feasible-winner", "aborted"}
 )
@@ -24,7 +25,7 @@ REQUIRED_MEMBERS = (
     "study.summary.json",
     "study.profile.yaml",
     ARTIFACT_INDEX_NAME,
-    "cache.sqlite",
+    OPTIMIZER_CACHE_NAME,
     "pareto.json",
     "leaderboard.csv",
     "job_status.json",

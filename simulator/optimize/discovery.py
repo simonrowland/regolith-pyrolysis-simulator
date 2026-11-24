@@ -5,8 +5,8 @@ from __future__ import annotations
 from pathlib import Path
 
 from simulator.optimize.import_bundle import is_imported_path
+from simulator.optimize.save_bundle import OPTIMIZER_CACHE_NAME
 
-OPTIMIZER_CACHE_NAME = "cache.sqlite"
 OPTIMIZER_JOBS_DIR_NAME = "jobs"
 
 

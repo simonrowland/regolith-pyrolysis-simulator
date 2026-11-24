@@ -162,9 +162,56 @@ def test_cli_dry_run_leaves_database_bytes_and_mtime_unchanged(tmp_path, monkeyp
     assert store.path.stat().st_mtime_ns == before_mtime
 
 
+def test_dry_run_counts_use_one_read_transaction(tmp_path, monkeypatch):
+    store = _store_with_versions(tmp_path)
+    connect = results_store_module.connect_readonly
+    statements = []
+
+    class RecordingConnection:
+        def __init__(self, path):
+            self.connection = connect(path)
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, exc_type, exc, traceback):
+            self.connection.close()
+
+        def execute(self, sql, parameters=()):
+            statements.append(sql.strip().upper())
+            return self.connection.execute(sql, parameters)
+
+    monkeypatch.setattr(
+        results_store_module,
+        "connect_readonly",
+        lambda path: RecordingConnection(path),
+    )
+
+    counts = ResultStore.count_stale_corpus_versions(
+        store.path, ("current", "older")
+    )
+
+    assert counts == {"stale": 1, "kept": 2, "unversioned": 1}
+    assert statements[0] == "BEGIN"
+    assert statements.count("BEGIN") == 1
+
+
 def test_apply_keeps_older_interoperable_corpus_version(tmp_path, monkeypatch):
     store = _store_with_versions(tmp_path)
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
+
+    assert cli.main(["prune-stale-corpus", "--store", str(store.path), "--apply"]) == 0
+
+    assert _keys(store) == {"current", "older-compatible", "unversioned"}
+
+
+def test_apply_uses_actual_shared_corpus_version_config(tmp_path, monkeypatch):
+    config = tmp_path / "corpus-version.yaml"
+    config.write_text(
+        "corpus_version: current\ninteroperable_versions:\n  - current\n  - older\n"
+    )
+    monkeypatch.setenv("REGOLITH_CORPUS_VERSION_FILE", str(config))
+    store = _store_with_versions(tmp_path)
 
     assert cli.main(["prune-stale-corpus", "--store", str(store.path), "--apply"]) == 0
 
@@ -183,13 +230,16 @@ def test_cli_discovery_matches_web_run_locations_and_runs_override(tmp_path, mon
     imported = root / "imported" / "study-a" / "cache.sqlite"
     imported.parent.mkdir(parents=True)
     imported.write_bytes(b"hash-indexed archive member")
+    (imported.parent / "import.overlay.json").write_text("{}")
     monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current",))
 
     assert {p / "cache.sqlite" for p in optimizer_run_dirs(root)} == set(paths)
     assert cli.main(["prune-stale-corpus"]) == 0
     report = json.loads(capsys.readouterr().out.splitlines()[-1])
-    assert {item["store"] for item in report["stores"]} == {str(path) for path in paths}
+    assert {item["store"] for item in report["stores"]} == {
+        *(str(path) for path in paths), str(imported.resolve())
+    }
 
 
 def test_explicit_import_archive_is_skipped_without_modification(tmp_path, capsys):
@@ -205,4 +255,59 @@ def test_explicit_import_archive_is_skipped_without_modification(tmp_path, capsy
     report = json.loads(capsys.readouterr().out.splitlines()[-1])
     assert report["stores"] == [{
         "store": str(path), "artifact_kind": "archive", "status": "skipped"
+    }]
+
+
+def test_moved_archive_marker_is_skipped_before_store_open(tmp_path, capsys):
+    original = _store_with_versions(tmp_path / "quarantine")
+    archive_dir = tmp_path / "moved" / "renamed-study"
+    archive_dir.parent.mkdir()
+    original.path.parent.rename(archive_dir)
+    path = archive_dir / "cache.sqlite"
+    (archive_dir / "import.overlay.json").write_text("{}")
+    before = path.read_bytes(), path.stat().st_mtime_ns
+
+    assert cli.main(["prune-stale-corpus", "--store", str(path), "--apply"]) == 0
+
+    assert (path.read_bytes(), path.stat().st_mtime_ns) == before
+    assert json.loads(capsys.readouterr().out.splitlines()[-1])["stores"] == [{
+        "store": str(path.resolve()), "artifact_kind": "archive", "status": "skipped"
+    }]
+
+
+def test_symlink_store_uses_real_database_study_lock(tmp_path, monkeypatch):
+    store = _store_with_versions(tmp_path / "native")
+    alias = tmp_path / "alias.sqlite"
+    alias.symlink_to(store.path)
+    monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
+
+    with ResultStoreWriteLock(study_results_write_lock_path(store.path.parent), timeout_ms=1):
+        with pytest.raises(ResultStoreWriteLockTimeout):
+            cli.main(["prune-stale-corpus", "--store", str(alias), "--apply"])
+
+
+def test_prune_cli_rejects_keep_version_override():
+    with pytest.raises(SystemExit):
+        cli.main(["prune-stale-corpus", "--keep-corpus-version", "current"])
+
+
+def test_default_report_keeps_pareto_and_lists_quarantined_store(tmp_path, monkeypatch, capsys):
+    root = tmp_path / "runs"
+    native = root / "run-a"
+    ResultStore(native / "cache.sqlite")
+    (native / "pareto.json").write_text("{}")
+    quarantined = root / "imported" / "study-a"
+    quarantined.mkdir(parents=True)
+    (quarantined / "cache.sqlite").write_bytes(b"archive")
+    (quarantined / "artifact.index.json").write_text("{}")
+    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
+
+    assert cli.main(["prune-stale-corpus"]) == 0
+
+    report = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert {entry["artifact_kind"] for entry in report["stores"]} == {
+        "result_rows", "archive"
+    }
+    assert report["retained_artifacts"] == [{
+        "path": str(native / "pareto.json"), "artifact_kind": "warm_start", "status": "kept"
     }]

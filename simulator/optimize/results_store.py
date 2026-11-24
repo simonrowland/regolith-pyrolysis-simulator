@@ -21,7 +21,6 @@ from pathlib import Path
 import sqlite3
 import threading
 import time
-from urllib.parse import quote
 import warnings
 from typing import Any, Mapping, Sequence
 
@@ -66,6 +65,7 @@ from simulator.optimize.result_trust import (
     real_engine_producer_stamp_rejections,
     result_trust_carriers as _admission_carriers,
 )
+from simulator.optimize.sqlite_readonly import connect_readonly
 
 SCHEMA_VERSION = 5
 OBJECTIVE_EVIDENCE_SCHEMA_VERSION = 1
@@ -292,7 +292,8 @@ class ResultStore:
 
         if apply:
             return self._execute_write(prune)
-        with self._connect_readonly(self.path) as conn:
+        with connect_readonly(self.path) as conn:
+            conn.execute("BEGIN")
             return prune(conn)
 
     @classmethod
@@ -300,7 +301,8 @@ class ResultStore:
         cls, path: str | Path, versions: Sequence[str]
     ) -> dict[str, int]:
         """Read-only count for CLI dry runs; never initializes or migrates a store."""
-        with cls._connect_readonly(Path(path)) as conn:
+        with connect_readonly(path) as conn:
+            conn.execute("BEGIN")
             if conn.execute(
                 "SELECT 1 FROM sqlite_master WHERE type='table' AND name='results'"
             ).fetchone() is None:
@@ -309,13 +311,6 @@ class ResultStore:
                 total = int(conn.execute("SELECT COUNT(*) FROM results").fetchone()[0])
                 return {"stale": 0, "kept": 0, "unversioned": total}
             return cls._corpus_version_counts(conn, versions)
-
-    @staticmethod
-    def _connect_readonly(path: Path) -> sqlite3.Connection:
-        uri = "file:" + quote(str(path.resolve()), safe="/") + "?mode=ro"
-        conn = sqlite3.connect(uri, uri=True)
-        conn.row_factory = sqlite3.Row
-        return conn
 
     @staticmethod
     def _corpus_version_counts(

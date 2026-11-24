@@ -29,8 +29,10 @@ from simulator.optimize.study import (
     run_certify,
 )
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
-from simulator.optimize.discovery import optimizer_run_dirs
-from simulator.optimize.import_bundle import IMPORTED_DIR_NAME, is_imported_path
+from simulator.optimize.discovery import OPTIMIZER_CACHE_NAME, optimizer_run_dirs
+from simulator.optimize.import_bundle import (
+    is_optimizer_archive_store,
+)
 from simulator.optimize.results_store import ResultStore, study_results_write_lock_path
 
 
@@ -125,64 +127,72 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
         prog="python -m simulator.optimize prune-stale-corpus"
     )
     parser.add_argument("--store", action="append", type=Path, default=[])
-    parser.add_argument("--keep-corpus-version", default=None)
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
-    keep_versions = (
-        (args.keep_corpus_version,)
-        if args.keep_corpus_version
-        else tuple(interoperable_corpus_versions())
-    )
+    keep_versions = tuple(interoperable_corpus_versions())
     runs_root = Path(os.environ.get("OPTIMIZER_RUNS_DIR") or Path.cwd() / "runs").expanduser()
-    stores = args.store or [path / "cache.sqlite" for path in optimizer_run_dirs(runs_root)]
+    stores = args.store or list(dict.fromkeys([
+        *(path / OPTIMIZER_CACHE_NAME for path in optimizer_run_dirs(runs_root)),
+        *(
+            path
+            for path in runs_root.rglob(OPTIMIZER_CACHE_NAME)
+            if is_optimizer_archive_store(path)
+        ),
+    ]))
     report = {
-        "keep_corpus_version": args.keep_corpus_version or current_corpus_version(),
+        "keep_corpus_version": current_corpus_version(),
         "keep_corpus_versions": list(keep_versions),
         "mode": "apply" if args.apply else "dry-run",
         "stores": [],
+        "retained_artifacts": [],
     }
     for path in stores:
         if not path.is_file():
             raise FileNotFoundError(f"optimizer result store not found: {path}")
-        is_archive = (
-            is_imported_path(path, runs_root)
-            or any(
-                parent.name == IMPORTED_DIR_NAME and is_imported_path(path, parent.parent)
-                for parent in path.resolve().parents
-            )
-        )
-        if is_archive:
+        real_path = Path(os.path.realpath(path))
+        if is_optimizer_archive_store(real_path):
             report["stores"].append(
-                {"store": str(path), "artifact_kind": "archive", "status": "skipped"}
+                {"store": str(real_path), "artifact_kind": "archive", "status": "skipped"}
             )
             continue
         if args.apply:
             result_store = ResultStore(
-                path,
-                write_lock_path=study_results_write_lock_path(path.parent),
+                real_path,
+                write_lock_path=study_results_write_lock_path(real_path.parent),
             )
             counts = result_store.prune_stale_corpus_version(keep_versions, apply=True)
         else:
-            counts = ResultStore.count_stale_corpus_versions(path, keep_versions)
+            counts = ResultStore.count_stale_corpus_versions(real_path, keep_versions)
         report["stores"].append(
             {
-                "store": str(path),
+                "store": str(real_path),
                 "artifact_kind": "result_rows",
                 **counts,
                 "deleted": counts["stale"] if args.apply else 0,
             }
         )
+    artifact_dirs = {Path(entry["store"]).parent for entry in report["stores"]}
+    if not args.store:
+        artifact_dirs.update(path.parent for path in runs_root.rglob("pareto.json"))
+    for directory in sorted(artifact_dirs):
+        pareto = directory / "pareto.json"
+        if pareto.is_file():
+            report["retained_artifacts"].append(
+                {"path": str(pareto), "artifact_kind": "warm_start", "status": "kept"}
+            )
     if not report["stores"]:
         print("No optimizer result stores found.")
     for entry in report["stores"]:
         if entry["artifact_kind"] == "archive":
-            print(f"{entry['store']} archive: skipped (hash-indexed import)")
+            print(f"{entry['store']} archive: skipped (archive markers present)")
             continue
         action = "deleted" if args.apply else "would delete"
         print(
             f"{entry['store']} result_rows: {action} {entry['stale']} stale; "
             f"kept {entry['kept']}; unversioned {entry['unversioned']}"
         )
+    for entry in report["retained_artifacts"]:
+        print(f"{entry['path']} warm_start: kept")
     print(json.dumps(report, sort_keys=True))
     return 0
 
@@ -216,7 +226,10 @@ def _parser() -> argparse.ArgumentParser:
     parser.add_argument("--seed", type=_non_negative_int, default=0, help="strategy seed")
     parser.add_argument(
         "--warm-start-from",
-        help="prior optimizer run directory, cache.sqlite, or pareto.json for W1 warm-start seeds",
+        help=(
+            "prior optimizer run directory, "
+            f"{OPTIMIZER_CACHE_NAME}, or pareto.json for W1 warm-start seeds"
+        ),
     )
     parser.add_argument(
         "--per-eval-timeout-seconds",
@@ -275,7 +288,7 @@ def _parser() -> argparse.ArgumentParser:
         "--source-store",
         type=Path,
         default=None,
-        help="source results cache.sqlite for --certify",
+        help=f"source results {OPTIMIZER_CACHE_NAME} for --certify",
     )
     parser.add_argument(
         "--cache-key",

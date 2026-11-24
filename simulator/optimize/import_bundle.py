@@ -29,6 +29,7 @@ from simulator.optimize.save_bundle import (
     ALLOWED_MEMBERS,
     ARTIFACT_INDEX_NAME,
     MEMBER_SCHEMA_VERSION,
+    OPTIMIZER_CACHE_NAME,
     REQUIRED_MEMBERS,
     SAVE_SCHEMA_VERSION,
     TERMINAL_STUDY_STATUSES,
@@ -192,7 +193,7 @@ def import_study_bundle(
             rmtree(tmp, ignore_errors=True)
             return ImportedStudy(destination.name, destination, True, warning)
 
-        with open_untrusted_result_db(tmp / "cache.sqlite") as conn:
+        with open_untrusted_result_db(tmp / OPTIMIZER_CACHE_NAME) as conn:
             conn.execute("SELECT name FROM sqlite_master LIMIT 1").fetchall()
         verification = verify_imported_study(
             tmp,
@@ -227,7 +228,7 @@ def open_untrusted_result_db(path: Path | str) -> sqlite3.Connection:
     if not db_path.is_file():
         raise ImportBundleError(f"imported sqlite not found: {db_path}")
     if db_path.stat().st_size > SQLITE_CAP_BYTES:
-        raise ImportSafetyCapError("cache.sqlite exceeds 400MB cap")
+        raise ImportSafetyCapError(f"{OPTIMIZER_CACHE_NAME} exceeds 400MB cap")
     uri = "file:" + quote(str(db_path.resolve()), safe="/") + "?mode=ro&immutable=1"
     conn = sqlite3.connect(uri, uri=True)
     try:
@@ -251,7 +252,9 @@ def open_untrusted_result_db(path: Path | str) -> sqlite3.Connection:
         page_size = int(conn.execute("PRAGMA page_size").fetchone()[0])
         page_count = int(conn.execute("PRAGMA page_count").fetchone()[0])
         if page_size * page_count > SQLITE_CAP_BYTES:
-            raise ImportSafetyCapError("cache.sqlite page footprint exceeds 400MB cap")
+            raise ImportSafetyCapError(
+                f"{OPTIMIZER_CACHE_NAME} page footprint exceeds 400MB cap"
+            )
     except Exception:
         conn.close()
         raise
@@ -336,7 +339,7 @@ def verify_imported_study(
 def _enforce_import_safety_caps(root: Path) -> dict[str, Any]:
     return {
         "leaderboard": _read_leaderboard(root / "leaderboard.csv"),
-        "rows_by_cache_key": _imported_rows_by_cache_key(root / "cache.sqlite"),
+        "rows_by_cache_key": _imported_rows_by_cache_key(root / OPTIMIZER_CACHE_NAME),
     }
 
 
@@ -465,6 +468,14 @@ def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:
     except ValueError:
         return False
     return True
+
+
+def is_optimizer_archive_store(path: Path | str) -> bool:
+    """Whether a result store sits beside native archive provenance markers."""
+    directory = Path(path).resolve().parent
+    return (directory / IMPORT_OVERLAY_NAME).is_file() or (
+        directory / ARTIFACT_INDEX_NAME
+    ).is_file()
 
 
 def _extract_bundle_members(
@@ -806,7 +817,7 @@ def _validate_zip_member(info: zipfile.ZipInfo) -> None:
 
 
 def _member_cap(name: str) -> int:
-    if name == "cache.sqlite":
+    if name == OPTIMIZER_CACHE_NAME:
         return SQLITE_CAP_BYTES
     if name == "leaderboard.csv":
         return CSV_CAP_BYTES
@@ -1538,16 +1549,18 @@ def _imported_rows_by_cache_key(cache_path: Path) -> dict[str, dict[str, Any]]:
                 for index, row in enumerate(cursor, start=1):
                     if index > row_cap:
                         raise ImportSafetyCapError(
-                            f"cache.sqlite results exceeds {row_cap} row cap"
+                            f"{OPTIMIZER_CACHE_NAME} results exceeds {row_cap} row cap"
                         )
                     if "cache_key" not in row.keys():
-                        raise ImportBundleError("cache.sqlite results missing cache_key")
+                        raise ImportBundleError(
+                            f"{OPTIMIZER_CACHE_NAME} results missing cache_key"
+                        )
                     rows[str(row["cache_key"])] = dict(row)
             finally:
                 conn.set_progress_handler(None, 0)
     except sqlite3.Error:
         raise ImportSafetyCapError(
-            "cache.sqlite results query exceeded resource bounds"
+            f"{OPTIMIZER_CACHE_NAME} results query exceeded resource bounds"
         )
     return rows
 
@@ -1558,9 +1571,9 @@ def _require_results_table(conn: sqlite3.Connection) -> None:
         ("results",),
     ).fetchone()
     if row is None:
-        raise ImportBundleError("cache.sqlite missing results table")
+        raise ImportBundleError(f"{OPTIMIZER_CACHE_NAME} missing results table")
     if row["type"] != "table":
-        raise ImportBundleError("cache.sqlite results must be a table")
+        raise ImportBundleError(f"{OPTIMIZER_CACHE_NAME} results must be a table")
 
 
 def _install_progress_limit(conn: sqlite3.Connection) -> None:
