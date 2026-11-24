@@ -676,6 +676,10 @@ def test_undersaturated_zero_is_scored(tmp_path, monkeypatch) -> None:
     assert residual.numeric.operation is MetricOperation.RELATIVE
     assert residual.numeric.value == Decimal(-1)
     assert "not_flagged_stratum" in residual.exclusions
+    assert {notice.kind for notice in residual.notices} == {
+        NoticeKind.METHOD_UNSTATED,
+        NoticeKind.UNDERSATURATED_WALL_NET_EVAPORATION,
+    }
     notices = [
         notice
         for notice in residual.notices

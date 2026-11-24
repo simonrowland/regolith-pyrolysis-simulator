@@ -883,7 +883,7 @@ def test_janaf_extract_ideal_gas_maps_only_for_that_source(tmp_path: Path) -> No
         and {notice.kind for notice in obs.notices} == {NoticeKind.PHASE_INFERRED}
         for obs in other_rows
     )
-    assert any(
+    assert not any(
         "ideal_gas_row" in entry.observation_id and "phase" in entry.axes
         for entry in other.queue
     )

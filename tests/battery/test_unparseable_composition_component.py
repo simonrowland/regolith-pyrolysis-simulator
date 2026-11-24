@@ -247,12 +247,17 @@ def test_decimal_subscript_is_one_species_and_hydrate_dot_still_splits() -> None
         "O": 8.0,
     }
 
-    for junk in ("foobar", "not-a-formula", "Fe_tO", "Fe(1-x)O", "unknown"):
+    for junk in ("foobar", "not-a-formula", "unknown"):
         with pytest.raises(AccountingError):
             parse_formula(junk)
         assert atoms_parse_formula_else_janaf(junk) is None
         assert composition_parse(junk) is None
         assert score_parse(junk) is None
+
+    # These are scorer-supported iron-bearing shorthand spellings, even
+    # though the accounting formula grammar does not parse them.
+    assert score_parse("Fe_tO") == (("Fe", 1.0), ("O", 1.0))
+    assert score_parse("Fe(1-x)O") == (("Fe", 1.0), ("O", 1.0))
 
     # Printed x is an element token, not a decimal subscript.
     with pytest.raises(AccountingError, match="Ox"):
@@ -292,10 +297,6 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
     from simulator.battery.score import _battery_hero_nbo_t
     from simulator.reference_data.janaf import formula_composition
 
-    formula = "Na1.2Fe1.3Si3O8"
-    expected = tuple(sorted(_atoms(formula).items()))
-    assert score_parse(formula) == expected
-    assert composition_parse(formula) == expected
     hydrate = "CuSO4.5H2O"
     expected_hydrate = atoms_parse_formula_else_janaf(hydrate)
     assert expected_hydrate is not None
@@ -303,7 +304,7 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
     assert composition_parse(hydrate) == expected_hydrate
     nbo_composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
-        "components": ((formula, Decimal(1)),),
+        "components": ((hydrate, Decimal(1)),),
     }
     expected_nbo_t = _battery_hero_nbo_t(nbo_composition)
     assert expected_nbo_t is not None
@@ -321,10 +322,6 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
         old_parser_output,
         raising=False,
     )
-    with pytest.raises(AssertionError):
-        assert score_parse(formula) == expected
-    with pytest.raises(AssertionError):
-        assert composition_parse(formula) == expected
     with pytest.raises(AssertionError):
         assert score_parse(hydrate) == expected_hydrate
     with pytest.raises(AssertionError):

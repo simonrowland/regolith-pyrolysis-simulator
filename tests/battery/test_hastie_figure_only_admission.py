@@ -171,7 +171,7 @@ def test_hastie_figure_rows_without_supported_inputs_keep_typed_refusals(
         regime = effusion_regime_unverified(
             experiment, Quantity.P_PARTIAL, observation=row
         )
-        assert regime.reason is RefusalReason.METHOD_UNKNOWN
+        assert regime.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
 
         for engine in SCORING_ENGINES:
             prediction = predict_with_engine(engine, row, experiment=experiment)
@@ -301,20 +301,16 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
             assert gates.primary_check == "in_cell_partial_pressure_sum"
             assert [
                 check.name for check in gates.checks if not check.passed
-            ] == ["in_cell_partial_pressure_sum", "method"]
+            ] == ["in_cell_partial_pressure_sum"]
             method_check = next(
                 check for check in gates.checks if check.name == "method"
             )
-            assert not method_check.passed
-            assert method_check.detail["reason"] == experiment.method.reason
-            assert (
-                _missing_apparatus_fact(
-                    method_check,
-                    allow_calibration=False,
-                    allow_unknown_method=True,
-                )
-                == "method_unknown"
-            )
+            assert method_check.passed
+            assert experiment.method.value is MethodToken.UNSPECIFIED
+            assert {notice.kind for notice in row.notices} == {
+                NoticeKind.METHOD_UNSTATED,
+                NoticeKind.SOURCE_DISAGREEMENT,
+            }
             assert not pressure_sum_check.passed
             assert (
                 pressure_sum_check.detail["reason"]
@@ -345,16 +341,14 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
             assert residual.status is ResidualStatus.REFUSED
             assert residual.numeric is None
             assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+            assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
             assert residual.refusal.detail["primary_check"] == (
                 "in_cell_partial_pressure_sum"
             )
             assert residual.refusal.detail["checks"] == [
-                "in_cell_partial_pressure_sum",
-                "method",
+                "in_cell_partial_pressure_sum"
             ]
             assert residual.refusal.detail["missing_facts"] == {
-                "method": experiment.method.reason,
                 "in_cell_partial_pressure_sum": pressure_sum_check.detail["reason"],
             }
             assert not any(

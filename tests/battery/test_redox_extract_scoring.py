@@ -25,6 +25,7 @@ from simulator.battery.enums import (
     RefusalReason,
     ResidualStatus,
 )
+from simulator.battery.engine_capability import engine_covers_quantity
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
@@ -1606,7 +1607,17 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
         benches=result.benches,
     )
     residuals, _ = score_store(context, engines=SCORE_ENGINE_SET, rail=Rail.REDOX)
-    assert len(residuals) == 16 * len(SCORE_ENGINE_SET)
+    expected_pairs = {
+        (row.observation_id, engine.value)
+        for row in redox_rows
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, row.identity.quantity.value)
+    }
+    observed_pairs = {
+        (residual.key.split(":T=", 1)[0], residual.key.rsplit("::", 1)[-1])
+        for residual in residuals
+    }
+    assert observed_pairs == expected_pairs
     for residual in residuals:
         observation_id = residual.key.split(":T=", 1)[0]
         engine = residual.key.rsplit("::", 1)[-1]
@@ -1634,12 +1645,6 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
                     "no fixed-T/fO2/composition ferric output without "
                     "phase-equilibrium execution"
                 )
-        elif engine == "catalog_evaluator":
-            # Gate 9's catalog evaluator answers vapour pressures only.
-            # Fe3+/Fe2+ stays a quantity refusal, not a ferric-split refusal.
-            assert residual.numeric is None
-            assert residual.refusal is not None
-            assert residual.refusal.reason is RefusalReason.UNSUPPORTED
         else:
             assert residual.numeric is None
             assert residual.refusal is not None

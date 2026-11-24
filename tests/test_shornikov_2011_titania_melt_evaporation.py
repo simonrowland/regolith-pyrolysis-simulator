@@ -352,7 +352,7 @@ def test_isolated_migration_reaches_temperature_on_every_row():
     assert all(
         {notice.kind.value for notice in row.notices} == {"method_unstated"}
         for row in curves
-    )
+    ), [(row.observation_id, {notice.kind.value for notice in row.notices}) for row in curves]
 
     for _formula, observation_id, value, _phase in RENDERED_CELLS:
         row = next(item for item in gibbs if item.observation_id.endswith(observation_id))

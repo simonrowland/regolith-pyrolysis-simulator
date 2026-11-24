@@ -1360,6 +1360,7 @@ def absence_audit(paths=STORE_PATHS):
                                 for path, value in leaves
                                 if value not in (None, "")
                                 and not path.endswith((".tag", ".reason"))
+                                and not path.startswith("derivation.method.")
                                 and re.search(
                                     r"(?:^|\.)"
                                     + re.escape(match[1])
@@ -1511,6 +1512,77 @@ def test_g1_absence_audit_catches_same_row_species_phase_mutation(
     assert bad[0][1] == "fixture-phase-mutation::row"
     assert bad[0][2] == "identity.species.phase.reason"
     assert bad[0][4] == ["phase"]
+
+
+@pytest.mark.parametrize(
+    ("source_method", "expected_bad"),
+    [
+        (
+            {
+                "derivation": {
+                    "method": {
+                        "state": {"tag": "value", "value": "model calculation"}
+                    }
+                }
+            },
+            False,
+        ),
+        (
+            {"method": {"state": {"tag": "value", "value": "Knudsen effusion"}}},
+            True,
+        ),
+    ],
+    ids=(
+        "derivation-method-is-not-experimental-method",
+        "experimental-method-is-evidence",
+    ),
+)
+def test_g1_method_absence_audit_distinguishes_experimental_method(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    source_method: dict,
+    expected_bad: bool,
+) -> None:
+    root = tmp_path / "repo"
+    source_dir = root / "data" / "literature" / "extracts"
+    store_dir = root / "data" / "literature" / "extracts-v2"
+    source_dir.mkdir(parents=True)
+    store_dir.mkdir(parents=True)
+    monkeypatch.setitem(absence_audit.__globals__, "REPO_ROOT", root)
+
+    source = {
+        "source_id": "fixture-method-absence",
+        "species": {
+            "Fe": {
+                "observations": [
+                    {"observation_id": "row", **source_method},
+                ]
+            }
+        },
+    }
+    store = {
+        "observations": [
+            {
+                "observation_id": "fixture-method-absence::row",
+                "source_id": "fixture-method-absence",
+                "notices": [
+                    {
+                        "reason": (
+                            "method_unstated: default=unspecified; "
+                            "original_reason=source does not state method"
+                        )
+                    }
+                ],
+            }
+        ]
+    }
+    source_path = source_dir / "fixture-method-absence.yaml"
+    store_path = store_dir / source_path.name
+    source_path.write_text(yaml.safe_dump(source), encoding="utf-8")
+    store_path.write_text(yaml.safe_dump(store), encoding="utf-8")
+
+    _judged, bad = absence_audit([store_path])
+    assert bool(bad) is expected_bad
 
 
 def test_g1_current_stolyarova_source_migrates_without_context_observation(

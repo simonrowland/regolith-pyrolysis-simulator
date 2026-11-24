@@ -352,6 +352,8 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
         expected_notice_kinds = (
             {"method_unstated"} if method.get("tag") != "value" else set()
         )
+        if raw["observation_id"] == "yan_2020_table2_prose_delta_fg_v2o3":
+            expected_notice_kinds.add("phase_inferred")
         assert {
             notice.kind.value for notice in observation.notices
         } == expected_notice_kinds, raw["observation_id"]

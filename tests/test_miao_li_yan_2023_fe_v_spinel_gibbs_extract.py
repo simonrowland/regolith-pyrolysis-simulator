@@ -7,7 +7,7 @@ import re
 import pytest
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import MethodToken, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.factories import migrate_one_extract
 
@@ -139,9 +139,16 @@ def test_all_typed_values_migrate_as_points_with_species_temperature_and_conditi
         values = raw["values"]
         observation = migrated[f"{SOURCE_ID}::{raw['observation_id']}"]
         assert observation.value.kind is ValueKind.POINT, raw["observation_id"]
-        assert {notice.kind.value for notice in observation.notices} == {
-            "method_unstated"
-        }, raw["observation_id"]
+        experiment = migrator.result.experiments[observation.experiment_id]
+        expected_notice_kinds = (
+            {"method_unstated"}
+            if experiment.method.is_value
+            and experiment.method.value is MethodToken.UNSPECIFIED
+            else set()
+        )
+        assert {
+            notice.kind.value for notice in observation.notices
+        } == expected_notice_kinds, raw["observation_id"]
         assert observation.identity.species.formula == str(values.get("formula") or container)
         if values["quantity"] == "equilibrium_phase_composition":
             assert observation.value.point == Decimal(str(values["component_amount"]))

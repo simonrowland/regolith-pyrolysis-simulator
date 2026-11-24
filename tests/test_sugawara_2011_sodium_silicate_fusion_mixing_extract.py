@@ -462,7 +462,10 @@ def test_compositions_keep_printed_basis_and_migration_conditions():
         row.experiment_id for row in migrated.values()
     } == {dsc_experiment_id, quoted.experiment_id}
     assert result.experiments[quoted.experiment_id].method.value is MethodToken.DROP_CALORIMETRY
-    assert {notice.kind.value for notice in quoted.notices} == {"method_inferred"}
+    assert {notice.kind.value for notice in quoted.notices} == {
+        "method_inferred",
+        "admission_defaulted",
+    }
     for observation_id, page, table in (
         ("sugawara_2011_t1_na2sio3_heat_of_fusion", 2, "1"),
         ("sugawara_2011_t2_sio2_liquid_heat_capacity", 3, "2"),

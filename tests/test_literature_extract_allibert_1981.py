@@ -95,8 +95,16 @@ def test_allibert_table_ii_activity_cells_migrate_from_printed_rows(tmp_path):
             assert phase == {"tag": "value", "value": "unspecified"}
             assert {
                 notice["kind"] for notice in row["notices"]
-            } == {"phase_inferred"}
-            assert "bulk_composition_in_two_phase_region" in row["notices"][0]["reason"]
+            } == {
+                "phase_inferred",
+                "comparison_method_cell_constant_cancels",
+                "out_of_certified_band",
+            }
+            phase_notice = next(
+                notice for notice in row["notices"]
+                if notice["kind"] == "phase_inferred"
+            )
+            assert "bulk_composition_in_two_phase_region" in phase_notice["reason"]
         else:
             assert phase == {"tag": "value", "value": "l"}
 
