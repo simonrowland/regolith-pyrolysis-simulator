@@ -2337,6 +2337,83 @@ def test_missing_pressure_uses_flagged_one_atmosphere_default():
     )
 
 
+def _assert_located_pressure_bound_explains_default():
+    from simulator.battery import waypoints
+
+    _, row, experiment, bench = _in_domain_buffer_context()
+    row = replace(
+        row,
+        source_id="ror-unattributed-pressure-bound",
+        identity=replace(
+            row.identity,
+            total_pressure_Pa=None,
+            fO2_Pa=State.of(Decimal(1)),
+        ),
+        point_conditions={
+            key: value
+            for key, value in (row.point_conditions or {}).items()
+            if key != "total_pressure_Pa"
+        },
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=F.located(
+                Value(
+                    ValueKind.BOUND,
+                    bound_operator=">=",
+                    bound_value=Decimal("200000"),
+                ),
+                note="printed lower pressure bound",
+            ),
+        ),
+    )
+    prediction = score_module.predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=experiment, bench=bench
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    assert prediction.identity.total_pressure_Pa.value == Decimal(101325)
+    pressure_notice = next(
+        notice
+        for notice in prediction.notices
+        if getattr(notice, "pressure_qualification", None) is not None
+    )
+    assert pressure_notice.pressure_qualification.value == (
+        "default_standard_atmosphere"
+    )
+    assert pressure_notice.route == "default_standard_atmosphere"
+    assert pressure_notice.pressure_pa == Decimal(101325)
+    plain_notices = to_plain(prediction.notices)
+    reason = next(
+        notice["reason"]
+        for notice in plain_notices
+        if "selected_pressure_Pa=101325" in notice["reason"]
+    )
+    assert "located pressure bound >= 200000 Pa" in reason
+    assert "pressure_source_gap=none" not in reason
+    assert waypoints.redox_prediction_pressure(
+        experiment, bench, row
+    ).value.value == Decimal(101325)
+
+
+def test_located_pressure_bound_explains_the_standard_atmosphere_default():
+    _assert_located_pressure_bound_explains_default()
+
+
+def test_located_pressure_bound_reason_mutation_probe(monkeypatch):
+    from simulator.battery import waypoints
+
+    _assert_located_pressure_bound_explains_default()
+    monkeypatch.setattr(
+        waypoints,
+        "_prediction_pressure_candidate",
+        lambda *_args: (None, ()),
+    )
+    with pytest.raises(AssertionError):
+        _assert_located_pressure_bound_explains_default()
+
+
 @pytest.mark.parametrize(
     ("element", "couple"),
     (("Cr", "Cr2plus_over_Cr3plus"), ("Ti", "Ti3plus_over_Ti4plus")),
@@ -2418,7 +2495,7 @@ def test_named_non_fe_pressure_mutation_probe_rejects_missing_tier2(
     test_named_non_fe_valence_uses_independent_fe_ferric_evidence(
         monkeypatch, element, couple
     )
-    monkeypatch.setattr(fo2_ladder, "_tier2", lambda *_args: None)
+    monkeypatch.setattr(fo2_ladder, "_tier2", lambda *_args, **_kwargs: None)
     with pytest.raises(AssertionError):
         test_named_non_fe_valence_uses_independent_fe_ferric_evidence(
             monkeypatch, element, couple

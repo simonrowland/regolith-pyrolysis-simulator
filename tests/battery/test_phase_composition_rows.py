@@ -2960,6 +2960,7 @@ def test_fe3_sumfe_fraction_reference_becomes_one_third(
         isolated=None,
         experiment=None,
         bench=None,
+        pressure_selection=None,
     ):
         return EnginePrediction(
             engine=engine,
@@ -3019,6 +3020,7 @@ def test_fe3_fe2_ratio_form_keeps_the_printed_ratio(
         isolated=None,
         experiment=None,
         bench=None,
+        pressure_selection=None,
     ):
         return EnginePrediction(
             engine=engine,

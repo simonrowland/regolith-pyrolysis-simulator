@@ -2002,6 +2002,16 @@ def _prediction_pressure_candidate(
         else printed_vacuum_upper_bound_pa(selected, experiment, observation)
     )
     if vacuum_pa is None:
+        if (
+            selected.value.kind is ValueKind.BOUND
+            and selected.value.bound_value is not None
+        ):
+            operator = selected.value.bound_operator or "bound"
+            missing = (
+                *missing,
+                f"{selected.route}: located pressure bound {operator} "
+                f"{selected.value.bound_value} Pa cannot supply a point pressure",
+            )
         return None, missing
     return PredictionPressure(
         value=identity_pressure_from_converted_point(

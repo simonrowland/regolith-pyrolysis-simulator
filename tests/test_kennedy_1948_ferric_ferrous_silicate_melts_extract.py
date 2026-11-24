@@ -8,6 +8,7 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
 
+import pytest
 import yaml
 
 from simulator.battery import score
@@ -579,12 +580,56 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         == "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
         for sample in table2_pins
     )
+    table1_composition_pins = [
+        sample
+        for sample in source["fidelity_samples"]
+        if sample.get("path", "").startswith(
+            "species.Fe.observations[kennedy_1948_table2_run_series].values.rows["
+        )
+        and sample.get("path", "").endswith(".oxide_wt_percent")
+        and sample.get("locator", {}).get("table") == "I"
+    ]
+    assert len(table1_composition_pins) == 22
+    assert all(
+        sample["locator"]["line_range"] == "3-12"
+        for sample in table1_composition_pins
+    )
+    row_1_composition = next(
+        sample
+        for sample in table1_composition_pins
+        if sample["path"].endswith("values.rows[0].oxide_wt_percent")
+    )
+    assert row_1_composition["value"]["SiO2"] == "50.87"
+    assert row_1_composition["locator"]["source_path"] == (
+        "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
+    )
     warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
     assert not {
         warning.kind for warning in warnings
     } & {"uncovered_observation", "unattested_sample"}
 
     mutated = deepcopy(source)
-    mutated["fidelity_samples"].pop(0)
+    whole_values_pin = next(
+        index
+        for index, sample in enumerate(mutated["fidelity_samples"])
+        if sample.get("path")
+        == "species.Fe.observations[kennedy_1948_table2_run_series].values"
+    )
+    mutated["fidelity_samples"].pop(whole_values_pin)
     warnings = vle.fidelity_source_warnings(mutated, label=EXTRACT.stem)
     assert any(warning.kind == "uncovered_observation" for warning in warnings)
+
+
+def test_whole_values_fidelity_pin_mutation_probe(monkeypatch):
+    resolve_address = vle._sample_evidence_address
+
+    def drop_whole_values_pin(doc, sample):
+        if sample.get("path") == (
+            "species.Fe.observations[kennedy_1948_table2_run_series].values"
+        ):
+            return None
+        return resolve_address(doc, sample)
+
+    monkeypatch.setattr(vle, "_sample_evidence_address", drop_whole_values_pin)
+    with pytest.raises(AssertionError):
+        test_kennedy_table2_fidelity_pin_covers_the_observation()

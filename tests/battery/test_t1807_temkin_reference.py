@@ -223,7 +223,9 @@ def test_engine_request_preserves_and_rejects_temkin_coefficient_basis(
 
 
 @pytest.mark.parametrize("consumer", ("fo2", "coefficient", "catalog", "bench"))
-def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
+def test_temkin_rejection_arms_are_behavioral(
+    migration, consumer: str, monkeypatch: pytest.MonkeyPatch
+) -> None:
     from simulator.battery.fo2_ladder import (
         metal_saturation_activity_refusal,
         resolve_row_fo2,
@@ -267,6 +269,12 @@ def test_temkin_rejection_arms_are_behavioral(migration, consumer: str) -> None:
         )
         # The shared ladder owns fO2 resolution now. A Temkin activity target
         # cannot supply its own fO2 through the retired saturation shortcut.
+        monkeypatch.setattr(
+            "simulator.battery.fo2_ladder.eligible_prediction_pressure",
+            lambda *_args: pytest.fail(
+                "pressure must not be resolved before tier-2 eligibility"
+            ),
+        )
         assert (
             resolve_row_fo2(
                 experiment,

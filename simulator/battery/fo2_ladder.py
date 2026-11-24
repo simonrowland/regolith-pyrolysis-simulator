@@ -365,16 +365,13 @@ def resolve_row_fo2(
         )
     )
     if not knudsen_vapour and not scored_ferric_target:
-        selected_pressure = prediction_pressure
-        if selected_pressure is None:
-            selected_pressure = eligible_prediction_pressure(
-                experiment, bench, observation
-            )
         tier2 = _tier2(
             observation,
             weights,
             temperature,
-            selected_pressure,
+            prediction_pressure,
+            experiment=experiment,
+            bench=bench,
         )
         if tier2 is not None:
             return tier2
@@ -758,12 +755,19 @@ def _tier2(
     weights: dict[str, float] | None,
     temperature_K: float | None,
     prediction_pressure: PredictionPressure | None,
+    *,
+    experiment: Experiment | None,
+    bench: object | None,
 ) -> ResolvedFo2 | None:
     if temperature_K is None:
         return None
     fraction, source = _printed_ferric_fraction(observation, weights)
     if fraction is None:
         return None
+    if prediction_pressure is None:
+        prediction_pressure = eligible_prediction_pressure(
+            experiment, bench, observation
+        )
     pressure_bar, pressure_route = _kress_pressure_bar(prediction_pressure)
     mol_fractions: Mapping[str, float] = {}
     if weights:
