@@ -272,7 +272,7 @@ def test_provider_flags_exact_minus_30_without_clamp_warning(monkeypatch) -> Non
 
 
 def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
-    """Pure-Si saturation caps the Si ratio; Mg and Na retain mass action."""
+    """Pure-metal saturation caps floor pressures when mass action exceeds it."""
 
     _withhold_metal_saturation_floor(monkeypatch)
     vapor_pressure_data = _yaml("vapor_pressures.yaml")
@@ -284,23 +284,46 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
         _request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0)
     ).diagnostic["vapor_pressures_Pa"]
 
-    # Without the ceiling, n_Si=-1 gives 21 dex. At 1700 K the production
-    # pure-Si saturation resolver caps P_Si at about 0.068309497634 Pa,
-    # below the uncapped ~7.13e9 Pa floor value. The ratio is therefore
-    # about 9.5794495e9, or P_sat,Si(1700 K) / P_Si(1e-9 bar).
+    # At 1700 K, the ceiling binds Si (P_sat ≈ 0.068309497634 Pa) and Mg
+    # (P_sat ≈ 9.21479e5 Pa); Na remains below its pure-metal saturation.
+    # The uncapped Si floor value is ~7.13e9 Pa, and the Mg and Na baselines
+    # retain their mass-action ratios unless the same ceiling lowers them.
     from simulator.chemistry import ellingham_graph
 
-    si_pure_saturation_pa = ellingham_graph.metal_saturation_pressure_Pa(
-        "Si", _T_K, vapor_pressure_data=vapor_pressure_data
-    )
-    assert at_floor["Si"] == pytest.approx(si_pure_saturation_pa)
-    expected_si_ratio = si_pure_saturation_pa / at_ref["Si"]
-    assert at_floor["Si"] / at_ref["Si"] == pytest.approx(
-        expected_si_ratio, rel=1e-9
-    )
-    # Mg and Na remain below their pure-component ceilings at this probe.
-    assert at_floor["Mg"] / at_ref["Mg"] == pytest.approx(10 ** 10.5, rel=1e-9)
-    assert at_floor["Na"] / at_ref["Na"] == pytest.approx(10 ** 5.25, rel=1e-6)
+    uncapped_floor_pressure_ratio = {
+        "Si": 1e21,
+        "Mg": 10 ** 10.5,
+        "Na": 10 ** 5.25,
+    }
+    pure_saturation_pressure_pa = {
+        species: ellingham_graph.metal_saturation_pressure_Pa(
+            species, _T_K, vapor_pressure_data=vapor_pressure_data
+        )
+        for species in uncapped_floor_pressure_ratio
+    }
+    uncapped_floor_pressure_pa = {
+        species: at_ref[species] * ratio
+        for species, ratio in uncapped_floor_pressure_ratio.items()
+    }
+    capped_floor_pressure_pa = {
+        species: min(
+            uncapped_floor_pressure_pa[species],
+            pure_saturation_pressure_pa[species],
+        )
+        for species in uncapped_floor_pressure_ratio
+    }
+    assert {
+        species
+        for species, pressure_pa in uncapped_floor_pressure_pa.items()
+        if pure_saturation_pressure_pa[species] < pressure_pa
+    } == {"Si", "Mg"}
+
+    for species, expected_pressure_pa in capped_floor_pressure_pa.items():
+        assert at_floor[species] == pytest.approx(expected_pressure_pa)
+        expected_ratio = expected_pressure_pa / at_ref[species]
+        assert at_floor[species] / at_ref[species] == pytest.approx(
+            expected_ratio, rel=1e-6
+        )
 
 
 def _si_floor_notice_from_provider(monkeypatch):
