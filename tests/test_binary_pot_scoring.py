@@ -87,7 +87,7 @@ def test_fe_pressure_notice_stays_off_unrelated_activity_comparator() -> None:
                 "affected_species": ["Fe"],
             }
         ],
-        authority="bridge",
+        authority="extrapolated",
     )
     assert cell_score_notice_kinds(
         cell, quantity="p_partial", species="Fe"
@@ -101,6 +101,7 @@ def test_fe_pressure_notice_stays_off_unrelated_activity_comparator() -> None:
     assert cell_score_authority(
         cell, refused=False, quantity="p_partial", species="Fe"
     ) == "extrapolated"
+    assert cell_score_authority(cell, refused=False) == "bridge"
     assert cell_score_authority(
         cell, refused=False, quantity="activity", species="SiO2"
     ) == "bridge"

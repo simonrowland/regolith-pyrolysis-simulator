@@ -465,8 +465,8 @@ def test_cell_score_authority_keeps_applicable_extrapolation_independent_of_orde
         )
 
     assert results == [
-        (AUTHORITY_EXTRAPOLATED, AUTHORITY_EXTRAPOLATED, "bridge"),
-        (AUTHORITY_EXTRAPOLATED, AUTHORITY_EXTRAPOLATED, "bridge"),
+        ("bridge", AUTHORITY_EXTRAPOLATED, "bridge"),
+        ("bridge", AUTHORITY_EXTRAPOLATED, "bridge"),
     ]
 
 

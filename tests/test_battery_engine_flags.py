@@ -71,6 +71,8 @@ def _rail(*_args, **_kwargs):
 
 
 def _install_fake_vaporock(monkeypatch):
+    original_import_module = vaporock_module.importlib.import_module
+
     def calc_vapor_pressures(composition=None, T_C=None, **_kwargs):
         composition = composition or {}
         pressures = {
@@ -86,7 +88,7 @@ def _install_fake_vaporock(monkeypatch):
     def fake_import_module(name):
         if name == "vaporock":
             return types.SimpleNamespace(calc_vapor_pressures=calc_vapor_pressures)
-        raise ImportError(name)
+        return original_import_module(name)
 
     monkeypatch.setattr(vaporock_module.importlib, "import_module", fake_import_module)
 
@@ -257,73 +259,166 @@ def test_vaporock_1773k_cell_keeps_extrapolated_flag(monkeypatch) -> None:
 def test_vaporock_fe_pressure_does_not_inherit_builtin_holzheid_notice(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    _install_fake_vaporock(monkeypatch)
     temperature_K = 1878.15
     po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-8)
     pot = _fe_bearing_pot()
-    vaporock_handle = _vaporock_handle()
-    vaporock_cell = equilibrate_cell(
-        vaporock_handle,
-        pot,
-        temperature_K=temperature_K,
-        po2=po2,
-        isolated=False,
-    )
-    assert vaporock_cell.status == "ok"
-    assert vaporock_cell.gas_partial_pressures_Pa["Fe"] > 0.0
     reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
-    assert not any(reason in str(row.get("reason", "")) for row in vaporock_cell.notices)
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        close_battery_engine_handle,
+    )
 
     builtin_handle = open_battery_engine("internal-analytical")
+    vaporock_handle = None
     try:
-        builtin_cell = equilibrate_cell(
-            builtin_handle,
+        builtin_result = builtin_handle.backend.equilibrate(
+            temperature_C=temperature_K - 273.15,
+            composition_kg={"FeO": 0.2, "Na2O": 0.2, "SiO2": 0.6},
+            composition_mol={
+                "FeO": 2.7838093647,
+                "Na2O": 3.2269234585,
+                "SiO2": 9.9861857763,
+            },
+            fO2_log=-8.0,
+            pressure_bar=1.0e-6,
+            po2_request=po2,
+        )
+        builtin_flags, _authority, _band = engine_flags_from_result(builtin_result)
+        _install_fake_vaporock(monkeypatch)
+        vaporock_handle = _vaporock_handle()
+        vaporock_cell = equilibrate_cell(
+            vaporock_handle,
             pot,
             temperature_K=temperature_K,
             po2=po2,
             isolated=False,
         )
     finally:
-        from simulator.diagnostic_helpers.binary_pot_battery import (
-            close_battery_engine_handle,
+        if vaporock_handle is not None:
+            close_battery_engine_handle(vaporock_handle)
+        close_battery_engine_handle(builtin_handle)
+    assert builtin_result.vapor_pressures_Pa["Fe"] > 0.0
+    assert any(reason in str(row.get("reason", "")) for row in builtin_flags)
+
+    assert vaporock_cell.status == "ok", (
+        vaporock_cell.refusal_reason,
+        vaporock_cell.engine_status,
+        vaporock_cell.engine_reason,
+    )
+    assert vaporock_cell.gas_partial_pressures_Pa["Fe"] > 0.0
+
+    def assert_no_builtin_notice(cell) -> None:
+        assert not any(
+            reason in str(row.get("reason", "")) for row in cell.notices
+        ), reason
+
+    assert_no_builtin_notice(vaporock_cell)
+
+    read_flags = battery_module.engine_flags_from_result
+
+    def mutate_to_leak_builtin_notice(result, **kwargs):
+        flags, authority, band = read_flags(result, **kwargs)
+        return (
+            [
+                *flags,
+                {
+                    "kind": "out_of_certified_band",
+                    "authority": AUTHORITY_EXTRAPOLATED,
+                    "reason": reason,
+                    "affected_species": ["Fe"],
+                    "affected_quantities": ["p_partial"],
+                },
+            ],
+            AUTHORITY_EXTRAPOLATED,
+            band,
         )
 
-        close_battery_engine_handle(builtin_handle)
-    assert builtin_cell.status == "ok"
-    assert builtin_cell.gas_partial_pressures_Pa["Fe"] > 0.0
-    assert any(reason in str(row.get("reason", "")) for row in builtin_cell.notices)
+    vaporock_handle = _vaporock_handle()
+    try:
+        with monkeypatch.context() as mutation:
+            mutation.setattr(
+                battery_module,
+                "engine_flags_from_result",
+                mutate_to_leak_builtin_notice,
+            )
+            leaked_cell = equilibrate_cell(
+                vaporock_handle,
+                pot,
+                temperature_K=temperature_K,
+                po2=po2,
+                isolated=False,
+            )
+            with pytest.raises(AssertionError, match="Holzheid"):
+                assert_no_builtin_notice(leaked_cell)
+    finally:
+        close_battery_engine_handle(vaporock_handle)
 
 
-def test_provider_authority_requires_an_applicable_quantity_scope() -> None:
-    result = types.SimpleNamespace(
-        diagnostics={
-            "vapor_pressure_diagnostic": {
-                "Fe": {
-                    "notice": {
-                        "kind": "out_of_certified_band",
-                        "authority_level": AUTHORITY_EXTRAPOLATED,
-                        "reason": "scoped provider notice",
-                        "affected_species": ["Fe"],
-                        "affected_quantities": ["p_partial"],
-                    }
-                }
+def test_provider_authority_requires_an_applicable_quantity_scope(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    notice = {
+        "kind": "out_of_certified_band",
+        "authority_level": AUTHORITY_EXTRAPOLATED,
+        "reason": "scoped provider notice",
+        "affected_species": ["Fe"],
+        "affected_quantities": ["p_partial"],
+    }
+
+    def result_with_provider_notice():
+        return types.SimpleNamespace(
+            diagnostics={
+                "authority": AUTHORITY_EXTRAPOLATED,
+                "vapor_pressure_diagnostic": {"Fe": {"notice": notice}},
             }
-        }
+        )
+
+    def assert_provider_scope() -> None:
+        result = battery_module._preserve_provider_notices_for_engine_cache(
+            result_with_provider_notice()
+        )
+        flags, aggregate_authority, _band = (
+            battery_module.engine_flags_from_result(result)
+        )
+        assert aggregate_authority is None, "aggregate_authority"
+        assert battery_module.engine_flags_from_result(
+            result, quantity="activity", species="Fe"
+        )[1] is None
+        assert battery_module.engine_flags_from_result(
+            result, quantity="p_partial", species="SiO"
+        )[1] is None
+        scoped_flags, scoped_authority, _band = (
+            battery_module.engine_flags_from_result(
+                result, quantity="p_partial", species="Fe"
+            )
+        )
+        assert scoped_authority == AUTHORITY_EXTRAPOLATED
+        assert scoped_flags == flags
+
+    assert_provider_scope()
+
+    source = textwrap.dedent(
+        inspect.getsource(battery_module.engine_flags_from_result)
+    )
+    quantity_gate = "if quantity is not None and any("
+    assert source.count(quantity_gate) == 1
+    namespace = vars(battery_module).copy()
+    exec(
+        compile(
+            source.replace(quantity_gate, "if any("),
+            "<provider authority without quantity gate>",
+            "exec",
+        ),
+        namespace,
     )
 
-    flags, aggregate_authority, _band = engine_flags_from_result(result)
-    assert aggregate_authority is None
-    assert engine_flags_from_result(
-        result, quantity="activity", species="Fe"
-    )[1] is None
-    assert engine_flags_from_result(
-        result, quantity="p_partial", species="SiO"
-    )[1] is None
-    scoped_flags, scoped_authority, _band = engine_flags_from_result(
-        result, quantity="p_partial", species="Fe"
-    )
-    assert scoped_authority == AUTHORITY_EXTRAPOLATED
-    assert scoped_flags == flags
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            battery_module,
+            "engine_flags_from_result",
+            namespace["engine_flags_from_result"],
+        )
+        with pytest.raises(AssertionError, match="aggregate_authority"):
+            assert_provider_scope()
 
 
 def test_openimcc_temperature_notice_survives_cell_notices() -> None:
@@ -984,3 +1079,75 @@ def test_predict_keeps_engine_flag(monkeypatch) -> None:
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND for notice in warm.notices
     )
     assert float(warm.value) != float(hot.value)
+
+
+def test_internal_analytical_residue_integrator_keeps_scoped_fe_notice(
+    tmp_path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator import engine_cache
+    from simulator.battery.residue import (
+        ResidueChannel,
+        ResiduePressureResult,
+        _make_residue_pressure_model,
+        integrate_residue_inventory,
+    )
+
+    temperature_K = 1878.15
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "residue.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    inventory = {
+        "FeO": 2.7838093647,
+        "Na2O": 3.2269234585,
+        "SiO2": 9.9861857763,
+    }
+    pressure_model = _make_residue_pressure_model(
+        "internal-analytical",
+        (("Fe", ("FeO", 1.0, -0.5)),),
+        None,
+        temperature_K=temperature_K,
+        total_pressure_Pa=0.1,
+        engine_metadata={},
+        engine_flags=set(),
+        missing_channels_reason="residue_pressure_channels_missing",
+        caller="scoped Fe residue regression",
+    )
+
+    pressure_result = pressure_model(inventory, -8.0)
+    assert isinstance(pressure_result, ResiduePressureResult)
+    assert pressure_result.pressures_Pa["Fe"] > 0.0
+    fe_notices = [
+        notice
+        for notice in pressure_result.notices
+        if notice.get("reason")
+        == "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    ]
+    assert len(fe_notices) == 1
+    assert fe_notices[0]["affected_species"] == ["Fe"]
+    assert fe_notices[0]["affected_quantities"] == ["p_partial"]
+
+    engine_cache._MEMORY_CACHE.clear()
+    cached_result = pressure_model(inventory, -8.0)
+    assert cached_result == pressure_result
+    counters = engine_cache.engine_cache_counters(reset=True)[
+        "internal-analytical"
+    ]
+    assert counters["misses"] == 1
+    assert counters["hits"] == 1
+
+    integrated = integrate_residue_inventory(
+        inventory,
+        (ResidueChannel("Fe", "Fe", "FeO", 1.0, "test"),),
+        pressure_model,
+        temperature_K=temperature_K,
+        duration_s=0.1,
+        area_evolution_m2=(1.0e-4,),
+        buffered_fO2_log=-8.0,
+    )
+    assert any(
+        notice.get("reason")
+        == "Holzheid stoichiometric FeO gamma conversion extrapolated"
+        for notice in integrated.pressure_notices
+    )

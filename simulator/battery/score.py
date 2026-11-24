@@ -12523,6 +12523,8 @@ def _residue_engine_pressure_notices(
     *,
     species_formula: str | None = None,
 ) -> tuple[Notice, ...]:
+    from types import SimpleNamespace
+
     from simulator.diagnostic_helpers.binary_pot_battery import _scope_matches
 
     if not isinstance(raw_notices, (list, tuple)):
@@ -12530,6 +12532,9 @@ def _residue_engine_pressure_notices(
     dependent_elements = set(
         parse_formula_elements(species_formula) or ()
     ) if species_formula else set()
+    scoped_species = dependent_elements | (
+        {species_formula} if species_formula is not None else set()
+    )
     built: list[Notice] = []
     for row in raw_notices:
         if not isinstance(row, Mapping):
@@ -12538,49 +12543,55 @@ def _residue_engine_pressure_notices(
             continue
         affected_species = row.get("affected_species")
         if species_formula is not None and (
-            affected_species is None
-            or not any(
+            affected_species is not None
+            and not any(
                 _scope_matches(affected_species, selected, species=True)
-                for selected in {species_formula, *dependent_elements}
+                for selected in scoped_species
             )
         ):
             continue
-        try:
-            kind = NoticeKind(str(row.get("kind")))
-        except ValueError:
+        matching_species = next(
+            (
+                selected
+                for selected in sorted(scoped_species)
+                if affected_species is None
+                or _scope_matches(affected_species, selected, species=True)
+            ),
+            None,
+        )
+        typed_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            SimpleNamespace(notices=(row,), authority=None),
+            species=matching_species,
+        )
+        if not typed_notices:
             continue
-        reason = str(row.get("reason") or kind.value)
-        if affected_species is not None:
-            scope = affected_species
-            scope_items = (
-                scope if isinstance(scope, (list, tuple, set, frozenset))
-                else (scope,)
+        for notice in typed_notices:
+            reason = notice.reason
+            if affected_species is not None:
+                scope = affected_species
+                scope_items = (
+                    scope if isinstance(scope, (list, tuple, set, frozenset))
+                    else (scope,)
+                )
+                scope_text = ",".join(sorted(str(item) for item in scope_items))
+                reason = f"{reason}; pressure species scope={scope_text}"
+            authority = (
+                Authority.EXTRAPOLATED
+                if row.get("authority") == "extrapolated"
+                or row.get("authority_level") == "extrapolated"
+                else notice.authority
             )
-            scope_text = ",".join(sorted(str(item) for item in scope_items))
-            reason = f"{reason}; pressure species scope={scope_text}"
-        band = row.get("certified_band") or row.get("band")
-        built.append(
-            Notice(
-                kind=kind,
+            adapted = replace(
+                notice,
                 affected_quantities=(dependent_quantity,),
                 reason=reason,
-                origin=str(
-                    row.get("origin")
-                    or "engine:internal-analytical:residue-pressure"
-                ),
-                band=(
-                    json.dumps(band, sort_keys=True, default=str)
-                    if isinstance(band, Mapping)
-                    else (None if band is None else str(band))
-                ),
-                authority=(
-                    Authority.EXTRAPOLATED
-                    if row.get("authority") == "extrapolated"
-                    or row.get("authority_level") == "extrapolated"
-                    else None
-                ),
+                origin="engine:internal-analytical:residue-pressure",
+                authority=authority,
             )
-        )
+            if adapted not in built:
+                built.append(adapted)
     return tuple(built)
 
 

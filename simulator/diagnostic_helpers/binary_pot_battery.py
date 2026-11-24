@@ -1799,8 +1799,6 @@ def engine_flags_from_result(
         band = row.get("certified_band")
         if isinstance(band, Mapping):
             certified_band = dict(band)
-    if authority is None and diagnostics.get("authority"):
-        authority = str(diagnostics["authority"])
     if certified_band is None and isinstance(
         diagnostics.get("certified_band"), Mapping
     ):
@@ -1808,6 +1806,27 @@ def engine_flags_from_result(
 
     provider_notices = _provider_notice_flags_from_result(result)
     notices.extend(provider_notices)
+    if diagnostics.get("imcc_notices"):
+        imcc_rows = diagnostics["imcc_notices"]
+    else:
+        imcc_rows = getattr(result, "imcc_notices", None) or []
+    scoped_extrapolation = any(
+        isinstance(row, Mapping)
+        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+        and (
+            row.get("affected_quantities") is not None
+            or row.get("affected_species") is not None
+        )
+        for row in [*provider_notices, *imcc_rows]
+    )
+    diagnostic_authority = diagnostics.get("authority")
+    if authority is None and diagnostic_authority:
+        diagnostic_authority = str(diagnostic_authority)
+        if not (
+            diagnostic_authority == AUTHORITY_EXTRAPOLATED
+            and scoped_extrapolation
+        ):
+            authority = diagnostic_authority
     if quantity is not None and any(
         row.get("authority") == AUTHORITY_EXTRAPOLATED
         and _scope_matches(row.get("affected_quantities"), quantity)
@@ -1816,10 +1835,6 @@ def engine_flags_from_result(
     ):
         authority = AUTHORITY_EXTRAPOLATED
 
-    if diagnostics.get("imcc_notices"):
-        imcc_rows = diagnostics["imcc_notices"]
-    else:
-        imcc_rows = getattr(result, "imcc_notices", None) or []
     for row in imcc_rows:
         if not isinstance(row, Mapping):
             continue
@@ -1827,7 +1842,18 @@ def engine_flags_from_result(
         if copied in provider_notices:
             continue
         notices.append(copied)
-        if authority is None and copied.get("authority"):
+        has_scope = (
+            copied.get("affected_quantities") is not None
+            or copied.get("affected_species") is not None
+        )
+        applies_to_request = not has_scope or (
+            quantity is not None
+            and _scope_matches(copied.get("affected_quantities"), quantity)
+            and _scope_matches(
+                copied.get("affected_species"), species, species=True
+            )
+        )
+        if authority is None and copied.get("authority") and applies_to_request:
             authority = str(copied["authority"])
         band = copied.get("certified_band")
         if (
@@ -1880,7 +1906,7 @@ def cell_score_authority(
     if refused:
         return "refused"
     authority = getattr(cell, "authority", None)
-    if authority and quantity is None:
+    if authority and quantity is None and authority != AUTHORITY_EXTRAPOLATED:
         return str(authority)
     scoped_authority = False
     applicable_authorities: set[str] = set()
@@ -1892,6 +1918,10 @@ def cell_score_authority(
         scoped_authority = scoped_authority or (
             affected_quantities is not None or affected_species is not None
         )
+        if quantity is None and (
+            affected_quantities is not None or affected_species is not None
+        ):
+            continue
         if not _scope_matches(affected_quantities, quantity) or not _scope_matches(
             affected_species, species, species=True
         ):

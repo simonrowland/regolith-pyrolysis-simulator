@@ -465,17 +465,26 @@ class ResiduePressureResult:
     notices: tuple[Mapping[str, object], ...] = ()
 
 
-def _residue_pressure_values(
+def _retain_residue_pressure_notices(
     result: Mapping[str, float] | ResiduePressureResult,
     notices: list[Mapping[str, object]],
-) -> Mapping[str, float]:
+) -> None:
     if not isinstance(result, ResiduePressureResult):
-        return result
+        return
     for notice in result.notices:
         row = dict(notice)
         if row not in notices:
             notices.append(row)
-    return result.pressures_Pa
+
+
+def _residue_pressure_values(
+    result: Mapping[str, float] | ResiduePressureResult,
+    notices: list[Mapping[str, object]],
+) -> Mapping[str, float]:
+    if isinstance(result, ResiduePressureResult):
+        _retain_residue_pressure_notices(result, notices)
+        return result.pressures_Pa
+    return result
 
 
 @dataclass(frozen=True)
@@ -1606,7 +1615,7 @@ def _make_residue_pressure_model(
             except _InternalAnalyticalInputRefusal as exc:
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
             provider_notices, _provider_authority, _provider_band = (
-                engine_flags_from_result(response)
+                engine_flags_from_result(response, quantity="p_partial")
             )
             pressures: dict[str, float] = {}
             for channel, pressure in response.vapor_pressures_Pa.items():
@@ -1969,6 +1978,7 @@ def _mass_loss_corner_bounds(
         [Mapping[str, float], float], Mapping[str, float] | ResiduePressureResult
     ],
     *, unsourced: Sequence[str], temperature_K: float, area_m2: float, duration_s: float,
+    pressure_notices: list[Mapping[str, object]] | None = None,
     include_sourced: bool = False,
 ) -> tuple[dict[str, float], dict[str, Any]]:
     terms = _channel_terms(channels)
@@ -1982,6 +1992,13 @@ def _mass_loss_corner_bounds(
     # sourced-flux suppression cannot cancel B. This envelope is not a joint
     # trajectory. The point arm and its original area/inventory remain L.
     roots = []
+    notice_sink = pressure_notices if pressure_notices is not None else []
+
+    def pressure_values_at(logp: float) -> Mapping[str, float]:
+        return _residue_pressure_values(
+            pressure_model(inventory, logp), notice_sink
+        )
+
     for low_corner in (True, False):
         selected = tuple(
             replace(channel, alpha=(
@@ -1993,7 +2010,7 @@ def _mass_loss_corner_bounds(
         )
         try:
             roots.append(_solve_vacuum_oxygen_balance(
-                lambda logp: pressure_model(inventory, logp), selected,
+                pressure_values_at, selected,
                 temperature_K=temperature_K,
             ).pO2_bar)
         except ValueError as exc:
@@ -2001,7 +2018,7 @@ def _mass_loss_corner_bounds(
     low, high = roots
     if low > high:
         raise ResidueInventoryRefusal("mass_loss_corner_order_invalid", str(roots))
-    pressures = [pressure_model(inventory, math.log10(root) if root > 0.0 else 0.0)
+    pressures = [pressure_values_at(math.log10(root) if root > 0.0 else 0.0)
                  for root in roots]
     selected_pressures = {}
     inventory_caps = {}
@@ -2455,14 +2472,15 @@ def predict_mass_loss_fraction(
         )
 
         def pressures_at(inventory_at, logp):
-            return _residue_pressure_values(
-                pressure_model(inventory_at, logp), pressure_notices
-            )
+            result = pressure_model(inventory_at, logp)
+            _retain_residue_pressure_notices(result, pressure_notices)
+            return result
 
         def measure(incoming, active_channels, area, duration):
             bounds, corners = _mass_loss_corner_bounds(
                 incoming, active_channels, pressures_at, unsourced=unsourced,
                 temperature_K=at_K, area_m2=area, duration_s=duration,
+                pressure_notices=pressure_notices,
                 include_sourced=rectangle,
             )
             inventory_capped_channels.update(corners["inventory_capped_channels"])
@@ -3486,9 +3504,15 @@ def _predict_hashimoto_residue_cohort(
                 "engine_floor_inversion_diagnostics": tuple(
                     engine_floor_inversion_diagnostics.values()
                 ),
-                "engine_pressure_notices": geometry_pressure_notices[
-                    primary_geometry
-                ],
+                **(
+                    {
+                        "engine_pressure_notices": geometry_pressure_notices[
+                            primary_geometry
+                        ]
+                    }
+                    if geometry_pressure_notices[primary_geometry]
+                    else {}
+                ),
                 "liquid_rows_used": tuple(active_liquid_rows[row_key]),
                 "d060_pending": True,
                 "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),
