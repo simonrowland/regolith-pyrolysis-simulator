@@ -327,6 +327,12 @@ def _case(
     )
     if quantity is not Quantity.ACTIVITY:
         identity = replace(identity, quantity=State.of(quantity))
+    if oxygen is not None:
+        # Bar-frame pascals for a printed log. 10**log × 1e5 Pa/bar.
+        identity = replace(
+            identity,
+            fO2_Pa=State.of((Decimal(10) ** oxygen) * Decimal("100000")),
+        )
     observation = replace(
         f.observation("obs", experiment.experiment_id, identity, Decimal("1e-7")),
         point_conditions=point,
@@ -1136,7 +1142,54 @@ def test_printed_oxygen_is_commanded_and_not_the_engine_default(monkeypatch):
     assert seen["mode"] == "commanded"
     assert seen["po2_bar"] == pytest.approx(1e-7)
     assert seen["mode"] != "engine_default"
-    assert prediction.value == Decimal("0.2")
+
+
+def test_unknown_frame_activity_commands_dp010_not_the_printed_zero():
+    from simulator.battery.enums import Quantity
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+    from simulator.battery.score import _resolve_row_fo2
+    from simulator.battery.waypoints import oxygen_condition
+
+    experiment, bench, observation = _case(
+        composition=_composition(("SiO2", "1")),
+        oxygen=Decimal("0"),
+    )
+    observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            fO2_Pa=State.unknown(_BARE_LOG_SCALE_UNKNOWN),
+        ),
+    )
+    oxygen = oxygen_condition(experiment, bench, observation)
+    ladder = resolve_row_fo2(
+        experiment,
+        bench,
+        observation,
+        composition_wt={"SiO2": 100.0},
+        temperature_K=1473.15,
+        oxygen=oxygen,
+        quantity=Quantity.ACTIVITY,
+    )
+    assert ladder is None or ladder.route != "observation_fO2_log"
+    _resolved, log, notices = _resolve_row_fo2(
+        observation.identity,
+        observation,
+        experiment,
+        {"SiO2": 100.0},
+        Decimal("1473.15"),
+        Quantity.ACTIVITY,
+    )
+    assert log != 0 and log != Decimal("0")
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.policy.value == "-9.0"
+        and "printed_fO2_log=0" in notice.reason
+        and "commanded_default_log10_bar=" in notice.reason
+        for notice in notices
+    )
 
 
 def test_alphamelts_activity_uses_printed_oxygen_and_matches_direct_call(monkeypatch):

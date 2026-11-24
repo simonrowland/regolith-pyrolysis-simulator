@@ -1301,7 +1301,9 @@ def _score_store_to_jsonl(
         _prepare_score_run,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        legacy_float_index_text,
         parse_residual_order_entry,
+        residual_order_index_text,
         supervised_process_map,
     )
 
@@ -1497,6 +1499,13 @@ def _score_store_to_jsonl(
                                     raise ValueError(
                                         "score shard has an invalid serial-order entry"
                                     )
+                                expected = residual_order_index_text(payload)
+                                if (
+                                    not isinstance(order_value, list)
+                                    or len(order_value) != 6
+                                    or list(order_value[4:]) != expected
+                                ):
+                                    raise AssertionError("parallel_summary")
                                 if entry.exact:
                                     stream.append_payload_line(
                                         line,
@@ -1505,9 +1514,21 @@ def _score_store_to_jsonl(
                                         band_value=entry.band_value,
                                     )
                                 else:
+                                    numeric = payload.get("numeric")
+                                    raw_band = None
+                                    raw_numeric = None
+                                    if isinstance(numeric, Mapping):
+                                        raw_numeric = numeric.get("value")
+                                        band = numeric.get("decision_band")
+                                        if isinstance(band, Mapping):
+                                            raw_band = band.get("value")
                                     stream.append_payload_line(
                                         line,
                                         sort_order=entry.sort_order,
+                                        numeric_value=legacy_float_index_text(
+                                            raw_numeric
+                                        ),
+                                        band_value=legacy_float_index_text(raw_band),
                                     )
                             if order_file.read(1):
                                 raise ValueError(

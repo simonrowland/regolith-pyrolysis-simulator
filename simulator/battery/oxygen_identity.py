@@ -154,40 +154,29 @@ def _air_composition_quote(
         return source_quote
     if _AIR_NEGATION.search(normalized_quote):
         return None
-    # A source quote establishes the dry-air rung only when it places the
-    # sample in air during equilibration. Air displaced before the run and an
-    # air quench after an inert run are not atmosphere evidence for DP-003.
-    # "air-free" normalizes to "air free". The sample's atmosphere is the
-    # word after "in air", so a following "free" is not air. A furnace
-    # sensor reading air outside the chamber is not the sample either.
+    # The sample's atmosphere is a sample, melt, glass, or charge in air, or
+    # a run that equilibrated in air. "air-free" normalizes to "air free".
+    # A furnace sensor or room air anywhere in the quote is not that sample.
+    sample_air = re.search(
+        r"\b(?:sample|melt|glass|charge)\b(?:\s+\w+){0,8}\s+"
+        r"(?:in|under|atmosphere)\s+(?:ambient\s+)?air\b(?!\s+free\b)",
+        normalized_quote,
+    )
     equilibration_air = re.search(
         r"\bequilibrat\w*(?:\s+\w+){0,5}\s+(?:in|under)\s+(?:ambient\s+)?air\b"
         r"(?!\s+free\b)",
         normalized_quote,
     )
-    air_during_equilibration = re.search(
-        r"\bair\b(?!\s+free\b).{0,60}\b(?:during|throughout)\s+equilibrat\w*",
-        normalized_quote,
-    )
-    sensor_outside_chamber = (
-        air_during_equilibration is not None
-        and re.search(
-            r"\b(?:sensor|outside)\b",
-            air_during_equilibration.group(0),
-        )
-        is not None
-    )
-    if (
-        equilibration_air is not None
-        and not re.search(
-            r"\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\b",
-            equilibration_air.group(0),
-        )
-    ) or (
-        air_during_equilibration is not None and not sensor_outside_chamber
+    sensor_or_room = re.search(r"\b(?:sensor|room)\b", normalized_quote)
+    positive = sample_air if sample_air is not None else equilibration_air
+    if positive is None or sensor_or_room is not None:
+        return None
+    if re.search(
+        r"\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\b",
+        positive.group(0),
     ):
-        return source_quote
-    return None
+        return None
+    return source_quote
 
 
 def _dp002_pressure_default(

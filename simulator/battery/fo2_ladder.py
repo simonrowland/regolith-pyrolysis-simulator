@@ -68,7 +68,7 @@ from simulator.battery.waypoints import (
     oxygen_condition,
 )
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import BAR_PA_DECIMAL, PA_PER_BAR
 
 _TIER1_DIRECT_ROUTES = TYPED_RUN_OXYGEN_ROUTES | EXPERIMENT_RUN_OXYGEN_ROUTES
 _TIER3_ATMOSPHERE_ROUTES = (
@@ -140,6 +140,64 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
     )
+
+
+def dp010_command_notice(
+    quantity: Quantity,
+    intrinsic: ResolvedFo2,
+    *,
+    identity: Identity | None,
+    printed_log: str | None = None,
+    atmospheric_quote: str | None = None,
+) -> tuple[Notice, Decimal, Decimal]:
+    """The phase and vapour paths share one DP-010 receipt.
+
+    The notice carries the registry policy, the commanded default, and the
+    missing-evidence clause. The returned pascal value is that command once;
+    callers keep it instead of rebuilding it from a float log.
+    """
+
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+    from simulator.battery.records import NoticePolicy
+
+    command = float(intrinsic.log10_fO2_bar)
+    policy = resolve_default_policy("DP-010", formula_result=command)
+    ladder_notice = fo2_tier_notice(quantity, intrinsic)
+    frame_evidence = scale_unknown_evidence_clause(identity, printed_log)
+    if frame_evidence is not None:
+        missing_evidence = frame_evidence
+    else:
+        missing_evidence = (
+            "original_missing_evidence=no printed fO2, applicable buffer, or "
+            "air-composition evidence; "
+        )
+    quote = (
+        f"pressure_evidence_quote={atmospheric_quote!r}; "
+        if atmospheric_quote is not None
+        else ""
+    )
+    # Registry formatting normalises -9.0 to -9. The commanded default keeps
+    # the value the engine is given.
+    policy_meta = replace(
+        NoticePolicy(**policy.payload["policy"]),
+        value=str(command),
+    )
+    notice = replace(
+        ladder_notice,
+        kind=policy.flag,
+        reason=(
+            "DP-010 physics_rung=4: "
+            + missing_evidence
+            + f"commanded_default_log10_bar={str(command)}; "
+            + quote
+            + ladder_notice.reason
+        ),
+        origin="score:DP-010",
+        policy=policy_meta,
+    )
+    log = Decimal(str(command))
+    return notice, log, log10_fo2_to_pa(log)
 
 
 def fo2_refusal_notice(quantity: Quantity) -> Notice:
@@ -253,6 +311,25 @@ def resolve_row_fo2(
         if _is_tier1(route, observation):
             log = _log_point(route.value)
             if log is not None:
+                # A grounded printed log keeps this route. The commanded
+                # number is the stored absolute pressure, so an atm frame
+                # is not sent on as the printed log.
+                if route.route == "observation_fO2_log":
+                    admitted = absolute_frame_admission(
+                        observation,
+                        identity,
+                        route=route.route,
+                        physics_rung=1 if knudsen_vapour else None,
+                    )
+                    if admitted is not None:
+                        return ResolvedFo2(
+                            float(admitted.log10_bar),
+                            1,
+                            route.route,
+                            False,
+                            po2_bar=admitted.command_bar(),
+                            physics_rung=admitted.physics_rung,
+                        )
                 return ResolvedFo2(
                     log, 1, route.route, False,
                     physics_rung=1 if knudsen_vapour else None,
@@ -277,9 +354,9 @@ def resolve_row_fo2(
             return tier2
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
-            if (
-                route.route == "buffer_relation"
-                and uncalibrated_buffer_awaits_receipt(observation)
+            if route.route == "buffer_relation" and (
+                uncalibrated_buffer_awaits_receipt(observation)
+                or _receipted_buffer(observation)
             ):
                 continue
             log = _log_point(route.value)
@@ -578,6 +655,101 @@ def oxygen_frame_receipts(observation: Observation | None) -> tuple[Notice, ...]
     )
 
 
+@dataclass(frozen=True)
+class AdmittedOxygen:
+    """One oxygen pressure admitted with the frame that resolved it.
+
+    ``pressure_pa`` is the stored absolute pressure. ``log10_bar`` is that
+    pressure over 1 bar. Callers command ``command_bar()`` and keep
+    ``pressure_pa``; they do not rebuild pascals from the printed log.
+    """
+
+    pressure_pa: Decimal
+    log10_bar: Decimal
+    tier: int
+    route: str
+    borrowed: bool
+    notices: tuple[Notice, ...] = ()
+    physics_rung: int | None = None
+
+    def command_bar(self) -> float:
+        return float(self.pressure_pa / BAR_PA_DECIMAL)
+
+
+def decimal_log10_bar(pressure_pa: Decimal) -> Decimal:
+    """log10(pressure_pa / 1 bar). 100000 Pa is exactly zero."""
+
+    return pressure_pa.log10() - BAR_PA_DECIMAL.log10()
+
+
+def stored_absolute_pressure_pa(identity: Identity | None) -> Decimal | None:
+    """The identity's finite positive fO2 in pascals, or None."""
+
+    if identity is None or identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
+        return None
+    value = identity.fO2_Pa.value
+    if not isinstance(value, Decimal):
+        return None
+    if not value.is_finite() or value <= 0:
+        return None
+    return value
+
+
+def _admission_notices(observation: Observation | None) -> tuple[Notice, ...]:
+    """DP-112 receipts and frame receipts, once each."""
+
+    if observation is None:
+        return ()
+    from simulator.battery.oxygen_identity import _dp112_receipts
+
+    notices: list[Notice] = []
+    for notice in (*_dp112_receipts(observation), *oxygen_frame_receipts(observation)):
+        if notice not in notices:
+            notices.append(notice)
+    return tuple(notices)
+
+
+def absolute_frame_admission(
+    observation: Observation | None,
+    identity: Identity | None,
+    *,
+    route: str = "identity_fO2_Pa",
+    tier: int = 1,
+    physics_rung: int | None = None,
+) -> AdmittedOxygen | None:
+    """Admit the stored absolute pressure when the frame is already resolved.
+
+    A monkeypatched frame check with no stored pressure returns None. The
+    caller then reconstructs from the printed log; production unknown frames
+    never reach that reconstruction because ``absolute_oxygen_frame`` is false.
+    """
+
+    if not absolute_oxygen_frame(identity):
+        return None
+    pressure_pa = stored_absolute_pressure_pa(identity)
+    if pressure_pa is None:
+        return None
+    return AdmittedOxygen(
+        pressure_pa=pressure_pa,
+        log10_bar=decimal_log10_bar(pressure_pa),
+        tier=tier,
+        route=route,
+        borrowed=False,
+        notices=_admission_notices(observation),
+        physics_rung=physics_rung,
+    )
+
+
+def _receipted_buffer(observation: Observation | None) -> bool:
+    """True when DP-112 has already receipted this row's buffer."""
+
+    if observation is None:
+        return False
+    from simulator.battery.oxygen_identity import _dp112_receipts
+
+    return bool(_dp112_receipts(observation))
+
+
 def uncalibrated_buffer_awaits_receipt(observation: Observation | None) -> bool:
     """True when a buffer marker is present and DP-112 has not receipted it.
 
@@ -655,7 +827,10 @@ def admitted_score_oxygen(
             and _log_point(route.value) is not None
             and not (
                 route.route == "buffer_relation"
-                and uncalibrated_buffer_awaits_receipt(observation)
+                and (
+                    uncalibrated_buffer_awaits_receipt(observation)
+                    or _receipted_buffer(observation)
+                )
             )
         ):
             return route

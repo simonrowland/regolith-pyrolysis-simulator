@@ -211,33 +211,26 @@ _CONVERSION = (
 _AIR_FREE = (
     (
         ROOT / "simulator/battery/oxygen_identity.py",
-        """    equilibration_air = re.search(
+        """    sample_air = re.search(
+        r"\\b(?:sample|melt|glass|charge)\\b(?:\\s+\\w+){0,8}\\s+"
+        r"(?:in|under|atmosphere)\\s+(?:ambient\\s+)?air\\b(?!\\s+free\\b)",
+        normalized_quote,
+    )
+    equilibration_air = re.search(
         r"\\bequilibrat\\w*(?:\\s+\\w+){0,5}\\s+(?:in|under)\\s+(?:ambient\\s+)?air\\b"
         r"(?!\\s+free\\b)",
         normalized_quote,
     )
-    air_during_equilibration = re.search(
-        r"\\bair\\b(?!\\s+free\\b).{0,60}\\b(?:during|throughout)\\s+equilibrat\\w*",
-        normalized_quote,
-    )
-    sensor_outside_chamber = (
-        air_during_equilibration is not None
-        and re.search(
-            r"\\b(?:sensor|outside)\\b",
-            air_during_equilibration.group(0),
-        )
-        is not None
-    )
-    if (
-        equilibration_air is not None
-        and not re.search(
-            r"\\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\\b",
-            equilibration_air.group(0),
-        )
-    ) or (
-        air_during_equilibration is not None and not sensor_outside_chamber
+    sensor_or_room = re.search(r"\\b(?:sensor|room)\\b", normalized_quote)
+    positive = sample_air if sample_air is not None else equilibration_air
+    if positive is None or sensor_or_room is not None:
+        return None
+    if re.search(
+        r"\\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\\b",
+        positive.group(0),
     ):
-        return source_quote
+        return None
+    return source_quote
 """,
         """    equilibration_air = re.search(
         r"\\bequilibrat\\w*(?:\\s+\\w+){0,5}\\s+(?:in|under)\\s+(?:ambient\\s+)?air\\b",

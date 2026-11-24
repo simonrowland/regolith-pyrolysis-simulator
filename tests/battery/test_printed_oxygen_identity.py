@@ -1801,6 +1801,8 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
     for false_air in (
         "The sample was equilibrated in air-free argon.",
         "The furnace sensor measured air outside the chamber during equilibration.",
+        "The furnace sensor recorded air during equilibration.",
+        "An argon sample was inside; air flowed in the room during equilibration.",
     ):
         false_evidence = AmbientPressureEvidence(
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
@@ -2085,6 +2087,7 @@ def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> 
         if row.source_id == source_id
         and row.identity.quantity.is_value
         and row.identity.quantity.value is Quantity.ACTIVITY
+        and row.value.kind is ValueKind.POINT
         and any(
             notice.origin == "score:DP-112"
             and notice.kind
@@ -2139,7 +2142,12 @@ def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> 
         context=mutated_context,
         prediction=prediction,
     )
-    assert residual.status is not ResidualStatus.REFUSED
+    refusal = residual.refusal
+    assert residual.status is not ResidualStatus.REFUSED, (
+        f"status={residual.status} execution={residual.execution.state} "
+        f"reason={None if refusal is None else refusal.reason} "
+        f"detail={None if refusal is None else refusal.detail}"
+    )
     assert any(
         notice.policy is not None and notice.policy.id == "DP-112"
         for notice in residual.notices
@@ -2368,9 +2376,13 @@ def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
     assert _liquid_pair_target(unlabelled) is None
     shared_locator = Locator(note="assemblage contains phase Lfe and phase Lsi")
     single_locator = Locator(note="measured phase Lfe")
+    conjunction_locator = Locator(note="assemblage contains phase Lfe and Lsi")
+    coexisting_locator = Locator(note="unlabelled glass coexisting with phase Lfe")
     assert (
         _liquid_pair_target(replace(unlabelled, locator=shared_locator)) is None
     ), "phase Lfe and phase Lsi"
+    assert _liquid_pair_target(replace(unlabelled, locator=conjunction_locator)) is None
+    assert _liquid_pair_target(replace(unlabelled, locator=coexisting_locator)) is None
     assert _liquid_pair_target(replace(unlabelled, locator=single_locator)) == (
         "Lfe",
         "Lsi",
@@ -3013,6 +3025,7 @@ def test_unknown_frame_and_uncalibrated_buffer_are_not_clean_commands() -> None:
         observation,
         composition_wt=weights,
         temperature_K=float(temperature),
+        oxygen=oxygen,
         quantity=Quantity.ACTIVITY,
     )
     assert ladder is None or ladder.route != "observation_fO2_log", "printed_fO2_log"

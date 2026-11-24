@@ -182,9 +182,14 @@ def _worker_test_predict(
 
 
 def _score_rows_and_summary(
-    context: ScoreContext, path: Path, workers: int | None
+    context: ScoreContext,
+    path: Path,
+    workers: int | None,
+    predict=None,
 ) -> tuple[bytes, bytes]:
     options = {} if workers is None else {"workers": workers}
+    if predict is not None:
+        options["predict"] = predict
     written, metadata = _score_store_to_jsonl(
         context,
         path,
