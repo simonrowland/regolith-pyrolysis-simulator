@@ -27,24 +27,8 @@ def _measure(label, operation) -> float:
     return cpu_seconds
 
 
-def test_sc09_full_sim_process_cpu_sample(tmp_path) -> None:
-    runner = runpy.run_path("tests/test_runner_smoke.py")
-    scenario = runner["SCENARIOS"][0]
-    assert scenario["name"] == "lunar_mare_low_ti_C0_24h"
+def test_sc09_full_score_process_cpu_sample() -> None:
+    from simulator.battery.score import load_score_context, score_store
 
-    from simulator import engine_local_config
-    from tests.binding_admission_fixtures import isolate_engine_local_config
-
-    source_path = engine_local_config.config_path()
-
-    def run_lunar_scenario(index):
-        with isolate_engine_local_config(
-            tmp_path / f"lunar-run-{index}", source_path=source_path
-        ):
-            runner["_run_scenario"](scenario)
-
-    for index in range(3):
-        _measure(
-            "lunar_mare_low_ti_C0_24h",
-            lambda index=index: run_lunar_scenario(index),
-        )
+    context = load_score_context()
+    _measure("score_store_full", lambda: score_store(context))
