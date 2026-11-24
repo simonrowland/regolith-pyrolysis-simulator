@@ -561,7 +561,7 @@ def test_prechange_winner_writer_matches_green_fixture(
         GREEN_PRECHANGE_WINNER_FIXTURE.read_text(encoding="utf-8")
     )
     record = replace(
-        _save_format_record(),
+        _save_format_record(cost_parameters=expected["cost_parameters"]),
         patch=RecipePatch.from_nested(expected),
     )
     out = _write_save_format_artifacts(
@@ -570,13 +570,6 @@ def test_prechange_winner_writer_matches_green_fixture(
         prepared_record=record,
     )
     actual = yaml.safe_load((out / "winner.recipe.yaml").read_text(encoding="utf-8"))
-    for document in (actual, expected):
-        source = document["cost_parameters"]["provenance"]["source"]
-        prefix, config_path = source.split("; base_config:", maxsplit=1)
-        assert config_path.endswith("/data/optimize_costs.yaml")
-        document["cost_parameters"]["provenance"]["source"] = (
-            f"{prefix}; base_config:<checkout>/data/optimize_costs.yaml"
-        )
     assert actual == expected
 
 

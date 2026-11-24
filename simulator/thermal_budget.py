@@ -2391,6 +2391,12 @@ def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
         ) from exc
 
 
+def furnace_power_trace_last_sample_s(trace: Mapping[str, Any]) -> float:
+    """Return the final measured-power time using the sampler's trace parser."""
+
+    return _power_trace_curve_s(trace)[-1][0]
+
+
 def solve_power_driven_melt_temperature_C(
     *,
     power_W: float,

@@ -89,10 +89,15 @@ def _step(manager, melt, step_index: int):
     return float(target), float(ramp), record, previous
 
 
-def _series(schedule, *, furnace_max_T_C: float = 1800.0):
+def _series(
+    schedule,
+    *,
+    furnace_max_T_C: float = 1800.0,
+    step_count: int = 59,
+):
     manager = _manager(schedule, furnace_max_T_C=furnace_max_T_C)
     melt = _melt()
-    return [_step(manager, melt, index) for index in range(59)]
+    return [_step(manager, melt, index) for index in range(step_count)]
 
 
 def _double_power(schedule) -> dict:
@@ -118,11 +123,37 @@ def _trace_watts_by_minute(trace) -> dict[float, float]:
     }
 
 
+def _assert_robinot_power_window_fits_trace(spec) -> None:
+    assert spec.step_count == 59
+    driver = spec.lab_schedule[FURNACE_POWER_DRIVER_KEY]
+    trace = driver["trace"]
+    fields = trace["point_fields"]
+    last_time_s = float(trace["points"][-1][fields.index("time_min")]) * 60.0
+    step_end_samples_s = [
+        index * spec.process_dt_s
+        for index in range(1, spec.step_count + 1)
+    ]
+    assert all(sample_s <= last_time_s for sample_s in step_end_samples_s), (
+        "measured-power window requests a sample beyond the trace"
+    )
+    assert step_end_samples_s[-1] == 59.0 * 60.0
+    notice = spec.provenance["power_window_notice"]
+    assert notice["kind"] == "typed_unknown"
+    assert notice["reason"] == (
+        "measured_power_trace_ends_before_declared_duration"
+    )
+    assert notice["declared_duration_s"] == 3600.0
+    assert notice["trace_last_sample_s"] == 59.5 * 60.0
+    assert notice["uncovered_tail_s"] == 30.0
+    assert notice["executed_duration_s"] == 59.0 * 60.0
+
+
 def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     spec = _load_preset_run_spec(_ROBINOT, "faithful")
     schedule = copy.deepcopy(spec.lab_schedule)
     assert spec.temperature_driver is TemperatureDriver.MEASURED_FURNACE_POWER
     assert spec.provenance["temperature_driver"] == spec.temperature_driver.value
+    _assert_robinot_power_window_fits_trace(spec)
     driver = schedule[FURNACE_POWER_DRIVER_KEY]
     assert driver["mass_kg"] == pytest.approx(0.00338)
     assert driver["exposed_area_m2"] is None
@@ -136,7 +167,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert driver["conductivity_W_m_K"] is None
     watts = _trace_watts_by_minute(driver["trace"])
 
-    rows = _series(schedule)
+    rows = _series(schedule, step_count=spec.step_count)
     temperatures = [row[0] for row in rows]
     assert all(math.isfinite(temperature) for temperature in temperatures)
     assert all(25.0 < temperature < 10000.0 for temperature in temperatures)
@@ -286,6 +317,21 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert observed[0]["source_class"] == "literature_sidecar"
     assert observed[0]["qualifier"] == "approximate_peak"
     assert reported_temperature_observations((record,)) == ()
+
+
+def test_robinot_power_window_pin_detects_unbracketed_duration_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setattr(
+        runner_module,
+        "furnace_power_trace_last_sample_s",
+        lambda _trace: 3600.0,
+    )
+    with pytest.raises(
+        runner_module.PresetRunnerError,
+        match="power_trace_does_not_bracket",
+    ):
+        _load_preset_run_spec(_ROBINOT, "faithful")
 
 
 def test_robinot_recipe_curve_takes_precedence_over_measured_power() -> None:

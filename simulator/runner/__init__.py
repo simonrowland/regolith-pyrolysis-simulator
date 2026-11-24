@@ -156,9 +156,12 @@ from simulator.lab_schedule import (
 from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
     PowerTemperatureRefusal,
+    TYPED_UNKNOWN,
     declared_benchtop_lengths_m,
+    furnace_power_trace_last_sample_s,
     furnace_power_driver_payload,
     measured_furnace_power_trace,
+    sample_furnace_power_W,
 )
 from simulator.recipe import (
     C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES,
@@ -728,6 +731,50 @@ def _load_vacuum_preset_run_spec(
     provenance["temperature_driver"] = temperature_driver.value
     if temperature_driver is TemperatureDriver.MEASURED_FURNACE_POWER:
         assert power_trace is not None
+        trace_end_s = furnace_power_trace_last_sample_s(power_trace)
+        requested_steps = hours
+        trace_limited_steps = min(
+            requested_steps,
+            math.floor(trace_end_s / timestep.dt_s),
+        )
+        if trace_limited_steps < 1:
+            raise PresetRunnerError(
+                "measured_power_trace_cannot_bracket_first_process_step",
+                provenance=provenance,
+            )
+        for sample_s in {
+            timestep.dt_s,
+            trace_limited_steps * timestep.dt_s,
+        }:
+            try:
+                sample_furnace_power_W(power_trace, sample_s)
+            except PowerTemperatureRefusal as exc:
+                raise PresetRunnerError(
+                    f"malformed_preset: {exc.reason}: measured power window",
+                    provenance=provenance,
+                ) from exc
+        if trace_limited_steps < requested_steps:
+            declared_duration_s = duration_h * float(PROCESS_HOUR_S)
+            executed_duration_s = trace_limited_steps * timestep.dt_s
+            provenance["power_window_notice"] = {
+                "kind": TYPED_UNKNOWN,
+                "reason": "measured_power_trace_ends_before_declared_duration",
+                "declared_duration_s": declared_duration_s,
+                "trace_last_sample_s": trace_end_s,
+                "uncovered_tail_s": declared_duration_s - trace_end_s,
+                "executed_duration_s": executed_duration_s,
+                "executed_step_count": trace_limited_steps,
+                "source": (
+                    "The measured power trace ends before the declared run "
+                    "duration; no power is extrapolated."
+                ),
+            }
+            provenance["executed_duration_h"] = (
+                executed_duration_s / float(PROCESS_HOUR_S)
+            )
+            hours = trace_limited_steps
+            provenance["step_count"] = trace_limited_steps
+            spec_step_count = trace_limited_steps
         try:
             exposed_area_m2 = read_gram_lab_exposed_melt_area(geometry)
         except LabGeometryError as exc:

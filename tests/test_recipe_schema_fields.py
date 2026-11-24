@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.cost_parameters as cost_parameters_module
 from simulator.lab_geometry import parse_lab_geometry
 from simulator.recipe import RecipePatch, RecipeSchema, RecipeValidationError
 from simulator.recipe_io import load_recipe_patch, write_recipe_patch
@@ -66,6 +67,72 @@ def test_green_recipe_fixtures_keep_load_save_parity(
     saved_path = tmp_path / fixture_path.name
     write_recipe_patch(saved_path, loaded)
     assert load_recipe_patch(saved_path) == loaded
+
+
+def test_green_starter_save_bytes_match_the_captured_fixture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(tmp_path)
+    virtual_checkout = Path("<checkout>")
+    cost_path = virtual_checkout / "data" / "optimize_costs.yaml"
+    cost_path.parent.mkdir(parents=True)
+    cost_path.write_bytes((ROOT / "data" / "optimize_costs.yaml").read_bytes())
+    monkeypatch.setattr(
+        cost_parameters_module,
+        "DEFAULT_COST_PARAMETERS_PATH",
+        cost_path,
+    )
+    saved_path = (
+        virtual_checkout / "data" / "recipes" / "starter.recipe.yaml"
+    )
+
+    write_recipe_patch(saved_path, load_recipe_patch(GREEN_STARTER_FIXTURE))
+
+    assert saved_path.read_bytes() == GREEN_STARTER_FIXTURE.read_bytes()
+
+
+def _assert_setpoint_document_contains(
+    actual: dict,
+    expected: dict,
+    path: tuple[str, ...] = (),
+) -> None:
+    for key, expected_value in expected.items():
+        current_path = (*path, key)
+        if isinstance(expected_value, dict):
+            assert isinstance(actual.get(key), dict), ".".join(current_path)
+            _assert_setpoint_document_contains(
+                actual[key],
+                expected_value,
+                current_path,
+            )
+        else:
+            assert actual.get(key) == expected_value, ".".join(current_path)
+
+
+def test_green_starter_fixture_keeps_runner_hours_feedstock_and_setpoints() -> None:
+    # Load the backend module first to avoid the thermal_budget import cycle
+    # exercised by the runner's public entry.
+    import engines.builtin.vapor_pressure
+    from simulator.runner import PyrolysisRun
+
+    fixture = yaml.safe_load(GREEN_STARTER_FIXTURE.read_bytes())
+    loaded = load_recipe_patch(GREEN_STARTER_FIXTURE)
+    expected_setpoints = RecipeSchema().to_setpoints_patch(
+        RecipePatch.from_nested(fixture)
+    )
+    hours = fixture["campaigns"]["C2A_continuous"]["max_hold_hr"]
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        hours=hours,
+        setpoints_patch=loaded,
+    )
+
+    config = run._session_config()
+
+    assert config.hours == hours
+    assert config.feedstock_id == "lunar_mare_low_ti"
+    _assert_setpoint_document_contains(config.setpoints, expected_setpoints)
 
 
 def test_lab_schedule_and_source_tags_round_trip_without_losing_knots(

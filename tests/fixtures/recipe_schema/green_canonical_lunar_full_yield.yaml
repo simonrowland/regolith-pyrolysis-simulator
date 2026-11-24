@@ -99,9 +99,9 @@ cost_parameters:
           source_tag: earth_price_pending_immaterial_vs_delivery
           value: 0.0
   provenance:
-    source: default:owner-t7-two-price-energy-v1; base_config:/Users/simonrowland/.goal-flight/remote-ci-managed/tmp/354dd8442c044d1bba0dd68f24bee308/regolith-pytest-worker-cache/checkout/gw0-regolith-56fd8bcdd98b3a76f0d17039e005d19d/tmp/bench1-green-capture-66u9k11m/data/optimize_costs.yaml
+    source: default:owner-t7-two-price-energy-v1; base_config:<checkout>/data/optimize_costs.yaml
     defaults_applied: true
-    recipe_source: /Users/simonrowland/.goal-flight/remote-ci-managed/tmp/354dd8442c044d1bba0dd68f24bee308/pytest-of-simonrowland/pytest-0/popen-gw0/magemin-openmpi/tmpus_dod17/starter.recipe.yaml
+    recipe_source: <checkout>/data/recipes/starter.recipe.yaml
 campaigns:
   C2A_continuous:
     dT_dt_C_per_hr:
