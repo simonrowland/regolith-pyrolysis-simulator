@@ -1152,6 +1152,7 @@ def test_internal_analytical_equilibrium_ok_paths_are_vapor_only_without_liquid_
     assert hot.liquid_fraction is None
     assert hot.phase_assemblage_available is False
     assert hot.vapor_pressures_Pa
+    assert set(hot.vapor_pressures_source) == set(hot.vapor_pressures_Pa)
 
 
 def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
