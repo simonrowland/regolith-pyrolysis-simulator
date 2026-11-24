@@ -252,6 +252,87 @@ def test_sidecar_formats_and_null_extract_fallback(tmp_path, monkeypatch, format
     assert all(value is None for value in row["corpus"].values())
 
 
+def test_builder_uses_extract_citation_doi_before_work_doi(monkeypatch, tmp_path):
+    monkeypatch.setattr(builder, "load_extracts", lambda root: {
+        "extract-doi": {"doc": {"source": {"citation": "Paper DOI: 10.9999/extract"}}, "files": []}
+    })
+    monkeypatch.setattr(builder, "load_pdfs", lambda root: {})
+    monkeypatch.setattr(builder, "load_work_metadata", lambda root: {
+        "extract-doi": {"citation": "Fallback citation", "doi": "10.9999/work"}
+    })
+    monkeypatch.setattr(builder, "load_consumers", lambda root: ([], []))
+    monkeypatch.setattr(builder, "git_tracked_set", lambda root: ("not-git", None))
+    monkeypatch.setattr(builder, "walk_private_roots", lambda root, paths: ([], [], {}))
+    monkeypatch.setattr(builder, "build_alias_map", lambda *args: ({}, []))
+
+    row = builder.build_index(tmp_path)["sources"][0]
+    assert row["doi"] == "10.9999/extract"
+
+
+def test_extract_citation_doi_mutation_is_detected(monkeypatch, tmp_path):
+    """Mutation probe: a later work DOI must not replace the resolved extract DOI."""
+    monkeypatch.setattr(builder, "load_extracts", lambda root: {
+        "extract-doi": {"doc": {"source": {"citation": "Paper DOI: 10.9999/extract"}}, "files": []}
+    })
+    monkeypatch.setattr(builder, "load_pdfs", lambda root: {})
+    monkeypatch.setattr(builder, "load_work_metadata", lambda root: {
+        "extract-doi": {"citation": "Fallback citation", "doi": "10.9999/work"}
+    })
+    monkeypatch.setattr(builder, "load_consumers", lambda root: ([], []))
+    monkeypatch.setattr(builder, "git_tracked_set", lambda root: ("not-git", None))
+    monkeypatch.setattr(builder, "walk_private_roots", lambda root, paths: ([], [], {}))
+    monkeypatch.setattr(builder, "build_alias_map", lambda *args: ({}, []))
+    original = builder.build_index
+
+    def mutated(root, **kwargs):
+        rows = original(root, **kwargs)
+        rows["sources"][0]["doi"] = "10.9999/work"
+        return rows
+
+    monkeypatch.setattr(builder, "build_index", mutated)
+    with pytest.raises(AssertionError):
+        assert builder.build_index(tmp_path)["sources"][0]["doi"] == "10.9999/extract"
+
+
+def test_work_metadata_rejects_empty_assets_and_accepts_typed_placeholder(tmp_path):
+    works = tmp_path / "data/literature/works"
+    works.mkdir(parents=True)
+    empty = {
+        "schema_version": "battery_work.v2.1",
+        "work": {"source_ids": ["empty"], "citation": "Empty", "source_files": {"files": []}},
+        "experiments": [], "context": [],
+    }
+    placeholder = {
+        "schema_version": "battery_work.v2.1",
+        "work": {"source_ids": ["placeholder"], "citation": "Placeholder", "source_files": {
+            "files": [{"asset_id": "unknown:placeholder", "role": "pdftotext", "path": "unknown"}]
+        }},
+        "experiments": [], "context": [],
+    }
+    (works / "empty.yaml").write_text(yaml.safe_dump(empty))
+    (works / "placeholder.yaml").write_text(yaml.safe_dump(placeholder))
+
+    metadata = builder.load_work_metadata(tmp_path)
+    assert "empty" not in metadata
+    assert metadata["placeholder"]["citation"] == "Placeholder"
+
+
+def test_empty_asset_mutation_is_detected(monkeypatch, tmp_path):
+    """Mutation probe: admitting an empty asset list violates the loader contract."""
+    original = builder.load_work_metadata
+    works = tmp_path / "data/literature/works"
+    works.mkdir(parents=True)
+    (works / "empty.yaml").write_text(yaml.safe_dump({
+        "schema_version": "battery_work.v2.1",
+        "work": {"source_ids": ["empty"], "citation": "Empty", "source_files": {"files": []}},
+        "experiments": [], "context": [],
+    }))
+    assert "empty" not in original(tmp_path)
+    monkeypatch.setattr(builder, "load_work_metadata", lambda root: {"empty": {"citation": "Empty"}})
+    with pytest.raises(AssertionError):
+        assert "empty" not in builder.load_work_metadata(tmp_path)
+
+
 def test_heading_no_doi_and_primary_file_table(tmp_path):
     path = tmp_path / "paper.md"
     path.write_text("## DOI\n\n`doi: null`\n\nFailed guess https://doi.org/10.9999/wrong\n\n"
