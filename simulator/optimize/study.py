@@ -124,6 +124,7 @@ from simulator.optimize.save_bundle import MEMBER_SCHEMA_VERSION, SAVE_SCHEMA_VE
 from simulator.optimize.results_store import (
     ResultStore,
     ResultStoreWriteRejected,
+    study_results_write_lock_path,
     _deserialize_eval_spec,
     _deserialize_margins,
     _deserialize_objectives,
@@ -494,17 +495,6 @@ class StudyReplayResult:
         object.__setattr__(self, "strategy_state", MappingProxyType(dict(self.strategy_state)))
 
 
-def _study_write_lock_path(out: Path) -> Path:
-    """Shared commit lock for cache.sqlite plus materialized study artifacts.
-
-    Evaluations run outside this lock. Final artifact files are latest snapshots
-    for the run directory, so concurrent finishers serialize and the later
-    completed artifact commit wins.
-    """
-
-    return out / ".study-results.write.lock"
-
-
 class _LockedLineWriter:
     def __init__(self, path: Path, mode: str, store: ResultStore) -> None:
         if mode not in {"a", "w", "r"}:
@@ -654,7 +644,7 @@ def run(
     _prepare_out_dir(out)
     store = result_store or ResultStore(
         out / "cache.sqlite",
-        write_lock_path=_study_write_lock_path(out),
+        write_lock_path=study_results_write_lock_path(out),
     )
     warm_start_source = _resolve_warm_start_source(
         resolved_profile,
@@ -1266,7 +1256,7 @@ def run_certify(
     _prepare_out_dir(out)
     store = ResultStore(
         out / "cache.sqlite",
-        write_lock_path=_study_write_lock_path(out),
+        write_lock_path=study_results_write_lock_path(out),
     )
     source = ResultStore(Path(source_store))
     stored = source.fetch(certify_cache_key)

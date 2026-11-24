@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import argparse
 from datetime import UTC, datetime
-import glob
 import json
+import os
 from pathlib import Path
 import sys
 from typing import Sequence
@@ -28,8 +28,10 @@ from simulator.optimize.study import (
     run,
     run_certify,
 )
-from simulator.corpus_version import current_corpus_version
-from simulator.optimize.results_store import ResultStore
+from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
+from simulator.optimize.discovery import optimizer_run_dirs
+from simulator.optimize.import_bundle import IMPORTED_DIR_NAME, is_imported_path
+from simulator.optimize.results_store import ResultStore, study_results_write_lock_path
 
 
 JOB_STATUS_NAME = "job_status.json"
@@ -126,22 +128,42 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
     parser.add_argument("--keep-corpus-version", default=None)
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
-    keep_version = args.keep_corpus_version or current_corpus_version()
-    stores = args.store or [
-        Path(path) for path in sorted(glob.glob("runs/*/cache.sqlite"))
-    ]
+    keep_versions = (
+        (args.keep_corpus_version,)
+        if args.keep_corpus_version
+        else tuple(interoperable_corpus_versions())
+    )
+    runs_root = Path(os.environ.get("OPTIMIZER_RUNS_DIR") or Path.cwd() / "runs").expanduser()
+    stores = args.store or [path / "cache.sqlite" for path in optimizer_run_dirs(runs_root)]
     report = {
-        "keep_corpus_version": keep_version,
+        "keep_corpus_version": args.keep_corpus_version or current_corpus_version(),
+        "keep_corpus_versions": list(keep_versions),
         "mode": "apply" if args.apply else "dry-run",
         "stores": [],
     }
     for path in stores:
         if not path.is_file():
             raise FileNotFoundError(f"optimizer result store not found: {path}")
-        result_store = ResultStore(path)
-        counts = result_store.prune_stale_corpus_version(
-            keep_version, apply=args.apply
+        is_archive = (
+            is_imported_path(path, runs_root)
+            or any(
+                parent.name == IMPORTED_DIR_NAME and is_imported_path(path, parent.parent)
+                for parent in path.resolve().parents
+            )
         )
+        if is_archive:
+            report["stores"].append(
+                {"store": str(path), "artifact_kind": "archive", "status": "skipped"}
+            )
+            continue
+        if args.apply:
+            result_store = ResultStore(
+                path,
+                write_lock_path=study_results_write_lock_path(path.parent),
+            )
+            counts = result_store.prune_stale_corpus_version(keep_versions, apply=True)
+        else:
+            counts = ResultStore.count_stale_corpus_versions(path, keep_versions)
         report["stores"].append(
             {
                 "store": str(path),
@@ -153,6 +175,9 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
     if not report["stores"]:
         print("No optimizer result stores found.")
     for entry in report["stores"]:
+        if entry["artifact_kind"] == "archive":
+            print(f"{entry['store']} archive: skipped (hash-indexed import)")
+            continue
         action = "deleted" if args.apply else "would delete"
         print(
             f"{entry['store']} result_rows: {action} {entry['stale']} stale; "

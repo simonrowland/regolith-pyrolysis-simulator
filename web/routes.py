@@ -74,6 +74,11 @@ from simulator.mre_ladder import (
     preset_catalog as build_mre_preset_catalog,
 )
 from simulator.optimize import job_runner as optimizer_job_runner
+from simulator.optimize.discovery import (
+    OPTIMIZER_CACHE_NAME,
+    OPTIMIZER_JOBS_DIR_NAME,
+    optimizer_run_dirs as _optimizer_run_dirs,
+)
 from simulator.optimize.job_runner import _version_badge
 from simulator.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import current_code_version
@@ -145,7 +150,6 @@ THERMAL_TRAIN_DEFAULT_ARTIFACT_SCHEMA = 'thermal-train-default-artifact-v2'
 THERMAL_TRAIN_DEFAULT_ARTIFACT_PATH = (
     DATA_DIR / 'fixtures' / 'thermal_train' / 'default-v2.json'
 )
-OPTIMIZER_CACHE_NAME = 'cache.sqlite'
 OPTIMIZER_ARTIFACT_NAMES = (
     OPTIMIZER_CACHE_NAME,
     'study.manifest.json',
@@ -158,7 +162,6 @@ OPTIMIZER_ARTIFACT_NAMES = (
     'search_provenance.json',
     'provenance.jsonl',
 )
-OPTIMIZER_JOBS_DIR_NAME = 'jobs'
 OPTIMIZER_JOB_STRATEGIES = ('random', 'screen', 'bayes', 'nsga2', 'staged')
 OPTIMIZER_JOB_FIDELITIES = (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -343,40 +346,6 @@ def _submit_optimizer_job(
         if open_jobs >= _optimizer_job_queue_cap():
             return None, 'optimizer job queue is full'
         return runner.submit(job_request), None
-
-
-def _optimizer_run_dirs(root: Path) -> list[Path]:
-    if not root.exists():
-        return []
-
-    run_dirs: list[Path] = []
-    if (root / OPTIMIZER_CACHE_NAME).is_file() and not is_imported_path(root, root):
-        run_dirs.append(root)
-
-    for child in sorted(root.iterdir()):
-        if (
-            child.is_dir()
-            and not is_imported_path(child, root)
-            and (child / OPTIMIZER_CACHE_NAME).is_file()
-        ):
-            run_dirs.append(child)
-
-    jobs_root = root / OPTIMIZER_JOBS_DIR_NAME
-    if jobs_root.is_dir():
-        for child in sorted(jobs_root.iterdir()):
-            if (
-                child.is_dir()
-                and not is_imported_path(child, root)
-                and (child / OPTIMIZER_CACHE_NAME).is_file()
-            ):
-                run_dirs.append(child)
-
-    unique = {path.resolve(): path for path in run_dirs}
-    return sorted(
-        unique.values(),
-        key=lambda path: (path.stat().st_mtime, path.name),
-        reverse=True,
-    )
 
 
 def _sqlite_uri(path: Path) -> str:
