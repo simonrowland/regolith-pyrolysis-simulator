@@ -12,10 +12,29 @@ This module calls that function. It does not reimplement it.
 saturation floor that also imported the vapour-pressure provider would
 cycle. Si, Cr, Ti, Mn, and Ni use the Ellingham standard Gibbs energy
 already in ``simulator.chemistry.ellingham_thermo``. No new thermo is
-added here. Na, K, and Mg are gas on that owner at furnace temperature,
-so they have no condensed floor. Al, Ca, and P are not in the named set:
-P in particular has ``n_ox = 1/5``, so a trace of P2O5 still sits above
-the Si line and would hide the shuttle case.
+added here. Na and K are gas throughout the furnace band. Mg is gas
+above its JANAF boiling point (1366.104 K), but its condensed interval
+is below the float guard: at 1300 K the Mg-010 row gives
+``ΔG° = -1229.485036627 - 1300 × (-0.240695156636) = -916.581333``
+kJ/mol O2, so for the pure-MgO line
+``log10(fO2/bar) = -916581.333 / (8.31446261815324 × 1300 × ln(10)) = -36.827970``.
+That is 6.827970 dex below the ``1e-30`` bar guard
+(``log10 = -30``); ``a_MgO < 1`` moves the line lower by
+``2 log10(a_MgO)``. The condensed-Mg window is therefore not represented
+by this floor owner.
+
+Mn's JANAF phase intervals record liquid Mn through 2334.526 K and
+ideal-gas Mn above it, but the available Ellingham fit segments remain
+the reconstructed ``Mn(l) + O2 -> MnO(s)`` line through 2600 K.
+``ellingham_metal_phase_kind`` follows that fitted reaction basis and
+therefore still says condensed above the boiling point. Changing only
+the rail classification would combine a liquid-basis ΔG with a gas
+pressure rail; this owner has no matching gas-basis MnO formation fit,
+so the above-boiling Mn classification remains a documented limitation.
+
+Al, Ca, and P are not in the named set: P in particular has
+``n_ox = 1/5``, so a trace of P2O5 still sits above the Si line and
+would hide the shuttle case.
 
 The 1e-30 bar value in ``MELT_DISSOCIATION_PO2_MIN_BAR`` is a float
 guard inside ``physical_melt_dissociation_pO2_bar``. It is not a melt
