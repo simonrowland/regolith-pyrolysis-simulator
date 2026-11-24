@@ -245,37 +245,56 @@ def _compact_observation_ids(observation_ids: list[str]) -> list[dict[str, objec
     remaining = set(observation_ids)
     compact = []
     while remaining:
-        templates: dict[str, list[tuple[int, str]]] = {}
+        templates: dict[str, list[tuple[tuple[str, ...], str]]] = {}
         for observation_id in sorted(remaining):
-            for match in re.finditer(r"\d+", observation_id):
-                template = (
-                    observation_id[:match.start()]
-                    + "{n}"
-                    + observation_id[match.end():]
-                )
-                templates.setdefault(template, []).append((int(match.group()), observation_id))
+            matches = list(re.finditer(r"\d+", observation_id))
+            if not matches:
+                continue
+            pieces = []
+            numbers = []
+            previous = 0
+            for match in matches:
+                pieces.extend((observation_id[previous:match.start()], "{n}"))
+                numbers.append(match.group())
+                previous = match.end()
+            pieces.append(observation_id[previous:])
+            template = "".join(pieces)
+            templates.setdefault(template, []).append((tuple(numbers), observation_id))
         candidates = {
             template: members
             for template, members in templates.items()
-            if len({observation_id for _, observation_id in members}) > 1
+            if len(members) > 1
         }
         if not candidates:
             break
         template, members = max(
             candidates.items(),
-            key=lambda item: len({observation_id for _, observation_id in item[1]}),
+            key=lambda item: len(item[1]),
         )
-        numbers = sorted({number for number, _ in members})
-        ranges = []
-        start = previous = numbers[0]
-        for number in numbers[1:]:
-            if number == previous + 1:
-                previous = number
-                continue
+        number_tuples = sorted({numbers for numbers, _ in members})
+        one_numeric_token = all(len(numbers) == 1 for numbers in number_tuples)
+        canonical_numbers = one_numeric_token and all(
+            number == "0" or not number.startswith("0")
+            for numbers in number_tuples
+            for number in numbers
+        )
+        if canonical_numbers:
+            numbers = sorted(int(number_tuple[0]) for number_tuple in number_tuples)
+            ranges = []
+            start = previous = numbers[0]
+            for number in numbers[1:]:
+                if number == previous + 1:
+                    previous = number
+                    continue
+                ranges.append(str(start) if start == previous else f"{start}-{previous}")
+                start = previous = number
             ranges.append(str(start) if start == previous else f"{start}-{previous}")
-            start = previous = number
-        ranges.append(str(start) if start == previous else f"{start}-{previous}")
-        compact.append({"template": template, "numbers": ranges})
+            compact.append({"template": template, "numbers": ranges})
+        else:
+            compact.append({
+                "template": template,
+                "values": [list(numbers) for numbers in number_tuples],
+            })
         remaining.difference_update(observation_id for _, observation_id in members)
     if remaining:
         compact.append({"ids": sorted(remaining)})
