@@ -1,5 +1,7 @@
 """Formula-owner pins for corpus spellings that cross formula syntax branches."""
 
+import re
+
 import pytest
 
 from simulator.accounting.exceptions import UnknownSpeciesError
@@ -31,6 +33,37 @@ def test_parse_corpus_adducts_and_adjacent_parenthesized_groups() -> None:
 
 def test_unlisted_ascii_dot_suffix_is_not_an_adduct() -> None:
     assert not _is_ascii_adduct("CaAl.SiCK")
+
+
+def test_valid_trailing_zero_decimal_subscript_and_malformed_adduct() -> None:
+    assert dict(parse_formula("FeO1.0").elements) == {"Fe": 1.0, "O": 1.0}
+    assert not _is_ascii_adduct("FeO1.0")
+    for formula in ("3Al2O3.0SiO2", "3Al2O3.0", "3Al2O3..2SiO2"):
+        assert not _is_ascii_adduct(formula)
+
+
+def test_old_trailing_zero_mutation_fails_valid_subscript_assertion(monkeypatch) -> None:
+    from simulator.accounting import formulas as formula_owner
+
+    real_check = formula_owner._has_malformed_ascii_adduct
+
+    def old_check(formula: str) -> bool:
+        return real_check(formula) or any(
+            re.search(r"\.0+$", segment)
+            for segment in formula.split("·")
+        )
+
+    monkeypatch.setattr(formula_owner, "_has_malformed_ascii_adduct", old_check)
+
+    def assert_valid_decimal() -> None:
+        try:
+            actual = dict(parse_formula("FeO1.0").elements)
+        except UnknownSpeciesError as exc:
+            raise AssertionError("valid trailing-zero decimal subscript was rejected") from exc
+        assert actual == {"Fe": 1.0, "O": 1.0}
+
+    with pytest.raises(AssertionError):
+        assert_valid_decimal()
 
 
 def test_ascii_adduct_recognizer_rejects_malformed_parts() -> None:

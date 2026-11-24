@@ -6,6 +6,7 @@ import json
 import re
 from dataclasses import replace
 from decimal import Decimal
+from inspect import getsource
 from pathlib import Path
 
 import pytest
@@ -490,6 +491,47 @@ def _assert_rejected_span_boundary_refuses() -> None:
 
 def test_rejected_span_does_not_join_neighboring_text() -> None:
     _assert_rejected_span_boundary_refuses()
+
+
+@pytest.mark.parametrize("name", ["TEST Ag($Kg_{3}$)", "TEST ($Kg_{3}$)Ag"])
+def test_rejected_span_keeps_separate_formula_tokens(name: str) -> None:
+    formula, _charge = generator._formula_from_name(name)
+    assert formula == "Ag"
+
+
+def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatch) -> None:
+    source = getsource(generator._formula_from_name).replace(
+        "name[cursor].isspace() or name[cursor] in \"()\"",
+        "name[cursor - 1].isspace()",
+    )
+    namespace = vars(generator).copy()
+    exec(source, namespace)
+    old_formula_from_name = namespace["_formula_from_name"]
+    monkeypatch.setattr(generator, "_formula_from_name", old_formula_from_name)
+    with pytest.raises(AssertionError):
+        assert generator._formula_from_name("TEST Ag($Kg_{3}$)")[0] == "Ag"
+
+
+def test_generator_preserves_explicit_decimal_subscript_for_accounting(monkeypatch) -> None:
+    from simulator.accounting.formulas import parse_formula
+
+    source = r"$Fe_{1.5}SiO_{2}$"
+    formula, charge = generator._formula_from_name(f"TEST {source}")
+    assert charge is None
+    assert formula is not None
+    assert dict(parse_formula(formula).elements) == {"Fe": 1.5, "O": 2.0, "Si": 1.0}
+
+    namespace = vars(generator).copy()
+    old_latex_to_formula = getsource(generator._latex_to_formula).replace(
+        "lambda match: match.group(0)\n        if \".\" in (match.group(1) or match.group(2) or \"\")\n        else (match.group(1) or match.group(2))",
+        "lambda match: match.group(1) or match.group(2)",
+    )
+    exec(old_latex_to_formula, namespace)
+    monkeypatch.setattr(generator, "_latex_to_formula", namespace["_latex_to_formula"])
+    with pytest.raises(AssertionError):
+        old_formula, _ = generator._formula_from_name(f"TEST {source}")
+        assert old_formula is not None
+        assert dict(parse_formula(old_formula).elements) == {"Fe": 1.5, "O": 2.0, "Si": 1.0}
 
 
 def _row_name_and_weight(record: dict, index: int) -> tuple[str, str | None]:

@@ -792,7 +792,12 @@ def _latex_to_formula(chunk: str) -> tuple[str, int | None]:
             charge = -1
         chunk = chunk[: superscript.start()] + chunk[superscript.end() :]
     chunk = chunk.replace(r"\cdot", "·").replace(r"\mathrm", "")
-    chunk = _LATEX_SUB_RE.sub(lambda match: match.group(1) or match.group(2), chunk)
+    chunk = _LATEX_SUB_RE.sub(
+        lambda match: match.group(0)
+        if "." in (match.group(1) or match.group(2) or "")
+        else (match.group(1) or match.group(2)),
+        chunk,
+    )
     chunk = chunk.replace("{", "").replace("}", "").replace("\\", "")
     chunk = chunk.replace(" ", "")
     return chunk, charge
@@ -874,16 +879,24 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
     for start, end in rejected:
         segment = name[cursor:start]
         segment_tokens = segment.replace("(", " ").replace(")", " ").split()
-        if cursor > 0 and not name[cursor - 1].isspace() and segment_tokens:
+        if (
+            cursor < len(name)
+            and not (name[cursor].isspace() or name[cursor] in "()")
+            and segment_tokens
+        ):
             boundary_tokens[token_count] = segment_tokens[0]
-        if start > cursor and not name[start - 1].isspace() and segment_tokens:
+        if (
+            start > cursor
+            and not (name[start - 1].isspace() or name[start - 1] in "()")
+            and segment_tokens
+        ):
             boundary_tokens[token_count + len(segment_tokens) - 1] = segment_tokens[-1]
         fallback_parts.append(segment)
         token_count += len(segment_tokens)
         cursor = end
     tail = name[cursor:]
     tail_tokens = tail.replace("(", " ").replace(")", " ").split()
-    if rejected and tail and not tail[0].isspace() and tail_tokens:
+    if rejected and tail and not (tail[0].isspace() or tail[0] in "()") and tail_tokens:
         boundary_tokens[token_count] = tail_tokens[0]
     fallback_parts.append(tail)
     fallback = " ".join(fallback_parts)
