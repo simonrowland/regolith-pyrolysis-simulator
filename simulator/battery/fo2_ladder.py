@@ -50,6 +50,7 @@ from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
 )
 from simulator.battery.oxygen_balance import _cell_oxygen_class
+from simulator.battery.source_declarations import source_rule_enabled
 from simulator.battery.records import (
     Composition,
     Experiment,
@@ -58,7 +59,6 @@ from simulator.battery.records import (
     Value,
     nominal_pressure_pa,
 )
-from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,
@@ -315,7 +315,7 @@ def resolve_row_fo2(
             )
     if (
         observation is not None
-        and observation.source_id == "rego-1985-na2o-sio2-transpiration"
+        and source_rule_enabled(observation.source_id, "rego_c_co_cover")
         and identity is not None
         and getattr(identity.species, "formula", None) == "Na"
         and quantity is Quantity.P_PARTIAL
@@ -436,7 +436,9 @@ def _rys_oxygen_measurement_status(
     identity = _identity(observation)
     if (
         observation is None
-        or observation.source_id != RYS_SOURCE_ID
+        or not source_rule_enabled(
+            observation.source_id, "oxygen_measurement_status_required"
+        )
         or identity is None
         or getattr(identity.species, "formula", None) != "Na"
         or (quantity or quantity_token(identity)) is not Quantity.P_PARTIAL
