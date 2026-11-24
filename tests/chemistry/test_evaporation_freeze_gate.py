@@ -664,13 +664,9 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         # after readback the gate held the C0 curve all day. Each record is a
         # committed rebuild; hours that do not move the cache key add none.
         'lunar_mare_low_ti_C0_24h': [
-            (
-                'C0',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                918.75,
-                1370.3125,
-                ((918.75, 0.0), (1370.3125, 1.0)),
-            ),
+            # The startup C0 forecast clone now solves this key through the
+            # shared gate memo (gmemo car). The live C0 hour is a memo hit
+            # with the identical curve, so no rebuild is recorded.
             (
                 'C0B',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
