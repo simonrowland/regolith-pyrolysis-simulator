@@ -1553,11 +1553,30 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     unlocated_rows = [
         (
             row.observation_id,
-            row.identity.temperature_K,
-            row.identity.fO2_Pa,
-            row.identity.composition,
-            row.point_conditions.get("temperature_K"),
-            row.point_conditions.get("fO2_log"),
+            [
+                field
+                for field, present in (
+                    ("quantity", row.identity.quantity.is_value and row.identity.quantity.value is Quantity.FE3_FE2_RATIO),
+                    ("identity_temperature", row.identity.temperature_K.is_value),
+                    ("fO2_pressure", row.identity.fO2_Pa.is_value),
+                    (
+                        "composition",
+                        row.identity.composition.is_value
+                        and isinstance(row.identity.composition.value, Composition),
+                    ),
+                    (
+                        "located_temperature_condition",
+                        "temperature_K" in row.point_conditions
+                        and row.point_conditions["temperature_K"].state.is_value,
+                    ),
+                    (
+                        "located_fO2_condition",
+                        "fO2_log" in row.point_conditions
+                        and row.point_conditions["fO2_log"].state.is_value,
+                    ),
+                )
+                if not present
+            ],
         )
         for row in rows
         if not (

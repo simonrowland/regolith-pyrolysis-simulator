@@ -74,12 +74,19 @@ def assert_residue_score_cache_equivalence(
         numeric_ti_row = False
         for row in rows:
             payload = json.loads(row)
-            request = payload.get("candidate_request")
+            candidate = payload.get("candidate_observation")
+            identity = (
+                candidate.get("identity")
+                if isinstance(candidate, Mapping)
+                else None
+            )
+            species = identity.get("species") if isinstance(identity, Mapping) else None
             numeric = payload.get("numeric")
             if (
-                isinstance(request, Mapping)
-                and request.get("experiment_id") == test_experiment_ids[0]
-                and "_ti_" in str(payload.get("key") or "").casefold()
+                isinstance(candidate, Mapping)
+                and candidate.get("experiment_id") == test_experiment_ids[0]
+                and isinstance(species, Mapping)
+                and species.get("formula") == "Ti"
                 and isinstance(numeric, Mapping)
                 and numeric.get("value") is not None
             ):
