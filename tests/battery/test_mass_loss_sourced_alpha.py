@@ -1118,7 +1118,7 @@ def test_redox_fallback_flag_reaches_mass_loss_prediction(
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_full_prediction_refuses_non_negligible_unsourced_channel(
-    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
+    r11_inputs, prescribed_pressure_engine,
 ):
     row, experiment = r11_inputs
     prescribed_pressure_engine["unsourced_ca"] = True
@@ -1130,21 +1130,32 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
     assert detail["bound_fraction"] > 0.01
     assert detail["unsourced_channels"] == ["Ca"]
 
-    # The fixture has 215 one-minute steps and 48 integration endpoints.
-    # Its CaO inventory supports the unsourced-Ca corner for 212 of those
-    # checks; each has two ordinary corners and one negative-exponent cap
-    # corner. Each of 263 step/endpoint checks adds one all-on root solve.
-    # The end-of-schedule diagnostic adds one final neighbour-only audit after
-    # the 48 per-integration endpoints.
-    step_count = 60 + 25 + 20 + 20 + 90
-    endpoint_count = 1 + 25 + 20 + 1 + 1
-    active_corner_checks = 212
-    corners_per_check = 2 + 1
-    expected_corners = active_corner_checks * corners_per_check
-    expected_roots = expected_corners + step_count + endpoint_count
+    # The schedule's 25 + 20 + 20 + 90 point steps have two corners each:
+    # only unsourced Ca is targeted, and its lone negative-exponent cap reuses
+    # the already-solved vector. The 47 point endpoints (25 + 20 + 1 + 1)
+    # have three each: those same two corners plus one Ca neighbour flip.
+    # The 60 preheat-rectangle steps have three each because the rectangle also
+    # targets sourced Mg. Its one endpoint has five: three primary corners,
+    # plus one neighbour flip for each of Ca and Mg.
+    point_steps = 25 + 20 + 20 + 90
+    point_endpoint_count = 25 + 20 + 1 + 1
+    preheat_steps = 60
+    preheat_endpoint_count = 1
+    expected_corners = (
+        point_steps * 2
+        + point_endpoint_count * 3
+        + preheat_steps * 3
+        + preheat_endpoint_count * 5
+    )
+    # Every step and endpoint call also performs one all-on solve.
+    number_of_calls = (
+        point_steps + point_endpoint_count + preheat_steps + preheat_endpoint_count
+    )
+    expected_roots = expected_corners + number_of_calls
+    expected_neighbours = point_endpoint_count * 1 + preheat_endpoint_count * 2
     assert detail["corner_evaluations"] == expected_corners, detail
     assert detail["corner_root_solves"] == expected_roots, detail
-    assert detail["corner_neighbour_evaluations"] == endpoint_count + 1, detail
+    assert detail["corner_neighbour_evaluations"] == expected_neighbours, detail
 
 
 @pytest.mark.engine_cache_off
@@ -1154,19 +1165,17 @@ def test_corner_counter_oracle_rejects_dropped_step_callback(
     """Mutation probe: a lost integration callback must fail the fixture oracle."""
     import simulator.battery.residue as residue
 
-    row, experiment = r11_inputs
-    prescribed_pressure_engine["unsourced_ca"] = True
     original_integrate = residue._hashimoto_integrate_geometry
+    dropped_callback = False
 
     def drop_first_step_callback(*args, **kwargs):
+        nonlocal dropped_callback
         callback = kwargs.get("on_step")
-        if callback is not None:
-            skipped = False
-
+        if callback is not None and not dropped_callback:
             def mutant_callback(*callback_args, **callback_kwargs):
-                nonlocal skipped
-                if not skipped:
-                    skipped = True
+                nonlocal dropped_callback
+                if not dropped_callback:
+                    dropped_callback = True
                     return None
                 return callback(*callback_args, **callback_kwargs)
 
@@ -1174,11 +1183,11 @@ def test_corner_counter_oracle_rejects_dropped_step_callback(
         return original_integrate(*args, **kwargs)
 
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", drop_first_step_callback)
-    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    detail = json.loads(prediction.refusal_detail["detail"])
-    expected_corner_evaluations = 212 * 3
     with pytest.raises(AssertionError):
-        assert detail["corner_evaluations"] == expected_corner_evaluations
+        test_full_prediction_refuses_non_negligible_unsourced_channel(
+            r11_inputs, prescribed_pressure_engine
+        )
+    assert dropped_callback
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
