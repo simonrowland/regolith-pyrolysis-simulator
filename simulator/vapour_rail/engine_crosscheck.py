@@ -67,7 +67,7 @@ DEFAULT_VAPOR_PRESSURE_PATH: Final[Path] = (
 DEFAULT_FEEDSTOCK_ID: Final[str] = "lunar_mare_low_ti"
 DEFAULT_FO2_LOG10_BAR: Final[tuple[float, ...]] = (-9.0, -8.0, -7.0)
 DEFAULT_PRESSURE_BAR: Final[float] = 1.0e-6
-REPORT_SCHEMA_VERSION: Final[int] = 2
+REPORT_SCHEMA_VERSION: Final[int] = 3
 _MELT_MODEL_ID: Final[str] = "MELTS-v1.0"
 
 
@@ -306,6 +306,7 @@ def _run_rail_cell(
             "status": "refused",
             "reason": f"{type(exc).__name__}: {exc}",
             "pressures_Pa": {},
+            "notices_by_species": {},
             "sources": {},
             "activities": {},
         }
@@ -317,10 +318,36 @@ def _run_rail_cell(
     if status not in {"ok", "non_authoritative"}:
         reason = str(diagnostic.get("reason") or status)
         pressures = {}
+    notices_by_species: dict[str, list[dict[str, Any]]] = {}
+    provenance = diagnostic.get("vapor_pressure_numerator_provenance")
+    # binary_pot_battery imports divergence_label from this module; defer this
+    # shared-reader import until both modules have finished initialization.
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _provider_notice_flags_from_result,
+        _scope_matches,
+    )
+
+    provider_notices = _provider_notice_flags_from_result(
+        {"diagnostics": {"vapor_pressure_diagnostic": diagnostic}}
+    )
+    if isinstance(provenance, Mapping):
+        for species in provenance:
+            if species not in pressures:
+                continue
+            scoped_notices = [
+                dict(notice)
+                for notice in provider_notices
+                if _scope_matches(
+                    notice.get("affected_species"), str(species), species=True
+                )
+            ]
+            if scoped_notices:
+                notices_by_species[str(species)] = scoped_notices
     return {
         "status": status,
         "reason": reason,
         "pressures_Pa": pressures,
+        "notices_by_species": notices_by_species,
         "sources": dict(diagnostic.get("vapor_pressures_source") or {}),
         "activities": dict(diagnostic.get("activities") or {}),
     }
@@ -425,15 +452,31 @@ def _observation(
     cell_reason: str | None,
     p_floor_Pa: float,
     silent_zero_notes: Sequence[Mapping[str, Any]] | None = None,
+    notices_by_species: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    notice_field: dict[str, Any] = {}
+    if notices_by_species is not None:
+        notices = notices_by_species.get(species) or ()
+        scoped_notices = [dict(row) for row in notices if isinstance(row, Mapping)]
+        notice_field = {
+            "notices_by_species": {species: scoped_notices}
+            if scoped_notices
+            else {}
+        }
     if cell_status not in {"ok", "non_authoritative"}:
         return {
             "kind": "refused",
             "pressure_Pa": None,
             "reason": cell_reason or f"cell_status={cell_status}",
+            **notice_field,
         }
     if species not in pressures:
-        return {"kind": "not_answered", "pressure_Pa": None, "reason": None}
+        return {
+            "kind": "not_answered",
+            "pressure_Pa": None,
+            "reason": None,
+            **notice_field,
+        }
     try:
         pressure = float(pressures[species])
     except (TypeError, ValueError):
@@ -443,26 +486,35 @@ def _observation(
             "kind": "refused",
             "pressure_Pa": None,
             "reason": "non-finite or non-positive pressure",
+            **notice_field,
         }
     if pressure == 0.0:
         return {
             "kind": ZeroBecause.PROVEN_EMPTY_INVENTORY.value,
             "pressure_Pa": 0.0,
             "reason": _proven_empty_reason(species, silent_zero_notes),
+            **notice_field,
         }
     if pressure < 0.0:
         return {
             "kind": "refused",
             "pressure_Pa": None,
             "reason": "non-finite or non-positive pressure",
+            **notice_field,
         }
     if pressure <= p_floor_Pa:
         return {
             "kind": "censored_sub_floor",
             "pressure_Pa": pressure,
             "reason": f"0 < P <= {p_floor_Pa:g} Pa",
+            **notice_field,
         }
-    return {"kind": "point", "pressure_Pa": pressure, "reason": None}
+    return {
+        "kind": "point",
+        "pressure_Pa": pressure,
+        "reason": None,
+        **notice_field,
+    }
 
 
 def _coverage_label(rail: Mapping[str, Any], vaporock: Mapping[str, Any]) -> str:
@@ -678,6 +730,7 @@ def build_crosscheck_report(
                 cell_status=cell["rail"]["status"],
                 cell_reason=cell["rail"].get("reason"),
                 p_floor_Pa=p_floor_Pa,
+                notices_by_species=cell["rail"].get("notices_by_species", {}),
             )
             vaporock = _observation(
                 cell["vaporock"]["pressures_Pa"],
@@ -820,6 +873,12 @@ def build_crosscheck_report(
             ),
         },
         "engines": {
+            "builtin": {
+                "role": "built-in equilibrium vapour-pressure provider",
+                "route": "BuiltinVaporPressureProvider (rail)",
+                "queried": True,
+                "notice_scope": "per-species partial-pressure provider notices",
+            },
             "vaporock": {
                 "role": "external_vapour_pressure_comparator",
                 "route": "VR-5 warm pool only",
@@ -1021,6 +1080,10 @@ def render_crosscheck_markdown(report: Mapping[str, Any]) -> str:
         "",
         "| Engine | Role in this report | Pressure comparator? | Coverage finding |",
         "|---|---|---:|---|",
+        (
+            "| Builtin rail | Live built-in equilibrium pressure provider | yes | "
+            "Its pressure notices remain scoped by gas species in each matched row |"
+        ),
         (
             "| VapoRock | External vapour-pressure baseline | yes | Warm-pool "
             "calls only; full non-authoritative speciation retained |"

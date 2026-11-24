@@ -71,16 +71,224 @@ def test_hashimoto_exhaustion_closure_refactor_numeric_pin():
     assert result.exhaustion_notices[0]["remaining_moles"] == 6.84e-10
 
 
+@pytest.mark.parametrize("route", ("hashimoto", "knudsen"))
+def test_fe_pressure_notice_reaches_coupled_mgo_residue_output(
+    route, extent_point, monkeypatch
+):
+    from simulator.battery import residue, score
+    from simulator.battery.score import ScoreContext
+
+    inventory = {"FeO": 1.0, "MgO": 2.0}
+    channels = (
+        ResidueChannel("Fe", "Fe", "FeO", 1.0, "coupled residue regression"),
+        ResidueChannel("Mg", "Mg", "MgO", 1.0, "coupled residue regression"),
+    )
+    notice = {
+        "kind": "out_of_certified_band",
+        "authority": "extrapolated",
+        "reason": "Fe pressure extension",
+        "affected_species": ["Fe"],
+        "affected_quantities": ["p_partial"],
+    }
+
+    def integrate(fe_pressure: float):
+        if route == "hashimoto":
+            return residue.integrate_residue_inventory(
+                inventory,
+                channels,
+                lambda _inventory, _logp: residue.ResiduePressureResult(
+                    {"Fe": fe_pressure, "Mg": 1.0}, (notice,)
+                ),
+                temperature_K=2000.0,
+                duration_s=1.0,
+                area_evolution_m2=(1.0e-4,),
+                buffered_fO2_log=-8.0,
+            )
+        knudsen_channels = (
+            *channels,
+            ResidueChannel(
+                "O2", "O2", None, 1.0, "coupled residue regression"
+            ),
+        )
+        return integrate_knudsen_residue_inventory(
+            inventory,
+            knudsen_channels,
+            lambda _inventory, _logp, _temperature: residue.ResiduePressureResult(
+                {"Fe": fe_pressure, "Mg": 1.0, "O2": 0.0}, (notice,)
+            ),
+            temperature_path=((0.01, 2000.0),),
+            measured_mass_loss_fraction=0.01,
+            near_saturated=True,
+            source_fO2_log_by_interval=(-8.0,),
+        )
+
+    low_fe = integrate(1.0)
+    high_fe = integrate(2.0)
+    low_mgo_wt_pct = residue._hashimoto_project_oxide_wt_pct(
+        low_fe.residue_mol
+    )["MgO"]
+    high_mgo_wt_pct = residue._hashimoto_project_oxide_wt_pct(
+        high_fe.residue_mol
+    )["MgO"]
+
+    assert high_mgo_wt_pct > low_mgo_wt_pct
+
+    # Exercise the scoring entry point that attaches integration notices to
+    # its MgO prediction. The real integration above supplies the coupled
+    # result and its Fe pressure notice.
+    reference, experiment, rows = extent_point
+    reference = replace(
+        reference,
+        identity=replace(reference.identity, species=Species("MgO", Phase.L)),
+    )
+    context = ScoreContext(
+        {},
+        {experiment.experiment_id: experiment},
+        {row.observation_id: row for row in (*rows, reference)},
+    )
+    if route == "hashimoto":
+        source_id = "kems-015-hashimoto-1983"
+        reference = replace(
+            reference,
+            observation_id=(
+                source_id
+                + "::hashimoto_1983_table3_residue_composition_series::MgO"
+            ),
+            source_id=source_id,
+        )
+        selection = frozenset({experiment.experiment_id})
+        provenance = {"engine_pressure_notices": high_fe.pressure_notices}
+        rows_by_arm = {
+            experiment.experiment_id + "::alpha_common_unity_sensitivity": SimpleNamespace(
+                experiment_id=experiment.experiment_id,
+                alpha_arm="alpha_common_unity_sensitivity",
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct={"MgO": high_mgo_wt_pct},
+                sensitivity_band_wt_pct={"MgO": (high_mgo_wt_pct, high_mgo_wt_pct)},
+                provenance=provenance,
+            ),
+            experiment.experiment_id + "::alpha_runtime_catalog": SimpleNamespace(
+                experiment_id=experiment.experiment_id,
+                alpha_arm="alpha_runtime_catalog",
+                primary_geometry_policy_id="sphere_shrinking",
+                primary_oxide_wt_pct={"MgO": high_mgo_wt_pct},
+                geometry_oxide_wt_pct={},
+                sensitivity_band_wt_pct={"MgO": (high_mgo_wt_pct, high_mgo_wt_pct)},
+                provenance={},
+            ),
+        }
+        cache = {
+            (source_id, Engine.INTERNAL_ANALYTICAL, selection): rows_by_arm
+        }
+        prediction = score._hashimoto_residue_prediction(
+            context,
+            reference,
+            Engine.INTERNAL_ANALYTICAL,
+            cache,
+            selected_experiment_ids=selection,
+            test_experiment_ids=selection,
+        )
+    else:
+        monkeypatch.setattr(
+            residue,
+            "predict_knudsen_residue_composition",
+            lambda *_args, **_kwargs: {
+                "composition_wt_pct": {"MgO": high_mgo_wt_pct},
+                "notices": (),
+                "pressure_notices": high_fe.pressure_notices,
+            },
+        )
+        prediction = score._knudsen_residue_prediction(
+            context, reference, Engine.INTERNAL_ANALYTICAL
+        )
+    assert prediction.value is not None
+    assert any(
+        item.reason.startswith("Fe pressure extension")
+        and item.affected_quantities == (Quantity.RESIDUE_COMPONENT_COMPOSITION,)
+        for item in prediction.notices
+    )
+
+
+def test_hashimoto_geometry_preserves_pressure_notice_and_accepted_root_hook():
+    from simulator.battery import residue
+    from simulator.battery import score as residue_score
+
+    inventory = {"FeO": 1.0, "MgO": 2.0}
+    channels = tuple(
+        ResidueChannel(gas, gas, parent, 1.0, "production geometry notice test")
+        for gas, parent in (("Fe", "FeO"), ("Mg", "MgO"), ("O2", None))
+    )
+    notice = {
+        "kind": "out_of_certified_band",
+        "authority": "extrapolated",
+        "reason": "Fe pressure extension",
+        "affected_species": ["Fe"],
+        "affected_quantities": ["p_partial"],
+    }
+    accepted_floor_diagnostics: list[dict[str, object]] = []
+
+    def pressure_model(_inventory, logp):
+        return residue.ResiduePressureResult(
+            {
+                "Fe": 5e-8 * 10 ** (-logp / 2),
+                "Mg": 2e-8 * 10 ** (-logp / 2),
+                "O2": 10**logp * 1e5,
+            },
+            (notice,),
+        )
+
+    def record_accepted_floor_diagnostic(logp: float) -> None:
+        accepted_floor_diagnostics.append(
+            {
+                "kind": "floor_inversion",
+                "species": "Fe",
+                "reason": "recorded accepted-root floor inversion",
+                "original": logp,
+                "band": {"log10_pO2_bar": [-15.0, -3.0]},
+            }
+        )
+
+    pressure_model._on_accepted_evaluation = record_accepted_floor_diagnostic
+    integrated = residue._hashimoto_integrate_geometry(
+        inventory,
+        channels,
+        pressure_model,
+        temperature_K=2000.0,
+        duration_s=1.0,
+        steps=1,
+        geometry_policy_id="sphere_shrinking",
+        initial_area_m2=1.0e-4,
+    )
+
+    assert integrated.pressure_notices == (notice,)
+    assert integrated.evaporated_mol["Fe"] > 0.0
+    assert accepted_floor_diagnostics
+    floor_notices = residue_score._hashimoto_engine_floor_inversion_notices(
+        Engine.INTERNAL_ANALYTICAL, accepted_floor_diagnostics
+    )
+    assert floor_notices
+    assert floor_notices[0].reason.startswith(
+        "recorded accepted-root floor inversion:Fe"
+    )
+
+
 def _channels(gas="FeO"):
     return (ResidueChannel(gas, gas, "FeO", 1.0, "equilibrium effusion"),
             ResidueChannel("O2", "O2", None, 1.0, "equilibrium effusion"))
 
 
 def _preserve_pressure_contract(source, wrapper):
-    from simulator.battery.residue import _inherit_residue_pressure_contract
+    from simulator.battery.residue import (
+        ResiduePressureResult,
+        _inherit_residue_pressure_contract,
+    )
 
-    _inherit_residue_pressure_contract(wrapper, source)
-    return wrapper
+    def pressure_at(*args, **kwargs):
+        result = wrapper(*args, **kwargs)
+        return result.pressures_Pa if isinstance(result, ResiduePressureResult) else result
+
+    _inherit_residue_pressure_contract(pressure_at, source)
+    return pressure_at
 
 
 @pytest.mark.parametrize("pressure", (1e-9, 1e6))
@@ -869,7 +1077,7 @@ def test_internal_analytical_pressure_callback_covers_real_channels_and_oxygen()
     from simulator.physical_constants import PA_PER_BAR
     inventory, channels, pressure_model = _real_analytical_cmas_pressure(2000)
     predicted = pressure_model(inventory, -10)
-    assert set(predicted) == {str(s) for s, _ in channels}
+    assert set(predicted.pressures_Pa) == {str(s) for s, _ in channels}
     response = battery._internal_analytical_vapor_pressure_adapter(
         core=battery._new_internal_analytical_core(), temperature_C=1726.85,
         pressure_bar=0, composition_kg=None, composition_mol=inventory, fO2_log=-10,
@@ -879,10 +1087,10 @@ def test_internal_analytical_pressure_callback_covers_real_channels_and_oxygen()
     # Expected names come from the existing species resolver, not a test alias table.
     for channel, value in response.vapor_pressures_Pa.items():
         formula = battery._gas_formula_for_oxygen_balance(channel)
-        if formula in predicted:
-            assert predicted[formula] == pytest.approx(value)
-    assert predicted["O2"] == pytest.approx(1e-5)
-    assert predicted["O"] == pytest.approx(_oxygen_atom_partial_pressure_bar(
+        if formula in predicted.pressures_Pa:
+            assert predicted.pressures_Pa[formula] == pytest.approx(value)
+    assert predicted.pressures_Pa["O2"] == pytest.approx(1e-5)
+    assert predicted.pressures_Pa["O"] == pytest.approx(_oxygen_atom_partial_pressure_bar(
         2000, 1e-10, extract_path=Path(__file__).resolve().parents[2] / "data/literature/extracts/nasa-cea-thermo.yaml",
     ) * PA_PER_BAR)
 
@@ -1009,6 +1217,23 @@ def test_real_analytical_closure_and_extent_carry_redox_diagnostic():
     assert extent_iron[0] == endpoint_iron[0]
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-9
 
+    # Stripping same-evaluation Fe speciation restores the hard exponent
+    # identity check; the typed pressure result above preserves the redox law.
+    with pytest.raises(ResidueInventoryRefusal) as root:
+        _residue_oxygen_balance(_channel_terms(channels), inventory,
+                                lambda p: dict(pressure(inventory, p).pressures_Pa), 1905.15)
+    assert root.value.reason == "residue_pressure_law_exponent_mismatch"
+    assert "'Fe': declared -0.5, observed " in root.value.detail
+    with pytest.raises(ResidueInventoryRefusal) as extent:
+        integrate_knudsen_residue_inventory(
+            inventory, channels,
+            lambda n, p, temperature: dict(pressure(n, p).pressures_Pa),
+            temperature_path=((0.01, 1905.15),), measured_mass_loss_fraction=0.01,
+            near_saturated=True, source_fO2_log_by_interval=(None,),
+        )
+    assert extent.value.reason == root.value.reason
+    assert extent.value.detail == root.value.detail
+
 
 @pytest.mark.parametrize("oxygen_parent", (None, ""))
 @pytest.mark.parametrize("oxygen_species", ("O", "O2"))
@@ -1046,6 +1271,14 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperatu
                      for s, (parent, _, _) in gas_channels)
     pressure_at = _preserve_pressure_contract(
         pressure, lambda p: pressure(inventory, p),
+    )
+    with pytest.raises(ResidueInventoryRefusal) as root:
+        _residue_oxygen_balance(_channel_terms(channels), inventory,
+                                lambda p: dict(pressure(inventory, p).pressures_Pa),
+                                temperature_K)
+    assert root.value.reason == "residue_pressure_law_exponent_mismatch"
+    assert root.value.detail.startswith(
+        "pressure law exponent mismatch for 'Fe': declared -0.5, observed "
     )
     balance = _residue_oxygen_balance(
         _channel_terms(channels), inventory, pressure_at, temperature_K,
@@ -1090,6 +1323,16 @@ def test_real_markova_first_interval_zeroes_omitted_al_and_flags_redox(temperatu
     assert len(endpoint_iron) == len(extent_iron) == 1
     assert extent_iron[0] == endpoint_iron[0]
     assert max(abs(value) for value in result.atom_closure_mol.values()) < 1.0e-9
+
+    with pytest.raises(ResidueInventoryRefusal) as mismatch:
+        integrate_knudsen_residue_inventory(
+            inventory, channels,
+            lambda n, p, t: dict(pressure(n, p).pressures_Pa),
+            temperature_path=((extent, temperature_K),), measured_mass_loss_fraction=extent,
+            near_saturated=True, source_fO2_log_by_interval=(None,),
+        )
+    assert mismatch.value.reason == root.value.reason
+    assert mismatch.value.detail == root.value.detail
 
 
 @pytest.mark.parametrize("temperature_K,wt", (
@@ -1192,7 +1435,7 @@ def test_markova_bracket_top_callback_zeroes_recorded_al_omission(
     assert "Al" not in response.vapor_pressures_Pa
     assert record["species"] == "Al"
     assert record["computed_pressure_Pa"] <= record["reporting_threshold_Pa"]
-    assert predicted["Al"] == 0.0
+    assert predicted.pressures_Pa["Al"] == 0.0
     translated = pressure.below_threshold_omission_records["Al"]
     assert translated["computed_pressure_Pa"] == record["computed_pressure_Pa"]
     assert translated["reporting_threshold_Pa"] == record["reporting_threshold_Pa"]
@@ -1235,8 +1478,8 @@ def test_analytical_callback_at_2000k_returns_finite_al():
     """Passing real callback: Al is reported, so there is no omission record."""
     inventory, _channels, pressure = _real_analytical_cmas_pressure(2000)
     predicted = pressure(inventory, -10)
-    assert "Al" in predicted
-    assert math.isfinite(predicted["Al"])
-    assert predicted["Al"] > 0.0
+    assert "Al" in predicted.pressures_Pa
+    assert math.isfinite(predicted.pressures_Pa["Al"])
+    assert predicted.pressures_Pa["Al"] > 0.0
     assert pressure.below_threshold_omission_records == {}
     assert pressure.below_threshold_omission_notices == []

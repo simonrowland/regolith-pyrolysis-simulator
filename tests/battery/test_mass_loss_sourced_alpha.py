@@ -12,7 +12,11 @@ import pytest
 import simulator.battery.score as score_module
 from simulator.battery.enums import Engine, Quantity, RefusalReason
 from simulator.battery.migrate import LITERATURE, Migrator
-from simulator.battery.residue import ResidueInventoryRefusal, _mass_loss_sourced_alphas
+from simulator.battery.residue import (
+    ResidueInventoryRefusal,
+    ResiduePressureResult,
+    _mass_loss_sourced_alphas,
+)
 from simulator.battery.score import predict_with_engine, quantity_token
 
 
@@ -1484,6 +1488,17 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
             vapor_pressures_Pa={"Mg": 0.001 / (10.0**logp)**0.5},
             diagnostics={
                 "vapor_pressure_diagnostic": {
+                    "vapor_pressure_numerator_provenance": {
+                        "Mg": {
+                            "notice": {
+                                "kind": "out_of_certified_band",
+                                "reason": "scoped Mg pressure test",
+                                "authority_level": "extrapolated",
+                                "affected_species": ["Mg"],
+                                "affected_quantities": ["p_partial"],
+                            },
+                        },
+                    },
                     "below_reporting_threshold_omissions": {
                         "Al": {
                             "species": "Al",
@@ -1513,6 +1528,18 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
         binary_pot_battery, "_openimcc_gas_channels_and_omission_notices", gas_channels,
     )
 
+    original_integrator = residue._hashimoto_integrate_geometry
+    callback_results = []
+
+    def observe_pressure_result(inventory, channels, pressure_model, **kwargs):
+        if not callback_results:
+            callback_results.append(pressure_model(inventory, -9.0))
+        return original_integrator(inventory, channels, pressure_model, **kwargs)
+
+    monkeypatch.setattr(
+        residue, "_hashimoto_integrate_geometry", observe_pressure_result,
+    )
+
     def assert_omission(notice, computed):
         assert notice.kind is NoticeKind.INPUT_OMITTED
         assert notice.affected_quantities == (Quantity.MASS_LOSS_FRACTION,)
@@ -1534,6 +1561,13 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
         "internal-analytical", experiment, temperature_K=temperature_K,
         source_document=fig3_source, observation=row,
     )
+    assert isinstance(callback_results[0], ResiduePressureResult), callback_results[0]
+    assert callback_results[0].notices, callback_results[0]
+    assert any(
+        notice["reason"] == "scoped Mg pressure test"
+        and notice["affected_species"] == ["Mg"]
+        for notice in result.pressure_notices
+    ), result.pressure_notices
     payload = json.loads(result.engine_metadata["below_threshold_omissions"])
     recorded = {
         record["computed_pressure_Pa"] for record in payload["records"]["Al"]
@@ -1548,6 +1582,11 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
         Engine.INTERNAL_ANALYTICAL, row, experiment=experiment,
     )
     assert produced.value is not None, produced.refusal_detail
+    assert any(
+        notice.reason.startswith("scoped Mg pressure test")
+        and notice.affected_quantities == (Quantity.MASS_LOSS_FRACTION,)
+        for notice in produced.notices
+    ), [(notice.reason, notice.affected_quantities) for notice in produced.notices]
     produced_omissions = [
         notice for notice in produced.notices
         if notice.kind is NoticeKind.INPUT_OMITTED

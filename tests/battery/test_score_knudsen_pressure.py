@@ -260,6 +260,60 @@ def _mock_knudsen_prediction(
     return prediction, calls
 
 
+@pytest.mark.parametrize("flagged_call", [1, 2], ids=["seed", "reevaluated"])
+def test_knudsen_pressure_reuses_selected_key_for_both_evaluations(
+    monkeypatch, flagged_call
+) -> None:
+    from simulator.battery.enums import Authority, Phase
+    from simulator.battery.records import Species
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+
+    experiment, reference, _context = _partial_row(
+        f"knudsen-pressure-reordered-key-{flagged_call}"
+    )
+    reference = replace(
+        reference,
+        identity=replace(
+            reference.identity,
+            species=Species("O2Si(g)", Phase.G),
+        ),
+    )
+    original_cell = battery.EquilibrateCell
+    reported_keys: list[str] = []
+    reason = "review scoped pressure rail"
+
+    def cell_with_reported_key(**kwargs):
+        pressures = kwargs["gas_partial_pressures_Pa"]
+        key = "SiO2(g)" if not reported_keys else "SiO2_gas"
+        reported_keys.append(key)
+        pressures[key] = pressures.pop("Na")
+        if len(reported_keys) == flagged_call:
+            kwargs["authority"] = "extrapolated"
+            kwargs["notices"] = [{
+                "kind": "out_of_certified_band",
+                "authority": "extrapolated",
+                "reason": reason,
+                "affected_species": [key],
+                "affected_quantities": ["p_partial"],
+            }]
+        return original_cell(**kwargs)
+
+    monkeypatch.setattr(battery, "EquilibrateCell", cell_with_reported_key)
+    prediction, pressure_calls = _mock_knudsen_prediction(
+        Engine.ALPHAMELTS,
+        experiment,
+        reference,
+        monkeypatch,
+        backend_mode="python_api",
+    )
+
+    assert reported_keys == ["SiO2(g)", "SiO2_gas"]
+    assert pressure_calls == pytest.approx([1e-3, 2e-4])
+    assert prediction.value == Decimal("10.0")
+    assert prediction.authority is Authority.EXTRAPOLATED
+    assert any(notice.reason == reason for notice in prediction.notices)
+
+
 @pytest.mark.parametrize(
     (
         "engine",

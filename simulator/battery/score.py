@@ -303,6 +303,7 @@ from simulator.battery.oxygen_balance import (
 from simulator.battery.composition import (
     SLAG_METAL_CHARGE_BASIS,
     canonical_element_symbol,
+    canonical_species_key,
     chloride_component_symbol,
     composition_wt_pct,
     element_mass_fraction_redox,
@@ -1416,14 +1417,6 @@ def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bo
     return element != "O" and count == 1
 
 
-# Inverse of simulator.melt_backend.vaporock._GAS_NAMESPACE_SUFFIX.
-# The vapour adapter appends this exact suffix when a gas formula collides
-# with a melt oxide (SiO2(g) -> SiO2_gas). The scorer does not import the
-# vapour backend to read a four-character suffix. The emitter constant stays
-# in the adapter.
-_GAS_PHASE_SUFFIX = "_gas"
-
-
 def match_reported_species(
     formula: str,
     reported: Mapping[str, float],
@@ -1485,18 +1478,18 @@ def _match_reported_species_with_notices(
             )
         )
     for name, value in reported.items():
-        if oxide_activity and _is_raw_element_label(str(name), species=species):
+        text = str(name)
+        if oxide_activity and _is_raw_element_label(text, species=species):
             continue
-        parsed = parse_species_formula(str(name), species=species)
+        parsed = parse_species_formula(text, species=species)
         if parsed == target:
-            return (str(name), float(value)), repair_notices
+            return (text, float(value)), repair_notices
     if not oxide_activity:
-        suffix = _GAS_PHASE_SUFFIX
         for name, value in reported.items():
             text = str(name)
-            if len(text) <= len(suffix) or not text.endswith(suffix):
+            stem = canonical_species_key(text)
+            if stem == text:
                 continue
-            stem = text[: -len(suffix)]
             if parse_species_formula(stem, species=species) == target:
                 return (text, float(value)), ()
         return None, ()
@@ -8186,6 +8179,9 @@ def _flags_from_scored_cell(
     cell: object,
     authority: Authority,
     certified_band: Mapping[str, tuple[float, float]] | None,
+    *,
+    quantity: Quantity | None = None,
+    species: str | None = None,
 ) -> tuple[Authority, Mapping[str, tuple[float, float]] | None]:
     """Upgrade a bridge default from the cell. Never downgrades a flag."""
 
@@ -8194,7 +8190,12 @@ def _flags_from_scored_cell(
         cell_score_authority,
     )
 
-    if cell_score_authority(cell, refused=False) == AUTHORITY_EXTRAPOLATED:
+    if cell_score_authority(
+        cell,
+        refused=False,
+        quantity=None if quantity is None else quantity.value,
+        species=species,
+    ) == AUTHORITY_EXTRAPOLATED:
         authority = Authority.EXTRAPOLATED
     if certified_band is None:
         band = _interval_certified_band(getattr(cell, "certified_band", None))
@@ -8207,17 +8208,26 @@ def cell_notices(
     quantity: Quantity,
     engine: Engine,
     cell: object,
+    *,
+    species: str | None = None,
 ) -> tuple[Notice, ...]:
     from simulator.diagnostic_helpers.binary_pot_battery import (
         AUTHORITY_EXTRAPOLATED,
         AUTHORITY_FALLBACK,
         _FLOOR_INVERSION_REASON,
+        _scope_matches,
     )
 
     notices: list[Notice] = []
     raw_notices = list(getattr(cell, "notices", None) or [])
     for row in raw_notices:
         if not isinstance(row, Mapping):
+            continue
+        affected_quantities = row.get("affected_quantities")
+        affected_species = row.get("affected_species")
+        if not _scope_matches(affected_quantities, quantity.value) or not _scope_matches(
+            affected_species, species, species=True
+        ):
             continue
         kind = str(row.get("kind") or "")
         if _row_out_of_certified_band(kind, row):
@@ -12993,6 +13003,58 @@ def _predict_phase_row(
     )
 
 
+def _residue_engine_pressure_notices(
+    raw_notices: object,
+    dependent_quantity: Quantity,
+) -> tuple[Notice, ...]:
+    from types import SimpleNamespace
+
+    from simulator.diagnostic_helpers.binary_pot_battery import _scope_matches
+
+    if not isinstance(raw_notices, (list, tuple)):
+        return ()
+    built: list[Notice] = []
+    for row in raw_notices:
+        if not isinstance(row, Mapping):
+            continue
+        if not _scope_matches(row.get("affected_quantities"), "p_partial"):
+            continue
+        affected_species = row.get("affected_species")
+        typed_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.INTERNAL_ANALYTICAL,
+            SimpleNamespace(notices=(row,), authority=None),
+        )
+        if not typed_notices:
+            continue
+        for notice in typed_notices:
+            reason = notice.reason
+            if affected_species is not None:
+                scope = affected_species
+                scope_items = (
+                    scope if isinstance(scope, (list, tuple, set, frozenset))
+                    else (scope,)
+                )
+                scope_text = ",".join(sorted(str(item) for item in scope_items))
+                reason = f"{reason}; pressure species scope={scope_text}"
+            authority = (
+                Authority.EXTRAPOLATED
+                if row.get("authority") == "extrapolated"
+                or row.get("authority_level") == "extrapolated"
+                else notice.authority
+            )
+            adapted = replace(
+                notice,
+                affected_quantities=(dependent_quantity,),
+                reason=reason,
+                origin="engine:internal-analytical:residue-pressure",
+                authority=authority,
+            )
+            if adapted not in built:
+                built.append(adapted)
+    return tuple(built)
+
+
 def _predict_mass_loss_with_residue(
     engine: Engine,
     identity: Identity,
@@ -13094,7 +13156,13 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=refusal,
             refusal_detail=detail,
-            notices=omission_notices(payload),
+            notices=(
+                *omission_notices(payload),
+                *_residue_engine_pressure_notices(
+                    getattr(exc, "pressure_notices", ()),
+                    Quantity.MASS_LOSS_FRACTION,
+                ),
+            ),
             identity=identity,
         )
     except ResidueEngineNonconvergence as exc:
@@ -13114,7 +13182,13 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
             refusal_detail=detail,
-            notices=omission_notices(payload),
+            notices=(
+                *omission_notices(payload),
+                *_residue_engine_pressure_notices(
+                    getattr(exc, "pressure_notices", ()),
+                    Quantity.MASS_LOSS_FRACTION,
+                ),
+            ),
             identity=identity,
         )
 
@@ -13140,6 +13214,10 @@ def _predict_mass_loss_with_residue(
             diagnostic.as_record()
             for diagnostic in result.pressure_law_diagnostics
         ),
+    )
+    notices += _residue_engine_pressure_notices(
+        result.pressure_notices,
+        Quantity.MASS_LOSS_FRACTION,
     )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
@@ -16027,8 +16105,25 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
-    notices = union_notices(tuple(extra_notices), cell_notices(quantity, engine, cell))
-    authority, certified_band = _flags_from_scored_cell(cell, authority, certified_band)
+    notice_species = formula
+    selected_pressure_target: tuple[str, float] | None = None
+    if quantity is Quantity.P_PARTIAL:
+        initial_pressures = dict(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {}
+        )
+        selected_pressure_target = match_reported_species(
+            formula, initial_pressures, species=identity.species
+        )
+        notice_species = (
+            "" if selected_pressure_target is None else selected_pressure_target[0]
+        )
+    notices = union_notices(
+        tuple(extra_notices),
+        cell_notices(quantity, engine, cell, species=notice_species),
+    )
+    authority, certified_band = _flags_from_scored_cell(
+        cell, authority, certified_band, quantity=quantity, species=notice_species
+    )
     refusal = getattr(cell, "refusal_reason", None)
     status = getattr(cell, "status", None)
     call_evidence = f"equilibrate_cell:{name}:exit={getattr(cell, 'exit_code', None)}"
@@ -16178,9 +16273,7 @@ def _predict_with_engine(
         if invalid_refusal is not None:
             return invalid_refusal
         initial_pressures = pressures
-        initial_target = match_reported_species(
-            formula, initial_pressures, species=identity.species
-        )
+        initial_target = selected_pressure_target
         if initial_target is None:
             return missing_knudsen_target_refusal(
                 "seed",
@@ -16312,7 +16405,19 @@ def _predict_with_engine(
             )
         except Exception as exc:
             return engine_call_failure(exc)
-        notices = union_notices(notices, cell_notices(quantity, engine, cell))
+        updated_pressures = dict(
+            getattr(cell, "gas_partial_pressures_Pa", None) or {}
+        )
+        selected_pressure_target = match_reported_species(
+            formula, updated_pressures, species=identity.species
+        )
+        notice_species = (
+            "" if selected_pressure_target is None else selected_pressure_target[0]
+        )
+        notices = union_notices(
+            notices,
+            cell_notices(quantity, engine, cell, species=notice_species),
+        )
         if getattr(cell, "status", None) != "ok":
             return EnginePrediction(
                 engine=engine,
@@ -16346,15 +16451,13 @@ def _predict_with_engine(
         if invalid_refusal is not None:
             return invalid_refusal
         authority, certified_band = _flags_from_scored_cell(
-            cell, authority, certified_band
+            cell,
+            authority,
+            certified_band,
+            quantity=quantity,
+            species=notice_species,
         )
-        updated_pressures = dict(
-            getattr(cell, "gas_partial_pressures_Pa", None) or {}
-        )
-        updated_target = match_reported_species(
-            formula, updated_pressures, species=identity.species
-        )
-        if updated_target is None:
+        if selected_pressure_target is None:
             return missing_knudsen_target_refusal(
                 "derived",
                 call_evidence=f"equilibrate_cell:{name}:knudsen_pressure_update",
@@ -16421,7 +16524,7 @@ def _predict_with_engine(
             )
             sensitivity_dex = math.inf
             before = initial_target[1]
-            after = updated_target[1]
+            after = selected_pressure_target[1]
             if (
                 math.isfinite(before)
                 and math.isfinite(after)
@@ -16700,6 +16803,12 @@ def _predict_with_engine(
             reported, compared,
         )
         magnitude = value
+    elif quantity is Quantity.P_PARTIAL:
+        magnitude = (
+            None
+            if selected_pressure_target is None
+            else selected_pressure_target[1]
+        )
     else:
         matched, activity_repair_warnings = _match_reported_species_with_notices(
             compared,
@@ -17264,6 +17373,12 @@ def _hashimoto_residue_prediction(
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
             )
         )
+        notices.extend(
+            _residue_engine_pressure_notices(
+                primary_provenance.get("engine_pressure_notices"),
+                reported_quantity,
+            )
+        )
         surface_floor = primary_provenance.get("surface_pO2_balance_floor")
         if isinstance(surface_floor, Mapping):
             floor_steps = int(surface_floor.get("steps_at_floor") or 0)
@@ -17526,7 +17641,13 @@ def _knudsen_residue_prediction(
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=notices, identity=reference.identity,
+            notices=(
+                *notices,
+                *_residue_engine_pressure_notices(
+                    result.get("pressure_notices"),
+                    reported_quantity,
+                ),
+            ), identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:

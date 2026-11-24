@@ -626,15 +626,16 @@ def test_default_and_test_configuration_cache_keys_are_byte_stable(
         lambda *_args, **_kwargs: (_ for _ in ()).throw(FileNotFoundError()),
     )
     # Leading bytes are the chemistry-version pin (engine number, u16 version).
-    # b265 onto b-1244 moves internal-analytical to v3 and MAGEMin,
-    # alphaMELTS, and ThermoEngine to v4. The comparison rebuilds the
-    # header from ENGINE_CHEMISTRY_VERSION and checks the payload tail.
+    # Markova and Holzheid require one combined internal-analytical v5 bump,
+    # so the version-derived prefix must follow.
+    # The comparison rebuilds the header from ENGINE_CHEMISTRY_VERSION and
+    # keeps the payload tail pinned.
     snapshots = (
         (
             "internal-analytical default",
             "internal-analytical",
             None,
-            "0200030008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
+            "0200040008018b08020514686967685f745f6d656c745f616374697669747905086f70656e696d636305166f787967656e5f62616c616e63655f6261636b656e64050764656661756c74",
         ),
         (
             "openimcc default",
@@ -824,6 +825,169 @@ def test_default_alphamelts_projection_matches_resolved_opener_settings(
             )
     finally:
         close_battery_engine_handle(handle)
+
+
+@pytest.mark.parametrize("isolated", (False, True))
+def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    isolated: bool,
+) -> None:
+    from simulator import engine_cache
+    from simulator.battery.enums import Authority, Quantity
+    from simulator.battery.score import cell_notices
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        BinaryPot,
+        Po2Request,
+        close_battery_engine_handle,
+        equilibrate_cell,
+    )
+    from tests.battery.cache_test_support import skip_if_engine_missing
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "alphamelts.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    handle = battery._open_battery_engine_with_settings(
+        "alphamelts", {"transport": "subprocess"}
+    )
+    if not handle.available or handle.backend is None:
+        skip_if_engine_missing(
+            handle,
+            "alphamelts",
+            nodeid="builtin Fe pressure notice cache round trip",
+        )
+    try:
+        assert getattr(handle.backend, "_mode", None) == "subprocess"
+        pot = BinaryPot(
+            pot_id="fe-holzheid-alphamelts-cache",
+            kato_1993_table4_system=None,
+            why="scoped builtin Fe pressure notice cache probe",
+            composition_wt_pct={"FeO": 20.0, "Na2O": 20.0, "SiO2": 60.0},
+        )
+        cold = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1878.15,
+            po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
+            isolated=isolated,
+        )
+        engine_cache._MEMORY_CACHE.clear()
+        warm = equilibrate_cell(
+            handle,
+            pot,
+            temperature_K=1878.15,
+            po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
+            isolated=isolated,
+        )
+    finally:
+        close_battery_engine_handle(handle)
+
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    for cell in (cold, warm):
+        assert cell.status == "ok", cell.engine_reason
+        assert cell.gas_partial_pressures_Pa["Fe"] > 0.0
+        fe_notices = cell_notices(
+            Quantity.P_PARTIAL,
+            Engine.ALPHAMELTS,
+            cell,
+            species="Fe",
+        )
+        matching_notices = [notice for notice in fe_notices if notice.reason == reason]
+        assert len(matching_notices) == 1
+        # The builtin out-of-band record has no authority field, and the
+        # typed converter preserves that. The cell authority resolver still
+        # reports extrapolation for the scoped Fe pressure below.
+        assert matching_notices[0].authority is None
+        assert not any(
+            notice.reason == reason
+            for notice in cell_notices(
+                Quantity.P_PARTIAL,
+                Engine.ALPHAMELTS,
+                cell,
+                species="SiO",
+            )
+        )
+        assert battery.cell_score_authority(
+            cell,
+            refused=False,
+            quantity=Quantity.P_PARTIAL.value,
+            species="Fe",
+        ) == battery.AUTHORITY_EXTRAPOLATED
+    assert cold.notices == warm.notices
+    assert engine_cache.engine_cache_counters(reset=True)["alphamelts"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
+        "conflicts": 0,
+    }
+
+
+def test_internal_residue_builtin_fe_notice_survives_cache_round_trip(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_cache
+    from simulator.battery.enums import Quantity
+    from simulator.battery.score import cell_notices
+    from simulator.diagnostic_helpers import binary_pot_battery as battery
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        PO2_COMMANDED,
+        Po2Request,
+        engine_flags_from_result,
+        internal_analytical_residue_vapor_pressure,
+    )
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "residue.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    request = {
+        "core": battery._new_internal_analytical_core(),
+        "temperature_C": 1605.0,
+        "pressure_bar": 1.0,
+        "composition_kg": {"FeO": 0.2, "Na2O": 0.2, "SiO2": 0.6},
+        "composition_mol": None,
+        "fO2_log": -8.0,
+        "po2_request": Po2Request(PO2_COMMANDED, 1.0e-8),
+        "include_diagnostic_shadows": False,
+    }
+
+    cold = internal_analytical_residue_vapor_pressure(**request)
+    engine_cache._MEMORY_CACHE.clear()
+    warm = internal_analytical_residue_vapor_pressure(**request)
+
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    for result in (cold, warm):
+        flags, authority, _band = engine_flags_from_result(result)
+        scored = SimpleNamespace(notices=flags, authority=authority)
+        assert any(
+            notice.reason == reason
+            for notice in cell_notices(
+                Quantity.P_PARTIAL,
+                Engine.INTERNAL_ANALYTICAL,
+                scored,
+                species="Fe",
+            )
+        )
+        assert not any(
+            notice.reason == reason
+            for notice in cell_notices(
+                Quantity.P_PARTIAL,
+                Engine.INTERNAL_ANALYTICAL,
+                scored,
+                species="SiO",
+            )
+        )
+    assert cold.vapor_pressures_Pa == warm.vapor_pressures_Pa
+    assert engine_cache.engine_cache_counters(reset=True)["internal-analytical"][
+        "hits"
+    ] == 1
 
 
 def _capture_engine_cache_settings_paths(
@@ -2897,7 +3061,7 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_without_cache(
     second = pressure({"Na2O": 1.0}, -8.0)
     pressure._on_accepted_evaluation(-8.0)
 
-    assert first == second == {"Na": 5.0}
+    assert first.pressures_Pa == second.pressures_Pa == {"Na": 5.0}
     assert floor_diagnostics["Na"]["detail"] == {
         "reason": "recorded floor inversion"
     }

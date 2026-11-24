@@ -481,10 +481,12 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 4,
+    "internal-analytical": 5,
     "vaporock": 1,
     "magemin": 4,
-    "alphamelts": 4,
+    # The subprocess EquilibriumResult includes the builtin provider's
+    # Holzheid-weighted Fe pressure, so old alphaMELTS rows can serve stale Fe.
+    "alphamelts": 5,
     "thermoengine": 4,
 }
 
@@ -504,10 +506,12 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
-# internal-analytical v4: 2026-11-23 Markova car 2 - preserve the Fe speciation consumed by residue oxygen balance. If b-1124's v4 also lands, the train re-bumps to max+1.
+# internal-analytical v4: 2026-11-23 Markova car 2 preserved the Fe speciation consumed by residue oxygen balance.
+# internal-analytical v5: 2026-11-24 combines that payload with b-1124 / d-339 Holzheid gamma regular-solution extrapolation.
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
+# alphamelts v5: 2026-11-23 b-1124 / d-339 subprocess result embeds builtin Holzheid-weighted Fe pressure
 
 
 _ENGINE_CACHE_ROOT = Path(__file__).resolve().parents[1]

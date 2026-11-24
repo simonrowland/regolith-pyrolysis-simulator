@@ -32,12 +32,20 @@ pytestmark = pytest.mark.engine_cache_off
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
-    "internal-analytical": (4, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
+    "internal-analytical": (5, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
-    "alphamelts": (4, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
+    # The train regenerates this digest against the new provider-pressure cache version.
+    "alphamelts": (5, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
     "thermoengine": (4, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
 }
+
+# Keep the 1605 °C Holzheid extrapolation probe alongside the certified 1700 K
+# cache golden above; it guards the out-of-band behavior introduced by d-339.
+INTERNAL_ANALYTICAL_OUT_OF_BAND_GOLDEN = (
+    5,
+    "a294dc7fa183d8c0c9a51b01b887ae3c4816768213fddaf977721d9440d2d467",
+)
 
 _EXPECTED_NUMERIC_TRACE_PATHS = {
     "openimcc": set(),
@@ -218,7 +226,9 @@ def _clear_numeric_input_read_caches() -> None:
     catalog._THERMO_OBSERVATION_CACHE.clear()
 
 
-def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
+def _live_engine_probe(
+    engine_name, nodeid, monkeypatch, *, mutate_cold=False, temperature_K=None
+):
     from simulator.battery.enums import Engine
     from simulator.diagnostic_helpers.binary_pot_battery import (
         Po2Request,
@@ -293,7 +303,12 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             cell = equilibrate_cell(
                 handle,
                 probe_pot,
-                temperature_K=1700.0,
+                # d-339 changes Fe activity beyond the 1600 C Holzheid edge.
+                temperature_K=(
+                    temperature_K
+                    if temperature_K is not None
+                    else 1700.0
+                ),
                 po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
                 timeout_s=90.0,
                 isolated=False,
@@ -335,7 +350,14 @@ def _cached_vapor_pressure_species(engine_name, cache_value):
 
 
 def _run_probe(
-    engine_name, request, tmp_path, *, mutate_cold=False, timeout_s=120.0, cwd=None
+    engine_name,
+    request,
+    tmp_path,
+    *,
+    mutate_cold=False,
+    temperature_K=None,
+    timeout_s=120.0,
+    cwd=None,
 ):
     result_path = tmp_path / "probe.json"
     # Keep native work and process-wide I/O patches out of the pytest worker.
@@ -350,6 +372,7 @@ def _run_probe(
         [
             sys.executable, "-m", "tests.test_engine_cache_golden_probes", engine_name,
             request.node.nodeid, str(result_path), str(int(mutate_cold)),
+            "" if temperature_K is None else str(temperature_K),
         ],
         env=environment,
         stdin=subprocess.DEVNULL,  # The worker's stdin belongs to xdist's channel.
@@ -544,6 +567,22 @@ def test_live_engine_numeric_probe_matches_version(
         )
         if engine_name == "internal-analytical":
             assert {"Fe", "SiO", "Na"} <= species
+
+
+def test_internal_analytical_out_of_band_numeric_probe_matches_version(
+    request, tmp_path
+) -> None:
+    result = _run_probe(
+        "internal-analytical",
+        request,
+        tmp_path,
+        temperature_K=1605.0 + 273.15,
+    )
+    expected_version, expected_digest = INTERNAL_ANALYTICAL_OUT_OF_BAND_GOLDEN
+    assert result["version"] == expected_version
+    assert result["digest"] == expected_digest
+
+
 def test_numeric_probe_change_without_version_bump_fails_guard() -> None:
     version, digest = ENGINE_GOLDEN_PROBES["internal-analytical"]
     changed = "0" * len(digest)
@@ -564,11 +603,15 @@ def test_real_cold_field_mutation_without_version_bump_fails_guard(
 
 
 if __name__ == "__main__":
-    engine_name, nodeid, output, mutate = sys.argv[1:]
+    engine_name, nodeid, output, mutate, temperature = sys.argv[1:]
     try:
         with pytest.MonkeyPatch.context() as patches:
             result = _live_engine_probe(
-                engine_name, nodeid, patches, mutate_cold=bool(int(mutate))
+                engine_name,
+                nodeid,
+                patches,
+                mutate_cold=bool(int(mutate)),
+                temperature_K=None if not temperature else float(temperature),
             )
     except pytest.skip.Exception as exc:
         result = {"skip": str(exc)}

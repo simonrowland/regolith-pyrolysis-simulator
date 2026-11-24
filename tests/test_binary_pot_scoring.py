@@ -19,10 +19,14 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EquilibrateCell,
     Po2Request,
     composition_kg_and_mol,
+    cell_score_authority,
+    cell_score_notice_kinds,
     load_binary_pots,
 )
 from simulator.diagnostic_helpers.binary_pot_scoring import (
+    ActivityComparator,
     DEFAULT_POTS_PATH,
+    ScoringPot,
     SCORING_EXTRACTS,
     build_scoring_pots_from_extracts,
     convert_printed_composition_to_wt_pct,
@@ -34,6 +38,7 @@ from simulator.diagnostic_helpers.binary_pot_scoring import (
     render_scoring_report_markdown,
     score_scoring_arm,
     sync_scoring_pots_into_catalog,
+    _comparator_envelope,
 )
 
 
@@ -52,6 +57,91 @@ ENGINE_ARM_POT_IDS = (
 def test_engine_arm_pots_unchanged() -> None:
     pots, _grid = load_binary_pots(DEFAULT_POTS_PATH)
     assert [pot.pot_id for pot in pots] == list(ENGINE_ARM_POT_IDS)
+
+
+def test_fe_pressure_notice_stays_off_unrelated_activity_comparator() -> None:
+    from scripts.calibration_battery import envelope, rail_for
+
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    cell = EquilibrateCell(
+        pot_id="feo_sio2",
+        engine="internal-analytical",
+        temperature_K=1900.0,
+        po2=Po2Request(mode="engine_default", po2_bar=None),
+        status="ok",
+        refusal_reason=None,
+        engine_status="ok",
+        engine_reason=None,
+        melt_activities={"SiO2": 0.32},
+        gas_partial_pressures_Pa={"Fe": 0.7, "SiO": 0.2},
+        liquid_fraction=1.0,
+        wall_s=0.1,
+        cpu_s=0.1,
+        hostname="test",
+        notices=[
+            {
+                "kind": "out_of_certified_band",
+                "authority": "extrapolated",
+                "reason": reason,
+                "affected_quantities": ["p_partial"],
+                "affected_species": ["Fe"],
+            }
+        ],
+        authority="extrapolated",
+    )
+    assert cell_score_notice_kinds(
+        cell, quantity="p_partial", species="Fe"
+    ) == ("out_of_certified_band",)
+    assert cell_score_notice_kinds(
+        cell, quantity="p_partial", species="SiO"
+    ) == ()
+    assert cell_score_notice_kinds(
+        cell, quantity="activity", species="SiO2"
+    ) == ()
+    assert cell_score_authority(
+        cell, refused=False, quantity="p_partial", species="Fe"
+    ) == "extrapolated"
+    assert cell_score_authority(cell, refused=False) == "bridge"
+    assert cell_score_authority(
+        cell, refused=False, quantity="activity", species="SiO2"
+    ) == "bridge"
+
+    pot = ScoringPot(
+        pot_id="feo_sio2",
+        source_id="test-source",
+        observation_id="test-observation",
+        sample_no=None,
+        temperatures_K=(1900.0,),
+        composition_basis="wt_pct",
+        composition_conversion="as_weighed",
+        composition_as_printed={"FeO": 40.0, "SiO2": 60.0},
+        composition_wt_pct={"FeO": 40.0, "SiO2": 60.0},
+        why="Fe pressure scoped independently of SiO2 activity",
+    )
+    comparator = ActivityComparator(
+        source_id="test-source",
+        observation_id="test-observation",
+        species="SiO2",
+        observable="activity",
+        method_class="measured",
+        sample_no=None,
+        temperature_K=1900.0,
+        measured=0.3,
+        units="1",
+        standard_state="liquid",
+        uncertainty=None,
+        doi=None,
+        row={},
+    )
+    row = _comparator_envelope(
+        pot=pot,
+        cell=cell,
+        comparator=comparator,
+        envelope=envelope,
+        rail_for=rail_for,
+    )
+    assert reason not in " ".join(str(item) for item in row["notices"])
+    assert row["authority"] != "extrapolated"
 
 
 @pytest.mark.parametrize("fail_cell", (False, True))

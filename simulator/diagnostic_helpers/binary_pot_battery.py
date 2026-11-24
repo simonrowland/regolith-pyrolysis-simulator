@@ -61,6 +61,7 @@ from simulator.melt_regime import (
     liquid_fraction_invalidity,
 )
 from simulator.battery.enums import NoticeKind
+from simulator.battery.composition import canonical_species_key
 from simulator.engine_pool import (
     EngineWorkerDied,
     EngineWorkerRemoteError,
@@ -422,11 +423,21 @@ def _call_cached_backend_equilibrate(
                     raise
                 caught_thermoengine.append(exc)
                 return payload
+        preserve_provider_notices = handle.name in {
+            "internal-analytical",
+            "alphamelts",
+        }
         if isinstance(result, EquilibriumResult):
+            if preserve_provider_notices:
+                result = _preserve_provider_notices_for_engine_cache(result)
             return result.to_hot(engine_id=handle.name)
         if isinstance(result, SimpleNamespace):
+            if preserve_provider_notices:
+                result = _preserve_provider_notices_for_engine_cache(result)
             return equilibrium_to_hot(vars(result), engine_id=handle.name, live_value=result)
         if isinstance(result, Mapping):
+            if preserve_provider_notices:
+                result = _preserve_provider_notices_for_engine_cache(result)
             return equilibrium_to_hot(result, engine_id=handle.name)
         if _is_refusal(result):
             return result
@@ -1685,17 +1696,121 @@ def _plain_data(value: Any) -> Any:
     return value
 
 
+def _scope_matches(scope: Any, selected: str | None, *, species: bool = False) -> bool:
+    """Match one typed-result scope; an explicit empty scope matches nothing."""
+
+    if scope is None:
+        return True
+    values = scope if isinstance(scope, (list, tuple, set, frozenset)) else (scope,)
+    if not values:
+        return False
+    if selected is None:
+        return True
+    normalize = canonical_species_key if species else str
+    selected_key = normalize(selected)
+    return any(normalize(value) == selected_key for value in values)
+
+
+def _nested_notice_flags(value: Any) -> list[dict[str, Any]]:
+    """Collect typed notices nested under diagnostic ``notice`` fields."""
+
+    notices: list[dict[str, Any]] = []
+    pending = [(value, None, None)]
+    while pending:
+        current, inherited_species, inherited_quantities = pending.pop()
+        if isinstance(current, Mapping):
+            species_scope = current.get("affected_species", inherited_species)
+            quantity_scope = current.get("affected_quantities", inherited_quantities)
+            nested_notice = current.get("notice")
+            has_scored_quantity_scope = _scope_matches(quantity_scope, None)
+            if (
+                isinstance(nested_notice, Mapping)
+                and nested_notice.get("kind")
+                and has_scored_quantity_scope
+            ):
+                row = _plain_data(nested_notice)
+                if (
+                    not row.get("authority")
+                    and row.get("authority_level") == AUTHORITY_EXTRAPOLATED
+                ):
+                    row["authority"] = AUTHORITY_EXTRAPOLATED
+                row.setdefault(
+                    "affected_quantities",
+                    quantity_scope if quantity_scope is not None else ["p_partial"],
+                )
+                if species_scope is not None:
+                    row.setdefault("affected_species", species_scope)
+                notices.append(row)
+            pending.extend(
+                (child, species_scope, quantity_scope)
+                for child in current.values()
+            )
+        elif isinstance(current, (list, tuple)):
+            pending.extend(
+                (child, inherited_species, inherited_quantities)
+                for child in current
+            )
+    return notices
+
+
+def _provider_notice_flags_from_result(result: Any) -> list[dict[str, Any]]:
+    """Read scoped builtin-provider notices from every result publication site."""
+
+    diagnostics = (
+        result.get("diagnostics")
+        if isinstance(result, Mapping)
+        else getattr(result, "diagnostics", None)
+    )
+    if not isinstance(diagnostics, Mapping):
+        return []
+    notices: list[dict[str, Any]] = []
+    for field_name in ("vapor_pressure_diagnostic", "subprocess_vapor_projection"):
+        diagnostic = diagnostics.get(field_name)
+        if isinstance(diagnostic, Mapping):
+            notices.extend(_nested_notice_flags(diagnostic))
+    return notices
+
+
+def _preserve_provider_notices_for_engine_cache(result: Any) -> Any:
+    """Keep provider notices in the cache's existing typed notice payload."""
+
+    provider_notices = _provider_notice_flags_from_result(result)
+    if not provider_notices:
+        return result
+    if isinstance(result, Mapping):
+        result = dict(result)
+        diagnostics = dict(result.get("diagnostics") or {})
+        result["diagnostics"] = diagnostics
+    else:
+        diagnostics = dict(getattr(result, "diagnostics", None) or {})
+        result.diagnostics = diagnostics
+    existing = diagnostics.get("imcc_notices") or []
+    existing_notices = list(existing) if isinstance(existing, (list, tuple)) else []
+    diagnostics["imcc_notices"] = existing_notices + [
+        notice for notice in provider_notices if notice not in existing_notices
+    ]
+    return result
+
+
 def engine_flags_from_result(
     result: Any,
+    *,
+    quantity: str | None = None,
+    species: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, dict[str, Any] | None]:
-    """Read the engine's own flag, authority, and notice once.
+    """Read the engine's own flag and all provider notices once.
 
     The IMCC battery backend stores one notice list on both
     ``diagnostics['imcc_notices']`` and ``result.imcc_notices``. Reading
-    both appended every notice twice.
+    both appended every notice twice. Builtin provider notices can also be
+    published under the core or alphaMELTS subprocess diagnostic branches.
     """
 
-    diagnostics = getattr(result, "diagnostics", None) or {}
+    diagnostics = (
+        result.get("diagnostics")
+        if isinstance(result, Mapping)
+        else getattr(result, "diagnostics", None)
+    ) or {}
     if not isinstance(diagnostics, Mapping):
         diagnostics = {}
     notices: list[dict[str, Any]] = []
@@ -1711,23 +1826,61 @@ def engine_flags_from_result(
         band = row.get("certified_band")
         if isinstance(band, Mapping):
             certified_band = dict(band)
-    if authority is None and diagnostics.get("authority"):
-        authority = str(diagnostics["authority"])
     if certified_band is None and isinstance(
         diagnostics.get("certified_band"), Mapping
     ):
         certified_band = _plain_data(diagnostics["certified_band"])
 
+    provider_notices = _provider_notice_flags_from_result(result)
+    notices.extend(provider_notices)
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
         imcc_rows = getattr(result, "imcc_notices", None) or []
+    scoped_extrapolation = any(
+        isinstance(row, Mapping)
+        and row.get("authority") == AUTHORITY_EXTRAPOLATED
+        and (
+            row.get("affected_quantities") is not None
+            or row.get("affected_species") is not None
+        )
+        for row in [*provider_notices, *imcc_rows]
+    )
+    diagnostic_authority = diagnostics.get("authority")
+    if authority is None and diagnostic_authority:
+        diagnostic_authority = str(diagnostic_authority)
+        if not (
+            diagnostic_authority == AUTHORITY_EXTRAPOLATED
+            and scoped_extrapolation
+        ):
+            authority = diagnostic_authority
+    if quantity is not None and any(
+        row.get("authority") == AUTHORITY_EXTRAPOLATED
+        and _scope_matches(row.get("affected_quantities"), quantity)
+        and _scope_matches(row.get("affected_species"), species, species=True)
+        for row in provider_notices
+    ):
+        authority = AUTHORITY_EXTRAPOLATED
+
     for row in imcc_rows:
         if not isinstance(row, Mapping):
             continue
         copied = _plain_data(row)
+        if copied in provider_notices:
+            continue
         notices.append(copied)
-        if authority is None and copied.get("authority"):
+        has_scope = (
+            copied.get("affected_quantities") is not None
+            or copied.get("affected_species") is not None
+        )
+        applies_to_request = not has_scope or (
+            quantity is not None
+            and _scope_matches(copied.get("affected_quantities"), quantity)
+            and _scope_matches(
+                copied.get("affected_species"), species, species=True
+            )
+        )
+        if authority is None and copied.get("authority") and applies_to_request:
             authority = str(copied["authority"])
         band = copied.get("certified_band")
         if (
@@ -1768,24 +1921,64 @@ def engine_flags_from_result(
     return notices, authority, certified_band
 
 
-def cell_score_authority(cell: Any, *, refused: bool) -> str:
-    """Envelope authority from the cell. Bridge only when the engine set none."""
+def cell_score_authority(
+    cell: Any,
+    *,
+    refused: bool,
+    quantity: str | None = None,
+    species: str | None = None,
+) -> str:
+    """Cell authority, filtered to the selected result when a scope is supplied."""
 
     if refused:
         return "refused"
     authority = getattr(cell, "authority", None)
-    if authority:
+    if authority and quantity is None and authority != AUTHORITY_EXTRAPOLATED:
         return str(authority)
+    scoped_authority = False
+    applicable_authorities: set[str] = set()
     for row in getattr(cell, "notices", None) or []:
-        if isinstance(row, Mapping) and row.get("authority"):
-            return str(row["authority"])
-    return "bridge"
+        if not isinstance(row, Mapping) or not row.get("authority"):
+            continue
+        affected_quantities = row.get("affected_quantities")
+        affected_species = row.get("affected_species")
+        scoped_authority = scoped_authority or (
+            affected_quantities is not None or affected_species is not None
+        )
+        if quantity is None and (
+            affected_quantities is not None or affected_species is not None
+        ):
+            continue
+        if not _scope_matches(affected_quantities, quantity) or not _scope_matches(
+            affected_species, species, species=True
+        ):
+            continue
+        applicable_authorities.add(str(row["authority"]))
+    if AUTHORITY_EXTRAPOLATED in applicable_authorities:
+        return AUTHORITY_EXTRAPOLATED
+    if applicable_authorities:
+        return min(applicable_authorities)
+    if authority and authority != AUTHORITY_EXTRAPOLATED:
+        return str(authority)
+    if authority == AUTHORITY_EXTRAPOLATED and scoped_authority:
+        return "bridge"
+    return str(authority or "bridge")
 
 
-def cell_score_notice_kinds(cell: Any) -> tuple[str, ...]:
+def cell_score_notice_kinds(
+    cell: Any,
+    *,
+    quantity: str | None = None,
+    species: str | None = None,
+) -> tuple[str, ...]:
     kinds: list[str] = []
     for row in getattr(cell, "notices", None) or []:
-        if isinstance(row, Mapping) and row.get("kind"):
+        if (
+            isinstance(row, Mapping)
+            and row.get("kind")
+            and _scope_matches(row.get("affected_quantities"), quantity)
+            and _scope_matches(row.get("affected_species"), species, species=True)
+        ):
             kinds.append(str(row["kind"]))
     return tuple(kinds)
 
@@ -3863,6 +4056,8 @@ def _internal_analytical_vapor_pressure_adapter(
                         "authority": AUTHORITY_EXTRAPOLATED,
                         "reason": f"{field_name}:{species}:{detail}",
                         "band": str(detail),
+                        "affected_species": [species],
+                        "affected_quantities": ["p_partial"],
                     }
                 )
     for authority_field in ("vapor_pressure_authority", "ellingham_authority"):
@@ -3880,6 +4075,8 @@ def _internal_analytical_vapor_pressure_adapter(
                         "authority": AUTHORITY_EXTRAPOLATED,
                         "reason": f"{authority_field}:{species}:{detail}",
                         "band": str(detail),
+                        "affected_species": [species],
+                        "affected_quantities": ["p_partial"],
                     }
                 )
     floor_notices = core_diagnostic.get("pO2_floor_inversion_notices_by_species")
@@ -3890,9 +4087,10 @@ def _internal_analytical_vapor_pressure_adapter(
                     "kind": "floor_inversion",
                     "authority": AUTHORITY_EXTRAPOLATED,
                     "reason": f"{_FLOOR_INVERSION_REASON}:{species}:{detail}",
+                    "affected_species": [species],
+                    "affected_quantities": ["p_partial"],
                 }
             )
-
     imcc_notices = [*oxygen_notices]
     imcc_notices.extend(core_flags)
     vapor_authority = core_diagnostic.get("vapor_pressure_authority")
@@ -4050,6 +4248,7 @@ def internal_analytical_residue_vapor_pressure(
                 "category": int(exc.category),
             }
         if getattr(result, "status", None) == "ok" and isinstance(getattr(result, "diagnostics", None), Mapping):
+            result = _preserve_provider_notices_for_engine_cache(result)
             return equilibrium_to_hot(vars(result), engine_id="internal-analytical", live_value=result)
         return result
 

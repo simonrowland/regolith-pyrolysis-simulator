@@ -647,6 +647,7 @@ from simulator.fe_redox import (
     calphad_ferrous_feo_activity_diagnostic,
     feot_equivalent_wt_pct,
     floor_vacuum_pressure_bar,
+    holzheid_authority_notice,
     intrinsic_melt_fO2,
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     fe_metal_saturation_log10_fO2_bar,
@@ -8986,6 +8987,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             fO2_log=fO2_log,
         )
         native_state = dict(native_extent['native_fe_state'])
+        native_extrapolation = any(
+            notice.get('authority') == 'extrapolated'
+            or notice.get('authority_level') == 'extrapolated'
+            for notice in native_state.get('notices', ())
+            if isinstance(notice, Mapping)
+        )
         native = min(1.0, max(0.0, float(
             native_extent.get('native_fe_frac', 0.0) or 0.0,
         )))
@@ -9009,8 +9016,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'temperature_band_case': split.get('temperature_band_case'),
             'temperature_band_status': split.get('temperature_band_status'),
             'temperature_band_source': split.get('temperature_band_source'),
-            'authoritative': bool(split.get('authoritative', False)),
-            'extrapolation': bool(split.get('extrapolation', False)),
+            'authoritative': (
+                bool(split.get('authoritative', False))
+                and not native_extrapolation
+            ),
+            'extrapolation': (
+                bool(split.get('extrapolation', False))
+                or native_extrapolation
+            ),
             'high_uncertainty': bool(split.get('high_uncertainty', False)),
             **(
                 {'native_fe_partition': dict(
@@ -9071,15 +9084,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 'native Fe saturation split requires grounded FeO activity; '
                 'CALPHAD/Holzheid FeO activity diagnostic failed'
             ) from exc
-        notices = activity.get("notices")
+        notices = list(activity.get("notices") or ())
+        holzheid_notice = holzheid_authority_notice(activity, consumed=True)
+        if holzheid_notice is not None:
+            notices.append(holzheid_notice)
 
-        def _carry_liquidus_notice(payload: Dict[str, Any]) -> Dict[str, Any]:
+        def _carry_activity_notices(payload: Dict[str, Any]) -> Dict[str, Any]:
             if notices:
-                payload["notices"] = list(notices)
+                payload["notices"] = notices
             return payload
 
         if a_feo <= 0.0 or not math.isfinite(a_feo):
-            return _carry_liquidus_notice({
+            return _carry_activity_notices({
                 'native_fe_saturation': False,
                 'native_fe_threshold': 'FeO_activity_saturation',
                 'native_fe_frac': 0.0,
@@ -9113,7 +9129,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             else:
                 native = ferrous_available * (1.0 - a_feo_saturation / a_feo)
         native = min(ferrous_available, max(0.0, native))
-        return _carry_liquidus_notice({
+        return _carry_activity_notices({
             'native_fe_saturation': native > 0.0,
             'native_fe_threshold': 'FeO_activity_saturation',
             'native_fe_frac': native,

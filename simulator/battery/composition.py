@@ -28,6 +28,7 @@ from simulator.reference_data.janaf import formula_composition
 _VOLUME_BASIS_DROPS = str.maketrans("", "", " _-\u2013\u2014")
 _VOLUME_PERCENT_SCALES = frozenset({"volpercent", "volumepercent"})
 _VOLUME_PPM_SCALES = frozenset({"volppm", "volumeppm", "vppm"})
+_GAS_PHASE_SUFFIX = "_gas"
 
 
 # Absolute tolerance on a phase point's mole-fraction sum. 1 ± 0.02.
@@ -41,6 +42,17 @@ def parse_species_formula(formula: str) -> tuple[tuple[str, float], ...] | None:
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
     return formula_composition(formula)
+
+
+def canonical_species_key(formula: object) -> str:
+    """Normalize the two gas spellings shared by pressure keys and identities."""
+
+    text = str(formula).strip()
+    if text.endswith(_GAS_PHASE_SUFFIX):
+        return text[: -len(_GAS_PHASE_SUFFIX)].rstrip()
+    if text.endswith("(g)"):
+        return text[:-3].rstrip()
+    return text
 
 
 def ideal_gas_volume_scale(token: object) -> str | None:
