@@ -165,6 +165,8 @@ def _payload_codec_version(artifact: str) -> int | None:
 def _payload_codec_is_current(
     artifact: str,
     payload: Any,
+    *,
+    key: Mapping[str, Any] | None = None,
 ) -> bool:
     version = _payload_codec_version(artifact)
     if version is None:
@@ -184,18 +186,63 @@ def _payload_codec_is_current(
         if not _curve_floor_marker_is_valid(curve, require_present=True):
             return False
         step_down = curve.get("gate_provider_step_down")
-        if not isinstance(step_down, Mapping):
-            return True
-        magemin_sourced = (
-            step_down.get("realized_provider") == _MAGEMIN_SHADOW_PROVIDER_ID
-            or step_down.get("magemin_sourced") is True
-        )
-        if (
-            "magemin_sourced" in step_down
-            and type(step_down["magemin_sourced"]) is not bool
-        ):
+        if step_down is not None and not isinstance(step_down, Mapping):
             return False
-        return not magemin_sourced or "magemin_sourced" in step_down
+        identity = (
+            _magemin_identity_from_replay_key(key)
+            if key is not None
+            else None
+        )
+        if isinstance(step_down, Mapping):
+            if (
+                "magemin_sourced" in step_down
+                and type(step_down["magemin_sourced"]) is not bool
+            ):
+                return False
+            if (
+                step_down.get("realized_provider")
+                == _MAGEMIN_SHADOW_PROVIDER_ID
+                or (
+                    identity is not None
+                    and identity.silica_verdict == "extrapolated"
+                )
+            ) and "magemin_sourced" not in step_down:
+                return False
+        if identity is None or identity.silica_verdict == "in_band":
+            return True
+        if identity.silica_verdict != "extrapolated":
+            return False
+        certified_band = curve.get("certified_band")
+        silica_bounds = (
+            certified_band.get("sio2_wt_pct")
+            if isinstance(certified_band, Mapping)
+            else None
+        )
+        parsed_silica_bounds = None
+        if (
+            isinstance(silica_bounds, (list, tuple))
+            and len(silica_bounds) == 2
+            and all(
+                isinstance(bound, (int, float))
+                and not isinstance(bound, bool)
+                for bound in silica_bounds
+            )
+        ):
+            try:
+                parsed_silica_bounds = tuple(
+                    float(bound) for bound in silica_bounds
+                )
+            except (OverflowError, TypeError, ValueError):
+                parsed_silica_bounds = None
+        return (
+            identity.certified_band is not None
+            and curve.get("authority") == "extrapolated"
+            and isinstance(certified_band, Mapping)
+            and parsed_silica_bounds is not None
+            and all(math.isfinite(bound) for bound in parsed_silica_bounds)
+            and parsed_silica_bounds[0] < parsed_silica_bounds[1]
+            and parsed_silica_bounds == identity.certified_band
+        )
     if artifact == "equilibrium_post_record":
         if version != PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION:
             return False
@@ -1062,18 +1109,10 @@ class PT0DeterminismStore:
             )
             for provider_role in roles
         )
-        require_domain_diagnostic = False
-        if getattr(sim, "_liquid_fraction_provider", None) == "magemin":
-            identity = _magemin_identity_from_replay_key(keys[0])
-            require_domain_diagnostic = (
-                identity is not None
-                and identity.silica_verdict != "in_band"
-            )
         payload = self._lookup_first_available(
             "freeze_gate_curve",
             keys,
             sim=sim,
-            require_gate_curve_domain_diagnostic=require_domain_diagnostic,
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
         return _curve_from_payload(payload["curve"])
@@ -1236,6 +1275,7 @@ class PT0DeterminismStore:
             and not _payload_codec_is_current(
                 artifact,
                 existing.get("payload"),
+                key=key,
             )
         )
         if existing is not None:
@@ -1327,7 +1367,6 @@ class PT0DeterminismStore:
         keys: tuple[Mapping[str, Any], ...],
         *,
         sim: Any | None = None,
-        require_gate_curve_domain_diagnostic: bool = False,
     ) -> dict[str, Any]:
         if not keys:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
@@ -1346,56 +1385,12 @@ class PT0DeterminismStore:
             if not _payload_codec_is_current(
                 artifact,
                 entry.get("payload"),
+                key=key,
             ):
                 continue
             if artifact == "freeze_gate_curve":
                 curve_payload = (entry.get("payload") or {}).get("curve")
                 if not isinstance(curve_payload, Mapping):
-                    continue
-            if require_gate_curve_domain_diagnostic:
-                identity = _magemin_identity_from_replay_key(key)
-                curve_payload = (entry.get("payload") or {}).get("curve")
-                certified_band = (
-                    curve_payload.get("certified_band")
-                    if isinstance(curve_payload, Mapping)
-                    else None
-                )
-                silica_bounds = (
-                    certified_band.get("sio2_wt_pct")
-                    if isinstance(certified_band, Mapping)
-                    else None
-                )
-                parsed_silica_bounds = None
-                if (
-                    isinstance(silica_bounds, (list, tuple))
-                    and len(silica_bounds) == 2
-                    and all(
-                        isinstance(bound, (int, float))
-                        and not isinstance(bound, bool)
-                        for bound in silica_bounds
-                    )
-                ):
-                    try:
-                        parsed_silica_bounds = tuple(
-                            float(bound) for bound in silica_bounds
-                        )
-                    except (OverflowError, TypeError, ValueError):
-                        parsed_silica_bounds = None
-                valid_silica_bounds = (
-                    parsed_silica_bounds is not None
-                    and all(math.isfinite(bound) for bound in parsed_silica_bounds)
-                    and parsed_silica_bounds[0] < parsed_silica_bounds[1]
-                )
-                if (
-                    identity is None
-                    or identity.silica_verdict != "extrapolated"
-                    or identity.certified_band is None
-                    or not isinstance(curve_payload, Mapping)
-                    or curve_payload.get("authority") != "extrapolated"
-                    or not isinstance(certified_band, Mapping)
-                    or not valid_silica_bounds
-                    or parsed_silica_bounds != identity.certified_band
-                ):
                     continue
             if not _disclosures_known(entry):
                 continue
@@ -1464,6 +1459,7 @@ class PT0DeterminismStore:
             if entry is not None and not _payload_codec_is_current(
                 artifact,
                 entry.get("payload"),
+                key=candidate_key,
             ):
                 entry = None
             cache_state = "cached_exact"
@@ -1478,6 +1474,7 @@ class PT0DeterminismStore:
                 entry = self._entry_for_physics_bucket(
                     artifact,
                     candidate_physics_bucket_key,
+                    query_key=candidate_key,
                 )
                 cache_state = "cached_physics_bucket"
                 physics_bucket_hash = _sha256(
@@ -1494,6 +1491,7 @@ class PT0DeterminismStore:
                             artifact,
                             rung_tag,
                             rung_key,
+                            query_key=candidate_key,
                         )
                         if entry is not None:
                             cache_state = "cached_physics_bucket"
@@ -1530,6 +1528,7 @@ class PT0DeterminismStore:
                 and not _payload_codec_is_current(
                     artifact,
                     entry.get("payload"),
+                    key=candidate_key,
                 )
             ):
                 entry = None
@@ -1614,6 +1613,8 @@ class PT0DeterminismStore:
         self,
         artifact: str,
         physics_bucket_key: Mapping[str, Any],
+        *,
+        query_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
         physics_bucket_hash = _sha256(physics_bucket_bytes)
@@ -1623,7 +1624,19 @@ class PT0DeterminismStore:
             entry is not None
             and entry.get("artifact") == artifact
             and entry.get("physics_bucket_hash") == physics_bucket_hash
-            and _payload_codec_is_current(artifact, entry.get("payload"))
+            and _payload_codec_is_current(
+                artifact,
+                entry.get("payload"),
+                key=entry.get("key"),
+            )
+            and (
+                query_key is None
+                or _payload_codec_is_current(
+                    artifact,
+                    entry.get("payload"),
+                    key=query_key,
+                )
+            )
         ):
             return entry
         entry = None
@@ -1634,6 +1647,15 @@ class PT0DeterminismStore:
                 and _payload_codec_is_current(
                     artifact,
                     candidate.get("payload"),
+                    key=candidate.get("key"),
+                )
+                and (
+                    query_key is None
+                    or _payload_codec_is_current(
+                        artifact,
+                        candidate.get("payload"),
+                        key=query_key,
+                    )
                 )
             ):
                 entry = candidate
@@ -1644,10 +1666,12 @@ class PT0DeterminismStore:
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
+                query_key=query_key,
             )
             if entry is not None and not _payload_codec_is_current(
                 artifact,
                 entry.get("payload"),
+                key=query_key or entry.get("key"),
             ):
                 entry = None
             if entry is not None:
@@ -1739,6 +1763,12 @@ class PT0DeterminismStore:
             if _payload_codec_is_current(
                 artifact,
                 candidate.get("payload"),
+                key=candidate.get("key"),
+            )
+            and _payload_codec_is_current(
+                artifact,
+                candidate.get("payload"),
+                key=key,
             )
         ]
         for candidate in candidates:
@@ -1949,6 +1979,11 @@ class PT1PersistentEquilibriumStore:
                 stale_payload = not _payload_codec_is_current(
                     artifact,
                     entry.get("payload"),
+                    key=entry.get("key"),
+                ) or not _payload_codec_is_current(
+                    artifact,
+                    entry.get("payload"),
+                    key=key,
                 )
                 if not stale_payload and (
                     entry["payload_hash"] != payload_hash
@@ -2190,6 +2225,7 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_key: Mapping[str, Any],
         physics_bucket_bytes: bytes,
         physics_bucket_hash: str,
+        query_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
         query = f"""
             SELECT *
@@ -2225,6 +2261,14 @@ class PT1PersistentEquilibriumStore:
                     if _payload_codec_is_current(
                         artifact,
                         entry.get("payload"),
+                        key=entry.get("key"),
+                    ) and (
+                        query_key is None
+                        or _payload_codec_is_current(
+                            artifact,
+                            entry.get("payload"),
+                            key=query_key,
+                        )
                     ):
                         return entry
             return None
@@ -2277,6 +2321,12 @@ class PT1PersistentEquilibriumStore:
                         raise PT1PersistentStoreCorrupt(
                             f"PT-1 row exact key replay scope mismatch: {row_hash}"
                         )
+                    if not _payload_codec_is_current(
+                        artifact,
+                        entry.get("payload"),
+                        key=entry.get("key"),
+                    ):
+                        continue
                     candidates.append(
                         {
                             "artifact": artifact,
@@ -2340,6 +2390,14 @@ class PT1PersistentEquilibriumStore:
                     if not _payload_codec_is_current(
                         artifact,
                         entry.get("payload"),
+                        key=entry.get("key"),
+                    ) or (
+                        query_key is not None
+                        and not _payload_codec_is_current(
+                            artifact,
+                            entry.get("payload"),
+                            key=query_key,
+                        )
                     ):
                         continue
                     if query_key is not None and _physics_ladder_coarsens_controls(
@@ -3769,7 +3827,52 @@ def _magemin_identity_from_replay_key(
     identity = getattr(freeze_gate_key, "magemin_domain_identity", None)
     from simulator.melt_backend.magemin import MAGEMinDomainIdentity
 
-    return identity if isinstance(identity, MAGEMinDomainIdentity) else None
+    if isinstance(identity, MAGEMinDomainIdentity):
+        return identity
+    if isinstance(freeze_gate_key, Mapping):
+        identity_payload = freeze_gate_key.get("magemin_domain_identity")
+    elif (
+        isinstance(freeze_gate_key, (list, tuple))
+        and len(freeze_gate_key) == 9
+    ):
+        # PT-1 stores NamedTuple keys as arrays; the typed d-447 identity is
+        # the eighth field in _FlaggedFreezeGateCurveCacheKey.
+        identity_payload = freeze_gate_key[7]
+    else:
+        identity_payload = None
+    if isinstance(identity_payload, Mapping):
+        band = identity_payload.get("certified_band")
+        if isinstance(band, list):
+            if len(band) != 2 or any(
+                isinstance(bound, bool)
+                or not isinstance(bound, (int, float))
+                for bound in band
+            ):
+                return None
+            band = tuple(float(bound) for bound in band)
+        elif band is not None:
+            return None
+        silica_verdict = identity_payload.get("silica_verdict")
+        projection_verdict = identity_payload.get(
+            "projection_threshold_verdict"
+        )
+        refusal_reason = identity_payload.get("refusal_reason")
+        if (
+            not isinstance(silica_verdict, str)
+            or not isinstance(projection_verdict, str)
+            or (
+                refusal_reason is not None
+                and not isinstance(refusal_reason, str)
+            )
+        ):
+            return None
+        return MAGEMinDomainIdentity(
+            silica_verdict,
+            projection_verdict,
+            band,
+            refusal_reason,
+        )
+    return None
 
 
 def canonical_physics_bucket_key(

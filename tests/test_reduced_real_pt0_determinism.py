@@ -4649,6 +4649,119 @@ def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
     assert replay._lookup("freeze_gate_curve", key) == current_payload
 
 
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "bad_band",
+    (None, [0.0, 100.0]),
+    ids=("missing-band", "wrong-band"),
+)
+def test_extrapolated_gate_rows_that_miss_d447_are_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    bad_band: list[float] | None,
+) -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    db_path = (
+        tmp_path / "extrapolated-gate-row-recapture.sqlite"
+        if persistent
+        else None
+    )
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(store)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._liquid_fraction_provider = "magemin"
+    register_synthetic_gate_curve_producer(sim)
+    composition_wt_pct = {
+        "SiO2": 80.001,
+        "MgO": 10.0,
+        "FeO": 9.999,
+    }
+    composition_mol = {
+        species: amount
+        / resolve_species_formula(
+            species,
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
+        for species, amount in composition_wt_pct.items()
+    }
+    ledger = AtomLedger(registry=sim.atom_ledger.registry)
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        composition_mol,
+        source="r33 extrapolated cache admission regression",
+        material_origin="feedstock",
+    )
+    sim.atom_ledger = ledger
+    sim._chem_kernel = sim._build_chemistry_kernel()
+    sim.inventory.inert_melt_components_kg.clear()
+    sim._project_cleaned_melt_from_atom_ledger()
+    key = canonical_replay_key(
+        sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=float(sim._current_melt_redox_fO2_log()),
+        fe_redox_policy="intrinsic",
+        provider_role="fallback",
+    )
+    identity = key["freeze_gate_cache_key"].magemin_domain_identity
+    assert identity.silica_verdict == "extrapolated"
+    assert identity.certified_band == (30.0, 80.0)
+    stored_identity = rrd._magemin_identity_from_replay_key(
+        rrd._json_ready(key)
+    )
+    assert stored_identity.matches(identity)
+
+    stale_curve = {
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1300.0,
+        "path": [],
+        "is_liquidus_floor": False,
+        "authority": "extrapolated",
+        "gate_provider_step_down": {
+            "failed_providers": [],
+            "realized_provider": None,
+            "magemin_sourced": True,
+        },
+    }
+    if bad_band is not None:
+        stale_curve["certified_band"] = {"sio2_wt_pct": bad_band}
+    current_curve = {
+        **stale_curve,
+        "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
+    }
+    store._store(
+        "freeze_gate_curve",
+        key,
+        {"curve": stale_curve},
+        law_disclosures=[],
+    )
+    miss = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else store
+    )
+    with pytest.raises(PT0CacheMiss):
+        miss._lookup("freeze_gate_curve", key)
+
+    store._store(
+        "freeze_gate_curve",
+        key,
+        {"curve": current_curve},
+        law_disclosures=[],
+    )
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else store
+    )
+    assert replay._lookup("freeze_gate_curve", key) == {
+        "curve": current_curve,
+    }
+
+
 def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -4697,7 +4810,7 @@ def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
     assert live_curve["certified_band"] == {
         "sio2_wt_pct": [30.0, 80.0],
     }
-    assert live_curve["is_liquidus_floor"] is False
+    assert live_curve.get("is_liquidus_floor", False) is False
     assert live_curve["gate_provider_step_down"]["magemin_sourced"] is True
 
     fO2_log = float(live_sim._current_melt_redox_fO2_log())
@@ -4734,6 +4847,110 @@ def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
     )
     replay = PT0DeterminismStore("replay", db_path=db_path)
     replay_sim = configure_sim(replay)
+    curve = replay_sim._establish_melt_redox_gate_authority_for_current_hour()
+    assert curve["authority"] == "extrapolated"
+    assert replay.last_cache_state == "cached_exact"
+
+    activity = replay_sim._native_fe_saturation_state(
+        composition_wt_pct,
+        fe3_over_sigma_fe=0.1,
+        T_K=1800.0 + 273.15,
+        pressure_bar=float(replay_sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=float(replay_sim._current_melt_redox_fO2_log()),
+    )
+    identity_notice = next(
+        notice
+        for notice in activity["notices"]
+        if notice.get("kind") == "magemin_domain_identity"
+    )
+    assert identity_notice["authority"] == "extrapolated"
+    assert identity_notice["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
+
+
+def test_projected_magemin_step_down_replay_keeps_d447_feo_flag(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.accounting.formulas import resolve_species_formula
+    from simulator.accounting.ledger import AtomLedger
+
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
+    composition_wt_pct = {
+        "SiO2": 79.9,
+        "MgO": 14.6,
+        "MnO": 0.5,
+        "FeO": 5.0,
+    }
+    db_path = tmp_path / "projected-magemin-step-down.sqlite"
+
+    def configure_sim(store):
+        sim = _build_pt0_sim(store)
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        sim._liquid_fraction_provider = "magemin"
+        register_synthetic_gate_curve_producer(sim)
+        composition_mol = {
+            species: amount
+            / resolve_species_formula(
+                species,
+                sim.species_formula_registry,
+            ).molar_mass_kg_per_mol()
+            for species, amount in composition_wt_pct.items()
+        }
+        ledger = AtomLedger(registry=sim.atom_ledger.registry)
+        ledger.load_external_mol(
+            "process.cleaned_melt",
+            composition_mol,
+            source="r33 projected MAGEMin step-down replay regression",
+            material_origin="feedstock",
+        )
+        sim.atom_ledger = ledger
+        sim._chem_kernel = sim._build_chemistry_kernel()
+        sim.inventory.inert_melt_components_kg.clear()
+        sim._project_cleaned_melt_from_atom_ledger()
+        trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+        return sim, trace
+
+    live_sim, trace = configure_sim(PT0DeterminismStore("capture"))
+    live_curve = live_sim._freeze_gate_curve_record()["curve"]
+    assert trace["provider_diagnostics"][0]["backend_status"] == "out_of_domain"
+    assert (
+        trace["provider_diagnostics"][0]["backend_diagnostics"][
+            "projected_liquidus_status"
+        ]
+        == "ok"
+    )
+    assert live_curve["authority"] == "extrapolated"
+    assert live_curve["certified_band"] == {
+        "sio2_wt_pct": [30.0, 80.0],
+    }
+    step_down = live_curve["gate_provider_step_down"]
+    assert len(step_down["failed_providers"]) == 2
+    assert step_down["failed_providers"][0]["status"] == "out_of_domain"
+    assert step_down["failed_providers"][1]["status"] != "ok"
+    assert step_down["realized_provider"] is None
+    assert step_down["magemin_sourced"] is True
+
+    key = canonical_replay_key(
+        live_sim,
+        artifact="freeze_gate_curve",
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        fO2_log=float(live_sim._current_melt_redox_fO2_log()),
+        fe_redox_policy="intrinsic",
+        provider_role="fallback",
+    )
+    payload = {"curve": rrd._curve_payload(live_curve)}
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    store._store(
+        "freeze_gate_curve",
+        key,
+        payload,
+        law_disclosures=[],
+    )
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim, _replay_trace = configure_sim(replay)
     curve = replay_sim._establish_melt_redox_gate_authority_for_current_hour()
     assert curve["authority"] == "extrapolated"
     assert replay.last_cache_state == "cached_exact"
