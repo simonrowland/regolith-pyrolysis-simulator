@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from functools import lru_cache
-import os
 from pathlib import Path
 import re
 from typing import Mapping
@@ -348,9 +347,9 @@ def append_proposal(
         for flag in flags
     ):
         raise ValueError("proposal flag must be a closed default-policy token")
-    proposer = proposed_by or os.environ.get("GOALFLIGHT_DISPATCH_ID")
+    proposer = proposed_by
     if not proposer:
-        raise ValueError("proposed_by or GOALFLIGHT_DISPATCH_ID is required")
+        raise ValueError("proposed_by is required")
     timestamp = proposed_at or datetime.now(timezone.utc).isoformat()
     try:
         parsed_timestamp = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))

@@ -287,11 +287,10 @@ def test_cli_discovery_matches_web_run_locations_and_runs_override(tmp_path, mon
     imported.parent.mkdir(parents=True)
     imported.write_bytes(b"hash-indexed archive member")
     (imported.parent / IMPORT_OVERLAY_NAME).write_text("{}")
-    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current",))
 
     assert {p / "cache.sqlite" for p in optimizer_run_dirs(root)} == set(paths)
-    assert cli.main(["prune-stale-corpus"]) == 0
+    assert cli.main(["prune-stale-corpus", "--runs-root", str(root)]) == 0
     report = json.loads(capsys.readouterr().out.splitlines()[-1])
     assert {item["store"] for item in report["stores"]} == {
         *(str(path) for path in paths), str(imported.resolve())
@@ -356,9 +355,7 @@ def test_default_report_keeps_pareto_and_lists_quarantined_store(tmp_path, monke
     quarantined = root / "imported" / "study-a"
     quarantined.mkdir(parents=True)
     (quarantined / "cache.sqlite").write_bytes(b"archive")
-    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
-
-    assert cli.main(["prune-stale-corpus"]) == 0
+    assert cli.main(["prune-stale-corpus", "--runs-root", str(root)]) == 0
 
     report = json.loads(capsys.readouterr().out.splitlines()[-1])
     assert {entry["artifact_kind"] for entry in report["stores"]} == {
@@ -375,9 +372,7 @@ def _assert_import_staging_is_not_discovered(tmp_path, monkeypatch, capsys):
     staging_store.parent.mkdir(parents=True)
     staging_store.write_bytes(b"partially published import")
     (staging_store.parent / IMPORT_OVERLAY_NAME).write_text("{}")
-    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
-
-    assert cli.main(["prune-stale-corpus"]) == 0
+    assert cli.main(["prune-stale-corpus", "--runs-root", str(root)]) == 0
 
     output = capsys.readouterr().out
     report = json.loads(output.splitlines()[-1])
@@ -398,7 +393,6 @@ def _assert_explicit_staging_store_is_refused(tmp_path, monkeypatch, capsys):
     members = import_fixtures["_members"](tmp_path)
     members[OPTIMIZER_CACHE_NAME] = indexed_db.read_bytes()
     bundle = import_fixtures["_write_zip"](tmp_path / "live-import.rpstudy.zip", members)
-    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
     replace = Path.replace
     attempted_report = []
@@ -419,7 +413,8 @@ def _assert_explicit_staging_store_is_refused(tmp_path, monkeypatch, capsys):
             observed_staging.append(staging)
             try:
                 cli.main([
-                    "prune-stale-corpus", "--store", str(staging_store), "--apply"
+                    "prune-stale-corpus", "--runs-root", str(root),
+                    "--store", str(staging_store), "--apply"
                 ])
             except StagedImportStoreError as exc:
                 assert str(staging.resolve()) in str(exc)
@@ -566,10 +561,12 @@ def _assert_native_export_is_pruned(tmp_path, monkeypatch, capsys):
 
     export_study_bundle(run_dir)
     assert (run_dir / ARTIFACT_INDEX_NAME).is_file()
-    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(run_dir.parent))
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
 
-    assert cli.main(["prune-stale-corpus", "--store", str(store.path), "--apply"]) == 0
+    assert cli.main([
+        "prune-stale-corpus", "--runs-root", str(run_dir.parent),
+        "--store", str(store.path), "--apply",
+    ]) == 0
 
     assert _keys(store) == {"current", "older-compatible", "unversioned"}
     report = json.loads(capsys.readouterr().out.splitlines()[-1])
