@@ -14677,8 +14677,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 None,
             )
             if isinstance(gate_curve_memo, dict):
-                # This keyed memo contains only solved curves; per-hour held,
-                # floor, and refusal state remains private to each simulator.
+                # The keyed memo holds provider-solved curves and stable
+                # out-of-domain floors with their refusal notices. The shared
+                # cacheability rule excludes transient outcomes and holds.
                 memo[id(gate_curve_memo)] = gate_curve_memo
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend

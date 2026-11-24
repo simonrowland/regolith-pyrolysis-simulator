@@ -2271,16 +2271,37 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
             'solidus_T_C': 1200.0, 'liquidus_T_C': 1500.0,
             'path': ((1200.0, 0.0), (1500.0, 1.0)),
         })
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    process_captures = []
+    if held:
+        capture_store = SimpleNamespace(
+            replay_enabled=False,
+            capture_enabled=True,
+            capture_gate_curve=lambda *args, **kwargs: process_captures.append(
+                (args, kwargs)
+            ),
+        )
+        monkeypatch.setattr(sim, '_pt0_store', lambda: capture_store)
     projection = MAGEMinBackend()._build_db_bulk_projection(
         {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 3.0, 'MnO': 2.0},
     )
-    monkeypatch.setattr(sim, '_dispatch_only', lambda *args, **kwargs: SimpleNamespace(
-        status='out_of_domain', warnings=(), diagnostic={
-            'backend_status_reason': 'composition_projected',
-            'input_composition_projection': _magemin_bulk_projection_details(projection),
-            'solidus_T_C': 900.0, 'liquidus_T_C': 1100.0,
-        },
-    ))
+
+    def over_limit_dispatch(*args, **kwargs):
+        return SimpleNamespace(
+            status='out_of_domain',
+            warnings=(),
+            diagnostic={
+                'backend_status_reason': 'composition_projected',
+                'input_composition_projection': (
+                    _magemin_bulk_projection_details(projection)
+                ),
+                'solidus_T_C': 900.0,
+                'liquidus_T_C': 1100.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', over_limit_dispatch)
     curve = sim._melt_redox_liquidus_gate_curve()
     notice = curve['composition_projected_notice']
     assert 'composition_projected_over_threshold' in notice['reason']
@@ -2288,6 +2309,31 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
     if held:
         assert curve['path'] == ((1200.0, 0.0), (1500.0, 1.0))
         assert curve['gate_provider_refusal']['qualification'] == 'held_last_good_curve'
+        assert not sim._freeze_gate_liquid_fraction_curve_memo
+        assert sim._freeze_gate_liquid_fraction_cache is None
+        assert shared_cache == {}
+        assert process_captures == []
+
+        live_memo = deepcopy(sim._freeze_gate_liquid_fraction_curve_memo)
+        forecast, unavailable = sim._build_c0_forecast_context()
+        assert forecast is not None, unavailable
+        assert (
+            forecast._freeze_gate_liquid_fraction_curve_memo
+            is sim._freeze_gate_liquid_fraction_curve_memo
+        )
+        forecast._freeze_gate_shared_curve_cache = shared_cache
+        forecast.melt.p_total_mbar += 100.0
+        monkeypatch.setattr(forecast, '_dispatch_only', over_limit_dispatch)
+
+        forecast_curve = forecast._melt_redox_liquidus_gate_curve()
+
+        assert forecast_curve['gate_provider_refusal']['qualification'] == (
+            'held_last_good_curve'
+        )
+        assert sim._freeze_gate_liquid_fraction_curve_memo == live_memo
+        assert forecast._freeze_gate_liquid_fraction_cache is None
+        assert shared_cache == {}
+        assert process_captures == []
     else:
         assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
         assert notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
