@@ -3986,6 +3986,92 @@ class EvaporationMixin:
             },
         )
 
+    def _lower_rung_gate_provider_refusal(
+        self,
+        failure: Mapping[str, Any],
+        diagnostic: Mapping[str, Any],
+        *,
+        timeout_reason: str | None,
+        fallback_authority: str | None = None,
+    ) -> dict[str, Any]:
+        """Stamp the Kress floor as the next callable liquid-fraction rung.
+
+        An ig-order drop (``composition_projected``) is on every lunar call
+        that reaches MAGEMin. It is not why an execution failure left the
+        declared provider. The flag names the exception, or the category
+        token when the diagnostic has only that domain label.
+        """
+        from engines.domain_reason import (
+            STABLE_OUT_OF_DOMAIN_REASONS,
+            reason_value,
+        )
+
+        def first_string(node: Any, key: str) -> str | None:
+            if not isinstance(node, Mapping):
+                return None
+            value = node.get(key)
+            if isinstance(value, str) and value.strip():
+                return value.strip()
+            for child in (
+                'backend_diagnostics',
+                'projected_liquidus_diagnostics',
+            ):
+                found = first_string(node.get(child), key)
+                if found is not None:
+                    return found
+            return None
+
+        stable_domain = {
+            str(reason_value(item) or '').strip().lower()
+            for item in STABLE_OUT_OF_DOMAIN_REASONS
+        }
+        if fallback_authority is not None:
+            candidate = first_string(diagnostic, 'backend_failure_exception')
+            if not candidate:
+                candidate = (
+                    diagnostic.get('backend_status_reason')
+                    or diagnostic.get('reason')
+                )
+                if (
+                    isinstance(candidate, str)
+                    and candidate.strip().lower() in stable_domain
+                ):
+                    candidate = None
+        else:
+            candidate = (
+                timeout_reason
+                or diagnostic.get('backend_status_reason')
+                or diagnostic.get('reason')
+            )
+        refusal = {
+            **failure,
+            'reason': candidate or failure['reason'],
+            'qualification': 'first_call_kress91_floor_prediction',
+            'authority': 'extrapolated (lower-rung)',
+            'failure_hour': int(self.melt.hour),
+            'failure_temperature_C': float(self.melt.temperature_C),
+            'detail': (
+                'Kress91 calibration-floor step; '
+                'not a fresh solve or a melting measurement'
+            ),
+        }
+        if fallback_authority is not None:
+            refusal['fallback_authority'] = fallback_authority
+        return refusal
+
+    def _return_lower_rung_gate_curve(
+        self,
+        curve: dict[str, Any],
+        *,
+        timeout_reason: str | None,
+    ) -> dict[str, Any]:
+        if timeout_reason == 'engine_worker_timeout':
+            return self._record_freeze_gate_magemin_timeout_fallback_notice(
+                curve,
+                timeout_reason=timeout_reason,
+            )
+        return curve
+
     def _freeze_gate_curve(
         self,
         *,
@@ -4058,6 +4144,22 @@ class EvaporationMixin:
         }
         return curve
 
+    def _matching_freeze_gate_hold(self) -> dict[str, Any] | None:
+        """Return this hour's tick-local gate curve, if one was already built.
+
+        Callers that only need the curve must use this before entering
+        ``_freeze_gate_curve_record``. A second entry would record the
+        same held curve again.
+        """
+        held = getattr(self, '_freeze_gate_held_curve_record', None)
+        if (
+            isinstance(held, Mapping)
+            and held.get('hour') == int(self.melt.hour)
+            and held.get('provider') == self._liquid_fraction_provider
+        ):
+            return copy.deepcopy(held['record'])
+        return None
+
     def _freeze_gate_curve_record(
         self,
         *,
@@ -4082,13 +4184,9 @@ class EvaporationMixin:
                 )
             return gate_curve_memo_record(curve, None, (), 'live')
 
-        held = self._freeze_gate_held_curve_record
-        if (
-            held is not None
-            and held['hour'] == int(self.melt.hour)
-            and held['provider'] == self._liquid_fraction_provider
-        ):
-            return copy.deepcopy(held['record'])
+        held_record = self._matching_freeze_gate_hold()
+        if held_record is not None:
+            return held_record
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
@@ -4290,11 +4388,26 @@ class EvaporationMixin:
                 )
                 # Holds and first-call floors are tick-local, never solved memos.
                 published = _gate_curve_live_publication(record, curve)
-                self._freeze_gate_held_curve_record = {
-                    'hour': int(self.melt.hour),
-                    'provider': self._liquid_fraction_provider,
-                    'record': copy.deepcopy(published),
-                }
+                # A swallowed startup error left no backend. Holding that floor
+                # would skip the next construction attempt.
+                registry = getattr(self, '_chem_registry', None)
+                provider = (
+                    registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+                    if registry is not None else None
+                )
+                startup_pending = (
+                    provider is not None
+                    and getattr(provider, '_backend', None) is None
+                    and getattr(
+                        provider, '_backend_initialization_error', None,
+                    ) is not None
+                )
+                if not startup_pending:
+                    self._freeze_gate_held_curve_record = {
+                        'hour': int(self.melt.hour),
+                        'provider': self._liquid_fraction_provider,
+                        'record': copy.deepcopy(published),
+                    }
                 return published
 
             # Invalid projected bounds are not a liquidus. The Kress floor
@@ -4760,9 +4873,11 @@ class EvaporationMixin:
         repair_notices: list[dict[str, Any]] | None = None,
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.fidelity_vocabulary import EvidenceClass
         from simulator.reduced_real_determinism import (
             ENVIRONMENT_RETRIES_KEY,
             GateCurveProviderOutcome,
+            gate_curve_provider_failure_is_terminal_input,
             gate_curve_provider_outcome_for_status,
             gate_curve_provider_outcome_token,
             gate_curve_bounds_are_usable,
@@ -4877,55 +4992,69 @@ class EvaporationMixin:
                 **({'detail': diagnostic['exception_message']}
                    if diagnostic.get('exception_message') else {}),
             }
-            if (
-                status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
-                or timeout_reason is not None
-            ):
-                held = self._hold_freeze_gate_provider_curve(
-                    failure,
-                    timeout_reason=timeout_reason,
+            # d-298 holds the same provider's last curve only for a
+            # numerical failure or a timeout. An execution failure (worker
+            # death, missing binary, OSError) is not that hold: the next
+            # callable rung is the Kress floor. Missing or invalid input
+            # still refuses, because no rung can be called on it.
+            terminal_input = gate_curve_provider_failure_is_terminal_input(
+                diagnostic,
+            )
+            same_provider_hold = (
+                not terminal_input
+                and (
+                    status_outcome is GateCurveProviderOutcome.NUMERICAL_FAILURE
+                    or timeout_reason is not None
                 )
-                if held is not None:
-                    if 'gate_provider_step_down' in notices:
-                        held['gate_provider_step_down'] = notices['gate_provider_step_down']
-                    if ENVIRONMENT_RETRIES_KEY in notices:
-                        held[ENVIRONMENT_RETRIES_KEY] = notices[ENVIRONMENT_RETRIES_KEY]
-                    if 'gate_provider_step_down' in held:
-                        held['gate_provider_step_down'] = {
-                            **held['gate_provider_step_down'],
-                            'prediction': 'held_last_good_curve',
-                            'realized_provider': (self._freeze_gate_last_good_curve or {}).get('realized_provider')
-                            or self._liquid_fraction_provider,
-                        }
-                    return self._record_freeze_gate_magemin_timeout_fallback_notice(
-                        held,
+            )
+            execution_failure = (
+                status_outcome is GateCurveProviderOutcome.FAILED
+                and not terminal_input
+                and timeout_reason is None
+            )
+            if same_provider_hold or execution_failure:
+                if same_provider_hold:
+                    held = self._hold_freeze_gate_provider_curve(
+                        failure,
                         timeout_reason=timeout_reason,
                     )
+                    if held is not None:
+                        if 'gate_provider_step_down' in notices:
+                            held['gate_provider_step_down'] = notices['gate_provider_step_down']
+                        if ENVIRONMENT_RETRIES_KEY in notices:
+                            held[ENVIRONMENT_RETRIES_KEY] = notices[ENVIRONMENT_RETRIES_KEY]
+                        if 'gate_provider_step_down' in held:
+                            held['gate_provider_step_down'] = {
+                                **held['gate_provider_step_down'],
+                                'prediction': 'held_last_good_curve',
+                                'realized_provider': (self._freeze_gate_last_good_curve or {}).get('realized_provider')
+                                or self._liquid_fraction_provider,
+                            }
+                        return self._return_lower_rung_gate_curve(
+                            held,
+                            timeout_reason=timeout_reason,
+                        )
                 curve = self._freeze_gate_kress_floor_curve(None, reasons)
                 if curve is not None:
-                    curve['gate_provider_refusal'] = {
-                        **failure,
-                        'reason': (
-                            timeout_reason
-                            or diagnostic.get('backend_status_reason')
-                            or diagnostic.get('reason')
-                            or failure['reason']
-                        ),
-                        'qualification': 'first_call_kress91_floor_prediction',
-                        'authority': 'extrapolated (lower-rung)',
-                        'failure_hour': int(self.melt.hour),
-                        'failure_temperature_C': float(self.melt.temperature_C),
-                        'detail': (
-                            'Kress91 calibration-floor step; '
-                            'not a fresh solve or a melting measurement'
-                        ),
-                    }
+                    curve['gate_provider_refusal'] = (
+                        self._lower_rung_gate_provider_refusal(
+                            failure,
+                            diagnostic,
+                            timeout_reason=timeout_reason,
+                            fallback_authority=(
+                                EvidenceClass.INTERNAL_ANALYTICAL.value
+                                if execution_failure
+                                else None
+                            ),
+                        )
+                    )
                     curve.update(notices)
                     if 'gate_provider_step_down' in curve:
                         curve['gate_provider_step_down'] = {
-                            **curve['gate_provider_step_down'], 'prediction': 'kress91_floor',
+                            **curve['gate_provider_step_down'],
+                            'prediction': 'kress91_floor',
                         }
-                    return self._record_freeze_gate_magemin_timeout_fallback_notice(
+                    return self._return_lower_rung_gate_curve(
                         curve,
                         timeout_reason=timeout_reason,
                     )

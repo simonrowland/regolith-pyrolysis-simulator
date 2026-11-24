@@ -19,10 +19,12 @@ from simulator.chemistry.kernel import normalize_chemistry_kernel_config
 from simulator.evaporation import EvaporationFluxRefusal
 from simulator.fe_redox import KRESS91_LIQUID_CALIBRATION_MIN_T_C
 from simulator.engine_pool import (
+    EngineWorkerDied,
     EngineWorkerPool,
     EngineWorkerTimeout,
     WarmEngineWorker,
 )
+from simulator.fidelity_vocabulary import EvidenceClass
 from simulator.melt_backend.liquidus import LiquidusSampleError
 from simulator.melt_backend.base import EquilibriumResult
 from simulator.melt_backend.magemin import (
@@ -353,7 +355,7 @@ def _warm_magemin_respawn_pool(backend):
 @pytest.mark.parametrize('exception_name', [
     'OSError', 'BlockingIOError', 'MemoryError', 'SubprocessError',
 ])
-def test_magemin_warm_worker_respawn_environment_errors_are_typed_refusals(
+def test_magemin_warm_worker_respawn_environment_errors_fall_to_analytical_floor(
     exception_name, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -374,15 +376,19 @@ def test_magemin_warm_worker_respawn_environment_errors_are_typed_refusals(
     before = sim.atom_ledger.mol_by_account()
     try:
         with patch.object(multiprocessing.process.BaseProcess, 'start', fail_start):
-            with pytest.raises(EvaporationFluxRefusal) as error:
-                sim._melt_redox_liquidus_gate_curve()
+            curve = sim._melt_redox_liquidus_gate_curve()
 
-        diagnostic = error.value.diagnostic['provider_diagnostic'][
+        refusal = curve['gate_provider_refusal']
+        diagnostic = refusal['provider_diagnostic'][
             'backend_diagnostics'
         ]['projected_liquidus_diagnostics']
         assert diagnostic['backend_failure_exception'] == exception_name
         assert diagnostic['backend_failure_disposition'] == 'environment'
-        assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
+        assert curve['source'] == 'kress91_liquid_calibration_floor'
+        assert refusal['provider'] == 'magemin'
+        assert refusal['fallback_authority'] == (
+            EvidenceClass.INTERNAL_ANALYTICAL.value
+        )
         assert attempts
         assert sim.atom_ledger.mol_by_account() == before
     finally:
@@ -428,29 +434,37 @@ def test_gate_provider_rejects_undeclared_values(value):
         normalize_chemistry_kernel_config({'liquid_fraction_provider': value})
 
 
+def _assert_analytical_floor_flag(refusal):
+    assert refusal['provider'] == 'magemin'
+    assert refusal['authority'] == 'extrapolated (lower-rung)'
+    assert refusal['fallback_authority'] == EvidenceClass.INTERNAL_ANALYTICAL.value
+
+
 @pytest.mark.parametrize('provider', [None, 'magemin'])
-def test_missing_declared_engine_refuses_before_first_hour(
+def test_missing_declared_engine_falls_to_analytical_floor(
     monkeypatch, provider, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
+    # Old rule: startup raised liquid_fraction_provider_missing_input.
     monkeypatch.setattr(MAGEMinShadowProvider, '_ensure_backend', lambda _: None)
     sim = _sim(provider, vapor_pressure_data, feedstocks_data, setpoints_data)
-    before = sim.atom_ledger.mol_by_account()
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim.start_campaign(CampaignPhase.C2A_STAGED)
-    assert error.value.reason == 'liquid_fraction_provider_missing_input'
-    assert error.value.diagnostic == {
-        'reason': 'missing_input',
-        'input': 'liquid_fraction_provider',
-        'provider': 'magemin',
-        'status': 'unavailable',
-    }
-    assert error.value.diagnostic['provider'] == 'magemin'
-    assert sim.melt.hour == 0
-    assert sim.atom_ledger.mol_by_account() == before
-    assert sim.record.snapshots == []
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    snapshot = sim.step()
+    assert sim.melt.hour == 1
+    assert sim.record.liquid_fraction_provider == 'magemin'
+    refusal = snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']
+    _assert_analytical_floor_flag(refusal)
+    # The hour summary copies diagnostics through a JSON boundary, so
+    # tuple fields such as phases_present become lists. The flag is the
+    # contract, not that copy's container types.
+    summary_refusal = build_per_hour_summary(sim, snapshot)[
+        'oxygen_reservoir'
+    ]['liquid_fraction_gate']['redox']['gate_provider_refusal']
+    _assert_analytical_floor_flag(summary_refusal)
+    assert summary_refusal['reason'] == refusal['reason']
+    assert summary_refusal['qualification'] == refusal['qualification']
 
 
-def test_daemonic_missing_binary_keeps_missing_input_diagnostic(
+def test_daemonic_missing_binary_falls_to_analytical_floor(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     monkeypatch.setattr(
@@ -464,21 +478,17 @@ def test_daemonic_missing_binary_keeps_missing_input_diagnostic(
         ChemistryIntent.GATE_LIQUID_FRACTION
     )
 
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    snapshot = sim.step()
 
-    assert error.value.reason == 'liquid_fraction_provider_missing_input'
-    assert error.value.diagnostic == {
-        'reason': 'missing_input',
-        'input': 'liquid_fraction_provider',
-        'provider': 'magemin',
-        'status': 'unavailable',
-        'daemon_context': True,
-    }
     assert provider._backend_initialization_error is None
+    assert sim.melt.hour == 1
+    _assert_analytical_floor_flag(
+        snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']
+    )
 
 
-def test_daemonic_child_start_failure_is_preserved_for_runner_diagnostic(
+def test_daemonic_child_start_failure_falls_to_analytical_floor(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     monkeypatch.setattr(
@@ -499,20 +509,17 @@ def test_daemonic_child_start_failure_is_preserved_for_runner_diagnostic(
         ChemistryIntent.GATE_LIQUID_FRACTION
     )
 
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    snapshot = sim.step()
 
-    assert error.value.reason == (
-        'liquid_fraction_provider_unavailable_daemonic_process_'
-        'cannot_start_child_workers'
-    )
-    assert 'daemonic process cannot start child worker processes' in (
-        error.value.diagnostic['detail']
-    )
     assert provider._backend_initialization_error is child_start_error
+    assert sim.melt.hour == 1
+    _assert_analytical_floor_flag(
+        snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']
+    )
 
 
-def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
+def test_binary_absence_falls_to_analytical_floor(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
     monkeypatch.setattr(
@@ -522,28 +529,22 @@ def test_binary_absence_keeps_campaign_and_direct_gate_refusals(
     campaign_sim = _sim(
         'magemin', vapor_pressure_data, feedstocks_data, setpoints_data,
     )
-    with pytest.raises(EvaporationFluxRefusal) as campaign_error:
-        campaign_sim.start_campaign(CampaignPhase.C2A_STAGED)
-    assert campaign_error.value.reason == 'liquid_fraction_provider_missing_input'
-    assert campaign_error.value.diagnostic == {
-        'reason': 'missing_input',
-        'input': 'liquid_fraction_provider',
-        'provider': 'magemin',
-        'status': 'unavailable',
-    }
-    assert campaign_error.value.diagnostic['provider'] == 'magemin'
+    campaign_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    snapshot = campaign_sim.step()
+    assert campaign_sim.melt.hour == 1
+    _assert_analytical_floor_flag(
+        snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']
+    )
 
     gate_sim = _sim(
         'magemin', vapor_pressure_data, feedstocks_data, setpoints_data,
     )
-    with pytest.raises(EvaporationFluxRefusal) as gate_error:
-        gate_sim._melt_redox_liquidus_gate_curve()
-    assert (
-        gate_error.value.diagnostic['reason']
-        == 'liquid_fraction_provider_failed'
-    )
-    assert gate_error.value.diagnostic['provider'] == 'magemin'
-    assert gate_sim._last_melt_redox_liquidus_gate_diagnostic == {}
+    curve = gate_sim._melt_redox_liquidus_gate_curve()
+    assert curve['source'] == 'kress91_liquid_calibration_floor'
+    _assert_analytical_floor_flag(curve['gate_provider_refusal'])
+    assert gate_sim._last_melt_redox_liquidus_gate_diagnostic[
+        'gate_provider_refusal'
+    ]['provider'] == 'magemin'
 
 
 def test_pool_init_timeout_refuses_direct_gate_read_and_retries_next_call(
@@ -591,12 +592,9 @@ def test_pool_init_timeout_refuses_direct_gate_read_and_retries_next_call(
         ChemistryIntent.GATE_LIQUID_FRACTION,
     )
     for attempt in range(2):
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._melt_redox_liquidus_gate_curve()
-        assert (
-            error.value.diagnostic['reason']
-            == 'liquid_fraction_provider_failed'
-        )
+        curve = sim._melt_redox_liquidus_gate_curve()
+        _assert_analytical_floor_flag(curve['gate_provider_refusal'])
+        assert curve['source'] == 'kress91_liquid_calibration_floor'
         if attempt == 0:
             assert provider._backend is None
         else:
@@ -630,9 +628,10 @@ def test_analytical_gate_never_probes_magemin_and_flags_each_hour(
 
 
 @pytest.mark.parametrize('status', ['unavailable', 'not_converged'])
-def test_declared_magemin_environment_failure_never_uses_another_liquidus(
+def test_declared_magemin_environment_failure_falls_to_analytical_floor(
     monkeypatch, status, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
+    # Old rule: this raised and never used another liquidus.
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
     monkeypatch.setattr(sim, '_dispatch_only', lambda *a, **kw: SimpleNamespace(
         status=status, diagnostic={'backend_status': status,
@@ -642,30 +641,33 @@ def test_declared_magemin_environment_failure_never_uses_another_liquidus(
     sim.backend.find_liquidus_solidus = lambda **kw: calls.append(kw)
     monkeypatch.setattr(
         sim, '_composition_projected_freeze_gate_curve',
-        lambda *a, **kw: pytest.fail('numerical failure used projected bounds'),
+        lambda *a, **kw: pytest.fail('execution failure used projected bounds'),
     )
-    with pytest.raises(EvaporationFluxRefusal) as error:
-        sim._freeze_gate_curve()
-    assert error.value.diagnostic['provider'] == 'magemin'
+    curve = sim._freeze_gate_curve()
+    assert curve['source'] == 'kress91_liquid_calibration_floor'
+    _assert_analytical_floor_flag(curve['gate_provider_refusal'])
+    assert curve['gate_provider_refusal']['reason'] == 'missing_binary'
     assert calls == []
 
 
-def test_runner_reports_typed_startup_missing_input(monkeypatch):
+def test_runner_continues_when_declared_engine_is_unavailable(monkeypatch):
+    # Old rule: PyrolysisRun status was refused / missing_input.
     monkeypatch.setattr(MAGEMinShadowProvider, '_ensure_backend', lambda _: None)
     result = PyrolysisRun(
         feedstock_id='lunar_mare_low_ti', campaign='C2A_staged', hours=1,
     ).run()
-    assert result['status'] == 'refused'
+    assert result['status'] not in {'refused', 'failed'}
+    rows = result['per_hour_summary']
+    assert rows
+    refusal = rows[0]['oxygen_reservoir']['liquid_fraction_gate']['redox'][
+        'gate_provider_refusal'
+    ]
+    _assert_analytical_floor_flag(refusal)
     artifact = build_run_artifact(result, run_id='missing-gate')
-    assert artifact['timesteps'] == []
+    assert artifact['timesteps']
     metadata = artifact['terminal']['run_metadata']
     assert metadata['liquid_fraction_provider'] == 'magemin'
-    assert metadata['refusal_diagnostic'] == {
-        'reason': 'missing_input',
-        'input': 'liquid_fraction_provider',
-        'provider': 'magemin',
-        'status': 'unavailable',
-    }
+    assert not metadata.get('refusal_diagnostic')
 
 
 @pytest.mark.parametrize('reason', ['engine_not_converged', 'engine_worker_timeout'])
@@ -777,7 +779,7 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
     (FileNotFoundError, errno.ENOENT),
     (OSError, errno.EMFILE),
 ])
-def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
+def test_actual_magemin_launch_oserror_falls_to_analytical_floor(
     monkeypatch, error_type, error_number,
     vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
@@ -809,11 +811,11 @@ def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
     monkeypatch.setattr(sim, '_dispatch_only', dispatch)
     before = sim.atom_ledger.mol_by_account()
     try:
-        with pytest.raises(EvaporationFluxRefusal) as error:
-            sim._melt_redox_liquidus_gate_curve()
-
-        assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
-        assert error.value.diagnostic['outcome'] == GateCurveProviderOutcome.FAILED
+        curve = sim._melt_redox_liquidus_gate_curve()
+        refusal = curve['gate_provider_refusal']
+        assert curve['source'] == 'kress91_liquid_calibration_floor'
+        _assert_analytical_floor_flag(refusal)
+        assert refusal['outcome'] == GateCurveProviderOutcome.FAILED
         assert diagnostics
         projected = diagnostics[-1]['backend_diagnostics'][
             'projected_liquidus_diagnostics'
@@ -865,18 +867,18 @@ def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
     provider._backend_initialised = True
     before = sim.atom_ledger.mol_by_account()
     try:
+        curve = sim._melt_redox_liquidus_gate_curve()
+        failure = curve['gate_provider_refusal']
+        assert curve['source'] == 'kress91_liquid_calibration_floor'
+        assert failure['authority'] == 'extrapolated (lower-rung)'
+        assert failure['outcome'] == GateCurveProviderOutcome.FAILED
         if exception_name == 'TimeoutExpired':
-            curve = sim._melt_redox_liquidus_gate_curve()
-            failure = curve['gate_provider_refusal']
-            assert curve['source'] == 'kress91_liquid_calibration_floor'
-            assert failure['authority'] == 'extrapolated (lower-rung)'
             assert failure['backend_failure_disposition'] == 'environment'
         else:
-            with pytest.raises(EvaporationFluxRefusal) as error:
-                sim._melt_redox_liquidus_gate_curve()
-            failure = error.value.diagnostic
-            assert failure['reason'] == 'liquid_fraction_provider_failed'
-        assert failure['outcome'] == GateCurveProviderOutcome.FAILED
+            assert failure['reason'] == exception_name
+            assert failure['fallback_authority'] == (
+                EvidenceClass.INTERNAL_ANALYTICAL.value
+            )
         projected = failure['provider_diagnostic'][
             'backend_diagnostics'
         ]['projected_liquidus_diagnostics']
@@ -1292,3 +1294,140 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
     held = sim._melt_redox_liquidus_gate_curve()
     assert held['liquidus_T_C'] == 1500.0
     assert held['gate_provider_refusal']['computed_hour'] == 10
+
+
+class _DeadWorkerPool:
+    """Pool whose first result is the UI-QA worker death.
+
+    ``workers`` is empty so database resolution uses the backend config.
+    A missing attribute is an AttributeError, which is a programming
+    error and does not reach the worker-death path.
+    """
+
+    def __init__(self):
+        self.workers = ()
+
+    def submit(self, _payload, timeout_s=None):
+        return self
+
+    def result(self, timeout=None):
+        raise EngineWorkerDied(
+            'call',
+            'MAGEMin subprocess pool slot 0 worker exited without a result',
+        )
+
+    def cancel(self):
+        return False
+
+    def close(self, **_kwargs):
+        return None
+
+
+def _install_dead_magemin_worker(sim):
+    sim._register_freeze_gate_liquid_fraction_providers()
+    provider = sim._chem_registry.fallback_for(
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = {}
+    backend._magemin_module = None
+    backend._subprocess_pool = _DeadWorkerPool()
+    backend._warnings = []
+    provider._backend = backend
+    provider._backend_initialised = True
+    return provider, backend
+
+
+def test_engine_worker_died_on_default_lunar_continues_on_analytical_floor(
+    vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    _provider, backend = _install_dead_magemin_worker(sim)
+    try:
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        snapshot = sim.step()
+    finally:
+        backend.close()
+    assert sim.melt.hour == 1
+    assert sim.record.liquid_fraction_provider == 'magemin'
+    refusal = snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']
+    _assert_analytical_floor_flag(refusal)
+    assert refusal['reason'] == 'EngineWorkerDied'
+    assert 'EngineWorkerDied' in str(refusal)
+    summary = build_per_hour_summary(sim, snapshot)
+    summary_refusal = summary['oxygen_reservoir']['liquid_fraction_gate'][
+        'redox'
+    ]['gate_provider_refusal']
+    _assert_analytical_floor_flag(summary_refusal)
+    assert summary_refusal['reason'] == refusal['reason']
+    from web.events import _browser_socket_payload
+
+    event_row = _browser_socket_payload('per_hour_summary', summary)
+    event_refusal = event_row['oxygen_reservoir']['liquid_fraction_gate'][
+        'redox'
+    ]['gate_provider_refusal']
+    _assert_analytical_floor_flag(event_refusal)
+    assert event_refusal == summary_refusal
+
+
+def test_all_liquid_fraction_rungs_unavailable_is_typed_refusal(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    _provider, backend = _install_dead_magemin_worker(sim)
+    monkeypatch.setattr(
+        sim, '_freeze_gate_kress_floor_curve', lambda *_args, **_kwargs: None,
+    )
+    try:
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim.step()
+    finally:
+        backend.close()
+    assert error.value.reason == 'liquid_fraction_provider_failed'
+    assert error.value.reason != (
+        'c6_joint_thermodynamic_liquid_fraction_window_empty'
+    )
+
+
+def test_mutation_terminal_predicate_restores_worker_death_abort(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Old rule: every failed provider aborts, including EngineWorkerDied."""
+    monkeypatch.setattr(
+        'simulator.reduced_real_determinism.'
+        'gate_curve_provider_failure_is_terminal_input',
+        lambda _diagnostic: True,
+    )
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    _provider, backend = _install_dead_magemin_worker(sim)
+    try:
+        sim.start_campaign(CampaignPhase.C2A_STAGED)
+        with pytest.raises(EvaporationFluxRefusal) as error:
+            sim.step()
+    finally:
+        backend.close()
+    assert error.value.reason == 'liquid_fraction_provider_failed'
+
+
+@pytest.mark.parametrize('reason', [
+    'missing_input', 'invalid_input', 'invalid_fo2_log',
+    'invalid_pressure_bar', 'non_finite_composition',
+])
+def test_terminal_input_still_refuses_when_the_floor_can_run(
+    monkeypatch, reason, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    monkeypatch.setattr(sim, '_dispatch_only', lambda *_args, **_kwargs: SimpleNamespace(
+        status='refused',
+        diagnostic={'reason': reason, 'backend_status': 'refused'},
+        warnings=(),
+    ))
+    with pytest.raises(EvaporationFluxRefusal) as error:
+        sim._freeze_gate_curve()
+    assert error.value.reason == 'liquid_fraction_provider_failed'
+    assert error.value.diagnostic['provider_diagnostic']['reason'] == reason

@@ -2800,7 +2800,6 @@ _GATE_CURVE_EXTRA_TRANSIENT_PROVIDER_REASONS = frozenset({
     "oserror",
 })
 
-
 def gate_curve_provider_diagnostic_reasons(
     diagnostic: Mapping[str, Any] | None,
 ) -> tuple[str, ...]:
@@ -2888,6 +2887,19 @@ def gate_curve_provider_timed_out(diagnostic: Mapping[str, Any] | None) -> bool:
     return gate_curve_provider_timeout_reason(diagnostic) is not None
 
 
+def gate_curve_provider_failure_is_terminal_input(
+    diagnostic: Mapping[str, Any] | None,
+) -> bool:
+    """True when no engine call is possible: missing or invalid input.
+
+    Execution failures (worker death, missing binary, OSError) are not
+    terminal. The gate falls to the next callable liquid-fraction rung.
+    """
+    return gate_curve_provider_has_terminal_input(
+        gate_curve_provider_diagnostic_reasons(diagnostic)
+    )
+
+
 def gate_curve_provider_outcome_for_status(
     status: str,
     diagnostic: Mapping[str, Any] | None = None,
@@ -2908,7 +2920,7 @@ def gate_curve_provider_outcome_for_status(
     reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
     if "environment" in reasons:
         return GateCurveProviderOutcome.FAILED
-    if gate_curve_provider_has_terminal_input(reasons):
+    if gate_curve_provider_failure_is_terminal_input(diagnostic):
         return GateCurveProviderOutcome.FAILED
     numerical_reasons = {
         "not_converged", "engine_not_converged", "negative_convergence_evidence",
