@@ -180,34 +180,48 @@ def _payload_codec_is_current(
     if artifact == "freeze_gate_curve":
         if version != PT0_GATE_CURVE_CODEC_VERSION:
             return False
-        curve = payload.get("curve")
-        if not isinstance(curve, Mapping):
+        curve_payload = payload.get("curve")
+        if not isinstance(curve_payload, Mapping):
             return False
-        if not _curve_floor_marker_is_valid(curve, require_present=True):
+        try:
+            curve = _curve_from_payload(curve_payload)
+        except Exception:
             return False
-        step_down = curve.get("gate_provider_step_down")
-        if step_down is not None and not isinstance(step_down, Mapping):
-            return False
-        identity = (
-            _magemin_identity_from_replay_key(key)
-            if key is not None
-            else None
-        )
-        if isinstance(step_down, Mapping):
+        step_down_payload = curve_payload.get("gate_provider_step_down")
+        if step_down_payload is not None:
+            if not isinstance(step_down_payload, Mapping):
+                return False
+            step_down = curve.get("gate_provider_step_down")
             if (
-                "magemin_sourced" in step_down
-                and type(step_down["magemin_sourced"]) is not bool
+                not isinstance(step_down, Mapping)
+                or type(step_down.get("magemin_sourced")) is not bool
             ):
                 return False
-            if (
-                step_down.get("realized_provider")
-                == _MAGEMIN_SHADOW_PROVIDER_ID
-                or (
-                    identity is not None
-                    and identity.silica_verdict == "extrapolated"
-                )
-            ) and "magemin_sourced" not in step_down:
-                return False
+        identity_key = (
+            key.get("freeze_gate_cache_key") if key is not None else None
+        )
+        identity_is_required = (
+            getattr(identity_key, "magemin_domain_identity", None) is not None
+            or (
+                isinstance(identity_key, Mapping)
+                and identity_key.get("magemin_domain_identity") is not None
+            )
+            or (
+                isinstance(identity_key, (list, tuple))
+                and len(identity_key) == 9
+                and identity_key[7] is not None
+            )
+        )
+        try:
+            identity = (
+                _magemin_identity_from_replay_key(key)
+                if key is not None
+                else None
+            )
+        except (OverflowError, TypeError, ValueError):
+            identity = None
+        if identity is None and identity_is_required:
+            return False
         if identity is None or identity.silica_verdict == "in_band":
             return True
         if identity.silica_verdict != "extrapolated":
@@ -245,6 +259,10 @@ def _payload_codec_is_current(
         )
     if artifact == "equilibrium_post_record":
         if version != PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION:
+            return False
+        try:
+            equilibrium_from_payload(payload)
+        except Exception:
             return False
         equilibrium_result = payload.get("equilibrium_result")
         diagnostics = (
@@ -1388,10 +1406,6 @@ class PT0DeterminismStore:
                 key=key,
             ):
                 continue
-            if artifact == "freeze_gate_curve":
-                curve_payload = (entry.get("payload") or {}).get("curve")
-                if not isinstance(curve_payload, Mapping):
-                    continue
             if not _disclosures_known(entry):
                 continue
             self.replay_sequence.append(
@@ -3849,7 +3863,10 @@ def _magemin_identity_from_replay_key(
                 for bound in band
             ):
                 return None
-            band = tuple(float(bound) for bound in band)
+            try:
+                band = tuple(float(bound) for bound in band)
+            except (OverflowError, TypeError, ValueError):
+                return None
         elif band is not None:
             return None
         silica_verdict = identity_payload.get("silica_verdict")
