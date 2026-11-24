@@ -587,7 +587,7 @@ def test_kennedy_scored_leaf_classification_keeps_facts_and_drops_metadata():
 
     assert non_finite == []
     assert ("values", "method") not in measured
-    assert ("values", "quantity") not in measured
+    assert ("values", "quantity") in measured
     assert not any("cell_locators" in leaf for leaf in measured)
     assert not any("composition_column_locators" in leaf for leaf in measured)
     assert any(
@@ -680,7 +680,7 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         if sample.get("locator", {}).get("source_path")
         == "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
     ]
-    assert len(table_text_samples) == 169
+    assert len(table_text_samples) == 170
     assert all(
         sample["locator"]["source_sha256"] == expected_table_digest
         for sample in table_text_samples
