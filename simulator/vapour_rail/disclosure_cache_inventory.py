@@ -963,14 +963,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Compiled provider object. Dispatch still evaluates the law, so the cached object is not a flagged pressure.',
     },
-    'store:simulator/diagnostic_helpers/kems.py:surface_cache': {
-        "path": 'simulator/diagnostic_helpers/kems.py',
-        "line": 654,
-        "kind": 'store',
-        "name": 'surface_cache',
-        "carries_disclosure": False,
-        "how": 'Request-local KEMS surface results keyed by temperature for one comparison case; no persistent memoization.',
-    },
     'store:simulator/engine_binding_admission.py:grouped_entries': {
         "path": 'simulator/engine_binding_admission.py',
         "line": 1544,
@@ -1322,14 +1314,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": '_janaf_state_for_source',
         "carries_disclosure": False,
         "how": 'Caches a source Gibbs state with its authority and published range for wall-law assembly; it does not cache a law result.',
-    },
-    'lru:simulator/engine_cache.py:_engine_cache_input_identity_digest': {
-        "path": 'simulator/engine_cache.py',
-        "line": 530,
-        "kind": 'lru',
-        "name": '_engine_cache_input_identity_digest',
-        "carries_disclosure": False,
-        "how": 'Memoizes the source-input digest used to construct engine request keys. It returns key bytes, not an evaluated vapour-law result.',
     },
     'store:simulator/core.py:published_cache': {
         "path": 'simulator/core.py',
