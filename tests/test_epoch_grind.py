@@ -17,6 +17,7 @@ from scripts import epoch_grind
 from scripts.seed_reduced_real_cache import payload_count
 from simulator.corpus_version import current_corpus_version
 from simulator.reduced_real_determinism import (
+    PT0_GATE_CURVE_CODEC_VERSION,
     PT1PersistentEquilibriumStore,
     canonical_json_bytes,
 )
@@ -1391,6 +1392,64 @@ def test_merge_epoch_shards_preserves_seed_source_labels_in_base_cache(tmp_path:
         con.close()
     assert merge_summary["seed_source_rows"] == 1
     assert rows == [(point_id, "ladder_polish", "job-a")]
+
+
+@pytest.mark.parametrize(
+    "base_layout",
+    ("fresh", "migrated", "unmigrated"),
+)
+def test_epoch_seed_carries_codec_stamp_across_pt1_column_layouts(
+    tmp_path: Path,
+    base_layout: str,
+) -> None:
+    base = tmp_path / f"{base_layout}-base.sqlite"
+    point_id = _put_pt1_cache_row(base, f"codec-{base_layout}")
+    if base_layout != "fresh":
+        with sqlite3.connect(base) as conn:
+            conn.execute(
+                f"ALTER TABLE {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+                "DROP COLUMN payload_codec_version"
+            )
+        if base_layout == "migrated":
+            PT1PersistentEquilibriumStore(base)
+
+    shard = tmp_path / base_layout / "shards" / "job-a.sqlite"
+    summary = epoch_grind.seed_job_cache(
+        shard,
+        base,
+        point_sources=[{"point_id": point_id, "source": "ladder_polish"}],
+        job_id="job-a",
+    )
+
+    with sqlite3.connect(shard) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+    expected_version = (
+        PT0_GATE_CURVE_CODEC_VERSION if base_layout == "fresh" else None
+    )
+    assert summary["seed_rows"] == 1
+    assert stored_version == expected_version
+
+
+def test_epoch_merge_preserves_payload_codec_stamp(tmp_path: Path) -> None:
+    base = tmp_path / "merge-codec-base.sqlite"
+    shard = tmp_path / "merge-codec-shard.sqlite"
+    PT1PersistentEquilibriumStore(base)
+    point_id = _put_pt1_cache_row(shard, "merge-codec")
+
+    summary = epoch_grind.merge_epoch_shards(base, [shard])
+
+    with sqlite3.connect(base) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {epoch_grind.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (point_id,),
+        ).fetchone()
+    assert summary["inserted_rows"] == 1
+    assert stored_version == PT0_GATE_CURVE_CODEC_VERSION
 
 
 @pytest.mark.parametrize(

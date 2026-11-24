@@ -19,6 +19,7 @@ from scripts.seed_reduced_real_cache import (
     seed_cache,
     validate_source_schema,
 )
+import simulator.reduced_real_determinism as rrd
 from simulator.corpus_version import current_corpus_version
 from simulator.optimize.evaluate import _cache_trace_payload
 from simulator.reduced_real_determinism import (
@@ -185,6 +186,38 @@ def test_seed_cache_merges_sources_idempotently(tmp_path: Path) -> None:
     assert first["rows_after"] == 1
     assert second["inserted_rows"] == 0
     assert payload_count(target) == 1
+
+
+@pytest.mark.parametrize(
+    ("drop_codec_column", "expected_version"),
+    [
+        (False, rrd.PT0_GATE_CURVE_CODEC_VERSION),
+        (True, None),
+    ],
+    ids=("current-stamp", "legacy-unmigrated"),
+)
+def test_seed_cache_preserves_or_carries_missing_payload_codec_version(
+    tmp_path: Path,
+    drop_codec_column: bool,
+    expected_version: int | None,
+) -> None:
+    source = tmp_path / "codec-source.db"
+    target = tmp_path / "codec-target.db"
+    _put_cache_row(source, tag="codec-transfer")
+    if drop_codec_column:
+        with sqlite3.connect(source) as conn:
+            conn.execute(
+                f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+                "DROP COLUMN payload_codec_version"
+            )
+
+    seed_cache(target, [source])
+
+    with sqlite3.connect(target) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored_version == expected_version
 
 
 def test_seed_cache_accepts_new_schema_equilibrium_authority(tmp_path: Path) -> None:

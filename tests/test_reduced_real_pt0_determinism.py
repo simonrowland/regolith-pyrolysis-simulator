@@ -18,6 +18,7 @@ import pytest
 import yaml
 
 from engines.alphamelts import AlphaMELTSProvider
+from scripts.seed_reduced_real_cache import seed_cache
 import simulator.reduced_real_determinism as rrd
 from simulator.chemistry.kernel import ChemistryIntent
 from simulator.chemistry.kernel.capabilities import CapabilityProfile
@@ -122,6 +123,32 @@ def _build_pt0_sim(store: PT0DeterminismStore | None, *, real_provider=False):
         # mechanics register their producer explicitly at the call site.
         provider._ensure_backend = lambda: SimpleNamespace(is_available=lambda: True)
     return sim
+
+
+def _capture_pt0_gate_curve(
+    db_path: Path,
+    *,
+    solidus_T_C: float,
+) -> tuple[PT0DeterminismStore, Any, float, dict[str, Any]]:
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(store)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(sim)
+    fO2_log = sim._compute_intrinsic_melt_fO2()
+    curve = {
+        "source": "unit-test:codec-transfer",
+        "solidus_T_C": solidus_T_C,
+        "liquidus_T_C": 1600.0,
+        "path": ((solidus_T_C, 0.0), (1600.0, 1.0)),
+    }
+    seed_gate_curve_memo_record(sim, curve)
+    store.capture_gate_curve(
+        sim,
+        fO2_log=fO2_log,
+        curve=curve,
+        repair_notices=[],
+    )
+    return store, sim, fO2_log, curve
 
 
 def _select_synthetic_gate_curve_binding(
@@ -4227,6 +4254,74 @@ def test_pt1_attached_legacy_table_without_notice_column_reads_as_null(
     ]
 
 
+def test_pt1_exact_lookup_skips_stale_local_row_for_current_attached_base(
+    tmp_path: Path,
+) -> None:
+    base_db = tmp_path / "current-base.db"
+    local_db = tmp_path / "stale-local.db"
+    _base_store, _base_sim, _base_fO2, base_curve = _capture_pt0_gate_curve(
+        base_db,
+        solidus_T_C=1100.0,
+    )
+    _local_store, _local_sim, _local_fO2, _local_curve = _capture_pt0_gate_curve(
+        local_db,
+        solidus_T_C=1200.0,
+    )
+    with sqlite3.connect(local_db) as conn:
+        (key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    _set_pt1_payload_codec_version(
+        local_db,
+        key_hash,
+        rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,
+    )
+
+    replay = PT0DeterminismStore(
+        "replay",
+        db_path=local_db,
+        read_only_base_db_path=base_db,
+    )
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    ) == base_curve
+    assert replay.hits == 1
+
+
+def test_gate_curve_codec_stamp_survives_seed_and_replays_from_target(
+    tmp_path: Path,
+) -> None:
+    shard_db = tmp_path / "capture-shard.db"
+    target_db = tmp_path / "seeded-base.db"
+    _capture, _capture_sim, _capture_fO2, curve = _capture_pt0_gate_curve(
+        shard_db,
+        solidus_T_C=1100.0,
+    )
+
+    seed_cache(target_db, [shard_db])
+
+    with sqlite3.connect(target_db) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
+
+    replay = PT0DeterminismStore("replay", db_path=target_db)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    ) == curve
+    assert replay.hits == 1
+
+
 @pytest.mark.parametrize(
     ("existing", "incoming", "expected"),
     [
@@ -5245,6 +5340,50 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version(
     entry = store._entries[key_hash]
     assert entry["payload_codec_version"] == rrd.PT0_GATE_CURVE_CODEC_VERSION
     assert entry["payload"] == current_payload
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else store
+    assert replay._lookup("freeze_gate_curve", key) == current_payload
+    assert replay.hits == 1
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_gate_codec_stale_row_with_different_payload_bytes_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "gate-codec-different-payload.sqlite" if persistent else None
+    store = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    legacy_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    current_payload = copy.deepcopy(legacy_payload)
+    current_payload["curve"]["solidus_T_C"] = 1190.0
+    current_payload["curve"]["path"][0]["temperature_C"] = 1190.0
+    assert canonical_json_bytes(legacy_payload) != canonical_json_bytes(
+        current_payload
+    )
+    store._store("freeze_gate_curve", key, legacy_payload, law_disclosures=[])
+    key_hash = _key_hash(key)
+    old_version = rrd.PT0_GATE_CURVE_CODEC_VERSION - 1
+    store._entries[key_hash]["payload_codec_version"] = old_version
+    if persistent:
+        assert db_path is not None
+        _set_pt1_payload_codec_version(db_path, key_hash, old_version)
+
+    store._store("freeze_gate_curve", key, current_payload, law_disclosures=[])
+
+    entry = store._entries[key_hash]
+    assert entry["payload"] == current_payload
+    assert entry["payload_codec_version"] == rrd.PT0_GATE_CURVE_CODEC_VERSION
     replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else store
     assert replay._lookup("freeze_gate_curve", key) == current_payload
     assert replay.hits == 1

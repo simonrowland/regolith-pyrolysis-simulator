@@ -338,6 +338,47 @@ def test_merge_cache_shard_recomputes_identity_contract(tmp_path):
 
 
 @pytest.mark.parametrize(
+    ("drop_codec_column", "expected_version"),
+    [
+        (False, rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION),
+        (True, None),
+    ],
+    ids=("current-stamp", "legacy-unmigrated"),
+)
+def test_populate_merge_preserves_or_carries_missing_payload_codec_version(
+    tmp_path,
+    drop_codec_column,
+    expected_version,
+):
+    driver = _load_driver()
+    shard_db = tmp_path / "codec-shard.db"
+    target_db = tmp_path / "codec-target.db"
+    key = _pt1_key("codec-transfer")
+    key["artifact"] = "equilibrium_post_record"
+    key_hash = _write_pt1_row(shard_db, key)
+    if drop_codec_column:
+        with sqlite3.connect(shard_db) as conn:
+            conn.execute(
+                f"ALTER TABLE {driver.PT1_EQUILIBRIUM_TABLE} "
+                "DROP COLUMN payload_codec_version"
+            )
+
+    source_row = driver._cache_payload_rows(shard_db)[0]
+    assert source_row["payload_codec_version"] == expected_version
+    validated = driver._validated_cache_payload_row(source_row)
+    assert validated["payload_codec_version"] == expected_version
+    driver._merge_cache_shard(shard_db, target_db)
+
+    with sqlite3.connect(target_db) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {driver.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored_version == expected_version
+
+
+@pytest.mark.parametrize(
     "repair_notices_json",
     ['[{"kind":"populate_repair"}]', "[]", None],
 )
