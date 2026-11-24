@@ -110,6 +110,7 @@ ENGINE_CARRIED_FORMULA_PINS = (
     ("b1259-ht-0186-akermanite", "Ca2MgSi2O7", "Ca 2 MgSi 20 7", 217),
     ("b1259-ht-0188-fayalite", "Fe2SiO4", "Fe 2 Si0 4", 219),
     ("b1259-ht-0193-wollastonite", "CaSiO3", "CaSi0 3", 224),
+    ("b1259-ht-0195-calcium-aluminum-pyroxene", "CaAl2SiO6", "CaAl.SiCK", 226),
     ("b1259-ht-0201-anorthite", "CaAl2Si2O8", "CaAl Si_0 0", 232),
 )
 
@@ -252,7 +253,7 @@ def test_engine_carried_formulas_match_image_verified_pages(corpus):
 
     engine_carried_ht_pages = {
         99, 117, 143, 144, 145, 160, 164, 190,
-        208, 209, 210, 214, 217, 219, 224, 232,
+        208, 209, 210, 214, 217, 219, 224, 226, 232,
     }
     for pdf_page, metadata in loader.IMAGE_VERIFIED_METADATA.items():
         printed = metadata.get("formula_as_published")

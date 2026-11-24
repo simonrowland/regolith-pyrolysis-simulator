@@ -1197,9 +1197,19 @@ def parse_species_formula(
         return None
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    # A dot inside ``_{1.5}`` is a coefficient. Expanding the braces before
+    # classification turns ``$MgAl_{1.5}H_2O$`` into five waters.
+    braced_decimal_dot = "\x00"
+
+    def _expand_subscript(match: re.Match[str]) -> str:
+        braced = match.group(1)
+        if braced is not None:
+            return braced.replace(".", braced_decimal_dot)
+        return match.group(2) or ""
+
     text = re.sub(
         r"_\{(\d+(?:\.\d+)?)\}|_(\d+(?:\.\d+)?)",
-        lambda m: m.group(1) or m.group(2),
+        _expand_subscript,
         text,
     )
     text = fold_subscript_digits(text)
@@ -1217,13 +1227,15 @@ def parse_species_formula(
         "aq": Phase.AQ,
     }
 
-    # Peel the two terminal suffixes from the right, then validate charge
-    # before phase. This handles both ``Fe(g)+`` and ``Ba^{++}(aq)``.
+    # Peel terminal charge, parenthetical phase, and bracket phase from the
+    # right. Charge and phase may stack (``Fe(g)+``, ``Ba^{++}(aq)``), and a
+    # bracket may hide a parenthetical phase (``Fe2O3(g)[s]``). Conflicting
+    # phases fail before any composition return. A phase with no species
+    # axis fails the same check.
     annotated_charge: int | None = None
-    annotated_phase: Phase | None = None
-    phase_seen = False
+    annotated_phases: list[Phase] = []
     charge_pattern = r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$"
-    for _ in range(2):
+    for _ in range(4):
         charge_annotation = re.search(charge_pattern, text)
         if charge_annotation is not None:
             if annotated_charge is not None:
@@ -1238,20 +1250,15 @@ def parse_species_formula(
             continue
 
         annotation = re.search(r"\(([^()]*)\)$", text)
-        if annotation is None:
-            break
-        raw_label = annotation.group(1).strip()
-        label = raw_label.lower()
-        # An uppercase element symbol in a terminal group is formula syntax,
-        # not the lowercase ``(c)`` phase annotation.
-        if label in phase_labels and raw_label != "C":
-            if phase_seen:
-                return None
-            annotated_phase = phase_labels[label]
-            phase_seen = True
-            text = text[: annotation.start()]
-            continue
-        else:
+        if annotation is not None:
+            raw_label = annotation.group(1).strip()
+            label = raw_label.lower()
+            # An uppercase element symbol in a terminal group is formula syntax,
+            # not the lowercase ``(c)`` phase annotation.
+            if label in phase_labels and raw_label != "C":
+                annotated_phases.append(phase_labels[label])
+                text = text[: annotation.start()]
+                continue
             # JANAF strips these recognized tags before returning atoms. Tags
             # without one scorer Phase axis must be rejected before that call.
             if PHASE_SUFFIX_RE.fullmatch(f"({label})"):
@@ -1267,42 +1274,45 @@ def parse_species_formula(
                     return None
                 text = text[: annotation.start()]
                 continue
-            elif not raw_label[:1].isupper():
+            if not raw_label[:1].isupper():
                 return None
+            break
 
+        # Bare [c] is not a phase suffix and stays unmatched. Any other
+        # terminal bracket phase is the same axis as a parenthetical one.
+        bracket = re.search(r"\[([^\[\]]*)\]$", text)
+        if bracket is not None:
+            label = bracket.group(1).strip().lower()
+            if label != "c" and label in phase_labels:
+                annotated_phases.append(phase_labels[label])
+                text = text[: bracket.start()]
+                continue
         break
+
+    if len(set(annotated_phases)) > 1:
+        return None
+    annotated_phase = annotated_phases[0] if annotated_phases else None
 
     if annotated_charge is not None and (
         species is None or charge_value(species) != annotated_charge
     ):
         return None
-    if (
-        annotated_phase is not None
-        and species is not None
-        and not _species_axis_matches_phase(species, annotated_phase)
+    if annotated_phase is not None and not _species_axis_matches_phase(
+        species, annotated_phase
     ):
         return None
 
-    # Accounting strips these terminal brackets with no species axis. Bare
-    # [c] is not in that suffix list and stays unmatched.
-    bracket = re.search(r"\[([^\[\]]*)\]$", text)
-    if bracket is not None:
-        label = bracket.group(1).strip().lower()
-        if label != "c" and label in phase_labels:
-            annotated_phase = phase_labels.get(label)
-            if annotated_phase is None or not _species_axis_matches_phase(
-                species, annotated_phase
-            ):
-                return None
-            text = text[: bracket.start()]
-
     # Validate suffix axes before the JANAF parser can strip a terminal phase
     # label and return a composition without seeing the required species axis.
+    # The braced-decimal sentinel is not a split dot.
     if "." in text and "·" not in text:
         from simulator.accounting.formulas import _is_ascii_adduct
 
         if _is_ascii_adduct(text):
-            return _accounting_formula_composition(text)
+            return _accounting_formula_composition(
+                text.replace(braced_decimal_dot, ".")
+            )
+    text = text.replace(braced_decimal_dot, ".")
 
     established = formula_composition(text)
     if established is not None:
@@ -1348,9 +1358,6 @@ def parse_species_formula(
             return None
         return tuple(sorted(hydrated.items()))
 
-    parsed = formula_composition(text)
-    if parsed is not None:
-        return parsed
     if "." in text:
         return None
     return _accounting_formula_composition(text)
