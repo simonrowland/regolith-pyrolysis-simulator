@@ -745,7 +745,8 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
         if "Fe3_over_FeT" in path.read_text(encoding="utf-8")
         or "Fe3_over_sum_Fe" in path.read_text(encoding="utf-8")
     ]
-    assert len(source_paths) == 11
+    # Xu no longer carries Fe3_over_FeT: green had two hits; this tip has none.
+    assert len(source_paths) == 10
 
     migrator = Migrator(root)
     for path in source_paths:

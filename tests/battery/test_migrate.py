@@ -10620,6 +10620,53 @@ def _scalar_extract(*, quantity: str, units: str, values: dict, obs_type: str = 
     return extract
 
 
+def _non_mapping_series_observation(tmp_path: Path):
+    extract = _scalar_extract(
+        quantity="unknown",
+        units="as_published",
+        obs_type="unmapped_row_type",
+        values={
+            "quantity": "unmapped_quantity",
+            "series": [["150", "0.02"]],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    return next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith("::point:0")
+    )
+
+
+def test_non_mapping_exploded_row_keeps_empty_values_reason(tmp_path: Path) -> None:
+    observation = _non_mapping_series_observation(tmp_path)
+
+    assert observation.value.kind is ValueKind.UNAVAILABLE
+    assert observation.value.unavailable_reason == "empty values"
+
+
+def test_non_mapping_exploded_row_rejects_empty_mapping_mutation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.migrate as migration
+
+    point_value = migration.sg.point_value
+    mutation_applied = False
+
+    def empty_mapping_mutation(selector, quantity_token, units, parent_values, payload):
+        nonlocal mutation_applied
+        if payload is None:
+            payload = {}
+            mutation_applied = True
+        return point_value(selector, quantity_token, units, parent_values, payload)
+
+    monkeypatch.setattr(migration.sg, "point_value", empty_mapping_mutation)
+    with pytest.raises(AssertionError):
+        observation = _non_mapping_series_observation(tmp_path)
+        assert observation.value.unavailable_reason == "empty values"
+    assert mutation_applied
+
+
 def test_prose_percent_fraction_conversion_keeps_basis_and_semicolon_units(
     tmp_path: Path,
 ) -> None:

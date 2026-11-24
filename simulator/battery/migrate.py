@@ -27541,7 +27541,6 @@ class Migrator:
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
         phase_was_unmapped = unmapped_phase is not None
-        phase_needs_resolution = _phase_needs_default(phase)
         phase_original_reason = (
             phase.reason
             if phase.is_unknown
@@ -27644,6 +27643,7 @@ class Migrator:
                     f"printed phase role {phase_role_token.value!r} identifies "
                     f"{phase.value.value!r}"
                 )
+        phase_needs_resolution = _phase_needs_default(phase)
         phase_flag_notice: Notice | None = None
         if phase_needs_resolution:
             transition_fields = (
@@ -31580,15 +31580,18 @@ class Migrator:
                     source=source_key,
                     observation_id=point_id,
                 )
-            selection_payload: Mapping[str, Any] = raw_item
+            selection_payload: Mapping[str, Any] | None = (
+                raw_item if isinstance(source_item, Mapping) else None
+            )
             if (
-                q_token is Quantity.EVOLVED_GAS_YIELD
+                isinstance(selection_payload, Mapping)
+                and q_token is Quantity.EVOLVED_GAS_YIELD
                 and isinstance(parent_values, Mapping)
                 and isinstance(parent_values.get("gas_species"), str)
-                and "gas_species" not in raw_item
+                and "gas_species" not in selection_payload
             ):
                 selection_payload = {
-                    **raw_item,
+                    **selection_payload,
                     "gas_species": parent_values["gas_species"],
                 }
             value_sel = sg.point_value(select_declared_source, q_token, units, parent_values, selection_payload)

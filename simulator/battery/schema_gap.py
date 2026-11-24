@@ -118,8 +118,10 @@ def point_value(
     quantity_token: object,
     units: str,
     parent_values: object,
-    selection_payload: Mapping[str, Any],
+    selection_payload: Mapping[str, Any] | None,
 ) -> Any:
+    if selection_payload is None:
+        return selector(quantity_token, units, None)
     selection_payload, gap_quantity = point_schema_gap_context(
         quantity_token, parent_values, selection_payload
     )
