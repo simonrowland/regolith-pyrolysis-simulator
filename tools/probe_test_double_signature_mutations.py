@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import ast
+import inspect
 import sys
 import tempfile
 import textwrap
@@ -39,6 +40,22 @@ class _SideEffectFixture:
 
     def emit(self, record):
         return record
+
+
+class _SignaturePropertyCallable:
+    marker: Path
+
+    def __call__(self, value):
+        return value
+
+    @property
+    def __signature__(self):
+        self.marker.write_text("signature inspected", encoding="utf-8")
+        return inspect.signature(self.__call__)
+
+
+class _SignaturePropertyTarget:
+    target = _SignaturePropertyCallable()
 
 
 def load_mutant(name: str, replacements: tuple[tuple[str, str], ...]):
@@ -245,7 +262,7 @@ def probe_local_class_descriptors() -> None:
             "    if isinstance(receiver.value, ast.ClassDef):\n"
             "        return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)\n",
             "    if isinstance(receiver.value, ast.ClassDef):\n"
-            "        return None\n",
+            "        return _SignatureResolution(None, \"unresolvable\", \"mutation\")\n",
         ),),
     )
     mutated = scan_fixture(mutant, "test_local_descriptors.py", local_descriptor_fixture())
@@ -365,6 +382,177 @@ def probe_opaque_builtin_is_skipped() -> None:
     print("PASS probe: builtin without a signature is counted as skipped")
 
 
+def probe_signature_property_is_not_evaluated() -> None:
+    with tempfile.TemporaryDirectory() as directory:
+        root = Path(directory)
+        marker = root / "signature-property-ran"
+        _SignaturePropertyCallable.marker = marker
+        fixture = root / "test_signature_property.py"
+        fixture.write_text(
+            "from __main__ import _SignaturePropertyTarget\n"
+            "def replacement(value): return value\n"
+            "def test_dynamic_signature(monkeypatch):\n"
+            "    receiver = _SignaturePropertyTarget()\n"
+            "    monkeypatch.setattr(receiver, 'target', replacement)\n",
+            encoding="utf-8",
+        )
+        census = checker.scan_tests(root)
+        assert census.scanned == 1 and census.resolved == 0
+        assert census.skipped_by_reason == (("unsafe-type", 1),)
+        assert not marker.exists()
+
+        mutant = load_mutant(
+            "unsafe_signature_type",
+            ((
+                "def _safe_signature_type(value) -> bool:\n"
+                "    return type(value) in _SAFE_SIGNATURE_TYPES\n",
+                "def _safe_signature_type(value) -> bool:\n"
+                "    return True\n",
+            ),),
+        )
+        mutated = mutant.scan_tests(root)
+        assert mutated.scanned == mutated.resolved == 1
+        assert marker.exists()
+    print("PASS mutation: unsafe __signature__ properties remain untouched")
+
+
+def probe_staticmethod_stays_unbound() -> None:
+    fixture = """
+        from __main__ import _DescriptorFixture
+        def replacement(value): return value
+        def test_static(monkeypatch):
+            receiver = _DescriptorFixture()
+            monkeypatch.setattr(receiver, 'static_call', replacement)
+    """
+    census = scan_fixture(checker, "test_staticmethod.py", fixture)
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and not census.violations
+
+    mutant = load_mutant(
+        "staticmethod_binding",
+        ((
+            "    if type(descriptor) is staticmethod:\n"
+            "        return _signature_of(descriptor.__func__)",
+            "    if type(descriptor) is staticmethod:\n"
+            "        return _bind_descriptor_signature(_signature_of(descriptor.__func__), drop_first=True)",
+        ),),
+    )
+    mutated = scan_fixture(mutant, "test_staticmethod.py", fixture)
+    assert mutated.resolved == 1 and len(mutated.violations) == 1
+    print("PASS mutation: staticmethod signatures remain unbound")
+
+
+def probe_string_classmethod_binding() -> None:
+    fixture = """
+        from unittest.mock import patch
+        def replacement(iterable=(), value=None): return None
+        def test_fromkeys():
+            patch('collections.UserDict.fromkeys', replacement)
+    """
+    census = scan_fixture(checker, "test_string_classmethod.py", fixture)
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and not census.violations
+
+    mutant = load_mutant(
+        "string_classmethod_binding",
+        ((
+            "    if type(descriptor) is classmethod:\n"
+            "        return _bind_descriptor_signature(_signature_of(descriptor.__func__), drop_first=True)",
+            "    if type(descriptor) is classmethod:\n"
+            "        return _bind_descriptor_signature(_signature_of(descriptor.__func__), drop_first=False)",
+        ),),
+    )
+    mutated = scan_fixture(mutant, "test_string_classmethod.py", fixture)
+    assert mutated.resolved == 1 and len(mutated.violations) == 1
+    print("PASS mutation: string targets use the classmethod binding resolver")
+
+
+def probe_string_and_object_targets_share_resolver() -> None:
+    fixture = """
+        from collections import UserDict
+        from unittest.mock import patch
+        def replacement(iterable=(), value=None): return None
+        def test_string_target():
+            patch('collections.UserDict.fromkeys', replacement)
+        def test_object_target():
+            patch.object(UserDict, 'fromkeys', replacement)
+    """
+    census = scan_fixture(checker, "test_shared_classmethod_resolver.py", fixture)
+    assert census.scanned == census.resolved == 2
+    assert not census.skipped and not census.violations
+
+    mutant = load_mutant(
+        "separate_string_resolver",
+        ((
+            "        return _receiver_attribute_signature(receiver, name)\n"
+            "    elif isinstance(target, ast.Tuple)",
+            "        return _signature_of(_imported_object(target.value, {}, {}))\n"
+            "    elif isinstance(target, ast.Tuple)",
+        ),),
+    )
+    mutated = scan_fixture(mutant, "test_shared_classmethod_resolver.py", fixture)
+    assert mutated.resolved == 1 and len(mutated.skipped) == 1
+    assert mutated.skipped_by_reason == (("unsafe-type", 1),)
+    print("PASS mutation: string and object targets share the same resolver")
+
+
+def probe_native_classmethod_binding_on_class_receiver() -> None:
+    fixture = """
+        from builtins import dict as Dict
+        from unittest.mock import patch
+        def replacement(iterable, value=None, /): return None
+        def test_fromkeys():
+            patch.object(Dict, 'fromkeys', replacement)
+    """
+    census = scan_fixture(checker, "test_native_classmethod.py", fixture)
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and not census.violations
+
+    mutant = load_mutant(
+        "native_classmethod_binding",
+        ((
+            "    if type(descriptor) is types.ClassMethodDescriptorType:\n"
+            "        return _bind_descriptor_signature(_signature_of(descriptor), drop_first=True)",
+            "    if type(descriptor) is types.ClassMethodDescriptorType:\n"
+            "        return _bind_descriptor_signature(_signature_of(descriptor), drop_first=False)",
+        ),),
+    )
+    mutated = scan_fixture(mutant, "test_native_classmethod.py", fixture)
+    assert mutated.resolved == 1 and len(mutated.violations) == 1
+    print("PASS mutation: native classmethod descriptors bind on class receivers")
+
+
+def probe_decorated_local_method_is_skipped() -> None:
+    fixture = """
+        from collections import UserDict
+        def narrow(function): return lambda cls, value=None: None
+        class Double:
+            @classmethod
+            @narrow
+            def fromkeys(cls, iterable=(), value=None): return None
+        def test_decorated(monkeypatch):
+            mapping = UserDict()
+            double = Double()
+            monkeypatch.setattr(mapping, 'fromkeys', double.fromkeys)
+    """
+    census = scan_fixture(checker, "test_decorated_classmethod.py", fixture)
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("decorated", 1),)
+
+    mutant = load_mutant(
+        "ignore_local_decorator",
+        ((
+            "    if any(decorator not in {\"classmethod\", \"staticmethod\"} for decorator in decorators):\n"
+            "        return _SignatureResolution(None, \"decorated\", \"local method has a decorator that can change its callable\")",
+            "    if False:\n"
+            "        return _SignatureResolution(None, \"decorated\", \"local method has a decorator that can change its callable\")",
+        ),),
+    )
+    mutated = scan_fixture(mutant, "test_decorated_classmethod.py", fixture)
+    assert mutated.resolved == 1 and not mutated.skipped and not mutated.violations
+    print("PASS mutation: decorated local methods cannot pass from their declaration")
+
+
 def probe_importorskip_alias() -> None:
     census = scan_fixture(
         checker,
@@ -377,8 +565,9 @@ def probe_importorskip_alias() -> None:
                 monkeypatch.setattr(module_alias, 'Counter', replacement)
         """,
     )
-    assert census.scanned == census.resolved == 1
-    assert not census.skipped and not census.violations
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("unsafe-type", 1),)
+    assert not census.violations
     mutant = load_mutant(
         "importorskip_alias",
         ((
@@ -397,7 +586,8 @@ def probe_importorskip_alias() -> None:
                 monkeypatch.setattr(module_alias, 'Counter', replacement)
         """,
     )
-    assert mutated.resolved == 0 and len(mutated.skipped) == 1
+    assert mutated.resolved == 0
+    assert mutated.skipped_by_reason == (("unresolvable", 1),)
     print("PASS mutation: pytest.importorskip module aliases resolve")
 
 
@@ -413,4 +603,10 @@ if __name__ == "__main__":
     probe_single_predicate_owners()
     probe_bound_method_narrowing()
     probe_opaque_builtin_is_skipped()
+    probe_signature_property_is_not_evaluated()
+    probe_staticmethod_stays_unbound()
+    probe_string_classmethod_binding()
+    probe_string_and_object_targets_share_resolver()
+    probe_native_classmethod_binding_on_class_receiver()
+    probe_decorated_local_method_is_skipped()
     probe_importorskip_alias()

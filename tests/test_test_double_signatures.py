@@ -1,5 +1,7 @@
 import ast
+import inspect
 from collections import Counter
+from functools import partial
 from pathlib import Path
 
 import pytest
@@ -28,12 +30,36 @@ class _NarrowBoundFixture:
         return None
 
 
+class _SignaturePropertyCallable:
+    marker: Path | None = None
+
+    def __call__(self, value):
+        return value
+
+    @property
+    def __signature__(self):
+        if self.marker is not None:
+            self.marker.write_text("signature inspected", encoding="utf-8")
+        return inspect.signature(self.__call__)
+
+
+class _SignaturePropertyTarget:
+    target = _SignaturePropertyCallable()
+
+
+class _PartialTarget:
+    target = partial(lambda value: value, 1)
+
+
 def test_patch_double_violation_allowlist_only_shrinks() -> None:
     census = scan_tests(Path(__file__).parent)
     assert census.resolved + len(census.skipped) == census.scanned
     assert census.scanned > 0
     assert census.resolved > 0
+    assert sum(count for _, count in census.skipped_by_reason) == len(census.skipped)
     print(f"UNRESOLVED-SKIPPED: {len(census.skipped)}")
+    for reason, count in census.skipped_by_reason:
+        print(f"SKIPPED-{reason.upper()}: {count}")
     allowed = Counter(
         line.strip()
         for line in ALLOWLIST.read_text(encoding="utf-8").splitlines()
@@ -178,8 +204,8 @@ def test_scan_preserves_pytest_importorskip_module_alias(tmp_path: Path) -> None
     )
     census = scan_tests(tmp_path)
     assert census.scanned == 1
-    assert census.resolved == 1
-    assert not census.skipped
+    assert census.resolved == 0
+    assert census.skipped_by_reason == (("unsafe-type", 1),)
     assert not census.violations
 
 
@@ -258,6 +284,130 @@ def test_scan_keeps_bound_classmethod_parameters(tmp_path: Path) -> None:
     assert census.violations[0].startswith(
         "test_bound_classmethod.py::test_bound_fromkeys::"
     )
+
+
+def test_scan_resolves_string_target_classmethod_binding(tmp_path: Path) -> None:
+    (tmp_path / "test_string_classmethod.py").write_text(
+        "from unittest.mock import patch\n"
+        "def test_narrow_fromkeys():\n"
+        "    patch('collections.UserDict.fromkeys', lambda value=None: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1
+    assert census.resolved == 1
+    assert not census.skipped
+    assert census.violations == (
+        "test_string_classmethod.py::test_narrow_fromkeys::'collections.UserDict.fromkeys'",
+    )
+
+
+def test_scan_uses_the_same_classmethod_resolver_for_string_and_object_targets(
+    tmp_path: Path,
+) -> None:
+    (tmp_path / "test_shared_classmethod_resolver.py").write_text(
+        "from collections import UserDict\n"
+        "from unittest.mock import patch\n"
+        "def replacement(iterable=(), value=None): return None\n"
+        "def test_string_target():\n"
+        "    patch('collections.UserDict.fromkeys', replacement)\n"
+        "def test_object_target():\n"
+        "    patch.object(UserDict, 'fromkeys', replacement)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 2
+    assert census.resolved == 2
+    assert not census.skipped
+    assert not census.violations
+
+
+def test_scan_binds_native_classmethod_for_class_and_instance_targets(tmp_path: Path) -> None:
+    (tmp_path / "test_native_classmethod.py").write_text(
+        "from builtins import dict as Dict\n"
+        "from unittest.mock import patch\n"
+        "def test_class_receiver():\n"
+        "    patch.object(Dict, 'fromkeys', lambda iterable, value=None, /: None)\n"
+        "def test_instance_receiver():\n"
+        "    mapping = Dict()\n"
+        "    patch.object(mapping, 'fromkeys', lambda iterable, value=None, /: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 2
+    assert census.resolved == 2
+    assert not census.skipped
+    assert not census.violations
+
+
+def test_scan_skips_local_method_with_an_unknown_decorator(tmp_path: Path) -> None:
+    (tmp_path / "test_decorated_classmethod.py").write_text(
+        "from collections import UserDict\n"
+        "def narrow(function):\n"
+        "    return lambda cls, value=None: None\n"
+        "class Double:\n"
+        "    @classmethod\n"
+        "    @narrow\n"
+        "    def fromkeys(cls, iterable=(), value=None): return None\n"
+        "def test_decorated_fromkeys(monkeypatch):\n"
+        "    mapping = UserDict()\n"
+        "    double = Double()\n"
+        "    monkeypatch.setattr(mapping, 'fromkeys', double.fromkeys)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1
+    assert census.resolved == 0
+    assert census.skipped_by_reason == (("decorated", 1),)
+    assert "SKIPPED-DECORATED" in census.skipped[0]
+    assert not census.violations
+
+
+def test_scan_does_not_evaluate_callable_signature_property(tmp_path: Path) -> None:
+    marker = tmp_path / "signature-property-ran"
+    _SignaturePropertyCallable.marker = marker
+    (tmp_path / "test_signature_property.py").write_text(
+        f"from {__name__} import _SignaturePropertyTarget\n"
+        "def replacement(value): return value\n"
+        "def test_dynamic_signature(monkeypatch):\n"
+        "    receiver = _SignaturePropertyTarget()\n"
+        "    monkeypatch.setattr(receiver, 'target', replacement)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+    _SignaturePropertyCallable.marker = None
+
+    assert census.scanned == 1
+    assert census.resolved == 0
+    assert census.skipped_by_reason == (("unsafe-type", 1),)
+    assert not marker.exists()
+    assert not census.violations
+
+
+def test_scan_skips_functools_partial_wrappers(tmp_path: Path) -> None:
+    (tmp_path / "test_partial_wrapper.py").write_text(
+        f"from {__name__} import _PartialTarget\n"
+        "def test_partial(monkeypatch):\n"
+        "    receiver = _PartialTarget()\n"
+        "    monkeypatch.setattr(receiver, 'target', lambda: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1
+    assert census.resolved == 0
+    assert census.skipped_by_reason == (("unsafe-type", 1),)
+    assert not census.violations
 
 
 def test_scan_resolves_local_descriptors_without_running_constructors(tmp_path: Path) -> None:

@@ -19,6 +19,8 @@ import ast
 import importlib
 import inspect
 import sys
+import types
+from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -38,6 +40,14 @@ class Census:
     resolved: int
     skipped: tuple[str, ...]
     violations: tuple[str, ...]
+    skipped_by_reason: tuple[tuple[str, int], ...]
+
+
+@dataclass(frozen=True)
+class _SignatureResolution:
+    signature: inspect.Signature | None
+    reason: str | None = None
+    detail: str | None = None
 
 
 @dataclass(frozen=True)
@@ -311,11 +321,27 @@ def _receiver(
     return _Receiver(value, not inspect.isclass(value) and not inspect.ismodule(value))
 
 
-def _signature_of(value) -> inspect.Signature | None:
+_SAFE_SIGNATURE_TYPES = (
+    types.FunctionType,
+    types.BuiltinFunctionType,
+    types.BuiltinMethodType,
+    types.MethodDescriptorType,
+    types.WrapperDescriptorType,
+    types.ClassMethodDescriptorType,
+)
+
+
+def _safe_signature_type(value) -> bool:
+    return type(value) in _SAFE_SIGNATURE_TYPES
+
+
+def _signature_of(value) -> _SignatureResolution:
+    if not _safe_signature_type(value):
+        return _SignatureResolution(None, "unsafe-type", "callable type is outside the inspection allowlist")
     try:
-        return inspect.signature(value)
+        return _SignatureResolution(inspect.signature(value, follow_wrapped=False))
     except (TypeError, ValueError):
-        return None
+        return _SignatureResolution(None, "signature-unavailable", "inspect.signature could not resolve the safe callable")
 
 
 def _without_first_parameter(signature: inspect.Signature) -> inspect.Signature:
@@ -329,24 +355,20 @@ def _without_first_parameter(signature: inspect.Signature) -> inspect.Signature:
 
 
 def _bind_descriptor_signature(
-    signature: inspect.Signature,
+    result: _SignatureResolution,
     *,
-    is_static: bool,
-    is_classmethod: bool,
-    is_instance: bool,
-) -> inspect.Signature:
-    if is_static:
-        return signature
-    if is_classmethod or is_instance:
-        return _without_first_parameter(signature)
-    return signature
+    drop_first: bool,
+) -> _SignatureResolution:
+    if result.signature is None or not drop_first:
+        return result
+    return _SignatureResolution(_without_first_parameter(result.signature))
 
 
 def _local_class_attribute_signature(
     class_node: ast.ClassDef,
     name: str,
     is_instance: bool,
-) -> inspect.Signature | None:
+) -> _SignatureResolution:
     member = next(
         (
             item
@@ -356,19 +378,19 @@ def _local_class_attribute_signature(
         None,
     )
     if member is None:
-        return None
-    signature = _replacement_signature(member)
-    if signature is None:
-        return None
-    decorators = {
+        return _SignatureResolution(None, "unresolvable", "local method declaration was not found")
+    decorators = [
         _dotted(item.func if isinstance(item, ast.Call) else item)
         for item in member.decorator_list
-    }
+    ]
+    if any(decorator not in {"classmethod", "staticmethod"} for decorator in decorators):
+        return _SignatureResolution(None, "decorated", "local method has a decorator that can change its callable")
+    signature = _replacement_signature(member)
+    if signature is None:
+        return _SignatureResolution(None, "signature-unavailable", "local method declaration has no readable signature")
     return _bind_descriptor_signature(
-        signature,
-        is_static="staticmethod" in decorators,
-        is_classmethod="classmethod" in decorators,
-        is_instance=is_instance,
+        _SignatureResolution(signature),
+        drop_first="classmethod" in decorators or ("staticmethod" not in decorators and is_instance),
     )
 
 
@@ -376,49 +398,42 @@ def _class_attribute_signature(
     class_object: type,
     name: str,
     is_instance: bool,
-) -> inspect.Signature | None:
+) -> _SignatureResolution:
     try:
         descriptor = inspect.getattr_static(class_object, name)
     except AttributeError:
-        return None
-    is_static = isinstance(descriptor, staticmethod)
-    is_classmethod = isinstance(descriptor, classmethod)
-    if is_static or is_classmethod:
-        descriptor = descriptor.__func__
-    is_function = inspect.isfunction(descriptor)
-    is_native_method = inspect.ismethoddescriptor(descriptor) or inspect.isbuiltin(descriptor)
-    if not (is_function or is_native_method):
-        descriptor_get = inspect.getattr_static(type(descriptor), "__get__", None)
-        if descriptor_get is not None:
-            return None
-    signature = _signature_of(descriptor)
-    if signature is None:
-        return None
-    return _bind_descriptor_signature(
-        signature,
-        is_static=is_static,
-        is_classmethod=is_classmethod,
-        is_instance=is_instance and (is_function or is_native_method),
-    )
+        return _SignatureResolution(None, "unresolvable", "static class attribute was not found")
+    if type(descriptor) is staticmethod:
+        return _signature_of(descriptor.__func__)
+    if type(descriptor) is classmethod:
+        return _bind_descriptor_signature(_signature_of(descriptor.__func__), drop_first=True)
+    if type(descriptor) is types.ClassMethodDescriptorType:
+        return _bind_descriptor_signature(_signature_of(descriptor), drop_first=True)
+    if type(descriptor) is types.FunctionType:
+        return _bind_descriptor_signature(_signature_of(descriptor), drop_first=is_instance)
+    if type(descriptor) in (types.MethodDescriptorType, types.WrapperDescriptorType):
+        return _bind_descriptor_signature(_signature_of(descriptor), drop_first=is_instance)
+    return _signature_of(descriptor)
 
 
 def _receiver_attribute_signature(
     receiver: _Receiver,
     name: str,
-) -> inspect.Signature | None:
+) -> _SignatureResolution:
     if isinstance(receiver.value, ast.ClassDef):
         return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)
     if inspect.isclass(receiver.value):
         return _class_attribute_signature(receiver.value, name, receiver.is_instance)
     if inspect.ismodule(receiver.value):
         try:
-            return _signature_of(inspect.getattr_static(receiver.value, name))
+            attribute = inspect.getattr_static(receiver.value, name)
         except AttributeError:
-            return None
+            return _SignatureResolution(None, "unresolvable", "static module attribute was not found")
+        return _signature_of(attribute)
     try:
         instance_attribute = inspect.getattr_static(receiver.value, name)
     except AttributeError:
-        return None
+        return _SignatureResolution(None, "unresolvable", "static instance attribute was not found")
     try:
         class_attribute = inspect.getattr_static(type(receiver.value), name)
     except AttributeError:
@@ -428,28 +443,52 @@ def _receiver_attribute_signature(
     return _signature_of(instance_attribute)
 
 
+def _receiver_and_attribute_for_path(
+    dotted: str,
+    modules: dict[str, str],
+    objects: dict[str, str],
+) -> tuple[_Receiver | None, str | None]:
+    parts = _resolve_alias(dotted, modules, objects).split(".")
+    if len(parts) < 2:
+        return None, None
+    for split in range(len(parts) - 1, 0, -1):
+        owner = _imported_object(".".join(parts[:split]), {}, {})
+        if owner is None:
+            continue
+        try:
+            for attribute in parts[split:-1]:
+                owner = inspect.getattr_static(owner, attribute)
+        except AttributeError:
+            continue
+        return _Receiver(owner, not inspect.isclass(owner) and not inspect.ismodule(owner)), parts[-1]
+    return None, parts[-1]
+
+
 def _production_signature(
     target: ast.AST,
     modules: dict[str, str],
     objects: dict[str, str],
     call: ast.Call,
     parents: dict[ast.AST, ast.AST],
-):
+) -> _SignatureResolution:
     if isinstance(target, ast.Constant) and isinstance(target.value, str):
-        dotted = target.value
+        receiver, name = _receiver_and_attribute_for_path(target.value, {}, {})
+        if receiver is None or name is None:
+            return _SignatureResolution(None, "unresolvable", "production target owner could not be statically resolved")
+        return _receiver_attribute_signature(receiver, name)
     elif isinstance(target, ast.Tuple) and len(target.elts) == 2 and isinstance(target.elts[1], ast.Constant):
         receiver = _receiver(target.elts[0], call, parents, modules, objects)
         if receiver is None:
-            return None
+            return _SignatureResolution(None, "unresolvable", "production receiver has no statically resolvable imported or local class")
         return _receiver_attribute_signature(receiver, target.elts[1].value)
     else:
         base = _dotted(target)
         if not base:
-            return None
-        dotted = _resolve_alias(base, modules, objects)
-
-    value = _imported_object(dotted, modules, objects)
-    return _signature_of(value) if callable(value) else None
+            return _SignatureResolution(None, "unresolvable", "production target has no static dotted name")
+        receiver, name = _receiver_and_attribute_for_path(base, modules, objects)
+        if receiver is None or name is None:
+            return _SignatureResolution(None, "unresolvable", "production target owner could not be statically resolved")
+        return _receiver_attribute_signature(receiver, name)
 
 
 def _replacement_signature(node: ast.AST) -> inspect.Signature | None:
@@ -623,21 +662,26 @@ def _replacement_signature_for_site(
     parents: dict[ast.AST, ast.AST],
     modules: dict[str, str],
     objects: dict[str, str],
-) -> inspect.Signature | None:
+) -> _SignatureResolution:
     definition = _callable_definition(node, site.call, parents, tree)
     if definition is not None:
-        return _replacement_signature(definition)
+        signature = _replacement_signature(definition)
+        if signature is None:
+            return _SignatureResolution(None, "signature-unavailable", "local replacement declaration has no readable signature")
+        return _SignatureResolution(signature)
     if isinstance(node, ast.Attribute):
         receiver = _receiver(node.value, site.call, parents, modules, objects)
         if receiver is None:
-            return None
+            return _SignatureResolution(None, "unresolvable", "replacement receiver has no statically resolvable imported or local class")
         return _receiver_attribute_signature(receiver, node.attr)
     if isinstance(node, ast.Name):
         value = _imported_object(_dotted(node) or "", modules, objects)
-        return _signature_of(value) if callable(value) else None
+        if value is None:
+            return _SignatureResolution(None, "unresolvable", "imported replacement target was not found")
+        return _signature_of(value)
     if isinstance(node, ast.Call):
-        return None
-    return None
+        return _SignatureResolution(None, "unresolvable", "replacement call result would require execution")
+    return _SignatureResolution(None, "unresolvable", "replacement has no statically resolvable signature")
 
 
 def scan_tests(root: Path) -> Census:
@@ -647,6 +691,7 @@ def scan_tests(root: Path) -> Census:
         sys.path.insert(0, str(repository_root))
     scanned = resolved = 0
     skipped: list[str] = []
+    skipped_by_reason: Counter[str] = Counter()
     violations: list[str] = []
     for path in sorted(root.rglob("test_*.py")):
         try:
@@ -663,32 +708,23 @@ def scan_tests(root: Path) -> Census:
             double = (
                 _replacement_signature_for_site(site.replacement, site, tree, parents, modules, objects)
                 if site.replacement is not None
-                else None
+                else _SignatureResolution(None, "unresolvable", "replacement was not statically resolved")
             )
-            if production is None or double is None:
-                reasons = []
-                if production is None:
-                    if isinstance(site.target, ast.Tuple):
-                        reasons.append(
-                            "production receiver has no statically resolvable imported or local class"
-                        )
-                    else:
-                        reasons.append("production target has no statically resolvable signature")
-                if double is None:
-                    if isinstance(site.replacement, ast.Call):
-                        reasons.append("replacement call result would require execution")
-                    elif isinstance(site.replacement, ast.Attribute):
-                        reasons.append(
-                            "replacement receiver has no statically resolvable imported or local class"
-                        )
-                    else:
-                        reasons.append("replacement has no statically resolvable signature")
+            if production.signature is None or double.signature is None:
+                primary = production if production.signature is None else double
+                reason = primary.reason or "unresolvable"
+                details = []
+                if production.signature is None:
+                    details.append(f"production: {production.detail or reason}")
+                if double.signature is None:
+                    details.append(f"replacement: {double.detail or double.reason or 'unresolvable'}")
                 skipped.append(
-                    f"{path}:{site.line}: SKIPPED-UNRESOLVABLE: {'; '.join(reasons)}"
+                    f"{path}:{site.line}: SKIPPED-{reason.upper()}: {'; '.join(details)}"
                 )
+                skipped_by_reason[reason] += 1
                 continue
             resolved += 1
-            if not _compatible(production, double):
+            if not _compatible(production.signature, double.signature):
                 try:
                     relative = path.relative_to(repository_root).as_posix()
                 except ValueError:
@@ -696,7 +732,13 @@ def scan_tests(root: Path) -> Census:
                 test_name = _test_name(site.call, parents)
                 target = ast.unparse(site.target)
                 violations.append(f"{relative}::{test_name}::{target}")
-    return Census(scanned, resolved, tuple(skipped), tuple(violations))
+    return Census(
+        scanned,
+        resolved,
+        tuple(skipped),
+        tuple(violations),
+        tuple(sorted(skipped_by_reason.items())),
+    )
 
 
 def _test_name(node: ast.AST, parents: dict[ast.AST, ast.AST]) -> str:
@@ -716,7 +758,9 @@ def main(argv: list[str] | None = None) -> int:
     print(f"DOUBLES-SCANNED: {census.scanned}")
     print(f"RESOLVED: {census.resolved}")
     print(f"VIOLATIONS: {len(census.violations)}")
-    print(f"SKIPPED-UNRESOLVABLE: {len(census.skipped)}")
+    print(f"SKIPPED: {len(census.skipped)}")
+    for reason, count in census.skipped_by_reason:
+        print(f"SKIPPED-{reason.upper()}: {count}")
     for item in census.violations:
         print(f"VIOLATION: {item}")
     for item in census.skipped:
