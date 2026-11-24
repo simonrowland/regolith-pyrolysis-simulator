@@ -730,9 +730,9 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
             "p001-p021.md"
         )
     ]
-    assert len(prose_pins) == 34
+    assert len(prose_pins) == 41
     expected_prose_digest = (
-        "9c69d49024ddc785020bb969b07d4041267e6b881ea64217ce4a0349fb7b86d3"
+        "6fe24b01ed68e4e84e602c9b772c621abfc96774862134e493a7d587754b0518"
     )
     assert all(
         sample["locator"]["source_sha256"] == expected_prose_digest
