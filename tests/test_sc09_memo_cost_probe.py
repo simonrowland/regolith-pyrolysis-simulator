@@ -43,4 +43,8 @@ def test_sc09_full_sim_process_cpu_sample(tmp_path) -> None:
         ):
             runner["_run_scenario"](scenario)
 
-    _measure("lunar_mare_low_ti_C0_24h", lambda: run_lunar_scenario(0))
+    for index in range(3):
+        _measure(
+            "lunar_mare_low_ti_C0_24h",
+            lambda index=index: run_lunar_scenario(index),
+        )
