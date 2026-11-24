@@ -296,6 +296,11 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
     expected = tuple(sorted(_atoms(formula).items()))
     assert score_parse(formula) == expected
     assert composition_parse(formula) == expected
+    hydrate = "CuSO4.5H2O"
+    expected_hydrate = atoms_parse_formula_else_janaf(hydrate)
+    assert expected_hydrate is not None
+    assert score_parse(hydrate) == expected_hydrate
+    assert composition_parse(hydrate) == expected_hydrate
     nbo_composition = {
         "amount_basis": AmountBasis.MOLE_FRACTION.value,
         "components": ((formula, Decimal(1)),),
@@ -320,6 +325,10 @@ def test_score_decimal_subscripts_use_accounting_parser_owner(
         assert score_parse(formula) == expected
     with pytest.raises(AssertionError):
         assert composition_parse(formula) == expected
+    with pytest.raises(AssertionError):
+        assert score_parse(hydrate) == expected_hydrate
+    with pytest.raises(AssertionError):
+        assert composition_parse(hydrate) == expected_hydrate
     with pytest.raises(AssertionError):
         assert _battery_hero_nbo_t(nbo_composition) == expected_nbo_t
 
