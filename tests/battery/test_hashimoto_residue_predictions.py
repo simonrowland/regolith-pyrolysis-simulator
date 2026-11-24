@@ -317,9 +317,16 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         engine="openimcc",
     )
     predictions = copy.deepcopy(cohort)
-    # The digest covers the reported typed engine notices as well as the
-    # prediction provenance. The primary numeric outputs remain pinned below
-    # independently as float.hex.
+    # Timing fields remain stripped. The digest covers the reported typed
+    # engine notices as well as prediction provenance; the primary numeric
+    # outputs remain pinned below independently as float.hex.
+    # The b265 merge 5d993f1192 added alpha_authority_status and
+    # authority_reason to proxy alpha rows. d-466 commit 4dfc7fcea3 applies
+    # o_bar_Fe = 1 + q/2. OpenIMCC holds activities fixed and lacks trial-pO2
+    # Fe speciation, so residue oxygen balance uses Kress91 and flags
+    # residue_fe_speciation_kress91_fallback. Provenance also records
+    # engine_flags and an empty pressure_law_diagnostics.
+    # Final integration-tip remote output must replace these provisional pins.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
         "3b1878ecf87665fde693e50342c568cfa276ab166eb936671ab6addc3e634642"
     ), _hashimoto_prediction_tuple_digest(predictions)

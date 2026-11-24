@@ -67,24 +67,52 @@ def test_species_rates_follow_the_vapor_owner_limit(monkeypatch):
     assert seen == [(floor, None)]
 
 
-def test_internal_analytical_cold_gate_follows_the_vapor_limit(monkeypatch):
+def test_internal_analytical_cold_gate_follows_the_vapor_limit():
+    code = """
+import engines.vapor_limits as vapor_limits
+vapor_limits.BUILTIN_VAPOR_BELOW_400K_LIMIT_K = 401.5
+from types import SimpleNamespace
+from simulator.equilibrium import EquilibriumMixin
+
+result = EquilibriumMixin._internal_analytical_equilibrium(
+    SimpleNamespace(
+        melt=SimpleNamespace(temperature_C=128.0, p_total_mbar=1.0),
+    )
+)
+assert result.status == "ok"
+assert result.diagnostics["vapor_pressure_zero_reason"] == (
+    "internal_analytical_below_400K"
+)
+"""
+    completed = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=Path(__file__).resolve().parents[1],
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+
+
+def test_equilibrium_duplicate_400k_binding_breaks_owner_assertion(monkeypatch):
+    import engines.vapor_limits as vapor_limits
     import simulator.equilibrium as equilibrium
-    from simulator.equilibrium import EquilibriumMixin
+
+    monkeypatch.setattr(vapor_limits, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 401.5)
+    monkeypatch.setattr(equilibrium, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 400.0)
+
+    def fail_after_cold_gate(self):
+        raise AssertionError("duplicate 400 K binding bypassed cold gate")
 
     monkeypatch.setattr(
-        equilibrium,
-        "BUILTIN_VAPOR_BELOW_400K_LIMIT_K",
-        500.0,
+        equilibrium.EquilibriumMixin,
+        "_headspace_transport_pO2_bar",
+        fail_after_cold_gate,
     )
-    result = EquilibriumMixin._internal_analytical_equilibrium(
-        SimpleNamespace(
-            melt=SimpleNamespace(temperature_C=130.0, p_total_mbar=1.0),
-        )
-    )
-    assert result.status == "ok"
-    assert result.diagnostics["vapor_pressure_zero_reason"] == (
-        "internal_analytical_below_400K"
-    )
+    host = object.__new__(equilibrium.EquilibriumMixin)
+    host.melt = SimpleNamespace(temperature_C=128.0, p_total_mbar=1.0)
+
+    with pytest.raises(AssertionError, match="duplicate 400 K binding bypassed cold gate"):
+        equilibrium.EquilibriumMixin._internal_analytical_equilibrium(host)
 
 
 def test_analytical_activity_vapor_gate_follows_the_vapor_limit(monkeypatch):
