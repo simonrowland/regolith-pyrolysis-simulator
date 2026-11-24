@@ -683,10 +683,11 @@ def test_c0_start_installs_printed_area_before_the_bridge(
 
 def test_dp007_area_notice_is_attached_to_run_metadata() -> None:
     preset = _vacuum_preset("sesko_2024.yaml")
-    sample_mass_kg = preset["lab_geometry"]["sample"]["mass_g"] / 1000.0
-    expected = resolve("DP-007", sample_mass_kg=sample_mass_kg)
     run = _gram_lab_run(preset, campaign="C0")
-    output = run._run_session(run._start_session())
+    session = run._start_session()
+    selected_area_m2 = session.simulator.melt.melt_surface_area_m2
+    expected = resolve("DP-007", selected_area_m2=selected_area_m2)
+    output = run._run_session(session)
 
     notices = output["run_metadata"]["runtime_notices"]
     assert len(notices) == 1

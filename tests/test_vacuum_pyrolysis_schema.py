@@ -75,9 +75,9 @@ ROBINOT_EAC1_ELEMENTAL_WT_PCT = {
 }
 SESKO_PRESSURE_REPORTED_MIN_MBAR = pytest.approx(1.0e-7)
 SESKO_PRESSURE_REPORTED_MAX_MBAR = pytest.approx(1.0e-2)
-SESKO_PRESSURE_RUNTIME_FLOOR_MBAR = pytest.approx(1.0e-3)
+SESKO_PRESSURE_ASSUMED_INITIAL_MBAR = pytest.approx(1.0e-3)
 SESKO_PRESSURE_RUNTIME_DELTA_ID = (
-    "pressure_floor_delta_reported_uhv_min_to_runtime_floor"
+    "pressure_assumption_reported_uhv_min_to_initial_point"
 )
 SESKO_TEMP_MIN_C = pytest.approx(1476.85)
 SESKO_TEMP_MAX_C = pytest.approx(1626.85)
@@ -595,6 +595,8 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
             "value": expected_default_pressure_mbar,
             "unit": "mbar",
             "default_source": "campaigns.C0.p_total_mbar_default",
+            "reason": "lab_schedule_chamber_pressure_not_reported",
+            "original_reason": "lab_schedule_chamber_pressure_not_reported",
             "out_of_domain": True,
         },
         "mass_kg": {
@@ -603,6 +605,8 @@ def test_unreported_pomeroy_knobs_use_runner_defaults_and_report_them(
             "value": expected_default_kg,
             "unit": "kg",
             "default_source": "PyrolysisRun.mass_kg",
+            "reason": "lab_geometry_sample_mass_not_reported",
+            "original_reason": "lab_geometry_sample_mass_not_reported",
             "out_of_domain": True,
         },
     }
@@ -810,7 +814,7 @@ def test_benchtop_presets_report_stage0_refusal_and_defaults(
         assert [
             point["value"]
             for point in preset.lab_schedule["chamber_pressure_mbar"]
-        ] == [SESKO_PRESSURE_RUNTIME_FLOOR_MBAR, SESKO_PRESSURE_REPORTED_MAX_MBAR]
+        ] == [SESKO_PRESSURE_ASSUMED_INITIAL_MBAR, SESKO_PRESSURE_REPORTED_MAX_MBAR]
         assert not any(
             notice["path"] == "lab_schedule.chamber_pressure_mbar"
             for notice in preset.provenance.get("notices", [])
@@ -1038,10 +1042,10 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     pressure_digest = next(
         row["digest"]
         for row in preset["source_notes"]
-        if row["digest"].startswith("The reported exposure pressure range")
+        if row["digest"].startswith("Reported exposure pressure")
     )
-    assert "parser-floor point" in pressure_digest
-    assert "runtime floor" in pressure_digest
+    assert "assumed initial schedule point" in pressure_digest
+    assert "extrapolation notice" in pressure_digest
 
     schedule = preset["lab_schedule"]
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
@@ -1049,7 +1053,7 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert schedule["melt_temperature_C"][0]["unit"] == "C"
     assert (
         schedule["chamber_pressure_mbar"][0]["value"]
-        == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
+        == SESKO_PRESSURE_ASSUMED_INITIAL_MBAR
     )
     assert (
         schedule["chamber_pressure_mbar"][0]["runtime_delta_annotation_id"]
@@ -1067,8 +1071,8 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
         row["id"]: row for row in schedule["runtime_schedule_annotations"]
     }[SESKO_PRESSURE_RUNTIME_DELTA_ID]
     assert runtime_delta["reported_value"] == SESKO_PRESSURE_REPORTED_MIN_MBAR
-    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_RUNTIME_FLOOR_MBAR
-    assert runtime_delta["reason"] == "normalize_lab_schedule_floor"
+    assert runtime_delta["runtime_value"] == SESKO_PRESSURE_ASSUMED_INITIAL_MBAR
+    assert runtime_delta["reason"] == "assumed_schedule_point_not_time_resolved"
     assert schedule["gas_boundary"]["background_gas"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["imposed_flow"]["reported_status"] == NOT_REPORTED
     assert schedule["gas_boundary"]["pressure_control"]["mode"] == "pumped_dynamic_uhv_exposure"
@@ -1096,10 +1100,13 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert "reported_pressure_range_does_not_establish_time_series" in certification_block[
         "reasons"
     ]
-    assert "runtime_schedule_clamps_values_below_1e-3_mbar" in certification_block[
+    assert "runtime_schedule_uses_assumed_initial_pressure_point" in certification_block[
         "reasons"
     ]
-    assert "unclamped_time_resolved_pressure_trace" in certification_block[
+    assert "reported_time_resolved_pressure_trace" in certification_block[
+        "required_evidence"
+    ]
+    assert "unclamped_time_resolved_pressure_trace" not in certification_block[
         "required_evidence"
     ]
     assert "pump_throughput_and_pressure_trace_are_not_reported" in certification_block[
@@ -1111,6 +1118,9 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
 
     geometry = preset["lab_geometry"]
     assert geometry["sample"]["mass_g"] == SESKO_SAMPLE_MASS_G
+    assert "p. 217 §3.2.2" in geometry["sample"]["mass_digest"]
+    assert geometry["pump"]["pressure_sensor_location"] == "chamber_exit"
+    assert "Fig. 1, p. 217" in geometry["pump"]["pressure_sensor_location_reason"]
     surfaces = {row["id"]: row for row in geometry["surfaces"]}
     assert surfaces["quartz_window"]["source_class"] == "literature_sidecar"
     assert surfaces["quartz_window"]["equivalent_diameter_m"] == pytest.approx(
@@ -1166,6 +1176,38 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert locations["crucible_wall"]["reported_species_or_composition"]["Fe"][
         "qualifier"
     ] == "brown_lower_layer_present"
+
+
+def test_sesko_reported_low_pressure_is_preserved_and_flagged() -> None:
+    raw = copy.deepcopy(load_yaml(SESKO_PRESET_PATH)["lab_schedule"])
+    reported_min = raw["reported_exposure_profile"]["pressure_mbar"][
+        "reported_min_value"
+    ]
+    raw["chamber_pressure_mbar"][0]["value"] = reported_min
+
+    normalized = normalize_lab_schedule(raw)
+
+    assert normalized["chamber_pressure_mbar"][0]["value"] == reported_min
+    notice = normalized["pressure_domain_notices"][0]
+    assert notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+    assert notice["authority"] == "extrapolated"
+
+
+def test_pomeroy_default_notices_keep_the_omission_reasons() -> None:
+    preset = runner_module._load_vacuum_preset_run_spec(
+        POMEROY_PRESET_PATH,
+        "faithful",
+    )
+    notices = {notice["path"]: notice for notice in preset.provenance["notices"]}
+
+    assert notices["mass_kg"]["reason"] == "lab_geometry_sample_mass_not_reported"
+    assert notices["mass_kg"]["original_reason"] == notices["mass_kg"]["reason"]
+    assert notices["lab_schedule.chamber_pressure_mbar"]["reason"] == (
+        "lab_schedule_chamber_pressure_not_reported"
+    )
+    assert notices["lab_schedule.chamber_pressure_mbar"]["original_reason"] == (
+        notices["lab_schedule.chamber_pressure_mbar"]["reason"]
+    )
 
 
 def test_valid_vpr_skeleton_passes_test_local_schema_validator() -> None:

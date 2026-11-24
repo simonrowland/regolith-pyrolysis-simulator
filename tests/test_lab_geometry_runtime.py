@@ -513,6 +513,8 @@ def test_profile_surface_notice_describes_the_temperature_used_at_runtime() -> N
             "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
             "source_class": "assumption_with_sensitivity_marker",
             "sensitivity_marker": "defaulted_lab_surface_temperature",
+            "reason": "lab_geometry_missing_surface_temperature: holder",
+            "original_reason": "lab_geometry_missing_surface_temperature: holder",
         }
     ]
     geometry = parse_lab_geometry(raw, allow_temperature_profiles=True)

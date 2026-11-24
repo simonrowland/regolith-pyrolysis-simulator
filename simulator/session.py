@@ -29,6 +29,7 @@ from simulator.process_timestep import (
     resolve_process_timestep,
 )
 from simulator.feedstock_guard import BlockedFeedstockError, assert_feedstock_loadable
+from simulator.lab_geometry import runtime_temperature_profiles_may_be_deferred
 from simulator.lab_schedule import LAB_SCHEDULE_OVERRIDE_KEY
 from simulator.scalar_boundary import is_declared_real_scalar, require_finite_float as _finite_float
 from simulator.campaigns import parse_campaign_override_value
@@ -413,6 +414,9 @@ class SimSession:
                 allow_lab_geometry_temperature_profiles=(
                     _has_runtime_surface_temperature_schedule(
                         config.runtime_campaign_overrides
+                    )
+                    or runtime_temperature_profiles_may_be_deferred(
+                        config.setpoints.get("lab_geometry")
                     )
                 ),
             )

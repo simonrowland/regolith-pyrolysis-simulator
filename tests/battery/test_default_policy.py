@@ -27,7 +27,7 @@ from simulator.battery.score import (
     flagged_stratum_rows,
     headline_payloads,
 )
-from simulator.equipment import EquipmentDesigner
+import simulator.battery.default_policy as default_policy
 from tests.battery import factories as F
 
 
@@ -198,33 +198,68 @@ def test_other_apparatus_default_resolves_runtime_value() -> None:
     assert resolve("DP-008", runtime_default=runtime_area).value == runtime_area
 
 
-def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
-    sample_mass_kg = 3.38e-3
-    expected_area_m2 = EquipmentDesigner().size_crucible(
-        sample_mass_kg
-    ).melt_surface_area_m2
-    resolved = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+def test_dp007_records_area_selected_by_equipment_sizing_owner() -> None:
+    selected_area_m2 = Decimal("0.0002")
+    resolved = resolve("DP-007", selected_area_m2=selected_area_m2)
 
-    assert resolved.value == Decimal(str(expected_area_m2))
+    assert resolved.value == selected_area_m2
     assert resolved.units == "m²"
-    assert resolved.value < Decimal("0.2") / Decimal("1000")
+    assert resolved.payload["policy"]["value"] == str(selected_area_m2)
 
-    # Mutation recipe: substitute MeltState().melt_surface_area_m2 (0.2 m²)
-    # for the size_crucible result; the gram-scale bound above must fail.
     with pytest.raises(
         ValueError,
-        match=(
-            "DP-007 requires sample_mass_kg: "
-            "an absolute rate needs an area or sample mass"
-        ),
+        match="DP-007 requires selected_area_m2 from the equipment sizing owner",
     ):
         resolve("DP-007")
-    for invalid_mass_kg in (0.0, -sample_mass_kg):
+    for invalid_area_m2 in (0.0, -selected_area_m2):
         with pytest.raises(
             ValueError,
-            match="DP-007 sample_mass_kg must be positive",
+            match="DP-007 selected_area_m2 must be positive",
         ):
-            resolve("DP-007", sample_mass_kg=invalid_mass_kg)
+            resolve("DP-007", selected_area_m2=invalid_area_m2)
+
+
+def test_dp007_shared_path_rejects_reintroduced_registry_resizing(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from types import SimpleNamespace
+
+    from simulator.equipment import EquipmentDesigner
+
+    selected_area_m2 = Decimal("0.0002")
+    original_resolve = default_policy.resolve
+
+    def contract() -> None:
+        resolved = default_policy.resolve(
+            "DP-007",
+            selected_area_m2=selected_area_m2,
+        )
+        assert resolved.value == selected_area_m2
+
+    contract()
+
+    def old_registry_rule(self, sample_mass_kg):
+        return SimpleNamespace(melt_surface_area_m2=0.2)
+
+    monkeypatch.setattr(EquipmentDesigner, "size_crucible", old_registry_rule)
+
+    def reintroduced_registry_resize(policy_id: str, **context: object):
+        if policy_id == "DP-007":
+            context = {
+                **context,
+                "selected_area_m2": EquipmentDesigner()
+                .size_crucible(3.38e-3)
+                .melt_surface_area_m2,
+            }
+        return original_resolve(policy_id, **context)
+
+    monkeypatch.setattr(
+        default_policy,
+        "resolve",
+        reintroduced_registry_resize,
+    )
+    with pytest.raises(AssertionError):
+        contract()
 
 
 def test_vacuum_pressure_uses_the_runtime_owner_constant() -> None:

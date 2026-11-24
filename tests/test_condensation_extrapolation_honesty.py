@@ -537,7 +537,7 @@ def test_predict_flag_rh03_recipe_completes_with_public_flags(hours):
 
 
 @pytest.mark.parametrize("all_missing", [False, True], ids=["partial", "all"])
-def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(monkeypatch, all_missing):
+def test_missing_runtime_wall_profile_uses_flagged_default(monkeypatch, all_missing):
     from types import MethodType, SimpleNamespace
     from simulator.core import PyrolysisSimulator
     from simulator.lab_geometry import parse_lab_geometry
@@ -549,7 +549,6 @@ def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(monkeypatch, a
     geometry = model.configure_lab_geometry(parse_lab_geometry(
         dynamic_surface_geometry_fixture(), allow_temperature_profiles=True,
     ))
-    prior = {segment.name: segment.wall_temperature_C for segment in model.pipe_segments}
     model.operating_history = [{}]
     schedule = dynamic_lab_schedule()["surface_temperature_C"]
     del schedule["holder_profile"]
@@ -558,23 +557,30 @@ def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(monkeypatch, a
     sim = SimpleNamespace(
         lab_geometry=geometry, condensation_model=model,
         _active_surface_temperature_schedule=lambda: schedule,
+        _dp008_surface_temperature_defaults={},
     )
     sim._resolve_lab_surface_temperatures = MethodType(
         PyrolysisSimulator._resolve_lab_surface_temperatures, sim,
     )
     PyrolysisSimulator._apply_lab_surface_temperatures(sim, sample_time_h=0.0)
 
-    assert model.wall_temperature_C is None
+    expected_temperatures = (
+        {"holder": 0.0, "condenser": 0.0}
+        if all_missing
+        else {"holder": 0.0, "condenser": 1500.0}
+    )
+    assert model.wall_temperature_C == min(expected_temperatures.values())
     history = model.operating_history[-1]
-    assert history["wall_temperature_C"] is None
-    missing = {"holder": "lab_schedule_missing_surface_temperature: holder_profile"}
+    assert history["wall_temperature_C"] == min(expected_temperatures.values())
+    assert "wall_temperature_input_refusals" not in history
+    assert history["pipe_segment_temperatures_C"] == expected_temperatures
+    assert sim._dp008_surface_temperature_defaults["holder"]["reason"] == (
+        "lab_schedule_missing_surface_temperature: holder_profile"
+    )
     if all_missing:
-        missing["condenser"] = "lab_schedule_missing_surface_temperature: condenser_profile"
-    assert history["wall_temperature_input_refusals"] == missing
-    assert history["pipe_segment_temperatures_C"] == ({} if all_missing else {"condenser": 1500.0})
-    for segment in model.pipe_segments:
-        if segment.name in missing:
-            assert segment.wall_temperature_C == prior[segment.name]
+        assert sim._dp008_surface_temperature_defaults["condenser"]["reason"] == (
+            "lab_schedule_missing_surface_temperature: condenser_profile"
+        )
 
     schedule.update(dynamic_lab_schedule()["surface_temperature_C"])
     PyrolysisSimulator._apply_lab_surface_temperatures(sim, sample_time_h=0.0)
@@ -603,12 +609,15 @@ def test_missing_runtime_wall_profile_keeps_aggregate_unavailable(monkeypatch, a
         allow_fallback_vapor=True, allow_unmeasured_alpha_fallback=True,
     )
     execution = RunExecutor().execute(run._session_config())
-    assert execution.status == "failed"
-    assert len(execution.snapshots) == 0
-    assert isinstance(execution.failure_exception, condensation.DepositionInputRefusal)
-    assert execution.failure_exception.terminal_refusal is True
-    assert execution.failure_exception.parameter == "T_wall_K"
-    assert "holder_profile" in execution.error_message
+    assert execution.status == "ok", execution.error_message
+    assert len(execution.snapshots) == 1
+    runtime_simulator = execution.session.simulator
+    assert runtime_simulator._dp008_surface_temperature_defaults["holder"][
+        "reason"
+    ] == "lab_schedule_missing_surface_temperature: holder_profile"
+    assert runtime_simulator.condensation_model.operating_history[-1][
+        "pipe_segment_temperatures_C"
+    ]["holder"] == 0.0
 
 
 @pytest.mark.parametrize("missing_knot", [False, True], ids=["complete", "missing_knot"])

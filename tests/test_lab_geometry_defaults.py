@@ -6,13 +6,18 @@ import pytest
 
 import simulator.core as core_module
 import simulator.lab_geometry as lab_geometry
+import simulator.session as session_module
 from simulator.core import PyrolysisSimulator
 from simulator.lab_geometry import (
     GramLabMeltAreaResolution,
     LabGeometryError,
+    _lab_surface_temperature_default_notices,
     parse_lab_geometry,
     resolve_gram_lab_exposed_melt_area,
+    runtime_temperature_profiles_may_be_deferred,
 )
+from simulator.runner import PyrolysisRun
+from simulator.session import SimSession
 
 
 @pytest.mark.parametrize(
@@ -172,7 +177,8 @@ def _profile_geometry() -> dict:
     }
 
 
-def test_unresolved_profile_defaults_and_records_dp008_reason() -> None:
+@pytest.mark.parametrize("surface_schedule", [None, {}], ids=["omitted", "empty"])
+def test_unresolved_profile_defaults_and_records_dp008_reason(surface_schedule) -> None:
     geometry = parse_lab_geometry(
         _profile_geometry(),
         allow_temperature_profiles=True,
@@ -184,7 +190,7 @@ def test_unresolved_profile_defaults_and_records_dp008_reason() -> None:
     )
     temperatures = PyrolysisSimulator._resolve_lab_surface_temperatures(
         simulator,
-        {},
+        surface_schedule or {},
         sample_time_h=0.0,
     )
     assert temperatures == {"holder": 0.0}
@@ -196,6 +202,80 @@ def test_unresolved_profile_defaults_and_records_dp008_reason() -> None:
     assert notice["reason"] == (
         "lab_schedule_missing_surface_temperature: holder_profile"
     )
+    assert notice["original_reason"] == notice["reason"]
+
+
+def test_static_wall_default_notice_preserves_omission_reason() -> None:
+    raw = _profile_geometry()
+    raw["surfaces"][0].pop("temperature_profile")
+
+    notice = _lab_surface_temperature_default_notices(
+        raw,
+        sample_mass_g=10.0,
+        allow_temperature_profiles=True,
+    )[0]
+
+    assert notice["value"] == pytest.approx(0.0)
+    assert notice["reason"] == "lab_geometry_missing_surface_temperature: holder"
+    assert notice["original_reason"] == notice["reason"]
+
+
+@pytest.mark.parametrize("surface_schedule", [None, {}], ids=["omitted", "empty"])
+def test_session_allows_runtime_profile_resolution_without_surface_map(
+    monkeypatch: pytest.MonkeyPatch,
+    surface_schedule,
+) -> None:
+    class GeometryAccepted(Exception):
+        pass
+
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        backend_name="internal-analytical",
+        setpoints_patch={"lab_geometry": _profile_geometry()},
+        lab_schedule=(
+            None
+            if surface_schedule is None
+            else {"surface_temperature_C": surface_schedule}
+        ),
+        force_builtin_vapor_pressure=True,
+        allow_fallback_vapor=True,
+    )
+
+    def build_geometry_only(config):
+        parse_lab_geometry(
+            config.setpoints["lab_geometry"],
+            allow_temperature_profiles=config.allow_lab_geometry_temperature_profiles,
+        )
+        raise GeometryAccepted
+
+    monkeypatch.setattr(session_module, "build_simulator", build_geometry_only)
+
+    def contract() -> None:
+        try:
+            SimSession().start(
+                run._session_config(),
+                backend=SimpleNamespace(
+                    name="internal-analytical",
+                    backend_name="internal-analytical",
+                ),
+            )
+        except GeometryAccepted:
+            return
+        except LabGeometryError as exc:
+            raise AssertionError(str(exc)) from exc
+        raise AssertionError("session did not reach the runtime profile resolver")
+
+    contract()
+    assert runtime_temperature_profiles_may_be_deferred(
+        run._session_config().setpoints["lab_geometry"]
+    )
+    monkeypatch.setattr(
+        session_module,
+        "runtime_temperature_profiles_may_be_deferred",
+        lambda _: False,
+    )
+    with pytest.raises(AssertionError):
+        contract()
 
 
 def test_probe_restored_profile_refusal_breaks_default_contract(

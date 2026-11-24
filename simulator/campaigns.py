@@ -2783,6 +2783,7 @@ class CampaignManager:
             value=pressure_mbar,
             unit="mbar",
             default_source="campaigns.C0.p_total_mbar_default",
+            reason="lab_schedule_chamber_pressure_not_reported",
         )
         return schedule, [notice]
 
@@ -2802,6 +2803,7 @@ class CampaignManager:
         value: float,
         unit: str,
         default_source: str,
+        reason: str,
     ) -> dict[str, object]:
         notice: dict[str, object] = {
             "code": "knob_defaulted",
@@ -2809,6 +2811,8 @@ class CampaignManager:
             "value": value,
             "unit": unit,
             "default_source": default_source,
+            "reason": reason,
+            "original_reason": reason,
         }
         if self._uses_gram_lab_defaults(lab_geometry):
             notice["out_of_domain"] = True
@@ -2829,6 +2833,7 @@ class CampaignManager:
             value=default_mass_kg,
             unit="kg",
             default_source="PyrolysisRun.mass_kg",
+            reason="lab_geometry_sample_mass_not_reported",
         )
         return default_mass_kg, True, notice
 

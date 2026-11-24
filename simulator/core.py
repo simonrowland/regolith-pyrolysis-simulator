@@ -18548,15 +18548,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 crucible_face_area_m2=crucible_area_m2,
             )
             if area_resolution.defaulted:
-                sample_mass_g = self.lab_geometry.sample_mass_g
-                sample_mass_kg = (
-                    sample_mass_g / 1000.0
-                    if sample_mass_g is not None
-                    else self.record.batch_mass_kg
-                )
+                assert area_resolution.area_m2 is not None
                 from simulator.battery.default_policy import resolve
 
-                resolved = resolve('DP-007', sample_mass_kg=sample_mass_kg)
+                resolved = resolve(
+                    'DP-007',
+                    selected_area_m2=area_resolution.area_m2,
+                )
                 resolved_area_m2 = float(area_resolution.area_m2)
                 self._dp007_area_default = {
                     'resolved': resolved,

@@ -70,6 +70,31 @@ def _n2_lab_schedule() -> dict:
     }
 
 
+def test_gram_lab_defaults_preserve_original_omission_reasons() -> None:
+    manager = CampaignManager(_setpoints())
+    geometry = {"scale": "gram_lab"}
+
+    _, pressure_notices = manager._default_missing_lab_schedule_pressure(
+        {},
+        lab_geometry=geometry,
+        duration_h=1.0,
+    )
+    _, defaulted, mass_notice = manager._default_missing_lab_sample_mass(
+        geometry,
+        sample_mass_g=None,
+        default_mass_kg=1000.0,
+    )
+
+    assert defaulted is True
+    assert pressure_notices[0]["reason"] == (
+        "lab_schedule_chamber_pressure_not_reported"
+    )
+    assert pressure_notices[0]["original_reason"] == pressure_notices[0]["reason"]
+    assert mass_notice is not None
+    assert mass_notice["reason"] == "lab_geometry_sample_mass_not_reported"
+    assert mass_notice["original_reason"] == mass_notice["reason"]
+
+
 @pytest.mark.parametrize(
     ("campaign", "pO2_mbar", "p_total_mbar", "atmosphere"),
     [

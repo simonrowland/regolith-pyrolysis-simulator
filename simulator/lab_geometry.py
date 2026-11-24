@@ -314,6 +314,24 @@ def resolve_gram_lab_exposed_melt_area(
     )
 
 
+def runtime_temperature_profiles_may_be_deferred(
+    lab_geometry: Mapping[str, Any] | None,
+) -> bool:
+    """Allow runtime resolution of declared gram-lab wall profiles."""
+
+    if (
+        not isinstance(lab_geometry, Mapping)
+        or str(lab_geometry.get("scale") or "").strip() != LAB_GEOMETRY_SCALE
+    ):
+        return False
+    surfaces = lab_geometry.get("surfaces")
+    return isinstance(surfaces, list) and any(
+        isinstance(surface, Mapping)
+        and str(surface.get("temperature_profile") or "").strip()
+        for surface in surfaces
+    )
+
+
 def gram_lab_exposed_melt_area_bridge(
     lab_geometry: Mapping[str, Any] | None,
     *,
@@ -402,7 +420,7 @@ def _lab_surface_temperature_default_notices(
         temperature_profile = str(
             surface.get("temperature_profile") or ""
         ).strip()
-        _, defaulted = _surface_temperature_resolution(
+        _, defaulted, reason = _surface_temperature_resolution(
             surface,
             surface_id,
             temperature_profile=temperature_profile,
@@ -419,6 +437,8 @@ def _lab_surface_temperature_default_notices(
             "default_source": "LabSurface.to_pipe_segment.wall_temperature_C",
             "source_class": "assumption_with_sensitivity_marker",
             "sensitivity_marker": "defaulted_lab_surface_temperature",
+            "reason": reason,
+            "original_reason": reason,
         }
         if sample_mass_g is None:
             notice["out_of_domain"] = True
@@ -488,7 +508,7 @@ def _parse_lab_surface(
     role = _canonical_role(raw.get("role"), surface_id=surface_id)
     area_m2 = _required_finite_positive(raw.get("area_m2"), f"{surface_id}.area_m2")
     temperature_profile = str(raw.get("temperature_profile") or "").strip()
-    temperature_C, _ = _surface_temperature_resolution(
+    temperature_C, _, _ = _surface_temperature_resolution(
         raw,
         surface_id,
         temperature_profile=temperature_profile,
@@ -550,19 +570,20 @@ def _surface_temperature_resolution(
     temperature_profile: str,
     allow_temperature_profiles: bool,
     allow_temperature_default: bool,
-) -> tuple[float | None, bool]:
+) -> tuple[float | None, bool, str | None]:
     for key in ("temperature_C", "wall_temperature_C"):
         if key in raw:
-            return _required_finite(raw[key], f"{surface_id}.{key}"), False
+            return _required_finite(raw[key], f"{surface_id}.{key}"), False, None
     if temperature_profile:
         if allow_temperature_profiles:
-            return None, False
+            return None, False, None
         raise LabGeometryError(
             "missing_lab_surface_temperature",
             f"{surface_id}: temperature_C or resolvable temperature_profile is required",
         )
     if allow_temperature_default:
-        return _LAB_SURFACE_TEMPERATURE_DEFAULT_C, True
+        reason = f"lab_geometry_missing_surface_temperature: {surface_id}"
+        return _LAB_SURFACE_TEMPERATURE_DEFAULT_C, True, reason
     raise LabGeometryError(
         "missing_lab_surface_temperature",
         f"{surface_id}: temperature_C or resolvable temperature_profile is required",

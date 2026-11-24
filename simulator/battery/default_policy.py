@@ -163,25 +163,17 @@ def _resolved_value(
         except ValueError as exc:
             raise ValueError("DP-107 inferred_method is not a method token") from exc
     if policy_id == "DP-007":
-        sample_mass = context.get("sample_mass_kg")
-        if sample_mass is None:
+        selected_area = context.get("selected_area_m2")
+        if selected_area is None:
             raise ValueError(
-                "DP-007 requires sample_mass_kg: an absolute rate needs an "
-                "area or sample mass"
+                "DP-007 requires selected_area_m2 from the equipment sizing owner"
             )
-        sample_mass_kg = _decimal(
-            sample_mass, context_name="DP-007 sample_mass_kg"
+        selected_area_m2 = _decimal(
+            selected_area, context_name="DP-007 selected_area_m2"
         )
-        if sample_mass_kg <= 0:
-            raise ValueError("DP-007 sample_mass_kg must be positive")
-
-        from simulator.equipment import EquipmentDesigner
-
-        crucible = EquipmentDesigner().size_crucible(float(sample_mass_kg))
-        return _decimal(
-            crucible.melt_surface_area_m2,
-            context_name="DP-007 crucible face area",
-        )
+        if selected_area_m2 <= 0:
+            raise ValueError("DP-007 selected_area_m2 must be positive")
+        return selected_area_m2
     if policy_id == "DP-008":
         if "runtime_default" not in context:
             raise ValueError("DP-008 requires the owning runtime_default")
