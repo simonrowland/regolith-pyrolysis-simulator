@@ -115,6 +115,15 @@ GATE_CURVE_NOTICE_KEYS = (
 GATE_CURVE_DOMAIN_KEYS = ('authority', 'certified_band')
 PT0_GATE_CURVE_CODEC_VERSION = 3
 PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION = 2
+
+
+@dataclasses.dataclass(frozen=True)
+class _DecodedEquilibriumReplayPayload:
+    result: EquilibriumResult
+    vapor_pressures_source: dict[str, Any]
+    vapor_pressure_diagnostic: dict[str, Any]
+
+
 _MAGEMIN_SHADOW_PROVIDER_ID = "magemin-shadow"
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
@@ -162,108 +171,92 @@ def _payload_codec_version(artifact: str) -> int | None:
     return None
 
 
-def _payload_codec_is_current(
+def _decode_payload_for_admission(
     artifact: str,
     payload: Any,
     *,
-    key: Mapping[str, Any] | None = None,
-) -> bool:
-    version = _payload_codec_version(artifact)
-    if version is None:
-        return True
+    keys: Sequence[Mapping[str, Any]] = (),
+) -> Any | None:
+    expected_version = _payload_codec_version(artifact)
+    if expected_version is None:
+        return payload
     if not isinstance(payload, Mapping):
-        return False
-    # Codec markers belong to row admission, not the reviewed output payload.
-    # Rows written by the earlier marker-bearing codec are stale as well.
-    if "payload_codec_version" in payload:
-        return False
+        return None
+    # Current payloads stay markerless to preserve their reviewed bytes. If a
+    # row carries a codec marker, admission compares that row value directly.
+    row_version = payload.get("payload_codec_version", expected_version)
+    if type(row_version) is not int or row_version != expected_version:
+        return None
     if artifact == "freeze_gate_curve":
-        if version != PT0_GATE_CURVE_CODEC_VERSION:
-            return False
         curve_payload = payload.get("curve")
         if not isinstance(curve_payload, Mapping):
-            return False
+            return None
         try:
             curve = _curve_from_payload(curve_payload)
         except Exception:
-            return False
-        step_down_payload = curve_payload.get("gate_provider_step_down")
-        if step_down_payload is not None:
-            if not isinstance(step_down_payload, Mapping):
-                return False
-            step_down = curve.get("gate_provider_step_down")
-            if (
-                not isinstance(step_down, Mapping)
-                or type(step_down.get("magemin_sourced")) is not bool
-            ):
-                return False
-        identity_key = (
-            key.get("freeze_gate_cache_key") if key is not None else None
-        )
-        identity_is_required = (
-            getattr(identity_key, "magemin_domain_identity", None) is not None
-            or (
-                isinstance(identity_key, Mapping)
-                and identity_key.get("magemin_domain_identity") is not None
+            return None
+        for key in keys:
+            identity_key = key.get("freeze_gate_cache_key")
+            identity_is_required = (
+                getattr(identity_key, "magemin_domain_identity", None) is not None
+                or (
+                    isinstance(identity_key, Mapping)
+                    and identity_key.get("magemin_domain_identity") is not None
+                )
+                or (
+                    isinstance(identity_key, (list, tuple))
+                    and len(identity_key) == 9
+                    and identity_key[7] is not None
+                )
             )
-            or (
-                isinstance(identity_key, (list, tuple))
-                and len(identity_key) == 9
-                and identity_key[7] is not None
-            )
-        )
-        try:
-            identity = (
-                _magemin_identity_from_replay_key(key)
-                if key is not None
+            try:
+                identity = _magemin_identity_from_replay_key(key)
+            except (OverflowError, TypeError, ValueError):
+                identity = None
+            if identity is None and identity_is_required:
+                return None
+            if identity is None or identity.silica_verdict == "in_band":
+                continue
+            if identity.silica_verdict != "extrapolated":
+                return None
+            certified_band = curve.get("certified_band")
+            silica_bounds = (
+                certified_band.get("sio2_wt_pct")
+                if isinstance(certified_band, Mapping)
                 else None
             )
-        except (OverflowError, TypeError, ValueError):
-            identity = None
-        if identity is None and identity_is_required:
-            return False
-        if identity is None or identity.silica_verdict == "in_band":
-            return True
-        if identity.silica_verdict != "extrapolated":
-            return False
-        certified_band = curve.get("certified_band")
-        silica_bounds = (
-            certified_band.get("sio2_wt_pct")
-            if isinstance(certified_band, Mapping)
-            else None
-        )
-        parsed_silica_bounds = None
-        if (
-            isinstance(silica_bounds, (list, tuple))
-            and len(silica_bounds) == 2
-            and all(
-                isinstance(bound, (int, float))
-                and not isinstance(bound, bool)
-                for bound in silica_bounds
-            )
-        ):
-            try:
-                parsed_silica_bounds = tuple(
-                    float(bound) for bound in silica_bounds
+            parsed_silica_bounds = None
+            if (
+                isinstance(silica_bounds, (list, tuple))
+                and len(silica_bounds) == 2
+                and all(
+                    isinstance(bound, (int, float))
+                    and not isinstance(bound, bool)
+                    for bound in silica_bounds
                 )
-            except (OverflowError, TypeError, ValueError):
-                parsed_silica_bounds = None
-        return (
-            identity.certified_band is not None
-            and curve.get("authority") == "extrapolated"
-            and isinstance(certified_band, Mapping)
-            and parsed_silica_bounds is not None
-            and all(math.isfinite(bound) for bound in parsed_silica_bounds)
-            and parsed_silica_bounds[0] < parsed_silica_bounds[1]
-            and parsed_silica_bounds == identity.certified_band
-        )
+            ):
+                try:
+                    parsed_silica_bounds = tuple(
+                        float(bound) for bound in silica_bounds
+                    )
+                except (OverflowError, TypeError, ValueError):
+                    parsed_silica_bounds = None
+            if not (
+                identity.certified_band is not None
+                and curve.get("authority") == "extrapolated"
+                and isinstance(certified_band, Mapping)
+                and parsed_silica_bounds is not None
+                and all(math.isfinite(bound) for bound in parsed_silica_bounds)
+                and parsed_silica_bounds[0] < parsed_silica_bounds[1]
+                and parsed_silica_bounds == identity.certified_band
+            ):
+                return None
+        return curve
     if artifact == "equilibrium_post_record":
-        if version != PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION:
-            return False
         try:
-            equilibrium_from_payload(payload)
+            decoded = _decode_equilibrium_replay_payload(payload)
         except Exception:
-            return False
+            return None
         equilibrium_result = payload.get("equilibrium_result")
         diagnostics = (
             equilibrium_result.get("diagnostics")
@@ -275,11 +268,10 @@ def _payload_codec_is_current(
             if isinstance(diagnostics, Mapping)
             else None
         )
-        return not (
-            isinstance(feo_activity, Mapping)
-            and "notices" in feo_activity
-        )
-    return False
+        if isinstance(feo_activity, Mapping) and "notices" in feo_activity:
+            return None
+        return decoded
+    return None
 
 
 _ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"
@@ -812,6 +804,7 @@ class PT0DeterminismStore:
             key,
             physics_bucket_key=canonical_physics_bucket_key_from_replay_key(key),
             sim=sim,
+            return_decoded=True,
         )
         if payload is None:
             return None
@@ -823,6 +816,7 @@ class PT0DeterminismStore:
             "equilibrium_post_record",
             self._equilibrium_key(sim),
             sim=sim,
+            return_decoded=True,
         )
         return self._equilibrium_from_payload(sim, payload)
 
@@ -884,41 +878,22 @@ class PT0DeterminismStore:
     def _equilibrium_from_payload(
         self,
         sim: Any,
-        payload: Mapping[str, Any],
+        payload: Mapping[str, Any] | _DecodedEquilibriumReplayPayload,
     ) -> EquilibriumResult:
-        result = _refresh_feo_qualification(sim, equilibrium_from_payload(payload))
+        decoded = (
+            payload
+            if isinstance(payload, _DecodedEquilibriumReplayPayload)
+            else _decode_equilibrium_replay_payload(payload)
+        )
+        result = _refresh_feo_qualification(sim, decoded.result)
         sim._last_reduced_real_cache_state = self.last_cache_state
         sim._last_backend_status = getattr(result, "status", "ok")
         self._apply_equilibrium_cache_authority(sim, result)
         history = getattr(sim, "_backend_status_history", None)
         if isinstance(history, list):
             history.append(str(sim._last_backend_status))
-        sim._last_vapor_pressures_source = dict(
-            payload.get("last_vapor_pressures_source") or {}
-        )
-        vapor_pressure_diagnostic = dict(
-            payload.get("last_vapor_pressure_diagnostic") or {}
-        )
-        if (
-            vapor_pressure_diagnostic
-            and _payload_consumes_melt_envelope(payload, result)
-        ):
-            temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
-            if has_melt_extrapolation_envelope(vapor_pressure_diagnostic):
-                consume_melt_extrapolation_envelope(
-                    vapor_pressure_diagnostic,
-                    temperature_K=temperature_K,
-                )
-            vapor_pressure_diagnostic.update(
-                melt_extrapolation_diagnostic(
-                    temperature_K,
-                    "MELTS-v1.0",
-                )
-            )
-            consume_melt_extrapolation_envelope(
-                vapor_pressure_diagnostic,
-                temperature_K=temperature_K,
-            )
+        sim._last_vapor_pressures_source = dict(decoded.vapor_pressures_source)
+        vapor_pressure_diagnostic = dict(decoded.vapor_pressure_diagnostic)
         sim._last_vapor_pressure_diagnostic = vapor_pressure_diagnostic
         # d-401. Replay and the write-through hit both adopt the cached
         # vapour evaluation here, after the hour reset has cleared the
@@ -1131,9 +1106,10 @@ class PT0DeterminismStore:
             "freeze_gate_curve",
             keys,
             sim=sim,
+            return_decoded=True,
         )
         sim._last_reduced_real_cache_state = self.last_cache_state
-        return _curve_from_payload(payload["curve"])
+        return payload
 
     def _cached_real_binding_eligible(
         self,
@@ -1290,11 +1266,11 @@ class PT0DeterminismStore:
         existing = self._entries.get(key_hash)
         stale_payload = (
             existing is not None
-            and not _payload_codec_is_current(
+            and _decode_payload_for_admission(
                 artifact,
                 existing.get("payload"),
-                key=key,
-            )
+                keys=(key,),
+            ) is None
         )
         if existing is not None:
             if not stale_payload and existing["payload_hash"] != payload_hash:
@@ -1372,11 +1348,13 @@ class PT0DeterminismStore:
         key: Mapping[str, Any],
         *,
         sim: Any | None = None,
-    ) -> dict[str, Any]:
+        return_decoded: bool = False,
+    ) -> Any:
         return self._lookup_first_available(
             artifact,
             tuple(_compatible_replay_keys(key)),
             sim=sim,
+            return_decoded=return_decoded,
         )
 
     def _lookup_first_available(
@@ -1385,7 +1363,8 @@ class PT0DeterminismStore:
         keys: tuple[Mapping[str, Any], ...],
         *,
         sim: Any | None = None,
-    ) -> dict[str, Any]:
+        return_decoded: bool = False,
+    ) -> Any:
         if not keys:
             raise PT0CacheMiss(f"PT-0 cached replay miss: no keys for {artifact}")
 
@@ -1400,11 +1379,12 @@ class PT0DeterminismStore:
                 entry.get("key", {}),
             ):
                 continue
-            if not _payload_codec_is_current(
+            decoded = _decode_payload_for_admission(
                 artifact,
                 entry.get("payload"),
-                key=key,
-            ):
+                keys=(key,),
+            )
+            if decoded is None:
                 continue
             if not _disclosures_known(entry):
                 continue
@@ -1435,7 +1415,11 @@ class PT0DeterminismStore:
             )
             if artifact == "freeze_gate_curve" and sim is not None:
                 sim._last_reduced_real_replay_notices = replay_notices
-            return self._accept_cached_hit(entry, owner=sim)
+            return self._accept_cached_hit(
+                entry,
+                owner=sim,
+                decoded_payload=decoded if return_decoded else None,
+            )
 
         key, _key_bytes, key_hash = checked[0]
         self.replay_sequence.append(
@@ -1462,7 +1446,8 @@ class PT0DeterminismStore:
         *,
         physics_bucket_key: Mapping[str, Any] | None = None,
         sim: Any | None = None,
-    ) -> dict[str, Any] | None:
+        return_decoded: bool = False,
+    ) -> Any | None:
         tier_ceiling = str(
             getattr(self, "cache_tier_ceiling", "cached_interpolated")
         )
@@ -1470,11 +1455,16 @@ class PT0DeterminismStore:
             key_bytes = canonical_json_bytes(candidate_key)
             key_hash = _sha256(key_bytes)
             entry = self._entry_for_key(artifact, candidate_key, key_bytes, key_hash)
-            if entry is not None and not _payload_codec_is_current(
-                artifact,
-                entry.get("payload"),
-                key=candidate_key,
-            ):
+            decoded = (
+                _decode_payload_for_admission(
+                    artifact,
+                    entry.get("payload"),
+                    keys=(candidate_key,),
+                )
+                if entry is not None
+                else None
+            )
+            if entry is not None and decoded is None:
                 entry = None
             cache_state = "cached_exact"
             candidate_physics_bucket_key = (
@@ -1485,11 +1475,12 @@ class PT0DeterminismStore:
             physics_bucket_hash: str | None = None
             physics_bucket_rung: str | None = None
             if entry is None and tier_ceiling != "cached_exact":
-                entry = self._entry_for_physics_bucket(
+                bucket_hit = self._entry_for_physics_bucket(
                     artifact,
                     candidate_physics_bucket_key,
                     query_key=candidate_key,
                 )
+                entry, decoded = bucket_hit if bucket_hit is not None else (None, None)
                 cache_state = "cached_physics_bucket"
                 physics_bucket_hash = _sha256(
                     canonical_json_bytes(candidate_physics_bucket_key)
@@ -1501,11 +1492,14 @@ class PT0DeterminismStore:
                             candidate_key,
                             rung_tag,
                         )
-                        entry = self._entry_for_physics_ladder_bucket(
+                        ladder_hit = self._entry_for_physics_ladder_bucket(
                             artifact,
                             rung_tag,
                             rung_key,
                             query_key=candidate_key,
+                        )
+                        entry, decoded = (
+                            ladder_hit if ladder_hit is not None else (None, None)
                         )
                         if entry is not None:
                             cache_state = "cached_physics_bucket"
@@ -1522,11 +1516,14 @@ class PT0DeterminismStore:
                             candidate_key,
                             rung_tag,
                         )
-                        entry = self._entry_for_physics_ladder_bucket(
+                        ladder_hit = self._entry_for_physics_ladder_bucket(
                             artifact,
                             rung_tag,
                             rung_key,
                             query_key=candidate_key,
+                        )
+                        entry, decoded = (
+                            ladder_hit if ladder_hit is not None else (None, None)
                         )
                         if entry is not None:
                             cache_state = "cached_physics_bucket"
@@ -1536,16 +1533,6 @@ class PT0DeterminismStore:
                             )
                             physics_bucket_rung = rung_tag
                             break
-            if (
-                entry is not None
-                and cache_state != "cached_exact"
-                and not _payload_codec_is_current(
-                    artifact,
-                    entry.get("payload"),
-                    key=candidate_key,
-                )
-            ):
-                entry = None
             if entry is not None and not replay_dependency_vectors_match(
                 candidate_key,
                 entry.get("key", {}),
@@ -1560,6 +1547,7 @@ class PT0DeterminismStore:
                     artifact,
                     candidate_key,
                     sim=sim,
+                    return_decoded=return_decoded,
                 )
                 if interpolated is not None:
                     return interpolated
@@ -1600,7 +1588,11 @@ class PT0DeterminismStore:
                 (entry.get("repair_notices_json"),),
                 approximation_cache_state=cache_state,
             )
-        return self._accept_cached_hit(entry, owner=sim)
+        return self._accept_cached_hit(
+            entry,
+            owner=sim,
+            decoded_payload=decoded if return_decoded else None,
+        )
 
     def _entry_for_key(
         self,
@@ -1629,80 +1621,77 @@ class PT0DeterminismStore:
         physics_bucket_key: Mapping[str, Any],
         *,
         query_key: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any] | None:
+    ) -> tuple[dict[str, Any], Any] | None:
         physics_bucket_bytes = canonical_json_bytes(physics_bucket_key)
         physics_bucket_hash = _sha256(physics_bucket_bytes)
         key_hash = self.physics_bucket_entries.get(physics_bucket_hash)
         entry = self._entries.get(key_hash) if key_hash is not None else None
+        checked_hashes: set[str] = set()
         if (
             entry is not None
             and entry.get("artifact") == artifact
             and entry.get("physics_bucket_hash") == physics_bucket_hash
-            and _payload_codec_is_current(
+        ):
+            checked_hashes.add(str(key_hash))
+            decoded = _decode_payload_for_admission(
                 artifact,
                 entry.get("payload"),
-                key=entry.get("key"),
+                keys=tuple(
+                    key for key in (entry.get("key"), query_key)
+                    if isinstance(key, Mapping)
+                ),
             )
-            and (
-                query_key is None
-                or _payload_codec_is_current(
-                    artifact,
-                    entry.get("payload"),
-                    key=query_key,
-                )
-            )
-        ):
-            return entry
+            if decoded is not None:
+                return entry, decoded
+        elif entry is not None:
+            checked_hashes.add(str(key_hash))
         entry = None
         for candidate in self._entries.values():
             if (
                 candidate.get("artifact") == artifact
                 and candidate.get("physics_bucket_hash") == physics_bucket_hash
-                and _payload_codec_is_current(
+            ):
+                candidate_hash = str(candidate.get("key_hash", ""))
+                if candidate_hash in checked_hashes:
+                    continue
+                checked_hashes.add(candidate_hash)
+                decoded = _decode_payload_for_admission(
                     artifact,
                     candidate.get("payload"),
-                    key=candidate.get("key"),
+                    keys=tuple(
+                        key for key in (candidate.get("key"), query_key)
+                        if isinstance(key, Mapping)
+                    ),
                 )
-                and (
-                    query_key is None
-                    or _payload_codec_is_current(
-                        artifact,
-                        candidate.get("payload"),
-                        key=query_key,
-                    )
-                )
-            ):
-                entry = candidate
-                break
+                if decoded is not None:
+                    return candidate, decoded
         if entry is None and self.persistent_store is not None:
-            entry = self.persistent_store.get_by_physics_bucket(
+            bucket_hit = self.persistent_store._get_by_physics_bucket(
                 artifact=artifact,
                 physics_bucket_key=physics_bucket_key,
                 physics_bucket_bytes=physics_bucket_bytes,
                 physics_bucket_hash=physics_bucket_hash,
                 query_key=query_key,
+                return_decoded=True,
             )
-            if entry is not None and not _payload_codec_is_current(
-                artifact,
-                entry.get("payload"),
-                key=query_key or entry.get("key"),
-            ):
-                entry = None
-            if entry is not None:
+            if bucket_hit is not None:
+                entry, decoded = bucket_hit
                 row_hash = str(entry["key_hash"])
                 self._entries[row_hash] = copy.deepcopy(entry)
                 self.physics_bucket_entries.setdefault(
                     physics_bucket_hash,
                     row_hash,
                 )
-        return entry
+                return entry, decoded
+        return None
 
     def _accept_cached_hit(
         self,
         entry: Mapping[str, Any],
         *,
         owner: Any = None,
-    ) -> dict[str, Any] | None:
+        decoded_payload: Any = None,
+    ) -> Any | None:
         """Return the payload after re-registering a measured disclosure.
 
         Unknown disclosure is not a hit. Every cache-hit return goes through
@@ -1719,6 +1708,8 @@ class PT0DeterminismStore:
         if published is None:
             return None
         self._accepted_hit_disclosures = published
+        if decoded_payload is not None:
+            return decoded_payload
         return copy.deepcopy(entry["payload"])
 
     def _merged_neighbor_disclosures(
@@ -1756,7 +1747,8 @@ class PT0DeterminismStore:
         key: Mapping[str, Any],
         *,
         sim: Any | None = None,
-    ) -> dict[str, Any] | None:
+        return_decoded: bool = False,
+    ) -> Any | None:
         from simulator.reduced_real_cache_interpolation import (
             attempt_cached_interpolation,
             replay_scope_for_interpolation,
@@ -1766,29 +1758,23 @@ class PT0DeterminismStore:
             return None
         key_bytes = canonical_json_bytes(key)
         key_hash = _sha256(key_bytes)
-        candidates = self.persistent_store.list_interpolation_candidates(
+        candidates = self.persistent_store._list_interpolation_candidates(
             artifact=artifact,
             replay_scope_sha256=replay_scope_for_interpolation(key),
             exclude_key_hash=key_hash,
+            query_key=key,
         )
-        candidates = [
-            candidate
-            for candidate in candidates
-            if _payload_codec_is_current(
-                artifact,
-                candidate.get("payload"),
-                key=candidate.get("key"),
-            )
-            and _payload_codec_is_current(
-                artifact,
-                candidate.get("payload"),
-                key=key,
-            )
-        ]
         for candidate in candidates:
             self._entries[str(candidate["key_hash"])] = copy.deepcopy(candidate)
         attempt = attempt_cached_interpolation(key, candidates)
         if attempt is None:
+            return None
+        decoded = _decode_payload_for_admission(
+            artifact,
+            attempt["payload"],
+            keys=(key,),
+        )
+        if decoded is None:
             return None
         merged = self._merged_neighbor_disclosures(attempt["neighbors"])
         if merged is None:
@@ -1825,6 +1811,7 @@ class PT0DeterminismStore:
                 "law_disclosures": merged,
             },
             owner=sim,
+            decoded_payload=decoded if return_decoded else None,
         )
 
     def _entry_for_physics_ladder_bucket(
@@ -1834,21 +1821,24 @@ class PT0DeterminismStore:
         rung_key: Mapping[str, Any],
         *,
         query_key: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any] | None:
+    ) -> tuple[dict[str, Any], Any] | None:
         rung_bytes = canonical_json_bytes(rung_key)
         rung_hash = _sha256(rung_bytes)
         if self.persistent_store is None:
             return None
-        entry = self.persistent_store.get_by_physics_ladder_bucket(
+        entry = self.persistent_store._get_by_physics_ladder_bucket(
             artifact=artifact,
             rung_tag=rung_tag,
             rung_key=rung_key,
             rung_hash=rung_hash,
             query_key=query_key,
+            return_decoded=True,
         )
         if entry is not None:
+            entry, decoded = entry
             self._entries[str(entry["key_hash"])] = copy.deepcopy(entry)
-        return entry
+            return entry, decoded
+        return None
 
     def _verify_entry(
         self,
@@ -1990,15 +1980,11 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
-                stale_payload = not _payload_codec_is_current(
+                stale_payload = _decode_payload_for_admission(
                     artifact,
                     entry.get("payload"),
-                    key=entry.get("key"),
-                ) or not _payload_codec_is_current(
-                    artifact,
-                    entry.get("payload"),
-                    key=key,
-                )
+                    keys=(entry.get("key", {}), key),
+                ) is None
                 if not stale_payload and (
                     entry["payload_hash"] != payload_hash
                     or canonical_json_bytes(entry["payload"]) != payload_bytes
@@ -2045,7 +2031,9 @@ class PT1PersistentEquilibriumStore:
                     self._write_law_disclosures(
                         conn,
                         key_hash,
-                        _prefer_law_disclosures(
+                        incoming_disclosures
+                        if stale_payload
+                        else _prefer_law_disclosures(
                             _law_disclosures_from_json(
                                 existing["law_disclosures_json"]
                                 if "law_disclosures_json" in existing.keys()
@@ -2180,7 +2168,11 @@ class PT1PersistentEquilibriumStore:
                 ),
             )
             stored = None
-            if existing is not None and "law_disclosures_json" in existing.keys():
+            if (
+                existing is not None
+                and not stale_payload
+                and "law_disclosures_json" in existing.keys()
+            ):
                 stored = existing["law_disclosures_json"]
             self._write_law_disclosures(
                 conn,
@@ -2202,9 +2194,6 @@ class PT1PersistentEquilibriumStore:
         ):
             return
         encoded = _law_disclosures_json(disclosures)
-        if encoded is None:
-            # Unknown stays NULL. Do not migrate an absent field to [].
-            return
         conn.execute(
             f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
             "SET law_disclosures_json = ? WHERE key_hash = ?",
@@ -2241,6 +2230,24 @@ class PT1PersistentEquilibriumStore:
         physics_bucket_hash: str,
         query_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
+        return self._get_by_physics_bucket(
+            artifact=artifact,
+            physics_bucket_key=physics_bucket_key,
+            physics_bucket_bytes=physics_bucket_bytes,
+            physics_bucket_hash=physics_bucket_hash,
+            query_key=query_key,
+        )
+
+    def _get_by_physics_bucket(
+        self,
+        *,
+        artifact: str,
+        physics_bucket_key: Mapping[str, Any],
+        physics_bucket_bytes: bytes,
+        physics_bucket_hash: str,
+        query_key: Mapping[str, Any] | None = None,
+        return_decoded: bool = False,
+    ) -> Any | None:
         query = f"""
             SELECT *
             FROM {{table}}
@@ -2272,19 +2279,16 @@ class PT1PersistentEquilibriumStore:
                         physics_bucket_bytes=physics_bucket_bytes,
                         physics_bucket_hash=physics_bucket_hash,
                     )
-                    if _payload_codec_is_current(
+                    decoded = _decode_payload_for_admission(
                         artifact,
                         entry.get("payload"),
-                        key=entry.get("key"),
-                    ) and (
-                        query_key is None
-                        or _payload_codec_is_current(
-                            artifact,
-                            entry.get("payload"),
-                            key=query_key,
-                        )
-                    ):
-                        return entry
+                        keys=tuple(
+                            key for key in (entry.get("key"), query_key)
+                            if isinstance(key, Mapping)
+                        ),
+                    )
+                    if decoded is not None:
+                        return (entry, decoded) if return_decoded else entry
             return None
 
     def list_interpolation_candidates(
@@ -2293,6 +2297,20 @@ class PT1PersistentEquilibriumStore:
         artifact: str,
         replay_scope_sha256: str,
         exclude_key_hash: str | None = None,
+    ) -> list[dict[str, Any]]:
+        return self._list_interpolation_candidates(
+            artifact=artifact,
+            replay_scope_sha256=replay_scope_sha256,
+            exclude_key_hash=exclude_key_hash,
+        )
+
+    def _list_interpolation_candidates(
+        self,
+        *,
+        artifact: str,
+        replay_scope_sha256: str,
+        exclude_key_hash: str | None = None,
+        query_key: Mapping[str, Any] | None = None,
     ) -> list[dict[str, Any]]:
         query = f"""
             SELECT *
@@ -2335,11 +2353,14 @@ class PT1PersistentEquilibriumStore:
                         raise PT1PersistentStoreCorrupt(
                             f"PT-1 row exact key replay scope mismatch: {row_hash}"
                         )
-                    if not _payload_codec_is_current(
+                    if _decode_payload_for_admission(
                         artifact,
                         entry.get("payload"),
-                        key=entry.get("key"),
-                    ):
+                        keys=tuple(
+                            key for key in (entry.get("key"), query_key)
+                            if isinstance(key, Mapping)
+                        ),
+                    ) is None:
                         continue
                     candidates.append(
                         {
@@ -2368,6 +2389,24 @@ class PT1PersistentEquilibriumStore:
         rung_hash: str,
         query_key: Mapping[str, Any] | None = None,
     ) -> dict[str, Any] | None:
+        return self._get_by_physics_ladder_bucket(
+            artifact=artifact,
+            rung_tag=rung_tag,
+            rung_key=rung_key,
+            rung_hash=rung_hash,
+            query_key=query_key,
+        )
+
+    def _get_by_physics_ladder_bucket(
+        self,
+        *,
+        artifact: str,
+        rung_tag: str,
+        rung_key: Mapping[str, Any],
+        rung_hash: str,
+        query_key: Mapping[str, Any] | None = None,
+        return_decoded: bool = False,
+    ) -> Any | None:
         hash_column = _physics_ladder_hash_column(rung_tag)
         distance_column = _physics_ladder_distance_column(rung_tag)
         query = f"""
@@ -2390,6 +2429,7 @@ class PT1PersistentEquilibriumStore:
             if read_only_table is not None:
                 tables.append(read_only_table)
             best_entry: dict[str, Any] | None = None
+            best_decoded: Any = None
             best_sort: tuple[float, str] | None = None
             for table in tables:
                 rows = conn.execute(query.format(table=table), params)
@@ -2401,18 +2441,15 @@ class PT1PersistentEquilibriumStore:
                         rung_key=rung_key,
                         rung_hash=rung_hash,
                     )
-                    if not _payload_codec_is_current(
+                    decoded = _decode_payload_for_admission(
                         artifact,
                         entry.get("payload"),
-                        key=entry.get("key"),
-                    ) or (
-                        query_key is not None
-                        and not _payload_codec_is_current(
-                            artifact,
-                            entry.get("payload"),
-                            key=query_key,
-                        )
-                    ):
+                        keys=tuple(
+                            key for key in (entry.get("key"), query_key)
+                            if isinstance(key, Mapping)
+                        ),
+                    )
+                    if decoded is None:
                         continue
                     if query_key is not None and _physics_ladder_coarsens_controls(
                         rung_tag
@@ -2432,6 +2469,9 @@ class PT1PersistentEquilibriumStore:
                     if best_sort is None or sort_key < best_sort:
                         best_sort = sort_key
                         best_entry = entry
+                        best_decoded = decoded
+            if return_decoded and best_entry is not None:
+                return best_entry, best_decoded
             return best_entry
 
     def _connect(self) -> sqlite3.Connection:
@@ -4452,6 +4492,55 @@ def equilibrium_from_payload(payload: Mapping[str, Any]) -> EquilibriumResult:
     return result
 
 
+def _decode_equilibrium_replay_payload(
+    payload: Mapping[str, Any],
+) -> _DecodedEquilibriumReplayPayload:
+    result_data = payload.get("equilibrium_result")
+    if not isinstance(result_data, Mapping):
+        raise TypeError("equilibrium result must be a mapping")
+    result_diagnostics = result_data.get("diagnostics")
+    if result_diagnostics is not None and not isinstance(
+        result_diagnostics, Mapping
+    ):
+        raise TypeError("equilibrium result diagnostics must be a mapping")
+    authority = payload.get("authority")
+    if authority is not None and not isinstance(authority, Mapping):
+        raise TypeError("equilibrium replay authority must be a mapping")
+    result = equilibrium_from_payload(payload)
+    source = payload.get("last_vapor_pressures_source", {})
+    diagnostic = payload.get("last_vapor_pressure_diagnostic", {})
+    if not isinstance(source, Mapping) or not isinstance(diagnostic, Mapping):
+        raise TypeError("equilibrium replay diagnostics must be mappings")
+    alphamelts_diagnostics = payload.get("alphamelts_diagnostics")
+    if alphamelts_diagnostics is not None and not isinstance(
+        alphamelts_diagnostics, Mapping
+    ):
+        raise TypeError("AlphaMELTS replay diagnostics must be a mapping")
+    replay_diagnostic = dict(diagnostic)
+    if replay_diagnostic and _payload_consumes_melt_envelope(payload, result):
+        temperature_K = float(result.temperature_C) + CELSIUS_TO_KELVIN_OFFSET
+        if has_melt_extrapolation_envelope(replay_diagnostic):
+            consume_melt_extrapolation_envelope(
+                replay_diagnostic,
+                temperature_K=temperature_K,
+            )
+        replay_diagnostic.update(
+            melt_extrapolation_diagnostic(
+                temperature_K,
+                "MELTS-v1.0",
+            )
+        )
+        consume_melt_extrapolation_envelope(
+            replay_diagnostic,
+            temperature_K=temperature_K,
+        )
+    return _DecodedEquilibriumReplayPayload(
+        result=result,
+        vapor_pressures_source=dict(source),
+        vapor_pressure_diagnostic=replay_diagnostic,
+    )
+
+
 def _payload_consumes_melt_envelope(
     payload: Mapping[str, Any],
     result: EquilibriumResult,
@@ -4674,25 +4763,83 @@ def _curve_from_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         raise PT0CacheMiss(
             "PT-0 cached replay miss: gate-curve floor marker is missing or invalid"
         )
+    if not isinstance(payload.get("source"), str):
+        raise TypeError("gate-curve source must be a string")
+    path_payload = payload.get("path")
+    if (
+        not isinstance(path_payload, (list, tuple))
+        or isinstance(path_payload, (str, bytes))
+        or not path_payload
+    ):
+        raise TypeError("measured gate-curve path must be a non-empty sequence")
+
+    def finite_number(value: Any) -> bool:
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+        try:
+            return math.isfinite(float(value))
+        except (OverflowError, TypeError, ValueError):
+            return False
+
+    solidus = payload.get("solidus_T_C")
+    liquidus = payload.get("liquidus_T_C")
+    if not finite_number(solidus) or not finite_number(liquidus):
+        raise TypeError("gate-curve bounds must be finite numbers")
+    path = []
+    for point in path_payload:
+        if (
+            not isinstance(point, Mapping)
+            or not finite_number(point.get("temperature_C"))
+            or not finite_number(point.get("liquid_fraction"))
+        ):
+            raise TypeError("gate-curve path points must contain finite numbers")
+        path.append(
+            (
+                float(point["temperature_C"]),
+                float(point["liquid_fraction"]),
+            )
+        )
     curve = {
-        "source": str(payload["source"]),
-        "solidus_T_C": float(payload["solidus_T_C"]),
-        "liquidus_T_C": float(payload["liquidus_T_C"]),
-        "path": tuple(
-            (float(point["temperature_C"]), float(point["liquid_fraction"]))
-            for point in payload.get("path", ())
-        ),
+        "source": payload["source"],
+        "solidus_T_C": float(solidus),
+        "liquidus_T_C": float(liquidus),
+        "path": tuple(path),
     }
     if is_liquidus_floor:
         curve["is_liquidus_floor"] = True
     for notice_key in GATE_CURVE_NOTICE_KEYS:
         notice = payload.get(notice_key)
-        if isinstance(notice, Mapping):
+        if notice_key in payload:
+            if not isinstance(notice, Mapping):
+                raise TypeError(f"gate-curve {notice_key} must be a mapping")
             curve[notice_key] = dict(notice)
+    step_down = curve.get("gate_provider_step_down")
+    if step_down is not None:
+        failed_providers = step_down.get("failed_providers")
+        realized_provider = step_down.get("realized_provider")
+        if (
+            not isinstance(failed_providers, (list, tuple))
+            or isinstance(failed_providers, (str, bytes))
+            or any(not isinstance(item, Mapping) for item in failed_providers)
+            or (
+                realized_provider is not None
+                and not isinstance(realized_provider, str)
+            )
+            or type(step_down.get("magemin_sourced")) is not bool
+        ):
+            raise TypeError("gate-provider step-down record has invalid fields")
     for domain_key in GATE_CURVE_DOMAIN_KEYS:
         value = payload.get(domain_key)
-        if value is not None:
-            curve[domain_key] = dict(value) if isinstance(value, Mapping) else value
+        if domain_key not in payload:
+            continue
+        if domain_key == "authority":
+            if not isinstance(value, str):
+                raise TypeError("gate-curve authority must be a string")
+            curve[domain_key] = value
+        else:
+            if not isinstance(value, Mapping):
+                raise TypeError("gate-curve certified_band must be a mapping")
+            curve[domain_key] = dict(value)
     return curve
 
 

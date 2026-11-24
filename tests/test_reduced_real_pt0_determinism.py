@@ -1468,7 +1468,10 @@ def test_gate_replay_rejects_malformed_required_silica_diagnostic(
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
             "liquidus_T_C": 1300.0,
-            "path": [],
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
             "authority": "extrapolated",
             "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
             "is_liquidus_floor": False,
@@ -1497,7 +1500,10 @@ def test_gate_replay_rejects_malformed_required_silica_diagnostic(
                 "source": "gate_liquid_fraction",
                 "solidus_T_C": 1200.0,
                 "liquidus_T_C": 1300.0,
-                "path": [],
+                "path": [
+                    {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                    {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+                ],
                 "authority": "extrapolated",
                 "certified_band": {"sio2_wt_pct": sio2_wt_pct},
                 "is_liquidus_floor": False,
@@ -1862,7 +1868,16 @@ def _c3a_ladder_key(
 def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
     payload = {
         "authority": _alphamelts_record_authority(),
-        "equilibrium_result": {"status": "ok"},
+        "equilibrium_result": {
+            "status": "ok",
+            "temperature_C": 1200.0,
+            "pressure_bar": 0.001,
+            "liquid_fraction": 0.5,
+            "phase_assemblage_available": True,
+            "liquidus_T_C": 1300.0,
+        },
+        "last_vapor_pressures_source": {},
+        "last_vapor_pressure_diagnostic": {},
         "label": label,
     }
     key_bytes = canonical_json_bytes(key)
@@ -2126,7 +2141,10 @@ def test_equilibrium_capture_strips_read_time_feo_qualification(
         'source': 'liquidus_solidus:alphamelts:test',
         'solidus_T_C': float(result.temperature_C) - 100.0,
         'liquidus_T_C': float(result.temperature_C) + 100.0,
-        'path': (),
+        'path': (
+            (float(result.temperature_C) - 100.0, 0.0),
+            (float(result.temperature_C) + 100.0, 1.0),
+        ),
         'is_liquidus_floor': False,
     }
     sim._melt_redox_gate_authority_this_tick = {
@@ -4407,7 +4425,7 @@ def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> 
         "source": "unit-test:composition_projected",
         "solidus_T_C": 1100.0,
         "liquidus_T_C": 1600.0,
-        "path": (),
+        "path": ((1100.0, 0.0), (1600.0, 1.0)),
         "composition_projected_notice": notice,
     }
 
@@ -4520,7 +4538,10 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',
             'solidus_T_C': 1200.0,
             'liquidus_T_C': 1200.000001,
-            'path': [],
+            'path': [
+                {'temperature_C': 1200.0, 'liquid_fraction': 0.0},
+                {'temperature_C': 1200.000001, 'liquid_fraction': 1.0},
+            ],
             'is_liquidus_floor': True,
             'gate_provider_step_down': {
                 'failed_providers': [],
@@ -4563,7 +4584,10 @@ def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
             'source': 'gate_liquid_fraction:fallback:magemin-shadow',
             'solidus_T_C': 1200.0,
             'liquidus_T_C': 1200.000001,
-            'path': [],
+            'path': [
+                {'temperature_C': 1200.0, 'liquid_fraction': 0.0},
+                {'temperature_C': 1200.000001, 'liquid_fraction': 1.0},
+            ],
             'is_liquidus_floor': True,
             'gate_provider_step_down': {
                 'failed_providers': [],
@@ -4621,7 +4645,10 @@ def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
             "liquidus_T_C": 1300.0,
-            "path": [],
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
         },
     }
     current_payload = {
@@ -4723,7 +4750,10 @@ def test_extrapolated_gate_rows_that_miss_d447_are_replaceable(
         "source": "gate_liquid_fraction:fallback:magemin-shadow",
         "solidus_T_C": 1200.0,
         "liquidus_T_C": 1300.0,
-        "path": [],
+        "path": [
+            {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+            {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+        ],
         "is_liquidus_floor": False,
         "authority": "extrapolated",
         "gate_provider_step_down": {
@@ -5011,7 +5041,10 @@ def test_decoder_unreadable_gate_row_misses_before_hit_and_is_replaceable(
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
             "liquidus_T_C": 1300.0,
-            "path": [],
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
             "is_liquidus_floor": False,
         },
     }
@@ -5045,6 +5078,186 @@ def test_decoder_unreadable_gate_row_misses_before_hit_and_is_replaceable(
         else capture
     )
     assert replay._lookup("freeze_gate_curve", key) == current_payload
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_empty_gate_curve_path_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "empty-gate-path.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    current_payload = {
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    empty_path_payload = copy.deepcopy(current_payload)
+    empty_path_payload["curve"]["path"] = []
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        empty_path_payload,
+        law_disclosures=[],
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("freeze_gate_curve", key)
+    assert capture.hits == 0
+
+    capture._store(
+        "freeze_gate_curve",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
+    assert replay._lookup("freeze_gate_curve", key) == current_payload
+
+
+def test_gate_codec_admission_uses_the_row_version() -> None:
+    store = PT0DeterminismStore("capture")
+    key = _freeze_gate_key()
+    payload = {
+        "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    store._store("freeze_gate_curve", key, payload, law_disclosures=[])
+
+    decoded = store._lookup_first_available(
+        "freeze_gate_curve",
+        (key,),
+        return_decoded=True,
+    )
+
+    assert decoded["path"] == ((1200.0, 0.0), (1300.0, 1.0))
+
+
+def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version() -> None:
+    store = PT0DeterminismStore("capture")
+    key = _freeze_gate_key()
+    current_payload = {
+        "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
+        "curve": {
+            "source": "gate_liquid_fraction",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    stale_payload = copy.deepcopy(current_payload)
+    stale_payload["payload_codec_version"] -= 1
+    store._store("freeze_gate_curve", key, stale_payload, law_disclosures=[])
+
+    with pytest.raises(PT0CacheMiss):
+        store._lookup("freeze_gate_curve", key)
+    assert store.hits == 0
+
+    store._store("freeze_gate_curve", key, current_payload, law_disclosures=[])
+    assert store._lookup("freeze_gate_curve", key) == current_payload
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_unreadable_equilibrium_replay_side_row_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "unreadable-equilibrium.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    unreadable_payload = copy.deepcopy(current_payload)
+    unreadable_payload["last_vapor_pressure_diagnostic"] = 7
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        unreadable_payload,
+        law_disclosures=[],
+    )
+
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", key)
+    assert capture.hits == 0
+
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        current_payload,
+        law_disclosures=[],
+    )
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
+    assert replay._lookup("equilibrium_post_record", key) == current_payload
+
+
+def test_pt1_stale_replacement_publishes_fresh_measured_disclosure(
+    tmp_path: Path,
+) -> None:
+    from simulator.chemistry.ellingham_graph import (
+        effective_equilibrium_pressure_Pa,
+    )
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    db_path = tmp_path / "stale-disclosure-replacement.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    stale_payload = copy.deepcopy(payload)
+    stale_payload["last_vapor_pressure_diagnostic"] = 7
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        stale_payload,
+        law_disclosures=[],
+    )
+
+    with disclosure_scope(inherit=False) as measured:
+        effective_equilibrium_pressure_Pa(
+            "FeO_association_gas",
+            1800.0,
+            1.0e-9,
+            vapor_pressure_data=_load_yaml("vapor_pressures.yaml"),
+        )
+        fresh_disclosures = measured.snapshot()
+    assert fresh_disclosures
+
+    capture._store(
+        "equilibrium_post_record",
+        key,
+        payload,
+        law_disclosures=fresh_disclosures,
+    )
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    with disclosure_scope(inherit=False) as published:
+        assert replay._lookup("equilibrium_post_record", key) == payload
+        assert published.snapshot() == fresh_disclosures
+    assert replay._accepted_hit_disclosures == fresh_disclosures
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
@@ -5098,7 +5311,10 @@ def test_in_band_legacy_step_down_without_source_marker_is_replaceable(
             "source": "gate_liquid_fraction:fallback:magemin-shadow",
             "solidus_T_C": 1200.0,
             "liquidus_T_C": 1300.0,
-            "path": [],
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
             "is_liquidus_floor": False,
             "gate_provider_step_down": {
                 "failed_providers": [],
