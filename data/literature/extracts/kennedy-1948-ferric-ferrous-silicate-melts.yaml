@@ -65,11 +65,10 @@ species:
           method_class: measured_reduced
           evidence_class: measured_reduced
           value_status: printed
-          composition_basis_as_published: starting uniform NM-5 basalt glass, Table I column 2, recomputed on a water-free basis; this is the composition explicitly linked to the runs in the Experimental Method and Results text.
+          note: The starting composition was uniform NM-5 basalt glass, Table I column 2, recomputed on a water-free basis; the Experimental Method and Results text links it to the runs. Temperature uncertainty is printed as ± 3°, but the convention is not stated. No row-specific uncertainty is printed for FeO or Fe2O3; Fe2O3 is obtained by difference from total iron as FeO.
           composition_units: wt% oxides, as printed in Table I
           temperature_units: °C, as printed
-          temperature_uncertainty_as_printed: '± 3°; convention not stated'
-          uncertainty_as_published: 'No row-specific uncertainty is printed for FeO or Fe2O3. Fe2O3 is obtained by difference from total iron as FeO.'
+          temperature_uncertainty_as_printed: '± 3'
           composition_column_locators:
             SiO2: {published_page: 532, pdf_page_index: 3, table: 'I', record: 'NM-5 recomputed, column 2', column: SiO2}
             TiO2: {published_page: 532, pdf_page_index: 3, table: 'I', record: 'NM-5 recomputed, column 2', column: TiO2}
@@ -123,6 +122,11 @@ species:
             - {T_C: '1300', FeO_wt_pct: '2.35', Fe2O3_wt_pct: '9.97', locator: {published_page: 536, pdf_page_index: 7, table: 'III', record: '1300°C row'}}
             - {T_C: '1200', FeO_wt_pct: '1.59', Fe2O3_wt_pct: '10.82', locator: {published_page: 536, pdf_page_index: 7, table: 'III', record: '1200°C row'}}
 fidelity_samples:
+  - path: species.Fe.observations[kennedy_1948_table2_run_series].values.temperature_uncertainty_as_printed
+    value: '± 3'
+    reviewed_by: w1124t1963f17
+    reviewed_on: '2026-11-24'
+    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'table temperature header', column: 'Temperature C. +/- 3 C', line_range: 16, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].T_C
     value: '1430'
     reviewed_by: w1124t1963f14

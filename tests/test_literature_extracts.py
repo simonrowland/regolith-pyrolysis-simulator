@@ -6182,13 +6182,9 @@ _ADMITTED_ANNOTATION_KEYS = (
     "attribution",
     "note",
     "reason",
-    "quantity",
     "schema_gap",
     "composition_derivation",
     "parents_not_printed",
-    "composition_basis_as_published",
-    "temperature_uncertainty_as_printed",
-    "uncertainty_as_published",
 )
 
 
@@ -6201,9 +6197,8 @@ def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates(
         "values": {
             "quantity": "fe3_fe2_ratio",
             "method": "wet_chemical_analysis",
-            "composition_basis_as_published": "Table I column 2",
-            "temperature_uncertainty_as_printed": "± 3°; convention not stated",
-            "uncertainty_as_published": "Fe2O3 is obtained by difference",
+            "temperature_uncertainty_as_printed": "± 3",
+            "uncertainty_as_published": "± 1.3",
             "cell_locators": {
                 "T_C": {"published_page": 534, "record": "Table II row 1"}
             },
@@ -6240,6 +6235,8 @@ def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates(
 
     assert non_finite == []
     assert measured == [
+        ("values", "temperature_uncertainty_as_printed"),
+        ("values", "uncertainty_as_published"),
         ("values", "point_conditions", "fO2_control", "state", "value"),
         ("values", "point_conditions", "phase_as_printed", "locator", "note"),
         ("values", "point_conditions", "regime_as_printed", "locator", "note"),
@@ -6264,12 +6261,6 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
             "source_sha256",
             "line_range",
         }
-    )
-    annotation_fields = (
-        "quantity",
-        "composition_basis_as_published",
-        "temperature_uncertainty_as_printed",
-        "uncertainty_as_published",
     )
     seen = Counter()
 
@@ -6309,12 +6300,15 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
                     for leaf in measured
                 )
                 for value_mapping, prefix in value_mappings:
-                    for field in annotation_fields:
+                    for field in (
+                        "temperature_uncertainty_as_printed",
+                        "uncertainty_as_published",
+                    ):
                         if field in value_mapping and isinstance(
                             value_mapping[field], str
                         ):
                             seen[field] += 1
-                            assert prefix + (field,) not in measured
+                            assert prefix + (field,) in measured
 
                 for row in rows:
                     if not isinstance(row, dict):
@@ -6336,8 +6330,6 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
 
     assert seen["cell_locators"] > 0
     assert seen["composition_column_locators"] > 0
-    assert seen["quantity"] > 0
-    assert seen["composition_basis_as_published"] > 0
     assert seen["temperature_uncertainty_as_printed"] > 0
     assert seen["uncertainty_as_published"] > 0
     assert seen["regime_as_printed.state.value"] > 0
@@ -6346,16 +6338,49 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
 def test_scored_leaf_classifier_reversion_mutation_probe(monkeypatch):
     test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates()
 
-    provenance_keys = vle._VALUE_PROVENANCE_KEYS
     monkeypatch.setattr(vle, "_VALUE_PROVENANCE_KEYS", frozenset())
     with pytest.raises(AssertionError):
         test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates()
 
-    monkeypatch.setattr(vle, "_VALUE_PROVENANCE_KEYS", provenance_keys)
-    annotation_keys = vle.ANNOTATION_KEYS
-    monkeypatch.setattr(vle, "ANNOTATION_KEYS", annotation_keys - {"quantity"})
+
+def _uncertainty_fields_are_measured_in_itoh_and_snyder():
+    for filename, expected_path in (
+        (
+            "itoh-1989-zno-solid-zinc-silicate.yaml",
+            ("values", "uncertainty_as_published"),
+        ),
+        (
+            "snyder-carmichael-1992-olivine-liquid-feo-activity.yaml",
+            ("values", "temperature_uncertainty_as_printed"),
+        ),
+    ):
+        path = REPO_ROOT / "data/literature/extracts" / filename
+        doc = yaml.safe_load(path.read_text(encoding="utf-8"))
+        observations, ambiguous, missing = vle._scored_observations(doc)
+        assert not ambiguous
+        assert not missing
+        measured_paths = {
+            leaf
+            for row in observations.values()
+            for leaf in vle._scored_measured_leaves(row)
+        }
+        assert expected_path in measured_paths
+
+
+def test_printed_uncertainties_are_measured_leaves_in_itoh_and_snyder():
+    _uncertainty_fields_are_measured_in_itoh_and_snyder()
+
+
+def test_printed_uncertainty_coverage_reversion_mutation_probe(monkeypatch):
+    _uncertainty_fields_are_measured_in_itoh_and_snyder()
+    monkeypatch.setattr(
+        vle,
+        "ANNOTATION_KEYS",
+        vle.ANNOTATION_KEYS
+        | {"temperature_uncertainty_as_printed", "uncertainty_as_published"},
+    )
     with pytest.raises(AssertionError):
-        test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates()
+        _uncertainty_fields_are_measured_in_itoh_and_snyder()
 
 
 @pytest.mark.parametrize(

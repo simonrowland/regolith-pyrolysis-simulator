@@ -2501,13 +2501,9 @@ ANNOTATION_KEYS = frozenset(
         "attribution",
         "note",
         "reason",
-        "quantity",
         "schema_gap",
         "composition_derivation",
         "parents_not_printed",
-        "composition_basis_as_published",
-        "temperature_uncertainty_as_printed",
-        "uncertainty_as_published",
     }
 )
 # Condition-state refusal tags. StateTag is the schema owner. ``value`` is
