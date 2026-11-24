@@ -11,6 +11,7 @@ from __future__ import annotations
 import base64
 import json
 import lzma
+import os
 import re
 from pathlib import Path
 from unittest.mock import patch
@@ -173,37 +174,36 @@ def _observation_rows(output: bytes) -> dict[str, dict[str, object]]:
 
 
 def _field_differences(path: str, stored: object, regenerated: object) -> list[str]:
+    return [
+        f"{change['field']}: stored={json.dumps(change['old'], sort_keys=True, default=str)}; "
+        f"regenerated={json.dumps(change['new'], sort_keys=True, default=str)}"
+        for change in _field_change_records(path, stored, regenerated)
+    ]
+
+
+def _field_change_records(path: str, stored: object, regenerated: object) -> list[dict[str, object]]:
     if isinstance(stored, dict) and isinstance(regenerated, dict):
         differences = []
         for key in sorted(stored.keys() | regenerated.keys(), key=str):
             if key not in stored or key not in regenerated:
                 old = stored[key] if key in stored else "<absent>"
                 new = regenerated[key] if key in regenerated else "<absent>"
-                differences.append(
-                    f"{path}.{key}: stored={json.dumps(old, sort_keys=True, default=str)}; "
-                    f"regenerated={json.dumps(new, sort_keys=True, default=str)}"
-                )
+                differences.append({"field": f"{path}.{key}", "old": old, "new": new})
                 continue
-            differences.extend(_field_differences(
+            differences.extend(_field_change_records(
                 f"{path}.{key}", stored[key], regenerated[key],
             ))
         return differences
     if isinstance(stored, list) and isinstance(regenerated, list):
         if len(stored) != len(regenerated):
-            return [
-                f"{path}: stored={json.dumps(stored, sort_keys=True, default=str)}; "
-                f"regenerated={json.dumps(regenerated, sort_keys=True, default=str)}"
-            ]
+            return [{"field": path, "old": stored, "new": regenerated}]
         differences = []
         for index, (old, new) in enumerate(zip(stored, regenerated)):
-            differences.extend(_field_differences(f"{path}[{index}]", old, new))
+            differences.extend(_field_change_records(f"{path}[{index}]", old, new))
         return differences
     if stored == regenerated:
         return []
-    return [
-        f"{path}: stored={json.dumps(stored, sort_keys=True, default=str)}; "
-        f"regenerated={json.dumps(regenerated, sort_keys=True, default=str)}"
-    ]
+    return [{"field": path, "old": stored, "new": regenerated}]
 
 
 def _compact_difference_paths(differences: list[str], prefix: str) -> str:
@@ -301,9 +301,9 @@ def _compact_observation_ids(observation_ids: list[str]) -> list[dict[str, objec
     return compact
 
 
-def _store_difference_details(
+def _store_difference_payload(
     stored: dict[str, bytes], regenerated: dict[str, bytes], paths: list[str]
-) -> str:
+) -> dict[str, object]:
     details = {
         "changed_store_paths": len(paths),
         "observations": {},
@@ -315,12 +315,13 @@ def _store_difference_details(
         regenerated_bytes = regenerated.get(path)
         if stored_bytes is None or regenerated_bytes is None:
             present_bytes = stored_bytes if stored_bytes is not None else regenerated_bytes
-            details["other"].append(
-                f"{path}: {'missing from store' if stored_bytes is None else 'unexpected in store'}"
-            )
+            details["other"].append({"path": path, "fields": [
+                "missing from store" if stored_bytes is None else "unexpected in store"
+            ]})
             if present_bytes is not None:
                 observation_ids = sorted(_observation_rows(present_bytes))
                 details["observations"][path] = {
+                    "source_ids": [Path(path).stem],
                     "fields": [
                         "row missing from store" if stored_bytes is None else "unexpected row"
                     ],
@@ -330,13 +331,13 @@ def _store_difference_details(
                             for observation_id in observation_ids
                         ]
                     ),
+                    "rows": [],
                 }
             continue
         if path.endswith(".md"):
-            details["other"].append(
-                f"{path}: bytes differ ({len(stored_bytes)} stored, "
-                f"{len(regenerated_bytes)} regenerated)"
-            )
+            details["other"].append({"path": path, "fields": [
+                f"bytes differ ({len(stored_bytes)} stored, {len(regenerated_bytes)} regenerated)"
+            ]})
             continue
         if path.startswith("data/literature/works/"):
             stored_work = yaml.load(stored_bytes, Loader=_FAST_SAFE_YAML_LOADER)
@@ -355,9 +356,11 @@ def _store_difference_details(
             details["work"].append({
                 "path": path,
                 "source": source_label,
+                "source_ids": list(map(str, source_ids)),
                 "fields": _compact_difference_paths(differences, "work")
                 if differences
                 else "bytes differ without a YAML field difference",
+                "changes": _field_change_records("work", stored_work, regenerated_work),
             })
             continue
         stored_rows = _observation_rows(stored_bytes)
@@ -369,18 +372,27 @@ def _store_difference_details(
         ]
         if changed_rows:
             source_fields = set()
+            row_details = []
             for observation_id in changed_rows:
-                differences = _field_differences(
+                changes = _field_change_records(
                     "observation",
                     stored_rows.get(observation_id),
                     regenerated_rows.get(observation_id),
                 )
-                field_paths = [
-                    difference.split(": stored=", 1)[0]
-                    for difference in differences
-                ] or ["bytes differ without a YAML field difference"]
+                field_paths = [str(change["field"]) for change in changes]
+                if not field_paths:
+                    field_paths = ["bytes differ without a YAML field difference"]
                 source_fields.update(field_paths)
+                row = regenerated_rows.get(observation_id) or stored_rows.get(observation_id) or {}
+                source_id = str(row.get("source_id") or Path(path).stem)
+                row_details.append({
+                    "id": observation_id.removeprefix(f"{Path(path).stem}::"),
+                    "source_id": source_id,
+                    "locator": row.get("locator"),
+                    "changes": changes,
+                })
             details["observations"][path] = {
+                "source_ids": sorted({str(row["source_id"]) for row in row_details}),
                 "fields": sorted(source_fields),
                 "ids": _compact_observation_ids(
                     [
@@ -388,15 +400,263 @@ def _store_difference_details(
                         for observation_id in changed_rows
                     ]
                 ),
+                "rows": row_details,
             }
         else:
-            details["other"].append(
-                f"{path}: bytes differ ({len(stored_bytes)} stored, "
-                f"{len(regenerated_bytes)} regenerated); no observation-row difference"
-            )
+            details["other"].append({"path": path, "fields": [
+                f"bytes differ ({len(stored_bytes)} stored, {len(regenerated_bytes)} regenerated); "
+                "no observation-row difference"
+            ]})
+    return details
+
+
+def _store_difference_details(
+    stored: dict[str, bytes], regenerated: dict[str, bytes], paths: list[str]
+) -> str:
+    details = _store_difference_payload(stored, regenerated, paths)
     raw = json.dumps(details, sort_keys=True, separators=(",", ":")).encode("utf-8")
     payload = base64.b64encode(lzma.compress(raw, preset=9)).decode("ascii")
     return f"store_delta_lzma_base64={payload}"
+
+
+def _source_extract_row(source_id: str, observation_id: str) -> dict[str, object] | None:
+    path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
+    if not path.is_file():
+        return None
+    document = yaml.load(path.read_bytes(), Loader=_FAST_SAFE_YAML_LOADER)
+    local_id = observation_id.removeprefix(f"{source_id}::")
+    for species in document.get("species", {}).values():
+        for row in species.get("observations", []):
+            if row.get("observation_id") == local_id:
+                return row
+    return None
+
+
+def _source_cell_basis(
+    source_row: dict[str, object] | None, field: str
+) -> tuple[object, list[object], object]:
+    if source_row is None:
+        return "source extract row unavailable", [], None
+    values = source_row.get("values")
+    values = values if isinstance(values, dict) else {}
+    field_name = field.removeprefix("observation.")
+    candidates: list[object] = []
+    if field_name == "value.point":
+        quantity = values.get("quantity")
+        if isinstance(quantity, str) and quantity in values:
+            candidates.append(values[quantity])
+            as_published = values.get(f"{quantity}_as_published")
+            if as_published is not None:
+                candidates.append(as_published)
+        cell = {
+            "quantity": quantity,
+            "printed_value": values.get(f"{quantity}_as_published") if quantity else None,
+            "scale": values.get(f"printed_{quantity}_scale") if quantity else None,
+            "extracted_value": values.get(quantity) if quantity else None,
+            "units": source_row.get("units"),
+            "locator": source_row.get("locator"),
+        }
+    elif "temperature_K" in field_name or field_name.endswith(".T_C"):
+        if source_row.get("T_C") is not None:
+            candidates.append(source_row["T_C"])
+        cell = {
+            "T_C": source_row.get("T_C"),
+            "printed_condition": source_row.get("point_conditions", {}).get("T_C")
+            if isinstance(source_row.get("point_conditions"), dict) else None,
+            "locator": source_row.get("locator"),
+        }
+    elif "fO2" in field_name or "oxygen" in field_name.lower():
+        oxygen = values.get("oxygen_partial_pressure")
+        if isinstance(oxygen, dict):
+            candidates.append(oxygen.get("value"))
+        cell = {
+            "oxygen_partial_pressure": oxygen,
+            "locator": source_row.get("locator"),
+        }
+    else:
+        leaf = field_name.rsplit(".", 1)[-1]
+        for container in (values, source_row):
+            if leaf in container:
+                candidates.append(container[leaf])
+        cell = {
+            "source_values": values,
+            "T_C": source_row.get("T_C"),
+            "units": source_row.get("units"),
+            "locator": source_row.get("locator"),
+        }
+    basis = source_row.get("derivation") or source_row.get("values", {}).get(
+        f"{values.get('quantity', '')}_derivation", None
+    ) if isinstance(source_row.get("values"), dict) else source_row.get("derivation")
+    return cell, candidates, basis
+
+
+def _side_matches_cell(side: object, candidates: list[object]) -> bool:
+    if side in candidates:
+        return True
+    if isinstance(side, (str, int, float)) and not isinstance(side, bool):
+        try:
+            side_number = float(side)
+        except (TypeError, ValueError):
+            return False
+        for candidate in candidates:
+            try:
+                if side_number == float(candidate):
+                    return True
+            except (TypeError, ValueError):
+                continue
+    return False
+
+
+def _field_locator(
+    row: dict[str, object], source_row: dict[str, object] | None, field: str
+) -> object:
+    prefix = "observation.point_conditions."
+    if field.startswith(prefix) and source_row is not None:
+        condition = field[len(prefix):].split(".", 1)[0]
+        conditions = source_row.get("point_conditions")
+        if isinstance(conditions, dict):
+            condition_value = conditions.get(condition)
+            if isinstance(condition_value, dict) and condition_value.get("locator"):
+                return condition_value["locator"]
+    return (source_row or {}).get("locator") or row.get("locator")
+
+
+def _format_store_delta_report(
+    details: dict[str, object], mode: str, source_filter: set[str]
+) -> str:
+    observations = details["observations"]
+    work = details["work"]
+    other = details["other"]
+    assert isinstance(observations, dict) and isinstance(work, list) and isinstance(other, list)
+    grouped: dict[str, dict[str, object]] = {}
+
+    def source_group(source_id: str) -> dict[str, object]:
+        return grouped.setdefault(source_id, {
+            "observation_paths": set(), "work_paths": set(), "score_rows": set(),
+            "fields": set(), "value_fields": set(),
+        })
+
+    for path, record in observations.items():
+        assert isinstance(record, dict)
+        for row in record.get("rows", []):
+            assert isinstance(row, dict)
+            group = source_group(str(row["source_id"]))
+            group["observation_paths"].add(path)
+            group["score_rows"].add(str(row["id"]))
+            for change in row.get("changes", []):
+                field = str(change["field"]).removeprefix("observation.")
+                group["fields"].add(field)
+                if field.endswith((".value", ".point")):
+                    group["value_fields"].add(field)
+        if not record.get("rows"):
+            for source_id in record.get("source_ids", [Path(path).stem]):
+                source_group(str(source_id))["observation_paths"].add(path)
+    for record in work:
+        assert isinstance(record, dict)
+        source_ids = record.get("source_ids") or ["__work_without_source_id__"]
+        for source_id in source_ids:
+            source_group(str(source_id))["work_paths"].add(str(record["path"]))
+            group = source_group(str(source_id))
+            for field in record.get("fields", []):
+                if isinstance(field, str):
+                    group["fields"].add(field)
+    for record in other:
+        assert isinstance(record, dict)
+        source_group("__store_global__").setdefault("other_paths", set()).add(str(record["path"]))
+
+    if mode == "summary":
+        output = [
+            "STORE DELTA SUMMARY: score rows are changed observation IDs; value-field count is distinct changed leaves ending .value or .point."
+        ]
+        for source_id in sorted(grouped):
+            group = grouped[source_id]
+            output.append(" | ".join((
+                source_id,
+                "observation_paths=" + ",".join(sorted(group["observation_paths"])),
+                "work_metadata_paths=" + ",".join(sorted(group["work_paths"])),
+                "other_paths=" + ",".join(sorted(group.get("other_paths", set()))),
+                "score_rows=" + json.dumps(_compact_observation_ids(sorted(group["score_rows"])), separators=(",", ":")),
+                "changed_value_fields=" + str(len(group["value_fields"])),
+            )))
+        unique_paths = set(observations) | {str(item["path"]) for item in work + other}
+        output.append(f"TOTAL changed_store_paths={len(unique_paths)}")
+        return "\n".join(output)
+
+    decoded: list[str] = []
+    for path, record in observations.items():
+        assert isinstance(record, dict)
+        for row in record.get("rows", []):
+            assert isinstance(row, dict)
+            source_id = str(row["source_id"])
+            if mode in {"source", "scope"} and source_filter and source_id not in source_filter:
+                continue
+            source_row = _source_extract_row(source_id, str(row["id"]))
+            for change in row.get("changes", []):
+                field = str(change["field"])
+                if mode == "scope" and _field_is_fold22_scope(field, change, source_id):
+                    continue
+                cell, candidates, basis = _source_cell_basis(source_row, field)
+                old_match = _side_matches_cell(change["old"], candidates)
+                new_match = _side_matches_cell(change["new"], candidates)
+                matched = "both" if old_match and new_match else "old" if old_match else "new" if new_match else "neither"
+                locator = _field_locator(row, source_row, field)
+                decoded.append(" | ".join((
+                    source_id,
+                    json.dumps(locator, sort_keys=True, default=str),
+                    field,
+                    "old=" + json.dumps(change["old"], sort_keys=True, default=str),
+                    "new=" + json.dumps(change["new"], sort_keys=True, default=str),
+                    "printed_cell=" + json.dumps(cell, sort_keys=True, default=str),
+                    "matched_side=" + matched,
+                    "basis=" + json.dumps(basis, sort_keys=True, default=str),
+                )))
+    for record in work:
+        assert isinstance(record, dict)
+        source_ids = list(map(str, record.get("source_ids", [])))
+        if mode in {"source", "scope"} and source_filter and not (source_filter & set(source_ids)):
+            continue
+        source_id = next(iter(sorted(source_filter & set(source_ids))), source_ids[0] if source_ids else "__work_without_source_id__")
+        source_bytes = REPO_ROOT / str(record["path"])
+        stored_bytes = source_bytes.read_bytes() if source_bytes.is_file() else b""
+        work_doc = yaml.load(stored_bytes, Loader=_FAST_SAFE_YAML_LOADER) if stored_bytes else {}
+        work_meta = work_doc.get("work", {}) if isinstance(work_doc, dict) else {}
+        if mode == "scope" and not any(
+            not _field_is_fold22_scope(str(change["field"]), change, source_id)
+            for change in record.get("changes", [])
+        ):
+            continue
+        for change in record.get("changes", []):
+            if mode == "scope" and _field_is_fold22_scope(str(change["field"]), change, source_id):
+                continue
+            decoded.append(" | ".join((
+                source_id,
+                json.dumps(work_meta.get("locator"), sort_keys=True, default=str),
+                str(change["field"]),
+                "old=" + json.dumps(change["old"], sort_keys=True, default=str),
+                "new=" + json.dumps(change["new"], sort_keys=True, default=str),
+                "printed_cell=" + json.dumps({"citation": work_meta.get("citation"), "locator": work_meta.get("locator")}, sort_keys=True, default=str),
+                "matched_side=neither",
+                "basis=bibliographic/work metadata, not a measurement cell",
+            )))
+    header = f"STORE DELTA {mode.upper()} changed_paths={details['changed_store_paths']} decoded_rows={len(decoded)}"
+    return "\n".join([header, *decoded])
+
+
+def _field_is_fold22_scope(field: str, change: dict[str, object], source_id: str) -> bool:
+    if source_id in {
+        "kems-020-hastie-1981-nbsir",
+        *(row[0].removesuffix(".yaml") for row in _EXTRACT_ROWS),
+    }:
+        return True
+    normalized = field.removeprefix("observation.")
+    if normalized.startswith("identity.fO2_Pa"):
+        return True
+    if normalized.startswith("notices"):
+        text = json.dumps((change.get("old"), change.get("new")), default=str)
+        return any(token in text for token in (
+            "CONDITION_EXCLUDED_TARGET_DEPENDENCY", "gas_ratio_requires_bench", "DP-010"
+        ))
+    return False
 
 
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
@@ -2544,9 +2804,6 @@ def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:
         if stored.get(path) != regenerated.get(path)
     )
     assert helper_differences == byte_differences
-    assert byte_differences == [], _store_difference_details(
-        stored, regenerated, byte_differences
-    )
 
     report = regenerated["data/battery/migration-report.md"].decode("utf-8")
     headline = {
@@ -2559,3 +2816,14 @@ def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:
     }
     for label, count in headline.items():
         assert f"{label}: {count}" in report
+
+    report_mode = os.environ.get("REGOLITH_STORE_DELTA_REPORT")
+    if report_mode:
+        source_filter = set(filter(None, os.environ.get("REGOLITH_STORE_DELTA_SOURCES", "").split(",")))
+        payload = _store_difference_payload(stored, regenerated, byte_differences)
+        print(_format_store_delta_report(payload, report_mode, source_filter))
+        assert len(byte_differences) == 376
+        return
+    assert byte_differences == [], _store_difference_details(
+        stored, regenerated, byte_differences
+    )
