@@ -9,7 +9,8 @@ import pytest
 import yaml
 from openpyxl import load_workbook
 
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import Engine, NoticeKind, RefusalReason
+from simulator.battery.score import predict_with_engine
 from tests.battery.factories import migrate_one_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -91,6 +92,14 @@ def test_absent_primary_keeps_quoted_run_composition_missing(migrated_extract) -
     assert experiment.sample.initial_composition is None
     assert experiment.sample.initial_composition_inherited_from is None
     assert observation.identity.composition.is_unknown
+    prediction = predict_with_engine(
+        Engine.MAGEMIN, observation, experiment=experiment
+    )
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert prediction.refusal_detail == {
+        "reason": "missing_input",
+        "input": "composition",
+    }
 
 
 @pytest.mark.skipif(not SOURCE_XLSX.is_file(), reason="regolith-corpus workbook is absent")

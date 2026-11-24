@@ -5,6 +5,7 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as M
+from simulator.battery import validate as validation_module
 from simulator.battery.enums import AmountBasis, QuotedTargetKind, RefusalReason
 from simulator.battery.records import Composition, QuotedFrom, State
 from simulator.battery.validate import validate_corpus
@@ -119,82 +120,72 @@ def test_measured_liquid_composition_cannot_stand_in_for_run_composition() -> No
     )
 
 
-def test_ambiguous_printed_run_match_stays_unlinked() -> None:
-    temperature = Decimal("1453.15")
-    primary_runs = []
-    primary_observations = []
-    for experiment_id, observation_id, composition in (
-        ("primary-run-a", "primary-row-a", _composition()),
-        (
-            "primary-run-b",
-            "primary-row-b",
-            replace(
-                _composition(),
-                components=(
-                    ("SiO2", Decimal("0.4")),
-                    ("MgO", Decimal("0.6")),
-                ),
-            ),
+_INHERITED_COMPOSITION_PATH = (
+    "experiment[quoted-experiment].sample.initial_composition_inherited_from"
+)
+
+
+def _inherited_composition_mismatch_report():
+    primary = F.tabulation_experiment("primary-experiment")
+    starting_composition = _composition()
+    primary = replace(
+        primary,
+        sample=replace(
+            primary.sample,
+            initial_composition=F.located(starting_composition),
         ),
-    ):
-        experiment = F.tabulation_experiment(
-            experiment_id, T_K=temperature
-        )
-        experiment = replace(
-            experiment,
-            sample=replace(
-                experiment.sample,
-                initial_composition=F.located(composition),
-            ),
-        )
-        observation = F.observation(
-            observation_id,
-            experiment_id,
-            F.o2_identity(T_K=temperature),
-            "1",
-        )
-        observation = replace(
-            observation,
-            provenance={"sample_id_as_printed": "W-1."},
-            point_conditions={
-                "fO2_log": F.located(
-                    "-12.2", table="included experimental data", record="E4"
-                )
-            },
-        )
-        primary_runs.append(experiment)
-        primary_observations.append(observation)
+    )
+    different_composition = replace(
+        starting_composition,
+        components=(
+            ("SiO2", Decimal("0.4")),
+            ("MgO", Decimal("0.6")),
+        ),
+    )
+    quoted = _quoted_experiment(
+        QuotedFrom(QuotedTargetKind.EXPERIMENT, primary.experiment_id),
+        composition=different_composition,
+    )
+    return validate_corpus([F.work()], [primary, quoted], [])
 
-    quoted = F.tabulation_experiment(
-        "quoted-experiment", T_K=temperature
+
+def _assert_inherited_composition_mismatch(report) -> None:
+    assert any(
+        issue.path == _INHERITED_COMPOSITION_PATH
+        and issue.reason is RefusalReason.CONDITIONAL_FIELD
+        for issue in report.hard_issues
     )
-    quoted_observation = F.observation(
-        "quoted-row",
-        quoted.experiment_id,
-        F.o2_identity(T_K=temperature),
-        "1",
+
+
+def test_inherited_initial_composition_must_match_cited_run() -> None:
+    _assert_inherited_composition_mismatch(
+        _inherited_composition_mismatch_report()
     )
-    quoted_observation = replace(
-        quoted_observation,
-        provenance={"sample_id_as_printed": "W-1."},
-        point_conditions={
-            "fO2_log": F.located(
-                "-12.2", table="included experimental data", record="E4"
+
+
+def test_inherited_initial_composition_mismatch_mutation_is_detected(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    validate_experiment = validation_module.validate_experiment
+
+    def without_mismatch_refusal(*args, **kwargs):
+        issues = validate_experiment(*args, **kwargs)
+        return [
+            issue
+            for issue in issues
+            if not (
+                issue.path == _INHERITED_COMPOSITION_PATH
+                and issue.reason is RefusalReason.CONDITIONAL_FIELD
             )
-        },
-    )
+        ]
 
-    report = validate_corpus(
-        [F.work()],
-        [*primary_runs, quoted],
-        [*primary_observations, quoted_observation],
+    monkeypatch.setattr(
+        validation_module, "validate_experiment", without_mismatch_refusal
     )
-
-    assert len(primary_runs) == 2
-    assert quoted.quoted_from is None
-    assert quoted.sample.initial_composition is None
-    assert quoted.sample.initial_composition_inherited_from is None
-    assert report.hard_issues == ()
+    with pytest.raises(AssertionError):
+        _assert_inherited_composition_mismatch(
+            _inherited_composition_mismatch_report()
+        )
 
 
 def test_quoted_from_requires_a_resolving_target() -> None:
