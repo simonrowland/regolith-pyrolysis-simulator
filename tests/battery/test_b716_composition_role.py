@@ -1200,7 +1200,7 @@ def test_owner_gets_flat_declared_parent_and_identity_assays(monkeypatch) -> Non
         run_composition_columns_declared=True,
     )
 
-    assert offered == [["point", "declared", "parent", "identity"]]
+    assert offered == [("point", "declared", "parent", "identity")]
 
 
 def test_owner_gets_invalid_point_parent_and_identity_assays(monkeypatch) -> None:
@@ -1230,7 +1230,7 @@ def test_owner_gets_invalid_point_parent_and_identity_assays(monkeypatch) -> Non
         },
     )
 
-    assert offered == [["point", "parent", "identity"]]
+    assert offered == [("point", "parent", "identity")]
 
 
 def test_owner_preserves_proxy_for_incomplete_initial_charge_map() -> None:
@@ -1319,7 +1319,7 @@ def test_partial_pressure_located_composition_is_decoded_without_role(
     observation = next(iter(result.observations.values()))
 
     assert observation.point_conditions["composition"].state.is_value
-    assert offered == [["point"]]
+    assert offered == [("point", "identity")]
 
 
 def test_preselecting_one_candidate_breaks_the_owner_pin(monkeypatch) -> None:

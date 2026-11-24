@@ -225,6 +225,15 @@ def _choose_assay(
             _assay_usable(previous) for previous in candidates[:index]
         ):
             return candidate
+    if declared_role == INITIAL_CHARGE_ONLY_PROXY_FLAG and not any(
+        _assay_usable(candidate) for candidate in candidates
+    ):
+        missing_charge = next(
+            (candidate for candidate in candidates if candidate.source == "none"),
+            None,
+        )
+        if missing_charge is not None:
+            return missing_charge
     for index, candidate in enumerate(candidates):
         if not _assay_usable(candidate):
             continue

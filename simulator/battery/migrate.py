@@ -9631,7 +9631,6 @@ def _initial_charge_only_composition_proxy(
                 locator=locator,
                 declared_map=point_composition_map_declared,
                 inherit_parent_role=False,
-                terminal=True,
             )
             if flat_unknown is not None:
                 flat_candidate = replace(flat_candidate, state=flat_unknown)
@@ -9759,7 +9758,7 @@ def _initial_charge_only_composition_proxy(
                 source="identity",
             )
         )
-    if not candidates:
+    if not any(candidate.source == "none" for candidate in candidates):
         if refusal_reasons:
             missing_reason = refusal_reasons[0]
         elif point_composition_map_declared:
@@ -31113,7 +31112,6 @@ class Migrator:
             point_candidate = composition_roles.AssayCandidate(
                 State.unknown(composition_unknown_reason(point_composition_refusal)),
                 source="point",
-                terminal=True,
                 incomplete_initial_charge=bool(missing_major_oxide_names),
             )
             candidates = [point_candidate]
