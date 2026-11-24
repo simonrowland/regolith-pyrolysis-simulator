@@ -60,14 +60,14 @@ PINS: dict[str, tuple[str, str, bool, tuple[str, ...], tuple[str, ...], str]] = 
         "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": (
-        "0.10013889718897892", "no_band", False, (),
+        "0.10013889718897892", "match", False, (),
         ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
-        "ferric_fraction_uncertainty_linearization_invalid",
+        "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": (
-        "0.0697125628667097", "no_band", False, (),
+        "0.0697125628667097", "match", False, (),
         ("total_iron_reported_as_feo", "fo2_frame_from_printed_atmosphere", "admission_defaulted", "engine_model_caveat", "input_omitted", "out_of_certified_band"),
-        "ferric_fraction_uncertainty_linearization_invalid",
+        "none",
     ),
     "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes": (
         "-0.19443092435728185", "mismatch", False, (),

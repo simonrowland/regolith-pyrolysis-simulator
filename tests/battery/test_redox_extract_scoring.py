@@ -1305,10 +1305,12 @@ def test_borisov_2018_rows_reach_redox_scoring_population(monkeypatch):
         435,
         404,
     )
+    # METHOD_UNSTATED/PHASE_INFERRED (ea358c0945) flag all rows; 10 also carry
+    # out_of_certified_band.
     assert (
         measured_unknown["certified_numeric"],
         measured_unknown["flagged_numeric"],
-    ) == (0, len(inferred_rows))
+    ) == (0, 404)
     assert not any(
         row.get("source_relation") == "training" and row.get("candidates")
         for row in measured_rows

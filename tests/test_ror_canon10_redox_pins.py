@@ -29,9 +29,9 @@ from tests.battery.test_redox_extract_scoring import (
     _sossi_aithala_redox_context,
 )
 
-# Studio 3, OpenIMCC pin 66ec4a3, request w1124c12-probe2. Log 0 at 1 bar
-# makes this float digest equal the historical log-as-bar float set. The
-# payload hash below is the printed-atmosphere frame, not that command.
+# Regenerated on Studio 2 with OpenIMCC pin 66ec4a3 from the merged scorer.
+# Log 0 at 1 bar makes this float digest equal the historical log-as-bar float
+# set. The payload hash below is the printed-atmosphere frame, not that command.
 OPENIMCC_NUMERIC_DIGEST = (
     "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
 )
@@ -57,8 +57,8 @@ _FULL_PAYLOAD_PINS = {
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes": "cff37f189f885060ffdc2ebf13a78b2c25f789b065562fd19d16fc1f45ecd291",
         "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes": "eb1e195c143036653c7f0485b1002d731bb2eed32f2a6c9b9af4013d96cf5fe8",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes": "0750fcf07f413df6927a4b26dd25da77d614831b8526b28a06e0e99bd9a00d45",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": "1e0091c52f234529ff0b2df0294cc960f86188e9ab7be9dc1701cce6bd7ae854",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": "d844654f248b29cf469d3bcd8784015a8e36f98139c04928364226a633f0eb58",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": "5cbd5a7c95425a27d1665d3408dfaffc24a15ce292f83e6111602a56122e7c00",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": "190cedb86b480e71c0074befcd78589dd72fa3da4b04794ecc6d932c487831a4",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes": "2ae11f8d2d6f8f33087d86c1d45b87c8ecd6f75ca3f7254e0b535a6eed8e790f",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes": "327f2135a5ca8b1c15146a22204329cf24ff2d223b8d66c3f276885719519dfb",
         "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes": "ed8561974a1e77f228699f31fb9c71ede6c19f5e8afb9f6282888f1c5425d210",
@@ -70,24 +70,24 @@ _FULL_PAYLOAD_PINS = {
         "sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes": "615a21efe0548b28e3b7ad879a02d289e00b45f84634d55d2152ebb69e34706c",
     },
     Engine.OPENIMCC: {
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes": "92337772bdc6cb4d060dc56767ee7660429e19a7dee01e9ee320c82d1003203e",
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_xanes": "3e6b340fd5b39923f0301bbbf4509e82e6cb1ec6d9411ba643e5749a690d5c94",
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_xanes": "b6871bd1bab185973d189db82ec213e030c90bffd06410074d10e85a632b1613",
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes": "d051bbf194cdc12530fcba06cdcb401c122dc7054b02115ac6374bfa4ed52538",
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes": "0812b6c11bfd3fb93d124472be8b7d0202bc60d17f58bf52e251ec4eebce84b4",
-        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes": "a8edf9f963a4fc20e5112e6a6bd044c9c71b698d04cf57654bbacc9e48fa7ec2",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes": "d196b0397f6b9bf5364e9b40e0f498b969cb980872bfe8cb44a584bf4b042a53",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": "e4afbc218f64fa0df41c5f54bba22ad939e3598105c3c74d9666a15c34ceb5c2",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": "9a0aeb78c814329bf8c0cdbe15ad29ccbcad2649a137f8078302f7bf8b3b2b3e",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes": "738bc12a1f6f3461971953361c748d46e7003711bbc5bc01822b8e8c258f3ba9",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes": "7967435865ee518b106c846cd58780e59c28bfff4796ae4e5fd56d407f243acf",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes": "7c16a76cff661e74617b04b89a71de11fe12fceef10bcd3541435eeecd584994",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes": "0f0ebbc71cee4e050e37e08180918fee13e0a86ddeafdb9cd2a5e024b93b2eb9",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes": "42176dd625a8c32b69384f238f86c398f1675bd5da405d3f0175870d15960dbe",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes": "9d97fa8d4948d5a0dc618bba0a2f6a56375e7b14ce79a106de9124d1e7fc7d0e",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes": "20124212f05ae3dee9fcab9711fa615b5387ad7e6d5732603c7e8bea7a0b2ce5",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes": "0f832e334a825b92938deee19233d5287d4019485b32d53d770794f23cd7c24e",
-        "sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes": "56323f31748cc9ccba8113559e45ea3f5e139a09b6853eecd1d7f2a9d08a67bd",
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1800_30_xanes": "d697d4972715490fb4e56187041c1c2c5deeeea4804e5bab400fec36359688fb",
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_1900_30_xanes": "9984b244439737ceffc64f908d5953f19e47c39469529e31261f471a8c9fa64e",
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_10_xanes": "5ef363f7a75015a7bf4c4bad2bf76426bc2c42fb5d0ff67862c17867429f2cc3",
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_120_xanes": "d041168a30a9bd2bdac046aee542a66d6123a9a781ce272e8380564b17c861fd",
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2000_30_xanes": "08de328245b0e82404e44e98b00506d62244f0a6475b0b8d49f2d9a856ed2896",
+        "aithala-2026-magmatic-iron-redox-to-2100c::aithala_2026_2100_30_xanes": "5ffed3e52fa9e9dcad06d73f93d66e2c561ead694d7804fb42832fbcf5dea86f",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_10_xanes": "f51200baae8d62d2f0e60749d1b7b601e4bbdb92f4aaf00f3b8992ae999f4379",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_11_xanes": "3a4c4d7d0c3c706e800eb9bbd3b2b608714f6a6a15692fcb6e25258234301f0c",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_12_xanes": "99d9c9ac67a7ca800c33c2a9929ca3fd37b6ed0dbedb1425243a4dcf50cee062",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_1_xanes": "cfb2a65bbf6ae9f59b0c969f65ef775f03ad46065a9d705e86cbc881cb0ee0b0",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_2_xanes": "7ce80d4f0bc7725d4a28af14686f91c3ee60a303006a5d4265126e72a4a54a86",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_3_xanes": "8263367ea4a8c230d2a18ca3ad78373f246f67f71a2949697a3f6196ce4110bd",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_6_xanes": "31c70ab2d6dda8ecb9e38944b602b7b2e8104285086772c46655d90384b2a704",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_7_xanes": "f42936739e98bcefb2c43d87cbc3308d85260c278bfa51c3d56ccacfef6c4bfc",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_8_xanes": "0cab8011bdd5fe371f0d4fe47a529efc768f3291272931d5e65767e5115849c5",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_f_o2_9_xanes": "77c5e30b1323ad2b8de414d58a93d300e7e453c3579b47a0290d866000bd1e77",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_ts1_xanes": "d37d70306a7640bbb08c60aff816dab518f2bdcbc5efa9ec40c5e8959e5289f0",
+        "sossi-2020-magma-ocean-redox::sossi_2020_per_ts2_xanes": "6adadc852a927a4ddc90bc4f307e93b679065c077c22b145cfca26b45a7fc399",
     },
 }
 
