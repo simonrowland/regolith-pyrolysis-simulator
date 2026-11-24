@@ -15,6 +15,7 @@ from engines.antoine import (
     _antoine_log10_pressure,
     _read_antoine_coefficients,
 )
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.chemistry.ellingham_thermo import (
     ELLINGHAM_METAL_PHASE_GAS,
     ELLINGHAM_THERMO as _CANONICAL_ELLINGHAM_THERMO,
@@ -376,7 +377,6 @@ class EquilibriumMixin:
         """
         from simulator.melt_backend.base import EquilibriumResult
         from engines.builtin.vapor_pressure import (
-            BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
             COEFF_BLOCK_ANTOINE,
             FIT_TARGET_PSEUDO_VAPOROCK,
             FIT_TARGET_STANDARD_REACTION,
