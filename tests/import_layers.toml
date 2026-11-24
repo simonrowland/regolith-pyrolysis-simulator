@@ -27,6 +27,9 @@
 "simulator.chemistry.kernel" = 2
 "simulator.chemistry.kernel.errors" = 0
 "simulator.fe_redox" = 1
+# Engines (layer 1) call the floor before dissociation mass action.
+# Same layer as fe_redox, which this module calls and does not reimplement.
+"simulator.metal_saturation_floor" = 1
 "simulator.feedstock_composition" = 1
 "simulator.melt_backend" = 1
 "simulator.engine_local_config" = 0

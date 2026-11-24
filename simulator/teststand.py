@@ -2,9 +2,10 @@
 
 The balance and the driver split are specified in design-teststand.md.
 Conductances and the series speed law are the ones in transport_regime.
-This module does not own a timestep. The process hour passes dt_s=3600
-and asks for the steady state; the analytic exponential is available for
-a caller that already has a step length.
+This module does not own a timestep. The process step passes its dt_s
+and asks for the steady state. The one-hour step passes the literal
+3600 s. The analytic exponential is available for a caller that already
+has a step length.
 """
 
 from __future__ import annotations
@@ -339,12 +340,11 @@ def advance_chamber_pressure(
 
 
 def apply_process_chamber_pressure(sim: Any, *, dt_s: float = _HOUR_S) -> None:
-    """Solve the hour's chamber pressure when the driver is apparatus.
+    """Solve chamber pressure for one process step when the driver is apparatus.
 
     Imposed and legacy schedules return without writing ``p_total_mbar``.
-    The steady form is the large-dt limit. ``dt_s`` is the caller's step
-    length; the hour passes the existing 3600 s hour and does not invent
-    a shorter step.
+    The steady form is the large-dt limit. ``dt_s`` is the caller's
+    process step. The one-hour step passes the literal 3600 s.
     """
     schedule = _schedule_from_sim(sim)
     if schedule is None:

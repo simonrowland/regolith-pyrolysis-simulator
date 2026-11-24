@@ -15,6 +15,7 @@ import pytest
 from simulator.config import load_config_bundle
 from simulator.corpus_version import current_corpus_version
 from simulator.electrolysis import min_decomposition_voltage
+import simulator.lab_schedule as lab_schedule
 from simulator.furnace_materials import resolve_furnace_max_T_C
 from simulator.lab_schedule import (
     LAB_SCHEDULE_PRESSURE_FLOOR_MBAR,
@@ -4031,16 +4032,131 @@ def test_lab_schedule_pressure_floor_endpoint_is_explicit() -> None:
     assert normalized["chamber_pressure_mbar"][0]["value"] == pytest.approx(
         LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
     )
+    assert normalized["pressure_domain_notices"] == ()
 
-    below_floor = copy.deepcopy(schedule)
-    below_floor["chamber_pressure_mbar"][0]["value"] = (
-        LAB_SCHEDULE_PRESSURE_FLOOR_MBAR / 2.0
+
+@pytest.mark.parametrize("pressure_mbar", [1.333e-4, 1.0e-9])
+def test_lab_schedule_pressure_mutation_below_floor_runs_with_notice(
+    pressure_mbar: float,
+) -> None:
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=((0.0, 1.0), (1.0, 1.0)),
+        furnace_ceiling_C=1300.0,
     )
-    with pytest.raises(
-        LabScheduleValidationError,
-        match="lab_schedule_pressure_below_implemented_floor",
-    ):
-        normalize_lab_schedule(below_floor)
+    schedule["chamber_pressure_mbar"][0]["value"] = pressure_mbar
+    schedule["chamber_pressure_mbar"][1]["value"] = pressure_mbar
+
+    spec, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _lab_schedule_profile(schedule),
+        RecipeSchema(),
+    )
+
+    runtime_schedule = run_config.runtime_campaign_overrides[
+        "C2A_continuous"
+    ]["lab_schedule"]
+    assert tuple(
+        point["value"] for point in runtime_schedule["chamber_pressure_mbar"]
+    ) == pytest.approx((pressure_mbar, pressure_mbar))
+    assert tuple(
+        point["value"] for point in spec.lab_schedule["chamber_pressure_mbar"]
+    ) == pytest.approx((pressure_mbar, pressure_mbar))
+    session = _force_builtin_run_from_config(run_config)._start_session()
+    row = session.advance().per_hour_summary
+    assert row["pO2_enforcement"]["p_total_mbar"] == pytest.approx(pressure_mbar)
+    assert session.simulator.melt.p_total_mbar == pytest.approx(pressure_mbar)
+    notices = runtime_schedule["pressure_domain_notices"]
+    assert len(notices) == 2
+    for notice in notices:
+        assert notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+        assert notice["authority"] == "extrapolated"
+        assert notice["pressure_mbar"] == pytest.approx(pressure_mbar)
+        assert notice["certified_band"]["minimum_pressure_mbar"] == pytest.approx(
+            LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
+        )
+    assert spec.lab_schedule["pressure_domain_notices"] == notices
+    assert row["pO2_enforcement"]["pressure_domain_notices"] == [
+        dict(notice) for notice in notices
+    ]
+
+
+def test_unscheduled_c2a_still_applies_knudsen_pressure_adjustment() -> None:
+    _, run_config = _build_eval_inputs(
+        RecipePatch({}),
+        "lunar_mare_low_ti",
+        "internal-analytical",
+        _campaign_window_profile(
+            "C2A_continuous",
+            None,
+            None,
+            1,
+            profile_id="unscheduled-c2a",
+        ),
+        RecipeSchema(),
+    )
+    sim = _force_builtin_run_from_config(run_config)._start_session().simulator
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.melt.p_total_mbar = 1.0e-6
+    sim.melt.pO2_mbar = 0.0
+
+    sim._apply_c2a_knudsen_pressure_adjustment()
+
+    assert sim.campaign_mgr.last_pO2_enforcement is None
+    assert sim.melt.p_total_mbar == pytest.approx(5.0)
+
+
+@pytest.mark.parametrize(
+    ("pressure_mbar", "expected_reason"),
+    [
+        (0.0, "lab_schedule_chamber_pressure_mbar[0].value_must_be_positive"),
+        (-1.0, "lab_schedule_chamber_pressure_mbar[0].value_must_be_non_negative"),
+        (float("nan"), "lab_schedule_chamber_pressure_mbar[0].value_must_be_finite"),
+        (float("inf"), "lab_schedule_chamber_pressure_mbar[0].value_must_be_finite"),
+        (float("-inf"), "lab_schedule_chamber_pressure_mbar[0].value_must_be_finite"),
+    ],
+)
+def test_lab_schedule_pressure_mutations_reject_invalid_values(
+    pressure_mbar: float,
+    expected_reason: str,
+) -> None:
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=((0.0, 1.0), (1.0, 1.0)),
+        furnace_ceiling_C=1300.0,
+    )
+    schedule["chamber_pressure_mbar"][0]["value"] = pressure_mbar
+
+    with pytest.raises(LabScheduleValidationError) as error:
+        normalize_lab_schedule(schedule)
+    assert str(error.value) == expected_reason
+
+
+def test_normalize_lab_schedule_marks_subfloor_pressure_as_extrapolated() -> None:
+    pressure_mbar = lab_schedule.LAB_SCHEDULE_PRESSURE_FLOOR_MBAR / 2.0
+    schedule = _lab_schedule(
+        duration_h=1.0,
+        temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+        pressure_points=((0.0, pressure_mbar), (1.0, pressure_mbar)),
+        furnace_ceiling_C=1300.0,
+    )
+    normalized = normalize_lab_schedule(schedule)
+
+    notices = normalized["pressure_domain_notices"]
+    assert len(notices) == 2
+    assert [notice["pressure_mbar"] for notice in notices] == [
+        pressure_mbar,
+        pressure_mbar,
+    ]
+    assert all(
+        notice["reason"] == "lab_schedule_pressure_below_implemented_floor"
+        and notice["authority"] == "extrapolated"
+        for notice in notices
+    )
 
 
 def test_lab_schedule_pO2_setpoint_above_total_pressure_clips_per_hour() -> None:
@@ -4270,6 +4386,21 @@ def test_interpolate_schedule_points_refuses_extrapolation() -> None:
             match="lab_schedule_sample_time_outside_declared_window",
         ):
             interpolate_schedule_points(points, sample_time_h)
+
+
+def test_interpolate_schedule_points_preserves_positive_descending_endpoint() -> None:
+    schedule = normalize_lab_schedule(
+        _lab_schedule(
+            duration_h=1.0,
+            temperature_points=((0.0, 25.0), (1.0, 1200.0)),
+            pressure_points=((0.0, 0.01), (1.0, 1.0e-19)),
+            furnace_ceiling_C=1300.0,
+        )
+    )
+
+    assert interpolate_schedule_points(
+        schedule["chamber_pressure_mbar"], 1.0
+    ) == 1.0e-19
 
 
 def test_non_string_mapping_keys_raise() -> None:

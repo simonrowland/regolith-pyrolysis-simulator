@@ -121,6 +121,10 @@ from simulator.chemistry.melt_activity import (  # noqa: E402
     normalize_high_t_melt_activity,
     single_cation_mole_fractions,
 )
+from simulator.metal_saturation_floor import (  # noqa: E402
+    METAL_SATURATION_FLOOR_OXIDES,
+    apply_melt_metal_saturation_floor,
+)
 from simulator.melt_backend import openimcc_bridge  # noqa: E402
 from simulator.physical_constants import (  # noqa: E402
     GAS_CONSTANT,
@@ -1409,6 +1413,39 @@ def _build_high_t_melt_activity_authority(
                 record["ln_gamma_last"] = math.log(gamma_last)
             certificates[parent] = record
     return base
+
+
+def _dissociation_metal_floor_activities(
+    composition_mol: Mapping[str, float],
+    *,
+    temperature_K: float,
+    authority: Mapping[str, Any] | None,
+    a_feo_stoich: float,
+) -> dict[str, float]:
+    """Activities the metal-saturation floor reads on this vapour path.
+
+    FeO is the Kress stoichiometric activity already evaluated at the
+    unfloored log. The other oxides use ``_high_t_activity_for_parent``,
+    the same owner the vapour partial pressures use, on the parent
+    formula basis. The floor module does not import this provider.
+    """
+
+    activities: dict[str, float] = {}
+    if math.isfinite(a_feo_stoich) and a_feo_stoich > 0.0:
+        activities["FeO"] = float(a_feo_stoich)
+    for _metal, oxide in METAL_SATURATION_FLOOR_OXIDES:
+        row = _high_t_activity_for_parent(
+            oxide,
+            composition_mol,
+            temperature_K=temperature_K,
+            authority=authority,
+        )
+        if row is None:
+            continue
+        activity = row.thermodynamic_parent_activity()
+        if math.isfinite(activity) and activity > 0.0:
+            activities[oxide] = float(activity)
+    return activities
 
 
 def _high_t_activity_for_parent(
@@ -2918,12 +2955,12 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if intrinsic_fO2_log_supplied
             else None
         )
+        # Dissociation pO2 is filled in after the oxide activities exist.
+        # The metal-saturation floor has to see them; the 1e-30 float
+        # guard stays behind that floor and is not the melt state.
         melt_dissociation_pO2_bar = transport_pO2_bar
         melt_dissociation_pO2_clamped = False
-        if intrinsic_fO2_log is not None:
-            melt_dissociation_pO2_bar, melt_dissociation_pO2_clamped = (
-                physical_melt_dissociation_pO2_bar(float(intrinsic_fO2_log))
-            )
+        metal_saturation_floor_notice: dict[str, object] | None = None
         comp_wt = composition_wt_pct_from_account_view(
             request.account_view, self.DECLARED_ACCOUNT
         )
@@ -3006,6 +3043,36 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 floor_bar=vacuum_floor_bar,
                 liquid_domain=liquid_domain,
             )
+            # a_FeO above was evaluated at the unfloored log. Flooring
+            # first would hide a collapsed shuttle state inside Kress.
+            dissociation_fO2_log, metal_saturation_floor_notice = (
+                apply_melt_metal_saturation_floor(
+                    float(intrinsic_fO2_log),
+                    T_K,
+                    _dissociation_metal_floor_activities(
+                        melt_account_mol,
+                        temperature_K=T_K,
+                        authority=vapour_activity_authority,
+                        a_feo_stoich=float(below_cap_fe_activity),
+                    ),
+                )
+            )
+            if metal_saturation_floor_notice is not None:
+                warnings.append(
+                    f"{metal_saturation_floor_notice['kind']}: "
+                    f"metal={metal_saturation_floor_notice['metal']} "
+                    f"T_K={float(metal_saturation_floor_notice['temperature_K']):.6g} "
+                    "floor_log10_fO2_bar="
+                    f"{float(metal_saturation_floor_notice['floor_log10_fO2_bar']):.6g} "
+                    "unfloored_log10_fO2_bar="
+                    f"{float(metal_saturation_floor_notice['unfloored_log10_fO2_bar']):.6g}"
+                )
+            (
+                melt_dissociation_pO2_bar,
+                melt_dissociation_pO2_clamped,
+            ) = physical_melt_dissociation_pO2_bar(
+                float(dissociation_fO2_log)
+            )
 
         vapor_pressures: dict[str, float] = {}
         vapor_pressure_sources: dict[str, str] = {}
@@ -3038,7 +3105,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             # from a float clamp (b-148).
             warnings.append(
                 "melt_dissociation_pO2_clamped_to_physical_envelope: "
-                f"fO2_log={float(intrinsic_fO2_log):.6g} "
+                f"fO2_log={float(dissociation_fO2_log):.6g} "
                 f"pO2_bar={melt_dissociation_pO2_bar:g} "
                 f"envelope_bar=[{MELT_DISSOCIATION_PO2_MIN_BAR:g}, "
                 f"{MELT_DISSOCIATION_PO2_MAX_BAR:g}]"
@@ -4601,6 +4668,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
         if feo_activity_diagnostic is not None:
             diagnostic["a_FeO_calphad"] = feo_activity_diagnostic
+        if metal_saturation_floor_notice is not None:
+            diagnostic["melt_metal_saturation_floor_notice"] = (
+                metal_saturation_floor_notice
+            )
 
         return IntentResult(
             intent=ChemistryIntent.VAPOR_PRESSURE,

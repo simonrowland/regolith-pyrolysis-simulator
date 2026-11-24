@@ -204,10 +204,8 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
 )
 
 # DP-019 uses this finite high-vacuum boundary when a vacuum method omits
-# total pressure. The transitional general missing-pressure path still uses
-# the same numeric value under rejected DP-101 until t-1924c retargets it.
-# Unit check: 1e-6 bar × 1e5 Pa/bar = 0.1 Pa. This is a model boundary, not
-# inferred source pressure.
+# total pressure. Unit check: 1e-6 bar × 1e5 Pa/bar = 0.1 Pa. This is a model
+# boundary, not inferred source pressure.
 # Limiting check: pressure-independent comparisons should be unchanged by this
 # input; lowering pressure moves a pressure-sensitive gas equilibrium toward
 # its vacuum limit. Actual higher pressure may therefore bias the prediction.

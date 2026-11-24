@@ -2596,18 +2596,27 @@ def test_unknown_candidate_request_quantity_is_serialized_as_null() -> None:
 
 
 @pytest.mark.parametrize("string_version", [False, True])
-def test_transitional_missing_pressure_notice_is_pinned(string_version: bool) -> None:
+def test_missing_pressure_notice_uses_resolved_policy_and_preserves_version_type(
+    string_version: bool,
+) -> None:
+    from simulator.battery.default_policy import resolve
+
+    resolved = resolve("DP-001")
     notice = score_mod._assumption_notice(
         Quantity.P_PARTIAL,
         "observation does not carry total_pressure_Pa",
-        1e-6,
+        resolved,
     )
-    assert notice.kind is NoticeKind.METHOD_IMPLIED
     assert notice.policy is not None
-    assert type(notice.policy.version) is int
-    expected_version = "1" if string_version else 1
+    assert notice.kind is resolved.flag
+    policy_version = resolved.payload["policy"]["version"]
+    assert type(notice.policy.version) is type(policy_version)
+    expected_version = str(policy_version) if string_version else policy_version
     if string_version:
-        notice = replace(notice, policy=replace(notice.policy, version=expected_version))
+        notice = replace(
+            notice,
+            policy=replace(notice.policy, version=expected_version),
+        )
     residual = replace(
         F.residual(
             "assumed-pressure::partial",
@@ -2618,14 +2627,10 @@ def test_transitional_missing_pressure_notice_is_pinned(string_version: bool) ->
     )
     payload = json.loads(score_mod.dumps_residual_line(residual))
 
-    assert payload["notices"][0]["kind"] == NoticeKind.METHOD_IMPLIED.value
-    assert payload["notices"][0]["policy"] == {
-        "id": "DP-101",
-        "version": expected_version,
-        "status": "rejected",
-        "value": "1e-6",
-        "units": "bar",
-    }
+    expected_policy = dict(resolved.payload["policy"])
+    expected_policy["version"] = expected_version
+    assert payload["notices"][0]["kind"] == resolved.flag.value
+    assert payload["notices"][0]["policy"] == expected_policy
     from simulator.battery.migrate import _notice_from_plain
 
     decoded = _notice_from_plain(payload["notices"][0])
