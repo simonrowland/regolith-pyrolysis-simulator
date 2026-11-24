@@ -83,6 +83,37 @@ def test_all_43_sossi_table2_gas_equilibria_match_the_printed_logs() -> None:
     )
 
 
+def test_checked_logs_preserve_the_prior_sossi_engine_fO2_map() -> None:
+    from simulator.battery.enums import Quantity
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import load_migrated_store
+
+    experiments, series = _source_parts()
+    checks = check_sossi_table2_gas_equilibrium(experiments, series)
+    _works, _experiments, observations = load_migrated_store(
+        sources=("kems-012-sossi-2019",)
+    )
+    prior_engine_inputs = {}
+    for row in observations.values():
+        if (
+            row.source_id != "kems-012-sossi-2019"
+            or row.admission.status.value != "admitted"
+            or quantity_token(row.identity)
+            is not Quantity.RESIDUE_COMPONENT_COMPOSITION
+        ):
+            continue
+        fO2 = (row.point_conditions or {}).get("fO2_log")
+        if fO2 is not None and fO2.state.is_value:
+            run_id = row.experiment_id.rsplit("::", 1)[-1]
+            prior_engine_inputs[run_id] = fO2.state.value
+
+    assert len(prior_engine_inputs) == 43
+    assert prior_engine_inputs == {
+        check.experiment_id: check.checked_log10_fO2_bar
+        for check in checks.values()
+    }
+
+
 def test_breaking_the_printed_co_co2_ratio_refuses_the_run() -> None:
     experiments, series = _source_parts()
     mutated = deepcopy(series)
