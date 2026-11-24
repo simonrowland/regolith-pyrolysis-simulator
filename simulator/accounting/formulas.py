@@ -674,6 +674,10 @@ def _has_malformed_ascii_adduct(formula: str) -> bool:
     for segment in formula.split("·"):
         if segment.startswith(".") or segment.endswith(".") or ".." in segment:
             return True
+        # With a leading oxide multiplier this is malformed adduct notation,
+        # not a decimal count for the terminal element (``3Al2O3.0``).
+        if re.match(r"^\d+(?=[A-Z\[(])", segment) and re.search(r"\.0+$", segment):
+            return True
         for unit in _ASCII_ADDUCT_UNITS_LONGEST_FIRST:
             if re.search(rf"\.0+{re.escape(unit)}(?:$|\.)", segment):
                 return True
