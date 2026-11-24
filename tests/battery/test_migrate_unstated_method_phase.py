@@ -313,26 +313,19 @@ def test_activity_at_printed_liquidus_remains_unspecified(tmp_path: Path) -> Non
     assert observation.identity.species.phase.value is Phase.UNSPECIFIED
 
 
-def test_phase_with_no_single_side_becomes_flagged_unspecified(
+def test_phase_with_no_single_side_preserves_explicit_unknown(
     tmp_path: Path,
 ) -> None:
     result = _fixture_result(tmp_path, phase="cr,l")
     observation = _only_observation(result)
 
-    assert observation.identity.species.phase.is_value
-    assert observation.identity.species.phase.value is Phase.UNSPECIFIED
-    assert any(
+    assert observation.identity.species.phase.is_unknown
+    assert observation.identity.species.phase.reason == (
+        "phase string 'cr,l' is not in the closed automatic map"
+    )
+    assert not any(
         notice.kind is NoticeKind.PHASE_INFERRED
         for notice in observation.notices
-    )
-    assert any(
-        "value=unspecified" in notice.reason
-        and "original_reason=phase string 'cr,l'" in notice.reason
-        for notice in observation.notices
-        if notice.kind is NoticeKind.PHASE_INFERRED
-    )
-    assert flagged_strata(observation.notices) == (
-        NoticeKind.PHASE_INFERRED.value,
     )
     assert not any(
         "phase" in entry.axes and entry.observation_id == observation.observation_id
@@ -404,7 +397,7 @@ def test_two_phase_labels_allow_spacing_before_temperature_inference(
         )
 
 
-def test_two_phase_transition_temperature_remains_unspecified(tmp_path: Path) -> None:
+def test_two_phase_transition_temperature_preserves_explicit_unknown(tmp_path: Path) -> None:
     extract = _scalar_fixture_extract()
     raw = extract["species"]["Na"]["observations"][0]
     raw["phase"] = "cr,l"
@@ -413,9 +406,11 @@ def test_two_phase_transition_temperature_remains_unspecified(tmp_path: Path) ->
     result = migrate(_write_min_tree(tmp_path, extract), write=False)
     observation = _only_observation(result)
 
-    assert observation.identity.species.phase.is_value
-    assert observation.identity.species.phase.value is Phase.UNSPECIFIED
-    assert any(
+    assert observation.identity.species.phase.is_unknown
+    assert observation.identity.species.phase.reason == (
+        "phase string 'cr,l' is not in the closed automatic map"
+    )
+    assert not any(
         notice.kind is NoticeKind.PHASE_INFERRED
         for notice in observation.notices
     )

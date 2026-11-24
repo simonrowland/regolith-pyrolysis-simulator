@@ -10631,6 +10631,12 @@ class _PhaseSourceState(Enum):
     ABSENT = "absent"
 
 
+def _phase_is_unmapped_source_token(phase: State[Phase]) -> bool:
+    """Map-phase reasons retain explicit input after generic paths drop it."""
+
+    return phase.is_unknown and (phase.reason or "").startswith("phase string ")
+
+
 def map_phase(raw: object) -> tuple[State[Phase], str | None]:
     if isinstance(raw, Mapping) and raw.get("tag") == "unknown":
         reason = raw.get("reason")
@@ -10655,12 +10661,20 @@ def _phase_source_state(
     source_phase: object,
     phase: State[Phase],
     transition_reason: str | None,
+    *,
+    phase_is_role_input: bool = False,
 ) -> _PhaseSourceState:
-    if phase.is_value:
-        return _PhaseSourceState.RESOLVED
-    if source_phase not in (None, "") or transition_reason is not None:
-        return _PhaseSourceState.EXPLICITLY_UNKNOWN
-    return _PhaseSourceState.ABSENT
+    if source_phase in (None, ""):
+        if transition_reason is not None or (
+            not phase_is_role_input and _phase_is_unmapped_source_token(phase)
+        ):
+            return _PhaseSourceState.EXPLICITLY_UNKNOWN
+        return _PhaseSourceState.ABSENT
+    return (
+        _PhaseSourceState.RESOLVED
+        if phase.is_value
+        else _PhaseSourceState.EXPLICITLY_UNKNOWN
+    )
 
 
 def _phase_policy_resolution(
@@ -10794,9 +10808,7 @@ def _phase_needs_default(phase: State[Phase]) -> bool:
         "source does not state phase",
         "missing phase",
         "sidecar does not state phase",
-    } or (
-        phase.reason or ""
-    ).startswith("phase string ")
+    } or _phase_is_unmapped_source_token(phase)
 
 
 def _printed_phase_names_sample_source(raw: object) -> bool:
@@ -25984,7 +25996,24 @@ class Migrator:
         observation_notices = list(observation.notices)
         if isinstance(identity, Identity) and identity.species is not None:
             phase_state = identity.species.phase
-            if _phase_needs_default(phase_state):
+            provenance = observation.provenance or {}
+            source_phase_raw = provenance.get("printed_phase")
+            source_phase_state = _phase_source_state(
+                source_phase_raw,
+                phase_state,
+                None,
+                phase_is_role_input=(
+                    provenance.get(PHASE_SOURCE_KIND_KEY) == ROLE_DERIVED_PHASE_KIND
+                ),
+            )
+            if (
+                source_phase_state is _PhaseSourceState.ABSENT
+                and _phase_needs_default(phase_state)
+                and not any(
+                    notice.kind is NoticeKind.PHASE_INFERRED
+                    for notice in observation_notices
+                )
+            ):
                 quantity = (
                     identity.quantity.value
                     if identity.quantity.is_value
@@ -26011,11 +26040,7 @@ class Migrator:
                     identity,
                     species=replace(identity.species, phase=State.of(phase)),
                 )
-                if not any(
-                    notice.kind is NoticeKind.PHASE_INFERRED
-                    for notice in observation_notices
-                ):
-                    observation_notices.append(phase_notice)
+                observation_notices.append(phase_notice)
 
         experiment = self.result.experiments.get(observation.experiment_id)
         if (
@@ -27448,10 +27473,24 @@ class Migrator:
                 if token is not None:
                     phase, unmapped_phase = State.of(token), None
         phase_was_unmapped = unmapped_phase is not None
-        phase_needs_resolution = _phase_needs_default(phase)
+        source_phase_state = _phase_source_state(
+            source_phase_raw,
+            phase,
+            transition_reason,
+            phase_is_role_input=role_phase_raw not in (None, ""),
+        )
+        phase_needs_resolution = (
+            source_phase_state is _PhaseSourceState.ABSENT
+            or (
+                source_phase_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
+                and _phase_needs_default(phase)
+            )
+        )
         phase_original_reason = (
             phase.reason
             if phase.is_unknown
+            else "source does not state phase"
+            if source_phase_state is _PhaseSourceState.ABSENT
             else "source explicitly leaves phase unspecified"
         )
         phase_resolution_evidence: str | None = None
@@ -27543,9 +27582,6 @@ class Migrator:
                 return
             phase_role_token = _phase_role_token(values.get("phase_label"))
             counter_phase_role_token = _phase_role_token(values.get("counter_phase_label"))
-            source_phase_state = _phase_source_state(
-                source_phase_raw, phase, transition_reason
-            )
             if (
                 phase_role_token is not None
                 and source_phase_state is _PhaseSourceState.ABSENT
@@ -27620,14 +27656,19 @@ class Migrator:
                 )
             if phase_inference is None and phase_provenance and phase.is_value:
                 phase_inference = (phase.value, phase_provenance)
-            quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
-            inferred_phase, phase_flag_notice = _phase_policy_resolution(
-                phase_inference,
-                quantity=quantity_for_notice,
-                origin=obs_id,
-                original_reason=phase_original_reason or "source does not state phase",
-            )
-            phase = State.of(inferred_phase)
+            # An explicit unmapped source token stays unknown without evidence.
+            if not (
+                phase_inference is None
+                and source_phase_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
+            ):
+                quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
+                inferred_phase, phase_flag_notice = _phase_policy_resolution(
+                    phase_inference,
+                    quantity=quantity_for_notice,
+                    origin=obs_id,
+                    original_reason=phase_original_reason or "source does not state phase",
+                )
+                phase = State.of(inferred_phase)
         if (
             (phase_raw is None or phase_raw == "")
             and measured_tabulated_gas_formula is None

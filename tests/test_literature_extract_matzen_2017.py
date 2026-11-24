@@ -10,7 +10,11 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import PhaseRole, ValueKind
+from simulator.battery.enums import NoticeKind, Phase, PhaseRole, ValueKind
+from simulator.battery.input_provenance import (
+    PHASE_SOURCE_KIND_KEY,
+    ROLE_DERIVED_PHASE_KIND,
+)
 from simulator.battery.migrate import migrate
 from literature_extract_test_utils import isolated_root
 from tests.helpers.corpus_paths import regolith_corpus_root
@@ -130,7 +134,22 @@ def test_matzen_rows_migrate_as_points_with_run_axes(tmp_path: Path) -> None:
     by_id = {row.observation_id.rsplit("::", 1)[1]: row for row in rows}
     sio2 = by_id["matzen2017_run_49_glass_sio2"]
     assert sio2.identity.species.formula == "SiO2"
+    assert sio2.identity.species.phase.is_value
+    assert sio2.identity.species.phase.value is Phase.GLASS
     assert sio2.identity.phase_role.value is PhaseRole.GLASS
+    assert (sio2.provenance or {}).get(PHASE_SOURCE_KIND_KEY) == (
+        ROLE_DERIVED_PHASE_KIND
+    )
+    phase_notices = [
+        notice for notice in sio2.notices
+        if notice.kind is NoticeKind.PHASE_INFERRED
+    ]
+    assert len(phase_notices) == 1
+    assert phase_notices[0].reason == (
+        "phase_inferred: value=glass; evidence=printed phase role 'glass' "
+        "identifies 'glass'; "
+        "original_reason=source does not state phase"
+    )
     assert sio2.identity.temperature_K.value == Decimal("1703.15")
     assert sio2.point_conditions["total_pressure_Pa"].state.value == Decimal("1500000000")
     assert sio2.value.point == Decimal("48.71")

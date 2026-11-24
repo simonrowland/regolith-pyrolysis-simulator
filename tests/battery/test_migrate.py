@@ -936,10 +936,11 @@ def test_tachibana_approximate_author_estimate_reaches_residual_stratum(
         observation, Engine.INTERNAL_ANALYTICAL, context=context
     )
     assert residual.status is ResidualStatus.REFUSED
-    assert flagged_strata(residual.notices) == (
-        NoticeKind.PHASE_INFERRED.value,
-        FLAGGED_STRATUM_APPROXIMATE_VALUE,
+    assert observation.identity.species.phase.is_unknown
+    assert observation.identity.species.phase.reason == (
+        "phase string 'forsterite_dust' is not in the closed automatic map"
     )
+    assert flagged_strata(residual.notices) == (FLAGGED_STRATUM_APPROXIMATE_VALUE,)
 
 
 def test_flemetakis_approximate_sample_mass_reaches_value_without_row_growth(
@@ -3700,6 +3701,20 @@ def test_pressure_phase_provenance_matches_resulting_phase(
     )
     if phase == "condensed_solid":
         assert all(point.identity.species.phase.value is Phase.CR for point in points)
+    elif phase == "not_a_phase":
+        assert all(
+            point.identity.species.phase.is_unknown
+            and point.identity.species.phase.reason
+            == "phase string 'not_a_phase' is not in the closed automatic map"
+            for point in points
+        )
+        assert all(
+            not any(
+                notice.kind is NoticeKind.PHASE_INFERRED
+                for notice in point.notices
+            )
+            for point in points
+        )
     else:
         assert all(
             point.identity.species.phase.is_value
@@ -5222,7 +5237,7 @@ def test_g01_blank_phase_is_flagged_unspecified_not_gas(tmp_path: Path) -> None:
     assert report.hard_issues == ()
 
 
-def test_g01_unmapped_phases_are_flagged_unspecified_not_guessed(tmp_path: Path) -> None:
+def test_g01_unmapped_phases_keep_their_explicit_unknown_identity(tmp_path: Path) -> None:
     """Unmapped source phases stay distinct from the ordinary gas phase."""
 
     extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
@@ -5267,14 +5282,22 @@ def test_g01_unmapped_phases_are_flagged_unspecified_not_guessed(tmp_path: Path)
         stored = _phase_state(obs)
         if phase == "graphite":
             assert stored.is_value and stored.value is Phase.CR
-        else:
-            assert stored.is_value and stored.value is Phase.UNSPECIFIED, (phase, stored)
+        elif phase == "":
+            assert stored.is_value and stored.value is Phase.UNSPECIFIED
             assert any(
+                notice.kind is NoticeKind.PHASE_INFERRED for notice in obs.notices
+            )
+        else:
+            assert stored.is_unknown, (phase, stored)
+            assert stored.reason == (
+                f"phase string {phase!r} is not in the closed automatic map"
+            )
+            assert not any(
                 notice.kind is NoticeKind.PHASE_INFERRED for notice in obs.notices
             )
 
 
-def test_g01_partial_pressure_sidecar_without_phase_is_flagged_gas(tmp_path: Path) -> None:
+def test_kems_sidecar_distinguishes_absent_from_unmapped_phase(tmp_path: Path) -> None:
     root = _write_min_tree(tmp_path)
     lit = root / "data" / "literature"
     (lit / "kems_measurements.yaml").write_text(
@@ -5297,7 +5320,15 @@ def test_g01_partial_pressure_sidecar_without_phase_is_flagged_gas(tmp_path: Pat
                                 "coordinate": {"temperature_K": 2000.0},
                                 "partial_pressure_pa": 1.0,
                                 "source_locator": {"figure": 1},
-                            }
+                            },
+                            {
+                                "observable_id": "kems_unknown_phase",
+                                "species": "Ca",
+                                "phase": "not_a_phase",
+                                "coordinate": {"temperature_K": 2000.0},
+                                "partial_pressure_pa": 1.0,
+                                "source_locator": {"figure": 1},
+                            },
                         ],
                     }
                 },
@@ -5311,6 +5342,15 @@ def test_g01_partial_pressure_sidecar_without_phase_is_flagged_gas(tmp_path: Pat
     assert kems.identity.species.phase.is_value
     assert kems.identity.species.phase.value is Phase.G
     assert any(notice.kind is NoticeKind.PHASE_INFERRED for notice in kems.notices)
+    unknown_phase = result.observations["kems_unknown_phase"]
+    assert unknown_phase.identity.species.phase.is_unknown
+    assert unknown_phase.identity.species.phase.reason == (
+        "phase string 'not_a_phase' is not in the closed automatic map"
+    )
+    assert not any(
+        notice.kind is NoticeKind.PHASE_INFERRED
+        for notice in unknown_phase.notices
+    )
 
 
 def test_effusion_pressure_reservoir_requires_stated_phase_and_pressure() -> None:
