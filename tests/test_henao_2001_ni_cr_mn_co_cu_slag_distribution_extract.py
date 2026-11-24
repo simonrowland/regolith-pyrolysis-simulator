@@ -21,8 +21,17 @@ from simulator.battery.enums import (
     PhaseRole,
     RefusalReason,
 )
-from simulator.battery.migrate import Migrator
-from simulator.battery.input_provenance import locator_row_identity
+from simulator.battery.migrate import (
+    Migrator,
+    _MASS_PERCENT_MAXIMUM_KEPT_SUM,
+    _MASS_PERCENT_MINIMUM_KEPT_SUM,
+)
+from simulator.battery.input_provenance import (
+    PHASE_SOURCE_KIND_KEY,
+    ROLE_DERIVED_PHASE_KIND,
+    collect_run_texts,
+    locator_row_identity,
+)
 from simulator.state_types import State
 from simulator.battery.score import _predict_with_engine
 
@@ -363,6 +372,11 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     assert len(observations) == 431
     assert all(row.admission.status.value == "admitted" for row in observations)
     assert all(
+        (row.provenance or {}).get(PHASE_SOURCE_KIND_KEY) == ROLE_DERIVED_PHASE_KIND
+        and "printed_phase" not in (row.provenance or {})
+        for row in observations
+    ), "ROLE fallback must be role-derived provenance, never printed_phase"
+    assert all(
         row.identity.species.phase.is_value
         and row.identity.species.phase.value is Phase.L
         for row in observations
@@ -448,6 +462,12 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     by_id = {row.observation_id.rsplit("::", 1)[-1]: row for row in observations}
     assert all(row.identity.composition is not None for row in observations)
     a1_slag = by_id["henao_2001_t1_A-1_slag_Ni"]
+    assert all(
+        text != ROLE_DERIVED_PHASE_KIND
+        for _label, text in collect_run_texts(
+            result.experiments[a1_slag.experiment_id], a1_slag
+        )
+    )
     assert a1_slag.identity.composition.is_unknown
     assert a1_slag.identity.composition.reason == IRON_VALENCE_UNKNOWN_REASON
     assert a1_slag.point_conditions["composition"].inference is None
@@ -562,25 +582,67 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
         "simulator.battery.score._equilibrate_phase_assemblage",
         engine_must_not_be_called,
     )
+    alloy_map_totals = {
+        row["observation_id"]: sum(
+            (Decimal(str(amount)) for amount in row["values"]["composition_wt_pct"].values()),
+            Decimal(0),
+        )
+        for row in source_observations
+        if row["values"].get("phase_label") == "metal"
+    }
+    # Independent census: sum the checked-in alloy cells with Decimal, then
+    # apply migrate's shared 95–105 wt% closure bounds. This gives 108 usable
+    # maps and 25 rejected maps (19 over 105, six below 95), independent of the
+    # migrated identity states being tested below.
+    usable_alloy_ids = {
+        observation_id
+        for observation_id, total in alloy_map_totals.items()
+        if _MASS_PERCENT_MINIMUM_KEPT_SUM <= total <= _MASS_PERCENT_MAXIMUM_KEPT_SUM
+    }
+    assert len(alloy_map_totals) == 133
+    assert len(usable_alloy_ids) == 108
+    assert sum(total > _MASS_PERCENT_MAXIMUM_KEPT_SUM for total in alloy_map_totals.values()) == 19
+    assert sum(total < _MASS_PERCENT_MINIMUM_KEPT_SUM for total in alloy_map_totals.values()) == 6
     metal_engine_outcomes = [
-        _predict_with_engine(
-            engine,
+        (
             row,
-            experiment=result.experiments[row.experiment_id],
+            engine,
+            _predict_with_engine(
+                engine,
+                row,
+                experiment=result.experiments[row.experiment_id],
+            ),
         )
         for row in metal_rows
         for engine in (Engine.ALPHAMELTS, Engine.THERMOENGINE, Engine.MAGEMIN)
     ]
     assert len(metal_engine_outcomes) == 399
-    assert all(
-        prediction.refusal_reason
-        is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
-        for prediction in metal_engine_outcomes
-    ), "all original metal-alloy rows must receive the adapter capability refusal"
-    assert all(
-        prediction.execution.state.value == "unsupported"
-        for prediction in metal_engine_outcomes
-    )
+    assert sum(
+        row.observation_id.rsplit("::", 1)[-1] in usable_alloy_ids
+        for row, _engine, _prediction in metal_engine_outcomes
+    ) == 324
+    assert sum(
+        row.observation_id.rsplit("::", 1)[-1] not in usable_alloy_ids
+        for row, _engine, _prediction in metal_engine_outcomes
+    ) == 75
+    for row, engine, prediction in metal_engine_outcomes:
+        source_observation_id = row.observation_id.rsplit("::", 1)[-1]
+        if source_observation_id in usable_alloy_ids:
+            assert prediction.refusal_reason is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION, (
+                f"{source_observation_id} on {engine.value}: usable alloy map must "
+                "reach the adapter capability refusal"
+            )
+            assert prediction.execution.state.value == "unsupported"
+        else:
+            assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE, (
+                f"{source_observation_id} on {engine.value}: metal row refusal must "
+                "match the independent alloy-map sum"
+            )
+            assert prediction.refusal_detail == {
+                "reason": "missing_input",
+                "input": "composition",
+            }
+            assert prediction.execution.state.value == "not_probed"
     missing_alloy_composition = replace(
         a1_metal,
         identity=replace(
@@ -683,3 +745,24 @@ def test_typed_cell_mutation_is_detected_by_independent_pdf_pins() -> None:
     bound["point_conditions"]["composition"]["state"]["tag"] = "value"
     with pytest.raises(AssertionError):
         _assert_slag_compositions_remain_unknown(mutated)
+
+
+def test_explicit_phase_remains_printed_phase_provenance(tmp_path: Path) -> None:
+    document = _document()
+    source_row = _observations(document)[0]
+    source_row["phase"] = "liquid"
+    extract = tmp_path / EXTRACT.name
+    extract.write_text(yaml.safe_dump(document, sort_keys=False), encoding="utf-8")
+
+    migrator = Migrator(root=tmp_path, index={}, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    migrated = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.observation_id.endswith(f"::{source_row['observation_id']}")
+    )
+    provenance = migrated.provenance or {}
+    assert provenance.get("printed_phase") == "liquid"
+    assert PHASE_SOURCE_KIND_KEY not in provenance

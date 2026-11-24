@@ -33,6 +33,8 @@ PRINTED_STARTING_BULK = "printed_starting_bulk"
 NAMED_MATERIAL_MIXTURE = "named_material_mixture_of_printed_starts"
 ANALYSED_MELT_MINUS_SCORED = "analysed_melt_minus_scored"
 SAME_RUN_INITIAL_ANALYSED_MELT = "same_run_initial_analysed_melt"
+PHASE_SOURCE_KIND_KEY = "phase_source_kind"
+ROLE_DERIVED_PHASE_KIND = "role_derived"
 
 INPUT_PROVENANCE_TOKENS = frozenset(
     {
@@ -319,23 +321,28 @@ def unprinted_analysed_phase_echo_detail(
     """Refuse a missing input only when the printed map is this row's phase.
 
     A point-condition map alone does not establish either its phase or its
-    relation to this observation. The printed phase label and matching full
-    row locator together bind it to this phase row.
+    relation to this observation. A printed phase label, or a role-derived
+    phase kind bound to the identity role, and the matching full row locator
+    together bind it to this phase row.
     """
 
     quantity = quantity_token(identity)
     if quantity is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
         return None
     role = _phase_role_of(identity)
-    phase = (observation.provenance or {}).get("printed_phase")
-    if not isinstance(phase, str):
-        return None
-    phase_role = {
-        "liquid": PhaseRole.MELT,
-        "melt": PhaseRole.MELT,
-        "slag": PhaseRole.SLAG,
-        "glass": PhaseRole.GLASS,
-    }.get(phase.strip().casefold())
+    provenance = observation.provenance or {}
+    if provenance.get(PHASE_SOURCE_KIND_KEY) == ROLE_DERIVED_PHASE_KIND:
+        phase_role = role if role in _MELT_ROLES else None
+    else:
+        phase = provenance.get("printed_phase")
+        if not isinstance(phase, str):
+            return None
+        phase_role = {
+            "liquid": PhaseRole.MELT,
+            "melt": PhaseRole.MELT,
+            "slag": PhaseRole.SLAG,
+            "glass": PhaseRole.GLASS,
+        }.get(phase.strip().casefold())
     if role not in _MELT_ROLES or role is not phase_role:
         return None
     conditions = observation.point_conditions or {}
@@ -459,7 +466,7 @@ def collect_run_texts(
         if isinstance(printed_phase, str) and printed_phase.strip():
             texts.append(("observation.phase", printed_phase.strip()))
         for key, value in provenance.items():
-            if key == "printed_phase":
+            if key in {"printed_phase", PHASE_SOURCE_KIND_KEY}:
                 continue
             if isinstance(value, str) and value.strip():
                 texts.append((f"provenance.{key}", value.strip()))

@@ -114,7 +114,9 @@ from simulator.battery.polymorph_dictionary import (
 from simulator.battery.input_provenance import (
     ANALYSED_MELT_MINUS_SCORED,
     NAMED_MATERIAL_MIXTURE,
+    PHASE_SOURCE_KIND_KEY,
     PRINTED_STARTING_BULK,
+    ROLE_DERIVED_PHASE_KIND,
     SAME_RUN_INITIAL_ANALYSED_MELT,
     SCORED_PHASE_ANALYSIS,
     analysed_melt_decision,
@@ -26897,10 +26899,19 @@ class Migrator:
             obs, values, provenance, quantity=q_token
         )
         source_phase_raw = compilation_phase_text(values) or compilation_phase_text(obs)
-        phase_raw = source_phase_raw or values.get("phase_label")
+        role_phase_raw = values.get("phase_label")
+        phase_raw = source_phase_raw or role_phase_raw
         observation_provenance = _provenance_with_printed_phase(
-            observation_provenance, phase_raw
+            observation_provenance, source_phase_raw
         )
+        if (
+            source_phase_raw in (None, "")
+            and isinstance(role_phase_raw, str)
+            and role_phase_raw.strip()
+        ):
+            selected_provenance = dict(observation_provenance or {})
+            selected_provenance[PHASE_SOURCE_KIND_KEY] = ROLE_DERIVED_PHASE_KIND
+            observation_provenance = selected_provenance
         phase_provenance: str | None = None
         sample_source_provenance: str | None = None
         transition_reason = transition_phase_reason(obs_type, values)
@@ -29182,7 +29193,7 @@ class Migrator:
                 value_derivation.relation if value_derivation is not None else None
             ),
             phase_text=_phase_evidence_text(
-                phase_raw,
+                source_phase_raw,
                 obs.get("phase_as_measured"),
                 values.get("phase_as_measured") if isinstance(values, Mapping) else None,
             ),

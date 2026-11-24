@@ -32,6 +32,8 @@ TESTS_BY_MUTATION = {
     "phase-role": (HENAO_TEST,),
     "basis-before-conversion": (PHASE_ROWS_TEST,),
     "alloy-capability": (HENAO_TEST,),
+    "malformed-metal-mass-percent": (PHASE_ROWS_TEST,),
+    "role-provenance": (HENAO_TEST,),
     "test-local": (HENAO_TEST,),
     "locator-row": (HENAO_TEST,),
 }
@@ -75,7 +77,19 @@ EXPECTED_FAILURES = {
     "alloy-capability": (
         (
             "test_henao_tables_migrate_as_typed_compositions_with_conditions",
-            "all original metal-alloy rows must receive the adapter capability refusal",
+            "usable alloy map must reach the adapter capability refusal",
+        ),
+    ),
+    "malformed-metal-mass-percent": (
+        (
+            "test_malformed_metal_mass_percent_keeps_basis_refusal",
+            "malformed metal mass-percent map must keep the basis rejection",
+        ),
+    ),
+    "role-provenance": (
+        (
+            "test_henao_tables_migrate_as_typed_compositions_with_conditions",
+            "ROLE fallback must be role-derived provenance, never printed_phase",
         ),
     ),
     "test-local": (
@@ -148,12 +162,11 @@ def restore(mutation: str) -> None:
             "        )\n"
         )
         replace_once(SCORE, conversion, "")
-        basis_check = (
-            "    if (\n"
-            "        role is PhaseRole.METAL\n"
-            "        and composition.amount_basis is AmountBasis.MASS_PERCENT\n"
+        capability_gate = (
+            "    if role is PhaseRole.METAL:\n"
+            "        from simulator.melt_backend.base import battery_adapter_class\n"
         )
-        replace_once(SCORE, basis_check, conversion + basis_check)
+        replace_once(SCORE, capability_gate, conversion + capability_gate)
     elif mutation == "alloy-capability":
         replace_once(
             SCORE,
@@ -165,6 +178,51 @@ def restore(mutation: str) -> None:
             "        ) != Decimal(\"100\")\n"
             "    ):\n"
             "        from simulator.melt_backend.base import battery_adapter_class\n",
+        )
+    elif mutation == "malformed-metal-mass-percent":
+        preflight = (
+            "    if (\n"
+            "        role is PhaseRole.METAL\n"
+            "        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION\n"
+            "        and composition.amount_basis is AmountBasis.MASS_PERCENT\n"
+            "    ):\n"
+            "        from simulator.accounting.exceptions import UnparseableCompositionComponent\n"
+            "\n"
+            "        try:\n"
+            "            well_formed_mass_percent_map = composition_wt_pct(composition) is not None\n"
+            "        except UnparseableCompositionComponent:\n"
+            "            well_formed_mass_percent_map = False\n"
+            "        if not well_formed_mass_percent_map:\n"
+            "            return mass_percent_basis_refusal()\n"
+        )
+        replace_once(SCORE, preflight, "")
+    elif mutation == "role-provenance":
+        replace_once(
+            MIGRATE,
+            "        observation_provenance = _provenance_with_printed_phase(\n"
+            "            observation_provenance, source_phase_raw\n"
+            "        )\n",
+            "        observation_provenance = _provenance_with_printed_phase(\n"
+            "            observation_provenance, phase_raw\n"
+            "        )\n",
+        )
+        role_provenance = (
+            "        if (\n"
+            "            source_phase_raw in (None, \"\")\n"
+            "            and isinstance(role_phase_raw, str)\n"
+            "            and role_phase_raw.strip()\n"
+            "        ):\n"
+            "            selected_provenance = dict(observation_provenance or {})\n"
+            "            selected_provenance[PHASE_SOURCE_KIND_KEY] = ROLE_DERIVED_PHASE_KIND\n"
+            "            observation_provenance = selected_provenance\n"
+        )
+        replace_once(MIGRATE, role_provenance, "")
+        replace_once(
+            MIGRATE,
+            "            phase_text=_phase_evidence_text(\n"
+            "                source_phase_raw,\n",
+            "            phase_text=_phase_evidence_text(\n"
+            "                phase_raw,\n",
         )
     elif mutation == "test-local":
         census = (
@@ -205,6 +263,8 @@ def main() -> int:
         "phase-role": (MIGRATE,),
         "basis-before-conversion": (SCORE,),
         "alloy-capability": (SCORE,),
+        "malformed-metal-mass-percent": (SCORE,),
+        "role-provenance": (MIGRATE,),
         "test-local": (HENAO_TEST,),
         "locator-row": (PROVENANCE,),
     }[args.mutation]

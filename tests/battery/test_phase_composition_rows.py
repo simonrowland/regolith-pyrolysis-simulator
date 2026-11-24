@@ -1730,6 +1730,36 @@ def test_all_zero_mass_percent_phase_keeps_basis_refusal() -> None:
     )
 
 
+def test_malformed_metal_mass_percent_keeps_basis_refusal() -> None:
+    identity = _phase_identity(
+        "Fe", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL
+    )
+    malformed_mass_percent = replace(
+        identity,
+        composition=State.of(
+            Composition(
+                basis="printed_phase_composition",
+                components=(("foobar", Decimal("50")), ("SiO2", Decimal("50"))),
+                amount_basis=AmountBasis.MASS_PERCENT,
+            )
+        ),
+    )
+    observation = F.observation(
+        "unparseable-metal-mass-percent-map",
+        "sample-1",
+        malformed_mass_percent,
+        Decimal("5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-phase-source",
+    )
+
+    prediction = predict_with_engine(Engine.MAGEMIN, observation)
+
+    assert prediction.refusal_reason is RefusalReason.COEFFICIENT_BASIS_MISMATCH, (
+        "malformed metal mass-percent map must keep the basis rejection"
+    )
+
+
 def test_metal_capability_precedes_unparseable_component_conversion() -> None:
     identity = _phase_identity(
         "Fe", Quantity.EQUILIBRIUM_PHASE_COMPOSITION, role=PhaseRole.METAL

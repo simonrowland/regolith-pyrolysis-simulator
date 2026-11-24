@@ -12428,19 +12428,25 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
+    if (
+        role is PhaseRole.METAL
+        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        # Do not let the adapter capability result hide green's basis refusal
+        # for an empty or unparseable mass-percent map.
+        from simulator.accounting.exceptions import UnparseableCompositionComponent
+
+        try:
+            well_formed_mass_percent_map = composition_wt_pct(composition) is not None
+        except UnparseableCompositionComponent:
+            well_formed_mass_percent_map = False
+        if not well_formed_mass_percent_map:
+            return mass_percent_basis_refusal()
     metal_charge = _unaccepted_metal_charge(engine, composition_state.value)
     if metal_charge is not None:
         reason, detail = metal_charge
         return refused(reason, detail)
-    if (
-        role is PhaseRole.METAL
-        and composition.amount_basis is AmountBasis.MASS_PERCENT
-        and len(composition.components) == 1
-        and composition.components[0][1] < Decimal("1")
-    ):
-        # A sub-one singleton cannot be a complete mass-percent alloy map;
-        # keep the input-basis diagnosis ahead of the alloy capability refusal.
-        return mass_percent_basis_refusal()
     if role is PhaseRole.METAL:
         from simulator.melt_backend.base import battery_adapter_class
 
