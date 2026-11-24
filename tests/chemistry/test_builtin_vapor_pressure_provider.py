@@ -2228,6 +2228,102 @@ def test_legacy_internal_analytical_oxide_antoine_pressure_pin(
     assert result.vapor_pressures_Pa["SiO"].hex() == "0x1.6adedc06bbbddp+2"
 
 
+def test_each_legacy_pressure_producer_emits_its_branch_source(
+    vapor_pressure_data,
+):
+    class _KOnlyMelt:
+        temperature_C = 1500.0 - 273.15
+        p_total_mbar = 1e-3
+
+        def composition_wt_pct(self):
+            return {"K2O": 100.0}
+
+    cases = []
+    cases.append(
+        (
+            "standard_reaction_term",
+            _LegacyInternalAnalyticalModel(
+                vapor_pressure_data,
+                melt=_KOnlyMelt(),
+            ),
+            "K",
+            "builtin_authoritative:standard_reaction_term",
+        )
+    )
+    cases.append(
+        (
+            "liquid_oxide_standard_reaction",
+            _LegacyInternalAnalyticalModel(
+                vapor_pressure_data,
+                melt=_MnOnlyMelt(),
+            ),
+            "Mn",
+            "builtin_authoritative:liquid_oxide_standard_reaction",
+        )
+    )
+
+    gas_rail_data = copy.deepcopy(vapor_pressure_data)
+    gas_rail_data["metals"]["Mg"]["gas_rail_standard_reaction"].update(
+        status="active",
+        authoritative=True,
+    )
+    cases.append(
+        (
+            "gas_rail_standard_reaction",
+            _LegacyInternalAnalyticalModel(
+                gas_rail_data,
+                melt=_MgOnlyMelt(1800.0),
+            ),
+            "Mg",
+            "builtin_authoritative:gas_rail_liquid_oxide_standard_reaction",
+        )
+    )
+    cases.append(
+        (
+            "ellingham",
+            _LegacyInternalAnalyticalModel(
+                vapor_pressure_data,
+                melt=_MgOnlyMelt(2273.151),
+            ),
+            "Mg",
+            "builtin_authoritative:gas_standard_fugacity",
+        )
+    )
+    cases.append(
+        (
+            "oxide_vapor",
+            _LegacyInternalAnalyticalModel(
+                vapor_pressure_data,
+                melt=_SiOnlyMelt(),
+            ),
+            "SiO",
+            "builtin_authoritative:standard_reaction_term",
+        )
+    )
+
+    for branch, model, species, expected_source in cases:
+        result = model._internal_analytical_equilibrium()
+        assert result.vapor_pressures_Pa[species] > 0.0, branch
+        source = result.vapor_pressures_source[species]
+        if branch == "ellingham":
+            assert expected_source in source, branch
+        else:
+            assert source == expected_source, branch
+        assert source != "unlabelled", branch
+
+    # These production-path pressure pins guard numerical parity while source
+    # publication changes independently of the computed values.
+    assert cases[1][1]._internal_analytical_equilibrium().vapor_pressures_Pa[
+        "Mn"
+    ].hex() == "0x1.26b81ca1c9120p+6"
+    assert cases[2][1]._internal_analytical_equilibrium().vapor_pressures_Pa[
+        "Mg"
+    ].hex() == "0x1.efe4942a447a5p-6"
+    assert cases[4][1]._internal_analytical_equilibrium().vapor_pressures_Pa[
+        "SiO"
+    ].hex() == "0x1.6adedc06bbbddp+2"
+
+
 def test_active_gas_rail_antoine_pressure_pins(vapor_pressure_data):
     temperature_K = 1800.0
     for species, oxide, expected_legacy, expected_reference in (

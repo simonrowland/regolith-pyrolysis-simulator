@@ -1588,7 +1588,7 @@ class EquilibriumMixin:
             vapor_pressures_source={
                 species: vapor_pressure_sources.get(
                     species,
-                    'builtin_authoritative',
+                    'unlabelled',
                 )
                 for species in vapor_pressures
             },

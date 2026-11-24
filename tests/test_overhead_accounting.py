@@ -1,4 +1,7 @@
+import ast
+import inspect
 import math
+import textwrap
 import types
 
 import pytest
@@ -7,7 +10,15 @@ import simulator.evaporation as evaporation_module
 from simulator.accounting import AccountingError, MaterialLot
 from simulator.condensation import CondensationRouteResult
 from simulator.core import PyrolysisSimulator
-from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.equilibrium import EquilibriumMixin
+from simulator.melt_backend.base import (
+    InternalAnalyticalBackend,
+    vapor_pressure_source_code,
+)
+from simulator.grind_preflight import (
+    APPROVED_LIVE_VAPOR_SOURCES,
+    _source_authority,
+)
 from simulator.state import (
     Atmosphere,
     CampaignPhase,
@@ -1153,6 +1164,61 @@ def test_internal_analytical_equilibrium_ok_paths_are_vapor_only_without_liquid_
     assert hot.phase_assemblage_available is False
     assert hot.vapor_pressures_Pa
     assert set(hot.vapor_pressures_source) == set(hot.vapor_pressures_Pa)
+    assert all(
+        source != 'unlabelled' for source in hot.vapor_pressures_source.values()
+    )
+
+
+def test_missing_legacy_oxide_vapor_source_is_not_published_as_authoritative(
+    monkeypatch,
+):
+    method = EquilibriumMixin._internal_analytical_equilibrium
+    parsed = ast.parse(textwrap.dedent(inspect.getsource(method)))
+    function = next(
+        node for node in parsed.body if isinstance(node, ast.FunctionDef)
+    )
+
+    class _DropSiOSourceWrite(ast.NodeTransformer):
+        def visit_Assign(self, node):
+            target = node.targets[0] if len(node.targets) == 1 else None
+            if (
+                isinstance(target, ast.Subscript)
+                and isinstance(target.value, ast.Name)
+                and target.value.id == 'vapor_pressure_sources'
+                and isinstance(target.slice, ast.Name)
+                and target.slice.id == 'name'
+            ):
+                return ast.copy_location(ast.Pass(), node)
+            return self.generic_visit(node)
+
+    mutated = _DropSiOSourceWrite().visit(function)
+    ast.fix_missing_locations(mutated)
+    module = ast.Module(body=[mutated], type_ignores=[])
+    namespace = {}
+    exec(
+        compile(module, inspect.getsourcefile(method), 'exec'),
+        method.__globals__,
+        namespace,
+    )
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        '_internal_analytical_equilibrium',
+        namespace[method.__name__],
+    )
+
+    sim = _sio_o2_train_sim()
+    sim.melt.temperature_C = 1600.0
+    emitted = sim._internal_analytical_equilibrium()
+
+    assert emitted.vapor_pressures_Pa['SiO'] > 0.0
+    assert emitted.vapor_pressures_source['SiO'] == 'unlabelled'
+    assert emitted.vapor_pressures_source['SiO'] != 'builtin_authoritative'
+    with pytest.raises(AssertionError, match='unlabelled'):
+        assert emitted.vapor_pressures_source['SiO'] != 'unlabelled', (
+            emitted.vapor_pressures_source
+        )
+    assert vapor_pressure_source_code('unlabelled') is None
+    assert _source_authority('unlabelled') not in APPROVED_LIVE_VAPOR_SOURCES
 
 
 def test_fe_redox_and_sio_use_coupled_oxygen_reservoirs():
