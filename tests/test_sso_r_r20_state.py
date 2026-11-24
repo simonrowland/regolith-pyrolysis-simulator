@@ -3354,6 +3354,79 @@ def test_native_fe_split_updates_fO2_to_saturation_boundary() -> None:
     assert after["native_fe_frac"] <= 2.0e-12
 
 
+def test_native_fe_precipitation_hour_conserves_oxygen() -> None:
+    """Precipitation O2 equals the melt O that left, from the unfloored base.
+
+    The pre-split exchange and respeciation must leave the planted deficit
+    in place. Sizing the credit on that deficit and then climbing again
+    from the metal line would land about (floor - base) dex above the line.
+    """
+
+    sim = _make_sim()
+    sim.melt.temperature_C = 1600.0
+    sim.melt.p_total_mbar = 10.0
+    temperature_K = 1600.0 + 273.15
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -12.0
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+
+    sim._apply_oxygen_reservoir_exchange()
+    sim._apply_fe_redox_respeciation(update_reservoir_state=False)
+    base_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    floor_log, metal = melt_metal_saturation_floor_log10_fO2_bar(
+        temperature_K,
+        sim._melt_metal_saturation_activities(temperature_K),
+    )
+    assert floor_log is not None and metal is not None
+    assert base_fO2 < float(floor_log) - 1.0e-3
+
+    melt_o_before = float(
+        sim.atom_ledger.atom_moles_by_account("process.cleaned_melt").get("O", 0.0)
+    )
+    overhead_o2_before = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) or 0.0
+    )
+
+    split = sim._apply_native_fe_saturation_split()
+
+    melt_o_after = float(
+        sim.atom_ledger.atom_moles_by_account("process.cleaned_melt").get("O", 0.0)
+    )
+    overhead_o2_after = float(
+        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) or 0.0
+    )
+    melt_o_drop = melt_o_before - melt_o_after
+    o2_released = overhead_o2_after - overhead_o2_before
+    assert split["native_fe_event"] == "native_fe_partitioned_saturation"
+    assert o2_released > 0.0
+    assert melt_o_drop == pytest.approx(2.0 * o2_released, rel=1.0e-12, abs=0.0)
+
+    booked = float(
+        sim._redox_source_terms_this_hr["redox_source:native_fe_saturation_split"]
+    )
+    capacity = float(
+        sim.melt.oxygen_reservoir.melt_redox_capacity_mol_per_ln_fO2
+    )
+    assert capacity > OXYGEN_RESERVOIR_NOOP_MOL
+    assert 0.0 < booked <= o2_released * (1.0 + 1.0e-12)
+    tangent = base_fO2 + booked / (capacity * math.log(10.0))
+    published_floor, _published_metal = melt_metal_saturation_floor_log10_fO2_bar(
+        temperature_K,
+        sim._melt_metal_saturation_activities(temperature_K),
+    )
+    assert published_floor is not None
+    expected = min(
+        max(tangent, float(published_floor)),
+        sim._melt_redox_fO2_upper_bound_log(),
+    )
+    published = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
+    assert published == pytest.approx(expected, abs=1.0e-8)
+    assert published >= float(published_floor) - 1.0e-6
+    assert published <= float(published_floor) + 0.25 * (
+        float(published_floor) - base_fO2
+    )
+
+
 def test_native_fe_partition_vacuum_exceeds_pn2_and_small_pool_vaporizes() -> None:
     sim = _make_sim()
     sim.melt.temperature_C = 1700.0

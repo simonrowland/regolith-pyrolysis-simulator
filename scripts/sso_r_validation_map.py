@@ -505,7 +505,11 @@ def run_row(
     T_K = float(temperature_C) + 273.15
     sim._re_reference_melt_fO2_to_temperature(T_K)
     exchange = sim._apply_oxygen_reservoir_exchange()
-    first_respeciation = sim._apply_fe_redox_respeciation()
+    # Same pre-split contract as PyrolysisSimulator._step_one_hour:
+    # the ledger moves, and the floor is not published before the split.
+    first_respeciation = sim._apply_fe_redox_respeciation(
+        update_reservoir_state=False,
+    )
     split = sim._apply_native_fe_saturation_split(sample_time_h=SAMPLE_TIME_H)
     sim._refresh_oxygen_reservoir_transport_pO2_for_vapor()
     equilibrium = sim._get_equilibrium()
