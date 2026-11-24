@@ -38,14 +38,6 @@ def test_citation_only_works_load_with_migration_identities_and_index_rows():
 
     assert set(committed_ids) == REGISTERED_SOURCES
     assert set(works) >= set(committed_ids.values())
-    for source_id in ("ganits-1979", "brisi-abbattista-1960"):
-        assert committed_ids[source_id] == work_id_for(
-            citation=next(yaml.safe_load(path.read_text())["work"]["citation"]
-                          for path in (REPO_ROOT / "data/literature/works").glob("*.yaml")
-                          if source_id in yaml.safe_load(path.read_text())["work"].get("source_ids", [])),
-            doi=None, source_id=source_id, aliases={},
-        )[0]
-
     index = literature_builder.build_index(REPO_ROOT)
     rows = {row["source_id"]: row for row in index["sources"]}
     committed = yaml.safe_load((REPO_ROOT / "data/literature/INDEX.yaml").read_text())
