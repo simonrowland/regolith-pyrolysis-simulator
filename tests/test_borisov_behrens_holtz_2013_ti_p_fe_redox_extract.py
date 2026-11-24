@@ -27,6 +27,14 @@ SOURCE_ID = "borisov-behrens-holtz-2013-ti-p-fe-redox"
 WORK_ID = "10.1007/s00410-013-0943-9"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
 OXIDES = ("SiO2", "TiO2", "Al2O3", "Fe2O3", "MgO", "CaO", "P2O5")
+UNSTATED_METHOD_IDS = {
+    "borisov_2013_morb_christie_1986_quoted",
+    "borisov_2013_morb_cottrell_kelley_2011_quoted",
+    "borisov_2013_pu3_schuessler_2008_quoted_mean",
+    "borisov_2013_pu3_wet_chemistry_session_1",
+    "borisov_2013_pu3_wet_chemistry_session_2",
+    "borisov_2013_pu3_wet_chemistry_session_3",
+}
 
 # Independently transcribed from the 600 dpi render of physical PDF page 5.
 # Temperature and duration ditto marks are expanded to the preceding printed
@@ -242,20 +250,15 @@ def test_table1_post_run_p2o5_and_sample_weights_match_render() -> None:
 
 def _assert_unstated_method_rows(result, document: dict) -> None:
     records = list(result.observations.values())
-    unstated_method_ids = {
-        "borisov_2013_morb_christie_1986_quoted",
-        "borisov_2013_morb_cottrell_kelley_2011_quoted",
-        "borisov_2013_pu3_schuessler_2008_quoted_mean",
-        "borisov_2013_pu3_wet_chemistry_session_1",
-        "borisov_2013_pu3_wet_chemistry_session_2",
-        "borisov_2013_pu3_wet_chemistry_session_3",
-    }
     method_rows = {
         record.observation_id.split("::", 1)[1]: record
         for record in records
-        if record.observation_id.split("::", 1)[1] in unstated_method_ids
+        if record.observation_id.split("::", 1)[1] in UNSTATED_METHOD_IDS
     }
-    assert set(method_rows) == unstated_method_ids
+    assert set(method_rows) == UNSTATED_METHOD_IDS, (
+        f"missing moved observations: {UNSTATED_METHOD_IDS - set(method_rows)}; "
+        f"unexpected matches: {set(method_rows) - UNSTATED_METHOD_IDS}"
+    )
     method_policy = NoticePolicy(**resolve("DP-106").payload["policy"])
     source_rows = {
         item["observation_id"]: item
@@ -269,10 +272,15 @@ def _assert_unstated_method_rows(result, document: dict) -> None:
         assert method.is_value and method.value is MethodToken.UNSPECIFIED, (
             f"{local_id} must not inherit a quench experiment method"
         )
-        method_notice = next(
+        method_notices = [
             notice for notice in record.notices
             if notice.kind is NoticeKind.METHOD_UNSTATED
+        ]
+        assert len(method_notices) == 1, (
+            f"{local_id} should have one METHOD_UNSTATED notice, "
+            f"found {len(method_notices)}"
         )
+        method_notice = method_notices[0]
         assert method_notice.policy == method_policy
         printed_method = source_rows[local_id]["values"]["method_as_printed"]
         assert f"printed analytical method: {printed_method}" in method_notice.reason
@@ -448,19 +456,10 @@ def test_mutating_method_resolver_to_drop_method_notice_fails(
     monkeypatch,
 ) -> None:
     original = Migrator._resolve_method_for_observation
-    quoted_assay_ids = {
-        "borisov_2013_morb_christie_1986_quoted",
-        "borisov_2013_morb_cottrell_kelley_2011_quoted",
-        "borisov_2013_pu3_schuessler_2008_quoted_mean",
-        "borisov_2013_pu3_wet_chemistry_session_1",
-        "borisov_2013_pu3_wet_chemistry_session_2",
-        "borisov_2013_pu3_wet_chemistry_session_3",
-    }
-
     def discard_method_notice(self, **kwargs):
         method, notice = original(self, **kwargs)
         if (
-            kwargs["observation_id"].split("::", 1)[1] in quoted_assay_ids
+            kwargs["observation_id"].split("::", 1)[1] in UNSTATED_METHOD_IDS
             and notice is not None
             and notice.kind is NoticeKind.METHOD_UNSTATED
         ):
