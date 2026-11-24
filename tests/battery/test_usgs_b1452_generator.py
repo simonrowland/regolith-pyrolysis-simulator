@@ -501,9 +501,16 @@ def test_rejected_span_keeps_separate_formula_tokens(name: str) -> None:
 
 def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatch) -> None:
     source = getsource(generator._formula_from_name).replace(
-        "name[cursor].isspace() or name[cursor] in \"()\"",
-        "name[cursor - 1].isspace()",
+        'not (name[cursor].isspace() or name[cursor] in "()")',
+        "not name[cursor - 1].isspace()",
+    ).replace(
+        'not (name[start - 1].isspace() or name[start - 1] in "()")',
+        "not name[start - 1].isspace()",
+    ).replace(
+        'not (tail[0].isspace() or tail[0] in "()")',
+        "not tail[0].isspace()",
     )
+    assert source != getsource(generator._formula_from_name)
     namespace = vars(generator).copy()
     exec(source, namespace)
     old_formula_from_name = namespace["_formula_from_name"]
@@ -526,6 +533,7 @@ def test_generator_preserves_explicit_decimal_subscript_for_accounting(monkeypat
         "lambda match: match.group(0)\n        if \".\" in (match.group(1) or match.group(2) or \"\")\n        else (match.group(1) or match.group(2))",
         "lambda match: match.group(1) or match.group(2)",
     )
+    assert old_latex_to_formula != getsource(generator._latex_to_formula)
     exec(old_latex_to_formula, namespace)
     monkeypatch.setattr(generator, "_latex_to_formula", namespace["_latex_to_formula"])
     with pytest.raises(AssertionError):
@@ -598,15 +606,15 @@ def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
         observation
         for observation in generated.observations
         if quantity_token(observation.identity) is Quantity.S
-        and observation.identity.species.formula in {"TbO1.714", "TbO1.812"}
+        and observation.identity.species.formula in {"TbO_{1.714}", "TbO_{1.812}"}
     ]
 
     assert {
         (observation.identity.species.formula, observation.value.point)
         for observation in observations
     } == {
-        ("TbO1.714", Decimal("80.75")),
-        ("TbO1.812", Decimal("81.17")),
+        ("TbO_{1.714}", Decimal("80.75")),
+        ("TbO_{1.812}", Decimal("81.17")),
     }
     excluded = [
         row
@@ -618,8 +626,8 @@ def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
     assert len(excluded) == 2
 
     for formula, formula_weight in (
-        ("TbO1.714", Decimal("186.348")),
-        ("TbO1.812", Decimal("187.916")),
+        ("TbO_{1.714}", Decimal("186.348")),
+        ("TbO_{1.812}", Decimal("187.916")),
     ):
         formula_observations = [
             observation
@@ -631,20 +639,20 @@ def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
         assert calculated_mass is not None
         assert abs(calculated_mass - formula_weight) < Decimal("0.001")
     assert sum(
-        observation.identity.species.formula in {"TbO1.714", "TbO1.812"}
+        observation.identity.species.formula in {"TbO_{1.714}", "TbO_{1.812}"}
         for observation in generated.observations
     ) == B1452_TB_298K_OBSERVATIONS
 
     for record_id, formula, formula_weight, expected_count in (
         (
             "robie-hemingway-fisher-1978-usgs-b1452-0202",
-            "TbO1.714",
+            "TbO_{1.714}",
             Decimal("186.348"),
             B1452_TB_0202_OBSERVATIONS,
         ),
         (
             "robie-hemingway-fisher-1978-usgs-b1452-0203",
-            "TbO1.812",
+            "TbO_{1.812}",
             Decimal("187.916"),
             B1452_TB_0203_OBSERVATIONS,
         ),

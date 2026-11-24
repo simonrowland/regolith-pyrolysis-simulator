@@ -798,7 +798,7 @@ def _latex_to_formula(chunk: str) -> tuple[str, int | None]:
         else (match.group(1) or match.group(2)),
         chunk,
     )
-    chunk = chunk.replace("{", "").replace("}", "").replace("\\", "")
+    chunk = re.sub(r"(?<!_)\{([^{}]*)\}", r"\1", chunk).replace("\\", "")
     chunk = chunk.replace(" ", "")
     return chunk, charge
 
@@ -2029,7 +2029,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             and token.column == "entropy_s298"
             and token.row_index is not None
             and _formula_from_formula_line(_row_name(payload, token.row_index) or "")[0]
-            in {"TbO1.714", "TbO1.812"}
+            in {"TbO_{1.714}", "TbO_{1.812}"}
             and _formula_weight_as_published(payload, row_index=token.row_index) is None
         ):
             exclude(
