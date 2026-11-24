@@ -108,6 +108,25 @@ def test_each_ascii_dot_is_classified_alone() -> None:
     }
 
 
+def test_leading_decimal_counts_and_decimal_adducts_stay_in_the_formula_owner() -> None:
+    assert dict(parse_formula("Fe.9470").elements) == {"Fe": 0.947}
+    assert dict(parse_formula("NbC.98").elements) == {"C": 0.98, "Nb": 1.0}
+    assert dict(parse_formula("VC.88").elements) == {"C": 0.88, "V": 1.0}
+    assert _is_ascii_adduct("H2SO4.6.5H2O")
+    assert dict(parse_formula("H2SO4.6.5H2O").elements) == {
+        "H": 15.0,
+        "O": 10.5,
+        "S": 1.0,
+    }
+    assert dict(parse_formula("CuO•CuSO₄").elements) == {
+        "Cu": 2.0,
+        "O": 5.0,
+        "S": 1.0,
+    }
+    with pytest.raises(UnknownSpeciesError):
+        parse_formula("3Al2O3.0")
+
+
 def test_delimited_decimal_dot_survives_accounting_adduct_split(monkeypatch) -> None:
     from simulator.accounting import formulas as formula_owner
 

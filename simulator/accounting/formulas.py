@@ -544,6 +544,23 @@ class _FormulaParser:
 
     def _read_number(self, default: float) -> float:
         match = _NUMBER_RE.match(self.text, self.index)
+        previous = self.text[self.index - 1] if self.index else ""
+        if (
+            match is None
+            and self.index + 1 < len(self.text)
+            and self.text[self.index] == "."
+            and self.text[self.index + 1].isdigit()
+            and (previous.isalpha() or previous in _CLOSE_TO_OPEN)
+        ):
+            match = re.match(r"\.\d+", self.text[self.index :])
+            if match is not None:
+                self.index += match.end()
+                value = float(match.group(0))
+                if value <= 0.0:
+                    raise AccountingError(
+                        f"formula multiplier must be positive in {self.text!r}"
+                    )
+                return value
         if match is None:
             return default
         self.index = match.end()
@@ -620,7 +637,11 @@ def _clean_formula_text(formula: str) -> str:
     if text.startswith("$") and text.endswith("$"):
         text = text[1:-1]
     text = _strip_formula_markup(text)
-    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    text = (
+        text.replace(r"\cdot", "·")
+        .replace(r"\bullet", "·")
+        .replace("•", "·")
+    )
 
     def _expand_subscript(match: re.Match[str]) -> str:
         braced = match.group(1)
@@ -662,21 +683,19 @@ def _has_malformed_ascii_adduct(formula: str) -> bool:
 def _adduct_boundary(text: str, dot: int) -> int | None:
     """End index of one adduct unit that begins just after ``dot``.
 
-    The tail is an optional positive integer coefficient and one closed
-    vocabulary unit, and that unit ends at the string end or the next dot.
+    The tail is an optional positive integer or decimal coefficient and one
+    closed-vocabulary unit, and that unit ends at the string end or next dot.
     A zero coefficient is not a separator. Each dot is judged on its own.
     """
 
     start = dot + 1
     if start >= len(text):
         return None
-    end = start
-    while end < len(text) and text[end].isdigit():
-        end += 1
-    if end > start:
-        if int(text[start:end]) <= 0:
+    coefficient = _NUMBER_RE.match(text, start)
+    if coefficient is not None:
+        if float(coefficient.group(0)) <= 0.0:
             return None
-        start = end
+        start = coefficient.end()
     for unit in _ASCII_ADDUCT_UNITS_LONGEST_FIRST:
         if text.startswith(unit, start):
             unit_end = start + len(unit)
@@ -740,7 +759,7 @@ def _split_formula_segments(formula: str) -> list[str]:
     A middle dot (U+00B7) always separates segments: ``CuSO4·5H2O`` is
     five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. Each ASCII dot
     is judged alone: it separates an adduct only when the tail is an
-    optional positive integer and one unit in ``_ASCII_ADDUCT_UNITS``.
+    optional positive number and one unit in ``_ASCII_ADDUCT_UNITS``.
     A dot between digits that is not that tail stays a decimal, including
     when a later dot is a water. Thus ``Al2O3.3H2O``, ``3Al2O3.2SiO2``,
     and ``Fe0.947O.2H2O`` split, while ``Fe0.947O``, ``MgAl1.5SiO3``,
