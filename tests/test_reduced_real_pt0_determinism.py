@@ -818,10 +818,9 @@ def test_alphamelts_provider_key_partitions_mode_not_engine_version() -> None:
         "mode": "subprocess",
         "magemin_database": None,
     }
-    # Studio-2 canonical bytes at 35c987e96 after the equilibrium key was
-    # narrowed to the submitted inert-filtered composition and its formulas.
+    # Canonical identity after SC-09 added the selected high-T activity input.
     assert _key_hash(base) == (
-        "79d74e79f9f00d458f048acbcd1da25f19cad645d0d0efc8f060cba22dd9373d"
+        "4fca257eae100f5c782cd5ba11d86bb19ae2e0a43c9b77b6817db51c77b93515"
     )
     assert thermoengine["model"]["mode"] == "thermoengine"
     assert "engine_version" not in next_engine["model"]
@@ -1096,19 +1095,19 @@ def test_python_api_identity_pins_current_model_and_provider_fields(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "aba38d237aa4c4e57ce0b1d4331e646e5f224e7baa349354b085aacff441637e"),
-        ("", "20a65e05d5acf3303c5ac794dc455d45359c34f61602ddd7e10ecb5b06b6ce76"),
-        (DEFAULT_ALPHAMELTS_MODEL, "250646f69b23a91fe5d1f0904fdeab2f206432e6f28f9472bff84ee032b54cb3"),
-        ("pMELTS", "7b50ed0b4168c94d12ca1ae38e7a64b2e049942f16757765ea359ad52106eef1"),
-        ("MELTSv1.1.0", "238d7c7582835a6d4983861344fbc8fa8cc05dbdb96c45eec242f58f5b83614d"),
-        ("MELTSv1.2.0", "70ed32461ba7e9755beb1e95a34b356837e7ae09f3090b1ca150a08f4e39b273"),
+        (None, "7d1f1658a19a69757ec3589443ee428759ccf4840f14eb56ac1bcf32ed15e690"),
+        ("", "df768b3c9a52a09edee75699a7c64728c0093f47e9282193adf83ad3b4c3fd13"),
+        (DEFAULT_ALPHAMELTS_MODEL, "5b4a9570ae52ea28f678d6d7e8ffec23a8faf9e008bf9af9091c1d01d7c7c51d"),
+        ("pMELTS", "e61dd5c4101df30c1fedf70a3832616cff868e4c74d499690893d2a6ada76b8b"),
+        ("MELTSv1.1.0", "87b6b5b061d46b25b9e47096a82cfb789d949baffd682ac2b36f9827f04cf9db"),
+        ("MELTSv1.2.0", "0f46e3fbcacb54a329de4eb0ad6f063ff7a0600a29655eeb2a259684c64eff06"),
     ],
 )
 def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
     model: str | None,
     expected_hash: str,
 ) -> None:
-    # Studio-2 canonical hashes at 35c987e96 after keying on submitted inputs.
+    # Canonical hashes after SC-09 added the selected high-T activity input.
     key, _authority = _alphamelts_pt0_identity(model, mode="python_api")
 
     actual_hash = hashlib.sha256(rrd.canonical_json_bytes(key)).hexdigest()
@@ -1118,12 +1117,12 @@ def test_python_api_accepted_replay_key_hashes_include_provider_input_identity(
 @pytest.mark.parametrize(
     ("model", "expected_hash"),
     [
-        (None, "70082de80468f7c4239446ac453e340ccc53c58e7f06d30ed4340a97abf9dae1"),
-        ("", "f2804f1dfd4bcb2835d0ab1e33a8b3f2ba2fced471d81ce21cbafe03de3da88c"),
-        (DEFAULT_ALPHAMELTS_MODEL, "f2804f1dfd4bcb2835d0ab1e33a8b3f2ba2fced471d81ce21cbafe03de3da88c"),
-        ("pMELTS", "bba92d10ca74b54a58eb5457558079a5c5ce4e196bac55dbeab2937ecf2afd97"),
-        ("MELTSv1.1.0", "4a6ccd886a196e09ad376cb783b9c689d5210e5d5e797409355dccd13e8cdfb5"),
-        ("MELTSv1.2.0", "771a9c502a0e0b789ca0f2fc1ccb95015cfcf7015d972777a6469adf02a9611f"),
+        (None, "d289fd7fd9e8885fd19985160a45ef79ae9ca2482ce7e366cafa18df9f09f81d"),
+        ("", "dcfe65eff463cd87a2985a9fdd9cc59d26e45bb2361f0b40c5610d21a8e8ff7b"),
+        (DEFAULT_ALPHAMELTS_MODEL, "dcfe65eff463cd87a2985a9fdd9cc59d26e45bb2361f0b40c5610d21a8e8ff7b"),
+        ("pMELTS", "a1cfd2c96b78186a485a0631a760aeea5946e84c4d5d09500bc05e3c06368c6a"),
+        ("MELTSv1.1.0", "a1e065258560ea119ecd6d9024fcc7f4a1c7384f42f7eff48840d5ae62e472b0"),
+        ("MELTSv1.2.0", "28c108947d23cd6e1f2d08b76761b404ab1b4b0545f941c3dc2ec17147aa1904"),
     ],
 )
 def test_cached_real_python_api_replay_key_hashes_include_provider_input_identity(
@@ -1295,8 +1294,8 @@ def test_silicate_dispatch_excludes_explicit_inert_species_from_mol_view(
 
 
 def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
-    # Studio-2 canonical bytes at 35c987e96 after gate keys began embedding the
-    # owner freeze-gate provider-input identity.
+    # Freeze-gate identity stays unchanged; the equilibrium key now includes
+    # the selected high-temperature activity input.
     store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
@@ -1323,9 +1322,9 @@ def test_current_magemin_and_internal_analytical_replay_key_bytes() -> None:
     generic_key = generic_store._equilibrium_key(generic_sim)
     generic_bytes = canonical_json_bytes(generic_key)
     assert generic_key["namespace_id"] == "internal-analytical:equilibrium-composite"
-    assert len(generic_bytes) == 1687
+    assert len(generic_bytes) == 1739
     assert hashlib.sha256(generic_bytes).hexdigest() == (
-        "f23032fcd2ddba188fccad867d238b352c63e4ca53b77c3dc643baae0af422f9"
+        "db7455ae66cdb9d34c22e8ac8a23fd17d38a2bd099bff11f361bef507407c3d8"
     )
 
 
