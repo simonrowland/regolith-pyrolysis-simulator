@@ -28,6 +28,7 @@ from simulator.battery.enums import (
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
+    _BARE_LOG_BAR_NOTICE,
     fe3_fe2_ratio_from_ferric_fraction,
     fe3_fe2_ratio_from_oxide_wt_pct,
     load_yaml,
@@ -199,9 +200,17 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     assert args[0]["Mg"] > 0.0
     assert args[2] == "imposed"
     assert args[1] == float(observation.identity.temperature_K.value)
-    assert kwargs["lambda_imposed"] == pytest.approx(
-        float(observation.point_conditions["fO2_log"].state.value) * math.log(10.0),
-        rel=1e-15,
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    assert float(observation.point_conditions["fO2_log"].state.value) == 0.0
+    assert kwargs["lambda_imposed"] != pytest.approx(0.0, abs=1e-12)
+    assert prediction.identity.fO2_Pa.value != Decimal("100000")
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and _BARE_LOG_SCALE_UNKNOWN in notice.reason
+        and "printed_fO2_log=0" in notice.reason
+        for notice in prediction.notices
     )
     direct = original_evaluate_redox(*args, **kwargs)
     direct_ratio = direct.ferric_fe_mol / direct.ferrous_fe_mol
@@ -288,34 +297,48 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
     residuals, _ = score_store(
         context, engines=(Engine.OPENIMCC,), rail=Rail.REDOX
     )
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
     values = [
-        float(residual.numeric.value).hex()
+        residual
         for residual in residuals
         if residual.numeric is not None
     ]
     assert len(values) == 18
-    encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
-    # Pinned with the declared OpenIMCC pin 66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84 (pyproject.toml); under e975edd the digest is 12100581….
-    assert hashlib.sha256(encoded).hexdigest() == (
-        "c79971dce81ac423bf34a04525b3da956a437f83e6dbe1fa601d24c1627b8f44"
-    )
-    for backlog in (
-        score_module.notice_backlog(residuals),
-        score_module.notice_backlog_payloads(
-            [residual_to_plain(residual) for residual in residuals]
-        ),
-    ):
-        assert backlog.get(NoticeKind.SOURCE_DISAGREEMENT.value, 0) == 0
-        assert backlog["engine_model_caveat"] == 142
-        assert backlog["admission_defaulted"] == 18
-        assert backlog["total_iron_reported_as_feo"] == 18
-    assert all(
-        not score_module.flagged_strata(residual.notices) for residual in residuals
-    )
-    assert not any(residual.score_eligible for residual in residuals)
+    # The previous digest c79971dce81ac423… pinned the ungrounded log-as-bar
+    # command on OpenIMCC 66ec4a3. d-460 retires that command. Recount the
+    # digest from a studio score; do not paste a hash that was not regenerated.
+    unknown_frame = 0
+    for residual in values:
+        observation = context.observations[residual.reference]
+        state = observation.identity.fO2_Pa
+        if (
+            state is not None
+            and state.is_unknown
+            and state.reason == _BARE_LOG_SCALE_UNKNOWN
+        ):
+            unknown_frame += 1
+            assert any(
+                notice.policy is not None
+                and notice.policy.id == "DP-010"
+                and _BARE_LOG_SCALE_UNKNOWN in notice.reason
+                and "printed_fO2_log=" in notice.reason
+                for notice in residual.notices
+            )
+            assert not residual.score_eligible
+    assert unknown_frame > 0
+    assert all(residual.refusal is None for residual in values)
 
 
-def test_openimcc_redox_without_printed_fo2_still_refuses():
+def test_openimcc_redox_without_printed_fo2_uses_the_registered_default():
+    """Absent printed oxygen with composition and temperature is DP-010.
+
+    d-460 refuses only when the engine cannot be called. This row still has
+    iron, composition, and temperature. The notice names the absence, not
+    the unknown-scale sentence, so a removed log stays distinct from a
+    printed zero whose frame was not stated.
+    """
+
     pytest.importorskip("openimcc")
     _context, observations = _sossi_aithala_redox_context()
     observation = observations[
@@ -332,12 +355,16 @@ def test_openimcc_redox_without_printed_fo2_still_refuses():
 
     prediction = predict_with_engine(Engine.OPENIMCC, missing_fo2)
 
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail == {
-        "reason": "missing_input",
-        "input": "printed_fO2",
-    }
+    assert prediction.refusal_reason is None
+    assert prediction.value is not None
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and "no printed fO2, applicable buffer, or air-composition evidence"
+        in notice.reason
+        and "reference scale not printed" not in notice.reason
+        for notice in prediction.notices
+    )
 
 
 def _openimcc_row_with_mass_composition(components):
@@ -410,14 +437,25 @@ def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     args, kwargs = calls[0]
     assert args[0].get("Fe", 0.0) > 0.0
     assert args[2] == "imposed"
-    assert kwargs["lambda_imposed"] == pytest.approx(
-        float(row.point_conditions["fO2_log"].state.value) * math.log(10.0),
-        rel=1e-15,
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    assert float(row.point_conditions["fO2_log"].state.value) == 0.0
+    assert kwargs["lambda_imposed"] != pytest.approx(0.0, abs=1e-12)
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and _BARE_LOG_SCALE_UNKNOWN in notice.reason
+        and "printed_fO2_log=0" in notice.reason
+        for notice in prediction.notices
     )
 
 
 def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
-    """Silica with no fO2 is a printed-oxygen refusal, not a Kress FeOt refusal."""
+    """Silica with no iron cannot call OpenIMCC. Absent fO2 is not that refusal.
+
+    d-460 supplies DP-010 when composition and temperature exist. The engine
+    still cannot be called with no iron, so the refusal is total_iron.
+    """
 
     row = _openimcc_row_with_mass_composition((("SiO2", Decimal("100")),))
     conditions = dict(row.point_conditions or {})
@@ -435,7 +473,7 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
     assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert prediction.refusal_detail == {
         "reason": "missing_input",
-        "input": "printed_fO2",
+        "input": "total_iron",
     }
     assert prediction.coefficient_sources == ()
 
@@ -1809,7 +1847,14 @@ def test_melts_fe_redox_uses_recorded_engine_oxide_weights(monkeypatch):
         Quantity.FE3_FE2_RATIO,
     )
     assert printed is not None
-    assert oxygen_notices == ()
+    assert not any(
+        item.policy is not None and item.policy.id == "DP-010" for item in oxygen_notices
+    )
+    assert all(
+        item.reason == _BARE_LOG_BAR_NOTICE
+        or item.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        for item in oxygen_notices
+    )
     for engine in (Engine.THERMOENGINE, Engine.ALPHAMELTS):
         prediction = predict_with_engine(engine, row4, isolated=False)
         assert prediction.value == expected

@@ -277,6 +277,11 @@ def resolve_row_fo2(
             return tier2
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
+            if (
+                route.route == "buffer_relation"
+                and uncalibrated_buffer_awaits_receipt(observation)
+            ):
+                continue
             log = _log_point(route.value)
             if log is not None:
                 return ResolvedFo2(
@@ -502,9 +507,105 @@ def _oxygen_routes(
     return oxygen.routes
 
 
+def absolute_oxygen_frame(identity: Identity | None) -> bool:
+    """True when the row's oxygen pressure is already an absolute value.
+
+    Migration writes that value only after it has bound a frame: an explicit
+    bar or atm unit, a printed atmosphere match, or the 1-bar convention.
+    A located log with no inference is not a frame. The scale-unknown
+    sentence is not a value, so it is not absolute.
+    """
+
+    if identity is None:
+        return False
+    state = identity.fO2_Pa
+    if state is None or not state.is_value or state.value is None:
+        return False
+    try:
+        pa = float(state.value)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(pa) and pa > 0.0
+
+
+def scale_unknown_oxygen(identity: Identity | None) -> bool:
+    """True when the stored pressure says the log's scale was not printed."""
+
+    if identity is None or identity.fO2_Pa is None or not identity.fO2_Pa.is_unknown:
+        return False
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    return identity.fO2_Pa.reason == _BARE_LOG_SCALE_UNKNOWN
+
+
+def scale_unknown_evidence_clause(
+    identity: Identity | None, printed_fO2_log: str | None
+) -> str | None:
+    """Flag text for a log whose absolute-versus-buffer frame was not printed.
+
+    The clause quotes the stored reason and the printed log, including a
+    real zero, and names DP-010 as the command that replaces it. Callers
+    that already hold a different registered default keep their own sentence.
+    """
+
+    if not scale_unknown_oxygen(identity):
+        return None
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    printed = "absent" if printed_fO2_log is None else printed_fO2_log
+    return (
+        f"original_missing_evidence={_BARE_LOG_SCALE_UNKNOWN}; "
+        f"printed_fO2_log={printed}; "
+        "reference_frame_default=DP-010; "
+    )
+
+
+def oxygen_frame_receipts(observation: Observation | None) -> tuple[Notice, ...]:
+    """Notices that record the frame a grounded log was admitted under."""
+
+    if observation is None:
+        return ()
+    from simulator.battery.migrate import _BARE_LOG_BAR_NOTICE
+
+    return tuple(
+        notice
+        for notice in observation.notices
+        if isinstance(notice.reason, str)
+        and (
+            notice.reason == _BARE_LOG_BAR_NOTICE
+            or notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        )
+    )
+
+
+def uncalibrated_buffer_awaits_receipt(observation: Observation | None) -> bool:
+    """True when a buffer marker is present and DP-112 has not receipted it.
+
+    A typed buffer name is not the calibration. The marker has to be seen
+    by the DP-112 resolver before any buffer command is admitted.
+    """
+
+    if observation is None:
+        return False
+    marker = False
+    for notice in observation.notices:
+        if (
+            notice.kind
+            is not NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ):
+            continue
+        if notice.policy is not None and notice.policy.id == "DP-112":
+            return False
+        marker = True
+    return marker
+
+
 def _is_tier1(route: Waypoint, observation: Observation | None) -> bool:
     if route.route == "observation_fO2_log":
-        return route.authority is WaypointAuthority.PRINTED
+        return (
+            route.authority is WaypointAuthority.PRINTED
+            and absolute_oxygen_frame(_identity(observation))
+        )
     if route.route == "observation_fO2_Pa_to_log_fO2":
         if observation is None or derived_fo2_condition(observation):
             return False
@@ -537,10 +638,11 @@ def admitted_score_oxygen(
 ) -> Waypoint | None:
     """First score-time oxygen route in the waypoint owner's order.
 
-    Tier 1 is a printed log, a provenance-valid observation pressure, or a
-    registered run route. Tier 3 is a gas mixture or buffer calculation.
-    An inferred observation pressure is neither: it needs a DP-112 receipt
-    or it falls through to the score-time defaults.
+    Tier 1 is a grounded printed log, a provenance-valid observation
+    pressure, or a registered run route. An unknown frame is not tier 1.
+    Tier 3 is a gas mixture or a buffer whose calibration is not waiting
+    on a DP-112 receipt. An uncalibrated buffer marker is not admitted
+    here: the DP-112 resolver has to see it first.
     """
 
     for route in oxygen.routes:
@@ -551,6 +653,10 @@ def admitted_score_oxygen(
             route.route in _TIER3_ATMOSPHERE_ROUTES
             and route.authority is WaypointAuthority.DERIVED
             and _log_point(route.value) is not None
+            and not (
+                route.route == "buffer_relation"
+                and uncalibrated_buffer_awaits_receipt(observation)
+            )
         ):
             return route
     return None

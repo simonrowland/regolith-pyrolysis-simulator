@@ -1835,17 +1835,6 @@ def _c_co_pressure_Pa(
     return None
 
 
-def _is_pressure_unit_conversion(inference: object) -> bool:
-    return (
-        inference is not None
-        and str(getattr(inference, "relation", "")).endswith("_to_Pa")
-        and any(
-            str(item).startswith("original_unit=")
-            for item in getattr(inference, "inputs", ())
-        )
-    )
-
-
 # Names owned here. fo2_ladder and the scorer import these sets; they do not
 # restate the literals.
 ROUTE_OXYGEN_PARTIAL_PRESSURE = "oxygen_partial_pressure_to_log_fO2"
@@ -1877,9 +1866,9 @@ def _printed_run_oxygen_pa(experiment: Experiment, name: str) -> Value | None:
     located = experiment.conditions.get(name)
     if located is None or not located.state.is_value:
         return None
-    if located.inference is not None and not _is_pressure_unit_conversion(
-        located.inference
-    ):
+    from simulator.battery.source_oxygen import pressure_has_only_unit_conversion
+
+    if not pressure_has_only_unit_conversion(located):
         return None
     note = located.locator.note if located.locator is not None else None
     if isinstance(note, str) and "derived condition" in note.casefold():
@@ -2083,12 +2072,11 @@ def oxygen_condition(
         if boundary.route == "observation_total_pressure_Pa" and observation is not None:
             located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
         locator_note = str(located_pressure.locator.note or "").lower() if located_pressure is not None and located_pressure.locator is not None else ""
+        from simulator.battery.source_oxygen import pressure_has_only_unit_conversion
+
         vacuum_evidence = (
             located_pressure is not None
-            and (
-                located_pressure.inference is None
-                or _is_pressure_unit_conversion(located_pressure.inference)
-            )
+            and pressure_has_only_unit_conversion(located_pressure)
             and any(
                 token in locator_note
                 for token in (

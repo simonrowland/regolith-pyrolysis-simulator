@@ -1725,12 +1725,18 @@ def test_printed_experiment_pressure_reaches_the_scorer(
     missing = _with_bulk(_row(migrate(bare, write=False), "sample1-sio2-melt"))
     assert missing.identity.total_pressure_Pa.is_unknown
     assert missing.identity.total_pressure_Pa.is_not_applicable is False
-    refused = predict_with_engine(Engine.ALPHAMELTS, missing)
-    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert refused.refusal_detail["input"] == "total_pressure_Pa"
-    assert refused.execution.state is ExecutionState.NOT_PROBED
-    assert refused.value is None
-    assert calls == []
+    fallback = predict_with_engine(Engine.ALPHAMELTS, missing)
+    assert fallback.refusal_reason is None
+    assert fallback.execution.state is ExecutionState.PRODUCED
+    assert fallback.value == Decimal("10")
+    assert len(calls) == 1
+    assert calls[0]["pressure_bar"] == float(Decimal("101325") / Decimal("1e5"))
+    assert fallback.identity is not None
+    assert fallback.identity.total_pressure_Pa.value == Decimal("101325")
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in fallback.notices
+    )
 
 
 def test_legacy_alignment_axes_match_the_stored_ratchet() -> None:

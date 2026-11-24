@@ -157,13 +157,25 @@ def _air_composition_quote(
     # A source quote establishes the dry-air rung only when it places the
     # sample in air during equilibration. Air displaced before the run and an
     # air quench after an inert run are not atmosphere evidence for DP-003.
+    # "air-free" normalizes to "air free". The sample's atmosphere is the
+    # word after "in air", so a following "free" is not air. A furnace
+    # sensor reading air outside the chamber is not the sample either.
     equilibration_air = re.search(
-        r"\bequilibrat\w*(?:\s+\w+){0,5}\s+(?:in|under)\s+(?:ambient\s+)?air\b",
+        r"\bequilibrat\w*(?:\s+\w+){0,5}\s+(?:in|under)\s+(?:ambient\s+)?air\b"
+        r"(?!\s+free\b)",
         normalized_quote,
     )
     air_during_equilibration = re.search(
-        r"\bair\b.{0,60}\b(?:during|throughout)\s+equilibrat\w*",
+        r"\bair\b(?!\s+free\b).{0,60}\b(?:during|throughout)\s+equilibrat\w*",
         normalized_quote,
+    )
+    sensor_outside_chamber = (
+        air_during_equilibration is not None
+        and re.search(
+            r"\b(?:sensor|outside)\b",
+            air_during_equilibration.group(0),
+        )
+        is not None
     )
     if (
         equilibration_air is not None
@@ -171,7 +183,9 @@ def _air_composition_quote(
             r"\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\b",
             equilibration_air.group(0),
         )
-    ) or air_during_equilibration is not None:
+    ) or (
+        air_during_equilibration is not None and not sensor_outside_chamber
+    ):
         return source_quote
     return None
 

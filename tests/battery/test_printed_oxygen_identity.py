@@ -1798,6 +1798,17 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
     assert _air_composition_quote(
         atmospheric_air, atmosphere_condition=printed_argon
     ) is None
+    for false_air in (
+        "The sample was equilibrated in air-free argon.",
+        "The furnace sensor measured air outside the chamber during equilibration.",
+    ):
+        false_evidence = AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            false_air,
+            locator,
+        )
+        assert _air_composition_quote(false_evidence) is None, false_air
+        assert _dp002_applicability(false_evidence) is None
 
 
 def test_registered_method_pressure_precedes_the_unbound_default() -> None:
@@ -2355,6 +2366,15 @@ def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
 
     unlabelled = without_target_label(lfe)
     assert _liquid_pair_target(unlabelled) is None
+    shared_locator = Locator(note="assemblage contains phase Lfe and phase Lsi")
+    single_locator = Locator(note="measured phase Lfe")
+    assert (
+        _liquid_pair_target(replace(unlabelled, locator=shared_locator)) is None
+    ), "phase Lfe and phase Lsi"
+    assert _liquid_pair_target(replace(unlabelled, locator=single_locator)) == (
+        "Lfe",
+        "Lsi",
+    )
     unlabelled_prediction, _unlabelled_with_bulk = predict_single_liquid(unlabelled)
     assert (
         unlabelled_prediction.refusal_reason
@@ -2907,3 +2927,146 @@ def test_redox_path_uses_the_shared_oxygen_rungs_for_a_real_row(
     assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
     assert refused.refusal_detail["input"] == "printed_fO2"
     assert refused.execution.state is ExecutionState.NOT_PROBED
+
+
+def test_unknown_frame_and_uncalibrated_buffer_are_not_clean_commands() -> None:
+    """A printed log of zero is not 1 bar, and a buffer marker is not a command.
+
+    The same owner decides both entry points. A grounded log of zero still
+    commands zero. An inferred run pressure with a conversion label but no
+    conversion arithmetic is not a run-oxygen route.
+    """
+
+    from simulator.battery.fo2_ladder import (
+        admitted_score_oxygen,
+        resolve_row_fo2,
+    )
+    from simulator.battery.records import Notice
+    from simulator.battery.score import _resolve_row_fo2
+    from simulator.battery.waypoints import (
+        _printed_run_oxygen_pa,
+        oxygen_condition,
+    )
+    from tests.battery import factories as F
+
+    temperature = Decimal("1400")
+    identity = replace(
+        F.activity_identity(T_K=temperature),
+        fO2_Pa=State.unknown(_BARE_LOG_SCALE_UNKNOWN),
+    )
+    marker = Notice(
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="buffer=IW offset=0 calibration not printed",
+        origin="test",
+    )
+    observation = F.observation(
+        "frame-row",
+        "frame-exp",
+        identity,
+        Decimal("1"),
+        notices=(marker,),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "fO2_log": Located(
+                State.of(Decimal("0")),
+                locator=Locator(note="printed log with no frame"),
+            ),
+        },
+    )
+    bad_pressure = Located(
+        State.of(Decimal("100000")),
+        locator=Locator(note="inferred run pressure"),
+        inference=Derivation(
+            "bar_to_Pa",
+            ("original_unit=bar",),
+            (),
+            "Pa",
+        ),
+    )
+    experiment = replace(
+        F.tabulation_experiment(
+            experiment_id="frame-exp",
+            T_K=temperature,
+            fO2_control=FO2Control(
+                channel=State.of(FO2Channel.BUFFER),
+                buffer=Located(State.of("IW"), locator=Locator(note="typed buffer")),
+            ),
+        ),
+        conditions={
+            **F.tabulation_experiment(T_K=temperature).conditions,
+            "fO2_Pa": bad_pressure,
+        },
+    )
+    weights = {"SiO2": 50.0, "FeO": 10.0, "MgO": 40.0}
+    oxygen = oxygen_condition(experiment, None, observation)
+    assert any(route.route == "buffer_relation" for route in oxygen.routes)
+    admitted = admitted_score_oxygen(oxygen, observation)
+    assert admitted is None or admitted.route != "buffer_relation", "buffer_relation"
+    assert _printed_run_oxygen_pa(experiment, "fO2_Pa") is None, "original_unit"
+    ladder = resolve_row_fo2(
+        experiment,
+        None,
+        observation,
+        composition_wt=weights,
+        temperature_K=float(temperature),
+        quantity=Quantity.ACTIVITY,
+    )
+    assert ladder is None or ladder.route != "observation_fO2_log", "printed_fO2_log"
+
+    def admitted_command(run):
+        return _resolve_row_fo2(
+            identity,
+            observation,
+            run,
+            weights,
+            temperature,
+            Quantity.ACTIVITY,
+            None,
+        )
+
+    _with_identity, with_log, with_notices = admitted_command(experiment)
+    _without_identity, without_log, without_notices = admitted_command(None)
+    assert with_log == without_log
+    assert with_log != Decimal("0")
+    for notices in (with_notices, without_notices):
+        assert any(
+            item.policy is not None
+            and item.policy.id == "DP-010"
+            and _BARE_LOG_SCALE_UNKNOWN in item.reason
+            and "printed_fO2_log=0" in item.reason
+            for item in notices
+        ), "printed_fO2_log"
+
+    grounded = replace(identity, fO2_Pa=State.of(Decimal("100000")))
+    grounded_row = replace(observation, identity=grounded, notices=())
+    _ground_identity, ground_log, ground_notices = _resolve_row_fo2(
+        grounded,
+        grounded_row,
+        None,
+        weights,
+        temperature,
+        Quantity.ACTIVITY,
+    )
+    assert ground_log == Decimal("0")
+    assert ground_notices == ()
+    convention = Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=_BARE_LOG_BAR_NOTICE,
+        origin="test",
+    )
+    convention_row = replace(grounded_row, notices=(convention,))
+    _convention_identity, convention_log, convention_notices = _resolve_row_fo2(
+        grounded,
+        convention_row,
+        None,
+        weights,
+        temperature,
+        Quantity.ACTIVITY,
+    )
+    assert convention_log == Decimal("0")
+    assert convention in convention_notices

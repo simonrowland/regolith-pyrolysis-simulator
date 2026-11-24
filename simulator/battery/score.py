@@ -10489,6 +10489,7 @@ def _oxygen_input_request(
         ResolvedFo2,
         fo2_tier_notice,
         resolve_row_fo2,
+        scale_unknown_evidence_clause,
     )
 
     if _has_printed_fo2(observation, identity):
@@ -10539,7 +10540,16 @@ def _oxygen_input_request(
             cell_material=resolved.cell_material,
         )
     if resolved is not None and not resolved.closure:
-        input_notices.append(fo2_tier_notice(quantity, resolved))
+        notice = fo2_tier_notice(quantity, resolved)
+        if resolved.tier == 4 and observation is not None:
+            printed_log = _printed_condition_decimal(observation, "fO2_log")
+            frame_evidence = scale_unknown_evidence_clause(
+                identity,
+                None if printed_log is None else format(printed_log, "f"),
+            )
+            if frame_evidence is not None:
+                notice = replace(notice, reason=frame_evidence + notice.reason)
+        input_notices.append(notice)
         bar = (
             resolved.po2_bar
             if resolved.po2_bar is not None
@@ -11483,8 +11493,18 @@ def _liquid_pair_target(observation: Observation) -> tuple[str, str] | None:
     )
     raw_label = provenance.get("liquid_label_as_published")
     if raw_label is None:
-        match = _SOURCE_PHASE_LABEL_PATTERN.search(locator_note)
-        raw_label = None if match is None else match.group(1)
+        # One locator designation can name the row. Two distinct phase
+        # tokens in a shared note do not say which liquid this row is.
+        labels = _SOURCE_PHASE_LABEL_PATTERN.findall(locator_note)
+        distinct: list[str] = []
+        seen: set[str] = set()
+        for found in labels:
+            folded = found.casefold()
+            if folded in seen:
+                continue
+            seen.add(folded)
+            distinct.append(found)
+        raw_label = distinct[0] if len(distinct) == 1 else None
     label = " ".join(str(raw_label).split()) if raw_label is not None else ""
     # Assemblage prose can name two liquids without saying which one this row
     # is. The guard fires only for a source label of one conjugate. TEM and
@@ -11565,23 +11585,39 @@ def _resolve_row_fo2(
     quantity: Quantity | None,
     bench: Bench | None = None,
 ) -> tuple[Identity, Decimal | None, tuple[Notice, ...]]:
-    """Resolve printed fO2, then DP-112, DP-003, and DP-010 in order."""
+    """Resolve printed fO2, then DP-112, DP-003, and DP-010 in order.
+
+    Admission goes through ``fo2_ladder``. An unknown frame is not converted
+    to a bar command. A buffer waypoint whose calibration marker has no
+    DP-112 receipt is not admitted here. A grounded log carries the frame
+    receipt migration already stored.
+    """
+
+    from simulator.battery.fo2_ladder import (
+        absolute_oxygen_frame,
+        admitted_score_oxygen,
+        oxygen_frame_receipts,
+    )
 
     derived_condition = _derived_fo2_condition(observation)
-    if not derived_condition and _has_printed_fo2(observation, identity):
+    if (
+        not derived_condition
+        and _has_printed_fo2(observation, identity)
+        and absolute_oxygen_frame(identity)
+    ):
+        receipts = oxygen_frame_receipts(observation)
         printed_log = _printed_condition_decimal(observation, "fO2_log")
         if printed_log is not None and printed_log.is_finite():
             return (
                 replace(identity, fO2_Pa=State.of(log10_fo2_to_pa(printed_log))),
                 printed_log,
-                (),
+                receipts,
             )
         fo2_log = _printed_fo2_log10_bar(identity)
         if fo2_log is not None:
-            return identity, Decimal(str(fo2_log)), ()
+            return identity, Decimal(str(fo2_log)), receipts
 
     if experiment is not None:
-        from simulator.battery.fo2_ladder import admitted_score_oxygen
         from simulator.battery.waypoints import oxygen_condition
 
         oxygen = oxygen_condition(experiment, bench, observation)
@@ -11589,10 +11625,15 @@ def _resolve_row_fo2(
         if waypoint is not None:
             run_oxygen_log = as_decimal(waypoint.value.point)
             if run_oxygen_log.is_finite():
+                receipts = (
+                    oxygen_frame_receipts(observation)
+                    if waypoint.route == "observation_fO2_log"
+                    else ()
+                )
                 return (
                     replace(identity, fO2_Pa=State.of(log10_fo2_to_pa(run_oxygen_log))),
                     run_oxygen_log,
-                    (),
+                    receipts,
                 )
 
     printed_pressure = (
@@ -11695,20 +11736,37 @@ def _resolve_row_fo2(
 
     if quantity is None:
         return identity, None, ()
-    from simulator.battery.fo2_ladder import _tier4, fo2_tier_notice
+    from simulator.battery.fo2_ladder import (
+        _tier4,
+        fo2_tier_notice,
+        scale_unknown_evidence_clause,
+    )
 
     intrinsic = _tier4(dict(composition_wt), float(temperature_K))
     if intrinsic is None:
         return identity, None, ()
     policy = resolve_default_policy("DP-010", formula_result=intrinsic.log10_fO2_bar)
     ladder_notice = fo2_tier_notice(quantity, intrinsic)
+    printed_unresolved_log = _printed_condition_decimal(observation, "fO2_log")
+    frame_evidence = scale_unknown_evidence_clause(
+        identity,
+        None
+        if printed_unresolved_log is None
+        else format(printed_unresolved_log, "f"),
+    )
+    if frame_evidence is not None:
+        missing_evidence = frame_evidence
+    else:
+        missing_evidence = (
+            "original_missing_evidence=no printed fO2, applicable buffer, or "
+            "air-composition evidence; "
+        )
     notice = replace(
         ladder_notice,
         kind=policy.flag,
         reason=(
             "DP-010 physics_rung=4: "
-            f"original_missing_evidence=no printed fO2, applicable buffer, or "
-            f"air-composition evidence; "
+            + missing_evidence
             + (
                 "pressure_evidence_quote="
                 f"{atmospheric_evidence.quote!r}; "
@@ -24869,6 +24927,55 @@ def _has_flagged_decision_notice(residual: Residual) -> bool:
     )
 
 
+@dataclass(frozen=True)
+class ResidualOrderEntry:
+    """One shard sidecar row: sort key plus the serial index strings.
+
+    ``exact`` is true when the sidecar carried the Decimal text the serial
+    scorer stored. A 4-element legacy row leaves the strings to be
+    re-derived from the JSON line.
+    """
+
+    sort_order: tuple[str, int, int, int]
+    numeric_value: str | None
+    band_value: str | None
+    exact: bool
+
+
+def parse_residual_order_entry(order_value: object) -> ResidualOrderEntry | None:
+    """Parse a shard order sidecar entry. None when the entry is invalid."""
+
+    if (
+        not isinstance(order_value, list)
+        or len(order_value) not in {4, 6}
+        or not isinstance(order_value[0], str)
+        or any(type(value) is not int for value in order_value[1:4])
+    ):
+        return None
+    if len(order_value) == 4:
+        return ResidualOrderEntry(
+            (order_value[0], order_value[1], order_value[2], order_value[3]),
+            None,
+            None,
+            False,
+        )
+    numeric_value = order_value[4]
+    band_value = order_value[5]
+    if numeric_value is not None and not isinstance(numeric_value, str):
+        return None
+    if band_value is not None and not isinstance(band_value, str):
+        return None
+    return ResidualOrderEntry(
+        (order_value[0], order_value[1], order_value[2], order_value[3]),
+        numeric_value,
+        band_value,
+        True,
+    )
+
+
+_EXACT_INDEX_ABSENT = object()
+
+
 class _ResidualJsonlStream:
     """Keep the in-flight JSONL on disk and sort rows without retaining them."""
 
@@ -24979,22 +25086,27 @@ class _ResidualJsonlStream:
         line: bytes,
         *,
         sort_order: tuple[str, int, int, int] | None = None,
+        numeric_value: object = _EXACT_INDEX_ABSENT,
+        band_value: object = _EXACT_INDEX_ABSENT,
     ) -> None:
         payload = json.loads(line)
         if not isinstance(payload, Mapping):
             raise ValueError("score shard row is not an object")
-        numeric = payload.get("numeric")
-        band = numeric.get("decision_band") if isinstance(numeric, Mapping) else None
-        band_value = (
-            str(band["value"])
-            if isinstance(band, Mapping) and band.get("value") is not None
-            else None
-        )
-        numeric_value = (
-            str(numeric["value"])
-            if isinstance(numeric, Mapping) and numeric.get("value") is not None
-            else None
-        )
+        if numeric_value is _EXACT_INDEX_ABSENT or band_value is _EXACT_INDEX_ABSENT:
+            numeric = payload.get("numeric")
+            band = numeric.get("decision_band") if isinstance(numeric, Mapping) else None
+            if band_value is _EXACT_INDEX_ABSENT:
+                band_value = (
+                    str(band["value"])
+                    if isinstance(band, Mapping) and band.get("value") is not None
+                    else None
+                )
+            if numeric_value is _EXACT_INDEX_ABSENT:
+                numeric_value = (
+                    str(numeric["value"])
+                    if isinstance(numeric, Mapping) and numeric.get("value") is not None
+                    else None
+                )
         self._append_line(
             line.rstrip(b"\r\n"),
             rail=str(payload.get("rail") or ""),
@@ -25022,7 +25134,18 @@ class _ResidualJsonlStream:
             # The sidecar is written first. After both flushes, each complete
             # residual line has exactly one recoverable serial-order entry.
             self._order_file.write(
-                json.dumps(stable_order, ensure_ascii=False, separators=(",", ":"))
+                json.dumps(
+                    [
+                        stable_order[0],
+                        stable_order[1],
+                        stable_order[2],
+                        stable_order[3],
+                        numeric_value,
+                        band_value,
+                    ],
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                )
                 + "\n"
             )
             self._order_file.flush()

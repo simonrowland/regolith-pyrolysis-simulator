@@ -121,7 +121,7 @@ def test_phase_route_census_matches_production_dispatch(monkeypatch) -> None:
     )
     from simulator.battery.identity import Identity
     from simulator.battery.records import Composition, Species
-    from simulator.battery.score import ScoreContext, predict_with_engine
+    from simulator.battery.score import ScoreContext, predict_with_engine, score_store
     from simulator.melt_backend import base as melt_base
     from simulator.state_types import State
     from tests.battery import factories as F
@@ -130,11 +130,6 @@ def test_phase_route_census_matches_production_dispatch(monkeypatch) -> None:
         Engine.ALPHAMELTS,
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
         "wt_percent",
-    )
-    assert not observation_route_covered(
-        Engine.ALPHAMELTS,
-        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-        "free text basis",
     )
     assert not observation_route_covered(
         Engine.VAPOROCK,
@@ -199,6 +194,12 @@ def test_phase_route_census_matches_production_dispatch(monkeypatch) -> None:
         n_refused_records=0,
     )
     assert summary["coverage"]["callable_observations"] == 1
+    assert summary["capability_matrix"]["uncovered_pair_total"] == 1
+    assert not observation_route_covered(
+        Engine.ALPHAMELTS,
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        "free text basis",
+    )
     phase_rows = [
         row
         for row in summary["capability_matrix"]["rows"]
@@ -232,6 +233,13 @@ def test_phase_route_census_matches_production_dispatch(monkeypatch) -> None:
     assert calls == []
     assert prose_prediction.execution.state is ExecutionState.UNSUPPORTED
     assert prose_prediction.refusal_detail["reason"] == "quantity_not_predicted"
+
+    produced, _candidates = score_store(
+        context,
+        engines=(Engine.ALPHAMELTS,),
+        include_diagnostics=False,
+    )
+    assert [item.reference for item in produced] == [supported.observation_id]
 
     calls.clear()
     vaporock_prediction = predict_with_engine(Engine.VAPOROCK, supported)

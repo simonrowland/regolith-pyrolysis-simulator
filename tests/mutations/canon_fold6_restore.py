@@ -163,6 +163,149 @@ _LIQUID_PAIR = (
     ),
 )
 
+_OXYGEN_FRAME = (
+    (
+        ROOT / "simulator/battery/fo2_ladder.py",
+        """        return (
+            route.authority is WaypointAuthority.PRINTED
+            and absolute_oxygen_frame(_identity(observation))
+        )
+""",
+        """        return route.authority is WaypointAuthority.PRINTED
+""",
+    ),
+)
+
+_BUFFER_RECEIPT = (
+    (
+        ROOT / "simulator/battery/fo2_ladder.py",
+        """        marker = True
+    return marker
+""",
+        """        marker = True
+    return False
+""",
+    ),
+)
+
+_CONVERSION = (
+    (
+        ROOT / "simulator/battery/waypoints.py",
+        """    located = experiment.conditions.get(name)
+    if located is None or not located.state.is_value:
+        return None
+    from simulator.battery.source_oxygen import pressure_has_only_unit_conversion
+
+    if not pressure_has_only_unit_conversion(located):
+        return None
+    note = located.locator.note if located.locator is not None else None
+""",
+        """    located = experiment.conditions.get(name)
+    if located is None or not located.state.is_value:
+        return None
+    note = located.locator.note if located.locator is not None else None
+""",
+    ),
+)
+
+_AIR_FREE = (
+    (
+        ROOT / "simulator/battery/oxygen_identity.py",
+        """    equilibration_air = re.search(
+        r"\\bequilibrat\\w*(?:\\s+\\w+){0,5}\\s+(?:in|under)\\s+(?:ambient\\s+)?air\\b"
+        r"(?!\\s+free\\b)",
+        normalized_quote,
+    )
+    air_during_equilibration = re.search(
+        r"\\bair\\b(?!\\s+free\\b).{0,60}\\b(?:during|throughout)\\s+equilibrat\\w*",
+        normalized_quote,
+    )
+    sensor_outside_chamber = (
+        air_during_equilibration is not None
+        and re.search(
+            r"\\b(?:sensor|outside)\\b",
+            air_during_equilibration.group(0),
+        )
+        is not None
+    )
+    if (
+        equilibration_air is not None
+        and not re.search(
+            r"\\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\\b",
+            equilibration_air.group(0),
+        )
+    ) or (
+        air_during_equilibration is not None and not sensor_outside_chamber
+    ):
+        return source_quote
+""",
+        """    equilibration_air = re.search(
+        r"\\bequilibrat\\w*(?:\\s+\\w+){0,5}\\s+(?:in|under)\\s+(?:ambient\\s+)?air\\b",
+        normalized_quote,
+    )
+    air_during_equilibration = re.search(
+        r"\\bair\\b.{0,60}\\b(?:during|throughout)\\s+equilibrat\\w*",
+        normalized_quote,
+    )
+    if (
+        equilibration_air is not None
+        and not re.search(
+            r"\\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\\b",
+            equilibration_air.group(0),
+        )
+    ) or air_during_equilibration is not None:
+        return source_quote
+""",
+    ),
+)
+
+_PHASE_LABEL = (
+    (
+        ROOT / "simulator/battery/score.py",
+        """        raw_label = distinct[0] if len(distinct) == 1 else None
+""",
+        """        raw_label = distinct[0] if distinct else None
+""",
+    ),
+)
+
+_UNCOVERED_COUNT = (
+    (
+        ROOT / "simulator/battery/engine_capability.py",
+        """    uncovered_pair_total = omitted_emission_pairs
+""",
+        """    uncovered_pair_total = sum(
+        row["n_observations"] for row in rows if not row["covered"]
+    )
+""",
+    ),
+)
+
+_SUMMARY_ORDER = (
+    (
+        ROOT / "simulator/battery/score.py",
+        """                json.dumps(
+                    [
+                        stable_order[0],
+                        stable_order[1],
+                        stable_order[2],
+                        stable_order[3],
+                        numeric_value,
+                        band_value,
+                    ],
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                )
+""",
+        """                json.dumps(
+                    list(stable_order),
+                    ensure_ascii=False,
+                    separators=(",", ":"),
+                )
+""",
+    ),
+)
+
 MUTATIONS = {
     "oxygen-provenance": (
         _OXYGEN_PROVENANCE,
@@ -200,6 +343,48 @@ MUTATIONS = {
         "test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal",
         "unlabelled",
     ),
+    "oxygen-frame": (
+        _OXYGEN_FRAME,
+        "tests/battery/test_printed_oxygen_identity.py::"
+        "test_unknown_frame_and_uncalibrated_buffer_are_not_clean_commands",
+        "printed_fO2_log",
+    ),
+    "buffer-receipt": (
+        _BUFFER_RECEIPT,
+        "tests/battery/test_printed_oxygen_identity.py::"
+        "test_unknown_frame_and_uncalibrated_buffer_are_not_clean_commands",
+        "buffer_relation",
+    ),
+    "conversion": (
+        _CONVERSION,
+        "tests/battery/test_printed_oxygen_identity.py::"
+        "test_unknown_frame_and_uncalibrated_buffer_are_not_clean_commands",
+        "original_unit",
+    ),
+    "air-free": (
+        _AIR_FREE,
+        "tests/battery/test_printed_oxygen_identity.py::"
+        "test_dp002_applicability_uses_registered_pressure_evidence",
+        "air-free",
+    ),
+    "phase-label": (
+        _PHASE_LABEL,
+        "tests/battery/test_printed_oxygen_identity.py::"
+        "test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal",
+        "phase Lfe and phase Lsi",
+    ),
+    "uncovered-count": (
+        _UNCOVERED_COUNT,
+        "tests/battery/test_engine_capability.py::"
+        "test_phase_route_census_matches_production_dispatch",
+        "uncovered_pair_total",
+    ),
+    "summary-order": (
+        _SUMMARY_ORDER,
+        "tests/battery/test_score_workers.py::"
+        "test_parallel_scoring_matches_serial_rows_and_summary",
+        "parallel_summary",
+    ),
 }
 
 
@@ -213,7 +398,7 @@ def anchors_hold() -> None:
             found = _count(path, old)
             if found != 1:
                 raise SystemExit(f"{name}: {path.name} anchor count {found}, expected 1")
-    print("anchors: 6 mutations, each anchor once")
+    print(f"anchors: {len(MUTATIONS)} mutations, each anchor once")
 
 
 def _apply(edits) -> dict[Path, str]:
@@ -257,12 +442,15 @@ def main(argv: list[str]) -> int:
     finally:
         _restore(saved)
     output = result.stdout + result.stderr
-    if result.returncode == 0 or marker not in output:
-        raise SystemExit(
-            f"{argv[0]} did not fail its pin\n" + output[-2000:]
-        )
-    print(f"PASS: {argv[0]} restores the defect and fails {node}")
-    return 0
+    if result.returncode == 0:
+        raise SystemExit(f"{argv[0]}: pin did not fail\n" + output[-2000:])
+    if marker in output and "AssertionError" in output:
+        print(f"PASS: {argv[0]} restores the defect and fails {node}")
+        return 0
+    raise SystemExit(
+        f"{argv[0]}: collection, infrastructure, or a different assertion\n"
+        + output[-2000:]
+    )
 
 
 if __name__ == "__main__":

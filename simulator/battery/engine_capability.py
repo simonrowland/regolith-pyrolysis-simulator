@@ -243,6 +243,7 @@ def capability_summary(
     counts: dict[tuple[str, str, str], int] = defaultdict(int)
     uncovered: dict[tuple[str, str], int] = defaultdict(int)
     callable_ids: set[str] = set()
+    omitted_emission_pairs = 0
     n_quantity_unknown = 0
     engine_list = tuple(engines)
     candidates = comparison_candidates(context)
@@ -272,8 +273,18 @@ def capability_summary(
             callable_ids.add(observation.observation_id)
         if not any_declared_engine_covers(quantity):
             uncovered[(quantity.value, rail_token)] += 1
+        experiment = context.experiments.get(observation.experiment_id)
         for engine in engine_list:
             counts[(engine.value, quantity.value, rail_token)] += 1
+            # The same skip as score_run's emission gate. Quantity-level
+            # ``covered`` stays on the matrix row; this count is the pairs
+            # that gate does not emit.
+            if not observation_route_covered(
+                engine, quantity, phase_basis
+            ) and not _residue_adapter_binds(
+                observation, engine, experiment, quantity
+            ):
+                omitted_emission_pairs += 1
     seen = {observation.observation_id for observation in candidates}
     outside: list[object] = []
     for observation in diagnostic_references(context):
@@ -327,9 +338,7 @@ def capability_summary(
     ]
     scored = callable_ids.intersection(scored_observation_ids)
     cross_product_total = sum(row["n_observations"] for row in rows)
-    uncovered_pair_total = sum(
-        row["n_observations"] for row in rows if not row["covered"]
-    )
+    uncovered_pair_total = omitted_emission_pairs
     return {
         "capability_matrix": {
             "cross_product_total": cross_product_total,

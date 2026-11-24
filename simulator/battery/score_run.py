@@ -1194,6 +1194,7 @@ def _materialize_failed_score_shard(
         _ResidualJsonlStream,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        parse_residual_order_entry,
     )
     if result.failure is None:
         return result
@@ -1233,27 +1234,24 @@ def _materialize_failed_score_shard(
                         if (
                             not isinstance(payload, Mapping)
                             or is_store_stamp_payload(payload)
-                            or not isinstance(order_value, list)
-                            or len(order_value) != 4
-                            or not isinstance(order_value[0], str)
-                            or any(
-                                type(value) is not int for value in order_value[1:]
-                            )
                         ):
                             continue
-                        stable_order = (
-                            order_value[0],
-                            order_value[1],
-                            order_value[2],
-                            order_value[3],
-                        )
-                        if stable_order in completed_orders:
+                        entry = parse_residual_order_entry(order_value)
+                        if entry is None or entry.sort_order in completed_orders:
                             continue
-                        recovered_stream.append_payload_line(
-                            line,
-                            sort_order=stable_order,
-                        )
-                        completed_orders.add(stable_order)
+                        if entry.exact:
+                            recovered_stream.append_payload_line(
+                                line,
+                                sort_order=entry.sort_order,
+                                numeric_value=entry.numeric_value,
+                                band_value=entry.band_value,
+                            )
+                        else:
+                            recovered_stream.append_payload_line(
+                                line,
+                                sort_order=entry.sort_order,
+                            )
+                        completed_orders.add(entry.sort_order)
         _score_store_with_decisions(
             prepared.context,
             _prepared=prepared,
@@ -1303,6 +1301,7 @@ def _score_store_to_jsonl(
         _prepare_score_run,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        parse_residual_order_entry,
         supervised_process_map,
     )
 
@@ -1493,27 +1492,23 @@ def _score_store_to_jsonl(
                                 ):
                                     continue
                                 order_value = json.loads(order_file.readline())
-                                if (
-                                    not isinstance(order_value, list)
-                                    or len(order_value) != 4
-                                    or not isinstance(order_value[0], str)
-                                    or any(
-                                        type(value) is not int
-                                        for value in order_value[1:]
-                                    )
-                                ):
+                                entry = parse_residual_order_entry(order_value)
+                                if entry is None:
                                     raise ValueError(
                                         "score shard has an invalid serial-order entry"
                                     )
-                                stream.append_payload_line(
-                                    line,
-                                    sort_order=(
-                                        order_value[0],
-                                        order_value[1],
-                                        order_value[2],
-                                        order_value[3],
-                                    ),
-                                )
+                                if entry.exact:
+                                    stream.append_payload_line(
+                                        line,
+                                        sort_order=entry.sort_order,
+                                        numeric_value=entry.numeric_value,
+                                        band_value=entry.band_value,
+                                    )
+                                else:
+                                    stream.append_payload_line(
+                                        line,
+                                        sort_order=entry.sort_order,
+                                    )
                             if order_file.read(1):
                                 raise ValueError(
                                     "score shard has extra serial-order entries"
