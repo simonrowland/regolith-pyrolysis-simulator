@@ -3,8 +3,10 @@ from __future__ import annotations
 from copy import deepcopy
 from pathlib import Path
 
+import pytest
 import yaml
 
+from simulator.battery import migrate as migration
 from simulator.battery.default_policy import resolve
 from simulator.battery.enums import MethodToken, NoticeKind, Phase, Quantity
 from simulator.battery.migrate import (
@@ -446,6 +448,136 @@ def test_tagged_unknown_phase_survives_observation_assembly(tmp_path: Path) -> N
     assert sum(
         notice.kind is NoticeKind.PHASE_INFERRED for notice in omitted.notices
     ) == 1
+
+
+def test_model_derived_saturation_pressure_keeps_tagged_unknown(tmp_path: Path) -> None:
+    extract = _scalar_fixture_extract()
+    raw = extract["species"]["Na"]["observations"][0]
+    raw["phase"] = {"tag": "unknown", "reason": "source does not state phase"}
+    raw["values"]["method_class"] = "model_derived"
+    tagged = _only_observation(
+        migrate(_write_min_tree(tmp_path / "tagged", extract), write=False)
+    )
+    notices = [
+        notice for notice in tagged.notices if notice.kind is NoticeKind.PHASE_INFERRED
+    ]
+    assert tagged.identity.species.phase.is_unknown, (
+        tagged.identity.species.phase,
+        notices,
+    )
+    assert tagged.identity.species.phase.reason == "source does not state phase"
+    assert not notices
+
+    absent_extract = _scalar_fixture_extract()
+    absent_raw = absent_extract["species"]["Na"]["observations"][0]
+    absent_raw.pop("phase")
+    absent_raw["values"]["method_class"] = "model_derived"
+    absent = _only_observation(
+        migrate(_write_min_tree(tmp_path / "absent", absent_extract), write=False)
+    )
+    assert absent.identity.species.phase.is_value
+    assert absent.identity.species.phase.value is Phase.G
+    assert any(
+        notice.kind is NoticeKind.PHASE_INFERRED for notice in absent.notices
+    )
+
+
+def test_exploded_series_keeps_parent_tagged_unknown(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    raw = extract["species"]["Na"]["observations"][0]
+    raw["phase"] = {"tag": "unknown", "reason": "source does not state phase"}
+    rows = tuple(
+        migrate(_write_min_tree(tmp_path / "tagged", extract), write=False).observations.values()
+    )
+    assert len(rows) == 2
+    for row in rows:
+        notices = [
+            notice.reason
+            for notice in row.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        ]
+        assert row.identity.species.phase.is_unknown, (
+            row.observation_id,
+            row.identity.species.phase,
+            notices,
+        )
+        assert row.identity.species.phase.reason == raw["phase"]["reason"]
+        assert not notices
+
+    absent_extract = deepcopy(FIXTURE_EXTRACT)
+    absent_extract["species"]["Na"]["observations"][0].pop("phase")
+    absent_rows = tuple(
+        migrate(
+            _write_min_tree(tmp_path / "absent", absent_extract), write=False
+        ).observations.values()
+    )
+    assert len(absent_rows) == 2
+    for row in absent_rows:
+        assert row.identity.species.phase.is_value
+        assert row.identity.species.phase.value is Phase.UNSPECIFIED
+        phase_notices = [
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        ]
+        assert len(phase_notices) == 1
+        assert "original_reason=source does not state phase" in phase_notices[0].reason
+
+
+def test_printed_point_phase_outranks_parent_tagged_unknown(tmp_path: Path) -> None:
+    extract = deepcopy(FIXTURE_EXTRACT)
+    raw = extract["species"]["Na"]["observations"][0]
+    raw["phase"] = {"tag": "unknown", "reason": "source does not state phase"}
+    raw["values"]["series"][1]["phase_as_printed"] = "melt"
+    rows = tuple(
+        migrate(_write_min_tree(tmp_path, extract), write=False).observations.values()
+    )
+    assert len(rows) == 2
+    inherited = min(rows, key=lambda row: row.identity.temperature_K.value)
+    printed = max(rows, key=lambda row: row.identity.temperature_K.value)
+    assert inherited is not printed
+    assert inherited.identity.species.phase.is_unknown
+    assert inherited.identity.species.phase.reason == "source does not state phase"
+    assert not any(
+        notice.kind is NoticeKind.PHASE_INFERRED for notice in inherited.notices
+    )
+    assert printed.identity.species.phase.is_value
+    assert printed.identity.species.phase.value is Phase.L
+
+
+def test_method_class_gas_default_mutant_drops_tagged_unknown(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    test_model_derived_saturation_pressure_keeps_tagged_unknown(tmp_path / "baseline")
+    monkeypatch.setattr(
+        migration,
+        "_pressure_gas_assignment_allowed",
+        lambda source_state, *, source_declares_gas: True,
+    )
+    with pytest.raises(AssertionError):
+        test_model_derived_saturation_pressure_keeps_tagged_unknown(
+            tmp_path / "mutant"
+        )
+
+
+def test_dropping_tagged_phase_state_fails_scalar_and_exploded_rows(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    test_tagged_unknown_phase_survives_observation_assembly(tmp_path / "scalar-base")
+    test_exploded_series_keeps_parent_tagged_unknown(tmp_path / "points-base")
+    original = migration.Migrator._add_observation
+
+    def reclassify(self, row, source_key, **kwargs):
+        kwargs.pop("phase_source_state", None)
+        return original(self, row, source_key, **kwargs)
+
+    monkeypatch.setattr(migration.Migrator, "_add_observation", reclassify)
+    with pytest.raises(AssertionError):
+        test_tagged_unknown_phase_survives_observation_assembly(
+            tmp_path / "scalar-mutant"
+        )
+    with pytest.raises(AssertionError):
+        test_exploded_series_keeps_parent_tagged_unknown(tmp_path / "points-mutant")
 
 
 def test_added_phase_spellings_have_single_closed_phases() -> None:

@@ -36,8 +36,11 @@ remain unknown, never certified / liquid / knudsen_effusion. An explicit
 experiment-level ``ambient_pressure_evidence`` may supply 101325 Pa only for
 an otherwise missing total pressure on an open/flowing-gas furnace.
 Unknown rail spellings raise. An unmapped explicit phase with no resolving
-evidence remains an unknown state with its source reason. An absent phase may
-use a role fallback; otherwise row evidence or DP-016 supplies a flagged phase.
+evidence remains an unknown state with its source reason. A tagged unknown
+stays tagged: a pressure method class does not assign gas, and an exploded
+point with no printed phase of its own inherits that decision. An absent phase
+may use a role fallback; otherwise row evidence or DP-016 supplies a flagged
+phase.
 """
 
 from __future__ import annotations
@@ -10712,6 +10715,22 @@ def _phase_resolution_required(
         and source_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
         and _phase_needs_default(phase)
     )
+
+
+def _pressure_gas_assignment_allowed(
+    source_state: _PhaseSourceState,
+    *,
+    source_declares_gas: bool,
+) -> bool:
+    """A pressure method class is not a gas declaration.
+
+    Tagged unknown stays tagged. A standard state that names a gas, or a
+    measured tabulated ``gas_species``, is located evidence and may set it.
+    """
+
+    if source_state is _PhaseSourceState.TAGGED_UNKNOWN and not source_declares_gas:
+        return False
+    return True
 
 
 def _phase_original_reason(
@@ -27588,8 +27607,14 @@ class Migrator:
                     "directly_reduced_measurement",
                 }
             )
-            if phase_provenance is not None and inferred_pressure_phase and (
-                phase.is_unknown or source_declares_gas_phase
+            if (
+                phase_provenance is not None
+                and inferred_pressure_phase
+                and (phase.is_unknown or source_declares_gas_phase)
+                and _pressure_gas_assignment_allowed(
+                    source_phase_state,
+                    source_declares_gas=source_declares_gas_phase,
+                )
             ):
                 phase = State.of(Phase.G)
                 unmapped_phase = None
@@ -30122,6 +30147,7 @@ class Migrator:
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    parent_phase_source_state=source_phase_state,
                 )
             if (
                 self._count(source_key).observations_out > before
@@ -30277,6 +30303,7 @@ class Migrator:
                             if field not in _RESIDUE_COMPONENT_SLOT_FIELDS
                             else None
                         ),
+                        parent_phase_source_state=source_phase_state,
                     )
             return
         row_point_containers: list[tuple[str, list[Any]]] = []
@@ -30397,6 +30424,7 @@ class Migrator:
                     composition_datum_declared=declares_composition_datum,
                     provenance=observation_provenance,
                     parent_point_conditions=point_conditions,
+                    parent_phase_source_state=source_phase_state,
                 )
                 if not child_carries_value:
                     children_carry_values = False
@@ -30601,6 +30629,7 @@ class Migrator:
                         ),
                         content_stable_id=True,
                         use_printed_point_species=non_yield_points,
+                        parent_phase_source_state=source_phase_state,
                     )
             if (
                 source_id == "johnston-1965-sodium-disilicate-redox"
@@ -31202,6 +31231,7 @@ class Migrator:
         composition_datum_declared: bool = False,
         provenance: Mapping[str, Any] | None = None,
         parent_point_conditions: Mapping[str, Located[Any]] | None = None,
+        parent_phase_source_state: _PhaseSourceState | None = None,
         source_point_oxide_map: Mapping[str, Decimal] | None = None,
         source_point_composition_context: Mapping[str, Any] | None = None,
         source_point_residue_fields: Sequence[str] | None = None,
@@ -33238,15 +33268,17 @@ class Migrator:
             derived_from,
             derivation,
         )
-        phase_source_state = (
-            _phase_source_state(
+        if printed_phase_text is not None and identity.species is not None:
+            # A printed point phase is located evidence. The same owner
+            # classifies it. A point with none inherits the parent decision,
+            # including a tagged unknown and its reason.
+            phase_source_state = _phase_source_state(
                 printed_phase_text,
                 identity.species.phase,
                 None,
             )
-            if printed_phase_text is not None and identity.species is not None
-            else None
-        )
+        else:
+            phase_source_state = parent_phase_source_state
         self._add_observation(
             observation, source_key, phase_source_state=phase_source_state
         )

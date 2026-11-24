@@ -444,6 +444,38 @@ def test_engines_without_a_phase_assemblage_keep_their_typed_refusal(
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
         role=PhaseRole.METAL,
         counter=None,
+        composition=_van_ende_charge(),
+    )
+    observation = F.observation(
+        "charge-row",
+        "run-1",
+        identity,
+        Decimal("7.8"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="fixture-source",
+    )
+    prediction = predict_with_engine(Engine.VAPOROCK, observation)
+    assert prediction.value is None
+    assert (
+        prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION
+    )
+
+
+def test_fe_ni_mass_percent_without_a_phase_assemblage_keeps_its_typed_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    def assemblage(*args, **kwargs):
+        raise AssertionError("phase assemblage must not be called")
+
+    monkeypatch.setattr(
+        "simulator.battery.score._equilibrate_phase_assemblage", assemblage
+    )
+    identity = _phase_identity(
+        "Mn",
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        role=PhaseRole.METAL,
+        counter=None,
         composition=Composition(
             basis="printed_phase_composition",
             components=(("Fe", Decimal("50")), ("Ni", Decimal("50"))),

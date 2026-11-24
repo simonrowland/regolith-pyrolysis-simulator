@@ -97,6 +97,39 @@ def test_all_zero_metal_mass_percent_keeps_basis_refusal(
     )
 
 
+def test_alloy_gate_ahead_of_mass_percent_fails_the_taniguchi_pin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from tests.battery.test_phase_composition_rows import (
+        test_sum_near_one_mass_percent_bulk_stays_refused,
+    )
+
+    test_sum_near_one_mass_percent_bulk_stays_refused(monkeypatch)
+    source = Path(score_module.__file__).read_text()
+    block = (
+        "    if (\n"
+        "        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION\n"
+        "        and composition.amount_basis is AmountBasis.MASS_PERCENT\n"
+        "    ):\n"
+        "        # Basis mismatch is decided before alloy capability. A wt% payload\n"
+        "        # that parses, including Taniguchi Fe 0.974, still cannot be moles.\n"
+        "        return mass_percent_basis_refusal()\n"
+    )
+    if source.count(block) != 1:
+        raise AssertionError("mass-percent precedence block was not unique")
+    code = compile(source.replace(block, "", 1), score_module.__file__, "exec")
+    for name in score_module._predict_phase_row.__qualname__.split("."):
+        code = next(
+            item
+            for item in code.co_consts
+            if isinstance(item, CodeType) and item.co_name == name
+        )
+    monkeypatch.setattr(score_module._predict_phase_row, "__code__", code)
+    with pytest.raises(AssertionError) as caught:
+        test_sum_near_one_mass_percent_bulk_stays_refused(monkeypatch)
+    assert "phase assemblage must not be called" not in str(caught.value)
+
+
 def test_malformed_metal_mutation_anchor_fails_the_conversion_assertion(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

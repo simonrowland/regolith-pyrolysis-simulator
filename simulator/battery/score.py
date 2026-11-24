@@ -12708,6 +12708,13 @@ def _predict_phase_row(
     if metal_charge is not None:
         reason, detail = metal_charge
         return refused(reason, detail)
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        # Basis mismatch is decided before alloy capability. A wt% payload
+        # that parses, including Taniguchi Fe 0.974, still cannot be moles.
+        return mass_percent_basis_refusal()
     if role is PhaseRole.METAL:
         from simulator.melt_backend.base import battery_adapter_class
 
@@ -12722,11 +12729,6 @@ def _predict_phase_row(
                     "detail": "adapter does not declare metal-alloy phase support",
                 },
             )
-    if (
-        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
-    ):
-        return mass_percent_basis_refusal()
     wt = composition_wt_pct(composition_state.value)
     if not wt:
         return refused(
