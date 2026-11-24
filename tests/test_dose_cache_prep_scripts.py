@@ -41,7 +41,20 @@ def _put_cache_row(db_path: Path, *, tag: str) -> None:
         "schema_version": "test",
         "tag": tag,
     }
-    payload = {"curve": {"status": "in_range", "tag": tag}}
+    payload = {
+        "curve": {
+            "source": "unit-test:seed-cache",
+            "status": "ok",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+            "tag": tag,
+        },
+    }
     key_bytes = canonical_json_bytes(key)
     payload_bytes = canonical_json_bytes(payload)
     PT1PersistentEquilibriumStore(db_path).put(
@@ -218,6 +231,27 @@ def test_seed_cache_preserves_or_carries_missing_payload_codec_version(
             f"SELECT payload_codec_version FROM {PT1_EQUILIBRIUM_TABLE}"
         ).fetchone()
     assert stored_version == expected_version
+
+
+def test_seed_cache_refreshes_stale_stamp_for_identical_row(tmp_path: Path) -> None:
+    source = tmp_path / "fresh-codec-source.db"
+    target = tmp_path / "stale-codec-target.db"
+    _put_cache_row(source, tag="codec-refresh")
+    target.write_bytes(source.read_bytes())
+    with sqlite3.connect(target) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = ?",
+            (rrd.PT0_GATE_CURVE_CODEC_VERSION - 1,),
+        )
+
+    seed_cache(target, [source])
+
+    with sqlite3.connect(target) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert stored_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
 
 
 def test_seed_cache_accepts_new_schema_equilibrium_authority(tmp_path: Path) -> None:

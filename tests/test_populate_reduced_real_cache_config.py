@@ -1,6 +1,7 @@
 import hashlib
 import importlib.util
 import json
+import shutil
 import sqlite3
 from pathlib import Path
 from types import SimpleNamespace
@@ -376,6 +377,45 @@ def test_populate_merge_preserves_or_carries_missing_payload_codec_version(
             (key_hash,),
         ).fetchone()
     assert stored_version == expected_version
+
+
+def test_populate_merge_refreshes_stale_stamp_for_identical_row(tmp_path):
+    driver = _load_driver()
+    shard_db = tmp_path / "fresh-codec-shard.db"
+    target_db = tmp_path / "stale-codec-target.db"
+    key = _pt1_key("codec-refresh")
+    key["artifact"] = "freeze_gate_curve"
+    payload = {
+        "curve": {
+            "source": "unit-test:populate-codec",
+            "status": "ok",
+            "solidus_T_C": 1200.0,
+            "liquidus_T_C": 1300.0,
+            "path": [
+                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
+                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
+            ],
+            "is_liquidus_floor": False,
+        },
+    }
+    key_hash = _write_pt1_row(shard_db, key, payload)
+    shutil.copyfile(shard_db, target_db)
+    with sqlite3.connect(target_db) as conn:
+        conn.execute(
+            f"UPDATE {driver.PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = ? WHERE key_hash = ?",
+            (rrd.PT0_GATE_CURVE_CODEC_VERSION - 1, key_hash),
+        )
+
+    driver._merge_cache_shard(shard_db, target_db)
+
+    with sqlite3.connect(target_db) as conn:
+        (stored_version,) = conn.execute(
+            f"SELECT payload_codec_version FROM {driver.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert stored_version == rrd.PT0_GATE_CURVE_CODEC_VERSION
 
 
 @pytest.mark.parametrize(
