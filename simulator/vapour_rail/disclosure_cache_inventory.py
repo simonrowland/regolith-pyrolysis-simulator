@@ -267,7 +267,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/score.py:residue_prediction_cache': {
         "path": 'simulator/battery/score.py',
-        "line": 17490,
+        "line": 17492,
         "kind": 'store',
         "name": 'residue_prediction_cache',
         "carries_disclosure": True,
