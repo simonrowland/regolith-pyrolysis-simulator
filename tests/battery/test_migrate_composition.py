@@ -8033,10 +8033,14 @@ def _internal_engine_point_for_real_extract(
         pytest.param(
             "kems-042-plante-1979.yaml",
             "plante1979_table2_s1126_r011_quoted",
-            {"K2O": 0.33331181591376485, "SiO2": 0.6666881840862351},
+            # At 1743 K the row prints 18.44 wt% K2O; its binary SiO2
+            # complement is 81.56 wt%. x_K2O=(18.44/94.1956) /
+            # ((18.44/94.1956) + (81.56/60.083)), unlike the 43.94 wt%
+            # shared starting charge.
+            {"K2O": 0.1260369192276479, "SiO2": 0.8739630807723522},
+            "calculated",
             None,
-            None,
-            id="plante-composition-remains-selected",
+            id="plante-point-datum-outranks-charge",
         ),
         pytest.param(
             "burnham-2015-europium-redox.yaml",
@@ -8186,7 +8190,17 @@ def test_m1_regression_rows_keep_green_internal_engine_point_composition(
     assert request.payload is not None
     assert request.payload["composition_mol"] == expected_composition
     assert request.payload.get("composition_method_class") == expected_method
-    assert request.payload.get("composition_notice") == expected_notice
+    if extract_name == "kems-042-plante-1979.yaml":
+        notice = request.payload.get("composition_notice")
+        assert isinstance(notice, str)
+        assert notice.startswith(
+            "calculated from printed binary oxide wt% composition; "
+            "relation=SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction; "
+        )
+        assert "18.44" in notice and "81.56" in notice
+        assert "published_page=277" in notice and "table='2'" in notice
+    else:
+        assert request.payload.get("composition_notice") == expected_notice
 
 
 def test_m1_kang_row_keeps_green_missing_evidence_gap() -> None:

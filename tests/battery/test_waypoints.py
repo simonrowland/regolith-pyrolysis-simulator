@@ -21,6 +21,7 @@ from simulator.battery.records import (
     Composition,
     Derivation,
     FO2Control,
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Located,
     Sample,
     SweepGas,
@@ -1028,6 +1029,81 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
     assert "observation_normalized_initial_composition" in {
         route.route for route in result.routes
     }
+
+
+def test_same_temperature_printed_datum_outranks_shared_starting_charge() -> None:
+    datum = wt_pct_to_mole_fraction(
+        {"K2O": Decimal("18.44"), "SiO2": Decimal("81.56")}
+    )
+    sample = Sample(
+        printed_composition=Located(
+            factories.State.of({"K2O": Decimal("43.94"), "SiO2": Decimal("56.06")})
+        )
+    )
+    experiment = replace(factories.kems_experiment(), sample=sample)
+    point = Located(
+        factories.State.of(datum),
+        factories.loc(published_page=277, table="2"),
+        Derivation(
+            "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
+            ("printed Table 2 datum: 18.44 wt% K2O at 1743 K",),
+            (),
+            "mole_fraction",
+        ),
+    )
+    observation = replace(
+        factories.observation(
+            "plante-point",
+            experiment.experiment_id,
+            factories.o2_identity(),
+            1,
+        ),
+        point_conditions={"composition": point},
+    )
+
+    result = normalized_composition(experiment, _bench(), observation)
+
+    assert result.selected is not None
+    assert result.selected.route == "observation_normalized_initial_composition"
+    assert result.selected.value == dict(datum.components)
+
+
+def test_initial_charge_proxy_does_not_rank_as_same_temperature_print() -> None:
+    charge = wt_pct_to_mole_fraction(
+        {"K2O": Decimal("43.94"), "SiO2": Decimal("56.06")}
+    )
+    proxy = replace(charge, proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG)
+    sample = Sample(
+        printed_composition=Located(
+            factories.State.of({"K2O": Decimal("43.94"), "SiO2": Decimal("56.06")})
+        )
+    )
+    experiment = replace(factories.kems_experiment(), sample=sample)
+    point = Located(
+        factories.State.of(proxy),
+        factories.loc(published_page=276, table="1"),
+        Derivation(
+            "wt_pct_to_mole_fraction",
+            ("printed shared starting charge",),
+            (),
+            "mole_fraction",
+        ),
+    )
+    observation = replace(
+        factories.observation(
+            "plante-starting-charge-proxy",
+            experiment.experiment_id,
+            factories.o2_identity(),
+            1,
+        ),
+        point_conditions={"composition": point},
+    )
+
+    result = normalized_composition(experiment, _bench(), observation)
+
+    assert result.selected is not None
+    assert result.selected.route == "normalized_printed_composition"
+    assert result.selected.value == dict(charge.components)
 
 
 def test_printed_mineral_mole_fraction_is_not_filtered_as_an_oxide() -> None:

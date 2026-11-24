@@ -10,6 +10,7 @@ from collections.abc import Iterator, Mapping
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.battery.decimal_tokens import decimal_token
 from simulator.battery.enums import AmountBasis, MethodToken, Quantity, ValueKind
+from simulator.battery.composition_roles import is_initial_charge_composition
 from simulator.battery.composition import (
     excluded_component_notice_reason,
     partition_engine_components,
@@ -1283,12 +1284,20 @@ def normalized_composition(
                     input_species = input_species.removesuffix(
                         ";wt_pct_to_mole_fraction"
                     ).removesuffix("_wt_pct")
+                    if printed_species is not None:
+                        composition_species = printed_species
+                    elif isinstance(raw, Composition):
+                        composition_species = {
+                            str(species) for species, _amount in raw.components
+                        }
+                    else:
+                        composition_species = None
                     if (
                         is_binary_complement
                         and output_species != input_species
                         and _is_engine_oxide_component(output_species)
                         and _is_engine_oxide_component(input_species)
-                        and printed_species == {output_species, input_species}
+                        and composition_species == {output_species, input_species}
                     ):
                         origin = "printed binary oxide wt% composition"
                     else:
@@ -1321,7 +1330,20 @@ def normalized_composition(
                         inference=basis_inference,
                     )
                 )
-                evidence_ranks.append((not bool(located.inference), directness))
+                same_temperature_print = (
+                    use_point_composition
+                    and not is_initial_charge_composition(located.state)
+                    and located.inference is not None
+                    and (
+                        located.inference.relation == "wt_pct_to_mole_fraction"
+                        or located.inference.relation.endswith(
+                            ";wt_pct_to_mole_fraction"
+                        )
+                    )
+                )
+                evidence_ranks.append(
+                    (same_temperature_print, not bool(located.inference), directness)
+                )
             if field == "printed_composition":
                 printed_basis_exempt = set(basis_exempt)
         except UnknownCompositionRelationError:
