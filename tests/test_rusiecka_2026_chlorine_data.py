@@ -21,6 +21,7 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
+from simulator.battery.migrate import _mass_percent_composition_located
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -150,6 +151,40 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
     changed_projection = dict(changed.identity.composition.value.components)
     assert changed_projection["Cl"] > base_projection["Cl"]
     assert changed_projection["SiO2"] < base_projection["SiO2"]
+
+
+def test_row6_projection_components_match_current_mass_percent_resolver(
+    tmp_path: Path,
+) -> None:
+    """Pin current Rusiecka oxide mole fractions before flag ownership moves."""
+
+    doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    source = next(
+        observation
+        for container in doc["species"].values()
+        for observation in container.get("observations", [])
+        if observation["observation_id"] == "rusiecka_2026_data_row6_sio2"
+    )
+    result = _migrate_real_extract(
+        tmp_path / "row6-projection-baseline", EXTRACT_NAME, extract_doc=doc
+    )
+    row = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith("::rusiecka_2026_data_row6_sio2")
+    )
+    values = source["values"]
+    printed = values["composition_wt_pct"]
+    expected = _mass_percent_composition_located(
+        {name: Decimal(amount) for name, amount in printed.items()},
+        basis="printed_phase_composition",
+        locator=row.point_conditions["composition"].locator,
+        closure_context=values,
+        declared_component_map=printed,
+    )
+    assert dict(row.identity.composition.value.components) == dict(
+        expected.state.value.components
+    )
 
 
 def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
