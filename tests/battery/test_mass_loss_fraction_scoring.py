@@ -415,10 +415,21 @@ def test_markova_openimcc_scores_printed_cells_and_keeps_card_blocked(
         # default switch (OpenIMCC ce673d05), and the car adds a mixed-parent
         # residue channel set. The b274 probe predates that car-only helper,
         # so these runs cannot separate those causes. Car and merged
-        # per-channel OpenIMCC activity snapshots match; the largest car ->
-        # merge residual is VI Al2O3 at 2480.15 K, from the residue endpoint
-        # corner path enabled by the nonlocal corner-counter fix
-        # (0e6bd5486c, brought in by merge a0a71dea3e).
+        # per-channel OpenIMCC activity snapshots match, so the car -> merge
+        # residual is downstream of OpenIMCC, in the Knudsen residue
+        # integration (predict_knudsen_residue_composition). Its largest leaf
+        # is VI Al2O3 at 2480.15 K, with CaO moving by the equal and opposite
+        # amount. It already exists at the merge's car-side parent
+        # 3541b5a7b5, and comes from two b274 Knudsen changes absent from the
+        # car 69e6c97ed4, both merged at 83d372eb1c:
+        # - parent depletion (51319285d6): exhausted parents are zeroed and
+        #   kept out of the pressure inventory;
+        # - redox oxygen per iron in the congruent vapour balance
+        #   (0ae7f84de6): Markova has no printed oxygen, so the vacuum
+        #   oxygen balance uses the Kress91 Fe demand 1 + q/2.
+        # The merge's event/endpoint alignment (7fb10b7a66) restores the
+        # car's event predicate rather than adding a difference. These runs
+        # do not separate the two causes.
         assert float(silica.value.point) == pytest.approx(
             52.420421484088045, abs=1e-5
         )
