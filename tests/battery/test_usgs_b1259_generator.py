@@ -1322,3 +1322,19 @@ def test_full_census_closes() -> None:
             "unguarded_stored": unguarded_total,
         },
     )
+
+
+def test_pyroxene_500k_enthalpy_correction_reaches_generator() -> None:
+    generated = _generation("b1259-ht-0195-calcium-aluminum-pyroxene")
+    enthalpy = _observations_for(
+        generated,
+        Quantity.DELTA_FH,
+        temperature="500",
+        formula="CaAl2SiO6",
+    )
+    assert len(enthalpy) == 1
+    observation = enthalpy[0]
+    assert observation.value.point == Decimal("-3292.561144")
+    assert observation.locator.published_page == 220
+    assert observation.locator.pdf_page_index == 226
+    assert "as_published='-786.941'" in (observation.locator.note or "")

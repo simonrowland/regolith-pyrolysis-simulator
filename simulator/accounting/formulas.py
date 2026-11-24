@@ -111,6 +111,10 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+# A caller may use this while expanding an explicitly delimited decimal
+# coefficient. It survives adduct splitting and becomes a decimal only once
+# the accounting parser has assigned all separator dots.
+_DECIMAL_DOT_SENTINEL = "\x00"
 # Source: controller ruling for t-1795 lists H2O, CO2, NH3, SO3, and HCl.
 # SiO2 is an adduct unit in B1452's printed mullite formula 3Al2O3·2SiO2.
 # D2O was on that list, but accounting has no deuterium mass, so a
@@ -254,7 +258,7 @@ def parse_formula(
     totals: defaultdict[str, float] = defaultdict(float)
     for segment in _split_formula_segments(cleaned):
         multiplier, body = _leading_multiplier(segment)
-        parser = _FormulaParser(body)
+        parser = _FormulaParser(body.replace(_DECIMAL_DOT_SENTINEL, "."))
         elements = parser.parse()
         for element, count in elements.items():
             totals[element] += count * multiplier
@@ -642,7 +646,9 @@ def _ascii_adduct_parts(text: str) -> list[str] | None:
     index = 0
     found = False
     while index < len(text):
-        if text[index] == ".":
+        if text[index] == "." and (
+            index == 0 or text[index - 1] != _DECIMAL_DOT_SENTINEL
+        ):
             boundary = _adduct_boundary(text, index)
             if boundary is not None:
                 parts.append(text[start:index])

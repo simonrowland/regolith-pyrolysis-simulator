@@ -4066,6 +4066,29 @@ def test_species_formula_parser_preserves_200_existing_parses() -> None:
         assert parse_species_formula(formula, species=species) == expected
 
 
+def test_species_formula_parser_pins_bianchite_to_b1452_source() -> None:
+    compilation = (
+        Path(__file__).resolve().parents[2]
+        / "data/literature/compilations/robie-hemingway-fisher-1978-usgs-b1452"
+    )
+    record = json.loads(
+        (compilation / "records/robie-hemingway-fisher-1978-usgs-b1452-0003.json")
+        .read_text(encoding="utf-8")
+    )
+    row = next(row for row in record["rows"] if row["source_text_line"] == 661)
+    assert 26 in record["source_locator"]["printed_pages"]
+    assert 32 in record["source_locator"]["pdf_pages"]
+    assert row["cells"]["name_and_formula"]["as_published"] == (
+        r"BIANCHITE $ZnSO_{4} \cdot 6H_{2}O$"
+    )
+    assert parse_species_formula("ZnSO4·6H2O") == (
+        ("H", 12.0),
+        ("O", 10.0),
+        ("S", 1.0),
+        ("Zn", 1.0),
+    )
+
+
 def test_species_formula_parser_accepts_published_typography() -> None:
     assert parse_species_formula("$Ta_{2}C$") == (("C", 1.0), ("Ta", 2.0))
     assert parse_species_formula("V₂S₃") == (("S", 3.0), ("V", 2.0))
@@ -4182,6 +4205,9 @@ def test_species_formula_parser_honors_braced_and_mixed_decimal_subscripts() -> 
         ("Mg", 1.0),
         ("O", 1.0),
     )
+    assert parse_species_formula("$MgAl_{1.5}H_2O.2H_2O$") == (
+        ("Al", 1.5), ("H", 6.0), ("Mg", 1.0), ("O", 3.0)
+    )
 
 
 def test_species_formula_parser_classifies_each_dot() -> None:
@@ -4195,6 +4221,9 @@ def test_species_formula_parser_classifies_each_dot() -> None:
             )
         )
         assert parse_species_formula(formula) == expected
+    assert parse_species_formula("Fe0.947O2.2H2O·CO2") == (
+        ("C", 1.0), ("Fe", 0.947), ("H", 4.0), ("O", 6.0)
+    )
 
 
 def test_species_formula_parser_rejects_conflicting_phase_suffixes() -> None:
@@ -4221,6 +4250,10 @@ def test_species_formula_parser_rejects_conflicting_phase_suffixes() -> None:
 
 def test_species_formula_parser_does_not_treat_d2o_as_an_adduct() -> None:
     assert parse_species_formula("CaSO4.2D2O") is None
+    assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
+    assert parse_species_formula("D2O(l)", species=Species("D2O", Phase.L)) == (
+        ("D", 2.0), ("O", 1.0)
+    )
 
 
 def test_decimal_precedence_mutation_recreates_production_parser_failure(

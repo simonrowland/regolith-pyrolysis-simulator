@@ -1,5 +1,7 @@
 """Formula-owner pins for corpus spellings that cross formula syntax branches."""
 
+import pytest
+
 from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.accounting.formulas import (
     _ASCII_ADDUCT_UNITS,
@@ -70,6 +72,24 @@ def test_each_ascii_dot_is_classified_alone() -> None:
         "H": 4.0,
         "O": 4.0,
     }
+
+
+def test_delimited_decimal_dot_survives_accounting_adduct_split(monkeypatch) -> None:
+    from simulator.accounting import formulas as formula_owner
+
+    sentinel = formula_owner._DECIMAL_DOT_SENTINEL
+    formula = f"MgAl1{sentinel}5H2O.2H2O"
+    expected = {"Al": 1.5, "H": 6.0, "Mg": 1.0, "O": 3.0}
+    assert dict(parse_formula(formula).elements) == expected
+
+    split = formula_owner._ascii_adduct_parts
+    monkeypatch.setattr(
+        formula_owner,
+        "_ascii_adduct_parts",
+        lambda text: split(text.replace(sentinel, ".")),
+    )
+    with pytest.raises((AssertionError, UnknownSpeciesError)):
+        assert dict(parse_formula(formula).elements) == expected
 
 
 def test_d2o_is_outside_the_adduct_vocabulary() -> None:

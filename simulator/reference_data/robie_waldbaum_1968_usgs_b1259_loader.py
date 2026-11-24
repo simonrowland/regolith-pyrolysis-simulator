@@ -648,6 +648,7 @@ IMAGE_VERIFIED_GRID_ROWS = {
 }
 
 IMAGE_VERIFIED_CELLS_R3 = {
+    226: [(500.0, 1, "delta_f_H", "-786.941")],
     48: [
         (1400.0, 1, 'delta_f_G', '.000'),
         (1400.0, 1, 'log_Kf', '.000'),

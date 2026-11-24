@@ -1199,7 +1199,9 @@ def parse_species_formula(
     text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
     # A dot inside ``_{1.5}`` is a coefficient. Expanding the braces before
     # classification turns ``$MgAl_{1.5}H_2O$`` into five waters.
-    braced_decimal_dot = "\x00"
+    from simulator.accounting.formulas import _DECIMAL_DOT_SENTINEL
+
+    braced_decimal_dot = _DECIMAL_DOT_SENTINEL
 
     def _expand_subscript(match: re.Match[str]) -> str:
         braced = match.group(1)
@@ -1302,16 +1304,20 @@ def parse_species_formula(
     ):
         return None
 
+    # A D2O adduct is outside the accounting vocabulary. JANAF accepts D as
+    # an ordinary element, so stop this unsupported hydrate before its decimal
+    # fallback can reinterpret the separator as oxygen stoichiometry.
+    if re.search(r"\.\d*D2O(?:$|[^a-z])", text):
+        return None
+
     # Validate suffix axes before the JANAF parser can strip a terminal phase
     # label and return a composition without seeing the required species axis.
-    # The braced-decimal sentinel is not a split dot.
+    # Accounting assigns separator dots before restoring this explicit decimal.
     if "." in text and "·" not in text:
         from simulator.accounting.formulas import _is_ascii_adduct
 
         if _is_ascii_adduct(text):
-            return _accounting_formula_composition(
-                text.replace(braced_decimal_dot, ".")
-            )
+            return _accounting_formula_composition(text)
     text = text.replace(braced_decimal_dot, ".")
 
     established = formula_composition(text)
@@ -1321,7 +1327,7 @@ def parse_species_formula(
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)
         try:
-            from simulator.accounting.formulas import parse_formula
+            from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 
             # Parse each middle-dot segment separately so hydrate multipliers
             # such as 1/2 and 6.5 do not collide with period splitting.
@@ -1343,15 +1349,9 @@ def parse_species_formula(
                     body = segment[multiplier_match.end() :]
                 if not body:
                     return None
-                composition = formula_composition(body)
+                composition = atoms_parse_formula_else_janaf(body)
                 if composition is None:
-                    parsed_body = parse_formula(body, species=body).elements
-                    composition = tuple(
-                        sorted(
-                            (str(symbol), float(count))
-                            for symbol, count in parsed_body.items()
-                        )
-                    )
+                    return None
                 for symbol, count in composition:
                     hydrated[symbol] += multiplier * count
         except ValueError:

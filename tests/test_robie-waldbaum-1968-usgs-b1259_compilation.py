@@ -227,6 +227,42 @@ def test_clinoenstatite_formula_matches_image_verified_page_228(layout_pages):
     }
 
 
+def test_pyroxene_500k_enthalpy_is_image_corrected_and_mutation_probed(
+    layout_pages, monkeypatch
+):
+    parsed = loader.parse_high_t_page(226, layout_pages[225])
+    assert parsed["page"] == 220
+    row = next(
+        row
+        for row in parsed["rows"]
+        if row.get("temperature", {}).get("as_published") == "500"
+    )
+    cell = row["delta_f_H"]
+    assert cell["layout_as_extracted"] == "-766.941"
+    assert cell["as_published"] == "-786.941"
+    assert cell["value"] == -786.941
+    assert cell["ocr_suspect"] is False
+    correction, = [
+        item for item in parsed["corrections"]
+        if item.get("field") == "delta_f_H" and item.get("printed_token") == "-786.941"
+    ]
+    assert correction["pdf_page"] == 226
+    assert correction["layout_as_extracted"] == "-766.941"
+    assert correction["evidence"] == (
+        "PDF page 226 image visibly prints delta_f_H=-786.941 at T=500.0 K"
+    )
+
+    monkeypatch.setitem(loader.IMAGE_VERIFIED_CELLS_R3, 226, [])
+    mutated = loader.parse_high_t_page(226, layout_pages[225])
+    mutated_row = next(
+        row
+        for row in mutated["rows"]
+        if row.get("temperature", {}).get("as_published") == "500"
+    )
+    with pytest.raises(AssertionError):
+        assert mutated_row["delta_f_H"]["as_published"] == "-786.941"
+
+
 def test_engine_carried_formulas_match_image_verified_pages(corpus):
     manifest, records = corpus
     by_id = {record["record_id"]: record for record in records}
