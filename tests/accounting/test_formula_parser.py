@@ -115,6 +115,9 @@ def test_formula_accounting_entrypoint_owns_delimited_decimals_and_d2o_refusal()
     )
     assert atoms_parse_formula_else_janaf("CaSO4.2D2O") is None
     assert atoms_parse_formula_else_janaf("CaSO4·2D2O") is None
+    assert atoms_parse_formula_else_janaf("CaSO4·1/2H2O") == (
+        ("Ca", 1.0), ("H", 1.0), ("O", 4.5), ("S", 1.0)
+    )
     assert atoms_parse_formula_else_janaf("AsD3") == (("As", 1.0), ("D", 3.0))
     assert atoms_parse_formula_else_janaf("D2O(l)") == (("D", 2.0), ("O", 1.0))
 
