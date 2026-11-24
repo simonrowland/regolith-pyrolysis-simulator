@@ -12,7 +12,7 @@ import threading
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any
+from typing import Any, Mapping
 
 import pytest
 import yaml
@@ -55,6 +55,7 @@ from simulator.reduced_real_determinism import (
     PT0InvalidControls,
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
+    PT1PersistentEquilibriumStore,
     PT1PersistentStoreCorrupt,
     canonical_physics_bucket_key_from_replay_key,
     canonical_json_bytes,
@@ -129,6 +130,7 @@ def _capture_pt0_gate_curve(
     db_path: Path,
     *,
     solidus_T_C: float,
+    law_disclosures: Any = (),
 ) -> tuple[PT0DeterminismStore, Any, float, dict[str, Any]]:
     store = PT0DeterminismStore("capture", db_path=db_path)
     sim = _build_pt0_sim(store)
@@ -147,6 +149,7 @@ def _capture_pt0_gate_curve(
         fO2_log=fO2_log,
         curve=curve,
         repair_notices=[],
+        law_disclosures=law_disclosures,
     )
     return store, sim, fO2_log, curve
 
@@ -4320,6 +4323,203 @@ def test_gate_curve_codec_stamp_survives_seed_and_replays_from_target(
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     ) == curve
     assert replay.hits == 1
+
+
+@pytest.mark.parametrize("transport", ("seed", "populate", "epoch"))
+@pytest.mark.parametrize(
+    "disclosures",
+    (
+        (),
+        (
+            {
+                "law_id": "FeO_association_gas:diagnostic",
+                "provenance": "fixture",
+                "authority": "diagnostic/extrapolated",
+                "certified_band_K": None,
+                "anchor_gaps_dex": {},
+                "closer": "fixture",
+                "certification_route": [],
+                "evaluation_count": 1,
+            },
+        ),
+    ),
+    ids=("measured-empty", "measured-disclosure"),
+)
+def test_pt1_assembly_transports_measured_gate_disclosures_and_hits(
+    tmp_path: Path,
+    transport: str,
+    disclosures: tuple[Mapping[str, Any], ...],
+) -> None:
+    shard_db = tmp_path / "capture-shard.sqlite"
+    target_db = tmp_path / "assembled-cache.sqlite"
+    _capture, _capture_sim, _capture_fO2, curve = _capture_pt0_gate_curve(
+        shard_db,
+        solidus_T_C=1100.0,
+        law_disclosures=disclosures,
+    )
+
+    if transport == "seed":
+        seed_cache(target_db, [shard_db])
+    elif transport == "populate":
+        from scripts import populate_reduced_real_cache
+
+        populate_reduced_real_cache._merge_cache_shard(shard_db, target_db)
+    else:
+        from scripts import epoch_grind
+
+        epoch_grind.merge_epoch_shards(target_db, [shard_db])
+
+    with sqlite3.connect(target_db) as conn:
+        (stored_disclosures,) = conn.execute(
+            f"SELECT law_disclosures_json FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+    assert json.loads(stored_disclosures) == list(disclosures)
+
+    replay = PT0DeterminismStore("replay", db_path=target_db)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    ) == curve
+    assert replay.hits == 1
+    assert replay._accepted_hit_disclosures == disclosures
+
+
+@pytest.mark.parametrize("transport", ("seed", "populate", "epoch"))
+def test_pt1_assembly_replaces_stale_equilibrium_payload_bytes(
+    tmp_path: Path,
+    transport: str,
+) -> None:
+    from simulator.reduced_real_determinism import (
+        PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION,
+    )
+
+    shard_db = tmp_path / "fresh-equilibrium-shard.sqlite"
+    target_db = tmp_path / "stale-equilibrium-target.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=shard_db)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
+    )
+    capture._store("equilibrium_post_record", key, payload, law_disclosures=[])
+    key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+
+    with sqlite3.connect(shard_db) as conn:
+        (fresh_payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+        legacy_payload_bytes = canonical_json_bytes(
+            {**payload, "legacy_equilibrium_marker": "old-row"}
+        )
+    # The target is a second real PT1 store with the same key and legacy bytes.
+    target_store = PT1PersistentEquilibriumStore(target_db)
+    with sqlite3.connect(shard_db) as source_conn, target_store._connect() as target_conn:
+        source_conn.backup(target_conn)
+    with sqlite3.connect(target_db) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_bytes = ?, payload_sha256 = ?, payload_codec_version = ? "
+            "WHERE key_hash = ?",
+            (
+                sqlite3.Binary(legacy_payload_bytes),
+                hashlib.sha256(legacy_payload_bytes).hexdigest(),
+                PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION - 1,
+                key_hash,
+            ),
+        )
+
+    if transport == "seed":
+        seed_cache(target_db, [shard_db])
+    elif transport == "populate":
+        from scripts import populate_reduced_real_cache
+
+        populate_reduced_real_cache._merge_cache_shard(shard_db, target_db)
+    else:
+        from scripts import epoch_grind
+
+        epoch_grind.merge_epoch_shards(target_db, [shard_db])
+
+    with sqlite3.connect(target_db) as conn:
+        (stored_payload_bytes,) = conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert bytes(stored_payload_bytes) == bytes(fresh_payload_bytes)
+
+    replay = PT0DeterminismStore("replay", db_path=target_db)
+    assert replay._lookup("equilibrium_post_record", key) is not None
+    assert replay.hits == 1
+
+
+def test_epoch_seed_migrates_b265_columns_and_legacy_row_still_misses(
+    tmp_path: Path,
+) -> None:
+    from scripts import epoch_grind
+
+    base_db = tmp_path / "unmigrated-b265-base.sqlite"
+    shard_db = tmp_path / "seeded-epoch-shard.sqlite"
+    _capture, _capture_sim, _capture_fO2, _curve = _capture_pt0_gate_curve(
+        base_db,
+        solidus_T_C=1100.0,
+        law_disclosures=[],
+    )
+    with sqlite3.connect(base_db) as conn:
+        (key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} DROP COLUMN payload_codec_version"
+        )
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} DROP COLUMN law_disclosures_json"
+        )
+
+    summary = epoch_grind.seed_job_cache(
+        shard_db,
+        base_db,
+        point_sources=[{"point_id": key_hash, "source": "ladder_polish"}],
+        job_id="job-a",
+    )
+
+    assert summary["seed_rows"] == 1
+    with sqlite3.connect(base_db) as conn:
+        columns = {
+            str(row[1])
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+        assert {"payload_codec_version", "law_disclosures_json"} <= columns
+        (base_codec, base_disclosures) = conn.execute(
+            f"SELECT payload_codec_version, law_disclosures_json "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    with sqlite3.connect(shard_db) as conn:
+        (shard_codec, shard_disclosures) = conn.execute(
+            f"SELECT payload_codec_version, law_disclosures_json "
+            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert (base_codec, base_disclosures) == (None, None)
+    assert (shard_codec, shard_disclosures) == (None, None)
+
+    replay = PT0DeterminismStore(
+        "replay",
+        db_path=shard_db,
+        read_only_base_db_path=base_db,
+    )
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+    with pytest.raises(PT0CacheMiss):
+        replay.replay_gate_curve(
+            replay_sim,
+            fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+        )
+    assert replay.hits == 0
 
 
 @pytest.mark.parametrize(
