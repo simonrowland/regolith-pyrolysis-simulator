@@ -346,6 +346,27 @@ def _sossi_experiment_run_id(experiment: Mapping[str, Any]) -> str:
     return run_id
 
 
+def _sossi_experiment_recorded_log10_fo2(
+    experiment: Mapping[str, Any],
+) -> Decimal | None:
+    """Read an independently located Sossi run fO2 from its buffer record."""
+    control = experiment.get("fO2_control")
+    buffer = control.get("buffer") if isinstance(control, Mapping) else None
+    state = buffer.get("state") if isinstance(buffer, Mapping) else None
+    locator = buffer.get("locator") if isinstance(buffer, Mapping) else None
+    value = state.get("value") if isinstance(state, Mapping) else None
+    if not isinstance(locator, Mapping) or not isinstance(value, str):
+        return None
+    match = re.fullmatch(r"\s*log10\s+fO2\s*=\s*(-?\d+(?:\.\d+)?)\s*", value)
+    if match is None:
+        return None
+    try:
+        parsed = Decimal(match.group(1))
+    except (ArithmeticError, ValueError):
+        return None
+    return parsed if parsed.is_finite() else None
+
+
 def _sossi_table2_gas_row(
     row: Mapping[str, Any],
 ) -> tuple[str, Decimal, Decimal | None, Decimal | None, Decimal]:

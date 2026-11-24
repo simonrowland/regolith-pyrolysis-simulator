@@ -66,7 +66,7 @@ def _schedule(*, component_flows: bool) -> dict:
                     "source_class": "literature_sidecar",
                     "citation_id": "sossi-2019",
                     "digest": "methods",
-                    "reason": "unresolved_sccm_standard_state",
+                    "reason": "sccm_reference_state_unreported",
                     "conversion_role": "diagnostic_only",
                     "conversion_note": (
                         "Pressure is imposed; fO2 uses the CO/CO2 ratio, so "
@@ -93,7 +93,7 @@ def _schedule(*, component_flows: bool) -> dict:
     }
 
 
-def test_component_flows_keep_printed_sccm_and_unresolved_state_as_diagnostic() -> None:
+def test_component_flows_keep_printed_sccm_and_unreported_state_as_diagnostic() -> None:
     schedule = normalize_lab_schedule(_schedule(component_flows=True))
     gas = schedule["gas_boundary"]
 
@@ -104,7 +104,7 @@ def test_component_flows_keep_printed_sccm_and_unresolved_state_as_diagnostic() 
     assert gas["reported_total_flow"]["value"] == 200
     assert gas["reported_total_flow"]["qualifier"] == "approximate"
     assert gas["flow_reference_state"]["reason"] == (
-        "unresolved_sccm_standard_state"
+        "sccm_reference_state_unreported"
     )
     assert gas["flow_reference_state"]["conversion_role"] == "diagnostic_only"
     assert "not load-bearing" in gas["flow_reference_state"]["conversion_note"]

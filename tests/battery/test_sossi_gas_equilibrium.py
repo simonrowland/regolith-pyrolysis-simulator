@@ -237,7 +237,7 @@ def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
     assert mixed["reported_total_flow"]["value"] == 200.0
     assert mixed["reported_total_flow"]["qualifier"] == "approximate"
     assert mixed["flow_reference_state"]["reason"] == (
-        "unresolved_sccm_standard_state"
+        "sccm_reference_state_unreported"
     )
     assert mixed["flow_reference_state"]["conversion_role"] == "diagnostic_only"
     assert mixed["pressure_control"]["pressure_driver"] == "imposed"
@@ -347,13 +347,112 @@ def test_rps_cli_passes_the_real_sossi_run_record(tmp_path, monkeypatch) -> None
         for key, item in source_observations.items()
         if item.observation_id != observation.observation_id
     }
-    assert _sossi_table2_flow_observation(
+    fallback_observation = _sossi_table2_flow_observation(
         experiment, without_flow_record.values()
-    ) is None
+    )
+    assert fallback_observation is not None
+    assert fallback_observation.observation_id != observation.observation_id
     missing_flow_record = generate(
         tmp_path / "without-flow-record", without_flow_record
     )
-    assert missing_flow_record["observation_id"] is None
-    assert "gas_boundary" in {
-        gap["waypoint"] for gap in missing_flow_record["readiness"]["gaps"]
-    }
+    assert missing_flow_record["observation_id"] == fallback_observation.observation_id
+    gaps = {gap["waypoint"] for gap in missing_flow_record["readiness"]["gaps"]}
+    assert "gas_boundary" not in gaps
+    assert "thermal_path" not in gaps
+    assert "run_pressure_boundary" not in gaps
+
+
+def test_rps_keeps_a_mismatched_table2_gas_quote_out_of_control_inputs() -> None:
+    from dataclasses import replace
+
+    from simulator.battery.consumer_inputs import (
+        _sossi_table2_gas_boundary,
+        collect_consumer_inputs,
+    )
+    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+
+    source_id = "kems-012-sossi-2019"
+    _works, experiments, observations = load_migrated_store(sources=(source_id,))
+    experiment = next(
+        item
+        for item in experiments.values()
+        if item.experiment_id.endswith("::experiment::sossi-2019-run-p09-06-18a")
+    )
+    observation = next(
+        item
+        for item in observations.values()
+        if item.source_id == source_id
+        and item.experiment_id == experiment.experiment_id
+        and item.identity.species.formula == "Mn"
+        and item.point_conditions is not None
+        and item.point_conditions.get("temperature_K") is not None
+        and item.point_conditions["temperature_K"].locator is not None
+        and item.point_conditions["temperature_K"].locator.table == "2"
+        and "quote=" in (item.point_conditions["temperature_K"].locator.note or "")
+    )
+    row_locator = observation.point_conditions["temperature_K"].locator
+    note = row_locator.note or ""
+    prefix, quote = note.split("quote=", 1)
+    mutated_quote, count = re.subn(
+        r"P09/06/18a\*?", "P09/06/18b", quote, count=1
+    )
+    assert count == 1
+    locator = replace(row_locator, note=prefix + "quote=" + mutated_quote)
+    point_conditions = dict(observation.point_conditions or {})
+    point_conditions["temperature_K"] = replace(
+        point_conditions["temperature_K"], locator=locator
+    )
+    mutated = replace(
+        observation, point_conditions=point_conditions
+    )
+
+    boundary = _sossi_table2_gas_boundary(
+        experiment, mutated, expected_run_id="P09/06/18a"
+    )
+    assert boundary is not None
+    assert boundary["background_gas"]["reason"].startswith(
+        "sossi_table2_gas_row_quote_invalid"
+    )
+    assert "component_flows" not in boundary
+
+    inputs = collect_consumer_inputs(
+        experiment, load_migrated_benches()[experiment.bench_id], mutated
+    )
+    assert inputs.waypoints["gas_boundary"].selected.value == boundary
+
+
+def test_sossi_unprinted_pressure_uses_flagged_dp002_method_premise() -> None:
+    from dataclasses import replace
+
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+    from simulator.battery.records import State
+    from simulator.battery.waypoints import WaypointAuthority, WaypointFlag
+
+    source_id = "kems-012-sossi-2019"
+    _works, experiments, _observations = load_migrated_store(sources=(source_id,))
+    experiment = next(
+        item
+        for item in experiments.values()
+        if item.experiment_id.endswith("::experiment::sossi-2019-run-p09-06-18a")
+    )
+    pressure = replace(
+        experiment.pressure_environment.total_pressure_Pa,
+        state=State.unknown("mutated unprinted pressure"),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment, total_pressure_Pa=pressure
+        ),
+    )
+    bench = load_migrated_benches()[experiment.bench_id]
+    inputs = collect_consumer_inputs(experiment, bench, None)
+
+    waypoint = inputs.waypoints["run_pressure_boundary"].selected
+    assert waypoint is not None
+    assert waypoint.route == "DP-002_method_implied_Sossi_gas_mixing_furnace"
+    assert waypoint.authority is WaypointAuthority.ASSUMED
+    assert waypoint.flags == (WaypointFlag.ASSUMPTION,)
+    assert waypoint.value.point == Decimal("101325")
+    assert "Total pressure is unprinted" in waypoint.notice

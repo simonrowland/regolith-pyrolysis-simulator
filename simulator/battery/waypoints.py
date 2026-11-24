@@ -45,7 +45,11 @@ from simulator.battery.records import (
     nominal_pressure_pa,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
-from simulator.physical_constants import BAR_PA_DECIMAL, GAS_CONSTANT_DECIMAL
+from simulator.physical_constants import (
+    BAR_PA_DECIMAL,
+    GAS_CONSTANT_DECIMAL,
+    STANDARD_ATMOSPHERE_PA,
+)
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
 
 
@@ -1471,6 +1475,28 @@ def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
     return _result("relevant_volume", routes, tuple(volume_inputs), present=volume_inputs)
 
 
+def _sossi_experiment_run_id_for_waypoint(experiment: Experiment) -> str | None:
+    from simulator.battery.oxygen_identity import _sossi_experiment_run_id
+
+    locator = experiment.locator
+    try:
+        return _sossi_experiment_run_id(
+            {
+                "locator": (
+                    {
+                        "note": locator.note,
+                        "table": locator.table,
+                        "page": locator.page,
+                    }
+                    if locator is not None
+                    else None
+                )
+            }
+        )
+    except ValueError:
+        return None
+
+
 def pressure_boundary(
     experiment: Experiment, bench: Bench, observation: Observation | None = None
 ) -> WaypointResult:
@@ -1479,14 +1505,32 @@ def pressure_boundary(
     if point is not None:
         routes.append(point)
     printed = _value(experiment.pressure_environment.total_pressure_Pa)
+    sossi_method_implied = (
+        printed is None and _sossi_experiment_run_id_for_waypoint(experiment) is not None
+    )
     if printed is not None:
         run_pressure = experiment.pressure_environment.total_pressure_Pa
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
             WaypointAuthority.DERIVED if run_pressure.inference else WaypointAuthority.PRINTED,
             ("experiment.pressure_environment.total_pressure_Pa",)))
+    elif sossi_method_implied:
+        routes.append(
+            Waypoint(
+                "pressure_boundary",
+                Value.point_of(STANDARD_ATMOSPHERE_PA),
+                "DP-002_method_implied_Sossi_gas_mixing_furnace",
+                WaypointAuthority.ASSUMED,
+                ("experiment.method", "experiment.locator"),
+                (WaypointFlag.ASSUMPTION,),
+                notice=(
+                    "Total pressure is unprinted; DP-002 method_implied uses "
+                    "the Sossi one-atmosphere gas-mixing furnace premise."
+                ),
+            )
+        )
     speed = _value(bench.pumping_speed_m3_s)
     gas_load = next((fact for fact in bench.other_facts if fact.name == "gas_load_Pa_m3_s"), None)
-    if speed is not None and gas_load is not None:
+    if not sossi_method_implied and speed is not None and gas_load is not None:
         load_value = _value(gas_load.value)
         if load_value is not None:
             derived = _divide(load_value, speed)

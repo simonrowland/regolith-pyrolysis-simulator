@@ -17158,50 +17158,127 @@ def _sossi_residue_prediction(
             values = table2.get("values") if isinstance(table2, Mapping) else None
             table2_series = values.get("series") if isinstance(values, Mapping) else None
             if not isinstance(table2_series, (list, tuple)):
-                raise ResidueInventoryRefusal(
-                    "gas_equilibrium_fo2_unavailable",
-                    "Sossi Table 2 gas-flow quotes are missing from the source extract.",
+                table2_series = ()
+                cohort_check_error = (
+                    "Sossi Table 2 gas-flow quotes are missing from the source extract."
                 )
+            else:
+                cohort_check_error = None
+            printed_fO2_by_run = {}
+            for item in table2_series:
+                if not isinstance(item, Mapping):
+                    continue
+                run_id = str(item.get("run_id") or "").rstrip("*")
+                raw_log = item.get("log10_fO2")
+                if isinstance(raw_log, Mapping):
+                    raw_log = raw_log.get("value")
+                try:
+                    printed = float(raw_log)
+                except (TypeError, ValueError, OverflowError):
+                    continue
+                if run_id and math.isfinite(printed):
+                    printed_fO2_by_run[run_id] = printed
             try:
+                from simulator.battery.oxygen_identity import (
+                    _sossi_experiment_recorded_log10_fo2,
+                    _sossi_experiment_run_id,
+                )
+
                 gas_checks = check_sossi_table2_gas_equilibrium(
                     tuple(source_experiments.values()), table2_series
                 )
             except (TypeError, ValueError) as exc:
-                raise ResidueInventoryRefusal(
-                    "gas_equilibrium_fo2_unavailable", str(exc)
-                ) from exc
-            run_refusals = {}
+                gas_checks = {}
+                cohort_check_error = str(exc)
+            run_assessments = {}
             for experiment_id in experiments_by_run:
                 check = gas_checks.get(experiment_id)
-                if check is None:
-                    raise ResidueInventoryRefusal(
-                        "gas_equilibrium_fo2_unavailable",
-                        f"no checked Table 2 gas record for {experiment_id}",
-                    )
-                if check.refusal_reason is not None:
-                    run_refusals[experiment_id] = _SossiResiduePrediction(
-                        experiment_id,
-                        {},
-                        {},
-                        {},
-                        (),
-                        {
-                            "run_refusal": {
-                                "reason": check.refusal_reason,
-                                "detail": check.refusal_detail
-                                or "Sossi gas equilibrium check failed.",
-                            }
-                        },
+                source_experiment = source_experiments[experiment_id]
+                try:
+                    run_id = _sossi_experiment_run_id(source_experiment)
+                except ValueError:
+                    run_id = ""
+                printed_log = printed_fO2_by_run.get(run_id)
+                if check is not None and check.checked_log10_fO2_bar is not None:
+                    buffered_fO2_by_experiment[experiment_id] = float(
+                        check.checked_log10_fO2_bar
                     )
                     continue
-                if check.checked_log10_fO2_bar is None:
-                    raise ResidueInventoryRefusal(
-                        "gas_equilibrium_fo2_unavailable",
-                        f"no checked log fO2 for {experiment_id}",
-                    )
-                buffered_fO2_by_experiment[experiment_id] = float(
-                    check.checked_log10_fO2_bar
+                reason = (
+                    check.refusal_reason or "gas_equilibrium_fo2_unavailable"
+                    if check is not None
+                    else "gas_equilibrium_fo2_unavailable"
                 )
+                detail = (
+                    (check.refusal_detail if check is not None else None)
+                    or cohort_check_error
+                    or f"no checked Table 2 gas record for {experiment_id}"
+                )
+                recorded_log = _sossi_experiment_recorded_log10_fo2(
+                    source_experiment
+                )
+                fallback_candidates = (
+                    (
+                        "independently_published_run_log_fO2",
+                        float(check.printed_log10_fO2_bar)
+                        if check is not None
+                        else None,
+                    ),
+                    ("independently_published_run_log_fO2", printed_log),
+                    (
+                        "located_run_recorded_fO2",
+                        float(recorded_log) if recorded_log is not None else None,
+                    ),
+                    (
+                        "vetted_gas_derived_fO2",
+                        float(check.computed_log10_fO2_bar)
+                        if check is not None
+                        else None,
+                    ),
+                )
+                fallback = next(
+                    (candidate for candidate in fallback_candidates if candidate[1] is not None),
+                    None,
+                )
+                if fallback is None:
+                    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+                    experiment = context.experiments.get(reference.experiment_id)
+                    resolved_fo2 = resolve_row_fo2(
+                        experiment,
+                        _bench_for_score(experiment, context.benches)
+                        if experiment is not None
+                        else None,
+                        reference,
+                        quantity=reported_quantity,
+                    )
+                    if (
+                        resolved_fo2 is not None
+                        and not resolved_fo2.closure
+                        and math.isfinite(resolved_fo2.log10_fO2_bar)
+                        and resolved_fo2.log10_fO2_bar <= 0.0
+                    ):
+                        fallback = (
+                            "oxygen_ladder_premise",
+                            resolved_fo2.log10_fO2_bar,
+                        )
+                if fallback is None:
+                    raise ResidueInventoryRefusal(reason, detail)
+                fallback_source, fallback_log = fallback
+                assert fallback_log is not None
+                buffered_fO2_by_experiment[experiment_id] = fallback_log
+                run_assessments[experiment_id] = {
+                    "reason": "sossi_gas_boundary_unverified",
+                    "original_reason": reason,
+                    "detail": detail,
+                    "printed_log10_fO2_bar": printed_log,
+                    "computed_minus_printed_dex": (
+                        float(check.delta_log10_fO2_dex)
+                        if check is not None and check.delta_log10_fO2_dex is not None
+                        else None
+                    ),
+                    "fallback": fallback_source,
+                }
             valid_ids = set(buffered_fO2_by_experiment)
             selected_valid_ids = (
                 None
@@ -17222,17 +17299,16 @@ def _sossi_residue_prediction(
                     engine=engine.value,
                     selected_experiment_ids=selected_valid_ids,
                 )
-                cohort = {row.experiment_id: row for row in rows}
+                cohort = {}
+                for row in rows:
+                    assessment = run_assessments.get(row.experiment_id)
+                    if assessment is not None:
+                        provenance = dict(row.provenance)
+                        provenance["gas_boundary_assessment"] = assessment
+                        row = replace(row, provenance=provenance)
+                    cohort[row.experiment_id] = row
             else:
                 cohort = {}
-            refusal_ids = (
-                set(run_refusals)
-                if cohort_selection is None
-                else set(cohort_selection) & set(run_refusals)
-            )
-            cohort.update(
-                {experiment_id: run_refusals[experiment_id] for experiment_id in refusal_ids}
-            )
             _residue_prediction_cache_entry(
                 cache,
                 _SOSSI_SOURCE_ID,
@@ -17343,6 +17419,17 @@ def _sossi_residue_prediction(
                 band=str(band) if band is not None else None,
             ),
         ]
+        gas_assessment = provenance.get("gas_boundary_assessment")
+        if isinstance(gas_assessment, Mapping):
+            notices.append(
+                Notice(
+                    kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+                    affected_quantities=(reported_quantity,),
+                    reason="sossi_gas_boundary_unverified",
+                    origin="sossi-gas-table2-diagnostic",
+                    band=json.dumps(gas_assessment, sort_keys=True, default=str),
+                )
+            )
         activity_extensions = provenance.get("melt_activity_extensions")
         mno_activity_extension = (
             activity_extensions.get("MnO")

@@ -558,7 +558,7 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_reference_state_not_reported_has_values"
                 )
-            if reference_state.get("reason") != "unresolved_sccm_standard_state":
+            if reference_state.get("reason") != "sccm_reference_state_unreported":
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_reference_state_not_reported_reason_invalid"
                 )

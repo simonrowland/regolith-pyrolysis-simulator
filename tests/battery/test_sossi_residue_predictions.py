@@ -560,10 +560,41 @@ def test_sossi_scorer_passes_the_checked_fO2_to_the_residue_cohort(monkeypatch) 
 
     assert prediction.execution.state.value == "produced", prediction.refusal_detail
     assert passed_fO2[experiment_id] == float(checked_log)
+    assert prediction.refusal_detail["predicted_element_ppm"] == 900.0
+    assert prediction.refusal_detail["sensitivity_band_ppm_for_cell"] == (800.0, 1000.0)
 
 
+@pytest.mark.parametrize(
+    ("mutation", "expected_reason", "expected_detail", "expected_spread"),
+    [
+        (
+            "discrepant",
+            "gas_equilibrium_fo2_disagrees_with_printed",
+            "mutation of the P09/06/18a CO/CO2 pair",
+            True,
+        ),
+        (
+            "failed",
+            "cover_not_printed_mixture",
+            "mutated Sossi cover record",
+            True,
+        ),
+        (
+            "missing",
+            "gas_equilibrium_fo2_unavailable",
+            "no checked Table 2 gas record for sossi-2019-run-p09-06-18a",
+            None,
+        ),
+        (
+            "parser_error",
+            "gas_equilibrium_fo2_unavailable",
+            "mutated Table 2 parser failure",
+            None,
+        ),
+    ],
+)
 def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
-    monkeypatch,
+    monkeypatch, mutation, expected_reason, expected_detail, expected_spread
 ) -> None:
     import simulator.battery.score as score_module
     import simulator.battery.residue as residue
@@ -595,15 +626,22 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
         rows[(valid_short, element)].experiment_id for element in ("Mn", "Ti")
     )
     test_ids = bad_ids | valid_ids
+    observed_spread = {}
 
     def reject_one_run(experiments, series):
         checks = dict(check_sossi_table2_gas_equilibrium(experiments, series))
         key = next(key for key, check in checks.items() if check.run_id == "P09/06/18a")
+        observed_spread["value"] = checks[key].delta_log10_fO2_dex
+        if mutation == "parser_error":
+            raise ValueError("mutated Table 2 parser failure")
+        if mutation == "missing":
+            checks.pop(key)
+            return checks
         checks[key] = replace(
             checks[key],
             checked_log10_fO2_bar=None,
-            refusal_reason="gas_equilibrium_fo2_disagrees_with_printed",
-            refusal_detail="mutation of the P09/06/18a CO/CO2 pair",
+            refusal_reason=expected_reason,
+            refusal_detail=expected_detail,
         )
         return checks
 
@@ -616,14 +654,22 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
         lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
     )
     calls = []
+    passed_fO2 = {}
 
-    def valid_cohort(experiments, *_args, selected_experiment_ids=None, **_kwargs):
+    def valid_cohort(
+        experiments,
+        *_args,
+        selected_experiment_ids=None,
+        buffered_fO2_log_by_experiment,
+        **_kwargs,
+    ):
+        passed_fO2.update(buffered_fO2_log_by_experiment)
         calls.append((
             frozenset(item["experiment_id"] for item in experiments),
             selected_experiment_ids,
         ))
         return tuple(
-            SimpleNamespace(
+            residue._SossiResiduePrediction(
                 experiment_id=item["experiment_id"],
                 primary_element_ppm={"Mn": 900.0, "Ti": 450.0},
                 geometry_element_ppm={
@@ -655,7 +701,11 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
             test_experiment_ids=test_ids,
         )
         assert prediction.execution.state.value == "produced", prediction.refusal_detail
-        refused = _sossi_residue_prediction(
+        assert prediction.refusal_detail["predicted_element_ppm"] == {
+            "Mn": 900.0,
+            "Ti": 450.0,
+        }[element]
+        fallback = _sossi_residue_prediction(
             context,
             rows[(bad_short, element)],
             Engine.OPENIMCC,
@@ -663,9 +713,26 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
             selected_experiment_ids=selection,
             test_experiment_ids=test_ids,
         )
-        assert refused.execution.state.value != "produced"
-        assert refused.refusal_detail["reason"] == (
-            "gas_equilibrium_fo2_disagrees_with_printed"
+        assert fallback.execution.state.value == "produced", fallback.refusal_detail
+        assert fallback.refusal_detail["predicted_element_ppm"] == {
+            "Mn": 900.0,
+            "Ti": 450.0,
+        }[element]
+        assessment = fallback.refusal_detail["gas_boundary_assessment"]
+        assert assessment["reason"] == "sossi_gas_boundary_unverified"
+        assert assessment["original_reason"] == expected_reason
+        assert assessment["detail"] == expected_detail
+        assert assessment["printed_log10_fO2_bar"] == -9.23
+        if expected_spread is None:
+            assert assessment["computed_minus_printed_dex"] is None
+        else:
+            assert assessment["computed_minus_printed_dex"] == pytest.approx(
+                float(observed_spread["value"])
+            )
+        assert assessment["fallback"] == "independently_published_run_log_fO2"
+        assert any(
+            notice.reason == "sossi_gas_boundary_unverified"
+            for notice in fallback.notices
         )
 
     cached = _residue_prediction_cache_entry(
@@ -674,11 +741,11 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
     assert cached is not None
     assert set(cached) == {bad_short, valid_short}
     assert "__cohort_error__" not in cached
-    assert cached[bad_short].provenance["run_refusal"]["detail"] == (
-        "mutation of the P09/06/18a CO/CO2 pair"
-    )
+    assert cached[bad_short].provenance["gas_boundary_assessment"]["detail"] == expected_detail
+    assert passed_fO2[bad_short] == pytest.approx(-9.23)
+    assert passed_fO2[valid_short] == pytest.approx(-9.23)
     assert calls == [
-        (frozenset({valid_short}), frozenset({valid_short})),
+        (frozenset({bad_short, valid_short}), frozenset({bad_short, valid_short})),
     ]
 
     unaffected_cache = {}

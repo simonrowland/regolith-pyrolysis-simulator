@@ -20,7 +20,6 @@ from simulator.battery.waypoints import (
     identity_composition_waypoint, is_melt_activity_observation, is_pure_substance_engine_reference,
     reference_state_is_known, reference_state_value,
 )
-from simulator.physical_constants import STANDARD_ATMOSPHERE_PA
 
 
 REQUIREMENTS = {
@@ -73,56 +72,62 @@ def _sossi_table2_gas_boundary(experiment, observation, *, expected_run_id=None)
         or "quote=" not in (row_locator.note or "")
     ):
         row_locator = observation.locator
-    if (
-        row_locator is None
-        or str(row_locator.page) not in {"54", "55"}
-        or row_locator.table != "2"
-    ):
+    if row_locator is None:
+        row_locator = experiment.locator
+    if row_locator is None:
         return None
     note = row_locator.note or ""
     marker = "quote="
-    if marker not in note:
-        raise ValueError("sossi_table2_gas_quote_missing")
-    quote = note.split(marker, 1)[1]
+    is_table2_row = str(row_locator.page) in {"54", "55"} and row_locator.table == "2"
+    reason = None if is_table2_row else "sossi_table2_gas_record_not_located"
+    quote = note.split(marker, 1)[1] if marker in note and is_table2_row else None
     from simulator.battery.oxygen_identity import (
         _sossi_table2_approximate_total_flow_sccm,
         _sossi_table2_gas_row_from_quote,
     )
 
-    run_id, _temperature_C, co_sccm, co2_sccm, _printed_log = (
-        _sossi_table2_gas_row_from_quote(quote)
-    )
     if expected_run_id is None:
         expected_run_id = _sossi_table2_run_id(experiment)
-    if (
-        run_id != expected_run_id
-        or observation.experiment_id != experiment.experiment_id
-    ):
-        raise ValueError("sossi_table2_gas_row_experiment_mismatch")
+    run_id = expected_run_id
+    co_sccm = co2_sccm = None
+    if quote is not None:
+        try:
+            run_id, _temperature_C, co_sccm, co2_sccm, _printed_log = (
+                _sossi_table2_gas_row_from_quote(quote, expected_run_id=expected_run_id)
+            )
+        except ValueError as exc:
+            reason = str(exc)
+    else:
+        reason = "sossi_table2_gas_quote_missing"
+    if observation.experiment_id != experiment.experiment_id:
+        reason = "sossi_table2_gas_row_experiment_mismatch"
 
     citation_id = observation.source_id
-    quote_digest = sha256(quote.encode("utf-8")).hexdigest()
+    quote_digest = sha256((quote or "").encode("utf-8")).hexdigest()
     row_source = {
         "source_class": "literature_primary",
         "citation_id": citation_id,
-        "source_ref": f"PDF page {observation.locator.page}, Table 2, run {run_id}",
+        "source_ref": (
+            f"PDF page {row_locator.page}, Table 2, run {run_id}"
+            if is_table2_row
+            else f"PDF Table 2 run {run_id}; gas quote not located"
+        ),
     }
-    pressure_pa = nominal_pressure_pa(
-        experiment.pressure_environment.total_pressure_Pa
+    pressure_method_implied = (
+        nominal_pressure_pa(experiment.pressure_environment.total_pressure_Pa) is None
     )
-    if pressure_pa != Decimal(str(STANDARD_ATMOSPHERE_PA)):
-        raise ValueError("sossi_table2_imposed_pressure_unavailable")
     not_reported = {
         **row_source,
         "reported_status": "not_reported",
         "digest": quote_digest,
     }
     if co_sccm is None and co2_sccm is None:
-        background_gas = {
-            **row_source,
-            "species": "air",
-        }
-        imposed_flow_reason = (
+        background_gas = (
+            {**not_reported, "reason": reason}
+            if reason
+            else {**row_source, "species": "air"}
+        )
+        imposed_flow_reason = reason or (
             "The source leaves both CO and CO2 flow columns blank for this run."
         )
     else:
@@ -140,6 +145,11 @@ def _sossi_table2_gas_boundary(experiment, observation, *, expected_run_id=None)
         "pressure_control": {
             "mode": "controlled",
             "pressure_driver": "imposed",
+            **(
+                {"pressure_basis": "DP-002 method_implied"}
+                if pressure_method_implied
+                else {}
+            ),
             "source_class": "literature_primary",
             "citation_id": citation_id,
             "source_ref": "PDF page 2: one-atmosphere gas-mixing furnace",
@@ -158,7 +168,7 @@ def _sossi_table2_gas_boundary(experiment, observation, *, expected_run_id=None)
         boundary["component_flows"] = component_flows
         boundary["flow_reference_state"] = {
             **not_reported,
-            "reason": "unresolved_sccm_standard_state",
+            "reason": "sccm_reference_state_unreported",
             "conversion_role": "diagnostic_only",
             "conversion_note": (
                 "Total pressure is imposed and fO2 uses the CO/CO2 ratio, "
@@ -187,23 +197,41 @@ def _sossi_table2_flow_observation(experiment, observations):
         run_id = _sossi_table2_run_id(experiment)
     except ValueError:
         return None
+    fallback_mn = None
+    fallback_any = None
+    located_mn = None
+    located_any = None
     for observation in observations:
         species = getattr(observation.identity, "species", None)
         if (
             observation.source_id != SOSSI_SOURCE_ID
             or observation.experiment_id != experiment.experiment_id
-            or getattr(species, "formula", None) != "Mn"
             or observation.admission.status.value != "admitted"
         ):
             continue
-        if (
-            _sossi_table2_gas_boundary(
-                experiment, observation, expected_run_id=run_id
-            )
-            is not None
-        ):
-            return observation
-    return None
+        temperature = (observation.point_conditions or {}).get("temperature_K")
+        has_located_temperature = (
+            isinstance(temperature, Located)
+            and temperature.state.is_value
+            and temperature.locator is not None
+        )
+        if getattr(species, "formula", None) != "Mn":
+            fallback_any = fallback_any or observation
+            if has_located_temperature:
+                located_any = located_any or observation
+            continue
+        boundary = _sossi_table2_gas_boundary(
+            experiment, observation, expected_run_id=run_id
+        )
+        if boundary is not None:
+            if "component_flows" in boundary or boundary["imposed_flow"].get(
+                "reason", ""
+            ).startswith("The source leaves both CO and CO2 flow columns blank"):
+                return observation
+        fallback_mn = fallback_mn or observation
+        if has_located_temperature:
+            located_mn = located_mn or observation
+    return located_mn or located_any or fallback_mn or fallback_any
 
 
 @dataclass(frozen=True)
@@ -301,7 +329,11 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
             temperature = _result("temperature_K", [], ("observation.point_conditions.temperature_K",))
     waypoints = {
         "normalized_composition": normalized_composition(experiment, bench, observation),
-        "thermal_path": thermal_path(experiment, bench),
+        "thermal_path": (
+            thermal
+            if observation is not None and observation.source_id == SOSSI_SOURCE_ID
+            else thermal_path(experiment, bench)
+        ),
         "temperature_K": temperature,
         "pressure_boundary": pressure_boundary(experiment, bench, observation),
         "run_pressure_boundary": pressure_boundary(experiment, bench),
