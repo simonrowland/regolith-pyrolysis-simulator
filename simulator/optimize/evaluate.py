@@ -74,6 +74,13 @@ from simulator.lab_schedule import (
     LabScheduleValidationError,
     lab_schedule_digests,
     normalize_lab_schedule,
+    resolve_schedule_run_duration,
+)
+from simulator.process_timestep import (
+    PROCESS_HOUR_S,
+    ProcessTimestepRefusal,
+    duration_step_count,
+    resolve_process_timestep,
 )
 from simulator.optimize.canonical import canonical_json_dumps, normalize_canonical_value
 from simulator.optimize.evalspec import (
@@ -3453,6 +3460,7 @@ def _build_eval_inputs_impl(
         feedstock_id=feedstock_id,
         campaign=str(run_options["campaign"]),
         hours=int(run_options["hours"]),
+        process_dt_s=float(run_options.get("process_dt_s", PROCESS_HOUR_S)),
         additives_kg=dict(run_options["additives_kg"]),
         mass_kg=float(run_options["mass_kg"]),
         backend_name=str(run_options["backend_name"]),
@@ -4089,7 +4097,11 @@ def _thermal_scheduled_run_options(
                 "lab_schedule_conflicts_with_thermal_window: remove "
                 "temp_range_C/duration thermal-window inputs"
             )
-        return _lab_scheduled_run_options(run_options, lab_schedule)
+        return _lab_scheduled_run_options(
+            run_options,
+            lab_schedule,
+            recipe_patch=recipe_patch,
+        )
 
     schedule = _profile_thermal_window_schedule(
         run_options,
@@ -4159,6 +4171,8 @@ def _profile_lab_schedule(
 def _lab_scheduled_run_options(
     run_options: Mapping[str, Any],
     lab_schedule: Mapping[str, Any],
+    *,
+    recipe_patch: RecipePatch,
 ) -> Mapping[str, Any]:
     merged = dict(run_options)
     runtime_overrides = {
@@ -4207,10 +4221,28 @@ def _lab_scheduled_run_options(
 
     # TODO(VPR-P2-lab-geometry-interface): surface_temperature_C is normalized
     # but remains unbound until pipe-segment geometry owns surface IDs.
-    duration_h = float(lab_schedule["duration_h"])
+    duration_h = resolve_schedule_run_duration(
+        lab_schedule,
+        recipe_schedule_supplied=True,
+        preset_leg_duration_h=None,
+        preset_leg_duration_present=False,
+    ).duration_h
+    timestep = resolve_process_timestep(
+        PROCESS_HOUR_S
+        if recipe_patch.process_dt_s is None
+        else recipe_patch.process_dt_s
+    )
+    try:
+        hours = duration_step_count(duration_h, timestep)
+    except ProcessTimestepRefusal as exc:
+        raise EvaluationInputError(
+            f"{exc.reason}: duration_h={duration_h!r} "
+            f"process_dt_s={timestep.dt_s!r}"
+        ) from exc
     merged["runtime_campaign_overrides"] = runtime_overrides
     merged["lab_schedule"] = lab_schedule
-    merged["hours"] = int(math.ceil(duration_h))
+    merged["hours"] = hours
+    merged["process_dt_s"] = timestep.dt_s
     return MappingProxyType(merged)
 
 

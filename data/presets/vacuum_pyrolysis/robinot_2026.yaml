@@ -5,8 +5,8 @@ measurement_id: robinot_2026_deposit_measurements
 preset_kind: faithful_with_remediation_twin
 extraction_status: comparison_ready_assumed_inputs_named
 
-# Run 59 one-minute steps instead of the printed 60 minutes: the solar-power
-# trace ends at 59.5 minutes, and a step-end sample at 60.0 has no trace power.
+# Robinot et al. (2026), §4.1, reports a one-hour heating period (published
+# p. 7; PDF p. 9; extract kems-044-robinot-2026, thermal_schedule).
 process_dt_s: 60
 
 source_notes:
@@ -226,7 +226,7 @@ pair:
     feedstock_id: lunar_eac_1a
     schedule_id: robinot_2026_schedule
     geometry_id: robinot_2026_geometry
-    duration_h: 0.9833333333333333
+    duration_h: 1.0
     transport_model: auto_named_regime
     mitigation: none
     kinetics_caveat: none
@@ -235,7 +235,7 @@ pair:
     feedstock_id: lunar_eac_1a
     schedule_id: robinot_2026_schedule
     geometry_id: robinot_2026_geometry
-    duration_h: 0.9833333333333333
+    duration_h: 1.0
     transport_model: auto_named_regime
     mitigation:
       pO2_cover:

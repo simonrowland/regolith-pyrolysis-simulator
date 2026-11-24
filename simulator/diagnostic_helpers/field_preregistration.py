@@ -4,11 +4,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tempfile
 from typing import Any, Mapping
 
 import yaml
 
-from simulator.diagnostic_helpers.reproduction_compare import content_digest
+from .reproduction_compare import content_digest
 
 
 def _freeze_field_run(
@@ -23,8 +24,9 @@ def _freeze_field_run(
     root: Path = Path("data/field-preregistration"),
     version: int = 1,
     predecessor_digest: str | None = None,
+    example_kind: str | None = None,
 ) -> Path:
-    """Write one immutable version and return its directory."""
+    """Stage, digest, and atomically publish one immutable version."""
 
     run_id = str(run_id).strip()
     if not run_id or run_id in {".", ".."} or "/" in run_id or "\\" in run_id:
@@ -39,13 +41,15 @@ def _freeze_field_run(
             raise ValueError("a later version requires its predecessor bundle digest")
         if previous_digest_path.read_text(encoding="utf-8").strip() != predecessor_digest:
             raise ValueError("predecessor_digest does not match the prior version")
+    if example_kind not in (None, "input_only"):
+        raise ValueError("example_kind must be 'input_only' when provided")
     if not isinstance(setup, Mapping) or not isinstance(resolved, Mapping):
         raise ValueError("setup and resolved values must be mappings")
     if not isinstance(predicted_series, Mapping):
         raise ValueError("predicted_series must be a mapping")
 
     directory = root / run_id / f"v{version}"
-    _create_version_directory(directory)
+    directory.parent.mkdir(parents=True, exist_ok=True)
     setup_value = _plain_value(setup)
     resolved_value = _plain_value(resolved)
     bundle: dict[str, Any] = {
@@ -61,28 +65,40 @@ def _freeze_field_run(
     }
     if predecessor_digest is not None:
         bundle["predecessor_digest"] = str(predecessor_digest)
+    if example_kind is not None:
+        bundle["example_kind"] = example_kind
 
-    (directory / "setup.yaml").write_text(
-        yaml.safe_dump(setup_value, sort_keys=False),
-        encoding="utf-8",
-    )
-    (directory / "resolved.yaml").write_text(
-        yaml.safe_dump(resolved_value, sort_keys=False),
-        encoding="utf-8",
-    )
-    (directory / "bundle.json").write_text(
-        json.dumps(bundle, sort_keys=True, indent=2, allow_nan=False) + "\n",
-        encoding="utf-8",
-    )
-    (directory / "bundle.sha256").write_text(
-        content_digest(bundle) + "\n",
-        encoding="utf-8",
-    )
+    with tempfile.TemporaryDirectory(
+        prefix=f".{directory.name}.",
+        dir=directory.parent,
+    ) as staging_name:
+        staging = Path(staging_name)
+        (staging / "setup.yaml").write_text(
+            yaml.safe_dump(setup_value, sort_keys=False),
+            encoding="utf-8",
+        )
+        (staging / "resolved.yaml").write_text(
+            yaml.safe_dump(resolved_value, sort_keys=False),
+            encoding="utf-8",
+        )
+        (staging / "bundle.json").write_text(
+            json.dumps(bundle, sort_keys=True, indent=2, allow_nan=False) + "\n",
+            encoding="utf-8",
+        )
+        (staging / "bundle.sha256").write_text(
+            content_digest(bundle) + "\n",
+            encoding="utf-8",
+        )
+        _publish_version_directory(staging, directory)
     return directory
 
 
-def _create_version_directory(directory: Path) -> None:
-    directory.mkdir(parents=True, exist_ok=False)
+def _publish_version_directory(staging: Path, directory: Path) -> None:
+    """Publish a complete staged bundle without exposing partial files."""
+
+    if directory.exists():
+        raise FileExistsError(directory)
+    staging.rename(directory)
 
 
 def _plain_value(value: Any) -> Any:

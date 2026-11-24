@@ -3756,10 +3756,13 @@ def test_lab_schedule_digest_uses_canonical_physics_not_legacy_or_provenance() -
         ]
         == base["schedule_digest"]
     )
+    normalized_point_provenance = normalize_lab_schedule(point_provenance)
     assert (
-        lab_schedule_digests(normalize_lab_schedule(point_provenance))[
-            "schedule_digest"
-        ]
+        normalized_point_provenance["melt_temperature_C"][0]["citation_id"]
+        == "other_citation"
+    )
+    assert (
+        lab_schedule_digests(normalized_point_provenance)["schedule_digest"]
         == base["schedule_digest"]
     )
     assert (

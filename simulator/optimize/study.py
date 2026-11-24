@@ -36,6 +36,7 @@ from simulator.cost_parameters import (
 )
 from simulator.corpus_version import current_corpus_version
 from simulator.diagnostics import coating_summary_with_grounded_authority
+from simulator.lab_schedule import resolve_schedule_run_duration
 from simulator.optimize.canonical import canonical_json_dumps
 from simulator.optimize.doe import (
     PRESSURE_PAIR_SAMPLER_DESCRIPTION,
@@ -109,6 +110,12 @@ from simulator.optimize.profiles import (
     load_profile,
     physics_constraints_from_profile,
     validate_profile,
+)
+from simulator.process_timestep import (
+    PROCESS_HOUR_S,
+    ProcessTimestepRefusal,
+    duration_step_count,
+    resolve_process_timestep,
 )
 from simulator.optimize.reoptimize import GOALS_SOURCES
 from simulator.optimize.recipe import (
@@ -5601,6 +5608,25 @@ def _write_artifacts(
                 winner_document["lab_schedule"] = _jsonable_value(
                     winner.eval_spec.lab_schedule
                 )
+                duration_h = resolve_schedule_run_duration(
+                    winner.eval_spec.lab_schedule,
+                    recipe_schedule_supplied=True,
+                    preset_leg_duration_h=None,
+                    preset_leg_duration_present=False,
+                ).duration_h
+                try:
+                    duration_step_count(
+                        duration_h,
+                        resolve_process_timestep(PROCESS_HOUR_S),
+                    )
+                except ProcessTimestepRefusal:
+                    if winner.patch.process_dt_s is None:
+                        raise ValueError(
+                            "fractional-hour winner requires process_dt_s"
+                        )
+                    winner_document["process_dt_s"] = float(
+                        winner.patch.process_dt_s
+                    )
             winner_path.write_text(
                 yaml.safe_dump(winner_document, sort_keys=False),
                 encoding="utf-8",

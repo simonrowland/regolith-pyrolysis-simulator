@@ -12,11 +12,18 @@ import math
 from pathlib import Path
 
 import pytest
+import yaml
 
 from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.campaigns import CampaignManager
 from simulator.equipment import EquipmentDesigner
-from simulator.lab_schedule import lab_schedule_digests
+from simulator.lab_schedule import (
+    TemperatureDriver,
+    interpolate_schedule_points,
+    lab_schedule_digests,
+    schedule_sample_time_h,
+)
+from simulator import runner as runner_module
 from simulator.runner import _load_preset_run_spec
 from simulator.state import (
     BatchRecord,
@@ -77,7 +84,7 @@ def _step(manager, melt, step_index: int):
         elapsed_h,
         melt,
     )
-    record = manager._power_temperature_for_step
+    record = getattr(manager, "_power_temperature_for_step", None)
     melt.temperature_C = float(target)
     return float(target), float(ramp), record, previous
 
@@ -112,7 +119,10 @@ def _trace_watts_by_minute(trace) -> dict[float, float]:
 
 
 def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
-    schedule = _robinot_schedule()
+    spec = _load_preset_run_spec(_ROBINOT, "faithful")
+    schedule = copy.deepcopy(spec.lab_schedule)
+    assert spec.temperature_driver is TemperatureDriver.MEASURED_FURNACE_POWER
+    assert spec.provenance["temperature_driver"] == spec.temperature_driver.value
     driver = schedule[FURNACE_POWER_DRIVER_KEY]
     assert driver["mass_kg"] == pytest.approx(0.00338)
     assert driver["exposed_area_m2"] is None
@@ -276,6 +286,68 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert observed[0]["source_class"] == "literature_sidecar"
     assert observed[0]["qualifier"] == "approximate_peak"
     assert reported_temperature_observations((record,)) == ()
+
+
+def test_robinot_recipe_curve_takes_precedence_over_measured_power() -> None:
+    preset = yaml.safe_load(_ROBINOT.read_text(encoding="utf-8"))
+    recipe_schedule = copy.deepcopy(preset["lab_schedule"])
+    spec = _load_preset_run_spec(
+        _ROBINOT,
+        "faithful",
+        recipe_fields={"lab_schedule": recipe_schedule, "process_dt_s": _DT_S},
+    )
+
+    assert spec.temperature_driver is TemperatureDriver.RECIPE_SCHEDULE
+    assert spec.provenance["temperature_driver"] == spec.temperature_driver.value
+    assert FURNACE_POWER_DRIVER_KEY not in spec.lab_schedule
+
+    manager = _manager(spec.lab_schedule)
+    melt = _melt()
+    rows = [_step(manager, melt, index) for index in range(spec.step_count or 0)]
+    first_minute, _ramp, power_record, _previous = rows[0]
+    expected = interpolate_schedule_points(
+        recipe_schedule["melt_temperature_C"],
+        _DT_H,
+    )
+    assert first_minute == pytest.approx(expected)
+    assert first_minute == pytest.approx(55.0, abs=1.0)
+    assert first_minute < 350.0
+    assert power_record is None
+    final_knot = spec.lab_schedule["melt_temperature_C"][-1]
+    final_step_start_h = (spec.step_count - 1) * _DT_H
+    final_step_end_h = final_step_start_h + _DT_H
+    assert final_step_end_h == final_knot["t_h"]
+    assert schedule_sample_time_h(
+        spec.lab_schedule,
+        final_step_start_h,
+        dt_h=_DT_H,
+    ) == final_knot["t_h"]
+    assert rows[-1][0] == final_knot["value"]
+
+
+def test_recipe_curve_priority_pin_detects_power_precedence_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preset = yaml.safe_load(_ROBINOT.read_text(encoding="utf-8"))
+    recipe_schedule = copy.deepcopy(preset["lab_schedule"])
+    monkeypatch.setattr(
+        runner_module,
+        "resolve_temperature_driver",
+        lambda **_kwargs: TemperatureDriver.MEASURED_FURNACE_POWER,
+    )
+    with pytest.raises(AssertionError, match="recipe curve must be selected"):
+        _assert_robinot_recipe_curve_selected(recipe_schedule)
+
+
+def _assert_robinot_recipe_curve_selected(recipe_schedule: dict) -> None:
+    spec = _load_preset_run_spec(
+        _ROBINOT,
+        "faithful",
+        recipe_fields={"lab_schedule": recipe_schedule, "process_dt_s": _DT_S},
+    )
+    assert spec.temperature_driver is TemperatureDriver.RECIPE_SCHEDULE, (
+        "recipe curve must be selected"
+    )
 
 
 def test_doubled_robinot_power_raises_the_predicted_temperature():

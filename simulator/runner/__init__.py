@@ -145,8 +145,13 @@ from simulator.run_executor import (
 from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
+    LabScheduleDurationConflict,
     LabScheduleValidationError,
+    RunDurationDecision,
+    TemperatureDriver,
     normalize_lab_schedule,
+    resolve_schedule_run_duration,
+    resolve_temperature_driver,
 )
 from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
@@ -306,9 +311,11 @@ class PresetRunnerError(RunnerError):
         message: str,
         *,
         provenance: Mapping[str, Any] | None = None,
+        refusal: LabScheduleDurationConflict | None = None,
     ) -> None:
         super().__init__(message)
         self.provenance = dict(provenance or {})
+        self.refusal = refusal
 
 
 # ----------------------------------------------------------------------
@@ -334,6 +341,7 @@ class PresetRunSpec:
     document: Mapping[str, Any]
     process_dt_s: float = float(PROCESS_HOUR_S)
     step_count: int | None = None
+    temperature_driver: TemperatureDriver = TemperatureDriver.CAMPAIGN_DEFAULT
 
 
 @dataclass(frozen=True)
@@ -594,7 +602,7 @@ def _load_vacuum_preset_run_spec(
             for surface in lab_geometry.surfaces
             if surface.temperature_profile
         )
-        normalize_lab_schedule(
+        normalized_schedule = normalize_lab_schedule(
             schedule,
             required_surface_profiles=required_profiles,
         )
@@ -611,11 +619,25 @@ def _load_vacuum_preset_run_spec(
             "unless the runner grows an explicit preset mass contract",
             provenance=provenance,
         )
-    duration_h = _preset_duration_h(
-        leg_block.get("duration_h", schedule.get("duration_h")),
-        f"pair.{requested_leg}.duration_h",
-        provenance,
-    )
+    try:
+        duration_decision: RunDurationDecision = resolve_schedule_run_duration(
+            normalized_schedule,
+            recipe_schedule_supplied=raw_recipe_schedule is not None,
+            preset_leg_duration_h=leg_block.get("duration_h"),
+            preset_leg_duration_present="duration_h" in leg_block,
+        )
+    except LabScheduleDurationConflict as exc:
+        raise PresetRunnerError(
+            str(exc),
+            provenance=provenance,
+            refusal=exc,
+        ) from exc
+    except LabScheduleValidationError as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {exc}",
+            provenance=provenance,
+        ) from exc
+    duration_h = duration_decision.duration_h
     process_dt_s = _preset_process_dt_s(
         leg_block,
         preset,
@@ -684,6 +706,7 @@ def _load_vacuum_preset_run_spec(
             "mass_kg": mass_kg,
             "schedule_id": schedule_id,
             "geometry_id": geometry_id,
+            "duration_source": duration_decision.source.value,
         }
     )
     if isinstance(recipe_fields, Mapping) and recipe_fields.get("source_tags"):
@@ -698,7 +721,13 @@ def _load_vacuum_preset_run_spec(
             f"malformed_preset: {exc.reason}: {exc}",
             provenance=provenance,
         ) from exc
-    if power_trace is not None:
+    temperature_driver = resolve_temperature_driver(
+        recipe_schedule=raw_recipe_schedule,
+        measured_power_available=power_trace is not None,
+    )
+    provenance["temperature_driver"] = temperature_driver.value
+    if temperature_driver is TemperatureDriver.MEASURED_FURNACE_POWER:
+        assert power_trace is not None
         try:
             exposed_area_m2 = read_gram_lab_exposed_melt_area(geometry)
         except LabGeometryError as exc:
@@ -751,6 +780,7 @@ def _load_vacuum_preset_run_spec(
         document=projected_document,
         process_dt_s=spec_dt_s,
         step_count=spec_step_count,
+        temperature_driver=temperature_driver,
     )
 
 
@@ -830,28 +860,6 @@ def _preset_text(
             provenance=provenance,
         )
     return text
-
-
-def _preset_duration_h(
-    value: Any,
-    field: str,
-    provenance: Mapping[str, Any],
-) -> float:
-    try:
-        if not is_declared_real_scalar(value, allow_numeric_str=True):
-            raise TypeError
-        duration_h = float(value)
-    except (TypeError, ValueError) as exc:
-        raise PresetRunnerError(
-            f"malformed_preset: {field} must be a finite positive number",
-            provenance=provenance,
-        ) from exc
-    if not math.isfinite(duration_h) or duration_h <= 0.0:
-        raise PresetRunnerError(
-            f"malformed_preset: {field} must be a finite positive number",
-            provenance=provenance,
-        )
-    return duration_h
 
 
 def _preset_process_dt_s(

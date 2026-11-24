@@ -9,6 +9,8 @@ enter the digest.
 from __future__ import annotations
 
 from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass
+from enum import Enum
 import hashlib
 import math
 from types import MappingProxyType
@@ -39,6 +41,94 @@ LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = frozenset(
 
 class LabScheduleValidationError(ValueError):
     """Raised when a declared lab schedule cannot be honored at runtime."""
+
+
+class LabScheduleDurationConflict(LabScheduleValidationError):
+    """A recipe schedule and preset leg declare different run durations."""
+
+    reason = "recipe_schedule_duration_conflicts_with_preset_leg"
+
+    def __init__(self, schedule_duration_h: float, preset_duration_h: float) -> None:
+        self.schedule_duration_h = float(schedule_duration_h)
+        self.preset_duration_h = float(preset_duration_h)
+        super().__init__(
+            f"{self.reason}: recipe schedule final knot "
+            f"{self.schedule_duration_h!r} h conflicts with preset leg "
+            f"duration_h={self.preset_duration_h!r} h"
+        )
+
+
+class TemperatureDriver(str, Enum):
+    """The selected owner of a run's melt temperature."""
+
+    RECIPE_SCHEDULE = "recipe_schedule"
+    MEASURED_FURNACE_POWER = "measured_furnace_power"
+    CAMPAIGN_DEFAULT = "campaign_default"
+
+
+class RunDurationSource(str, Enum):
+    """Source selected for the run's executed time window."""
+
+    RECIPE_SCHEDULE_FINAL_KNOT = "recipe_schedule_final_knot"
+    PRESET_LEG = "preset_leg"
+    PRESET_SCHEDULE_FINAL_KNOT = "preset_schedule_final_knot"
+
+
+@dataclass(frozen=True)
+class RunDurationDecision:
+    duration_h: float
+    source: RunDurationSource
+
+
+def resolve_temperature_driver(
+    *,
+    recipe_schedule: Mapping[str, Any] | None,
+    measured_power_available: bool,
+) -> TemperatureDriver:
+    """Select the temperature driver in recipe, measured-power, default order."""
+
+    if recipe_schedule is not None:
+        return TemperatureDriver.RECIPE_SCHEDULE
+    if measured_power_available:
+        return TemperatureDriver.MEASURED_FURNACE_POWER
+    return TemperatureDriver.CAMPAIGN_DEFAULT
+
+
+def resolve_schedule_run_duration(
+    schedule: Mapping[str, Any],
+    *,
+    recipe_schedule_supplied: bool,
+    preset_leg_duration_h: Any,
+    preset_leg_duration_present: bool,
+) -> RunDurationDecision:
+    """Select the run duration and refuse a conflicting recipe/preset pair.
+
+    A recipe schedule owns its window at the final temperature knot. Without a
+    recipe schedule, the legacy preset leg duration continues to own the run.
+    """
+
+    final_knot_h = float(schedule["melt_temperature_C"][-1]["t_h"])
+    if preset_leg_duration_present:
+        preset_duration_h = _required_finite_positive(
+            preset_leg_duration_h,
+            "preset_leg.duration_h",
+        )
+        if recipe_schedule_supplied and preset_duration_h != final_knot_h:
+            raise LabScheduleDurationConflict(final_knot_h, preset_duration_h)
+        if not recipe_schedule_supplied:
+            return RunDurationDecision(
+                preset_duration_h,
+                RunDurationSource.PRESET_LEG,
+            )
+    if recipe_schedule_supplied:
+        return RunDurationDecision(
+            final_knot_h,
+            RunDurationSource.RECIPE_SCHEDULE_FINAL_KNOT,
+        )
+    return RunDurationDecision(
+        final_knot_h,
+        RunDurationSource.PRESET_SCHEDULE_FINAL_KNOT,
+    )
 
 
 def _pressure_floor_notice_mbar(value: float) -> tuple[str, str] | None:
@@ -155,9 +245,18 @@ def lab_schedule_digests(schedule: Mapping[str, Any]) -> dict[str, str]:
         "duration_h": schedule.get("duration_h"),
         "interpolation": schedule.get("interpolation"),
         "furnace_ceiling_C": schedule.get("furnace_ceiling_C"),
-        "melt_temperature_C": schedule.get("melt_temperature_C", ()),
-        "chamber_pressure_mbar": schedule.get("chamber_pressure_mbar", ()),
-        "surface_temperature_C": schedule.get("surface_temperature_C", {}),
+        "melt_temperature_C": _schedule_point_physics(
+            schedule.get("melt_temperature_C", ())
+        ),
+        "chamber_pressure_mbar": _schedule_point_physics(
+            schedule.get("chamber_pressure_mbar", ())
+        ),
+        "surface_temperature_C": {
+            str(surface_id): _schedule_point_physics(points)
+            for surface_id, points in dict(
+                schedule.get("surface_temperature_C", {}) or {}
+            ).items()
+        },
         "window_semantics": schedule.get("window_semantics", {}),
     }
     if "pO2_cover" in schedule:
@@ -168,6 +267,19 @@ def lab_schedule_digests(schedule: Mapping[str, Any]) -> dict[str, str]:
         "schedule_digest": _sha256_canonical(normalized),
         "gas_boundary_digest": _sha256_canonical(gas_boundary),
     }
+
+
+def _schedule_point_physics(
+    points: Iterable[Mapping[str, Any]],
+) -> tuple[Mapping[str, Any], ...]:
+    return tuple(
+        {
+            key: point[key]
+            for key in ("t_h", "value", "unit")
+            if key in point
+        }
+        for point in points
+    )
 
 
 def interpolate_schedule_points(
@@ -285,7 +397,7 @@ def _normalize_points(raw: Any, *, duration_h: float, field: str) -> tuple[Mappi
         raise LabScheduleValidationError(f"lab_schedule_{field}_must_be_points")
     if len(raw) < 2:
         raise LabScheduleValidationError(f"lab_schedule_{field}_requires_two_points")
-    points: list[dict[str, float]] = []
+    points: list[dict[str, Any]] = []
     previous_t: float | None = None
     expected_unit = _expected_point_unit(field)
     for index, item in enumerate(raw):
@@ -308,7 +420,9 @@ def _normalize_points(raw: Any, *, duration_h: float, field: str) -> tuple[Mappi
                 f"lab_schedule_{field}_time_arrays_must_be_monotonic"
             )
         previous_t = t_h
-        point = {"t_h": t_h, "value": value}
+        point = {str(key): item_value for key, item_value in item.items()}
+        point["t_h"] = t_h
+        point["value"] = value
         if unit is not None:
             point["unit"] = unit
         points.append(point)
@@ -360,7 +474,7 @@ def _normalize_surface_temperatures(
         raw = {}
     if not isinstance(raw, Mapping):
         raise LabScheduleValidationError("lab_schedule_surface_temperature_C_must_be_mapping")
-    normalized: dict[str, tuple[Mapping[str, float], ...]] = {}
+    normalized: dict[str, tuple[Mapping[str, Any], ...]] = {}
     for surface_id, points in raw.items():
         normalized[str(surface_id)] = _normalize_points(
             points,

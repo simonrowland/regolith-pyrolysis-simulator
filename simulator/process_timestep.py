@@ -86,14 +86,26 @@ def duration_step_count(duration_h: object, timestep: ProcessTimestep) -> int:
             dt_s=timestep.dt_s,
             duration_h=duration,
         )
-    ratio = duration * float(PROCESS_HOUR_S) / float(timestep.dt_s)
-    nearest = round(ratio)
-    if nearest < 1 or not math.isclose(
-        ratio,
-        nearest,
-        rel_tol=0.0,
-        abs_tol=1.0e-9 if timestep.is_one_hour else 1.0e-8,
-    ):
+    if timestep.is_one_hour:
+        # Preserve the legacy hourly preset boundary: green truncated the
+        # supplied duration before applying the 1e-9 tolerance.
+        nearest = int(duration)
+        aligned = math.isclose(
+            duration,
+            nearest,
+            rel_tol=0.0,
+            abs_tol=1.0e-9,
+        )
+    else:
+        ratio = duration * float(PROCESS_HOUR_S) / float(timestep.dt_s)
+        nearest = round(ratio)
+        aligned = math.isclose(
+            ratio,
+            nearest,
+            rel_tol=0.0,
+            abs_tol=1.0e-8,
+        )
+    if nearest < 1 or not aligned:
         raise ProcessTimestepRefusal(
             "timestep_does_not_divide_duration",
             dt_s=timestep.dt_s,

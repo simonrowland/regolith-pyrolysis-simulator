@@ -4,6 +4,7 @@ import copy
 from dataclasses import replace
 import hashlib
 import json
+import math
 import subprocess
 import sys
 import textwrap
@@ -21,6 +22,9 @@ from simulator.diagnostic_helpers.vacuum_pyrolysis import (
 )
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
+from simulator.lab_schedule import RunDurationDecision, RunDurationSource
+from simulator.recipe import RecipePatch, RecipeSchema
+from simulator.recipe_io import load_recipe_patch
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
@@ -28,6 +32,110 @@ from tests.mre_reproduction_fixtures import synthetic_voltage_documents
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
+GREEN_RECIPE_FIXTURES = (
+    Path(__file__).parent / "fixtures/recipe_schema/green_canonical_lunar_full_yield.yaml",
+    Path(__file__).parent / "fixtures/recipe_schema/green_prechange_winner.recipe.yaml",
+)
+
+
+def _assert_nested_values(
+    actual: dict,
+    expected: dict,
+    path: tuple[str, ...] = (),
+) -> None:
+    for key, value in expected.items():
+        current_path = (*path, key)
+        if isinstance(value, dict):
+            assert isinstance(actual.get(key), dict), (
+                f"{'.'.join(current_path)} expected a mapping, got {actual.get(key)!r}"
+            )
+            _assert_nested_values(actual[key], value, current_path)
+        else:
+            assert actual.get(key) == value, (
+                f"{'.'.join(current_path)}: {actual.get(key)!r} != {value!r}"
+            )
+
+
+@pytest.mark.parametrize(
+    "fixture_path",
+    GREEN_RECIPE_FIXTURES,
+    ids=["starter", "prechange-winner"],
+)
+def test_green_recipe_fixtures_keep_runner_config_parity(fixture_path: Path) -> None:
+    loaded = load_recipe_patch(fixture_path)
+    setpoints_patch = RecipeSchema().to_setpoints_patch(
+        RecipePatch.from_nested(yaml.safe_load(fixture_path.read_bytes()))
+    )
+    assert loaded == setpoints_patch
+    run_config = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        setpoints_patch=setpoints_patch,
+    )._session_config()
+    _assert_nested_values(run_config.setpoints, setpoints_patch)
+
+
+def _robinot_preset() -> dict:
+    return yaml.safe_load(
+        (REPO_ROOT / "data/presets/vacuum_pyrolysis/robinot_2026.yaml").read_text(
+            encoding="utf-8"
+        )
+    )
+
+
+def _assert_recipe_schedule_duration_conflict(
+    preset_path: Path,
+    preset: dict,
+) -> None:
+    try:
+        runner_module._load_preset_run_spec(
+            preset_path,
+            "faithful",
+            recipe_fields={
+                "lab_schedule": preset["lab_schedule"],
+                "process_dt_s": 60,
+            },
+        )
+    except runner_module.PresetRunnerError as refused:
+        assert refused.refusal.reason == (
+            "recipe_schedule_duration_conflicts_with_preset_leg"
+        )
+        assert refused.refusal.schedule_duration_h == 1.0
+        assert refused.refusal.preset_duration_h == 0.5
+        assert "1.0" in str(refused)
+        assert "0.5" in str(refused)
+    else:
+        raise AssertionError("conflicting schedule and preset durations must refuse")
+
+
+def test_recipe_schedule_duration_conflict_refuses_with_both_values(
+    tmp_path: Path,
+) -> None:
+    preset = _robinot_preset()
+    preset["pair"]["faithful"]["duration_h"] = 0.5
+    preset_path = tmp_path / "robinot-duration-conflict.yaml"
+    preset_path.write_text(yaml.safe_dump(preset), encoding="utf-8")
+
+    _assert_recipe_schedule_duration_conflict(preset_path, preset)
+
+
+def test_schedule_duration_pin_detects_preset_leg_precedence_mutation(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preset = _robinot_preset()
+    preset["pair"]["faithful"]["duration_h"] = 0.5
+    preset_path = tmp_path / "robinot-duration-conflict.yaml"
+    preset_path.write_text(yaml.safe_dump(preset), encoding="utf-8")
+    monkeypatch.setattr(
+        runner_module,
+        "resolve_schedule_run_duration",
+        lambda _schedule, *, preset_leg_duration_h, **_kwargs: RunDurationDecision(
+            float(preset_leg_duration_h), RunDurationSource.PRESET_LEG
+        ),
+    )
+
+    with pytest.raises(AssertionError, match="conflicting schedule and preset"):
+        _assert_recipe_schedule_duration_conflict(preset_path, preset)
 
 
 def test_every_shipped_vacuum_pyrolysis_preset_loads() -> None:
@@ -40,7 +148,7 @@ def test_every_shipped_vacuum_pyrolysis_preset_loads() -> None:
         runner_module._load_preset_run_spec(preset_path, "faithful")
 
 
-def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> None:
+def test_robinot_recipe_schedule_runs_the_final_hourly_knot() -> None:
     preset_path = (
         REPO_ROOT
         / "data"
@@ -48,10 +156,20 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
         / "vacuum_pyrolysis"
         / "robinot_2026.yaml"
     )
-    preset = runner_module._load_preset_run_spec(preset_path, "faithful")
+    preset_document = yaml.safe_load(preset_path.read_text(encoding="utf-8"))
+    preset = runner_module._load_preset_run_spec(
+        preset_path,
+        "faithful",
+        recipe_fields={
+            "lab_schedule": copy.deepcopy(preset_document["lab_schedule"]),
+            "process_dt_s": 60.0,
+        },
+    )
 
     assert preset.process_dt_s == 60.0
-    assert preset.step_count == 59
+    assert preset.step_count == 60
+    assert preset.temperature_driver.value == "recipe_schedule"
+    assert runner_module.FURNACE_POWER_DRIVER_KEY not in preset.lab_schedule
     sample = preset.lab_geometry["sample"]
     assert sample["exposed_melt_area_m2"] == pytest.approx(
         0.00013273228961416876
@@ -67,25 +185,12 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     assert preset.provenance["notice"]["reason"] == (
         "liquid_footprint_not_printed"
     )
-    driver = preset.lab_schedule[runner_module.FURNACE_POWER_DRIVER_KEY]
-    assert driver["exposed_area_m2"] is None
-    assert driver["radiating_face_set"] == "hot_upper"
-    trace = driver["trace"]
-    fields = trace["point_fields"]
-    last_time_s = float(trace["points"][-1][fields.index("time_min")]) * 60.0
-    step_end_samples_s = [
-        index * preset.process_dt_s
-        for index in range(1, preset.step_count + 1)
-    ]
-    assert all(sample_s <= last_time_s for sample_s in step_end_samples_s)
-    assert step_end_samples_s[-1] == 59.0 * 60.0
-
     run = PyrolysisRun(
         feedstock_id=preset.feedstock_id,
         campaign="C0",
         hours=preset.hours,
-        mass_kg=preset.mass_kg,
         process_dt_s=preset.process_dt_s,
+        mass_kg=preset.mass_kg,
         lab_schedule=copy.deepcopy(preset.lab_schedule),
         setpoints_patch={"lab_geometry": copy.deepcopy(preset.lab_geometry)},
         allow_fallback_vapor=True,
@@ -99,9 +204,11 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(
         0.00013273228961416876
     )
-    assert session.simulator.campaign_mgr._power_temperature_for_step[
-        "time_s"
-    ] == 60.0
+    assert getattr(
+        session.simulator.campaign_mgr,
+        "_power_temperature_for_step",
+        None,
+    ) is None
     assert notice["kind"] == "deck_declared_assumption"
     assert notice["field"] == "exposed_melt_area_m2"
     assert notice["value"] == pytest.approx(0.00013273228961416876)
@@ -148,9 +255,9 @@ def test_quarter_hour_refusal_detects_lossy_guard_mutation(
         duration_h=0.25,
     )
     monkeypatch.setattr(
-        runner_module.math,
-        "isclose",
-        lambda *_args, **_kwargs: True,
+        runner_module,
+        "duration_step_count",
+        lambda duration_h, _timestep: math.ceil(float(duration_h)),
     )
 
     with pytest.raises(AssertionError, match="sub-hour preset was accepted"):
@@ -968,6 +1075,7 @@ def test_preset_bridge_records_exposed_area_result_scope(tmp_path: Path):
     assert preset["geometry_digest"] == "bridge_geometry_digest"
     assert preset["effective_exposed_area_m2"] == pytest.approx(0.000123)
     assert preset["area_basis"] == "gram_lab_exposed_melt"
+    assert preset["temperature_driver"] == "campaign_default"
 
 
 def test_preset_bridge_missing_feedstock_uses_existing_named_refusal(tmp_path: Path):

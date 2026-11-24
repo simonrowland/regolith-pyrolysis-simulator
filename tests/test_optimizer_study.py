@@ -40,6 +40,7 @@ from simulator.electrolysis import (
     MRE_RAW_MARGIN_REFUSAL,
 )
 from simulator.cost_parameters import default_cost_parameters_block
+from simulator.diagnostic_helpers.field_preregistration import _freeze_field_run
 from simulator.optimize import cli as optimizer_cli
 import simulator.optimize.evaluate as evaluation_module
 from simulator.optimize import physics as physics_module
@@ -135,6 +136,12 @@ PROFILE = {
 }
 FEEDSTOCK = "lunar_mare_low_ti"
 C6_WINDOW_REFUSAL = "c6_joint_thermodynamic_liquid_fraction_window_empty"
+GREEN_PRECHANGE_WINNER_FIXTURE = (
+    Path(__file__).parent
+    / "fixtures"
+    / "recipe_schema"
+    / "green_prechange_winner.recipe.yaml"
+)
 
 
 def _run_reference(**kwargs: Any) -> RunReference:
@@ -444,6 +451,9 @@ def _write_save_format_artifacts(
     warm_start_from: Path | None = None,
     cost_parameters: Mapping[str, Any] | None = None,
     lab_schedule: Mapping[str, Any] | None = None,
+    process_dt_s: float | None = None,
+    prepared_record: study.StudyRecord | None = None,
+    profile: Mapping[str, Any] = PROFILE,
 ) -> Path:
     out = tmp_path / "run"
     out.mkdir()
@@ -466,14 +476,18 @@ def _write_save_format_artifacts(
         }
 
     monkeypatch.setattr(study, "optimizer_tier_label", fake_honesty)
-    record = _save_format_record(cost_parameters)
-    if lab_schedule is not None:
+    record = prepared_record or _save_format_record(cost_parameters)
+    if prepared_record is None and (lab_schedule is not None or process_dt_s is not None):
+        patch = record.patch
+        if process_dt_s is not None:
+            patch = replace(patch, process_dt_s=process_dt_s)
         record = replace(
             record,
+            patch=patch,
             eval_spec=replace(record.eval_spec, lab_schedule=lab_schedule),
         )
     config = study.StudyConfig(
-        profile=PROFILE,
+        profile=profile,
         feedstock=FEEDSTOCK,
         strategy="random",
         fidelity="internal-analytical",
@@ -503,7 +517,7 @@ def _write_save_format_artifacts(
     )
     study._write_artifacts(
         out,
-        profile=PROFILE,
+        profile=profile,
         feedstock=FEEDSTOCK,
         fidelity="internal-analytical",
         definitions=study.objective_definitions(PROFILE),
@@ -537,6 +551,33 @@ def test_winner_recipe_records_evaluated_cost_parameters(
     assert winner["cost_parameters"]["parameters"]["electricity_cost_per_kWh"][
         "value"
     ] == pytest.approx(0.42)
+
+
+def test_prechange_winner_writer_matches_green_fixture(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    expected = yaml.safe_load(
+        GREEN_PRECHANGE_WINNER_FIXTURE.read_text(encoding="utf-8")
+    )
+    record = replace(
+        _save_format_record(),
+        patch=RecipePatch.from_nested(expected),
+    )
+    out = _write_save_format_artifacts(
+        tmp_path,
+        monkeypatch,
+        prepared_record=record,
+    )
+    actual = yaml.safe_load((out / "winner.recipe.yaml").read_text(encoding="utf-8"))
+    for document in (actual, expected):
+        source = document["cost_parameters"]["provenance"]["source"]
+        prefix, config_path = source.split("; base_config:", maxsplit=1)
+        assert config_path.endswith("/data/optimize_costs.yaml")
+        document["cost_parameters"]["provenance"]["source"] = (
+            f"{prefix}; base_config:<checkout>/data/optimize_costs.yaml"
+        )
+    assert actual == expected
 
 
 def test_robinot_schedule_round_trips_winner_recipe_io_and_preset_runner(
@@ -578,30 +619,34 @@ def test_robinot_schedule_round_trips_winner_recipe_io_and_preset_runner(
         "faithful",
         recipe_fields=loaded_recipe,
     )
-    expected_knots = yaml.safe_dump(
-        source_schedule["melt_temperature_C"],
-        sort_keys=False,
-    ).encode("utf-8")
-
     assert winner_document["lab_schedule"]["melt_temperature_C"] == (
         source_schedule["melt_temperature_C"]
     )
-    assert yaml.safe_dump(
-        loaded_recipe["lab_schedule"]["melt_temperature_C"],
-        sort_keys=False,
-    ).encode("utf-8") == expected_knots
-    assert yaml.safe_dump(
-        preset_spec.lab_schedule["melt_temperature_C"],
-        sort_keys=False,
-    ).encode("utf-8") == expected_knots
+    assert loaded_recipe["lab_schedule"]["melt_temperature_C"] == (
+        source_schedule["melt_temperature_C"]
+    )
+    assert preset_spec.lab_schedule["melt_temperature_C"] == (
+        source_schedule["melt_temperature_C"]
+    )
     assert preset_spec.process_dt_s == 60.0
-    assert preset_spec.step_count == 59
+    assert preset_spec.step_count == 60
     assert preset_spec.document["source_tags"] == source_tags
     assert preset_spec.provenance["recipe_source_tags"] == source_tags
 
     legacy_root = tmp_path / "legacy"
     legacy_root.mkdir()
-    legacy_out = _write_save_format_artifacts(legacy_root, monkeypatch)
+    legacy_winner_source = yaml.safe_load(
+        GREEN_PRECHANGE_WINNER_FIXTURE.read_text(encoding="utf-8")
+    )
+    legacy_record = replace(
+        _save_format_record(),
+        patch=RecipePatch.from_nested(legacy_winner_source),
+    )
+    legacy_out = _write_save_format_artifacts(
+        legacy_root,
+        monkeypatch,
+        prepared_record=legacy_record,
+    )
     legacy_winner_path = legacy_out / "winner.recipe.yaml"
     legacy_winner = yaml.safe_load(
         legacy_winner_path.read_text(encoding="utf-8")
@@ -612,6 +657,203 @@ def test_robinot_schedule_round_trips_winner_recipe_io_and_preset_runner(
     assert load_recipe_patch(legacy_winner_path) == RecipeSchema().to_setpoints_patch(
         RecipePatch.from_nested(legacy_winner)
     )
+
+
+def _half_hour_robinot_schedule() -> dict[str, Any]:
+    preset_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "presets"
+        / "vacuum_pyrolysis"
+        / "robinot_2026.yaml"
+    )
+    schedule = copy.deepcopy(
+        yaml.safe_load(preset_path.read_text(encoding="utf-8"))["lab_schedule"]
+    )
+    schedule["duration_h"] = 0.5
+    for field in ("melt_temperature_C", "chamber_pressure_mbar"):
+        for point in schedule[field]:
+            if float(point["t_h"]) > 0.0:
+                point["t_h"] = 0.5
+    for points in schedule["surface_temperature_C"].values():
+        for point in points:
+            if float(point["t_h"]) > 0.0:
+                point["t_h"] = 0.5
+    for window in schedule["experiment_windows"].values():
+        for field in ("start_h", "end_h"):
+            if field in window and float(window[field]) > 0.0:
+                window[field] = 0.5
+    schedule["window_semantics"]["measured_window_end_h"] = 0.5
+    return schedule
+
+
+def _assert_half_hour_schedule_uses_thirty_minute_steps(
+    schedule: Mapping[str, Any],
+    recipe_patch: RecipePatch,
+) -> None:
+    options = evaluation_module._lab_scheduled_run_options(
+        {
+            "campaign": "C2A",
+            "hours": 1,
+            "runtime_campaign_overrides": {},
+        },
+        schedule,
+        recipe_patch=recipe_patch,
+    )
+    assert options["hours"] == 30
+    assert options["process_dt_s"] == 60.0
+
+
+def test_half_hour_optimizer_winner_round_trips_to_runner_and_evaluator(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo = Path(__file__).resolve().parents[1]
+    preset_path = repo / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
+    preset = yaml.safe_load(preset_path.read_text(encoding="utf-8"))
+    preset["pair"]["faithful"]["duration_h"] = 0.5
+    half_hour_preset = tmp_path / "robinot-half-hour.yaml"
+    half_hour_preset.write_text(yaml.safe_dump(preset), encoding="utf-8")
+
+    schedule = _half_hour_robinot_schedule()
+    recipe_patch = RecipePatch(
+        {},
+        lab_schedule=schedule,
+        process_dt_s=60.0,
+    )
+    profile = copy.deepcopy(PROFILE)
+    profile["run"] = {
+        **profile["run"],
+        "lab_schedule": schedule,
+    }
+    prepared_spec, prepared_run = _build_eval_inputs(
+        recipe_patch,
+        FEEDSTOCK,
+        "internal-analytical",
+        profile,
+        RecipeSchema(),
+    )
+    assert prepared_run.hours == 30
+    assert prepared_run.process_dt_s == 60.0
+    assert prepared_spec.lab_schedule["melt_temperature_C"][0]["citation_id"] == (
+        schedule["melt_temperature_C"][0]["citation_id"]
+    )
+    prepared_record = replace(
+        _save_format_record(),
+        patch=recipe_patch,
+        eval_spec=prepared_spec,
+    )
+    out = _write_save_format_artifacts(
+        tmp_path,
+        monkeypatch,
+        prepared_record=prepared_record,
+        profile=profile,
+    )
+    winner_path = out / "winner.recipe.yaml"
+    winner_document = yaml.safe_load(winner_path.read_text(encoding="utf-8"))
+    assert winner_document["process_dt_s"] == 60.0
+    recipe_fields = load_recipe_patch(winner_path)
+    recipe_patch = RecipePatch.from_nested(recipe_fields)
+    assert recipe_patch.lab_schedule["melt_temperature_C"][0]["citation_id"] == (
+        schedule["melt_temperature_C"][0]["citation_id"]
+    )
+
+    spec = runner_module._load_preset_run_spec(
+        half_hour_preset,
+        "faithful",
+        recipe_fields=recipe_fields,
+    )
+    assert spec.hours == 30
+    assert spec.process_dt_s == 60.0
+    assert spec.step_count == 30
+    run_config = runner_module.PyrolysisRun(
+        feedstock_id=spec.feedstock_id,
+        hours=spec.hours,
+        process_dt_s=spec.process_dt_s,
+        mass_kg=spec.mass_kg,
+        setpoints_patch={"lab_geometry": spec.lab_geometry},
+        lab_schedule=spec.lab_schedule,
+    )._session_config()
+    assert run_config.hours == 30
+    assert run_config.process_dt_s == 60.0
+    run_result = runner_module.PyrolysisRun(
+        feedstock_id=spec.feedstock_id,
+        campaign="C2A",
+        hours=spec.hours,
+        process_dt_s=spec.process_dt_s,
+        mass_kg=spec.mass_kg,
+        setpoints_patch={"lab_geometry": spec.lab_geometry},
+        lab_schedule=spec.lab_schedule,
+        allow_fallback_vapor=True,
+        run_metadata_overrides={
+            runner_module.PRESET_PROVENANCE_METADATA_KEY: {
+                "temperature_driver": spec.temperature_driver.value
+            }
+        },
+    ).run()
+    assert run_result["status"] == "ok", run_result.get("error_message")
+    assert run_result["run_metadata"]["hours_completed"] == 30
+    assert run_result["run_metadata"]["process_dt_s"] == 60.0
+    assert run_result["run_metadata"]["duration_h"] == 0.5
+    assert run_result["run_metadata"][runner_module.PRESET_PROVENANCE_METADATA_KEY][
+        "temperature_driver"
+    ] == "recipe_schedule"
+    _assert_half_hour_schedule_uses_thirty_minute_steps(
+        recipe_patch.lab_schedule,
+        recipe_patch,
+    )
+
+
+def test_fractional_schedule_pin_detects_ceil_duration_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    schedule = _half_hour_robinot_schedule()
+    recipe_patch = RecipePatch.from_nested(
+        {"lab_schedule": schedule, "process_dt_s": 60.0}
+    )
+    monkeypatch.setattr(
+        evaluation_module,
+        "duration_step_count",
+        lambda duration_h, _timestep: math.ceil(float(duration_h)),
+    )
+    with pytest.raises(AssertionError):
+        _assert_half_hour_schedule_uses_thirty_minute_steps(
+            recipe_patch.lab_schedule,
+            recipe_patch,
+        )
+
+
+def test_optimizer_export_freezes_the_same_input_recipe_fields(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo = Path(__file__).resolve().parents[1]
+    preset_path = repo / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
+    schedule = yaml.safe_load(preset_path.read_text(encoding="utf-8"))["lab_schedule"]
+    out = _write_save_format_artifacts(
+        tmp_path,
+        monkeypatch,
+        lab_schedule=schedule,
+        process_dt_s=60.0,
+    )
+    exported_recipe = yaml.safe_load(
+        (out / "winner.recipe.yaml").read_text(encoding="utf-8")
+    )
+    frozen = _freeze_field_run(
+        "optimizer-export-example",
+        setup={"recipe": exported_recipe},
+        resolved={"recipe": exported_recipe},
+        engine_commit="example-engine-commit",
+        provider_runtime_identity={"status": "not_executed"},
+        predicted_series={"o2_cumulative_kg": None},
+        flags=[{"kind": "prediction_not_run"}],
+        root=tmp_path / "data" / "field-preregistration",
+        example_kind="input_only",
+    )
+    frozen_setup = yaml.safe_load(
+        (frozen / "setup.yaml").read_text(encoding="utf-8")
+    )
+    assert frozen_setup["recipe"] == exported_recipe
 
 
 def test_write_artifacts_emits_study_summary_schema(

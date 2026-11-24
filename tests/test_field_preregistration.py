@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import shutil
 
 import pytest
 import yaml
 
-import simulator.field_preregistration as field_preregistration
+import simulator.diagnostic_helpers.field_preregistration as field_preregistration
 from simulator.diagnostic_helpers.reproduction_compare import content_digest
 
 FROZEN_EXAMPLE = (
@@ -38,6 +39,7 @@ def _freeze(tmp_path: Path, *, version: int = 1, predecessor_digest: str | None 
         root=tmp_path / "data" / "field-preregistration",
         version=version,
         predecessor_digest=predecessor_digest,
+        example_kind="input_only",
     )
 
 
@@ -61,6 +63,29 @@ def test_freeze_writes_canonical_bundle_and_preserves_source_nulls(
     assert digest == content_digest(bundle)
 
 
+def test_failed_freeze_write_leaves_version_available_for_retry(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    real_write_text = Path.write_text
+
+    def fail_bundle_json(path: Path, *args, **kwargs):
+        if path.name == "bundle.json":
+            raise OSError("injected bundle write failure")
+        return real_write_text(path, *args, **kwargs)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(Path, "write_text", fail_bundle_json)
+        with pytest.raises(OSError, match="injected bundle write failure"):
+            _freeze(tmp_path)
+
+    version_one = tmp_path / "data" / "field-preregistration" / "robinot-example" / "v1"
+    assert not version_one.exists()
+    assert not list(version_one.parent.glob(".v1.*"))
+    assert _freeze(tmp_path) == version_one
+    assert (version_one / "bundle.sha256").is_file()
+
+
 def test_freeze_refuses_v1_rewrite_and_links_v2_to_predecessor(
     tmp_path: Path,
 ) -> None:
@@ -81,6 +106,7 @@ def test_freeze_refuses_v1_rewrite_and_links_v2_to_predecessor(
         root=tmp_path / "data" / "field-preregistration",
         version=2,
         predecessor_digest=predecessor,
+        example_kind="input_only",
     )
     bundle = json.loads((version_two / "bundle.json").read_text(encoding="utf-8"))
     assert bundle["predecessor_digest"] == predecessor
@@ -92,11 +118,13 @@ def test_immutability_test_detects_overwrite_guard_mutation(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     _freeze(tmp_path)
-    monkeypatch.setattr(
-        field_preregistration,
-        "_create_version_directory",
-        lambda directory: directory.mkdir(parents=True, exist_ok=True),
-    )
+    def allow_rewrite(staging: Path, directory: Path) -> None:
+        backup = directory.with_name(directory.name + ".backup")
+        directory.rename(backup)
+        staging.rename(directory)
+        shutil.rmtree(backup)
+
+    monkeypatch.setattr(field_preregistration, "_publish_version_directory", allow_rewrite)
 
     def assert_rewrite_refused() -> None:
         try:
@@ -118,6 +146,10 @@ def test_robinot_example_bundle_is_frozen_without_invented_predictions() -> None
     digest = (FROZEN_EXAMPLE / "bundle.sha256").read_text(encoding="utf-8").strip()
 
     assert setup["recipe"]["lab_schedule"]["id"] == "robinot_2026_schedule"
+    assert bundle["example_kind"] == "input_only"
+    assert "INPUT ONLY" in (
+        FROZEN_EXAMPLE.parent / "README.md"
+    ).read_text(encoding="utf-8")
     assert resolved["lab_geometry"]["sample"]["mass_g"] == 3.38
     assert resolved["lab_geometry"]["pump"]["pumping_speed_m3_s"] is None
     assert bundle["provider_runtime_identity"]["status"] == "not_executed"

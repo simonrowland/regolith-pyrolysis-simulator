@@ -182,6 +182,13 @@ def test_dt_3600_matches_green_analytic_depletion_golden():
     assert short_summary["hour"] == int(snapshot.hour)
 
 
+def test_legacy_hourly_duration_tolerance_keeps_green_boundary() -> None:
+    with pytest.raises(ProcessTimestepRefusal) as lower_boundary:
+        duration_step_count(1.0 - 5.0e-10, ONE_HOUR)
+    assert lower_boundary.value.reason == "timestep_does_not_divide_duration"
+    assert duration_step_count(1.0 + 5.0e-10, ONE_HOUR) == 1
+
+
 def _deplete_constant_k(sim, *, dt_s: float, k_per_h: float, t_h: float) -> float:
     """Integrate production depletion with k held constant.
 
