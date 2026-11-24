@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Mapping
 
@@ -70,6 +71,23 @@ def assert_residue_score_cache_equivalence(
         assert f'"reason":"{required_refusal_reason}"'.encode() in off
     if source == "kems-012-sossi-2019":
         rows = off.splitlines()
+        numeric_ti_row = False
+        for row in rows:
+            payload = json.loads(row)
+            request = payload.get("candidate_request")
+            numeric = payload.get("numeric")
+            if (
+                isinstance(request, Mapping)
+                and request.get("experiment_id") == test_experiment_ids[0]
+                and "_ti_" in str(payload.get("key") or "").casefold()
+                and isinstance(numeric, Mapping)
+                and numeric.get("value") is not None
+            ):
+                numeric_ti_row = True
+                break
+        assert numeric_ti_row, (
+            "same Sossi cohort's Ti row must have a numeric result"
+        )
         typed_missing = [
             row
             for row in rows
