@@ -1120,45 +1120,65 @@ def test_redox_fallback_flag_reaches_mass_loss_prediction(
 def test_full_prediction_refuses_non_negligible_unsourced_channel(
     r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
 ):
+    row, experiment = r11_inputs
+    prescribed_pressure_engine["unsourced_ca"] = True
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    assert prediction.value is None
+    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS
+    assert prediction.refusal_detail["reason"] == "alpha_not_sourced"
+    detail = json.loads(prediction.refusal_detail["detail"])
+    assert detail["bound_fraction"] > 0.01
+    assert detail["unsourced_channels"] == ["Ca"]
+
+    # The fixture has 215 one-minute steps and 48 integration endpoints.
+    # Its CaO inventory supports the unsourced-Ca corner for 212 of those
+    # checks; each has two ordinary corners and one negative-exponent cap
+    # corner. Each of 263 step/endpoint checks adds one all-on root solve.
+    # The end-of-schedule diagnostic adds one final neighbour-only audit after
+    # the 48 per-integration endpoints.
+    step_count = 60 + 25 + 20 + 20 + 90
+    endpoint_count = 1 + 25 + 20 + 1 + 1
+    active_corner_checks = 212
+    corners_per_check = 2 + 1
+    expected_corners = active_corner_checks * corners_per_check
+    expected_roots = expected_corners + step_count + endpoint_count
+    assert detail["corner_evaluations"] == expected_corners, detail
+    assert detail["corner_root_solves"] == expected_roots, detail
+    assert detail["corner_neighbour_evaluations"] == endpoint_count + 1, detail
+
+
+@pytest.mark.engine_cache_off
+def test_corner_counter_oracle_rejects_dropped_step_callback(
+    r11_inputs, prescribed_pressure_engine, monkeypatch,
+):
+    """Mutation probe: a lost integration callback must fail the fixture oracle."""
     import simulator.battery.residue as residue
 
     row, experiment = r11_inputs
     prescribed_pressure_engine["unsourced_ca"] = True
-    corner_counts = []
-    original_corner_bounds = residue._mass_loss_corner_bounds
+    original_integrate = residue._hashimoto_integrate_geometry
 
-    def record_corner_counts(*args, **kwargs):
-        bounds, corners = original_corner_bounds(*args, **kwargs)
-        corner_counts.append((kwargs.get("check_neighbours", False), corners))
-        return bounds, corners
+    def drop_first_step_callback(*args, **kwargs):
+        callback = kwargs.get("on_step")
+        if callback is not None:
+            skipped = False
 
-    monkeypatch.setattr(residue, "_mass_loss_corner_bounds", record_corner_counts)
-    with pytest.raises(ResidueInventoryRefusal) as failure:
-        residue.predict_mass_loss_fraction(
-            "openimcc", experiment, temperature_K=2073.15,
-            source_document=fig3_source, observation=row,
-        )
-    assert failure.value.reason == "alpha_not_sourced"
-    detail = json.loads(failure.value.detail)
-    assert detail["bound_fraction"] > 0.01
-    assert detail["unsourced_channels"] == ["Ca"]
+            def mutant_callback(*callback_args, **callback_kwargs):
+                nonlocal skipped
+                if not skipped:
+                    skipped = True
+                    return None
+                return callback(*callback_args, **callback_kwargs)
 
-    step_corners = [corners for endpoint, corners in corner_counts if not endpoint]
-    endpoint_corners = [corners for endpoint, corners in corner_counts if endpoint]
-    assert step_corners and endpoint_corners
-    # Each integration step contributes its input-derived corner/root counts;
-    # each endpoint contributes its own counts (and neighbour flips). Sum those
-    # calls across the preheat and sourced/unsourced R-11 segments independently
-    # of the predictor's aggregate counters.
-    assert detail["corner_evaluations"] == sum(
-        corners["corner_count"] for corners in step_corners + endpoint_corners
-    )
-    assert detail["corner_root_solves"] == sum(
-        corners["corner_root_solves"] for corners in step_corners + endpoint_corners
-    )
-    assert detail["corner_neighbour_evaluations"] == sum(
-        corners["corner_neighbour_evaluations"] for corners in endpoint_corners
-    )
+            kwargs["on_step"] = mutant_callback
+        return original_integrate(*args, **kwargs)
+
+    monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", drop_first_step_callback)
+    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
+    detail = json.loads(prediction.refusal_detail["detail"])
+    expected_corner_evaluations = 212 * 3
+    with pytest.raises(AssertionError):
+        assert detail["corner_evaluations"] == expected_corner_evaluations
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
