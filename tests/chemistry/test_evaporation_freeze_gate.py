@@ -7209,8 +7209,8 @@ def test_core_gate_curve_memo_predicts_and_flags_after_stable_out_of_domain(
     assert curves[0]['gate_provider_refusal']['qualification'] == 'out_of_domain_kress91_floor_prediction'
     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
     key = _freeze_gate_key_for_current_state(sim)
-    assert key not in sim._freeze_gate_liquid_fraction_curve_memo
-    assert shared_cache == {}
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['curve'] == curves[0]
+    assert shared_cache[key]['curve'] == curves[0]
     snapshot = sim._make_snapshot()
     assert snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']['status'] == 'out_of_domain'
     assert len(provider_calls) == 1

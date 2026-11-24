@@ -5431,9 +5431,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 isinstance(memoized_record, Mapping)
                 and isinstance(memoized_record.get('curve'), Mapping)
                 and memoized_record.get('disposition') in {'live', 'memo-hit'}
-                and self._freeze_gate_curve_is_solved(
-                    memoized_record['curve']
-                )
                 and gate_curve_memo_is_cacheable(
                     self,
                     memoized_record['curve'],
@@ -5593,7 +5590,6 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if (
             isinstance(memo, dict)
-            and self._freeze_gate_curve_is_solved(normalized_curve)
             and gate_curve_memo_is_cacheable(
                 self,
                 normalized_curve,
