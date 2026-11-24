@@ -23,6 +23,7 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
+    _decode_payload_for_admission,
     canonical_json_bytes,
     monotonic_repair_notices_json,
     validate_reduced_real_equilibrium_record_key,
@@ -180,6 +181,11 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
             if "repair_notices_json" in columns
             else "NULL AS repair_notices_json"
         )
+        payload_codec_version_column = (
+            "payload_codec_version"
+            if "payload_codec_version" in columns
+            else "NULL AS payload_codec_version"
+        )
         return [
             dict(row)
             for row in con.execute(
@@ -198,6 +204,7 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
                     engine_version,
                     data_digests_json,
                     {repair_notices_column},
+                    {payload_codec_version_column},
                     created_at,
                     git_dirty
                 FROM {PAYLOAD_TABLE}
@@ -226,6 +233,10 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
         for field in ("corpus_version", "engine_version"):
             if row[field] is not None and not isinstance(row[field], str):
                 invalid_types.append(field)
+        if row["payload_codec_version"] is not None and type(
+            row["payload_codec_version"]
+        ) is not int:
+            invalid_types.append("payload_codec_version")
         if row["repair_notices_json"] is not None and not isinstance(
             row["repair_notices_json"], str
         ):
@@ -350,7 +361,7 @@ def merge_cache_source(
                 f"""
                 SELECT artifact, store_schema_version, request_schema_version,
                        key_sha256, payload_sha256, key_bytes, payload_bytes,
-                       code_version, corpus_version, engine_version,
+                       payload_codec_version, code_version, corpus_version, engine_version,
                        data_digests_json, repair_notices_json,
                        created_at, git_dirty
                 FROM {PAYLOAD_TABLE}
@@ -362,6 +373,24 @@ def merge_cache_source(
                 if _row_identity(existing) != _row_identity(row):
                     raise CacheMergeCollision(
                         f"PT-1 cache collision while merging {key_hash}"
+                    )
+                existing_admitted = _decode_payload_for_admission(
+                    artifact,
+                    row["validated_payload"],
+                    payload_codec_version=existing["payload_codec_version"],
+                    keys=(row["validated_key"],),
+                )
+                incoming_admitted = _decode_payload_for_admission(
+                    artifact,
+                    row["validated_payload"],
+                    payload_codec_version=row["payload_codec_version"],
+                    keys=(row["validated_key"],),
+                )
+                if existing_admitted is None and incoming_admitted is not None:
+                    conn.execute(
+                        f"UPDATE {PAYLOAD_TABLE} "
+                        "SET payload_codec_version = ? WHERE key_hash = ?",
+                        (row["payload_codec_version"], key_hash),
                     )
                 merged_notices = monotonic_repair_notices_json(
                     existing["repair_notices_json"],
@@ -385,6 +414,7 @@ def merge_cache_source(
                     payload_sha256,
                     key_bytes,
                     payload_bytes,
+                    payload_codec_version,
                     code_version,
                     corpus_version,
                     engine_version,
@@ -392,7 +422,7 @@ def merge_cache_source(
                     repair_notices_json,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -403,6 +433,7 @@ def merge_cache_source(
                     payload_hash,
                     sqlite3.Binary(key_bytes),
                     sqlite3.Binary(payload_bytes),
+                    row["payload_codec_version"],
                     str(row["code_version"]),
                     row.get("corpus_version"),
                     row["engine_version"],

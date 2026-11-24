@@ -1070,13 +1070,10 @@ def _seed_cache_rows_from_base(
             conn,
             f"{_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}",
         )
-        target_without_notices = [
-            name for name in columns if name != "repair_notices_json"
-        ]
-        source_without_notices = [
-            name for name in source_columns if name != "repair_notices_json"
-        ]
-        if target_without_notices != source_without_notices:
+        optional_columns = {"repair_notices_json", "payload_codec_version"}
+        target_required_columns = set(columns) - optional_columns
+        source_required_columns = set(source_columns) - optional_columns
+        if target_required_columns != source_required_columns:
             raise ValueError(
                 "acquisition seed source schema mismatch: "
                 f"{base_cache} does not match {shard_db}"
@@ -1084,7 +1081,7 @@ def _seed_cache_rows_from_base(
         select_columns = [
             name
             if name in source_columns
-            else "NULL AS repair_notices_json"
+            else f"NULL AS {name}"
             for name in columns
         ]
         placeholders = ",".join("?" for _ in point_ids)

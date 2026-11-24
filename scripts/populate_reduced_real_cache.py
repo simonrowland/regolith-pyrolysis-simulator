@@ -49,6 +49,7 @@ from simulator.reduced_real_determinism import (
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
+    _decode_payload_for_admission,
     _physics_ladder_values_from_replay_key,
     _replay_scope_hash,
     canonical_json_bytes,
@@ -681,6 +682,11 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
             if "repair_notices_json" in columns
             else "NULL AS repair_notices_json"
         )
+        payload_codec_version_column = (
+            "payload_codec_version"
+            if "payload_codec_version" in columns
+            else "NULL AS payload_codec_version"
+        )
         identity_columns = (
             "physics_bucket_schema_version",
             "physics_bucket_sha256",
@@ -717,6 +723,7 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
                     engine_version,
                     data_digests_json,
                     {repair_notices_column},
+                    {payload_codec_version_column},
                     {identity_selects},
                     created_at,
                     git_dirty
@@ -778,6 +785,11 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         raise RuntimeError(
             f"PT-1 repair_notices_json storage type mismatch: {row['key_hash']}"
         )
+    payload_codec_version = row.get("payload_codec_version")
+    if payload_codec_version is not None and type(payload_codec_version) is not int:
+        raise RuntimeError(
+            f"PT-1 payload_codec_version storage type mismatch: {row['key_hash']}"
+        )
     validate_repair_notices_json(repair_notices_json)
     validate_reduced_real_equilibrium_record_key(artifact, key, payload)
     assert_strict_vapor_pt1_row(
@@ -804,6 +816,7 @@ def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
         "ladder_values": _physics_ladder_values_from_replay_key(key),
         "data_digests_json": str(row["data_digests_json"]),
         "repair_notices_json": repair_notices_json,
+        "payload_codec_version": payload_codec_version,
     }
 
 
@@ -885,6 +898,24 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     canonical_json_bytes(entry["payload"]) != payload_bytes
                 ):
                     raise RuntimeError(f"PT-1 cache collision while merging {key_hash}")
+                existing_admitted = _decode_payload_for_admission(
+                    artifact,
+                    entry["payload"],
+                    payload_codec_version=entry.get("payload_codec_version"),
+                    keys=(key,),
+                )
+                incoming_admitted = _decode_payload_for_admission(
+                    artifact,
+                    validated["payload"],
+                    payload_codec_version=validated["payload_codec_version"],
+                    keys=(key,),
+                )
+                if existing_admitted is None and incoming_admitted is not None:
+                    conn.execute(
+                        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+                        "SET payload_codec_version = ? WHERE key_hash = ?",
+                        (validated["payload_codec_version"], key_hash),
+                    )
                 merged_notices = monotonic_repair_notices_json(
                     entry.get("repair_notices_json"),
                     validated["repair_notices_json"],
@@ -920,6 +951,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     engine_version,
                     data_digests_json,
                     repair_notices_json,
+                    payload_codec_version,
                     physics_bucket_schema_version,
                     physics_bucket_sha256,
                     replay_scope_sha256,
@@ -934,7 +966,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     physics_bucket_h30c_distance,
                     created_at,
                     git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     key_hash,
@@ -950,6 +982,7 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
                     row.get("engine_version"),
                     validated["data_digests_json"],
                     validated["repair_notices_json"],
+                    validated["payload_codec_version"],
                     PHYSICS_BUCKET_SCHEMA_VERSION,
                     physics_bucket_hash,
                     _replay_scope_hash(physics_bucket_key),

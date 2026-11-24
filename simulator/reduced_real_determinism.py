@@ -16,7 +16,7 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -2231,16 +2231,23 @@ class PT1PersistentEquilibriumStore:
     ) -> dict[str, Any] | None:
         with self._connect() as conn:
             self._initialize(conn)
-            row = self._fetch(conn, key_hash)
-            if row is None:
-                return None
-            return self._entry_from_row(
-                row,
-                artifact=artifact,
-                key=key,
-                key_bytes=key_bytes,
-                key_hash=key_hash,
-            )
+            for row in self._fetch_candidates(conn, key_hash):
+                entry = self._entry_from_row(
+                    row,
+                    artifact=artifact,
+                    key=key,
+                    key_bytes=key_bytes,
+                    key_hash=key_hash,
+                )
+                if _decode_payload_for_admission(
+                    artifact,
+                    entry.get("payload"),
+                    payload_codec_version=entry.get("payload_codec_version"),
+                    keys=(key,),
+                ) is None:
+                    continue
+                return entry
+        return None
 
     def get_by_physics_bucket(
         self,
@@ -2763,6 +2770,13 @@ class PT1PersistentEquilibriumStore:
         conn: sqlite3.Connection,
         key_hash: str,
     ) -> sqlite3.Row | None:
+        return next(self._fetch_candidates(conn, key_hash), None)
+
+    def _fetch_candidates(
+        self,
+        conn: sqlite3.Connection,
+        key_hash: str,
+    ) -> Iterator[sqlite3.Row]:
         tables = [PT1_EQUILIBRIUM_TABLE]
         read_only_table = self._read_only_equilibrium_table(conn)
         if read_only_table is not None:
@@ -2809,8 +2823,7 @@ class PT1PersistentEquilibriumStore:
                 (key_hash,),
             ).fetchone()
             if row is not None:
-                return row
-        return None
+                yield row
 
     @staticmethod
     def _table_has_column(
