@@ -243,6 +243,26 @@ def test_sidecar_formats_and_null_extract_fallback(tmp_path, monkeypatch, format
     extract_dir = tmp_path / "data/literature/extracts"
     extract_dir.mkdir(parents=True)
     (extract_dir / "paper.yaml").write_text("schema_version: literature_extract.v1\nsource: {doi: null, citation: null}\n")
+    works_dir = tmp_path / "data/literature/works"
+    works_dir.mkdir(parents=True)
+    (works_dir / "fixture-work.yaml").write_text(
+        "schema_version: battery_work.v2.1\n"
+        "work:\n"
+        "  work_id: fixture-work\n"
+        "  citation: Work metadata citation\n"
+        "  doi: 10.9999/work-metadata\n"
+        "  source_ids: [paper]\n"
+        "  source_files:\n"
+        "    corpus_repo: regolith-corpus\n"
+        "    corpus_commit: {tag: unknown, reason: fixture}\n"
+        "    files:\n"
+        "    - asset_id: unknown:paper\n"
+        "      role: pdftotext\n"
+        "      path: unknown\n"
+        "      sha256: {tag: unknown, reason: fixture}\n"
+        "experiments: []\n"
+        "context: []\n"
+    )
     row = builder.build_index(tmp_path)["sources"][0]
     assert row["doi"] == "10.9999/test"
     assert row["citation"].strip("`") == "Author (2020), Paper"
@@ -618,7 +638,7 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
         source_id: indexed_sidecar_gaps[source_id]["missing_fields"]
         for source_id in t1880_source_ids
     } == expected_sidecar_gaps
-    assert counts["sources"] == 869
+    assert counts["sources"] == 879
     # PDF status of every source with extracts, compared by source id against
     # a checked-in manifest so a changed status is named, and the
     # extracts_without_pdf count is pinned to that independent expectation
@@ -1115,6 +1135,45 @@ def test_source_files_do_not_register_absent_layers():
     )
 
     assert {asset.asset_id for asset in files.files} == {"unknown:fixture-source"}
+
+
+def test_registered_citation_only_works_load_and_feed_index_metadata(tmp_path: Path) -> None:
+    import shutil
+
+    from simulator.battery.migrate import load_migrated_store
+
+    source_work_ids = {
+        "bell-roseboom-1969-jadeite-albite-melting": "f71f1546815d059a2957da7b9fb0bf4c2b21e5d9f3bc4561c8edde06b92949c0",
+        "blander-pelton-1983-anl-fe-83-19": "78648bc6f6f54256098f7a3b7759de3541ca2c88acfee01bf08d7d9dc6dc4964",
+        "chan-alcock-jacob-1973-oxygen-potential": "35d87c99e00483561404d150145a7c4c532fcafcb4d2746d2cdecaffebe692e7",
+        "glushko-1978-1982-thermodynamic-properties": "53e0bc9698d817992da4ff5ed16858c82341df6d4f43f4b4e09198b7974e0dc8",
+        "pankratz-kelley-1964-ri6555": "3d82819f9f3147a4a45a6cc246d02b855fdcd99b02d90acb43f757e12694e966",
+        "proks-eliasova-kosa-1977-heat-fusion-akermanite": "9580e89efeab1ab64dce87d028bb8e06de14be5cfea560f7dcafb95f75a9c14f",
+        "rein-chipman-1965-trans-aime": "c0c411028f74688fa14e4daa552004540acc370ce6385682af9edaa2c8106e4e",
+        "richet-bottinga-1984-epsl": "230a4d99bf4c08cc9a2045be0795a28989cec2f928602f128221c3780d1ed1f6",
+        "schairer-bowen-1985-kas-system": "2c67dbc8d0ca961c1ab86228819d7b799fdb837630660ea1fd39d57d931ce7f4",
+        "stout-piwinskii-1982-silicate-melts": "2bbf78ec242637310d3d76fd589b6293a41edebd4ba5e98d4f688037fc325e39",
+    }
+    works_dir = tmp_path / "data/literature/works"
+    works_dir.mkdir(parents=True)
+    for work_id in source_work_ids.values():
+        shutil.copyfile(
+            REPO_ROOT / "data/literature/works" / f"{work_id}.yaml",
+            works_dir / f"{work_id}.yaml",
+        )
+
+    loaded, experiments, observations = load_migrated_store(tmp_path)
+    assert set(loaded) == set(source_work_ids.values())
+    assert experiments == {}
+    assert observations == {}
+    for source_id, work_id in source_work_ids.items():
+        assets = loaded[work_id].source_files.files
+        assert len(assets) == 1
+        assert assets[0].asset_id == f"unknown:{source_id}"
+        assert assets[0].path == "unknown"
+
+    indexed = builder.load_work_metadata(REPO_ROOT)
+    assert set(source_work_ids) <= indexed.keys()
 
 
 def _require_nist_janaf_source_files(corpus_root: Path, table_ids: set[str]) -> None:
