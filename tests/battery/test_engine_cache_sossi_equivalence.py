@@ -29,8 +29,7 @@ def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
         for observation_id, observation in observations.items():
             identity = observation.identity
             if (
-                observation.source_id != source
-                or observation.experiment_id != test_experiment_ids[0]
+                observation.experiment_id != test_experiment_ids[0]
                 or observation.admission.status is not AdmissionStatus.ADMITTED
                 or quantity_token(identity) is not Quantity.RESIDUE_COMPONENT_COMPOSITION
                 or identity.species is None
