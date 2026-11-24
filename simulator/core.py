@@ -7071,6 +7071,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             base_fO2_log=base_fO2_log,
         )
+        if skip_reason:
+            # The tangent path floors its own landing. A skip never
+            # reaches that line, and re-reference no longer floors, so
+            # the published state would otherwise keep a sentinel below
+            # the metal line. Raise only. applied_delta_ln stays 0: the
+            # term was not integrated, and the climb is not booked twice.
+            published_fO2_log = self._floor_published_melt_fO2_log(
+                float(reservoir.melt_intrinsic_fO2_log),
+                T_K,
+            )
+            if published_fO2_log != float(reservoir.melt_intrinsic_fO2_log):
+                reservoir.melt_intrinsic_fO2_log = (
+                    self._finite_oxygen_reservoir_fO2_log(
+                        published_fO2_log,
+                        context='redox_source_terms',
+                        source_terms_mol_o2_equiv=terms,
+                        net_o2_equiv_mol=net_o2_equiv_mol,
+                        melt_redox_capacity_mol_per_ln_fO2=C_m,
+                        candidate_fO2_log=published_fO2_log,
+                    )
+                )
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(

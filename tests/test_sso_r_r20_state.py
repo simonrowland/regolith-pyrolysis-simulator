@@ -3380,26 +3380,56 @@ def test_native_fe_precipitation_hour_conserves_oxygen() -> None:
     assert floor_log is not None and metal is not None
     assert base_fO2 < float(floor_log) - 1.0e-3
 
-    melt_o_before = float(
-        sim.atom_ledger.atom_moles_by_account("process.cleaned_melt").get("O", 0.0)
-    )
-    overhead_o2_before = float(
-        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) or 0.0
-    )
+    def _oxygen_snapshot() -> tuple[dict[str, float], dict[str, float]]:
+        balances = sim.atom_ledger.mol_by_account()
+        o2_mol = {
+            account: float(species.get("O2", 0.0) or 0.0)
+            for account, species in balances.items()
+        }
+        oxygen_atoms = {
+            account: float(
+                sim.atom_ledger.atom_moles_by_account(account).get("O", 0.0)
+            )
+            for account in balances
+        }
+        return o2_mol, oxygen_atoms
+
+    o2_before, oxygen_before = _oxygen_snapshot()
 
     split = sim._apply_native_fe_saturation_split()
 
-    melt_o_after = float(
-        sim.atom_ledger.atom_moles_by_account("process.cleaned_melt").get("O", 0.0)
+    o2_after, oxygen_after = _oxygen_snapshot()
+    o2_accounts = set(o2_before) | set(o2_after)
+    oxygen_accounts = set(oxygen_before) | set(oxygen_after)
+    o2_deltas = {
+        account: o2_after.get(account, 0.0) - o2_before.get(account, 0.0)
+        for account in sorted(o2_accounts)
+        if o2_after.get(account, 0.0) != o2_before.get(account, 0.0)
+    }
+    oxygen_deltas = {
+        account: oxygen_after.get(account, 0.0) - oxygen_before.get(account, 0.0)
+        for account in sorted(oxygen_accounts)
+        if oxygen_after.get(account, 0.0) != oxygen_before.get(account, 0.0)
+    }
+    # FeO(l) = Fe + 1/2 O2. The vapor leg credits its O2 on
+    # reservoir.fo2_buffer, not only on process.overhead_gas. Every
+    # account's O2 is the released oxygen. Total O is unchanged.
+    o2_released = math.fsum(
+        o2_after.get(account, 0.0) - o2_before.get(account, 0.0)
+        for account in o2_accounts
     )
-    overhead_o2_after = float(
-        sim.atom_ledger.mol_by_account("process.overhead_gas").get("O2", 0.0) or 0.0
+    melt_o_drop = oxygen_before.get("process.cleaned_melt", 0.0) - oxygen_after.get(
+        "process.cleaned_melt", 0.0
     )
-    melt_o_drop = melt_o_before - melt_o_after
-    o2_released = overhead_o2_after - overhead_o2_before
+    total_o_before = math.fsum(oxygen_before.values())
+    total_o_after = math.fsum(oxygen_after.get(account, 0.0) for account in oxygen_accounts)
     assert split["native_fe_event"] == "native_fe_partitioned_saturation"
     assert o2_released > 0.0
-    assert melt_o_drop == pytest.approx(2.0 * o2_released, rel=1.0e-12, abs=0.0)
+    assert total_o_after == pytest.approx(total_o_before, rel=1.0e-12, abs=0.0), oxygen_deltas
+    assert melt_o_drop == pytest.approx(2.0 * o2_released, rel=1.0e-12, abs=0.0), {
+        "o2_mol": o2_deltas,
+        "oxygen_atoms": oxygen_deltas,
+    }
 
     booked = float(
         sim._redox_source_terms_this_hr["redox_source:native_fe_saturation_split"]
