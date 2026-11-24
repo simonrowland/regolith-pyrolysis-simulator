@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe_crucible_internal_standard' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,7 +39,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe_crucible_internal_standard'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_fe_sublimation_enthalpy_1370c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1916
@@ -1005,12 +1015,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1079,7 +1088,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5 oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1917
@@ -1130,12 +1151,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1204,7 +1224,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5 oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1917
@@ -1255,12 +1287,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1329,7 +1360,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5 oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_liquid_std_turkdogan_pearson
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1917
@@ -1380,12 +1423,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1467,7 +1509,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5 oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1918
@@ -1500,12 +1554,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1587,7 +1640,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5 oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1918
@@ -1620,12 +1685,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1707,7 +1771,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5 oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_gamma_p2o5_solid_std_henry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1918
@@ -1740,12 +1816,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'PbO-P2O5_and_FetO-P2O5_oxide_melts' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1770,7 +1845,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''PbO-P2O5_and_FetO-P2O5_oxide_melts'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1912
@@ -8131,6 +8217,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas declared by source standard_state P4O10(g); original_reason=phase
+      string ''P4O10_s_saturation_used_as_P2O5_solid_standard'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -8303,6 +8401,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas declared by source standard_state P4O10(g); original_reason=phase
+      string ''P4O10_s_saturation_used_as_P2O5_solid_standard'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -8475,6 +8585,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas declared by source standard_state P4O10(g); original_reason=phase
+      string ''P4O10_s_saturation_used_as_P2O5_solid_standard'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_p4o10_sat_janaf_extrapolated
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -8999,12 +9121,11 @@ observations:
     species:
       formula: Pd
       phase:
-        tag: unknown
-        reason: phase string 'Pd_crucible_internal_standard' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9027,7 +9148,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Pd_crucible_internal_standard'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_pd_internal_standard_pbo_system
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1912
@@ -15328,12 +15460,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_PbO-P2O5_and_FetO-P2O5_melts' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15356,7 +15487,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_PbO-P2O5_and_FetO-P2O5_melts'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_table1_ionic_species
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1913
@@ -15375,12 +15517,11 @@ observations:
     species:
       formula: PO
       phase:
-        tag: unknown
-        reason: phase string 'literature_AP_comparison' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15404,7 +15545,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''literature_AP_comparison'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_literature
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1913
@@ -15423,12 +15575,11 @@ observations:
     species:
       formula: PO
       phase:
-        tag: unknown
-        reason: phase string 'vapor_over_PbO-P2O5_and_FetO-P2O5_melts' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -15451,7 +15602,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''vapor_over_PbO-P2O5_and_FetO-P2O5_melts'' is not in the closed automatic map'
+    origin: kems-057-kambayashi-1985::kambayashi_1985_table2_appearance_potentials_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-057-kambayashi-1985
   locator:
     published_page: 1913

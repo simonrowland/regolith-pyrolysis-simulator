@@ -80,7 +80,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas derived from quantity=p_sat (p_sat identity names the gas
+      species); original_reason=phase string ''BSE_composition_melt'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_bse_total_vapor_pressure_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -194,7 +206,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas derived from quantity=p_sat (p_sat identity names the gas
+      species); original_reason=phase string ''BSM_composition_melt'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_bsm_total_vapor_pressure_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -239,12 +263,11 @@ observations:
     species:
       formula: CO2
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -265,7 +288,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''saturated_silicate_vapor'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_carbon_dioxide_ratio_constraint
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 5
@@ -311,12 +345,11 @@ observations:
     species:
       formula: SiO2_melt
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -335,7 +368,18 @@ observations:
   admission:
     status: pending
     reason: source admission_status=figure_only_no_digitization is not a closed v2.1 token
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''saturated_silicate_vapor'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_figure2_vapor_species_trends
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 3
@@ -353,12 +397,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -424,7 +467,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evolved_gas_yield
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''saturated_silicate_vapor'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 3
@@ -463,12 +518,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -534,7 +588,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evolved_gas_yield
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''saturated_silicate_vapor'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_low_temperature_volatile_dominance_zinc
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 3
@@ -646,7 +712,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''saturated_silicate_vapor'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_saturated_vapor_oxygen_fugacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 5
@@ -692,12 +770,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'pure_molten_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -763,7 +840,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''pure_molten_SiO2'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_sio2_pure_melt_vapor_pressure_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -851,7 +940,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''multicomponent_silicate_melt'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_sio_partial_pressure_equilibrium
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -897,12 +998,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'bulk_silicate_composition_input' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -924,7 +1024,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''bulk_silicate_composition_input'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_table1_bulk_silicate_compositions
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 2
@@ -1009,7 +1120,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas derived from quantity=p_sat (p_sat identity names the gas
+      species); original_reason=phase string ''multicomponent_silicate_melt'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_total_vapor_pressure_sum
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 4
@@ -1055,12 +1178,11 @@ observations:
     species:
       formula: H2O
       phase:
-        tag: unknown
-        reason: phase string 'saturated_silicate_vapor' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1081,7 +1203,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''saturated_silicate_vapor'' is not in the closed automatic map'
+    origin: visscher-fegley-2013-debris-disks::visscher_2013_water_ratio_constraint
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: visscher-fegley-2013-debris-disks
   locator:
     published_page: 5

@@ -11,12 +11,11 @@ observations:
     species:
       formula: O2
       phase:
-        tag: unknown
-        reason: phase string 'mixture_of_oxides_representative_of_lunar_soil' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_o2_yield_and_energy_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -143,7 +153,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -246,7 +268,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -349,7 +383,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -452,7 +498,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -555,7 +613,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -658,7 +728,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -761,7 +843,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -864,7 +958,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -967,7 +1073,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212
@@ -1070,7 +1188,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''mixture_of_oxides_representative_of_lunar_soil'' is not in the closed automatic map'
+    origin: steurer-1992-vapor-phase-pyrolysis::steurer_1992_table10_mixture_psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: steurer-1992-vapor-phase-pyrolysis
   locator:
     published_page: 212

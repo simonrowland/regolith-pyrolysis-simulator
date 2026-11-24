@@ -91,6 +91,11 @@ def _handle_successful_magemin_request(_resource, _request, _errlog):
     return {'phases': {'liq': {'mass_kg': 1.0}}}
 
 
+def _handle_short_magemin_request(_resource, _request, _errlog):
+    time.sleep(0.01)
+    return {'phases': {'liq': {'mass_kg': 1.0}}}
+
+
 def _handle_reusable_magemin_request(_resource, request, _errlog):
     return request.get('request_id')
 
@@ -331,6 +336,17 @@ def _attach_fake_magemin_worker(pool, backend):
     ),)
 
 
+def _use_test_magemin_slot_lock(monkeypatch, tmp_path):
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path
+    )
+    monkeypatch.setattr(
+        magemin_module,
+        '_MAGEMIN_SUBPROCESS_LOCK',
+        tmp_path / 'magemin-subprocess.lock',
+    )
+
+
 def _make_pooled_subprocess_backend(exception):
     backend = MAGEMinBackend()
     backend._available = True
@@ -352,8 +368,10 @@ def _make_pooled_subprocess_backend(exception):
     ],
 )
 def test_magemin_unfinished_pool_future_is_timed_out_and_aborted(
-    monkeypatch, database, capture_error, nonfinite_projection,
+    monkeypatch, tmp_path, database, capture_error, nonfinite_projection,
 ):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
+
     class RunningFuture(Future):
         cancel_attempted = False
 
@@ -487,6 +505,7 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
     monkeypatch,
     failure_kind,
 ):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
     worker_config = {
         'warm_call_timeout_s': 0.05,
@@ -599,12 +618,15 @@ def test_magemin_timeout_kills_and_reaps_a_hung_worker(
         waiter.join(timeout=1.0)
 
 
-@pytest.mark.cpu_budget(20)
-@pytest.mark.timeout(20)
-def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
+@pytest.mark.cpu_budget(30)
+@pytest.mark.timeout(30)
+def test_magemin_unmodified_worker_timeout_captures_request(
+    tmp_path, monkeypatch,
+):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
     worker_config = {
-        'warm_call_timeout_s': 0.05,
+        'warm_call_timeout_s': MAGEMIN_WARM_CALL_TIMEOUT_S,
         'worker_startup_timeout_s': 2.0,
     }
     pool = engine_pool.EngineWorkerPool(
@@ -614,7 +636,7 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
             bootstrap_args=('/fake/MAGEMin', 'ig', worker_config),
             handler=_handle_sleeping_magemin_request,
             startup_timeout_s=2.0,
-            call_timeout_s=0.05,
+            call_timeout_s=MAGEMIN_WARM_CALL_TIMEOUT_S,
             diagnostic_log_path=diagnostic_log_path,
         ),
         size=1,
@@ -642,13 +664,13 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
     waiter = threading.Thread(target=call, daemon=True)
     waiter.start()
     try:
-        waiter.join(timeout=3.0)
+        waiter.join(timeout=20.0)
         assert not waiter.is_alive(), 'worker timeout did not complete the future'
         assert len(outcomes) == 1
         timeout = outcomes[0]
         assert isinstance(timeout, EngineWorkerTimeout)
         assert timeout.worker_name == 'fake MAGEMin slot 0'
-        assert timeout.timeout_s == pytest.approx(0.05)
+        assert timeout.timeout_s == pytest.approx(MAGEMIN_WARM_CALL_TIMEOUT_S)
         assert timeout.phase == 'job'
         assert timeout.diagnostic_detail in str(timeout)
         diagnostic = json.loads(timeout.diagnostic_detail)
@@ -680,7 +702,10 @@ def test_magemin_unmodified_worker_timeout_captures_request(tmp_path):
         waiter.join(timeout=1.0)
 
 
-def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
+def test_successful_magemin_worker_call_writes_no_timeout_record(
+    tmp_path, monkeypatch,
+):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     diagnostic_log_path = tmp_path / 'magemin-diagnostics-0.log'
     worker_config = {
         'warm_call_timeout_s': 1.0,
@@ -717,7 +742,10 @@ def test_successful_magemin_worker_call_writes_no_timeout_record(tmp_path):
 
 @pytest.mark.cpu_budget(20)
 @pytest.mark.timeout(20)
-def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot():
+def test_magemin_blocked_send_timeout_reaps_and_restarts_worker_slot(
+    tmp_path, monkeypatch,
+):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     worker_config = {
         'warm_call_timeout_s': 0.05,
         'worker_startup_timeout_s': 2.0,
@@ -949,8 +977,12 @@ def test_magemin_reinitialize_closes_existing_warm_pool(monkeypatch):
     assert backend._subprocess_pool is None
 
 
-def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request):
+def test_magemin_runtime_pool_uses_right_sized_warm_timeout(
+    monkeypatch, request, tmp_path,
+):
     import simulator.melt_backend.magemin as magemin_module
+
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
 
     submitted = {}
 
@@ -1011,6 +1043,111 @@ def test_magemin_runtime_pool_uses_right_sized_warm_timeout(monkeypatch, request
         call_timeout_s=20.0,
     )
     assert submitted['result_timeout_s'] == pytest.approx(20.0)
+
+
+@pytest.mark.cpu_budget(30)
+@pytest.mark.timeout(30)
+def test_magemin_slot_wait_longer_than_warm_timeout_then_short_run_succeeds(
+    monkeypatch, tmp_path,
+):
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
+    monkeypatch.setattr(
+        magemin_module, '_magemin_subprocess_slot_count', lambda: 1
+    )
+    worker_config = {
+        'warm_call_timeout_s': MAGEMIN_WARM_CALL_TIMEOUT_S,
+        'worker_startup_timeout_s': 2.0,
+    }
+    pool = engine_pool.EngineWorkerPool(
+        lambda index: engine_pool.WarmEngineWorker(
+            name=f'fake MAGEMin slot {index}',
+            bootstrap=_bootstrap_sleeping_magemin_worker,
+            bootstrap_args=('/fake/MAGEMin', 'ig', worker_config),
+            handler=_handle_short_magemin_request,
+            startup_timeout_s=2.0,
+            call_timeout_s=MAGEMIN_WARM_CALL_TIMEOUT_S,
+        ),
+        size=1,
+    )
+    backend = MAGEMinBackend()
+    backend._available = True
+    backend._bridge = 'subprocess'
+    backend._binary_path = Path('/fake/MAGEMin')
+    backend._database = 'ig'
+    backend._config = worker_config
+    backend._subprocess_pool = pool
+    projection = backend._build_db_bulk_projection(
+        {'SiO2': 60.0, 'MgO': 40.0}
+    )
+    submissions = []
+    original_submit = pool.submit
+
+    def count_submit(request, *, timeout_s=None):
+        submissions.append(request)
+        return original_submit(request, timeout_s=timeout_s)
+
+    pool.submit = count_submit
+    slot_held = threading.Event()
+    release_slot = threading.Event()
+    slot_contended = threading.Event()
+
+    def hold_slot():
+        with _magemin_subprocess_slot(30.0):
+            slot_held.set()
+            release_slot.wait(25.0)
+
+    holder = threading.Thread(target=hold_slot, daemon=True)
+    holder.start()
+    assert slot_held.wait(timeout=5.0)
+    original_flock = magemin_module.fcntl.flock
+
+    def observe_slot_contention(fd, operation):
+        try:
+            return original_flock(fd, operation)
+        except BlockingIOError:
+            if threading.current_thread().name == 'magemin-slot-waiter':
+                slot_contended.set()
+            raise
+
+    monkeypatch.setattr(magemin_module.fcntl, 'flock', observe_slot_contention)
+    outcomes = []
+    caller_started = threading.Event()
+
+    def call():
+        caller_started.set()
+        try:
+            outcomes.append(backend._call_magemin(
+                projection,
+                temperature_C=1200.0,
+                pressure_bar=1.0,
+                fO2_log=-8.0,
+            ))
+        except BaseException as exc:  # return the worker result to the test
+            outcomes.append(exc)
+
+    caller = threading.Thread(
+        target=call, name='magemin-slot-waiter', daemon=True
+    )
+    started_at = time.monotonic()
+    caller.start()
+    try:
+        assert caller_started.wait(timeout=5.0)
+        assert slot_contended.wait(timeout=5.0)
+        time.sleep(MAGEMIN_WARM_CALL_TIMEOUT_S + 0.1)
+        assert caller.is_alive()
+        assert not submissions, 'worker dispatch started before slot acquisition'
+    finally:
+        release_slot.set()
+        holder.join(timeout=2.0)
+        caller.join(timeout=5.0)
+        pool.close(cancel_pending=True, timeout_s=3.0)
+
+    assert not caller.is_alive(), 'MAGEMin call did not finish after slot release'
+    assert time.monotonic() - started_at > MAGEMIN_WARM_CALL_TIMEOUT_S
+    assert len(outcomes) == 1
+    assert isinstance(outcomes[0], dict)
+    assert outcomes[0]['phases']['liq']['mass_kg'] == 1.0
+    assert len(submissions) == 1
 
 
 @pytest.mark.parametrize(
@@ -1234,23 +1371,22 @@ def test_magemin_in_process_budget_exhaustion_returns_typed_status():
     )
 
 
-def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
+def test_magemin_subprocess_slot_wait_limit_returns_environment_refusal(
     monkeypatch, tmp_path,
 ):
     from simulator.melt_backend import magemin as magemin_module
 
+    _use_test_magemin_slot_lock(monkeypatch, tmp_path)
     backend = MAGEMinBackend()
     backend._available = True
     backend._bridge = 'subprocess'
     backend._binary_path = Path('/fake/MAGEMin')
     backend._config = {'timeout_s': 0.001}
-    lock_path = tmp_path / 'magemin.lock'
-    monkeypatch.setattr(
-        magemin_module, '_MAGEMIN_SUBPROCESS_LOCK_DIR', tmp_path
-    )
-    monkeypatch.setattr(magemin_module, '_MAGEMIN_SUBPROCESS_LOCK', lock_path)
     monkeypatch.setattr(
         magemin_module, '_magemin_subprocess_slot_count', lambda: 1
+    )
+    monkeypatch.setattr(
+        magemin_module, '_MAGEMIN_SUBPROCESS_SLOT_WAIT_LIMIT_S', 0.001
     )
 
     def contended_flock(*_args, **_kwargs):
@@ -1270,9 +1406,12 @@ def test_magemin_subprocess_slot_timeout_returns_typed_not_converged(
 
     assert result.status == 'not_converged'
     assert result.diagnostics['backend_failure_exception'] == (
-        'MAGEMinSubprocessSlotTimeout'
+        'MAGEMinSubprocessSlotWaitLimitExceeded'
     )
-    assert 'slot timed out' in result.diagnostics['backend_failure_message']
+    assert result.diagnostics['backend_failure_disposition'] == 'environment'
+    assert 'slot wait limit exceeded' in result.diagnostics[
+        'backend_failure_message'
+    ]
 
 
 def test_magemin_subprocess_slot_permission_error_returns_not_converged(
@@ -3784,8 +3923,8 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
     backend = _make_pooled_subprocess_backend(
         EngineWorkerRemoteError(
             _MAGEMinEngineLifecycleError.__name__,
-            'MAGEMinSubprocessSlotTimeout: subprocess slot timed out',
-            'Traceback: _magemin_subprocess_slot -> timeout',
+            'MAGEMinAggregateBudgetExceeded: aggregate liquidus budget exhausted',
+            'Traceback: _residual_call_timeout_s -> exhausted',
         )
     )
 
@@ -3798,10 +3937,10 @@ def test_magemin_remote_engine_lifecycle_error_returns_typed_not_converged():
 
     assert result.status == 'not_converged'
     assert result.diagnostics['backend_failure_exception'] == (
-        'MAGEMinSubprocessSlotTimeout'
+        'MAGEMinAggregateBudgetExceeded'
     )
     assert result.diagnostics['backend_failure_message'] == (
-        'subprocess slot timed out'
+        'aggregate liquidus budget exhausted'
     )
 
 

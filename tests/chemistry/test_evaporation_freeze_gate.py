@@ -52,6 +52,7 @@ from simulator.reduced_real_determinism import (
     canonical_json_bytes,
     gate_curve_memo_record,
     gate_curve_memo_producer_configuration,
+    record_dependency_vector,
     uncacheable_replay_disposition,
 )
 from simulator.runner import _attach_composition_projected_liquidus_notice
@@ -663,13 +664,9 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         # after readback the gate held the C0 curve all day. Each record is a
         # committed rebuild; hours that do not move the cache key add none.
         'lunar_mare_low_ti_C0_24h': [
-            (
-                'C0',
-                'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
-                918.75,
-                1370.3125,
-                ((918.75, 0.0), (1370.3125, 1.0)),
-            ),
+            # The startup C0 forecast clone now solves this key through the
+            # shared gate memo (gmemo car). The live C0 hour is a memo hit
+            # with the identical curve, so no rebuild is recorded.
             (
                 'C0B',
                 'gate_liquid_fraction:fallback:magemin-shadow:composition_projected',
@@ -2270,16 +2267,37 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
             'solidus_T_C': 1200.0, 'liquidus_T_C': 1500.0,
             'path': ((1200.0, 0.0), (1500.0, 1.0)),
         })
+    shared_cache = {}
+    sim._freeze_gate_shared_curve_cache = shared_cache
+    process_captures = []
+    if held:
+        capture_store = SimpleNamespace(
+            replay_enabled=False,
+            capture_enabled=True,
+            capture_gate_curve=lambda *args, **kwargs: process_captures.append(
+                (args, kwargs)
+            ),
+        )
+        monkeypatch.setattr(sim, '_pt0_store', lambda: capture_store)
     projection = MAGEMinBackend()._build_db_bulk_projection(
         {'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 3.0, 'MnO': 2.0},
     )
-    monkeypatch.setattr(sim, '_dispatch_only', lambda *args, **kwargs: SimpleNamespace(
-        status='out_of_domain', warnings=(), diagnostic={
-            'backend_status_reason': 'composition_projected',
-            'input_composition_projection': _magemin_bulk_projection_details(projection),
-            'solidus_T_C': 900.0, 'liquidus_T_C': 1100.0,
-        },
-    ))
+
+    def over_limit_dispatch(*args, **kwargs):
+        return SimpleNamespace(
+            status='out_of_domain',
+            warnings=(),
+            diagnostic={
+                'backend_status_reason': 'composition_projected',
+                'input_composition_projection': (
+                    _magemin_bulk_projection_details(projection)
+                ),
+                'solidus_T_C': 900.0,
+                'liquidus_T_C': 1100.0,
+            },
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', over_limit_dispatch)
     curve = sim._melt_redox_liquidus_gate_curve()
     notice = curve['composition_projected_notice']
     assert 'composition_projected_over_threshold' in notice['reason']
@@ -2287,6 +2305,31 @@ def test_over_limit_projection_steps_down_to_hold_or_floor(
     if held:
         assert curve['path'] == ((1200.0, 0.0), (1500.0, 1.0))
         assert curve['gate_provider_refusal']['qualification'] == 'held_last_good_curve'
+        assert not sim._freeze_gate_liquid_fraction_curve_memo
+        assert sim._freeze_gate_liquid_fraction_cache is None
+        assert shared_cache == {}
+        assert process_captures == []
+
+        live_memo = deepcopy(sim._freeze_gate_liquid_fraction_curve_memo)
+        forecast, unavailable = sim._build_c0_forecast_context()
+        assert forecast is not None, unavailable
+        assert (
+            forecast._freeze_gate_liquid_fraction_curve_memo
+            is sim._freeze_gate_liquid_fraction_curve_memo
+        )
+        forecast._freeze_gate_shared_curve_cache = shared_cache
+        forecast.melt.p_total_mbar += 100.0
+        monkeypatch.setattr(forecast, '_dispatch_only', over_limit_dispatch)
+
+        forecast_curve = forecast._melt_redox_liquidus_gate_curve()
+
+        assert forecast_curve['gate_provider_refusal']['qualification'] == (
+            'held_last_good_curve'
+        )
+        assert sim._freeze_gate_liquid_fraction_curve_memo == live_memo
+        assert forecast._freeze_gate_liquid_fraction_cache is None
+        assert shared_cache == {}
+        assert process_captures == []
     else:
         assert curve['source'] == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
         assert notice['floor_T_C'] == KRESS91_LIQUID_CALIBRATION_MIN_T_C
@@ -5291,7 +5334,7 @@ def test_gate_curve_memo_ignores_sulfur_input_drift_same_key(
     assert len(provider_calls) == 1
 
 
-def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
+def test_gate_curve_memo_origin_ignores_sulfsat_but_replay_vector_keeps_it(
     monkeypatch,
     vapor_pressure_data,
     feedstocks_data,
@@ -5321,6 +5364,20 @@ def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
     state_changed.inventory.salt_phase_kg['SO3'] = 1.0
     state_changed.inventory.sulfide_matte_kg['FeS'] = 1.0
 
+    first_vector = record_dependency_vector(
+        sims[0],
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        resolve_magemin_database_default=True,
+    )
+    second_vector = record_dependency_vector(
+        state_changed,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        resolve_magemin_database_default=True,
+    )
+    assert first_vector["sulfur_side"] != second_vector["sulfur_side"]
+
     first = gate_curve_memo_producer_configuration(sims[0], curve)
     second = gate_curve_memo_producer_configuration(state_changed, curve)
 
@@ -5331,7 +5388,14 @@ def test_gate_curve_memo_producer_configuration_projects_sulfur_state(
             return False
 
     state_changed._sulfsat_gate = _OtherSulfSatGate()
-    assert gate_curve_memo_producer_configuration(state_changed, curve) != first
+    third_vector = record_dependency_vector(
+        state_changed,
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        artifact="freeze_gate_curve",
+        resolve_magemin_database_default=True,
+    )
+    assert third_vector["sulfur_side"] != second_vector["sulfur_side"]
+    assert gate_curve_memo_producer_configuration(state_changed, curve) == first
 
 
 def test_gate_curve_memo_admission_registers_uninitialized_fallback_supplier(
@@ -6270,12 +6334,9 @@ def test_gate_memo_origin_keeps_producer_dependency_vector(
     assert set(record['origin']['producer_configuration']) == {
         'namespace_id',
         'vapor_pressure_provider_selection',
-        'sulfur_side',
         'model',
     }
-    assert set(
-        record['origin']['producer_configuration']['sulfur_side']
-    ) == {'sulfsat_available', 'sulfsat_provider_selection'}
+    assert 'sulfur_side' not in record['origin']['producer_configuration']
     assert set(record['origin']['producer_configuration']['model']) == {
         'model',
         'mode',
@@ -7186,6 +7247,9 @@ def test_core_gate_curve_memo_predicts_and_flags_after_stable_out_of_domain(
     assert curves[0]['gate_provider_refusal']['reason'] == stable_reason
     assert curves[0]['gate_provider_refusal']['qualification'] == 'out_of_domain_kress91_floor_prediction'
     assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+    key = _freeze_gate_key_for_current_state(sim)
+    assert sim._freeze_gate_liquid_fraction_curve_memo[key]['curve'] == curves[0]
+    assert shared_cache[key]['curve'] == curves[0]
     snapshot = sim._make_snapshot()
     assert snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']['status'] == 'out_of_domain'
     assert len(provider_calls) == 1

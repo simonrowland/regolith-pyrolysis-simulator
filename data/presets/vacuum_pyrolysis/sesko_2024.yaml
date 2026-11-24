@@ -11,7 +11,7 @@ source_notes:
   - citation_id: sesko_2024
     digest: "Feedstock mapped to registered lunar_eac_1a alias; paper text uses EAC-1A while the composition table header abbreviates EAC-1."
   - citation_id: sesko_2024
-    digest: "Reported exposure pressure spans 1e-7..1e-2 mbar; reported_exposure_profile records that source range first-class, while chamber_pressure_mbar carries the runtime floor with a named delta annotation."
+    digest: "Reported exposure pressure spans 1e-7..1e-2 mbar; reported_exposure_profile records those bounds first-class, while chamber_pressure_mbar uses 1e-3 mbar as an assumed initial schedule point because the reported range is not a time-resolved trace."
 
 lab_schedule:
   id: sesko_2024_schedule_solar_exposure
@@ -100,10 +100,10 @@ lab_schedule:
     - {t_h: 0.0, value: 1476.85, unit: C, qualifier: converted_from_reported_1750_K_lower_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
     - {t_h: 1.0, value: 1626.85, unit: C, qualifier: converted_from_reported_1900_K_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
   chamber_pressure_mbar:
-    - {t_h: 0.0, value: 0.001, unit: mbar, qualifier: parser_floor_for_reported_1e-7_mbar, runtime_delta_annotation_id: pressure_floor_delta_reported_uhv_min_to_runtime_floor, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "Current normalize_lab_schedule floor is 1e-3 mbar; reported_exposure_profile.pressure_mbar preserves the stated 1e-7 mbar lower bound."}
+    - {t_h: 0.0, value: 0.001, unit: mbar, qualifier: assumed_initial_schedule_point_for_reported_pressure_range, runtime_delta_annotation_id: pressure_assumption_reported_uhv_min_to_initial_point, source_class: assumption_with_sensitivity_marker, citation_id: sesko_2024, extraction_note: "The reported pressure range gives bounds, not a time-resolved trajectory; 1e-3 mbar is an explicit initial schedule assumption."}
     - {t_h: 1.0, value: 0.01, unit: mbar, qualifier: reported_upper_range, source_class: literature_sidecar, source_ref: sesko_2024_experimental_procedure, citation_id: sesko_2024}
   runtime_schedule_annotations:
-    - id: pressure_floor_delta_reported_uhv_min_to_runtime_floor
+    - id: pressure_assumption_reported_uhv_min_to_initial_point
       field: chamber_pressure_mbar[0].value
       runtime_value: 1.0e-3
       runtime_unit: mbar
@@ -111,10 +111,10 @@ lab_schedule:
       reported_value: 1.0e-7
       reported_unit: mbar
       delta_factor: 10000
-      reason: normalize_lab_schedule_floor
+      reason: assumed_schedule_point_not_time_resolved
       source_class: assumption_with_sensitivity_marker
       citation_id: sesko_2024
-      extraction_note: "Runtime parser rejects chamber pressure below 1e-3 mbar; source-faithful reported profile remains 1e-7..1e-2 mbar."
+      extraction_note: "Reported pressure bounds are retained separately; the assumed schedule point is not a time-resolved pressure trace."
   gas_boundary:
     background_gas:
       reported_status: not_reported
@@ -295,20 +295,21 @@ comparison_contract:
   internal_analytical_used: false
   pressure_sensitive_certification_block:
     status: blocked
-    code: reported_dynamic_pressure_crosses_runtime_floor
+    code: pressure_trace_and_pump_throughput_unreported
     blocked_observables:
       - molecular_flow_transport_reproduction
       - transitional_flow_transport_reproduction
       - pressure_sensitive_deposit_mass
     reasons:
       - reported_pressure_oscillates_from_1e-7_to_1e-2_mbar
-      - runtime_schedule_clamps_values_below_1e-3_mbar
+      - reported_pressure_range_does_not_establish_time_series
       - exposure_duration_is_assumed
       - pump_throughput_and_pressure_trace_are_not_reported
     required_evidence:
       - molecular_transitional_transport_model
-      - unclamped_time_resolved_pressure_trace
+      - time_resolved_pressure_trace
       - reported_exposure_duration
+      - reported_pump_throughput
   blocked_claims:
     - molecular_flow_transport_reproduction
     - transitional_flow_transport_reproduction

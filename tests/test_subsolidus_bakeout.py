@@ -701,7 +701,7 @@ def test_joint_release_stays_within_pipe_capacity():
         return original(**kwargs)
 
     sim._apply_c0_bakeout = _bakeout
-    sim._apply_analytic_evaporation_depletion = lambda flux: flux
+    sim._apply_analytic_evaporation_depletion = lambda flux, **kwargs: flux
     sim.step()
     pump_admitted = 2.0 * scale
     decision = [

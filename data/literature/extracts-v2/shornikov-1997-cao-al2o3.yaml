@@ -1859,12 +1859,11 @@ observations:
     species:
       formula: Ca12Al14O33
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1931,6 +1930,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca12al14o33_iii_1600_1733_left_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca12al14o33_iii_1600_1733_left_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2026,6 +2049,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca12al14o33_v_1833_2033_left_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2054,12 +2089,11 @@ observations:
     species:
       formula: Ca3Al2O6
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2126,6 +2160,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1600_1808_left_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1600_1808_left_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2151,12 +2209,11 @@ observations:
     species:
       formula: Ca3Al2O6
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2223,6 +2280,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1808_2033_left_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca3al2o6_iii_1808_2033_left_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2318,6 +2399,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca3al2o6_v_1833_2033_left_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2416,6 +2509,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_ca5al6o14_v_1833_2033_left_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2515,6 +2620,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal12o19_v_1833_2033_right_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2543,12 +2660,11 @@ observations:
     species:
       formula: CaAl2O4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2615,6 +2731,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal2o4_iii_1600_1877_right_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal2o4_iii_1600_1877_right_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2640,12 +2780,11 @@ observations:
     species:
       formula: CaAl2O4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2711,6 +2850,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal2o4_v_1833_2033_right_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal2o4_v_1833_2033_right_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2736,12 +2899,11 @@ observations:
     species:
       formula: CaAl4O7
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2808,6 +2970,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal4o7_iii_1600_2033_right_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal4o7_iii_1600_2033_right_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -2833,12 +3019,11 @@ observations:
     species:
       formula: CaAl4O7
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2904,6 +3089,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal4o7_v_1833_2033_right_h
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=source
+      does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t2_caal4o7_v_1833_2033_right_h
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -3002,6 +3211,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_ca12al14o33_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3124,6 +3344,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_ca12al14o33_eq8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3234,6 +3465,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_ca3al2o6_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3358,6 +3600,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_ca3al2o6_eq8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3470,6 +3723,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_ca5al6o14_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3593,6 +3857,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_ca5al6o14_eq8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3708,6 +3983,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_caal12o19_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3818,6 +4104,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_caal12o19_eq8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -3928,6 +4225,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_caal2o4_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -4051,6 +4359,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_caal2o4_eq8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -4161,6 +4480,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_caal4o7_eq7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -4271,6 +4601,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-1997-cao-al2o3::shornikov_1997_cao_al2o3_t3_caal4o7_eq8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion

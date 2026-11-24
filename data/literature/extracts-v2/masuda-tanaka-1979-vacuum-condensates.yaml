@@ -11,12 +11,11 @@ observations:
     species:
       formula: Ba
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -61,7 +60,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ba
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -154,12 +165,11 @@ observations:
     species:
       formula: Ce
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -204,7 +214,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_ce
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -297,12 +319,11 @@ observations:
     species:
       formula: Dy
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -347,7 +368,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_dy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -440,12 +473,11 @@ observations:
     species:
       formula: Er
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -490,7 +522,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_er
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -583,12 +627,11 @@ observations:
     species:
       formula: Eu
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -633,7 +676,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_eu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -726,12 +781,11 @@ observations:
     species:
       formula: Gd
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -776,7 +830,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_gd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -869,12 +935,11 @@ observations:
     species:
       formula: La
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -919,7 +984,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_la
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1012,12 +1089,11 @@ observations:
     species:
       formula: Lu
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1062,7 +1138,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_lu
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1155,12 +1243,11 @@ observations:
     species:
       formula: Nd
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1205,7 +1292,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_nd
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1298,12 +1397,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1348,7 +1446,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_rb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1441,12 +1551,11 @@ observations:
     species:
       formula: Sm
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1491,7 +1600,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sm
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1584,12 +1705,11 @@ observations:
     species:
       formula: Sr
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1634,7 +1754,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_sr
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5
@@ -1727,12 +1859,11 @@ observations:
     species:
       formula: Yb
       phase:
-        tag: unknown
-        reason: phase string 'post-run residue; phase not stated' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1777,7 +1908,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''post-run residue; phase not stated'' is not in the closed automatic map'
+    origin: masuda-tanaka-1979-vacuum-condensates::masuda_tanaka_1979_residue_yb
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: masuda-tanaka-1979-vacuum-condensates
   locator:
     page: 5

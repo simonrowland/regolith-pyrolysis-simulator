@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -40,6 +39,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_figs_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -72,12 +82,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -101,6 +110,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_figs_ion_intensity_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -123,12 +143,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -157,7 +176,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_infinite_dilution_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 851
@@ -234,12 +264,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -263,7 +292,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 844
@@ -290,12 +330,11 @@ observations:
     species:
       formula: Nb
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -319,7 +358,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_quoted_gamma0_literature
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -842,12 +892,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -938,6 +987,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_22
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1008,12 +1069,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1104,6 +1164,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_25
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1174,12 +1246,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1270,6 +1341,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_27
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -1670,12 +1753,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1766,6 +1848,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table1_FeTa_a_Fe_heat_33
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -3660,12 +3754,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3688,7 +3781,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -3715,12 +3819,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3743,7 +3846,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -3770,12 +3884,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3798,7 +3911,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -3825,12 +3949,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3853,7 +3976,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -3880,12 +4014,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3908,7 +4041,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -3935,12 +4079,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3963,7 +4106,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -3990,12 +4144,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4018,7 +4171,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4045,12 +4209,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4073,7 +4236,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4100,12 +4274,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4128,7 +4301,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4155,12 +4339,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4183,7 +4366,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4210,12 +4404,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4238,7 +4431,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4265,12 +4469,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4293,7 +4496,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table2_metallography
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4320,12 +4534,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4349,7 +4562,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4376,12 +4600,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4405,7 +4628,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4432,12 +4666,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4461,7 +4694,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4488,12 +4732,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4517,7 +4760,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4544,12 +4798,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4573,7 +4826,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4600,12 +4864,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4629,7 +4892,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4656,12 +4930,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4685,7 +4958,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4712,12 +4996,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4741,7 +5024,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4768,12 +5062,11 @@ observations:
     species:
       formula: Ta
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4797,7 +5090,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table3_phase_boundaries
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 847
@@ -4824,12 +5128,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4856,7 +5159,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -4949,12 +5263,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4981,7 +5294,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5074,12 +5398,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5106,7 +5429,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5199,12 +5533,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5231,7 +5564,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5324,12 +5668,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5356,7 +5699,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5449,12 +5803,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5481,7 +5834,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5574,12 +5938,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5606,7 +5969,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5699,12 +6073,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5731,7 +6104,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -5824,12 +6208,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5856,7 +6239,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table4_FeTa_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 848
@@ -6775,12 +7169,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6871,6 +7264,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_19
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -6941,12 +7346,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7037,6 +7441,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_20
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7605,12 +8021,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7701,6 +8116,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_26
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -7937,12 +8364,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8033,6 +8459,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_29
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8103,12 +8541,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8199,6 +8636,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_30
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -8434,12 +8883,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -8530,6 +8978,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table5_FeNb_a_Fe_heat_32
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -9260,12 +9720,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9292,7 +9751,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -9367,12 +9837,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9399,7 +9868,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -9474,12 +9954,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9506,7 +9985,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -9581,12 +10071,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9613,7 +10102,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -9688,12 +10188,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9720,7 +10219,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -9795,12 +10305,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9827,7 +10336,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -9902,12 +10422,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -9934,7 +10453,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -10009,12 +10539,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10041,7 +10570,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -10116,12 +10656,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10148,7 +10687,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -10223,12 +10773,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10255,7 +10804,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -10330,12 +10890,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10362,7 +10921,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850
@@ -10437,12 +11007,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Ta_or_Fe-Nb_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -10469,7 +11038,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Ta_or_Fe-Nb_alloy'' is not in the closed automatic map'
+    origin: kems-112-ichise-1989::ichise_1989_table6_FeNb_1873K
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-112-ichise-1989
   locator:
     published_page: 850

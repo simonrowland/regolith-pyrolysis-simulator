@@ -77,7 +77,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas declared by source standard_state Th(g); original_reason=phase
+      string ''solid_liquid_Th_to_Th_g'' is not in the closed automatic map'
+    origin: ref-032-th::anchor_Th_pure_Psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ref-032-th::anchor_Th_pure_Psat
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ref-032-th
   locator:
     note: Ackermann, R.J. & Rauh, E.G. (historical Argonne) thorium metal vapor pressure / effusion; Alcock et al. (1984)

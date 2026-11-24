@@ -78,7 +78,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_oxygen_activity_coefficient_infinite_dilution::T=1573:row=this-work:h=fa403f047d9b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 5
@@ -203,6 +214,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_fruehan_richardson_1373
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -307,6 +329,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_fruehan_richardson_1473
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -411,6 +444,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_jacob_jeffes_1373
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -515,6 +559,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_jacob_jeffes_1573
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -619,6 +674,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1373
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -723,6 +789,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1423
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -827,6 +904,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kozuka_1473
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -931,6 +1019,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1373
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1035,6 +1134,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1473
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1139,6 +1249,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_kulkarni_1573
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1243,6 +1364,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_nanda_geiger_1408
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1347,6 +1479,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_rickert_wagner_1418
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1451,6 +1594,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_wilder_1373
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1555,6 +1709,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table2_wilder_1473
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -1662,6 +1827,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1373_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -1777,6 +1953,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1373_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -1895,6 +2082,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1573_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2010,6 +2208,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_jacob_jeffes_1573_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2128,6 +2337,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1373_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2243,6 +2463,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1373_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2361,6 +2592,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1473_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2476,6 +2718,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1473_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2594,6 +2847,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1573_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2709,6 +2973,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_kulkarni_1573_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2827,6 +3102,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_this_work_1573_eq3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -2942,6 +3228,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - interaction_parameter
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table3_this_work_1573_eq4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - interaction_parameter
@@ -3056,7 +3353,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1508:h=49b5bbc4754b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3179,7 +3487,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1523:h=424f3f297c52
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3302,7 +3621,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1543:h=5a8334aea4eb
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3425,7 +3755,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1558:h=6e49f11c34a8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3548,7 +3889,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1573:h=7ecee5064e42
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3671,7 +4023,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu2o_liquid::T=1583:h=32414a2e9294
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3794,7 +4157,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1508:h=23e19f9e9850
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -3917,7 +4291,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1523:h=6c2b47e356b9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4040,7 +4425,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1543:h=0976e572cc58
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4163,7 +4559,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1558:h=7e73e0210c49
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4286,7 +4693,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1573:h=5e173d21edc5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4409,7 +4827,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu2o_in_cu_liquid::T=1583:h=5b765b4399a2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4532,7 +4961,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1508:h=4d7bcbe6976b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4655,7 +5095,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1523:h=e207b63d0315
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4778,7 +5229,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1543:h=7bbb3051d00e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -4901,7 +5363,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1558:h=8fe32f0b8864
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5024,7 +5497,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1573:h=af73c227fc4f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5147,7 +5631,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu2o_liquid::T=1583:h=7b8629689291
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5270,7 +5765,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1508:h=e94bffe20282
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5393,7 +5899,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1523:h=669e6d31daf3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5516,7 +6033,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1543:h=51cd0db61afb
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5639,7 +6167,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1558:h=cb7fe55d3716
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5762,7 +6301,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1573:h=24713fc83e9b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9
@@ -5885,7 +6435,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kemori-1980-oxygen-liquid-copper::kemori_1980_table4_cu_in_cu_liquid::T=1583:h=05822244e7f2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kemori-1980-oxygen-liquid-copper
   locator:
     page: 9

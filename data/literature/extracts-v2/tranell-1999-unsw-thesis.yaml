@@ -9511,6 +9511,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tranell-1999-unsw-thesis::tranell_1999_table4_2_sample1_gamma_si
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -9688,6 +9699,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tranell-1999-unsw-thesis::tranell_1999_table4_2_sample2_gamma_si
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - activity_coefficient
@@ -9862,7 +9884,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tranell-1999-unsw-thesis::tranell_1999_table4_2_si_in_copper_sample1::T=1873:row=1:h=63a021c11459
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tranell-1999-unsw-thesis
   locator:
     page: 118
@@ -10018,7 +10051,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: tranell-1999-unsw-thesis::tranell_1999_table4_2_si_in_copper_sample2::T=1873:row=2:h=79e0392a5243
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: tranell-1999-unsw-thesis
   locator:
     page: 118

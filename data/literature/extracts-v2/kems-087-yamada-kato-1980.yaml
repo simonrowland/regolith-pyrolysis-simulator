@@ -11,12 +11,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,7 +82,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_P_plus_count_rate_1p52wt
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 248
@@ -138,12 +149,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -171,7 +181,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_epsilon_P_P_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 247
@@ -226,12 +247,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -256,6 +276,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fe_activity_slight_negative_deviation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -288,12 +319,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -317,6 +347,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig10_P2_over_P_sq_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -349,12 +390,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -378,6 +418,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig1_cell_assembly_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -410,12 +461,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -439,6 +489,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig2_P2_background_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -471,12 +532,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -500,6 +560,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig3_ion_ratio_vs_1_over_T_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -532,12 +603,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -561,6 +631,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig4_ion_ratio_vs_N_P_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -593,12 +674,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -623,6 +703,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig5_integration_curve_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -655,12 +746,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -685,6 +775,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig6_gamma_P_comparison_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -717,12 +818,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -747,6 +847,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig7_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -779,12 +890,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -809,6 +919,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig8_integration_error_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -841,12 +962,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -870,6 +990,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_fig9_P_plus_peak_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -902,12 +1033,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -932,7 +1062,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 244
@@ -1140,12 +1281,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1168,7 +1308,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 244
@@ -1223,12 +1374,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1251,7 +1401,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 244
@@ -1270,12 +1431,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1298,7 +1458,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 244
@@ -1317,12 +1488,11 @@ observations:
     species:
       formula: P
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-P_dilute' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1345,7 +1515,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-P_dilute'' is not in the closed automatic map'
+    origin: kems-087-yamada-kato-1980::yamada_kato_1980_quoted_epsilon_P_P
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-087-yamada-kato-1980
   locator:
     published_page: 244

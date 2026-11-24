@@ -11,12 +11,11 @@ observations:
     species:
       formula: EAC-1A
       phase:
-        tag: unknown
-        reason: phase string 'EAC-1A_and_comparison_simulants' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''EAC-1A_and_comparison_simulants'' is not in the closed automatic map'
+    origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1_dsc
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''argon_dsc''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1_dsc
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: engelschion-2020-eac1a-simulant
   locator:
     page: 5
@@ -55,12 +76,11 @@ observations:
     species:
       formula: EAC-1A
       phase:
-        tag: unknown
-        reason: phase string 'granular_lunar_regolith_simulant' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -126,6 +146,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_fraction
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''granular_lunar_regolith_simulant'' is not in the closed automatic map'
+    origin: engelschion-2020-eac1a-simulant::engelschion_2020_eac1a_water_release
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - mass_loss_fraction

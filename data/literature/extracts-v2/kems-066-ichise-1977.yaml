@@ -11,12 +11,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -49,7 +48,18 @@ observations:
         pdf_page_index: 6
         note: extrapolating each composition ln(I+_Al/I+_Fe) vs 1/T to 1600 C then integrating eq (2) gave gamma_Al^o=0.041
           and gamma_Fe^o=0.021; authors did not adopt because Fig. 4 slopes scatter
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_1600C_fig4_extrapolation_rejected
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -104,12 +114,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,7 +146,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p0
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -192,12 +212,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -225,7 +244,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -280,12 +310,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -313,7 +342,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -368,12 +408,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -401,7 +440,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -456,12 +506,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -489,7 +538,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p368
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -544,12 +604,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -577,7 +636,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p406
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -632,12 +702,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -665,7 +734,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -720,12 +800,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -753,7 +832,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -808,12 +898,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -841,7 +930,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -896,12 +996,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -929,7 +1028,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -984,12 +1094,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1017,7 +1126,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_0p9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1072,12 +1192,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1105,7 +1224,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_al_activity_table1_1400C_nal_1p0
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1160,12 +1290,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1190,7 +1319,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_eq10_11_ion_ratio_integrand_1400C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 420
@@ -1245,12 +1385,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1278,7 +1417,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p0
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1333,12 +1483,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1366,7 +1515,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1421,12 +1581,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1454,7 +1613,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1509,12 +1679,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1542,7 +1711,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1597,12 +1777,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1630,7 +1809,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p368
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1685,12 +1875,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1718,7 +1907,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p406
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1773,12 +1973,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1806,7 +2005,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1861,12 +2071,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1894,7 +2103,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -1949,12 +2169,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1982,7 +2201,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -2037,12 +2267,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2070,7 +2299,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -2125,12 +2365,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2158,7 +2397,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_0p9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -2213,12 +2463,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C_solid_and_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2246,7 +2495,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C_solid_and_liquid'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fe_activity_table1_1400C_nal_1p0
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 421
@@ -2301,12 +2561,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2330,6 +2589,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig10_Al2O_Al_ion_ratio_vs_1_over_T_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2352,12 +2622,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2382,6 +2651,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig11_quadratic_Al2O_plot_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2414,12 +2694,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2443,6 +2722,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig12_fragmentation_R_vs_ionizing_potential_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2465,12 +2755,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2494,6 +2783,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig2_temperature_correction_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2516,12 +2816,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2545,6 +2844,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig3_chamber_voltage_ion_ratio_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2577,12 +2887,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2606,6 +2915,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig4_ln_ion_ratio_vs_1_over_T_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2628,12 +2948,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2657,6 +2976,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig5_solidus_liquidus_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2679,12 +3009,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2709,6 +3038,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig6_integration_curve_1400C_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2741,12 +3081,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2771,6 +3110,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig7_activities_1400C_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2803,12 +3153,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2833,6 +3182,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig8_ln_rho_and_alpha_vs_1_over_T_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2855,12 +3215,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_in_alumina_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2885,6 +3244,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_in_alumina_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_fig9_ln_gamma_al_o_and_epsilon_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -2907,12 +3277,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2935,7 +3304,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy_infinite_dilution'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -2990,12 +3370,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3018,7 +3397,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy_infinite_dilution'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3073,12 +3463,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3101,7 +3490,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy_infinite_dilution'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3156,12 +3556,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3184,7 +3583,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy_infinite_dilution'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3239,12 +3649,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3267,7 +3676,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy_infinite_dilution'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_quoted_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3322,12 +3742,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Al_alloy_infinite_dilution' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3352,7 +3771,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Al_alloy_infinite_dilution'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_epsilon_table2_this_study_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3407,12 +3837,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_1400C' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3446,7 +3875,18 @@ observations:
         pdf_page_index: 7
         note: gamma_Al^o = 0.045 at 1400 C from I+(Al2O)/I+(Al) via eqs (34)-(37); authors reject in favour of the ion-intensity-ratio
           (Belton-Fruehan) value
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_1400C'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_gamma_al_from_Al2O_ratio_rejected
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 423
@@ -3501,12 +3941,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_NAl_0.5_in_alumina_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3572,7 +4011,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_NAl_0.5_in_alumina_cell'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_ion_ratio_NAl_0p5_1470C_30V
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 418
@@ -3627,12 +4078,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'infinite_dilution_Al_in_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3657,7 +4107,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''infinite_dilution_Al_in_Fe'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_limiting_molar_heat_of_mixing_Al
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3676,12 +4137,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_Darken_quadratic_range' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3709,7 +4169,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy_Darken_quadratic_range'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_ln_gamma_al_temperature_equations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3728,12 +4199,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3762,7 +4232,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-Al_alloy'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_ln_gamma_fe_temperature_equations
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 422
@@ -3782,12 +4263,11 @@ observations:
     species:
       formula: Al
       phase:
-        tag: unknown
-        reason: phase string 'Fe-Al_alloy_NAl_0.5' is not in the closed automatic map
+        tag: value
+        value: g
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3868,7 +4348,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''Fe-Al_alloy_NAl_0.5'' is not in the closed automatic map'
+    origin: kems-066-ichise-1977::ichise_1977_p_Al2O_p_Al_1500C_author_estimate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   source_id: kems-066-ichise-1977
   locator:
     published_page: 423

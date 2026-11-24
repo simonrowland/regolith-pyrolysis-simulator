@@ -25,6 +25,13 @@ rows for one class, and this process's memory of that file. Merge copies
 output rows only, not mask tables. A readonly cache cannot write the
 witness, but a contradiction seen in this process is not served again.
 The in-process counter is the one the score reads.
+
+A coarse-cell index sits beside the key, not in it. The optimizer passes
+coarsened requests for the xx_coarse, coarse, and medium presets. An exact
+miss during one of those passes may return any stored result in that cell,
+flagged neighbour_hit with the preset name, and the scope counts that hit
+for the run. fine passes and battery scoring do not take that lookup and
+do not write cells. A read-only open with no index is an exact miss.
 """
 
 from __future__ import annotations
@@ -474,7 +481,7 @@ def cacheable_refusal(result) -> bool:
 
 ENGINE_CHEMISTRY_VERSION = {
     "openimcc": 1,
-    "internal-analytical": 3,
+    "internal-analytical": 4,
     "vaporock": 1,
     "magemin": 4,
     "alphamelts": 4,
@@ -497,6 +504,7 @@ ENGINE_CHEMISTRY_VERSION = {
 # thermoengine v3: 2026-11-17 shared _MELTSBackendSupport numeric changes altered cached results (93bbb34d5d, df3abcff40)
 # internal-analytical v2: 2026-11-17 stateless activity rewrite changed repeated-call vapor pressures (0e9b03818f)
 # internal-analytical v3: 2026-11-18 b265 e7fbd4c052 onto b-1244 71806e046 - vapour-rail continuation notice, wall-saturation thermo and evaporation drive
+# internal-analytical v4: 2026-11-23 Markova car 2 - preserve the Fe speciation consumed by residue oxygen balance. If b-1124's v4 also lands, the train re-bumps to max+1.
 # magemin v4: 2026-11-18 MAGEMin pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - positive SiO2 outside [30, 80] wt% is predicted and flagged; Fe-free cells leave fO2 indeterminate
 # alphamelts v4: 2026-11-18 alphaMELTS binary pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - subfloor oxygen extrapolation notice and freeze-gate cooling path
 # thermoengine v4: 2026-11-18 ThermoEngine pin unchanged, b265 e7fbd4c052 onto b-1244 71806e046 - same subfloor oxygen extrapolation notice
@@ -681,6 +689,10 @@ _TABLE = "engine_outputs"
 _SPECIES_TABLE = "engine_output_species"
 _MASK_TABLE = "engine_refusal_mask"
 _MASK_AUDIT_TABLE = "engine_refusal_audit"
+# Not a key dimension and not a schema-version bump. Created on the first
+# optimizer store. A file without it still opens; lookup treats that as a miss.
+_NEIGHBOUR_TABLE = "engine_neighbour_cells"
+_COARSE_NEIGHBOUR_PRESETS = frozenset({"xx_coarse", "coarse", "medium"})
 _CACHE_SCHEMA_VERSION = 4
 _V3_OUTPUT_COLUMNS = (
     "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id",
@@ -1748,7 +1760,9 @@ def _check_cache_schema(connection: sqlite3.Connection, *, allow_empty: bool = F
         for table, columns, _ in _CACHE_TABLE_DEFINITIONS
     }
     expected_tables = set(expected_columns)
-    optional_tables = {_SYNC_WATERMARKS_TABLE, _MASK_TABLE, _MASK_AUDIT_TABLE}
+    optional_tables = {
+        _SYNC_WATERMARKS_TABLE, _MASK_TABLE, _MASK_AUDIT_TABLE, _NEIGHBOUR_TABLE,
+    }
     own_transaction = not connection.in_transaction
     if own_transaction:
         connection.execute("BEGIN")
@@ -2363,6 +2377,202 @@ def _store_cold(
         connection.execute("DELETE FROM cold.engine_values WHERE row_seq=?", (row_seq,))
 
 
+@dataclass(frozen=True)
+class _NeighbourScope:
+    lookup_preset: str | None
+    coarsen: Callable[[Any], Mapping[str, Any]]
+    # Caller-owned. A neighbour return increments ``hits`` for this run.
+    counter: Any = None
+
+
+_NEIGHBOUR_SCOPE: ContextVar[_NeighbourScope | None] = ContextVar(
+    "engine_neighbour_scope", default=None,
+)
+
+
+class _NeighbourList(list):
+    """A list hot value plus the coarse preset that supplied it.
+
+    Equilibrium decoders accept a list of a fixed length. A subclass is
+    still a list, so that length is unchanged. The preset is an attribute,
+    not an element, and it is not stored.
+    """
+
+    neighbour_hit: str
+
+
+class _NeighbourDict(dict):
+    """A mapping hot value plus the coarse preset that supplied it.
+
+    The preset is an attribute, not a key. A gas partial-pressure map is
+    the returned value; an extra key would be read as a species. Equality
+    and ``dict()`` still see only the stored items.
+    """
+
+    neighbour_hit: str
+
+
+@contextmanager
+def optimizer_neighbour_scope(
+    preset: str | None,
+    coarsen: Callable[[Any], Mapping[str, Any]] | None,
+    counter: Any = None,
+) -> Iterator[Any]:
+    """Record coarse cells for one optimizer pass, and maybe serve one.
+
+    ``coarsen`` returns preset name to coarsened request. This module packs
+    that request; it does not snap values. Lookup and the index run only
+    for xx_coarse, coarse, and medium. fine, a missing preset, and battery
+    scoring do not enter, so they neither coarsen nor write cells. A
+    neighbour return increments ``counter.hits`` when the caller passed one.
+    """
+
+    lookup = preset if preset in _COARSE_NEIGHBOUR_PRESETS else None
+    if lookup is None or coarsen is None:
+        yield counter
+        return
+    token = _NEIGHBOUR_SCOPE.set(_NeighbourScope(lookup, coarsen, counter))
+    try:
+        yield counter
+    finally:
+        _NEIGHBOUR_SCOPE.reset(token)
+
+
+def _scope_neighbour_cells(request: Any) -> tuple[str | None, dict[str, bytes]]:
+    scope = _NEIGHBOUR_SCOPE.get()
+    if scope is None or scope.lookup_preset is None:
+        return None, {}
+    try:
+        coarsened = scope.coarsen(request)
+    except (TypeError, ValueError):
+        return scope.lookup_preset, {}
+    cells: dict[str, bytes] = {}
+    if isinstance(coarsened, Mapping):
+        for name, value in coarsened.items():
+            if name not in _COARSE_NEIGHBOUR_PRESETS or value is None:
+                continue
+            try:
+                cells[str(name)] = pack(value, key=True)
+            except (TypeError, ValueError):
+                continue
+    return scope.lookup_preset, cells
+
+
+def _flag_neighbour_hit(value: Any, preset: str) -> Any | None:
+    """Copy the hot value and name the preset. The stored bytes stay exact.
+
+    The preset is an attribute. Putting it in the mapping would change a
+    gas partial-pressure result, and putting it in the list would change
+    a fixed-length equilibrium record. A value that is neither is solved
+    instead of returned without a flag.
+    """
+
+    if isinstance(value, Mapping):
+        flagged = _NeighbourDict(value)
+        flagged.neighbour_hit = preset
+        return flagged
+    if isinstance(value, list):
+        flagged = _NeighbourList(value)
+        flagged.neighbour_hit = preset
+        return flagged
+    return None
+
+
+def _ensure_neighbour_table(connection: sqlite3.Connection) -> None:
+    connection.execute(
+        f"CREATE TABLE IF NOT EXISTS {_NEIGHBOUR_TABLE} ("
+        "engine TEXT NOT NULL, chem_version TEXT NOT NULL, preset TEXT NOT NULL, "
+        "cell BLOB NOT NULL, key BLOB NOT NULL, "
+        "PRIMARY KEY(engine, chem_version, preset, cell)"
+        ") WITHOUT ROWID"
+    )
+
+
+def _read_neighbour(
+    connection: sqlite3.Connection | None,
+    *,
+    engine_id: str,
+    chem_version: str | int,
+    preset: str,
+    cell: bytes,
+    exact_key: bytes,
+    counts: dict[str, int],
+) -> Any | None:
+    if connection is None or preset not in _COARSE_NEIGHBOUR_PRESETS:
+        return None
+    try:
+        row = connection.execute(
+            f"SELECT key FROM {_NEIGHBOUR_TABLE} "
+            "WHERE engine=? AND chem_version=? AND preset=? AND cell=?",
+            (engine_id, str(chem_version), preset, cell),
+        ).fetchone()
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            return None
+        counts["read_error"] += 1
+        return None
+    except sqlite3.Error:
+        counts["read_error"] += 1
+        return None
+    if row is None or bytes(row[0]) == exact_key:
+        return None
+    try:
+        stored = connection.execute(
+            f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?",
+            (row[0],),
+        ).fetchone()
+    except sqlite3.Error:
+        counts["read_error"] += 1
+        return None
+    if stored is None:
+        return None
+    try:
+        value = _decode_hot(stored[0], _read_provenance(connection, stored[1]))
+    except (TypeError, ValueError, UnicodeDecodeError, sqlite3.Error):
+        counts["read_error"] += 1
+        return None
+    return _flag_neighbour_hit(value, preset)
+
+
+def _index_neighbour_cells(
+    connection: sqlite3.Connection,
+    engine_id: str,
+    chem_version: str | int,
+    exact_key: bytes,
+    request: Any,
+) -> bool:
+    """Point each coarse cell at this exact key. The first store wins until replaced.
+
+    A later store in the same cell replaces the pointer so an expired key
+    does not stick. The exact row is already in this transaction. A failure
+    here rolls back only the index.
+    """
+
+    _lookup, cells = _scope_neighbour_cells(request)
+    if not cells:
+        return True
+    try:
+        connection.execute("SAVEPOINT engine_neighbour")
+        _ensure_neighbour_table(connection)
+        connection.executemany(
+            f"INSERT OR REPLACE INTO {_NEIGHBOUR_TABLE} "
+            "(engine, chem_version, preset, cell, key) VALUES (?,?,?,?,?)",
+            [
+                (engine_id, str(chem_version), preset, cell, exact_key)
+                for preset, cell in cells.items()
+            ],
+        )
+        connection.execute("RELEASE engine_neighbour")
+    except Exception:
+        try:
+            connection.execute("ROLLBACK TO engine_neighbour")
+            connection.execute("RELEASE engine_neighbour")
+        except sqlite3.Error:
+            pass
+        return False
+    return True
+
+
 def not_stored_refusal_label(solved: Any, hot: Any) -> str | None:
     """Token for ``not_stored:refusal:<token>`` on a returned miss.
 
@@ -2473,6 +2683,8 @@ def register_mask_exception(
     _MASK_EXCEPTION_BUILDERS[type_name] = builder
 
 
+# Shared request-cell rounding primitives. Optimizer coarsening imports these
+# from this standard-library leaf; each caller keeps its own cell policy.
 def _mask_quantize(value: float | None, quantum: float, digits: int) -> float | None:
     if value is None:
         return None
@@ -2948,26 +3160,28 @@ def _lookup_refusal_mask(
     version: str,
     request: Any,
     path_value: str,
-) -> tuple[str, Mapping[str, Any], bytes] | None:
+) -> tuple[tuple[str, Mapping[str, Any], bytes] | None, bool]:
+    """Return the learned mask and whether a neighbour lookup is safe."""
+
     if connection is None:
-        return None
+        return None, False
     cell = refusal_mask_cell(request)
     if cell is None:
-        return None
+        return None, True
     # A contradiction already seen in this process wins over the file.
     # Readonly cannot delete the row, and a failed delete must not either.
     if _mask_cell_denied(path_value, engine_id, version, cell):
-        return None
+        return None, False
     try:
         selected = _select_mask(connection, engine_id, version, cell)
     except sqlite3.Error:
         with _LOCK:
             _counter_bucket(engine_id)["read_error"] += 1
-        return None
+        return None, False
     if selected is None:
-        return None
+        return None, True
     refusal_class, recipe = selected
-    return refusal_class, recipe, cell
+    return (refusal_class, recipe, cell), False
 
 
 def _serve_mask_without_engine(
@@ -3200,6 +3414,14 @@ def _finish_cache_miss(
                 # Build id is forensic only and is written with the COLD value.
                 # The hit path above returns before this call.
                 _store_cold(connection, path, int(stored_seq[0]), cold_values, engine_id)
+            # The exact key is unchanged. The cell pointer is a side row,
+            # written only while the optimizer scope is active.
+            if not _index_neighbour_cells(
+                connection, engine_id, chem_version, cache_key, request,
+            ):
+                index_name = "neighbour_index_error"
+                index_counts = _counter_bucket(engine_id)
+                index_counts[index_name] = index_counts.get(index_name, 0) + 1
             connection.commit()
             if inserted:
                 _record_bloom_key(connection, cache_key)
@@ -3359,9 +3581,34 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
                 return result
 
     version = str(chem_version)
-    masked = _lookup_refusal_mask(
+    masked, mask_allows_neighbour = _lookup_refusal_mask(
         connection, engine_id, version, request, path_value,
     )
+    # Exact HOT rows and refusal-mask outcomes both have priority. The
+    # neighbour lookup is reached only after the mask confirms no cell hit.
+    # Readonly caches may be shared across machines and runs. Their
+    # optimizer-neighbour contents must not influence the result; exact HOT
+    # lookup above remains available. Writable misses index neighbours in
+    # _finish_cache_miss after its readonly return.
+    if not readonly and masked is None and mask_allows_neighbour:
+        lookup_preset, neighbour_cells = _scope_neighbour_cells(request)
+        if lookup_preset is not None and lookup_preset in neighbour_cells:
+            neighbour = _read_neighbour(
+                connection,
+                engine_id=engine_id,
+                chem_version=chem_version,
+                preset=lookup_preset,
+                cell=neighbour_cells[lookup_preset],
+                exact_key=cache_key,
+                counts=counts,
+            )
+            if neighbour is not None:
+                counts["neighbour_hits"] = counts.get("neighbour_hits", 0) + 1
+                scope = _NEIGHBOUR_SCOPE.get()
+                counter = scope.counter if scope is not None else None
+                if counter is not None:
+                    counter.hits += 1
+                return neighbour
     finish = {
         "engine_id": engine_id,
         "request": request,
@@ -3835,6 +4082,80 @@ def _delete_cold_values(
     )
 
 
+def _delete_neighbour_identity(
+    connection: sqlite3.Connection,
+    engine: str,
+    *,
+    chem_version: str | None = None,
+    chem_version_not: str | None = None,
+) -> None:
+    """Drop side-table rows for one engine. A missing table is not an error.
+
+    expire, prune, and drop_chemistry_version call this for the same identity
+    they delete from the HOT table. Readonly callers do not.
+    """
+
+    clauses = ["engine=?"]
+    params: list[object] = [engine]
+    if chem_version is not None:
+        clauses.append("chem_version=?")
+        params.append(chem_version)
+    if chem_version_not is not None:
+        clauses.append("chem_version!=?")
+        params.append(chem_version_not)
+    try:
+        connection.execute(
+            f"DELETE FROM {_NEIGHBOUR_TABLE} WHERE " + " AND ".join(clauses),
+            params,
+        )
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            # A failed DELETE can leave the implicit transaction open, and
+            # the HOT sweep then issues BEGIN IMMEDIATE.
+            if connection.in_transaction:
+                connection.rollback()
+            return
+        raise
+    if connection.in_transaction:
+        connection.commit()
+
+
+def _delete_neighbour_rows_for_pairs(
+    connection: sqlite3.Connection,
+    pairs: list[tuple[str, int]],
+) -> None:
+    """Drop cell pointers at the HOT keys about to be deleted.
+
+    A missing side table is not an error. The caller's transaction owns
+    the commit, so a later failure rolls this delete back with the HOT rows.
+    """
+
+    if not pairs:
+        return
+    keys: list[bytes] = []
+    chunk = 200
+    for start in range(0, len(pairs), chunk):
+        batch = pairs[start:start + chunk]
+        where = " OR ".join("(source_box=? AND row_seq=?)" for _ in batch)
+        params = [item for pair in batch for item in pair]
+        found = connection.execute(
+            f"SELECT key FROM {_TABLE} WHERE {where}",
+            params,
+        ).fetchall()
+        keys.extend(bytes(row[0]) for row in found)
+    if not keys:
+        return
+    try:
+        connection.executemany(
+            f"DELETE FROM {_NEIGHBOUR_TABLE} WHERE key=?",
+            [(key,) for key in keys],
+        )
+    except sqlite3.OperationalError as exc:
+        if "no such table" in str(exc).lower():
+            return
+        raise
+
+
 def _delete_cached_rows(
     connection: sqlite3.Connection,
     has_cold: bool,
@@ -3862,6 +4183,7 @@ def _delete_cached_rows(
         return
     connection.execute("BEGIN IMMEDIATE")
     try:
+        _delete_neighbour_rows_for_pairs(connection, pairs)
         connection.executemany(
             f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
             pairs,
@@ -4690,6 +5012,8 @@ def expire_cache_file(
             pairs.extend(pair for pair in unknown_pairs if pair not in already)
         swept = 0
         if apply:
+            if all_rows:
+                _delete_neighbour_identity(connection, engine)
             swept = _apply_maintenance_deletes(
                 connection, path, has_cold, pairs, vacuum=True
             )
@@ -4824,6 +5148,12 @@ def prune_cache_file(path: str | Path, *, apply: bool = False) -> dict[str, Any]
             pairs.extend((str(source_box), int(row_seq)) for source_box, row_seq in found)
         swept = 0
         if apply:
+            for engine_name, version in ENGINE_CHEMISTRY_VERSION.items():
+                _delete_neighbour_identity(
+                    connection,
+                    engine_name,
+                    chem_version_not=str(version),
+                )
             swept = _apply_maintenance_deletes(
                 connection, path, has_cold, pairs, vacuum=True
             )
@@ -4958,8 +5288,12 @@ def drop_chemistry_version(engine_id: str, chem_version: str | int) -> int:
     ]
     cold_path = _cache_pair(path)[1]
     has_cold = cold_path.exists()
+    _delete_neighbour_identity(
+        connection, engine_id, chem_version=str(chem_version),
+    )
     # No HOT rows and no COLD file: nothing to sweep. Returning here leaves
     # the process cache alone, as a no-op drop did before the sweep existed.
+    # Neighbour rows for this chemistry version are already gone.
     if not pairs and not has_cold:
         return 0
     if connection.in_transaction:

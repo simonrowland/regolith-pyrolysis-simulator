@@ -83,6 +83,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_al2o3_cr_recommendation_prose
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -194,7 +205,18 @@ observations:
           the scratch copy retagged them to body so ± and range cells could be emitted. The paper says the CaO coefficient
           in this table was determined only for the crystalline phase. Table 5 does not print a temperature for αvap. The
           melting temperature in another column is not used.; row_label=1283–1473; column_header=αvap
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r02_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2015-cai-vaporization-coefficients
   locator:
     page: 3
@@ -292,7 +314,17 @@ observations:
           in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored
           as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.;
           row_label=1617–1728; column_header=αvap
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2015-cai-vaporization-coefficients
   locator:
     page: 3
@@ -419,6 +451,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r04_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -519,6 +562,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t01_r05_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -621,6 +675,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r02_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -723,6 +788,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -824,6 +900,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r04_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -926,6 +1013,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r05_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1026,6 +1124,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r06_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1128,6 +1237,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r07_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1227,6 +1347,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r08_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1357,7 +1488,18 @@ observations:
           in this table was determined only for the crystalline phase. The gas-phase component cell is a dash and is not stored
           as zero. Table 5 does not print a temperature for αvap. The melting temperature in another column is not used.;
           row_label=2273–2573; column_header=αvap
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p003_t02_r09_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2015-cai-vaporization-coefficients
   locator:
     page: 3
@@ -1410,12 +1552,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1482,6 +1623,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r02_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1582,6 +1746,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1610,12 +1785,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1684,6 +1858,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r04_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r04_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1710,12 +1907,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1785,6 +1981,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r05_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r05_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1811,12 +2030,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1886,6 +2104,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r06_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r06_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -1912,12 +2153,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1987,6 +2227,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r07_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r07_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2013,12 +2276,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2088,6 +2350,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r08_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r08_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2114,12 +2399,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2186,6 +2470,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r09_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r09_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2212,12 +2519,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2286,6 +2592,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r10_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r10_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2313,12 +2642,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2385,6 +2713,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r11_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r11_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2426,12 +2777,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2500,6 +2850,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r12_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r12_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2526,12 +2899,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2598,6 +2970,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r13_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r13_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2639,12 +3034,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2711,6 +3105,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r14_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r14_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2753,12 +3170,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2825,6 +3241,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r15_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r15_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2867,12 +3306,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2939,6 +3377,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r16_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r16_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -2981,12 +3442,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3053,6 +3513,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r17_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r17_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3168,6 +3651,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r18_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3285,6 +3779,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r19_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3314,12 +3819,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3386,6 +3890,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r20_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p004_t03_r20_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3487,6 +4014,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r02_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3590,6 +4128,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r03_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3692,6 +4241,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r04_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3795,6 +4355,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r05_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -3897,6 +4468,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r06_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4000,6 +4582,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r07_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4101,6 +4694,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r08_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4202,6 +4806,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r09_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4232,12 +4847,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4306,6 +4920,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r10_c04
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p005_t04_r10_c04
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4404,6 +5041,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r03_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4504,6 +5152,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r04_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4604,6 +5263,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r05_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4704,6 +5374,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r06_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4803,6 +5484,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r07_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -4902,6 +5594,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cai_vaporization_coefficients_p007_t05_r08_c08
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -5002,6 +5705,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_cao_liq_hypothesis
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -5112,7 +5826,18 @@ observations:
         paragraph: Crystalline Fe oxide
         note: The sentence starts at the bottom of published p. 1082 and the value is printed on published p. 1083. 600 dpi
           render of PDF p. 4. This is not the Table 5 cell, which prints 1.00 ± 0.30.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_feo_cr_prose
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2015-cai-vaporization-coefficients
   locator:
     page: 4
@@ -5206,6 +5931,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_feo_liq_prose
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -5302,6 +6038,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_mgo_liq_hypothesis
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -5401,6 +6148,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_tio2_liq_hypothesis
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -5501,6 +6259,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2015-cai-vaporization-coefficients::shornikov_2015_tio2_semenov_1920k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha

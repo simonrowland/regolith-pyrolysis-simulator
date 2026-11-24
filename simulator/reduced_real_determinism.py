@@ -16,7 +16,8 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Mapping, Sequence
+from collections.abc import Iterator, Mapping, Sequence
+from contextlib import contextmanager
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -46,6 +47,10 @@ from simulator.fe_redox import (
     _kress91_gate_key_referenced_log_fO2,
 )
 from simulator.fidelity_vocabulary import EvidenceClass
+from simulator.engine_cache import (
+    _mask_quantize as _quantize,
+    _mask_sigfig as _sigfig,
+)
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.melt_backend.base import (
     EquilibriumResult,
@@ -2731,22 +2736,20 @@ def gate_curve_memo_producer_configuration(
         provider_role=provider_role,
         resolve_magemin_database_default=True,
     )
-    sulfur_side = dependency_vector["sulfur_side"]
     model = dependency_vector["model"]
     redox_identity = (
         None if redox_state is None else redox_state.cache_identity()
     )
+    # Sulfur remains in the full dependency vector used for replay identity.
+    # It is not a liquidus input: gate dispatch filters to process.cleaned_melt
+    # and passes its composition/formulae, pressure, and referenced fO2 basis
+    # to find_liquidus_solidus. The Langmuir capacity caller may request this
+    # curve per batch, but adds no SulfSat input to that solver request.
     return {
         "namespace_id": dependency_vector["namespace_id"],
         "vapor_pressure_provider_selection": dependency_vector[
             "vapor_pressure_provider_selection"
         ],
-        "sulfur_side": {
-            "sulfsat_available": sulfur_side["sulfsat_available"],
-            "sulfsat_provider_selection": (
-                sulfur_side["sulfsat_provider_selection"]
-            ),
-        },
         "model": {
             name: model[name]
             for name in ("model", "mode", "magemin_database")
@@ -2817,6 +2820,23 @@ def gate_curve_provider_diagnostic_reasons(
     for field in ("backend_diagnostics", "projected_liquidus_diagnostics"):
         reasons.extend(gate_curve_provider_diagnostic_reasons(diagnostic.get(field)))
     return tuple(reasons)
+
+
+def gate_curve_bounds_are_usable(
+    solidus_T_C: Any,
+    liquidus_T_C: Any,
+) -> bool:
+    """Whether gate bounds are finite and strictly ordered."""
+    try:
+        solidus = float(solidus_T_C)
+        liquidus = float(liquidus_T_C)
+    except (TypeError, ValueError, OverflowError):
+        return False
+    return (
+        math.isfinite(solidus)
+        and math.isfinite(liquidus)
+        and solidus < liquidus
+    )
 
 
 def gate_curve_provider_timeout_reason(
@@ -3863,6 +3883,12 @@ def _is_cacheable_equilibrium_result(result: EquilibriumResult) -> bool:
 
 
 def _is_cacheable_gate_curve(curve: Mapping[str, Any]) -> bool:
+    refusal = curve.get("gate_provider_refusal")
+    if (
+        isinstance(refusal, Mapping)
+        and refusal.get("qualification") == "held_last_good_curve"
+    ):
+        return False
     status = _normalized_status(
         curve.get("status") or curve.get("backend_status")
     )
@@ -5122,26 +5148,251 @@ def _quantize_decimals(quantum: float) -> int:
     return max(0, -decimal.as_tuple().exponent)
 
 
-def _quantize(value: float | None, quantum: float, digits: int) -> float | None:
-    if value is None:
-        return None
-    number = float(value)
-    if not math.isfinite(number):
-        return None
-    bucket = round(number / quantum) * quantum
-    return round(bucket, digits)
+# Engine-request fields the coarse cell snaps. engine_settings stays exact:
+# a different model is not a nearby control. temperature_C is snapped in
+# Kelvin with the same offset quantized_controls uses, then converted back.
+# _sigfig_snap is a different rule and is not used here.
+_COARSE_NEIGHBOUR_PRESETS = frozenset({"xx_coarse", "coarse", "medium"})
+_NEIGHBOUR_COMPOSITION_FIELDS = frozenset({
+    "composition_wt_pct", "composition_mol", "composition_kg", "composition",
+})
+_NEIGHBOUR_TEMPERATURE_K_FIELDS = frozenset({"temperature_K"})
+_NEIGHBOUR_PRESSURE_FIELDS = frozenset({"pressure_bar", "physical_pressure_bar"})
+_NEIGHBOUR_LOG_FO2_FIELDS = frozenset({"fO2_log"})
+_NEIGHBOUR_PO2_FIELDS = frozenset({
+    "po2_bar", "po2", "vapor_transport_pO2_bar",
+})
+_NEIGHBOUR_EXACT_SUBTREES = frozenset({"engine_settings"})
 
 
-def _sigfig(value: float | None, sig_figs: int) -> float | None:
-    if value is None:
-        return None
+def _neighbour_number(value: object) -> bool:
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def _coarse_composition(value: Any, sig_figs: int) -> Any:
+    if _neighbour_number(value):
+        return _sigfig(float(value), sig_figs)
+    if isinstance(value, Mapping):
+        if any(not isinstance(key, str) for key in value):
+            raise TypeError("composition names must be strings")
+        return {
+            key: _coarse_composition(item, sig_figs) for key, item in value.items()
+        }
+    return value
+
+
+def _coarse_cell_value(
+    value: Any,
+    field: str | None,
+    quantization: ControlQuantization,
+) -> Any:
+    if field in _NEIGHBOUR_EXACT_SUBTREES:
+        return value
+    if isinstance(value, Mapping):
+        if any(not isinstance(key, str) for key in value):
+            raise TypeError("coarse cell names must be strings")
+        if field in _NEIGHBOUR_COMPOSITION_FIELDS:
+            return {
+                key: _coarse_composition(item, quantization.composition_sig_figs)
+                for key, item in value.items()
+            }
+        return {
+            key: _coarse_cell_value(item, key, quantization)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)) and not isinstance(value, (str, bytes)):
+        items = [_coarse_cell_value(item, None, quantization) for item in value]
+        return tuple(items) if isinstance(value, tuple) else items
+    if not _neighbour_number(value):
+        return value
     number = float(value)
-    if not math.isfinite(number):
+    if field in _NEIGHBOUR_TEMPERATURE_K_FIELDS:
+        return _quantize(number, quantization.t_k_quantum, quantization.t_k_decimals)
+    if field == "temperature_C":
+        snapped = _quantize(
+            number + CELSIUS_TO_KELVIN_OFFSET,
+            quantization.t_k_quantum,
+            quantization.t_k_decimals,
+        )
+        if snapped is None:
+            return None
+        return float(snapped) - CELSIUS_TO_KELVIN_OFFSET
+    if field in _NEIGHBOUR_PRESSURE_FIELDS:
+        return _quantize(
+            number,
+            quantization.pressure_bar_quantum,
+            quantization.pressure_bar_decimals,
+        )
+    if field in _NEIGHBOUR_LOG_FO2_FIELDS:
+        return _quantize(
+            number,
+            quantization.log_fo2_quantum,
+            quantization.log_fo2_decimals,
+        )
+    if field in _NEIGHBOUR_PO2_FIELDS:
+        return _sigfig(number, quantization.composition_sig_figs)
+    return value
+
+
+def coarsen_engine_request(request: Any, preset: str) -> Any:
+    """Snap one engine request onto a coarse ControlQuantization preset."""
+
+    if preset not in _COARSE_NEIGHBOUR_PRESETS:
+        raise ValueError(f"neighbour cells are not defined for preset {preset!r}")
+    return _coarse_cell_value(request, None, ControlQuantization.from_name(preset))
+
+
+def coarsen_engine_requests(request: Any) -> dict[str, Any]:
+    """Coarse cells for xx_coarse, coarse, and medium. fine is not a cell."""
+
+    cells: dict[str, Any] = {}
+    for name in ("xx_coarse", "coarse", "medium"):
+        try:
+            cells[name] = coarsen_engine_request(request, name)
+        except (TypeError, ValueError):
+            continue
+    return cells
+
+
+def _named_coarse_preset(quantization: ControlQuantization) -> str | None:
+    for name in ("xx_coarse", "coarse", "medium"):
+        if quantization == _CONTROL_QUANTIZATION_PRESETS[name]:
+            return name
+    return None
+
+
+class _NeighbourCounter:
+    """Process-local hit count for one optimizer evaluation.
+
+    The cache increments ``hits`` when it serves a neighbour. ``preset`` is
+    the coarse name, or None when this run stays exact and writes no cells.
+    """
+
+    __slots__ = ("hits", "preset")
+
+    def __init__(self, preset: str | None) -> None:
+        self.hits = 0
+        self.preset = preset
+
+
+def optimizer_neighbour_preset(reduced_real_cache: Any) -> str | None:
+    """Coarse preset name for an optimizer run, or None when lookup stays exact.
+
+    fine, production, and a quantization that is not one of the three coarse
+    presets return None. Those runs do not coarsen and do not write cells.
+    """
+
+    if not isinstance(reduced_real_cache, Mapping):
         return None
-    if number == 0.0:
-        return 0.0
-    digits = sig_figs - int(math.floor(math.log10(abs(number)))) - 1
-    return round(number, digits)
+    raw = reduced_real_cache.get("control_quantization")
+    if raw in (None, ""):
+        return None
+    if isinstance(raw, ControlQuantization):
+        return _named_coarse_preset(raw)
+    if isinstance(raw, str):
+        try:
+            name = _normalize_control_quantization_name(raw)
+        except ValueError:
+            return None
+        if name not in _COARSE_NEIGHBOUR_PRESETS:
+            return None
+        return name
+    if isinstance(raw, Mapping):
+        try:
+            quantization = ControlQuantization(
+                t_k_quantum=raw["t_k_quantum"],
+                pressure_bar_quantum=raw["pressure_bar_quantum"],
+                log_fo2_quantum=raw["log_fo2_quantum"],
+                composition_sig_figs=raw["composition_sig_figs"],
+            )
+        except (KeyError, TypeError, ValueError):
+            return None
+        return _named_coarse_preset(quantization)
+    return None
+
+
+def _quantization_identity_token(quantization: ControlQuantization) -> str:
+    for name, preset in _CONTROL_QUANTIZATION_PRESETS.items():
+        if quantization == preset:
+            return name
+    return (
+        "custom:"
+        f"{quantization.t_k_quantum}:"
+        f"{quantization.pressure_bar_quantum}:"
+        f"{quantization.log_fo2_quantum}:"
+        f"{quantization.composition_sig_figs}"
+    )
+
+
+def control_quantization_identity(reduced_real_cache: Any) -> str:
+    """EvalSpec token for the control preset. Empty when the run has none.
+
+    fine and coarse are different tokens. A missing preset stays empty so
+    a preset-less spec keeps its existing cache key. Neighbour lookup is a
+    separate question: fine is a token here and is not a neighbour preset.
+    """
+
+    if not isinstance(reduced_real_cache, Mapping):
+        return ""
+    raw = reduced_real_cache.get("control_quantization")
+    if raw in (None, ""):
+        return ""
+    if isinstance(raw, ControlQuantization):
+        return _quantization_identity_token(raw)
+    if isinstance(raw, str):
+        text = raw.strip()
+        if text.startswith("{"):
+            try:
+                parsed = json.loads(text)
+            except json.JSONDecodeError:
+                return text
+            if not isinstance(parsed, Mapping):
+                return text
+            raw = parsed
+        else:
+            try:
+                return _normalize_control_quantization_name(text)
+            except ValueError:
+                return ""
+    if isinstance(raw, Mapping):
+        try:
+            quantization = ControlQuantization(
+                t_k_quantum=raw["t_k_quantum"],
+                pressure_bar_quantum=raw["pressure_bar_quantum"],
+                log_fo2_quantum=raw["log_fo2_quantum"],
+                composition_sig_figs=raw["composition_sig_figs"],
+            )
+        except (KeyError, TypeError, ValueError):
+            return ""
+        return _quantization_identity_token(quantization)
+    return ""
+
+
+@contextmanager
+def optimizer_engine_neighbour(
+    reduced_real_cache: Any,
+    counter: Any = None,
+) -> Iterator[Any]:
+    """Count neighbour hits for one optimizer evaluation.
+
+    Lookup and the cell index are on only for a coarse preset. fine and a
+    missing preset yield a counter and do not coarsen. Battery scoring does
+    not call this, so a score stays on the exact key. The cache packs the
+    cell; the snap stays here.
+    """
+
+    preset = optimizer_neighbour_preset(reduced_real_cache)
+    if counter is None:
+        counter = _NeighbourCounter(preset)
+    else:
+        counter.preset = preset
+    if preset is None:
+        yield counter
+        return
+    from simulator.engine_cache import optimizer_neighbour_scope
+
+    with optimizer_neighbour_scope(preset, coarsen_engine_requests, counter):
+        yield counter
 
 
 def _sigfig_quantum(value: float, sig_figs: float) -> float:

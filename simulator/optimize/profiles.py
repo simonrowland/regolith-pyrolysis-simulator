@@ -219,6 +219,10 @@ _REDUCED_REAL_CACHE_KEYS = frozenset({
     "authorized_backend_version",
     "cache_tier_ceiling",
     "read_only_base_db_path",
+    # Already parsed by backends._parse_control_quantization_config. The
+    # optimizer names a coarse preset here. Omitting it rejected every
+    # profile that set one.
+    "control_quantization",
 })
 _TWO_PHASE_CERTIFY_KEYS = frozenset({
     "enabled",
@@ -1006,6 +1010,13 @@ def _validate_reduced_real_cache_config(
             f"{source}: {where}.cache_tier_ceiling must be one of "
             f"{', '.join(CACHE_TIER_CEILINGS)}"
         )
+    raw_quantization = raw.get("control_quantization")
+    if raw_quantization not in (None, ""):
+        if not isinstance(raw_quantization, (str, Mapping)):
+            raise ProfileValidationError(
+                f"{source}: {where}.control_quantization must be a tier name "
+                "or a quanta mapping"
+            )
 
 
 def _validate_two_phase_certify(

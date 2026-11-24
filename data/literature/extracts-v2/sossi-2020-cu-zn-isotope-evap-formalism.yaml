@@ -79,7 +79,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_fractionation_measured_reduced::point:0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 7
@@ -174,7 +185,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_fractionation_measured_reduced::point:1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 7
@@ -269,7 +291,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1573.15:row=p-4/04/17c:h=65fa2f98bb0c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -396,7 +429,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1573.15:row=p-6/04/17a:h=bc2e5ef4413d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -523,7 +567,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1573.15:row=p-7/04/17a:h=e41e4fe35515
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -650,7 +705,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1618.65:row=p-02/08/18a:h=b97cf9a98901
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -783,6 +849,17 @@ observations:
     - activity_coefficient
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1619.65:row=p-03/08/18b:h=e2444d338188
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1619.65:row=p-03/08/18b:h=e2444d338188
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -915,6 +992,17 @@ observations:
     - activity_coefficient
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1620.15:row=p-3/08/18a:h=14704ff2b79c
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1620.15:row=p-3/08/18a:h=14704ff2b79c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1041,7 +1129,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1669.75:row=p-01/08/18b:h=9ee042da8e54
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1174,6 +1273,17 @@ observations:
     - activity_coefficient
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1669.75:row=p-01/08/18d:h=7f71e0b72a7f
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1669.75:row=p-01/08/18d:h=7f71e0b72a7f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1300,7 +1410,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1670.15:row=p-01/08/18a:h=15244af03916
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1433,6 +1554,17 @@ observations:
     - activity_coefficient
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1671.15:row=p-25/07/18a:h=7a87799a6cdc
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1671.15:row=p-25/07/18a:h=7a87799a6cdc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1559,7 +1691,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1673.15:row=p-5/04/17a:h=179cff7b288b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1686,7 +1829,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1673.15:row=p-6/04/17b:h=d079754ac729
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1813,7 +1967,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1773.15:row=p-10/04/17a-r:h=fd8b58d3f174
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -1940,7 +2105,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1773.15:row=p-10/04/17a:h=b8c1f90788c4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2067,7 +2243,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1773.15:row=p-5/04/17b:h=0de88534e2fa
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2194,7 +2381,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1773.15:row=p-6/04/17c:h=42c3ac3edd78
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2327,6 +2525,17 @@ observations:
     - activity_coefficient
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1773.65:row=p-31/07/18d:h=c0042539113e
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1773.65:row=p-31/07/18d:h=c0042539113e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2459,6 +2668,17 @@ observations:
     - activity_coefficient
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1774.85:row=p-31/07/18c:h=f8c97ce13a37
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1774.85:row=p-31/07/18c:h=f8c97ce13a37
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2585,7 +2805,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1775.15:row=p-31/07/18a:h=16bceb025fa0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2712,7 +2943,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_logKstar_model_runs::T=1775.15:row=p-31/07/18b:h=8c908665b14c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -2842,6 +3084,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=7043adabb4c0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -2983,6 +3236,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18b::T=1669.75:row=p-01/08/18b:h=10181356b43c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3124,6 +3388,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18c::T=1669.75:row=p-01/08/18c:h=3abe5c1ac2a4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3265,6 +3540,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-01-08-18d::T=1669.75:row=p-01/08/18d:h=8103a100fc28
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3406,6 +3692,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-02-08-18a::T=1618.65:row=p-02/08/18a:h=9fd47a27fdd2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3547,6 +3844,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-03-08-18b::T=1619.65:row=p-03/08/18b:h=f0505fe8f058
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3688,6 +3996,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a-r::T=1773.15:row=p-10/04/17a-r:h=81d4a8214df7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3829,6 +4148,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-10-04-17a::T=1773.15:row=p-10/04/17a:h=9ff1bc4a5b86
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -3967,7 +4297,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-19-06-18a::T=1572.15:row=p-19/06/18a:h=cdeb583c0ed8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4094,7 +4435,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-19-06-18b::T=1572.65:row=p-19/06/18b:h=11c2d52f2804
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4221,7 +4573,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-19-06-18c::T=1572.15:row=p-19/06/18c:h=930821d69ef9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4348,7 +4711,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-19-06-18d::T=1673.15:row=p-19/06/18d:h=c10d22ee7ade
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4475,7 +4849,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-20-06-18a::T=1673.15:row=p-20/06/18a:h=293ea2b713e3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4602,7 +4987,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-20-06-18b::T=1671.15:row=p-20/06/18b:h=8a9628a8878f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4729,7 +5125,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-21-06-18a::T=1773.15:row=p-21/06/18a:h=1b96306bc873
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4856,7 +5263,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-21-06-18b::T=1773.15:row=p-21/06/18b:h=9241d4ab1d83
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -4983,7 +5401,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-21-06-18c::T=1773.15:row=p-21/06/18c:h=6a6c98275833
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5113,6 +5542,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-25-07-18a::T=1671.15:row=p-25/07/18a:h=8cccd7d4ec97
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -5251,7 +5691,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-26-12-18a::T=1573.15:row=p-26/12/18a:h=1bc7526ba3e3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5378,7 +5829,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-26-12-18b::T=1573.15:row=p-26/12/18b:h=798aff9ec74a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5505,7 +5967,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-26-12-18c::T=1573.15:row=p-26/12/18c:h=0918386dc7eb
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -5635,6 +6108,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-3-08-18a::T=1620.15:row=p-3/08/18a:h=de0057ac6a79
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -5776,6 +6260,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18a::T=1775.15:row=p-31/07/18a:h=e03a20cd9002
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -5917,6 +6412,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18b::T=1775.15:row=p-31/07/18b:h=23f3a4752b26
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6058,6 +6564,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18c::T=1774.85:row=p-31/07/18c:h=5b54cba7303c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6199,6 +6716,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-31-07-18d::T=1773.65:row=p-31/07/18d:h=66ab154dddff
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6340,6 +6868,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-4-04-17c::T=1573.15:row=p-4/04/17c:h=e7cefd567b1f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6481,6 +7020,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17a::T=1673.15:row=p-5/04/17a:h=163230fb760a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6622,6 +7172,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-5-04-17b::T=1773.15:row=p-5/04/17b:h=f3d2fd292ca7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6763,6 +7324,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17a::T=1573.15:row=p-6/04/17a:h=5bf45e7f3b76
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -6904,6 +7476,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17b::T=1673.15:row=p-6/04/17b:h=4a4f55af0940
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -7045,6 +7628,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-6-04-17c::T=1773.15:row=p-6/04/17c:h=6702edf11b0d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -7186,6 +7780,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17a::T=1573.15:row=p-7/04/17a:h=7d47221232ef
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -7327,6 +7932,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_cu_table1_measured_runs::p-7-04-17b::T=1673.15:row=p-7/04/17b:h=9fe01a91bdfb
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - isotope_delta
@@ -7473,6 +8089,17 @@ observations:
     - evaporation_coefficient_alpha
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18a:h=dc5779d64a19
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18a:h=dc5779d64a19
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 8
@@ -7583,6 +8210,17 @@ observations:
     - evaporation_coefficient_alpha
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18b:h=139106c975fe
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18b:h=139106c975fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 8
@@ -7693,6 +8331,17 @@ observations:
     - evaporation_coefficient_alpha
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18c:h=918c75ed534f
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18c:h=918c75ed534f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 8
@@ -7803,6 +8452,17 @@ observations:
     - evaporation_coefficient_alpha
     reason: 'fO2 reference state not printed; 1 bar convention assumed (1 atm alternative: +0.0057 dex)'
     origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18c:h=92732d667692
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_standalone_zoning_table2_model::rows:row=26/12/18c:h=92732d667692
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 8
@@ -7905,7 +8565,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 7
@@ -8000,7 +8671,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:1
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 7
@@ -8095,7 +8777,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 7
@@ -8190,7 +8883,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_fractionation_measured_reduced::point:3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 7
@@ -8286,7 +8990,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_logKstar_model_runs
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -8382,7 +9097,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-01-08-18a::T=1670.15:row=p-01/08/18a:h=c530d082f206
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -8510,7 +9236,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-01-08-18b::T=1669.75:row=p-01/08/18b:h=13cbab0fca1e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -8638,7 +9375,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-01-08-18c::T=1669.75:row=p-01/08/18c:h=5c9224513492
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -8766,7 +9514,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-01-08-18d::T=1669.75:row=p-01/08/18d:h=a62be5a09b0b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -8894,7 +9653,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-02-08-18a::T=1618.65:row=p-02/08/18a:h=f694c5214f06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9022,7 +9792,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-03-08-18b::T=1619.65:row=p-03/08/18b:h=531b0ef4c7dc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9150,7 +9931,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-10-04-17a-r::T=1773.15:row=p-10/04/17a-r:h=e228d69ed986
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9278,7 +10070,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-10-04-17a::T=1773.15:row=p-10/04/17a:h=61e89b68f8f3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9406,7 +10209,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-19-06-18a::T=1572.15:row=p-19/06/18a:h=9304c07452ff
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9534,7 +10348,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-19-06-18b::T=1572.65:row=p-19/06/18b:h=9d4e12674520
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9662,7 +10487,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-19-06-18c::T=1572.15:row=p-19/06/18c:h=099a343c8178
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9790,7 +10626,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-19-06-18d::T=1673.15:row=p-19/06/18d:h=96a46c2c5d4a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -9918,7 +10765,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-20-06-18a::T=1673.15:row=p-20/06/18a:h=2e461288c1c7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10046,7 +10904,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-20-06-18b::T=1671.15:row=p-20/06/18b:h=6e07e4e228ea
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10174,7 +11043,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-21-06-18a::T=1773.15:row=p-21/06/18a:h=1ac4dc10465f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10302,7 +11182,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-21-06-18b::T=1773.15:row=p-21/06/18b:h=636b67818089
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10430,7 +11321,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-21-06-18c::T=1773.15:row=p-21/06/18c:h=f8dfbec7a90b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10558,7 +11460,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-22-06-18b::T=1773.15:row=p-22/06/18b:h=5aeac2c75ab9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10686,7 +11599,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-22-06-18d::T=1673.15:row=p-22/06/18d:h=836d9e55e214
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10814,7 +11738,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-25-07-18a::T=1671.15:row=p-25/07/18a:h=29be8aa1846d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -10942,7 +11877,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-26-12-18a::T=1573.15:row=p-26/12/18a:h=091fc162058e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11070,7 +12016,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-26-12-18b::T=1573.15:row=p-26/12/18b:h=e74f05b5a16a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11198,7 +12155,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-26-12-18c::T=1573.15:row=p-26/12/18c:h=57c90d593d87
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11326,7 +12294,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-3-08-18a::T=1620.15:row=p-3/08/18a:h=546599e9d862
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11454,7 +12433,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-31-07-18a::T=1775.15:row=p-31/07/18a:h=e58e1a8278ad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11582,7 +12572,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-31-07-18b::T=1775.15:row=p-31/07/18b:h=4c1c5cc36919
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11710,7 +12711,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-31-07-18c::T=1774.85:row=p-31/07/18c:h=78b15dc2d57b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11838,7 +12850,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-31-07-18d::T=1773.65:row=p-31/07/18d:h=31ed49d053d4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -11966,7 +12989,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-4-04-17c::T=1573.15:row=p-4/04/17c:h=3f013a0df144
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12094,7 +13128,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-5-04-17a::T=1673.15:row=p-5/04/17a:h=f9e2b2189ac9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12222,7 +13267,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-5-04-17b::T=1773.15:row=p-5/04/17b:h=a440291d2f5a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12350,7 +13406,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-6-04-17a::T=1573.15:row=p-6/04/17a:h=699af5e3923d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12478,7 +13545,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-6-04-17b::T=1673.15:row=p-6/04/17b:h=09a28f4ef334
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12606,7 +13684,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-6-04-17c::T=1773.15:row=p-6/04/17c:h=48b0fd03d624
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12734,7 +13823,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-7-04-17a::T=1573.15:row=p-7/04/17a:h=b5dbc4b3e38d
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6
@@ -12862,7 +13962,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: sossi-2020-cu-zn-isotope-evap-formalism::sossi_2020_zn_table1_measured_runs::p-7-04-17b::T=1673.15:row=p-7/04/17b:h=f2e965b54a8c
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: sossi-2020-cu-zn-isotope-evap-formalism
   locator:
     page: 6

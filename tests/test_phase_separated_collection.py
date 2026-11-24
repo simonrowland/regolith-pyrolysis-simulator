@@ -404,8 +404,11 @@ def test_same_hour_zero_retained_oxygen_kernel_capture_closes(order, monkeypatch
     original_route = model.route
     routed_results = []
 
-    def force_commit_order(flux, melt):
-        result = replace(original_route(flux, melt), wall_route_species_order=order)
+    def force_commit_order(flux, melt, **kwargs):
+        result = replace(
+            original_route(flux, melt, **kwargs),
+            wall_route_species_order=order,
+        )
         routed_results.append(result)
         return result
 

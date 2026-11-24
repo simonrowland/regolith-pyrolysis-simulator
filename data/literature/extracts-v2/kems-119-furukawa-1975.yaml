@@ -11,12 +11,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -44,7 +43,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_HM_fe_infinite_dilution
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -73,12 +83,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -106,7 +115,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_HM_v_infinite_dilution
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -133,12 +153,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -162,6 +181,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_fig10_fe_v_cr_ion_ratio_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -194,12 +224,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -224,6 +253,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_fig12_ternary_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -256,12 +296,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -285,6 +324,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_fig4_ion_ratio_vs_1T_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -317,12 +367,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -347,6 +396,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_fig6_fe_v_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -379,12 +439,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -408,6 +467,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_fig7_av_comparison_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -440,12 +510,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -470,7 +539,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_gamma0_fe_1600c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3056
@@ -497,12 +577,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -528,7 +607,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_gamma0_v_1600c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3056
@@ -555,12 +645,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -585,7 +674,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_gamma_fe_binary_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -614,12 +714,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -644,7 +743,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv02_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3058
@@ -673,12 +783,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -703,7 +812,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_gamma_ternary_nv03_fits
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3058
@@ -732,12 +852,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -762,7 +881,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_gamma_v_fe_binary_fit
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -791,12 +921,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V_and_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -823,7 +952,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V_and_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051
@@ -854,12 +994,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'Fe-V_solid_liquid_equilibrium' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -883,7 +1022,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Fe-V_solid_liquid_equilibrium'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_liquidus_solidus_1600c
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3053
@@ -912,12 +1062,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-O' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -941,7 +1090,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-O'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_quoted_chipman_dastur_gamma0_v
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051
@@ -970,12 +1130,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-O' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1041,7 +1200,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid Fe-V-O; original_reason=phase
+      string ''liquid_Fe-V-O'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_quoted_fruehan_gamma_v
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051
@@ -1070,12 +1241,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-O' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1099,7 +1269,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-O'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_quoted_kay_kontopoulos_gamma0_v
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3051
@@ -1128,12 +1309,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'starting_metals' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1156,7 +1336,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''starting_metals'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3052
@@ -1185,12 +1376,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'starting_metals' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1213,7 +1403,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''starting_metals'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3052
@@ -1242,12 +1443,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'starting_metals' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1270,7 +1470,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''starting_metals'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table1_starting_materials
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3052
@@ -1299,12 +1510,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1371,7 +1581,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -1402,12 +1624,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1474,7 +1695,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -1505,12 +1738,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1577,7 +1809,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -1608,12 +1852,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1680,7 +1923,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -1711,12 +1966,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1783,7 +2037,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -1814,12 +2080,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1886,7 +2151,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -1917,12 +2194,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1989,7 +2265,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -2020,12 +2308,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2092,7 +2379,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -2123,12 +2422,11 @@ observations:
     species:
       formula: V
       phase:
-        tag: unknown
-        reason: phase string 'liquid_and_solid_Fe-V' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2195,7 +2493,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_and_solid_Fe-V'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table2_fe_v_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     page: 5
@@ -2226,12 +2536,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2297,7 +2606,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2326,12 +2647,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2397,7 +2717,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2426,12 +2758,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2497,7 +2828,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2526,12 +2869,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2597,7 +2939,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2626,12 +2980,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2697,7 +3050,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2726,12 +3091,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2797,7 +3161,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2826,12 +3202,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2897,7 +3272,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057
@@ -2926,12 +3313,11 @@ observations:
     species:
       formula: Cr
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-V-Cr' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2997,7 +3383,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-V-Cr'' is not in the closed automatic map'
+    origin: kems-119-furukawa-1975::furukawa_1975_table3_fe_v_cr_ion_current_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-119-furukawa-1975
   locator:
     published_page: 3057

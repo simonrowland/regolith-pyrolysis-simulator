@@ -11,12 +11,11 @@ observations:
     species:
       formula: Na2S
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -83,6 +82,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - S
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_S298_text
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - S
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_S298_text
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - S
@@ -116,12 +138,11 @@ observations:
     species:
       formula: Na2S
       phase:
-        tag: unknown
-        reason: phase string 's' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -188,6 +209,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - delta_fH
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''s'' is not in the closed automatic map'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_delta_fH298_text
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fH
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2s_delta_fH298_text
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fH
@@ -221,12 +265,11 @@ observations:
     species:
       formula: Na2SO3
       phase:
-        tag: unknown
-        reason: phase string 'solid Na2SO3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -290,6 +333,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid Na2SO3'' is not in the closed automatic map'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_melting_transition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_melting_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -349,12 +415,11 @@ observations:
     species:
       formula: Na2SO3
       phase:
-        tag: unknown
-        reason: phase string 'solid Na2SO3' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -422,6 +487,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid Na2SO3'' is not in the closed automatic map'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_solid_solid_transition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: raberg-2007-salt-stability-na2s-thermochemistry-thesis::raberg2007_na2so3_solid_solid_transition
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature

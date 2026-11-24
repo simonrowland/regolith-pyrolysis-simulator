@@ -32,9 +32,8 @@ experiments:
 - experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-1996-2001-fig-dots
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'Knudsen effusion mass spectrometry at 1300 K, cited. The dots are not measurements of this 2008 article.'
-      is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
@@ -66,9 +65,8 @@ experiments:
 - experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-fig-calculated
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'Lines 4, 5 and 6 are activities and oxide-formation Gibbs energies calculated in the present study. The
-      caption does not print discrete calculated points.' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:
@@ -100,9 +98,8 @@ experiments:
 - experiment_id: a0ca76cd4b10b606c0ac7539ad08eca3ee5e7d206cd03a1e3169ef2bdbda553a::experiment::shornikov-2008-table-1300k
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'The table caption says the Gibbs energies were calculated in the present study according to data [1, 6-9].
-      Per-row parents are not printed.' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: unspecified
   sample: {}
   conditions:
     temperature_K:

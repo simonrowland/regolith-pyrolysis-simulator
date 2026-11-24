@@ -57,12 +57,11 @@ observations:
     species:
       formula: AlO
       phase:
-        tag: unknown
-        reason: phase string 'Efremovka_CAI_type_A_and_B_knudsen' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -86,7 +85,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Efremovka_CAI_type_A_and_B_knudsen'' is not in the closed automatic map'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_CAI_Al_suboxide_fraction
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 946
@@ -19284,12 +19294,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_and_Efremovka_CAI_knudsen' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19313,7 +19322,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_and_Efremovka_CAI_knudsen'' is not in the closed automatic map'
+    origin: kems-028-yakovlev-1984::yakovlev_1984_kems_method
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-028-yakovlev-1984
   locator:
     published_page: 945

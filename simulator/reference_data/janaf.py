@@ -1270,11 +1270,13 @@ def _interpolate_formation_gibbs(
     missing_temperatures: Sequence[Decimal] = (),
     *,
     extrapolate: bool = False,
+    quantity: str = "Gibbs",
 ) -> Decimal:
-    """Interpolate printed ΔfG°; endpoint continuation requires explicit opt-in.
+    """Interpolate one printed formation column; endpoint continuation is opt-in.
 
     The wall-law caller flags an extrapolated result. Existing callers keep
     strict in-range admission. Both paths use this owner's one chord law.
+    ``quantity`` only names the column in the missing-node error.
     """
     outside = temperature_K < points[0][0] or temperature_K > points[-1][0]
     if outside and not extrapolate:
@@ -1291,7 +1293,7 @@ def _interpolate_formation_gibbs(
     )
     if missing_node is not None:
         raise ValueError(
-            f"JANAF formation Gibbs interpolation spans missing grid node "
+            f"JANAF formation {quantity} interpolation spans missing grid node "
             f"{missing_node} K at {temperature_K} K"
         )
     return _interpolate_table_points(points, temperature_K, extrapolate=extrapolate)
@@ -1406,20 +1408,25 @@ def _formation_gibbs_rows_kj_per_mol(
 
 
 def _formation_gibbs_rows_from_table(
-    table_id: str, table: Mapping[str, Any],
+    table_id: str,
+    table: Mapping[str, Any],
+    *,
+    column: str = "formation_gibbs_energy",
 ) -> tuple[tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
     """Prepare printed cells from a checked table, retaining missing nodes.
 
     Shared by the table-id reader and the wall reader, whose existing
-    source-path/file-version cache supplies the checked table.
+    source-path/file-version cache supplies the checked table. The default
+    column is ΔfG°. Formation enthalpy uses the same cells and the same
+    missing-node rule.
     """
     units = table.get("units_as_published")
     if (
         not isinstance(units, Mapping)
-        or units.get("formation_gibbs_energy") != "kJ mol^-1"
+        or units.get(column) != "kJ mol^-1"
     ):
         raise JanafParseError(
-            f"{table_id}: formation_gibbs_energy is not published in kJ mol^-1"
+            f"{table_id}: {column} is not published in kJ mol^-1"
         )
     values = table.get("values")
     if not isinstance(values, list):
@@ -1431,7 +1438,7 @@ def _formation_gibbs_rows_from_table(
         if not isinstance(item, Mapping):
             continue
         temperature = item.get("temperature")
-        gibbs = item.get("formation_gibbs_energy")
+        cell = item.get(column)
         if not isinstance(temperature, Mapping):
             continue
         try:
@@ -1442,24 +1449,28 @@ def _formation_gibbs_rows_from_table(
             continue
         try:
             # Keep the published token as provenance; value carries validated sign repairs.
-            formation_gibbs = Decimal(
-                str(gibbs.get("value") if isinstance(gibbs, Mapping) else None)
+            # A null value is an unprinted cell, including a sign the
+            # harvest could not assign across a transition marker.
+            formation_value = Decimal(
+                str(cell.get("value") if isinstance(cell, Mapping) else None)
             )
         except (InvalidOperation, TypeError, ValueError):
             missing_temperatures.add(row_temperature)
             continue
-        if not formation_gibbs.is_finite():
+        if not formation_value.is_finite():
             missing_temperatures.add(row_temperature)
             continue
         previous = rows_by_temperature.get(row_temperature)
-        if previous is not None and previous != formation_gibbs:
+        if previous is not None and previous != formation_value:
+            label = "ΔfG°" if column == "formation_gibbs_energy" else column
             raise JanafParseError(
-                f"{table_id}: conflicting ΔfG° rows at {row_temperature} K"
+                f"{table_id}: conflicting {label} rows at {row_temperature} K"
             )
-        rows_by_temperature[row_temperature] = formation_gibbs
+        rows_by_temperature[row_temperature] = formation_value
     rows = tuple(sorted(rows_by_temperature.items()))
     if len(rows) < 2:
-        raise JanafParseError(f"{table_id}: fewer than two printed ΔfG° rows")
+        label = "ΔfG°" if column == "formation_gibbs_energy" else column
+        raise JanafParseError(f"{table_id}: fewer than two printed {label} rows")
     return rows, tuple(sorted(missing_temperatures))
 
 
@@ -1481,6 +1492,85 @@ def _formation_gibbs_energy_kj_per_mol_at(
             f"[{rows[0][0]}, {rows[-1][0]}] K"
         )
     return _interpolate_formation_gibbs(rows, temperature, missing_temperatures)
+
+
+@lru_cache(maxsize=None)
+def _formation_enthalpy_rows_kj_per_mol(
+    table_id: str,
+) -> tuple[tuple[tuple[Decimal, Decimal], ...], tuple[Decimal, ...]]:
+    """Return printed ΔfH° points and missing nodes, in kJ/mol."""
+    table, _digest = _checked_compiled_table_document(table_id)
+    return _formation_gibbs_rows_from_table(
+        table_id,
+        table,
+        column="formation_enthalpy",
+    )
+
+
+def formation_enthalpy_kj_per_mol_at(
+    table_id: str,
+    temperature_K: float | Decimal,
+) -> Decimal:
+    """Interpolate JANAF ΔfH° in T between printed rows, without extrapolation."""
+    try:
+        temperature = Decimal(str(temperature_K))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise JanafParseError(
+            "temperature_K must be a finite positive number"
+        ) from exc
+    if not temperature.is_finite() or temperature <= 0:
+        raise JanafParseError("temperature_K must be a finite positive number")
+
+    rows, missing_temperatures = _formation_enthalpy_rows_kj_per_mol(table_id)
+    if temperature < rows[0][0] or temperature > rows[-1][0]:
+        raise JanafParseError(
+            f"{table_id}: {temperature} K is outside printed ΔfH° rows "
+            f"[{rows[0][0]}, {rows[-1][0]}] K"
+        )
+    return _interpolate_formation_gibbs(
+        rows,
+        temperature,
+        missing_temperatures,
+        quantity="enthalpy",
+    )
+
+
+def formation_enthalpy_kj_per_mol_admitted(
+    table_id: str,
+    temperature_K: float | Decimal,
+) -> tuple[Decimal, str]:
+    """ΔfH° on the printed chord, or the nearer printed row when the chord is refused.
+
+    The second value is ``chord``, ``below_table``, ``above_table``, or
+    ``unprinted_grid_node``. Outside the table the row is the nearest
+    endpoint. A missing grid node uses the closer printed row, and a tie
+    uses the lower temperature. Neither path extends a slope.
+    """
+    try:
+        return (
+            formation_enthalpy_kj_per_mol_at(table_id, temperature_K),
+            "chord",
+        )
+    except ValueError:
+        pass
+    try:
+        temperature = Decimal(str(temperature_K))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise JanafParseError(
+            "temperature_K must be a finite positive number"
+        ) from exc
+    if not temperature.is_finite() or temperature <= 0:
+        raise JanafParseError("temperature_K must be a finite positive number")
+    rows, _missing = _formation_enthalpy_rows_kj_per_mol(table_id)
+    if temperature < rows[0][0]:
+        return rows[0][1], "below_table"
+    if temperature > rows[-1][0]:
+        return rows[-1][1], "above_table"
+    nearest = min(
+        rows,
+        key=lambda row: (abs(row[0] - temperature), row[0]),
+    )
+    return nearest[1], "unprinted_grid_node"
 
 
 def table_delta_fh_298_uncertainty_for_table_id(
@@ -1701,6 +1791,7 @@ _FUSION_TABLES = {
     # High cristobalite is the high-temperature solid branch immediately
     # below the accepted SiO2 melting point; the quartz table is metastable.
     "SiO2": ("O-035", "O-038"),
+    "SrO": ("O-013", "O-014"),
 }
 
 # The source hashes identify the JANAF text; pin the extracted temperature-node
@@ -1710,6 +1801,8 @@ _FUSION_NODE_SET_SHA256 = {
     "Cr-015": "4a9048a895bd8b3e499110d27edbbbe984c8c130881687ee8654a2f750afb765",
     "Fe-018": "26bd2778c67db2938646629673d132f619c12e1ee9e9f32a1e90923e1bf80522",
     "Fe-019": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
+    "O-013": "d53e5993158eb4f22e3289299e21729953646127f0dd67579b9f758fb01064dc",
+    "O-014": "e7c4becbfe7033b2b739a3b12f1404808d4fa05c33c4ee04d15cc1e5c114d8d4",
     "O-043": "d231eea23e8ba366462064cece26816dd7bbf837eddc77d98a1af859f811bbf1",
     "O-044": "b61dfea8f1da3f3a90ba7c7ceedc7b1cd04048c46fb4cf20bf5e5c3c4f0c0b18",
     "O-037": "26bd2778c67db2938646629673d132f619c12e1ee9e9f32a1e90923e1bf80522",
@@ -1736,6 +1829,8 @@ _ACCEPTED_MELTING_K = {
     "Al2O3": Decimal("2327"),
     "MgO": Decimal("3100"),
     "SiO2": Decimal("1986"),
+    # O-013/O-014 print the crystal <--> liquid transition at 2938 K.
+    "SrO": Decimal("2938"),
 }
 
 @lru_cache(maxsize=2 * len(_FUSION_TABLES))

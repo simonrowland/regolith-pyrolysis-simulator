@@ -296,6 +296,12 @@ class AccountingQueries:
             })
 
         setpoints = getattr(self.sim, "setpoints", {})
+        timestep = getattr(self.sim, "process_timestep", None)
+        process_dt_h = (
+            float(timestep.dt_h)
+            if timestep is not None and not timestep.is_one_hour
+            else 1.0
+        )
         report = report_from_recorded_series(
             hot_series,
             oxygen_series,
@@ -304,6 +310,7 @@ class AccountingQueries:
             observed_transport_saturation_pct=saturation_series,
             observed_o2_vented_kg_hr=vented_series,
             overhead_state_series=overhead_state_series,
+            process_dt_h=process_dt_h,
         )
         return _annotate_thermal_train_unmeasured_hours(
             report,

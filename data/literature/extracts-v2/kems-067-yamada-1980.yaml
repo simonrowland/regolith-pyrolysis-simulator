@@ -11,12 +11,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'cell_oxide_in_equilibrium_with_Fe-Si-Al_Be_Th' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,7 +40,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''cell_oxide_in_equilibrium_with_Fe-Si-Al_Be_Th'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_cell_po2_calculated
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 489
@@ -100,12 +110,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -130,6 +139,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fe_activity_fig8_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -162,12 +182,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -191,6 +210,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig1_peak_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -223,12 +253,11 @@ observations:
     species:
       formula: SiO
       phase:
-        tag: unknown
-        reason: phase string 'Si-O_system' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -252,6 +281,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Si-O_system'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig2_Si_O_po2_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -284,12 +324,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -313,6 +352,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig3_ISiO_over_ISi_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -346,12 +396,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -375,6 +424,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig4_ion_ratio_vs_NSi_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -409,12 +469,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -438,6 +497,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig5_gamma_Si_comparison_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -470,12 +540,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -500,6 +569,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig6_integration_curve_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -532,12 +612,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -562,6 +641,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig7_gamma_Si_this_work_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -594,12 +684,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -624,6 +713,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig8_activities_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -656,12 +756,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -685,6 +784,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fig9_ionization_efficiency_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -717,12 +827,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -750,7 +859,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_fragmentation_BeO_ThO2_ion_ratios
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 494
@@ -779,12 +899,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -851,7 +970,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -906,12 +1037,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -978,7 +1108,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1033,12 +1175,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1105,7 +1246,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1160,12 +1313,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1232,7 +1384,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1287,12 +1451,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1359,7 +1522,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1414,12 +1589,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1486,7 +1660,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1541,12 +1727,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1613,7 +1798,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1668,12 +1865,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1740,7 +1936,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1795,12 +2003,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1867,7 +2074,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -1922,12 +2141,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1994,7 +2212,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - ion_intensity_ratio
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_ion_current_ratio_table1_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 490
@@ -2049,12 +2279,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si_in_thoria_Knudsen_cell' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2080,7 +2309,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si_in_thoria_Knudsen_cell'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_kems_geometry_and_calibration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 488
@@ -2139,12 +2379,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2175,7 +2414,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_log_gamma_Si_o_and_epsilon_Si_Si_1600C
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 492
@@ -2389,12 +2639,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2460,7 +2709,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid Fe-Si; original_reason=phase
+      string ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -2489,12 +2750,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2560,7 +2820,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid Fe-Si; original_reason=phase
+      string ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -2589,12 +2861,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2660,7 +2931,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid Fe-Si; original_reason=phase
+      string ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -2689,12 +2972,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2760,7 +3042,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid Fe-Si; original_reason=phase
+      string ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -2789,12 +3083,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2860,7 +3153,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid Fe-Si; original_reason=phase
+      string ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_gamma_Si_NSi_0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 491
@@ -2889,12 +3194,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2920,7 +3224,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -2977,12 +3292,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3008,7 +3322,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3065,12 +3390,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3096,7 +3420,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3153,12 +3488,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3184,7 +3518,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3213,12 +3558,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3244,7 +3588,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3273,12 +3628,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3304,7 +3658,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3333,12 +3698,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3364,7 +3728,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3393,12 +3768,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3424,7 +3798,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3453,12 +3838,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3484,7 +3868,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3513,12 +3908,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3544,7 +3938,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3573,12 +3978,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3604,7 +4008,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3633,12 +4048,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3664,7 +4078,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3693,12 +4118,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3724,7 +4148,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3753,12 +4188,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3784,7 +4218,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3813,12 +4258,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3844,7 +4288,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3873,12 +4328,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3904,7 +4358,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3933,12 +4398,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3964,7 +4428,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493
@@ -3993,12 +4468,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'liquid_Fe-Si' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4024,7 +4498,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_Fe-Si'' is not in the closed automatic map'
+    origin: kems-067-yamada-1980::yamada_1980_quoted_table2_investigators
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-067-yamada-1980
   locator:
     published_page: 493

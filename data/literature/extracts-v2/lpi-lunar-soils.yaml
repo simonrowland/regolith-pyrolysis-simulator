@@ -11,12 +11,11 @@ observations:
     species:
       formula: lunar_soil_samples
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_11_lunar_soil_10002' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -65,7 +64,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_11_lunar_soil_10002'' is not in the closed automatic map'
+    origin: lpi-lunar-soils::lpi_1983_soil_10002_provenance_and_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpi-lunar-soils
   locator:
     pdf_page_index: 11
@@ -339,12 +349,11 @@ observations:
     species:
       formula: lunar_soil_samples
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_12_lunar_soil_12032' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -389,7 +398,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_12_lunar_soil_12032'' is not in the closed automatic map'
+    origin: lpi-lunar-soils::lpi_1983_soil_12032_provenance_and_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpi-lunar-soils
   locator:
     pdf_page_index: 84
@@ -625,12 +645,11 @@ observations:
     species:
       formula: lunar_soil_samples
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_14_lunar_soil_14148' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -677,7 +696,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_14_lunar_soil_14148'' is not in the closed automatic map'
+    origin: lpi-lunar-soils::lpi_1983_soil_14148_provenance_and_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpi-lunar-soils
   locator:
     pdf_page_index: 244
@@ -932,12 +962,11 @@ observations:
     species:
       formula: lunar_soil_samples
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_15_lunar_soil_15020' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -984,7 +1013,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_15_lunar_soil_15020'' is not in the closed automatic map'
+    origin: lpi-lunar-soils::lpi_1983_soil_15020_provenance_and_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpi-lunar-soils
   locator:
     pdf_page_index: 367
@@ -1239,12 +1279,11 @@ observations:
     species:
       formula: lunar_soil_samples
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_16_lunar_soil_60050' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1287,7 +1326,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_16_lunar_soil_60050'' is not in the closed automatic map'
+    origin: lpi-lunar-soils::lpi_1983_soil_60050_provenance_and_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpi-lunar-soils
   locator:
     pdf_page_index: 584
@@ -1504,12 +1554,11 @@ observations:
     species:
       formula: lunar_soil_samples
       phase:
-        tag: unknown
-        reason: phase string 'Apollo_17_lunar_soil_74220' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1558,7 +1607,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Apollo_17_lunar_soil_74220'' is not in the closed automatic map'
+    origin: lpi-lunar-soils::lpi_1983_soil_74220_provenance_and_characterization
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: lpi-lunar-soils
   locator:
     pdf_page_index: 921

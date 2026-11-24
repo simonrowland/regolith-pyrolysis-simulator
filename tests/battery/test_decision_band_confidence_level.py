@@ -1,6 +1,6 @@
 """Pin that q6 conversion follows the source-stated confidence level."""
 
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 import yaml
@@ -70,10 +70,58 @@ def test_confidence_metadata_preserves_units_printed_in_scalar_value() -> None:
     )
 
     assert resolved.band is not None
-    assert resolved.band.value.quantize(Decimal("1e-24")) == Decimal(
-        "0.004364805402450084659744"
+    # A two-sigma 1 kPa width is divided to 0.5 kPa before the log interval:
+    # max(|log10(1.005)|, |log10(0.995)|) is the standard dex width, then Z95.
+    expected_standard_dex = max(
+        abs(Decimal("100500").ln() - Decimal("100000").ln())
+        / Decimal(10).ln(),
+        abs(Decimal("99500").ln() - Decimal("100000").ln())
+        / Decimal(10).ln(),
     )
+    expected_ticket = expected_standard_dex * Decimal("1.959963984540054")
+    assert abs(resolved.band.value - expected_ticket) < Decimal("1e-27")
     assert resolved.band.unit == "dimensionless"
+
+
+def test_assumed_and_explicit_two_sigma_use_the_same_transformed_band() -> None:
+    width_pa = Decimal("80000")
+    reference_pa = Decimal("100000")
+    assumed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="± 80000 Pa",
+        ),
+        reference_pa,
+    )
+    explicit = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "value": width_pa,
+                "unit": "Pa",
+                "confidence_level": "two_sigma",
+            },
+        ),
+        reference_pa,
+    )
+
+    assert assumed.two_sigma_band is not None
+    assert explicit.band is not None
+    assert assumed.two_sigma_band.value == explicit.band.value
+    assert assumed.two_sigma_band.unit == explicit.band.unit == "dimensionless"
+    half_width_pa = width_pa / Decimal(2)
+    # 60 digits leave ample guard digits for the endpoint ratios near 1;
+    # taking ln(endpoint/reference) directly avoids subtracting rounded logs.
+    with localcontext() as context:
+        context.prec = 60
+        expected_dex = max(
+            abs(((reference_pa + half_width_pa) / reference_pa).ln()),
+            abs(((reference_pa - half_width_pa) / reference_pa).ln()),
+        ) / Decimal(10).ln()
+    expected_band = expected_dex * Decimal("1.959963984540054")
+    assert abs(assumed.two_sigma_band.value - expected_band) < Decimal("1e-27")
 
 
 def test_denial_that_uncertainty_is_not_printed_is_not_a_width() -> None:

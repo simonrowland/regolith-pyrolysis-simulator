@@ -86,7 +86,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - valence_ratio
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: berry-2003-in-situ-cr-xanes-furnace::berry_2003_quoted_morb_cr2_fraction::T=1673:h=b3f9eaa483a5
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: berry-2003-in-situ-cr-xanes-furnace
   locator:
     page: 4

@@ -33,7 +33,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Cs2O_g_GEF_segments
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: pp. 154–156 region of JPCRD 13(1)
@@ -78,7 +88,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Cs2O_g_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     table: 'Table 4, p. 157–158 — Cs2O(g): ΔfH°298/R = −19.10 ± 3.00 kK; S°298/R = 38.23 ± 1.00; (H°298−H°0)/R = 1.66 kK'
@@ -124,7 +144,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Li2O_g_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     table: 'Table 4, p. 157 — Li2O(g) row: ΔfH°298/R = −20.78 ± 0.45 kK; S°298/R = 27.56 ± 0.75; (H°298−H°0)/R = 1.50 kK'
@@ -142,12 +172,11 @@ observations:
     species:
       formula: Li2O
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -168,7 +197,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: lamoreaux-hildenbrand-1984::LH84_Li2O_s_formation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Li2O_s_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: ΔfH°298/R = −71.91 ± 0.04 kK; S°298/R = 4.56 ± 0.02
@@ -185,12 +235,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'solid_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -257,6 +306,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid_liquid'' is not in the closed automatic map'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_fusion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_fusion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -296,12 +368,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -322,7 +393,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_l_GEF_segments
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 2
@@ -344,12 +425,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -370,7 +450,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_s_GEF_segments
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_s_GEF_segments
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 2
@@ -392,12 +493,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'solid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -421,7 +521,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''solid'' is not in the closed automatic map'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_s_formation
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na2O_s_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 5
@@ -481,7 +602,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na_g_GEF_segments
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 2
@@ -531,7 +662,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Na_g_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 5
@@ -591,7 +732,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_O2_g_GEF_segments
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 2
@@ -640,7 +791,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_O2_g_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     page: 5
@@ -703,7 +864,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Rb2O_g_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     table: 'Table 4, p. 157 — Rb2O(g): ΔfH°298/R = −8.05 ± 2.50 kK; S°298/R = 36.31 ± 0.75; (H°298−H°0)/R = 1.66 kK'
@@ -746,7 +917,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::LH84_Rb2O_s_formation
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: LH84_Rb2O_s_formation
@@ -829,7 +1010,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::NEA05_Se2_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: selected ΔfH°298(Se2,g) = (141.1 ± 3.0) kJ·mol⁻¹; ΔfG°298 = (92.4 ± 3.0); S°298 = (247.38 ± 0.40) J·K⁻¹·mol⁻¹; pp.
@@ -913,7 +1105,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::NEA05_Se5_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: selected ΔfH°298 = (144.4 ± 4.3) kJ·mol⁻¹; ΔfG°298 = (88.4 ± 5.3); S°298 = (398.3 ± 10.0) J·K⁻¹·mol⁻¹
@@ -996,7 +1199,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::NEA05_Se6_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: selected ΔfH°298 = (136.1 ± 3.8) kJ·mol⁻¹; ΔfG°298 = (83.6 ± 4.9); S°298 = (428.5 ± 10.0) J·K⁻¹·mol⁻¹
@@ -1035,7 +1249,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::illustrative_dissociation_reaction
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: illustrative_dissociation_reaction
@@ -1074,7 +1298,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::sublimation_BaO_s_to_BaO_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: sublimation_BaO_s_to_BaO_g
@@ -1113,7 +1347,17 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: lamoreaux-hildenbrand-1984::sublimation_SrO_s_to_SrO_g
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: lamoreaux-hildenbrand-1984
   locator:
     note: sublimation_SrO_s_to_SrO_g

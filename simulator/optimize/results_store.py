@@ -42,6 +42,7 @@ from simulator.optimize.evaluate import (
     MASS_BALANCE_ABORT_PCT,
     RunReference,
     ScoredResult,
+    neighbour_use_from_carrier,
 )
 from simulator.optimize.objective import (
     ObjectiveValue,
@@ -782,6 +783,8 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         margins=margins,
     )
     objectives = _deserialize_objectives(_json_load(row["objectives"]))
+    blob = _json_load(row["result_blob"])
+    hits, preset = neighbour_use_from_carrier(blob)
     result = ScoredResult(
         candidate_id=row["candidate_id"],
         eval_spec=_deserialize_eval_spec(_json_load(row["eval_spec"])),
@@ -798,9 +801,11 @@ def _row_to_scored_result(row: sqlite3.Row) -> ScoredResult:
         ),
         run_reference=_deserialize_run_reference(
             _json_load(row["run_reference"]),
-            _json_load(row["result_blob"]),
+            blob,
         ),
         notes=tuple(_json_load(row["notes"])),
+        neighbour_hits=hits,
+        neighbour_preset=preset,
     )
     reasons = _read_compatibility_rejections(result)
     if not reasons:

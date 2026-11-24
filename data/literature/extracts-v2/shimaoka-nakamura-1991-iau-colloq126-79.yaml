@@ -11,12 +11,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -56,6 +55,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -96,12 +118,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -136,7 +157,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=86A; column=k K
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_86a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -175,12 +217,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -220,6 +261,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -260,12 +324,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -300,7 +363,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=87A; column=k K
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_87a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -339,12 +423,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -384,6 +467,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -424,12 +530,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -464,7 +569,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=88A; column=k K
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_88a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -503,12 +629,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -548,6 +673,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -588,12 +736,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -628,7 +775,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=89A; column=k K
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_89a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -667,12 +835,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -712,6 +879,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -752,12 +942,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -792,7 +981,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=90A; column=k K
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_k_run_90a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -831,12 +1041,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -876,6 +1085,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -916,12 +1148,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -956,7 +1187,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=86A; column=k Na
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_86a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -995,12 +1247,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1040,6 +1291,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1080,12 +1354,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1120,7 +1393,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=87A; column=k Na
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_87a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -1159,12 +1453,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1204,6 +1497,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1244,12 +1560,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1284,7 +1599,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=88A; column=k Na
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_88a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -1323,12 +1659,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1368,6 +1703,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1408,12 +1766,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1448,7 +1805,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=89A; column=k Na
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_89a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -1487,12 +1865,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1532,6 +1909,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1572,12 +1972,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1612,7 +2011,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=90A; column=k Na
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_na_run_90a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -1651,12 +2071,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1696,6 +2115,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1736,12 +2178,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1776,7 +2217,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=86A; column=k Rb
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_86a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -1815,12 +2277,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1860,6 +2321,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -1900,12 +2384,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1940,7 +2423,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=87A; column=k Rb
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_87a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -1979,12 +2483,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2024,6 +2527,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2064,12 +2590,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2104,7 +2629,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=88A; column=k Rb
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_88a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -2143,12 +2689,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2188,6 +2733,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2228,12 +2796,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2268,7 +2835,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=89A; column=k Rb
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_89a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81
@@ -2307,12 +2895,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'run product' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2352,6 +2939,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - residue_component_composition
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''run product'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_concentration
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - residue_component_composition
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_concentration
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - residue_component_composition
@@ -2392,12 +3002,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: phase string 'alkali vaporization' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2432,7 +3041,28 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: row=90A; column=k Rb
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''alkali vaporization'' is not in the closed automatic map'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_vaporization_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shimaoka-nakamura-1991-iau-colloq126-79::shimaoka_1991_rb_run_90a_vaporization_rate
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shimaoka-nakamura-1991-iau-colloq126-79
   locator:
     published_page: 81

@@ -29,7 +29,7 @@ from simulator.battery.identity import (
     Identity,
     IdentityRefusal,
     _activity_pressure_above_limit,
-    _same_row_knudsen_residue_identity_equal,
+    _same_row_residue_extent_identity_equal,
     _values_compare,
     identity_equal,
     melt_activity_log10_pressure_bound,
@@ -450,7 +450,7 @@ def test_knudsen_residue_omits_the_band_and_ordinary_equality_does_not() -> None
     ordinary = identity_equal(measured, other)
     assert ordinary.kind is IdentityEqualKind.IDENTITY_MISMATCH
     assert "total_pressure_Pa" in ordinary.fields
-    omitted = _same_row_knudsen_residue_identity_equal(measured, other)
+    omitted = _same_row_residue_extent_identity_equal(measured, other)
     assert omitted.kind is IdentityEqualKind.EQUAL
 
 
