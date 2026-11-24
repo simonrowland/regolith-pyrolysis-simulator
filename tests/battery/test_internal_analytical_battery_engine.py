@@ -922,10 +922,11 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             'K2O': 1.0,
             'TiO2': 2.0,
             'Cr2O3': 1.0,
-            # The original 1 wt% + 1 wt% drops exceeded the projection's
-            # 1 wt% limit and selected the Kress fallback. Keep both dropped
-            # species while staying inside that limit so MAGEMin supplies the
-            # phase basis this receipt exercises.
+            # MAGEMin drops both oxides even at 0.311 wt% total because ig has
+            # no documented endmembers. The freeze gate admits a projected
+            # shadow curve only up to 1 wt% total; the old 1% + 1% case was
+            # over that admission limit and selected Kress. Keep both species
+            # at 0.98% total to exercise the projected shadow phase basis.
             'MnO': 0.49,
             'P2O5': 0.49,
         },

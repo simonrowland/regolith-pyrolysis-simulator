@@ -2879,6 +2879,7 @@ def gate_curve_provider_outcome_for_status(
     """
 
     from engines.domain_reason import (
+        OutOfDomainReason,
         STABLE_OUT_OF_DOMAIN_REASONS,
         TRANSIENT_OUT_OF_DOMAIN_REASONS,
         reason_value,
@@ -2902,6 +2903,21 @@ def gate_curve_provider_outcome_for_status(
         reason in transient_reasons - numerical_reasons for reason in reasons
     ):
         return GateCurveProviderOutcome.FAILED
+    if (
+        normalized_status in {"out_of_domain", "unsupported", "refused"}
+        and isinstance(diagnostic, Mapping)
+        and reason_value(diagnostic.get("backend_status_reason"))
+        == reason_value(OutOfDomainReason.COMPOSITION_PROJECTED)
+        and (
+            "projected_liquidus_status" in diagnostic
+            or isinstance(diagnostic.get("backend_diagnostics"), Mapping)
+            and "projected_liquidus_status" in diagnostic["backend_diagnostics"]
+        )
+    ):
+        # This is a stable refusal of the requested bulk. A numerical result
+        # from the optional projected-bulk search must not hide the existing
+        # MAGEMin-shadow fallback for a small, flagged composition drop.
+        return GateCurveProviderOutcome.STABLE_REFUSAL
     nested_outcomes = []
     if isinstance(diagnostic, Mapping):
         backend = diagnostic.get("backend_diagnostics")

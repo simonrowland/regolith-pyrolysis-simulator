@@ -11436,9 +11436,10 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert partition_basis["native_fe_source_account"] == "process.metal_phase"
     assert partition_basis["native_fe_split_commit_status"] == "ok"
     assert partition_basis["native_fe_vapor_route_status"] == "committed"
-    # The nine-hour ledger records one native Fe metal partition and no
-    # separate saturation-split event.
-    assert partition["native_fe_saturation_split_count"] == 0
+    # At h0 MAGEMin drops 0.207 wt% MnO and 0.104 wt% P2O5. The stable
+    # composition-projected refusal uses the shadow liquidus (1353.125 C,
+    # F=0.767 at 1250 C), deferring redox until the saturation split fires.
+    assert partition["native_fe_saturation_split_count"] == 1
     assert partition["native_fe_metal_partition_count"] >= 1
     assert partition["native_fe_partition_transition_count"] >= 1
     assert partition["tap_basis"]["status"] == "available"
