@@ -52,9 +52,7 @@ from simulator.battery.default_policy import (
 )
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import (
-    _air_composition_quote,
     _dp002_pressure_default,
-    _dp112_receipts,
     log10_fo2_to_pa,
     _resolve_score_time_buffer_identity,
 )
@@ -10061,10 +10059,15 @@ def _predict_redox(
             and isinstance(identity.fO2_Pa.value, Decimal)
             else None
         )
-        if admitted_pa is not None and admitted_pa > 0:
-            command_bar = float(admitted_pa / PA_PER_BAR_DEC)
-        else:
-            command_bar = float(10.0 ** float(fo2_log))
+        if admitted_pa is None or admitted_pa <= 0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": "missing_fO2",
+                    "quantity": Quantity.FE3_FE2_RATIO.value,
+                },
+            )
+        command_bar = float(admitted_pa / PA_PER_BAR_DEC)
         po2 = Po2Request(
             mode=PO2_COMMANDED,
             po2_bar=command_bar,
@@ -10386,27 +10389,28 @@ def _payload_pressure_pa(payload: Mapping) -> Decimal | None:
     return pressure
 
 
-def _payload_fo2_notice(
-    quantity: Quantity,
-    payload: Mapping,
-    *,
-    identity: Identity | None = None,
-    observation: Observation | None = None,
-) -> tuple[Notice | None, Decimal | None]:
-    """The owner's tier notice and the exact pascals that notice commands.
+def _payload_decision(
+    quantity: Quantity, payload: Mapping
+) -> tuple[tuple[Notice, ...], Decimal | None]:
+    """Notices and exact pascals the activity generator copied from the decision.
 
-    Tier 4 keeps the pascals ``dp010_command_notice`` returns. Every other
-    tier keeps the pascal string the activity generator copied from the owner.
+    ``fO2_notices`` is that decision. This does not rebuild a receipt from
+    the original observation, and it does not exponentiate a float log.
+    DP-003 and DP-010 already state the tier, so they are not repeated.
     """
 
+    pressure = _payload_pressure_pa(payload)
+    stored = payload.get("fO2_notices")
+    notices = tuple(stored) if stored is not None else ()
+    if any(
+        notice.policy is not None and notice.policy.id in {"DP-003", "DP-010"}
+        for notice in notices
+    ):
+        return notices, pressure
     tier = payload.get("fO2_tier")
     if tier is None:
-        return None, None
-    from simulator.battery.fo2_ladder import (
-        ResolvedFo2,
-        dp010_command_notice,
-        fo2_tier_notice,
-    )
+        return notices, pressure
+    from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
 
     log = payload.get("fO2_log")
     bar = payload.get("fO2_bar")
@@ -10416,32 +10420,17 @@ def _payload_fo2_notice(
         str(payload.get("fO2_route") or ""),
         bool(payload.get("fO2_borrowed")),
         None if bar is None else float(bar),
-        pressure_pa=_payload_pressure_pa(payload),
+        pressure_pa=pressure,
     )
-    if int(tier) == 4:
-        printed_log = _printed_condition_decimal(
-            observation, "fO2_log"
-        ) if observation is not None else None
-        notice, _command_log, pressure_pa = dp010_command_notice(
-            quantity,
-            resolved,
-            identity=identity,
-            printed_log=(
-                None
-                if printed_log is None or not printed_log.is_finite()
-                else format(printed_log, "f")
-            ),
-        )
-        return notice, pressure_pa
-    return fo2_tier_notice(quantity, resolved), resolved.pressure_pa
+    return (*notices, fo2_tier_notice(quantity, resolved)), pressure
 
 
 def _payload_fo2_bar(payload: Mapping) -> float | None:
+    pressure = _payload_pressure_pa(payload)
+    if pressure is not None:
+        return float(pressure / PA_PER_BAR_DEC)
     bar = payload.get("fO2_bar")
-    if bar is not None:
-        return float(bar)
-    log = payload.get("fO2_log")
-    return None if log is None else 10.0 ** float(log)
+    return None if bar is None else float(bar)
 
 
 def _prediction_identity_with_fo2(
@@ -10553,43 +10542,15 @@ def _oxygen_input_request(
         )
 
     from simulator.battery.fo2_ladder import (
-        ResolvedFo2,
-        absolute_frame_admission,
-        dp010_command_notice,
         fo2_tier_notice,
         resolve_row_fo2,
     )
 
-    if _has_printed_fo2(observation, identity):
-        admitted = absolute_frame_admission(
-            observation,
-            identity,
-            physics_rung=(
-                1 if _knudsen_vapour_equilibrium(quantity, experiment) else None
-            ),
-        )
-        if admitted is not None:
-            for notice in admitted.notices:
-                if notice not in input_notices:
-                    input_notices.append(notice)
-            input_notices.append(
-                fo2_tier_notice(
-                    quantity,
-                    ResolvedFo2(
-                        float(admitted.log10_bar),
-                        admitted.tier,
-                        admitted.route,
-                        False,
-                        po2_bar=admitted.command_bar(),
-                        physics_rung=admitted.physics_rung,
-                    ),
-                )
-            )
-            if commanded_pa is not None:
-                commanded_pa.append(admitted.pressure_pa)
-            return Po2Request(
-                mode=PO2_COMMANDED, po2_bar=admitted.command_bar()
-            )
+    oxygen = None
+    if experiment is not None:
+        from simulator.battery.waypoints import oxygen_condition
+
+        oxygen = oxygen_condition(experiment, bench, observation)
     resolved = resolve_row_fo2(
         experiment,
         bench,
@@ -10597,6 +10558,7 @@ def _oxygen_input_request(
         composition=composition_value,
         composition_wt=composition_wt,
         temperature_K=temperature_K,
+        oxygen=oxygen,
         source_oxygen_bar=source_oxygen_bar,
         quantity=quantity,
     )
@@ -10615,42 +10577,38 @@ def _oxygen_input_request(
             cell_material=resolved.cell_material,
         )
     if resolved is not None and not resolved.closure:
-        if resolved.tier == 4:
-            printed_log = (
-                _printed_condition_decimal(observation, "fO2_log")
-                if observation is not None
-                else None
-            )
-            notice, _command_log, command_pa = dp010_command_notice(
-                quantity,
-                resolved,
+        if resolved.pressure_pa is None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
                 identity=identity,
-                printed_log=(
-                    None
-                    if printed_log is None or not printed_log.is_finite()
-                    else format(printed_log, "f")
-                ),
+                requested=requested,
+                reason=RefusalReason.IDENTITY_INCOMPLETE,
+                detail={
+                    "reason": "missing_fO2",
+                    "quantity": quantity.value,
+                    "why": oxygen_why,
+                    "multivalent": list(redox),
+                },
+                notices=tuple(input_notices),
             )
-            if commanded_pa is not None:
-                commanded_pa.append(command_pa)
-            bar = float(command_pa / PA_PER_BAR_DEC)
-        else:
-            for extra in resolved.notices:
-                if extra not in input_notices:
-                    input_notices.append(extra)
-            notice = fo2_tier_notice(quantity, resolved)
-            if resolved.pressure_pa is not None:
-                if commanded_pa is not None:
-                    commanded_pa.append(resolved.pressure_pa)
-                bar = float(resolved.pressure_pa / PA_PER_BAR_DEC)
-            else:
-                bar = (
-                    resolved.po2_bar
-                    if resolved.po2_bar is not None
-                    else 10.0 ** resolved.log10_fO2_bar
-                )
-        input_notices.append(notice)
-        return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
+        for extra in resolved.notices:
+            if extra not in input_notices:
+                input_notices.append(extra)
+        # DP-003 and DP-010 already carry the tier text. Another tier notice
+        # would be a second receipt for the same command.
+        if not any(
+            notice.policy is not None and notice.policy.id in {"DP-003", "DP-010"}
+            for notice in resolved.notices
+        ):
+            input_notices.append(fo2_tier_notice(quantity, resolved))
+        if commanded_pa is not None:
+            commanded_pa.append(resolved.pressure_pa)
+        return Po2Request(
+            mode=PO2_COMMANDED,
+            po2_bar=float(resolved.pressure_pa / PA_PER_BAR_DEC),
+        )
     return _input_refusal(
         engine=engine,
         channel=channel,
@@ -11500,15 +11458,10 @@ def _phase_role_value(identity: Identity, name: str) -> PhaseRole | None:
 def _printed_total_pressure_bar(
     identity: Identity, observation: Observation
 ) -> Decimal | None:
-    state = identity.total_pressure_Pa
-    if state is not None and state.is_value and state.value is not None:
-        pa = nominal_pressure_pa(state)
-    else:
-        located = (observation.point_conditions or {}).get("total_pressure_Pa")
-        if located is None or located.inference is not None or not located.state.is_value:
-            return None
-        pa = nominal_pressure_pa(located)
-    if pa is None or not pa.is_finite() or pa <= 0:
+    from simulator.battery.fo2_ladder import printed_total_pressure_pa
+
+    pa = printed_total_pressure_pa(identity, observation)
+    if pa is None:
         return None
     return pa / PA_PER_BAR_DEC
 
@@ -11706,188 +11659,52 @@ def _resolve_row_fo2(
     quantity: Quantity | None,
     bench: Bench | None = None,
 ) -> tuple[Identity, Decimal | None, tuple[Notice, ...]]:
-    """Resolve printed fO2, then DP-112, DP-003, and DP-010 in order.
+    """Read the one oxygen decision. Phase and redox do not rebuild it.
 
-    Admission goes through ``fo2_ladder``. An unknown frame is not converted
-    to a bar command. A buffer waypoint whose calibration marker has no
-    DP-112 receipt is not admitted here. A grounded log carries the frame
-    receipt migration already stored.
+    The ferric inverse stays off. Named failure: these callers score the
+    ferric split, so commanding fO2 from that split would move the target.
+    Waypoints are collected even when the bench is absent; the ladder skips
+    ``oxygen_condition`` in that case and would drop a printed run pressure.
     """
 
     from simulator.battery.fo2_ladder import (
-        absolute_frame_admission,
-        absolute_oxygen_frame,
-        admit_waypoint_oxygen,
-        admitted_score_oxygen,
+        decimal_log10_bar,
+        resolve_row_fo2,
         stored_absolute_pressure_pa,
-        _receipted_buffer,
-    )
-    from simulator.battery.waypoints import (
-        EXPERIMENT_RUN_OXYGEN_ROUTES,
-        TYPED_RUN_OXYGEN_ROUTES,
     )
 
-    derived_condition = _derived_fo2_condition(observation)
-    # A receipted buffer's stored pascals precede a waypoint log.
-    if _receipted_buffer(observation):
-        admitted = absolute_frame_admission(observation, identity)
-        if admitted is not None:
-            return identity, admitted.log10_bar, admitted.notices
-    if (
-        not derived_condition
-        and _has_printed_fo2(observation, identity)
-        and absolute_oxygen_frame(identity)
-    ):
-        admitted = absolute_frame_admission(observation, identity)
-        if admitted is not None:
-            return identity, admitted.log10_bar, admitted.notices
-
+    oxygen = None
     if experiment is not None:
         from simulator.battery.waypoints import oxygen_condition
 
         oxygen = oxygen_condition(experiment, bench, observation)
-        waypoint = admitted_score_oxygen(oxygen, observation)
-        if waypoint is not None:
-            tier = (
-                1
-                if waypoint.route == "observation_fO2_log"
-                or waypoint.route in TYPED_RUN_OXYGEN_ROUTES | EXPERIMENT_RUN_OXYGEN_ROUTES
-                or waypoint.route == "observation_fO2_Pa_to_log_fO2"
-                else 3
-            )
-            admitted = admit_waypoint_oxygen(
-                waypoint, experiment, observation, bench=bench, tier=tier
-            )
-            if admitted is not None:
-                current = stored_absolute_pressure_pa(identity)
-                resolved_identity = (
-                    identity
-                    if current == admitted.pressure_pa
-                    else replace(identity, fO2_Pa=State.of(admitted.pressure_pa))
-                )
-                return resolved_identity, admitted.log10_bar, admitted.notices
-
-    printed_pressure = (
-        printed_source_pressure(observation)
-        if _has_printed_fo2(observation, identity)
-        else None
-    )
-    if printed_pressure is not None:
-        printed_log_decimal = printed_pressure.log10() - PA_PER_BAR_DEC.log10()
-        if printed_log_decimal.is_finite():
-            return (
-                replace(identity, fO2_Pa=State.of(printed_pressure)),
-                printed_log_decimal,
-                (),
-            )
-
-    resolved_observation = _resolve_score_time_buffer_identity(
+    resolved = resolve_row_fo2(
+        experiment,
+        bench,
         observation,
-        ambient_pressure_evidence=(
-            None if experiment is None else experiment.ambient_pressure_evidence
-        ),
+        composition_wt=composition_wt,
+        temperature_K=float(temperature_K),
+        oxygen=oxygen,
+        quantity=quantity,
+        include_ferric_inverse=False,
     )
-    resolved_identity = resolved_observation.identity
-    fo2_log = (
-        _printed_fo2_log10_bar(resolved_identity)
-        if _dp112_receipts(resolved_observation)
-        else None
-    )
-    if fo2_log is not None:
-        policy_notices = tuple(
-            notice
-            for notice in resolved_observation.notices
-            if notice not in observation.notices
-            and notice.policy is not None
-            and notice.policy.id in {"DP-002", "DP-112"}
-        )
-        if not policy_notices:
-            policy_notice = next(
-                (
-                    notice
-                    for notice in resolved_observation.notices
-                    if notice.policy is not None and notice.policy.id == "DP-112"
-                ),
-                None,
+    if resolved is None or resolved.closure or resolved.pressure_pa is None:
+        return identity, None, () if resolved is None else resolved.notices
+    updated = identity
+    for notice in resolved.notices:
+        if (
+            notice.policy is not None
+            and notice.policy.id == "DP-002"
+            and notice.policy.value not in (None, "")
+        ):
+            updated = replace(
+                updated,
+                total_pressure_Pa=State.of(Decimal(notice.policy.value)),
             )
-            policy_notices = () if policy_notice is None else (policy_notice,)
-        return resolved_identity, Decimal(str(fo2_log)), policy_notices
-
-    atmospheric_evidence = (
-        None if experiment is None else experiment.ambient_pressure_evidence
-    )
-    atmosphere_condition = (observation.point_conditions or {}).get("atmosphere")
-    air_quote = _air_composition_quote(
-        atmospheric_evidence, atmosphere_condition=atmosphere_condition
-    )
-    if air_quote is not None:
-        pressure_bar = _printed_total_pressure_bar(identity, observation)
-        resolved_identity = identity
-        pressure_notices: tuple[Notice, ...] = ()
-        if pressure_bar is None and quantity is not None:
-            pressure_pa, pressure_notice = _dp002_pressure_default(
-                atmospheric_evidence,
-                quantity,
-                atmosphere_condition=atmosphere_condition,
-            )
-            if pressure_pa is not None:
-                pressure_bar = pressure_pa / PA_PER_BAR_DEC
-                resolved_identity = replace(
-                    identity, total_pressure_Pa=State.of(pressure_pa)
-                )
-                if pressure_notice is not None:
-                    pressure_notices = (pressure_notice,)
-        if pressure_bar is not None:
-            total_pressure_pa = pressure_bar * PA_PER_BAR_DEC
-            policy = resolve_default_policy("DP-003", P_total=total_pressure_pa)
-            oxygen_pa = as_decimal(policy.value)
-            fo2_log = _printed_fo2_log10_bar(
-                replace(identity, fO2_Pa=State.of(oxygen_pa))
-            )
-            if fo2_log is not None and quantity is not None:
-                resolved_identity = replace(
-                    resolved_identity, fO2_Pa=State.of(oxygen_pa)
-                )
-                oxygen_notice = Notice(
-                    kind=policy.flag,
-                    affected_quantities=(quantity,),
-                    reason=(
-                        "DP-003 physics_rung=3: source says the experiment was "
-                        f"in air; quote={air_quote!r}; "
-                        f"P_total={total_pressure_pa} Pa"
-                    ),
-                    origin="score:DP-003",
-                    policy=NoticePolicy(**policy.payload["policy"]),
-                )
-                return (
-                    resolved_identity,
-                    Decimal(str(fo2_log)),
-                    (*pressure_notices, oxygen_notice),
-                )
-
-    if quantity is None:
-        return identity, None, ()
-    from simulator.battery.fo2_ladder import _tier4, dp010_command_notice
-
-    intrinsic = _tier4(dict(composition_wt), float(temperature_K))
-    if intrinsic is None:
-        return identity, None, ()
-    printed_unresolved_log = _printed_condition_decimal(observation, "fO2_log")
-    notice, command_log, command_pa = dp010_command_notice(
-        quantity,
-        intrinsic,
-        identity=identity,
-        printed_log=(
-            None
-            if printed_unresolved_log is None or not printed_unresolved_log.is_finite()
-            else format(printed_unresolved_log, "f")
-        ),
-        atmospheric_quote=(
-            None if atmospheric_evidence is None else atmospheric_evidence.quote
-        ),
-    )
-    resolved_identity = replace(identity, fO2_Pa=State.of(command_pa))
-    return resolved_identity, command_log, (notice,)
+    current = stored_absolute_pressure_pa(updated)
+    if current != resolved.pressure_pa:
+        updated = replace(updated, fO2_Pa=State.of(resolved.pressure_pa))
+    return updated, decimal_log10_bar(resolved.pressure_pa), resolved.notices
 
 
 def _select_phase_composition(
@@ -15373,19 +15190,10 @@ def _predict_with_engine(
             parent_activity = activity.thermodynamic_parent_activity()
             authority = Authority.BRIDGE
             notices: list[Notice] = list(input_notices)
-            from simulator.battery.fo2_ladder import _admission_notices
-
-            for extra in _admission_notices(observation):
+            decision_notices, owned_pa = _payload_decision(quantity, activity_payload)
+            for extra in decision_notices:
                 if extra not in notices:
                     notices.append(extra)
-            tier_notice, owned_pa = _payload_fo2_notice(
-                quantity,
-                activity_payload,
-                identity=identity,
-                observation=observation,
-            )
-            if tier_notice is not None:
-                notices.append(tier_notice)
             certified_band = None
             if activity.valid_range_K is not None:
                 low, high = (float(activity.valid_range_K[0]), float(activity.valid_range_K[1]))
@@ -15647,19 +15455,12 @@ def _predict_with_engine(
         # The contract's oxygen point, or none. Never an engine default.
         # A payload bar is the printed pascal command; a log is 10**fO2_log.
         if "fO2_bar" in activity_payload or "fO2_log" in activity_payload:
-            from simulator.battery.fo2_ladder import _admission_notices
-
-            for extra in _admission_notices(observation):
+            decision_notices, owned_pa = _payload_decision(
+                quantity, activity_payload
+            )
+            for extra in decision_notices:
                 if extra not in input_notices:
                     input_notices.append(extra)
-            tier_notice, owned_pa = _payload_fo2_notice(
-                quantity,
-                activity_payload,
-                identity=identity,
-                observation=observation,
-            )
-            if tier_notice is not None:
-                input_notices.append(tier_notice)
             if owned_pa is not None:
                 commanded_pa.append(owned_pa)
             bar = activity_fo2_bar

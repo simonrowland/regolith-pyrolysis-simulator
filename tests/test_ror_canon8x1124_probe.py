@@ -65,6 +65,7 @@ def _ladder(experiment, row, temperature):
 @pytest.mark.parametrize("quote", [
     "Before the run, the sample was held in air. Equilibration was under argon.",
     "The reference gas equilibrated in air. The sample equilibrated under argon.",
+    "The reference gas was equilibrated in air while the sample was equilibrated under nitrogen.",
 ])
 def test_air_must_describe_sample_equilibration(quote):
     evidence = AmbientPressureEvidence(
@@ -78,6 +79,7 @@ def test_air_must_describe_sample_equilibration(quote):
 @pytest.mark.parametrize("quote", [
     "Samples were equilibrated in air.",
     "The sample was equilibrated in air.",
+    "The sample was held under argon before the run. The sample was equilibrated in air.",
 ])
 def test_sample_equilibrated_in_air_still_matches(quote):
     evidence = AmbientPressureEvidence(
@@ -150,53 +152,114 @@ def test_receipted_buffer_precedes_a_different_run_pressure():
     )
 
 
-def test_unresolved_marker_uses_the_buffer_resolver(monkeypatch):
-    identity, row, experiment, temperature = _run_row("fO2_Pa", Decimal("3"))
-    # No located run pressure, so the marker is the only oxygen evidence.
-    # Temperature stays: an experiment with no conditions is not a record.
+def _pressure_warning(notices) -> bool:
+    return any(
+        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.origin == "score:DP-112"
+        for notice in notices
+    )
+
+
+def test_gaillard_unreceipted_nno_keeps_one_pressure_decision():
+    """The unreceipted Gaillard NNO marker carries one pascal and the warning.
+
+    Source id selects the activity buffer calibration. Total pressure and the
+    run fO2 are absent, so the resolver omits the pressure term at its
+    one-bar reference and emits ``pressure_provenance_unknown``. Activity
+    request, activity prediction, phase, and vapour all read that decision.
+    """
+
+    from simulator.battery.enums import AmountBasis, Engine
+    from simulator.battery.generators.bench import activity_request_for_engine
+    from simulator.battery.records import Composition
+    from simulator.battery.score import predict_with_engine
+
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    temperature = Decimal("1400")
+    identity = replace(
+        F.activity_identity(
+            formula="SiO2",
+            T_K=temperature,
+            component_basis="SiO2",
+            composition=Composition(
+                "ordered_complete_mole_inventory",
+                (("SiO2", Decimal("0.8")), ("FeO", Decimal("0.2"))),
+                AmountBasis.MOLE_FRACTION,
+            ),
+        ),
+        fO2_Pa=None,
+        total_pressure_Pa=None,
+    )
     experiment = replace(
-        experiment,
-        conditions={
-            key: value
-            for key, value in experiment.conditions.items()
-            if key not in RUN_FIELDS
-        },
+        F.tabulation_experiment(experiment_id="run", T_K=temperature),
+        ambient_pressure_evidence=None,
     )
     row = replace(
-        row,
+        F.observation("row", "run", identity, Decimal(1)),
+        source_id=source_id,
         notices=(
             _dp112("buffer=NNO offset=0 calibration=unresolved", policy=False),
         ),
     )
-    calls = []
-    real = oxygen_identity._resolve_score_time_buffer_identity
+    # Studio 3 measurement of this marker (review of b2bc92b4).
+    expected_pa = Decimal("0.0003571553358913043454467933519")
+    bench = None
 
-    def spy(observation, **kwargs):
-        calls.append(observation.observation_id)
-        resolved_identity = replace(observation.identity, fO2_Pa=State.of(Decimal("7")))
-        return replace(
-            observation,
-            identity=resolved_identity,
-            notices=(
-                *observation.notices,
-                _dp112("buffer=NNO offset=0", policy=True),
-            ),
-        )
-
-    del real
-    # Phase keeps a module-level binding. The ladder imports the owner at the call.
-    monkeypatch.setattr(oxygen_identity, "_resolve_score_time_buffer_identity", spy)
-    monkeypatch.setattr(score, "_resolve_score_time_buffer_identity", spy)
-    resolved, _log, notices = score._resolve_row_fo2(
-        identity, row, experiment, {"SiO2": 100.0}, temperature, Quantity.ACTIVITY
-    )
     ladder = _ladder(experiment, row, temperature)
-    assert calls == [row.observation_id, row.observation_id]
-    assert resolved.fO2_Pa.value == Decimal("7")
-    assert any(notice.policy is not None and notice.policy.id == "DP-112" for notice in notices)
     assert ladder is not None
-    assert ladder.pressure_pa == Decimal("7")
+    assert ladder.pressure_pa == expected_pa
     assert ladder.route == "score:DP-112"
+    assert _pressure_warning(ladder.notices)
+
+    phase_identity, _phase_log, phase_notices = score._resolve_row_fo2(
+        identity,
+        row,
+        experiment,
+        {"SiO2": 100.0},
+        temperature,
+        Quantity.ACTIVITY,
+        bench,
+    )
+    assert phase_identity.fO2_Pa.value == expected_pa
+    assert _pressure_warning(phase_notices)
+
+    # The row quantity stays activity, so the buffer resolver still owns it.
+    # The vapour request's identity is what makes oxygen an input.
+    vapour_identity = replace(identity, quantity=State.of(Quantity.P_PARTIAL))
+    vapour_notices: list = []
+    commanded: list = []
+    vapour = score._oxygen_input_request(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel="vapour",
+        sources=(),
+        identity=vapour_identity,
+        requested=None,
+        quantity=Quantity.P_PARTIAL,
+        composition_value=None,
+        input_notices=vapour_notices,
+        observation=row,
+        experiment=experiment,
+        bench=bench,
+        temperature_K=float(temperature),
+        commanded_pa=commanded,
+    )
+    assert commanded == [expected_pa]
+    assert _pressure_warning(vapour_notices)
+    assert vapour.po2_bar == float(expected_pa / Decimal("100000"))
+
+    generated = activity_request_for_engine(experiment, row, "internal-analytical")
+    assert generated is not None and generated.payload is not None
+    assert Decimal(generated.payload["fO2_Pa"]) == expected_pa
+    assert _pressure_warning(generated.payload["fO2_notices"])
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        row,
+        experiment=experiment,
+        bench=bench,
+    )
+    assert _pressure_warning(prediction.notices)
+    assert prediction.identity.fO2_Pa.value == expected_pa
 
 
 def test_sensor_guard_turns_red_with_prior_matcher(monkeypatch):

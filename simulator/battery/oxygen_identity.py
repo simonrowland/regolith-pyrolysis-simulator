@@ -109,16 +109,15 @@ def _dp002_applicability(
 
 # Negated or excluded air is not a run atmosphere. The categorical token is
 # matched before this, so a located value "air" is not sent through prose.
-# A sample, or the equilibration itself, held under argon is not an air run.
-# The match is one sentence. "argon sample" does not count: the gas has to
-# be the atmosphere the equilibration names.
-_ARGON_EQUILIBRATION = re.compile(
-    r"\b(?:samples|sample|melts|melt|glasses|glass|charges|charge|equilibrat\w*)\b"
-    r"(?:\s+\w+){0,8}\s+(?:in|under)\s+(?:flowing\s+|an?\s+)?argon\b"
-)
+# A claim is one clause: the sample, the equilibration event, and the
+# atmosphere have to belong to that same clause. Preparation under argon
+# does not veto a later air equilibration, and a reference gas equilibrated
+# in air is not the sample. "argon sample" does not count.
+_CLAIM_BOUNDARY = re.compile(r"\b(?:while|whereas|but)\b|[.;!?]+")
 _AIR_SUBJECT = re.compile(
     r"\b(?:samples|sample|melts|melt|glasses|glass|charges|charge)\b"
 )
+_OTHER_ATMOSPHERE_SUBJECT = re.compile(r"\breference\s+gas\b")
 _AIR_EQUILIBRATION = re.compile(
     r"\bequilibrat\w*(?:\s+\w+){0,6}\s+"
     r"(?:in|under|atmosphere)\s+(?:ambient\s+)?air\b(?!\s+free\b)"
@@ -172,24 +171,31 @@ def _air_composition_quote(
     if _AIR_NEGATION.search(normalized_quote):
         return None
     # Air has to be the sample atmosphere during equilibration. "Held in air
-    # before the run" is not that stage. A separate sentence that equilibrates
-    # the sample, or the equilibration itself, under argon rejects the quote.
-    # Sensor and room air reject only the sentence that contains them.
-    # "air-free" normalizes to "air free".
-    sentences = [
+    # before the run" is not that stage. Sensor and room air reject only the
+    # clause that contains them. "air-free" normalizes to "air free".
+    # The last subject before the equilibration decides the claim.
+    clauses = [
         part.strip()
-        for part in re.split(r"[.;!?]+", normalized_quote)
+        for part in _CLAIM_BOUNDARY.split(normalized_quote)
         if part.strip()
     ]
-    if any(_ARGON_EQUILIBRATION.search(sentence) for sentence in sentences):
-        return None
-    for sentence in sentences:
-        if _AIR_SENSOR_OR_ROOM.search(sentence) is not None:
+    for clause in clauses:
+        if _AIR_SENSOR_OR_ROOM.search(clause) is not None:
             continue
-        if _AIR_SUBJECT.search(sentence) is None:
+        equilibration = _AIR_EQUILIBRATION.search(clause)
+        if equilibration is None:
             continue
-        if _AIR_EQUILIBRATION.search(sentence) is not None:
-            return source_quote
+        prefix = clause[: equilibration.start()]
+        subjects = (
+            *((match.start(), "sample") for match in _AIR_SUBJECT.finditer(prefix)),
+            *(
+                (match.start(), "other")
+                for match in _OTHER_ATMOSPHERE_SUBJECT.finditer(prefix)
+            ),
+        )
+        if not subjects or max(subjects)[1] != "sample":
+            continue
+        return source_quote
     return None
 
 

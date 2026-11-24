@@ -36,14 +36,12 @@ _OXYGEN_PROVENANCE = (
 """,
     ),
     (
-        ROOT / "simulator/battery/score.py",
-        """    fo2_log = (
-        _printed_fo2_log10_bar(resolved_identity)
-        if _dp112_receipts(resolved_observation)
-        else None
-    )
+        ROOT / "simulator/battery/fo2_ladder.py",
+        """    if derived_fo2_condition(observation):
+        return False
+    fo2 = identity.fO2_Pa
 """,
-        """    fo2_log = _printed_fo2_log10_bar(resolved_identity)
+        """    fo2 = identity.fO2_Pa
 """,
     ),
 )
@@ -142,23 +140,9 @@ _LIQUID_PAIR = (
         return None
     return label, _LIQUID_PAIR_CONJUGATES[label.casefold()]
 """,
-        """    assemblage = provenance.get("phase_assemblage_as_printed")
-    source_text = " ".join(
-        value.casefold().replace("-", " ")
-        for value in (assemblage, locator_note)
-        if isinstance(value, str)
-    )
-    marker_present = any(
-        marker in source_text
-        for marker in ("immiscib", "coexisting liquid", "two liquid", "liquid pair")
-    )
-    if label.casefold() not in _LIQUID_PAIR_CONJUGATES and not marker_present:
-        return None
-    if not label:
-        label = "reported liquid"
-    return label, _LIQUID_PAIR_CONJUGATES.get(
-        label.casefold(), "the other coexisting liquid"
-    )
+        """    if label.casefold() not in _LIQUID_PAIR_CONJUGATES:
+        return "reported liquid", "the other coexisting liquid"
+    return label, _LIQUID_PAIR_CONJUGATES[label.casefold()]
 """,
     ),
 )
@@ -172,6 +156,35 @@ _OXYGEN_FRAME = (
         )
 """,
         """        return route.authority is WaypointAuthority.PRINTED
+""",
+    ),
+    (
+        ROOT / "simulator/battery/fo2_ladder.py",
+        """    if route.route == "observation_fO2_log":
+        return absolute_frame_admission(
+            observation,
+            _identity(observation),
+            route=route.route,
+            tier=tier,
+            physics_rung=physics_rung,
+        )
+""",
+        """    if route.route == "observation_fO2_log":
+        admitted = absolute_frame_admission(
+            observation,
+            _identity(observation),
+            route=route.route,
+            tier=tier,
+            physics_rung=physics_rung,
+        )
+        if admitted is not None:
+            return admitted
+        return _admit_log_defined(
+            route,
+            tier=tier,
+            observation=observation,
+            physics_rung=physics_rung,
+        )
 """,
     ),
 )
@@ -211,13 +224,23 @@ _CONVERSION = (
 _AIR_FREE = (
     (
         ROOT / "simulator/battery/oxygen_identity.py",
-        """    for sentence in sentences:
-        if _AIR_SENSOR_OR_ROOM.search(sentence) is not None:
+        """    for clause in clauses:
+        if _AIR_SENSOR_OR_ROOM.search(clause) is not None:
             continue
-        if _AIR_SUBJECT.search(sentence) is None:
+        equilibration = _AIR_EQUILIBRATION.search(clause)
+        if equilibration is None:
             continue
-        if _AIR_EQUILIBRATION.search(sentence) is not None:
-            return source_quote
+        prefix = clause[: equilibration.start()]
+        subjects = (
+            *((match.start(), "sample") for match in _AIR_SUBJECT.finditer(prefix)),
+            *(
+                (match.start(), "other")
+                for match in _OTHER_ATMOSPHERE_SUBJECT.finditer(prefix)
+            ),
+        )
+        if not subjects or max(subjects)[1] != "sample":
+            continue
+        return source_quote
     return None
 """,
         """    equilibration_air = re.search(

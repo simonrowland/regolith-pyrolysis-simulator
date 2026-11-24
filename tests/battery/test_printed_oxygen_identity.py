@@ -1798,6 +1798,13 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
     assert _air_composition_quote(
         atmospheric_air, atmosphere_condition=printed_argon
     ) is None
+    prepared_then_air = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        "The sample was held under argon before the run. The sample was equilibrated in air.",
+        locator,
+    )
+    assert _air_composition_quote(prepared_then_air) == prepared_then_air.quote
+    assert _dp002_applicability(prepared_then_air) == 'experiment "in air"'
     for false_air in (
         "The sample was equilibrated in air-free argon.",
         "The furnace sensor measured air outside the chamber during equilibration.",
@@ -1805,6 +1812,7 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
         "An argon sample was inside; air flowed in the room during equilibration.",
         "Before the run, the sample was held in air. Equilibration was under argon.",
         "The reference gas equilibrated in air. The sample equilibrated under argon.",
+        "The reference gas was equilibrated in air while the sample was equilibrated under nitrogen.",
     ):
         false_evidence = AmbientPressureEvidence(
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
@@ -1883,7 +1891,7 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
         assert any(
             notice.policy is not None and notice.policy.id == "DP-002" and marker in notice.reason
             for notice in notices
-        )
+        ), f"DP-002 {marker}"
         assert not any(
             notice.policy is not None and notice.policy.id == "DP-001"
             for notice in notices
@@ -1900,7 +1908,7 @@ def test_registered_method_pressure_precedes_the_unbound_default() -> None:
         and notice.policy.id == "DP-002"
         and 'experiment "in air"' in notice.reason
         for notice in air_notices
-    )
+    ), "DP-002"
 
     unbound_identity, unbound_bar, unbound_notices = resolve(unbound)
     assert unbound_identity.total_pressure_Pa == State.of(Decimal("101325"))
@@ -2375,7 +2383,7 @@ def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
         return replace(observation, provenance=provenance, locator=locator)
 
     unlabelled = without_target_label(lfe)
-    assert _liquid_pair_target(unlabelled) is None
+    assert _liquid_pair_target(unlabelled) is None, "unlabelled"
     shared_locator = Locator(note="assemblage contains phase Lfe and phase Lsi")
     single_locator = Locator(note="measured phase Lfe")
     conjunction_locator = Locator(note="assemblage contains phase Lfe and Lsi")

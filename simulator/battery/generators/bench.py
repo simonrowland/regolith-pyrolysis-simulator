@@ -8,6 +8,7 @@ from simulator.battery.consumer_inputs import ConsumerInputs, REQUIREMENTS
 from simulator.battery.enums import (
     Fo2Mode,
     Phase,
+    Quantity,
     ReferenceStateConvention,
     ValueKind,
 )
@@ -519,6 +520,16 @@ def melt_activity_requests(
 
         metal_refusal = metal_saturation_activity_refusal(experiment, observation)
         if fo2_mode is Fo2Mode.SHARED_LADDER or metal_refusal is not None:
+            from simulator.battery.identity import quantity_token
+
+            row_quantity = (
+                quantity_token(observation.identity)
+                if observation is not None
+                and getattr(observation, "identity", None) is not None
+                else None
+            )
+            if row_quantity is None:
+                row_quantity = Quantity.ACTIVITY
             ladder_candidate = resolve_row_fo2(
                 experiment,
                 bench,
@@ -526,6 +537,7 @@ def melt_activity_requests(
                 composition_moles=moles,
                 temperature_K=temperature_K,
                 oxygen=inputs.waypoints["oxygen_condition"],
+                quantity=row_quantity,
             )
             if fo2_mode is Fo2Mode.SHARED_LADDER:
                 resolved = ladder_candidate
@@ -670,9 +682,11 @@ def melt_activity_requests(
                 payload["fO2_tier"] = shared.tier
                 payload["fO2_route"] = shared.route
                 payload["fO2_borrowed"] = shared.borrowed
+                payload["fO2_notices"] = shared.notices
                 if shared.pressure_pa is not None:
                     payload["fO2_Pa"] = format(shared.pressure_pa, "f")
-                if shared.po2_bar is not None:
+                    payload["fO2_bar"] = float(shared.pressure_pa / BAR_PA_DECIMAL)
+                elif shared.po2_bar is not None:
                     payload["fO2_bar"] = shared.po2_bar
                 routes["fO2_log"] = {
                     "waypoint": "fo2_ladder",

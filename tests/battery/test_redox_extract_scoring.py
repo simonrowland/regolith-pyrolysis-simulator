@@ -329,12 +329,14 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
                 notice.policy is not None and notice.policy.id == "DP-010"
                 for notice in residual.notices
             )
-            assert "not_flagged_stratum" not in residual.exclusions
     assert unknown_rows
     assert grounded_rows
+    # d-460 flags the unknown-frame row, and the other rows stay ineligible
+    # on the same conjuncts as the internal-analytical table. An empty
+    # eligible list is the pin. Requiring a score_eligible row was the
+    # contradiction with that table.
     eligible = [residual for residual in values if residual.score_eligible]
-    assert eligible
-    assert all(residual.refusal is None for residual in eligible)
+    assert eligible == []
     backlog = score_module.notice_backlog(values)
     assert backlog.get(NoticeKind.ASSUMED_FO2.value, 0) == sum(
         1
@@ -668,7 +670,9 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
             assert residual.numeric is not None
             assert residual.numeric.value.is_finite()
             assert not has_default
-            assert "not_flagged_stratum" not in residual.exclusions
+            # Grounded rows are still a flagged stratum. The 18-row table
+            # requires this exclusion on every row, including these.
+            assert "not_flagged_stratum" in residual.exclusions
     assert unknown and grounded
     backlog = score_module.notice_backlog(residuals)
     assert backlog.get(NoticeKind.ASSUMED_FO2.value, 0) == sum(
