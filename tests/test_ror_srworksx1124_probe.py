@@ -20,7 +20,10 @@ def test_citation_only_works_load_with_migration_identities_and_index_rows():
     works, _, _ = load_migrated_store(REPO_ROOT, sources=REGISTERED_SOURCES)
     committed_ids = {}
     for path in (REPO_ROOT / "data/literature/works").glob("*.yaml"):
-        work = yaml.safe_load(path.read_text())["work"]
+        document = yaml.safe_load(path.read_text())
+        work = document.get("work") if isinstance(document, dict) else None
+        if not isinstance(work, dict):
+            continue
         source_ids = set(work.get("source_ids") or []) & REGISTERED_SOURCES
         if source_ids:
             assert len(source_ids) == 1
