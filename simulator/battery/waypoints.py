@@ -51,6 +51,7 @@ from simulator.physical_constants import (
     STANDARD_ATMOSPHERE_PA,
 )
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
+from simulator.source_ids import SOSSI_SOURCE_ID
 
 
 class WaypointAuthority(StrEnum):
@@ -1644,7 +1645,13 @@ def thermal_path(
     del bench
     routes: list[Waypoint] = []
     point = _point_condition(experiment, observation, "temperature_K", "thermal_path")
-    if point is not None:
+    sossi_observation = (
+        observation is not None
+        and observation.source_id == SOSSI_SOURCE_ID
+        and observation.experiment_id == experiment.experiment_id
+    )
+    sossi_run = _sossi_experiment_run_id_for_waypoint(experiment) is not None
+    if point is not None and not sossi_observation:
         routes.append(point)
     schedule: ThermalSchedule | None = experiment.thermal_schedule
     ramp_series: tuple[tuple[Decimal, Decimal], ...] | None = None
@@ -1816,6 +1823,69 @@ def thermal_path(
                 ),
             ),
         )
+    if sossi_run:
+        usable_series = [
+            route
+            for route in routes
+            if route.value.kind is ValueKind.SERIES
+            and len(route.value.series) >= 2
+        ]
+        if not usable_series and schedule is not None:
+            duration_located = schedule.total_duration_s
+            duration = _value(duration_located)
+            temperature_located = None
+            temperature_path = None
+            if schedule.setpoints_and_holds:
+                candidate = schedule.setpoints_and_holds[0].temperature_K
+                if candidate.state.is_value and candidate.locator is not None:
+                    temperature_located = candidate
+                    temperature_path = (
+                        "experiment.thermal_schedule.setpoints_and_holds[0].temperature_K"
+                    )
+            if (
+                temperature_located is None
+                and observation is not None
+                and observation.experiment_id == experiment.experiment_id
+            ):
+                candidate = (observation.point_conditions or {}).get("temperature_K")
+                if isinstance(candidate, Located) and candidate.state.is_value and candidate.locator is not None:
+                    temperature_located = candidate
+                    temperature_path = (
+                        f"observation[{observation.observation_id}]"
+                        ".point_conditions.temperature_K"
+                    )
+            temperature = _value(temperature_located)
+            if (
+                duration_located is not None
+                and duration_located.locator is not None
+                and duration is not None
+                and duration.kind is ValueKind.POINT
+                and duration.point is not None
+                and duration.point > 0
+                and temperature is not None
+                and temperature.kind is ValueKind.POINT
+                and temperature.point is not None
+                and temperature_path is not None
+            ):
+                usable_series.append(
+                    Waypoint(
+                        "thermal_path",
+                        Value(
+                            ValueKind.SERIES,
+                            series=(
+                                (Decimal(0), temperature.point),
+                                (duration.point, temperature.point),
+                            ),
+                        ),
+                        "sossi_located_temperature_and_duration",
+                        WaypointAuthority.DERIVED,
+                        (temperature_path, "experiment.thermal_schedule.total_duration_s"),
+                    )
+                )
+        if usable_series:
+            routes = usable_series
+        elif point is not None:
+            routes.append(point)
     temperature = experiment.conditions.get("temperature_K")
     raw_temperature = temperature.state.value if temperature is not None and temperature.state.is_value else None
     if raw_temperature is not None and not routes:

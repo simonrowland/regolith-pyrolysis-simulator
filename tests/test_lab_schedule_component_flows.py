@@ -138,20 +138,39 @@ def test_sccm_component_flows_cannot_drive_apparatus_pressure() -> None:
         normalize_lab_schedule(raw)
 
 
-def test_reported_sccm_reference_state_requires_temperature_and_pressure() -> None:
+def test_missing_sccm_reference_state_stays_diagnostic_and_unconverted() -> None:
+    raw = _schedule(component_flows=True)
+    raw["gas_boundary"].pop("flow_reference_state")
+
+    gas = normalize_lab_schedule(raw)["gas_boundary"]
+
+    assert gas["flow_reference_state"]["reason"] == (
+        "sccm_reference_state_unreported"
+    )
+    assert gas["flow_reference_state"]["conversion_role"] == "diagnostic_only"
+    assert gas["component_flows"]["CO"]["value"] == 130.0
+    assert gas["component_flows"]["CO2"]["value"] == 65.0
+
+
+def test_partial_sccm_reference_state_stays_diagnostic_and_unconverted() -> None:
     raw = _schedule(component_flows=True)
     raw["gas_boundary"]["flow_reference_state"] = {
         "reported_status": "reported",
+        "standard_temperature_K": 273.15,
         "source_class": "literature_primary",
         "citation_id": "sossi-2019",
         "source_ref": "Table 2 methods citation",
     }
 
-    with pytest.raises(
-        LabScheduleValidationError,
-        match="missing_gas_boundary_flow_reference_state_standard_temperature_K",
-    ):
-        normalize_lab_schedule(raw)
+    gas = normalize_lab_schedule(raw)["gas_boundary"]
+
+    assert gas["flow_reference_state"]["reason"] == (
+        "sccm_reference_state_incomplete"
+    )
+    assert gas["flow_reference_state"]["standard_temperature_K"] == 273.15
+    assert gas["flow_reference_state"]["conversion_role"] == "diagnostic_only"
+    assert gas["component_flows"]["CO"]["value"] == 130.0
+    assert gas["component_flows"]["CO2"]["value"] == 65.0
 
 
 def test_reported_sccm_reference_state_accepts_source_supported_temperature_and_pressure() -> None:

@@ -202,10 +202,62 @@ def test_empty_table2_quote_is_a_typed_parser_refusal() -> None:
     )
     row["locator"]["quote"] = ""
 
-    with pytest.raises(
-        ValueError, match="sossi_table2_gas_row_quote_invalid:P09/06/18a"
-    ):
-        check_sossi_table2_gas_equilibrium(experiments, mutated)
+    checks = _checks_by_run(experiments, mutated)
+
+    assert checks["P09/06/18a"].refusal_reason == (
+        "sossi_table2_gas_row_quote_invalid"
+    )
+    assert checks["P09/06/18a"].checked_log10_fO2_bar is None
+    assert checks["P09/06/18b"].checked_log10_fO2_bar == Decimal("-9.23")
+
+
+def test_only_a_vetted_gas_result_can_be_the_fallback() -> None:
+    from simulator.battery.oxygen_identity import (
+        SossiGasEquilibriumCheck,
+        resolve_sossi_run_oxygen,
+    )
+
+    disputed = SossiGasEquilibriumCheck(
+        "run-a",
+        "run-a",
+        "co2_dissociation_partials_bar",
+        None,
+        Decimal("-8.0"),
+        None,
+        None,
+        "gas_equilibrium_fo2_disagrees_with_printed",
+        "computed value is outside the printed band",
+        True,
+    )
+    decision = resolve_sossi_run_oxygen(
+        disputed,
+        recorded_log=None,
+        ladder_log=Decimal("-7.5"),
+        ladder_route="buffer_relation",
+    )
+    assert decision.log10_fO2_bar == Decimal("-7.5")
+    assert decision.source == "oxygen_ladder_premise"
+
+    unprinted = SossiGasEquilibriumCheck(
+        "run-b",
+        "run-b",
+        "co2_dissociation_partials_bar",
+        None,
+        Decimal("-8.0"),
+        None,
+        None,
+        "gas_equilibrium_fo2_unavailable",
+        "The Table 2 run-log fO2 is not printed.",
+        True,
+    )
+    decision = resolve_sossi_run_oxygen(
+        unprinted,
+        recorded_log=None,
+        ladder_log=Decimal("-7.5"),
+        ladder_route="buffer_relation",
+    )
+    assert decision.log10_fO2_bar == Decimal("-8.0")
+    assert decision.source == "vetted_gas_derived_fO2"
 
 
 def test_real_sossi_extract_flows_reach_the_lab_schedule_boundary() -> None:
@@ -391,6 +443,41 @@ def test_rps_cli_passes_the_real_sossi_run_record(tmp_path, monkeypatch) -> None
     assert "gas_boundary" not in gaps
     assert "thermal_path" not in gaps
     assert "run_pressure_boundary" not in gaps
+    no_rows = generate(tmp_path / "without-any-observation", {})
+    assert no_rows["observation_id"] is None
+    no_row_gaps = {gap["waypoint"] for gap in no_rows["readiness"]["gaps"]}
+    assert "gas_boundary" not in no_row_gaps
+    assert "thermal_path" not in no_row_gaps
+    assert "run_pressure_boundary" not in no_row_gaps
+
+
+def test_rps_keeps_the_located_15_minute_sossi_thermal_series() -> None:
+    from simulator.battery.consumer_inputs import (
+        _sossi_table2_flow_observation,
+        collect_consumer_inputs,
+    )
+    from simulator.battery.enums import ValueKind
+    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+
+    source_id = "kems-012-sossi-2019"
+    _works, experiments, observations = load_migrated_store(sources=(source_id,))
+    experiment = next(
+        item
+        for item in experiments.values()
+        if item.experiment_id.endswith(
+            "::experiment::sossi-2019-run-p09-06-18a"
+        )
+    )
+    bench = load_migrated_benches()[experiment.bench_id]
+    observation = _sossi_table2_flow_observation(experiment, observations.values())
+    inputs = collect_consumer_inputs(experiment, bench, observation)
+
+    thermal = inputs.waypoints["thermal_path"].selected.value
+    assert thermal.kind is ValueKind.SERIES
+    assert thermal.series == (
+        (Decimal(0), Decimal("1673.15")),
+        (Decimal(900), Decimal("1673.15")),
+    )
 
 
 def test_rps_keeps_a_mismatched_table2_gas_quote_out_of_control_inputs() -> None:
@@ -401,6 +488,7 @@ def test_rps_keeps_a_mismatched_table2_gas_quote_out_of_control_inputs() -> None
         collect_consumer_inputs,
     )
     from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+    from simulator.battery.records import State, SweepGas, Value
 
     source_id = "kems-012-sossi-2019"
     _works, experiments, observations = load_migrated_store(sources=(source_id,))
@@ -450,6 +538,119 @@ def test_rps_keeps_a_mismatched_table2_gas_quote_out_of_control_inputs() -> None
         experiment, load_migrated_benches()[experiment.bench_id], mutated
     )
     assert inputs.waypoints["gas_boundary"].selected.value == boundary
+
+    other_run_observation = next(
+        item
+        for item in observations.values()
+        if item.experiment_id.endswith(
+            "::experiment::sossi-2019-run-p09-06-18b"
+        )
+        and item.identity.species.formula == "Mn"
+    )
+    mismatched_run_boundary = _sossi_table2_gas_boundary(
+        experiment, other_run_observation
+    )
+    assert mismatched_run_boundary is not None
+    assert mismatched_run_boundary["imposed_flow"]["reason"] == (
+        "sossi_table2_gas_row_experiment_mismatch"
+    )
+    assert "component_flows" not in mismatched_run_boundary
+
+    pressure = experiment.pressure_environment
+    declared_cover = SweepGas(
+        "CO + CO2 + Kr",
+        State.unknown("unprinted"),
+        State.unknown("unprinted"),
+    )
+    contaminated = replace(
+        experiment,
+        pressure_environment=replace(
+            pressure,
+            sweep_gas=replace(pressure.sweep_gas, state=State.of(declared_cover)),
+        ),
+    )
+    contaminated_boundary = _sossi_table2_gas_boundary(contaminated, observation)
+    assert contaminated_boundary is not None
+    assert "component_flows" not in contaminated_boundary
+    assert contaminated_boundary["imposed_flow"]["reason"] == (
+        "cover_not_printed_mixture"
+    )
+
+    contradictory_pressure = replace(
+        pressure.total_pressure_Pa,
+        state=State.of(Value.point_of(50000)),
+    )
+    pressure_conflict = replace(
+        experiment,
+        pressure_environment=replace(
+            pressure,
+            total_pressure_Pa=contradictory_pressure,
+        ),
+    )
+    pressure_boundary = _sossi_table2_gas_boundary(
+        pressure_conflict, observation
+    )
+    assert pressure_boundary is not None
+    assert "component_flows" not in pressure_boundary
+    assert pressure_boundary["imposed_flow"]["reason"] == (
+        "sossi_table2_pressure_conflicts_with_one_atmosphere_citation"
+    )
+
+
+def test_rps_cover_guard_fails_if_consumer_reverts_to_quote_only_rule(monkeypatch) -> None:
+    from simulator.battery import consumer_inputs
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.migrate import load_migrated_benches, load_migrated_store
+    from simulator.battery.records import State, SweepGas
+
+    source_id = "kems-012-sossi-2019"
+    _works, experiments, observations = load_migrated_store(sources=(source_id,))
+    experiment = next(
+        item
+        for item in experiments.values()
+        if item.experiment_id.endswith(
+            "::experiment::sossi-2019-run-p09-06-18a"
+        )
+    )
+    observation = next(
+        item
+        for item in observations.values()
+        if item.experiment_id == experiment.experiment_id
+        and item.identity.species.formula == "Mn"
+    )
+    bench = load_migrated_benches()[experiment.bench_id]
+    pressure = experiment.pressure_environment
+    foreign_cover = replace(
+        experiment,
+        pressure_environment=replace(
+            pressure,
+            sweep_gas=replace(
+                pressure.sweep_gas,
+                state=State.of(
+                    SweepGas(
+                        "CO + CO2 + Kr",
+                        State.unknown("unprinted"),
+                        State.unknown("unprinted"),
+                    )
+                ),
+            ),
+        ),
+    )
+    safe_inputs = collect_consumer_inputs(foreign_cover, bench, observation)
+    assert "component_flows" not in safe_inputs.waypoints["gas_boundary"].selected.value
+
+    def quote_only_boundary(*_args, **_kwargs):
+        return {"component_flows": {"CO": {"value": 130}, "CO2": {"value": 65}}}
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            consumer_inputs, "_sossi_table2_gas_boundary", quote_only_boundary
+        )
+        unsafe_inputs = collect_consumer_inputs(foreign_cover, bench, observation)
+        with pytest.raises(AssertionError):
+            assert "component_flows" not in unsafe_inputs.waypoints[
+                "gas_boundary"
+            ].selected.value
 
 
 def test_sossi_unprinted_pressure_uses_flagged_dp002_method_premise() -> None:

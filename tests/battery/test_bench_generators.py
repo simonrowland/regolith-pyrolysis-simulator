@@ -723,6 +723,31 @@ def test_rps_requires_operator_choices_and_labels_them():
     assert next(item for item in readiness if item.consumer == "rps") == result.readiness
 
 
+def test_rps_accepts_fractional_hour_thermal_duration():
+    experiment, bench, observation, model = complete_rps()
+    experiment = replace(
+        experiment,
+        thermal_schedule=ThermalSchedule(
+            points=(
+                ThermalPoint(f.located(Value.point_of(0)), f.located(Value.point_of(1400))),
+                ThermalPoint(f.located(Value.point_of(900)), f.located(Value.point_of(1400))),
+            )
+        ),
+    )
+
+    result = vacuum_pyrolysis_preset(
+        collect_consumer_inputs(experiment, bench, observation),
+        modelling_inputs=model,
+    )
+
+    assert result.readiness.status is ReadinessStatus.READY, result.readiness.gaps
+    assert result.payload["lab_schedule"]["duration_h"] == pytest.approx(0.25)
+    assert [point["t_h"] for point in result.payload["lab_schedule"]["melt_temperature_C"]] == [
+        0.0,
+        0.25,
+    ]
+
+
 def test_unsupplied_operator_inputs_are_not_evidence_gaps():
     experiment, bench, observation, model = complete_rps()
     inputs = collect_consumer_inputs(experiment, bench, observation)

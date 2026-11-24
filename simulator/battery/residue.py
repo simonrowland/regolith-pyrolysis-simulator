@@ -3740,23 +3740,52 @@ def _predict_sossi_residue_cohort(
             and experiment_id not in selected_experiment_ids
         ):
             continue
-        schedule = experiment.get("thermal_schedule", {})
-        setpoints = schedule.get("setpoints_and_holds", ())
-        if not setpoints or not isinstance(setpoints[0], Mapping):
-            raise ResidueInventoryRefusal("sossi_temperature_missing")
-        temperature_K = _hashimoto_point_value(
-            setpoints[0].get("temperature_K", {})
-        )
-        duration_s = _hashimoto_point_value(
-            schedule.get("total_duration_s", {})
-        )
-        sample = experiment.get("sample") or {}
-        total_pressure_Pa = _hashimoto_point_value(
-            experiment.get("pressure_environment", {}).get("total_pressure_Pa", {})
-        )
-        inventory, sample_mass_kg, initial_melt_mass_kg = _sossi_initial_inventory(
-            experiment, starting_trace_ppm_by_experiment.get(experiment_id, {})
-        )
+        try:
+            schedule = experiment.get("thermal_schedule")
+            if not isinstance(schedule, Mapping):
+                raise ResidueInventoryRefusal("sossi_temperature_missing")
+            setpoints = schedule.get("setpoints_and_holds", ())
+            if not setpoints or not isinstance(setpoints[0], Mapping):
+                raise ResidueInventoryRefusal("sossi_temperature_missing")
+            temperature_K = _hashimoto_point_value(
+                setpoints[0].get("temperature_K", {})
+            )
+            duration_s = _hashimoto_point_value(
+                schedule.get("total_duration_s", {})
+            )
+            sample = experiment.get("sample") or {}
+            pressure_environment = experiment.get("pressure_environment")
+            if not isinstance(pressure_environment, Mapping):
+                raise ResidueInventoryRefusal("sossi_pressure_missing")
+            total_pressure_Pa = _hashimoto_point_value(
+                pressure_environment.get("total_pressure_Pa", {})
+            )
+            inventory, sample_mass_kg, initial_melt_mass_kg = (
+                _sossi_initial_inventory(
+                    experiment,
+                    starting_trace_ppm_by_experiment.get(experiment_id, {}),
+                )
+            )
+        except ResidueInventoryRefusal as exc:
+            prediction_rows.append(
+                _SossiResiduePrediction(
+                    experiment_id=experiment_id,
+                    primary_element_ppm={},
+                    geometry_element_ppm={},
+                    sensitivity_band_ppm={},
+                    channel_missing_elements=(),
+                    provenance={
+                        "source_id": _SOSSI_SOURCE_ID,
+                        "experiment_id": experiment_id,
+                        "engine": engine,
+                        "run_refusal": {
+                            "reason": exc.reason,
+                            "detail": exc.detail,
+                        },
+                    },
+                )
+            )
+            continue
         try:
             buffered_logp = float(buffered_fO2_log_by_experiment[experiment_id])
         except (KeyError, TypeError, ValueError, OverflowError) as exc:

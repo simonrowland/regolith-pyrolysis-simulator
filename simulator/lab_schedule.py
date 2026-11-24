@@ -23,6 +23,7 @@ LAB_SCHEDULE_PRESSURE_FLOOR_MBAR = 1.0e-3
 ASSUMED_WITH_SENSITIVITY = "assumption_with_sensitivity_marker"
 SUPPORTED_INTERPOLATION = "piecewise_linear"
 DEFAULT_LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = "not_reported"
+_SCCM_REFERENCE_STATE_UNREPORTED = "sccm_reference_state_unreported"
 LAB_SCHEDULE_DEPOSIT_SAMPLE_BASIS = frozenset(
     {
         "hot",
@@ -540,14 +541,81 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
         )
         flow_reference_state = raw.get("flow_reference_state")
         if flow_reference_state is None:
-            raise LabScheduleValidationError(
-                "lab_schedule_missing_gas_boundary_flow_reference_state"
+            if not normalized["component_flows"]:
+                raise LabScheduleValidationError(
+                    "lab_schedule_missing_gas_boundary_flow_reference_state"
+                )
+            component = next(iter(normalized["component_flows"].values()))
+            flow_reference_state = {
+                key: component.get(key) or fallback
+                for key, fallback in (
+                    ("source_class", "unreported"),
+                    ("citation_id", "flow_reference_state"),
+                    ("digest", "omitted"),
+                )
+            }
+            flow_reference_state.update(
+                {
+                    "reported_status": "not_reported",
+                    "reason": _SCCM_REFERENCE_STATE_UNREPORTED,
+                    "conversion_role": "diagnostic_only",
+                    "conversion_note": (
+                        "No flow reference temperature and pressure were supplied; "
+                        "the imposed-flow path retains sccm and performs no conversion."
+                    ),
+                }
             )
-        normalized["flow_reference_state"] = _normalize_gas_boundary_field(
-            flow_reference_state,
-            field="flow_reference_state",
-            required=("standard_temperature_K", "standard_pressure_Pa"),
-        )
+            normalized["flow_reference_state"] = _normalize_gas_boundary_field(
+                flow_reference_state,
+                field="flow_reference_state",
+                required=(),
+            )
+        elif not isinstance(flow_reference_state, Mapping):
+            raise LabScheduleValidationError(
+                "missing_gas_boundary_flow_reference_state"
+            )
+        elif (
+            flow_reference_state.get("reported_status") == "reported"
+            and (
+                flow_reference_state.get("standard_temperature_K") in (None, "")
+                or flow_reference_state.get("standard_pressure_Pa") in (None, "")
+            )
+        ):
+            reference_state = _normalize_gas_boundary_field(
+                flow_reference_state,
+                field="flow_reference_state",
+                required=(),
+            )
+            reported_temperature = reference_state.get("standard_temperature_K")
+            reported_pressure = reference_state.get("standard_pressure_Pa")
+            if reported_temperature not in (None, ""):
+                _required_finite_positive(
+                    reported_temperature,
+                    "gas_boundary_sccm_reference_temperature_K",
+                )
+            if reported_pressure not in (None, ""):
+                _required_finite_positive(
+                    reported_pressure,
+                    "gas_boundary_sccm_reference_pressure_Pa",
+                )
+            normalized["flow_reference_state"] = _freeze(
+                {
+                    **reference_state,
+                    "reason": "sccm_reference_state_incomplete",
+                    "conversion_role": "diagnostic_only",
+                    "conversion_note": (
+                        "An absolute sccm conversion needs both standard "
+                        "temperature and pressure; this imposed-flow path keeps "
+                        "the printed sccm values without converting them."
+                    ),
+                }
+            )
+        else:
+            normalized["flow_reference_state"] = _normalize_gas_boundary_field(
+                flow_reference_state,
+                field="flow_reference_state",
+                required=("standard_temperature_K", "standard_pressure_Pa"),
+            )
         reference_state = normalized["flow_reference_state"]
         reported_status = reference_state.get("reported_status")
         if reported_status == "not_reported":
@@ -558,7 +626,7 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_reference_state_not_reported_has_values"
                 )
-            if reference_state.get("reason") != "sccm_reference_state_unreported":
+            if reference_state.get("reason") != _SCCM_REFERENCE_STATE_UNREPORTED:
                 raise LabScheduleValidationError(
                     "lab_schedule_sccm_reference_state_not_reported_reason_invalid"
                 )
@@ -573,14 +641,20 @@ def _normalize_gas_boundary(raw: Any) -> Mapping[str, Any]:
                     "lab_schedule_sccm_conversion_diagnostic_missing_note"
                 )
         elif reported_status == "reported":
-            _required_finite_positive(
-                reference_state.get("standard_temperature_K"),
-                "gas_boundary_sccm_reference_temperature_K",
-            )
-            _required_finite_positive(
-                reference_state.get("standard_pressure_Pa"),
-                "gas_boundary_sccm_reference_pressure_Pa",
-            )
+            if reference_state.get("reason") == "sccm_reference_state_incomplete":
+                if reference_state.get("conversion_role") != "diagnostic_only":
+                    raise LabScheduleValidationError(
+                        "lab_schedule_sccm_conversion_role_must_be_diagnostic_only"
+                    )
+            else:
+                _required_finite_positive(
+                    reference_state.get("standard_temperature_K"),
+                    "gas_boundary_sccm_reference_temperature_K",
+                )
+                _required_finite_positive(
+                    reference_state.get("standard_pressure_Pa"),
+                    "gas_boundary_sccm_reference_pressure_Pa",
+                )
         else:
             raise LabScheduleValidationError(
                 "lab_schedule_sccm_reference_state_reported_status_invalid"

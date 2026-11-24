@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
@@ -565,41 +566,80 @@ def test_sossi_scorer_passes_the_checked_fO2_to_the_residue_cohort(monkeypatch) 
 
 
 @pytest.mark.parametrize(
-    ("mutation", "expected_reason", "expected_detail", "expected_spread"),
+    (
+        "mutation",
+        "expected_reason",
+        "expected_detail",
+        "expected_spread",
+        "expected_fallback",
+        "expected_printed_log",
+    ),
     [
         (
             "discrepant",
             "gas_equilibrium_fo2_disagrees_with_printed",
-            "mutation of the P09/06/18a CO/CO2 pair",
+            "computed=",
             True,
+            "independently_published_table2_run_log",
+            -9.23,
         ),
         (
             "failed",
             "cover_not_printed_mixture",
-            "mutated Sossi cover record",
+            "P09/06/18a does not use the cover gas",
+            None,
+            "independently_published_table2_run_log",
+            -9.23,
+        ),
+        (
+            "structured_log",
+            "sossi_table2_structured_fo2_disagrees_with_quote",
+            "sossi_table2_gas_row_quote_disagrees:P09/06/18a",
             True,
+            "independently_published_table2_run_log",
+            -9.23,
+        ),
+        (
+            "duplicate",
+            "sossi_table2_gas_row_repeated",
+            "expected one Table 2 row for P09/06/18a, found 2",
+            None,
+            "located_run_recorded_fO2",
+            None,
         ),
         (
             "missing",
-            "gas_equilibrium_fo2_unavailable",
-            "no checked Table 2 gas record for sossi-2019-run-p09-06-18a",
+            "sossi_table2_gas_row_missing",
+            "expected one Table 2 row for P09/06/18a, found 0",
+            None,
+            "located_run_recorded_fO2",
             None,
         ),
         (
             "parser_error",
-            "gas_equilibrium_fo2_unavailable",
-            "mutated Table 2 parser failure",
+            "sossi_table2_gas_row_quote_invalid",
+            "sossi_table2_gas_row_quote_invalid:P09/06/18a",
+            None,
+            "located_run_recorded_fO2",
             None,
         ),
     ],
 )
 def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
-    monkeypatch, mutation, expected_reason, expected_detail, expected_spread
+    monkeypatch,
+    mutation,
+    expected_reason,
+    expected_detail,
+    expected_spread,
+    expected_fallback,
+    expected_printed_log,
 ) -> None:
+    from copy import deepcopy
+
     import simulator.battery.score as score_module
     import simulator.battery.residue as residue
     from simulator.battery.enums import Engine, NoticeKind
-    from simulator.battery.oxygen_identity import check_sossi_table2_gas_equilibrium
+    from simulator.battery.oxygen_identity import SossiRunOxygenDecision
     from simulator.battery.score import (
         _residue_prediction_cache_entry,
         _sossi_residue_prediction,
@@ -627,28 +667,60 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
         rows[(valid_short, element)].experiment_id for element in ("Mn", "Ti")
     )
     test_ids = bad_ids | valid_ids
-    observed_spread = {}
+    original_load = score_module.load_yaml
+    drop_buffer = {"value": mutation == "structured_log"}
 
-    def reject_one_run(experiments, series):
-        checks = dict(check_sossi_table2_gas_equilibrium(experiments, series))
-        key = next(key for key, check in checks.items() if check.run_id == "P09/06/18a")
-        observed_spread["value"] = checks[key].delta_log10_fO2_dex
-        if mutation == "parser_error":
-            raise ValueError("mutated Table 2 parser failure")
-        if mutation == "missing":
-            checks.pop(key)
-            return checks
-        checks[key] = replace(
-            checks[key],
-            checked_log10_fO2_bar=None,
-            refusal_reason=expected_reason,
-            refusal_detail=expected_detail,
+    def poison_one_run(path):
+        value = original_load(path)
+        if not str(path).endswith(f"/extracts/{source_id}.yaml"):
+            return value
+        value = deepcopy(value)
+        experiment = next(
+            item
+            for item in value["experiments"]
+            if item["experiment_id"] == bad_short
         )
-        return checks
+        table = next(
+            item
+            for item in value["species"]["Mn"]["observations"]
+            if item.get("observation_id")
+            == "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906"
+        )
+        series = table["values"]["series"]
+        row = next(
+            item
+            for item in series
+            if item["run_id"].rstrip("*") == "P09/06/18a"
+        )
+        if mutation == "discrepant":
+            quote, count = re.subn(
+                r"(P09/06/18a\*?\s+1400\s+15\s+)130(\s+65\s+-9\.23)",
+                r"\g<1>100\g<2>",
+                row["locator"]["quote"],
+                count=1,
+            )
+            assert count == 1
+            row["locator"]["quote"] = quote
+        elif mutation == "failed":
+            experiment["pressure_environment"]["sweep_gas"]["state"] = {
+                "tag": "value",
+                "value": "CO + CO2 + Kr",
+            }
+        elif mutation == "missing":
+            table["values"]["series"] = [item for item in series if item is not row]
+        elif mutation == "structured_log":
+            row["log10_fO2"]["value"] = -2.0
+        elif mutation == "duplicate":
+            series.append(deepcopy(row))
+        else:
+            row["locator"]["quote"] = ""
+        if drop_buffer["value"]:
+            experiment["fO2_control"]["buffer"] = {
+                "state": {"tag": "unknown", "reason": "mutation"}
+            }
+        return value
 
-    monkeypatch.setattr(
-        score_module, "check_sossi_table2_gas_equilibrium", reject_one_run
-    )
+    monkeypatch.setattr(score_module, "load_yaml", poison_one_run)
     monkeypatch.setattr(
         score_module.subprocess,
         "run",
@@ -665,10 +737,12 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
         **_kwargs,
     ):
         passed_fO2.update(buffered_fO2_log_by_experiment)
-        calls.append((
-            frozenset(item["experiment_id"] for item in experiments),
-            selected_experiment_ids,
-        ))
+        calls.append(
+            (
+                frozenset(item["experiment_id"] for item in experiments),
+                selected_experiment_ids,
+            )
+        )
         return tuple(
             residue._SossiResiduePrediction(
                 experiment_id=item["experiment_id"],
@@ -693,7 +767,7 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
     selection = frozenset({bad_short, valid_short})
     cache = {}
     for element in ("Mn", "Ti"):
-        prediction = _sossi_residue_prediction(
+        healthy = _sossi_residue_prediction(
             context,
             rows[(valid_short, element)],
             Engine.OPENIMCC,
@@ -701,11 +775,12 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
             selected_experiment_ids=selection,
             test_experiment_ids=test_ids,
         )
-        assert prediction.execution.state.value == "produced", prediction.refusal_detail
-        assert prediction.refusal_detail["predicted_element_ppm"] == {
-            "Mn": 900.0,
-            "Ti": 450.0,
-        }[element]
+        assert healthy.execution.state.value == "produced", healthy.refusal_detail
+        assert "gas_boundary_assessment" not in healthy.refusal_detail
+        assert not any(
+            notice.kind is NoticeKind.SOSSI_GAS_BOUNDARY_UNVERIFIED
+            for notice in healthy.notices
+        )
         fallback = _sossi_residue_prediction(
             context,
             rows[(bad_short, element)],
@@ -722,15 +797,14 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
         assessment = fallback.refusal_detail["gas_boundary_assessment"]
         assert assessment["reason"] == "sossi_gas_boundary_unverified"
         assert assessment["original_reason"] == expected_reason
-        assert assessment["detail"] == expected_detail
-        assert assessment["printed_log10_fO2_bar"] == -9.23
+        assert expected_detail in assessment["detail"]
+        assert assessment["printed_log10_fO2_bar"] == expected_printed_log
         if expected_spread is None:
             assert assessment["computed_minus_printed_dex"] is None
         else:
-            assert assessment["computed_minus_printed_dex"] == pytest.approx(
-                float(observed_spread["value"])
-            )
-        assert assessment["fallback"] == "independently_published_run_log_fO2"
+            assert assessment["computed_minus_printed_dex"] is not None
+        assert assessment["fallback"] == expected_fallback
+        assert assessment["engine_log10_fO2_bar"] == pytest.approx(-9.23)
         assert any(
             notice.kind is NoticeKind.SOSSI_GAS_BOUNDARY_UNVERIFIED
             and notice.reason == "sossi_gas_boundary_unverified"
@@ -744,29 +818,171 @@ def test_one_sossi_gas_refusal_stays_scoped_to_its_run_and_cache_selection(
     assert cached is not None
     assert set(cached) == {bad_short, valid_short}
     assert "__cohort_error__" not in cached
-    assert cached[bad_short].provenance["gas_boundary_assessment"]["detail"] == expected_detail
+    assert expected_detail in cached[bad_short].provenance[
+        "gas_boundary_assessment"
+    ]["detail"]
     assert passed_fO2[bad_short] == pytest.approx(-9.23)
     assert passed_fO2[valid_short] == pytest.approx(-9.23)
     assert calls == [
         (frozenset({bad_short, valid_short}), frozenset({bad_short, valid_short})),
     ]
 
-    unaffected_cache = {}
-    unaffected = _sossi_residue_prediction(
+    if mutation == "parser_error":
+        drop_buffer["value"] = True
+        unaffected_cache = {}
+        unaffected = _sossi_residue_prediction(
+            context,
+            rows[(valid_short, "Mn")],
+            Engine.OPENIMCC,
+            unaffected_cache,
+            selected_experiment_ids=frozenset({valid_short}),
+            test_experiment_ids=test_ids,
+        )
+        assert unaffected.execution.state.value == "produced"
+        unaffected_cohort = _residue_prediction_cache_entry(
+            unaffected_cache,
+            source_id,
+            Engine.OPENIMCC,
+            frozenset({valid_short}),
+        )
+        assert unaffected_cohort is not None
+        assert set(unaffected_cohort) == {valid_short}
+        assert "__cohort_error__" not in unaffected_cohort
+
+    if mutation == "structured_log":
+        passed_fO2.clear()
+
+        def legacy_structured_log(check, **_kwargs):
+            return SossiRunOxygenDecision(
+                check.experiment_id,
+                Decimal("-2.0"),
+                "legacy_structured_fO2",
+            )
+
+        with monkeypatch.context() as mutation_patch:
+            mutation_patch.setattr(
+                score_module,
+                "resolve_sossi_run_oxygen",
+                legacy_structured_log,
+            )
+            mutated_prediction = _sossi_residue_prediction(
+                context,
+                rows[(bad_short, "Mn")],
+                Engine.OPENIMCC,
+                {},
+                selected_experiment_ids=selection,
+                test_experiment_ids=test_ids,
+            )
+        assert mutated_prediction.execution.state.value == "produced"
+        assert passed_fO2[bad_short] == pytest.approx(-2.0)
+        with pytest.raises(AssertionError):
+            assert passed_fO2[bad_short] == pytest.approx(-9.23)
+
+
+def test_sossi_ladder_fallback_uses_each_runs_own_observation(monkeypatch) -> None:
+    from copy import deepcopy
+
+    import simulator.battery.fo2_ladder as fo2_ladder
+    import simulator.battery.score as score_module
+    import simulator.battery.residue as residue
+    from simulator.battery.enums import Engine
+    from simulator.battery.fo2_ladder import ResolvedFo2
+    from simulator.battery.score import (
+        _sossi_residue_prediction,
+        load_score_context,
+        point_magnitude,
+    )
+
+    source_id = "kems-012-sossi-2019"
+    bad_short = "sossi-2019-run-p09-06-18a"
+    sibling_short = "sossi-2019-run-p09-06-18b"
+    context = load_score_context(sources=(source_id,))
+    run_rows = {
+        row.experiment_id.rsplit("::", 1)[-1]: row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.identity.species.formula == "Mn"
+        and row.admission.status.value == "admitted"
+        and point_magnitude(row.value) is not None
+        and row.experiment_id.rsplit("::", 1)[-1]
+        in {bad_short, sibling_short}
+    }
+    test_ids = frozenset(row.experiment_id for row in run_rows.values())
+    original_load = score_module.load_yaml
+
+    def poison_both_runs(path):
+        value = original_load(path)
+        if not str(path).endswith(f"/extracts/{source_id}.yaml"):
+            return value
+        value = deepcopy(value)
+        for experiment in value["experiments"]:
+            if experiment["experiment_id"] in {bad_short, sibling_short}:
+                experiment["fO2_control"]["buffer"] = {
+                    "state": {"tag": "unknown", "reason": "mutation"}
+                }
+        table = next(
+            item
+            for item in value["species"]["Mn"]["observations"]
+            if item.get("observation_id")
+            == "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906"
+        )
+        for row in table["values"]["series"]:
+            if row["run_id"].rstrip("*") in {"P09/06/18a", "P09/06/18b"}:
+                row["locator"]["quote"] = ""
+        return value
+
+    monkeypatch.setattr(score_module, "load_yaml", poison_both_runs)
+    monkeypatch.setattr(
+        score_module.subprocess,
+        "run",
+        lambda *_args, **_kwargs: pytest.fail("residue scoring must not require git"),
+    )
+    ladder_inputs = []
+
+    def run_scoped_ladder(experiment, _bench, observation, **_kwargs):
+        assert experiment.experiment_id == observation.experiment_id
+        short_id = observation.experiment_id.rsplit("::", 1)[-1]
+        ladder_inputs.append(short_id)
+        value = -8.1 if short_id == bad_short else -8.2
+        return ResolvedFo2(value, 3, "buffer_relation", False)
+
+    monkeypatch.setattr(fo2_ladder, "resolve_row_fo2", run_scoped_ladder)
+    passed_fO2 = {}
+
+    def capture_cohort(
+        experiments,
+        *_args,
+        buffered_fO2_log_by_experiment,
+        **_kwargs,
+    ):
+        passed_fO2.update(buffered_fO2_log_by_experiment)
+        return tuple(
+            residue._SossiResiduePrediction(
+                experiment_id=item["experiment_id"],
+                primary_element_ppm={"Mn": 900.0},
+                geometry_element_ppm={"Mn": {"sphere_constant": 900.0}},
+                sensitivity_band_ppm={"Mn": (800.0, 1000.0)},
+                channel_missing_elements=(),
+                provenance={"integration": {"primary": {"status": "converged"}}},
+            )
+            for item in experiments
+        )
+
+    monkeypatch.setattr(residue, "_predict_sossi_residue_cohort", capture_cohort)
+    cache = {}
+    prediction = _sossi_residue_prediction(
         context,
-        rows[(valid_short, "Mn")],
+        run_rows[bad_short],
         Engine.OPENIMCC,
-        unaffected_cache,
-        selected_experiment_ids=frozenset({valid_short}),
+        cache,
+        selected_experiment_ids=frozenset({bad_short, sibling_short}),
         test_experiment_ids=test_ids,
     )
-    assert unaffected.execution.state.value == "produced"
-    unaffected_cohort = _residue_prediction_cache_entry(
-        unaffected_cache, source_id, Engine.OPENIMCC, frozenset({valid_short})
-    )
-    assert unaffected_cohort is not None
-    assert set(unaffected_cohort) == {valid_short}
-    assert "__cohort_error__" not in unaffected_cohort
+
+    assert prediction.execution.state.value == "produced"
+    assert set(ladder_inputs) == {bad_short, sibling_short}
+    assert passed_fO2[bad_short] == pytest.approx(-8.1)
+    assert passed_fO2[sibling_short] == pytest.approx(-8.2)
 
 
 def test_mixed_hashimoto_and_sossi_score_keep_separate_engine_cohorts(

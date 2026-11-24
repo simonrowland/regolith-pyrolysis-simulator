@@ -29,6 +29,7 @@ from simulator.backend_names import (
     is_proprietary_engine,
     refuse_proprietary_engine_use as _refuse_proprietary_engine_use,
 )
+from simulator.lab_schedule import _SCCM_REFERENCE_STATE_UNREPORTED
 from simulator.state_types import StateTag
 
 
@@ -307,7 +308,7 @@ class NoticeKind(StrEnum):
     OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
     SOSSI_GAS_BOUNDARY_UNVERIFIED = "sossi_gas_boundary_unverified"
-    SCCM_REFERENCE_STATE_UNREPORTED = "sccm_reference_state_unreported"
+    SCCM_REFERENCE_STATE_UNREPORTED = _SCCM_REFERENCE_STATE_UNREPORTED
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
     COMPOSITION_BINARY_COMPLEMENT = "composition_binary_complement"
