@@ -5978,8 +5978,8 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    # Unmounted corpus baseline: Barin's 124 plus Kennedy's 170 attested table pins.
-    assert source_blind_pins == 294
+    # 34 Kennedy prose pins: 7 line-87 phase notes and 27 page-checked notes on lines 87, 89, and 259.
+    assert source_blind_pins == 328
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs

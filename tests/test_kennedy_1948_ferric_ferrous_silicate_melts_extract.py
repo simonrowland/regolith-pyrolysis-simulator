@@ -724,11 +724,25 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         for sample in source["fidelity_samples"]
         if sample.get("locator", {}).get("source_path")
         == (
-            "tables/kennedy-1948-ferric-ferrous-silicate-melts/"
-            "kennedy-1948-prose-text.txt"
+            "text/kennedy-1948-ferric-ferrous-silicate-melts/mineru/"
+            "p001-p021/out/regolith-kennedy-1948-ferric-ferrous-silicate-melts-"
+            "p001-p021/vlm/regolith-kennedy-1948-ferric-ferrous-silicate-melts-"
+            "p001-p021.md"
         )
     ]
-    assert prose_pins == []
+    assert len(prose_pins) == 34
+    expected_prose_digest = (
+        "9c69d49024ddc785020bb969b07d4041267e6b881ea64217ce4a0349fb7b86d3"
+    )
+    assert all(
+        sample["locator"]["source_sha256"] == expected_prose_digest
+        for sample in prose_pins
+    )
+    assert {sample["locator"]["line_range"] for sample in prose_pins} == {
+        "87",
+        "89",
+        "259",
+    }
     warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
     coverage_warnings = {
         warning.kind for warning in warnings
