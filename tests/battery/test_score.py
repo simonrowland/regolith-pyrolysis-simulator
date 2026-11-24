@@ -4025,18 +4025,24 @@ def test_one_sided_bound_is_not_scored_as_point() -> None:
 def test_species_formula_unparsed_never_string_matched() -> None:
     exp = F.tabulation_experiment()
     ident = F.o2_identity()
-    ident = replace(ident, species=replace(ident.species, formula="unknown"))
-    ref = F.observation(
-        "bad-formula",
-        exp.experiment_id,
-        ident,
-        Decimal("1"),
-        evidence=EvidenceClass.MEASURED_DIRECT,
-    )
-    residual, _ = _compile(ref, exp, _predict(Decimal("1"), ident))
-    assert residual.status is ResidualStatus.REFUSED
-    assert residual.numeric is None
-    assert residual.refusal.detail.get("reason") == "species_formula_unparsed"
+    for index, formula in enumerate(("unknown", "CaSO4.2D2O", "CaSO4·2D2O")):
+        formula_identity = replace(
+            ident, species=replace(ident.species, formula=formula)
+        )
+        ref = F.observation(
+            f"bad-formula-{index}",
+            exp.experiment_id,
+            formula_identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        residual, _ = _compile(
+            ref, exp, _predict(Decimal("1"), formula_identity)
+        )
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.detail.get("reason") == "species_formula_unparsed"
     assert parse_species_formula("unknown") is None
     assert parse_species_formula("kems-007") is None
     assert parse_species_formula("O2") == (("O", 2.0),)
