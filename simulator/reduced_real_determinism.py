@@ -3112,14 +3112,22 @@ def _pt1_row_admission(
     ) is not None
 
 
-def _pt1_cache_merge_identity(row: Mapping[str, Any]) -> tuple[Any, ...]:
-    return tuple(row[field] for field in _PT1_CACHE_MERGE_IDENTITY_FIELDS)
+def _pt1_cache_merge_identity(
+    row: Mapping[str, Any],
+    *,
+    require_capture_epoch_match: bool,
+) -> tuple[Any, ...]:
+    fields = _PT1_CACHE_MERGE_IDENTITY_FIELDS
+    if require_capture_epoch_match:
+        fields += ("created_at",)
+    return tuple(row[field] for field in fields)
 
 
 def _copy_pt1_equilibrium_rows(
     source_paths: Iterable[Path],
     target_path: Path,
     *,
+    require_capture_epoch_match: bool,
     key_hashes: Iterable[str] | None = None,
 ) -> dict[str, Any]:
     """Migrate the target, then merge source rows by destination column names."""
@@ -3209,8 +3217,12 @@ def _copy_pt1_equilibrium_rows(
 
             existing_admitted = planned_admission[key_hash]
             if existing_admitted and incoming_admitted:
-                if _pt1_cache_merge_identity(existing_row) != _pt1_cache_merge_identity(
-                    incoming_row
+                if _pt1_cache_merge_identity(
+                    existing_row,
+                    require_capture_epoch_match=require_capture_epoch_match,
+                ) != _pt1_cache_merge_identity(
+                    incoming_row,
+                    require_capture_epoch_match=require_capture_epoch_match,
                 ):
                     raise _PT1CacheMergeCollision(
                         f"PT-1 cache collision while merging {key_hash}"

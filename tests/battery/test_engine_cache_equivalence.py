@@ -43,7 +43,12 @@ class _FakeWorker:
 
     def call(self, request: Any, *, timeout_s: float) -> dict[str, Any]:
         self.calls += 1
-        return {"status": "ok", "refusal_reason": None, "result": 17}
+        return {
+            "status": "ok",
+            "refusal_reason": None,
+            "result": 17,
+            "law_disclosures": [],
+        }
 
 
 def test_isolated_cell_qualification_decoration_is_omitted_from_cache_key(

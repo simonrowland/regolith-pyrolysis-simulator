@@ -812,7 +812,9 @@ def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
     for row in rows:
         _validated_cache_payload_row(row)
-    result = _copy_pt1_equilibrium_rows([shard_path], target_path)
+    result = _copy_pt1_equilibrium_rows(
+        [shard_path], target_path, require_capture_epoch_match=False
+    )
     return {
         "merged": True,
         "source": "temporary_shard",

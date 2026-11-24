@@ -1123,6 +1123,7 @@ def _seed_cache_rows_from_base(
     _copy_pt1_equilibrium_rows(
         [base_cache],
         shard_db,
+        require_capture_epoch_match=True,
         key_hashes=seed_ids,
     )
     conn = sqlite3.connect(shard_db)

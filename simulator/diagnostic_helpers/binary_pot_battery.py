@@ -4735,12 +4735,8 @@ class _IsolatedCellWorker:
         )
 
         def solve() -> Any:
-            from simulator.vapour_rail.run_disclosure import (
-                accept_stored_memo,
-                active_registry,
-            )
+            from simulator.vapour_rail.run_disclosure import accept_stored_memo
 
-            scoped_run = active_registry() is not None
             with self._lock:
                 try:
                     result = self._worker.call(payload, timeout_s=timeout_s)
@@ -4788,17 +4784,6 @@ class _IsolatedCellWorker:
                 if not cacheable_refusal(result):
                     return result
             hot = EquilibrateCell.from_payload(result).to_hot()
-            if (
-                _engine_carries_disclosures(self.engine)
-                and scoped_run
-                and accepted_disclosures is None
-            ):
-                # Unknown child metadata cannot become a measured empty cache row.
-                if isinstance(hot, EngineCacheValue):
-                    return EngineCacheValue(
-                        hot.hot, hot.cold, cacheable=False
-                    )
-                return EngineCacheValue(hot, cacheable=False)
             return hot
 
         request = {

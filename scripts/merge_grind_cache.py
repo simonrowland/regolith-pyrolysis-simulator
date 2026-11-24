@@ -35,8 +35,10 @@ def main(argv: list[str]) -> int:
         for src in sources:
             rows = validate_cache_source_rows(src)
             source_rows.append((src, rows))
-        # Validate source content before the shared helper migrates either side.
-        result = _copy_pt1_equilibrium_rows(sources, target)
+        # Validate source content before the shared helper migrates the target.
+        result = _copy_pt1_equilibrium_rows(
+            sources, target, require_capture_epoch_match=False
+        )
     except (OSError, RuntimeError, sqlite3.Error, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2

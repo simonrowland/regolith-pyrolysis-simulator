@@ -2434,12 +2434,14 @@ def cached_engine_call(
                         (str(cold_path.resolve()),),
                     )
                     _check_cold_schema(connection)
+            connection.execute("BEGIN IMMEDIATE")
+            if stale_persistent_row is not None:
                 _delete_cached_rows(
                     connection,
                     has_cold,
                     [stale_persistent_row],
+                    manage_transaction=False,
                 )
-            connection.execute("BEGIN IMMEDIATE")
             inserted, conflict = _insert_cache_row_if_absent(
                 connection,
                 cache_key,
@@ -2926,12 +2928,14 @@ def _delete_cached_rows(
     has_cold: bool,
     pairs: list[tuple[str, int]],
     cold_delete: Callable[[sqlite3.Connection, list[tuple[str, int]]], None] | None = None,
+    *,
+    manage_transaction: bool = True,
 ) -> None:
     """Delete the HOT row and its species, then the COLD value.
 
-    Two commits. SQLite does not guarantee that one COMMIT updates both
-    a WAL database and an attached database: a crash can change one file
-    and leave the other. The HOT row is what a hit serves, so it commits
+    By default, two commits. SQLite does not guarantee that one COMMIT
+    updates both a WAL database and an attached database: a crash can change
+    one file and leave the other. The HOT row is what a hit serves, so it commits
     first. A crash between the commits leaves a COLD value with no HOT
     row. That value is not served. The caller sweeps it on this call when
     the paired delete commits, and on the next expire, prune, or drop
@@ -2941,12 +2945,14 @@ def _delete_cached_rows(
     seam for the paired delete. The orphan sweep does not use it, so a
     test that injects a failure there still leaves the orphan for the
     retry. An empty ``pairs`` list returns without writing; the caller
-    still sweeps.
+    still sweeps. With ``manage_transaction=False``, the caller must own an
+    active transaction; both deletes then remain in it.
     """
 
     if not pairs:
         return
-    connection.execute("BEGIN IMMEDIATE")
+    if manage_transaction:
+        connection.execute("BEGIN IMMEDIATE")
     try:
         connection.executemany(
             f"DELETE FROM {_SPECIES_TABLE} WHERE source_box=? AND row_seq=?",
@@ -2956,19 +2962,22 @@ def _delete_cached_rows(
             f"DELETE FROM {_TABLE} WHERE source_box=? AND row_seq=?",
             pairs,
         )
-        connection.commit()
+        if manage_transaction:
+            connection.commit()
     except BaseException:
         connection.rollback()
         raise
     if not has_cold:
         return
-    connection.execute("BEGIN IMMEDIATE")
+    if manage_transaction:
+        connection.execute("BEGIN IMMEDIATE")
     try:
         if cold_delete is None:
             _delete_cold_values(connection, pairs)
         else:
             cold_delete(connection, pairs)
-        connection.commit()
+        if manage_transaction:
+            connection.commit()
     except BaseException:
         connection.rollback()
         raise

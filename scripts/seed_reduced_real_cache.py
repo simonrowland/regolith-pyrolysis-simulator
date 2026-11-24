@@ -281,7 +281,9 @@ def merge_cache_source(
             "rows": len(rows),
             "inserted_rows": 0,
         }
-    result = _copy_pt1_equilibrium_rows([source], target)
+    result = _copy_pt1_equilibrium_rows(
+        [source], target, require_capture_epoch_match=True
+    )
     source_result = result["sources"][0]
     return {
         "merged": True,
@@ -336,6 +338,7 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
     merged = _copy_pt1_equilibrium_rows(
         [source for source, _rows in validated_sources],
         target,
+        require_capture_epoch_match=True,
     )
     merge_by_source = {
         Path(summary["source"]).resolve(): summary

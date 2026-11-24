@@ -1314,6 +1314,7 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
         "activities_standard_state": {"convention": "raoultian", "phase": "l"},
         "liquid_composition_wt_pct": {"SiO2": 51.0},
         "fe_redox_split": {"Fe3Fet": 0.1},
+        "law_disclosures": [],
     }
 
     class Worker:
@@ -1448,6 +1449,63 @@ def test_scoped_disclosure_miss_keeps_old_hot_species_and_cold_until_replace(
         assert connection.execute(
             "SELECT COUNT(*) FROM engine_values"
         ).fetchone()[0] == 0
+
+
+def test_scoped_replacement_insert_failure_preserves_old_hot_and_cold(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.engine_cache import EngineCacheValue
+    from simulator.vapour_rail import run_disclosure
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._MEMORY_CACHE.clear()
+    _engine_cache_counters(reset=True)
+    request = {"composition_wt_pct": {"SiO2": 50.0}}
+
+    assert engine_cache.cached_engine_call(
+        "alphamelts",
+        request,
+        lambda: EngineCacheValue(
+            {"answer": "unscoped"}, cold={"diagnostic": "retained"}
+        ),
+        disclosure_runtime=run_disclosure,
+    ) == {"answer": "unscoped"}
+    engine_cache._MEMORY_CACHE.clear()
+
+    def fail_insert(*_args, **_kwargs):
+        raise sqlite3.IntegrityError("replacement insert failed")
+
+    monkeypatch.setattr(engine_cache, "_insert_cache_row_if_absent", fail_insert)
+    with disclosure_scope(inherit=False):
+        assert engine_cache.cached_engine_call(
+            "alphamelts",
+            request,
+            lambda: EngineCacheValue({"answer": "replacement"}),
+            disclosure_runtime=run_disclosure,
+        ) == {"answer": "replacement"}
+
+    engine_cache._MEMORY_CACHE.clear()
+    assert engine_cache.cached_engine_call(
+        "alphamelts",
+        request,
+        lambda: pytest.fail("failed insert must preserve the old cache row"),
+        disclosure_runtime=run_disclosure,
+    ) == {"answer": "unscoped"}
+    with sqlite3.connect(database) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_outputs"
+        ).fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_output_species"
+        ).fetchone()[0] > 0
+    with sqlite3.connect(f"{database}.cold") as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_values"
+        ).fetchone()[0] == 1
 
 
 def test_equilibrium_cache_value_contains_only_scoring_inputs() -> None:

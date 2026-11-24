@@ -9145,6 +9145,71 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
     ] == os.getpid()
 
 
+def test_per_tick_gate_authority_matches_requested_buffer_offset_redox_state(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    state_a = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.1)
+    state_b = RedoxState.buffer_offset(FE_FEO_BUFFER_STANDARD, 0.2)
+    _set_freeze_gate_redox_state(sim, state_a)
+    curve = _freeze_gate_curve_fixture(sim, {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    })
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+        redox_state=state_a,
+    )
+    record['provider_outcome'] = GateCurveProviderOutcome.PRODUCED
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    sim._melt_redox_gate_authority_this_tick = record
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    matching_identity = MAGEMinDomainIdentity(
+        silica_verdict='in_band',
+        projection_threshold_verdict='clear',
+        certified_band=None,
+        refusal_reason=None,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_gate_current_pin_verdict',
+        lambda: (matching_identity, True),
+    )
+    sim._melt_redox_gate_authority_tick_verdict_identity = matching_identity
+    producer_calls = []
+    sim._freeze_gate_curve_from_gate_dispatch = (
+        lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (
+            producer_calls.append(redox_state)
+            or _freeze_gate_curve_with_outcome(sim, curve)
+        )
+    )
+
+    assert sim._establish_melt_redox_gate_authority_for_current_hour(
+        redox_state=state_a,
+    ) == curve
+    assert producer_calls == []
+
+    _set_freeze_gate_redox_state(sim, state_b)
+    assert sim._establish_melt_redox_gate_authority_for_current_hour(
+        redox_state=state_b,
+    ) == curve
+    assert producer_calls == [state_b]
+
+
 def test_core_gate_curve_memo_does_not_reuse_fallback_after_provider_unavailable(
     monkeypatch,
     vapor_pressure_data,

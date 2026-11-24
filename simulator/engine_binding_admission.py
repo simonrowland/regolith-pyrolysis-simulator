@@ -1038,6 +1038,20 @@ def gate_curve_memo_origin_matches(
         return False
     producer_evidence = origin.get("producer_evidence")
     provider_role = _gate_curve_provider_role(curve)
+    if producer_evidence == "unproven":
+        current = evidence or gate_curve_memo_evidence(
+            sim,
+            curve,
+            include_selected_bindings=True,
+        )
+        return (
+            _gate_curve_memo_evidence_is_locally_reusable(
+                sim,
+                current,
+                provider_role=provider_role,
+            )
+            and current.producer_evidence == producer_evidence
+        )
     if not _gate_curve_memo_evidence_can_support_reuse(
         sim,
         producer_evidence,
@@ -1072,16 +1086,18 @@ def gate_curve_memo_reuse_eligible(
     if not _is_cacheable_gate_curve(curve) or not isinstance(origin, Mapping):
         return False
     provider_role = _gate_curve_provider_role(curve)
-    stored_evidence_reusable = _gate_curve_memo_evidence_can_support_reuse(
-        sim,
-        origin.get("producer_evidence"),
-        provider_role=provider_role,
-    )
-    if not stored_evidence_reusable:
+    producer_evidence = origin.get("producer_evidence")
+    if producer_evidence != "unproven" and not (
+        _gate_curve_memo_evidence_can_support_reuse(
+            sim,
+            producer_evidence,
+            provider_role=provider_role,
+        )
+    ):
         return False
 
     current = evidence
-    if fresh_evidence:
+    if fresh_evidence or producer_evidence == "unproven":
         current = current or gate_curve_memo_evidence(
             sim,
             curve,
@@ -1144,10 +1160,16 @@ def _gate_curve_memo_evidence_is_locally_reusable(
 ) -> bool:
     return (
         _gate_curve_evidence_has_known_magemin_version(evidence)
-        and _gate_curve_memo_evidence_can_support_reuse(
-            sim,
-            evidence.producer_evidence,
-            provider_role=provider_role,
+        and (
+            (
+                evidence.producer_evidence == "unproven"
+                and evidence.eligible
+            )
+            or _gate_curve_memo_evidence_can_support_reuse(
+                sim,
+                evidence.producer_evidence,
+                provider_role=provider_role,
+            )
         )
     )
 
