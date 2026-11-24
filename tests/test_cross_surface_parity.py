@@ -156,6 +156,9 @@ def test_batch_cli_web_mol_ledger_parity(monkeypatch):
     assert batch.decisions == [
         ("PATH_AB", "A_staged"),
         ("BRANCH_ONE_TWO", "two"),
+        # Branch two's defined successor after C5 is reachable now (carrier
+        # 184ea10ad5).
+        ("C6_PROCEED", "yes"),
     ]
 
     campaigns = _campaigns(batch.summaries)
