@@ -642,6 +642,22 @@ def _format_store_delta_report(
                 new_match = _side_matches_cell(change["new"], candidates)
                 matched = "both" if old_match and new_match else "old" if old_match else "new" if new_match else "neither"
                 locator = _field_locator(row, source_row, field)
+                if mode == "scope":
+                    printed_cell = cell
+                    if isinstance(cell, dict) and "source_values" in cell:
+                        printed_cell = candidates if candidates else "<none>"
+                    basis_text = "source extract row; see locator and printed cell"
+                    decoded.append(" | ".join((
+                        source_id,
+                        json.dumps(locator, sort_keys=True, default=str),
+                        field,
+                        "old=" + json.dumps(change["old"], sort_keys=True, default=str),
+                        "new=" + json.dumps(change["new"], sort_keys=True, default=str),
+                        "printed_cell=" + json.dumps(printed_cell, sort_keys=True, default=str),
+                        "matched_side=" + matched,
+                        "basis=" + basis_text,
+                    )))
+                    continue
                 decoded.append(" | ".join((
                     source_id,
                     json.dumps(locator, sort_keys=True, default=str),
@@ -655,47 +671,57 @@ def _format_store_delta_report(
     for record in work:
         assert isinstance(record, dict)
         source_ids = list(map(str, record.get("source_ids", [])))
-        if mode == "source" and source_filter and not (source_filter & set(source_ids)):
-            continue
-        if mode == "scope" and source_filter and not any(
-            _source_in_report_filter(source_id, source_filter) for source_id in source_ids
-        ):
-            continue
-        source_id = next(iter(sorted(source_filter & set(source_ids))), source_ids[0] if source_ids else "__work_without_source_id__")
+        if mode == "scope":
+            report_source_ids = [
+                source_id
+                for source_id in source_ids
+                if not source_filter or _source_in_report_filter(source_id, source_filter)
+            ]
+            if not report_source_ids:
+                continue
+        else:
+            if mode == "source" and source_filter and not (source_filter & set(source_ids)):
+                continue
+            report_source_ids = [
+                next(iter(sorted(source_filter & set(source_ids))),
+                     source_ids[0] if source_ids else "__work_without_source_id__")
+            ]
         source_bytes = REPO_ROOT / str(record["path"])
         stored_bytes = source_bytes.read_bytes() if source_bytes.is_file() else b""
         work_doc = yaml.load(stored_bytes, Loader=_FAST_SAFE_YAML_LOADER) if stored_bytes else {}
         work_meta = work_doc.get("work", {}) if isinstance(work_doc, dict) else {}
         if mode == "scope" and not any(
             not _field_is_fold22_scope(str(change["field"]), change, source_id)
+            for source_id in report_source_ids
             for change in record.get("changes", [])
         ):
             continue
-        for change in record.get("changes", []):
-            if mode == "scope" and _field_is_fold22_scope(str(change["field"]), change, source_id):
-                continue
-            if mode == "scope":
+        for source_id in report_source_ids:
+            for change in record.get("changes", []):
+                if mode == "scope" and _field_is_fold22_scope(str(change["field"]), change, source_id):
+                    continue
+                if mode == "scope":
+                    decoded.append(" | ".join((
+                        source_id,
+                        "locator=null",
+                        str(change["field"]),
+                        "old=" + json.dumps(change["old"], sort_keys=True, default=str),
+                        "new=" + json.dumps(change["new"], sort_keys=True, default=str),
+                        "printed_cell=<none>",
+                        "matched_side=neither",
+                        "basis=work metadata; no measurement cell",
+                    )))
+                    continue
                 decoded.append(" | ".join((
                     source_id,
-                    "locator=null",
+                    json.dumps(work_meta.get("locator"), sort_keys=True, default=str),
                     str(change["field"]),
                     "old=" + json.dumps(change["old"], sort_keys=True, default=str),
                     "new=" + json.dumps(change["new"], sort_keys=True, default=str),
-                    "printed_cell=<none>",
+                    "printed_cell=" + json.dumps({"citation": work_meta.get("citation"), "locator": work_meta.get("locator")}, sort_keys=True, default=str),
                     "matched_side=neither",
-                    "basis=work metadata; no measurement cell",
+                    "basis=bibliographic/work metadata, not a measurement cell",
                 )))
-                continue
-            decoded.append(" | ".join((
-                source_id,
-                json.dumps(work_meta.get("locator"), sort_keys=True, default=str),
-                str(change["field"]),
-                "old=" + json.dumps(change["old"], sort_keys=True, default=str),
-                "new=" + json.dumps(change["new"], sort_keys=True, default=str),
-                "printed_cell=" + json.dumps({"citation": work_meta.get("citation"), "locator": work_meta.get("locator")}, sort_keys=True, default=str),
-                "matched_side=neither",
-                "basis=bibliographic/work metadata, not a measurement cell",
-            )))
     header = f"STORE DELTA {mode.upper()} changed_paths={details['changed_store_paths']} decoded_rows={len(decoded)}"
     return "\n".join([header, *decoded])
 
