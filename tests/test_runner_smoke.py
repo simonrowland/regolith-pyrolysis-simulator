@@ -2264,10 +2264,10 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
             allow_nan=False,
         ).encode("utf-8")
         assert canonical_hours == expected_hours
-        # The committed mars golden's per-hour summary. The condenser stack
-        # regenerated that fixture; this is its sha256, not a second run.
+        # b-1303 removes the skipped continuation notice and AlphaMELTS
+        # reference-pressure metadata from usable projected MAGEMin bounds.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "dc698b1407dd501052c9ca37b314cd670dcb49474fc084b5cdc3a3b4c612f8ba"
+            "05c25ea372c9b312074c1d8b4789c9154584ba78ba3fac0733ec20f4c4d9c97f"
         )
 
 
