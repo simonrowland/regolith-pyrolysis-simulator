@@ -464,8 +464,8 @@ summary:
   image_temperature_disagreement_count: 356
   image_temperature_grid_unconfirmed_count: 115
   ambiguity_count: 1659
-  correction_count: 102
-  image_verified_correction_count: 17
+  correction_count: 107
+  image_verified_correction_count: 19
   image_verified_locator_count: 3
 ambiguities:
 - record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
@@ -40777,3 +40777,66 @@ corrections:
   evidence: crop-verified PDF page 32 (folio 26), szomolnokite row
   image_quote: 'SZOMOLNOKITE FeSO4·H2O; ΔHf=-1243900 J/mol; uncertainty=500 J/mol'
   source_text_line: 644
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  source_text_line: 603
+  column: entropy_s298
+  as_published: ''
+  printed_token: ''
+  ocr_token: '1.55'
+  published_page: 25
+  pdf_page: 31
+  correction_provenance: image_read_reconstruction
+  action: value_withheld
+  evidence: 'crop-verified PDF page 31 (folio 25), hydromagnesite uncertainty row'
+  image_quote: 'HYDROMAGNESITE S°=503.67 ± 1.55 J/mol·K'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  source_text_line: 603
+  column: name_and_formula
+  ocr_token: '$SrHgO \cdot 4CO_{2} \cdot 5H_{2}O$'
+  printed_token: '$5MgO \cdot 4CO_{2} \cdot 5H_{2}O$'
+  published_page: 25
+  pdf_page: 31
+  correction_provenance: image_read_reconstruction
+  action: image_verified_correction
+  evidence: 'crop-verified PDF page 31 (folio 25), hydromagnesite formula row'
+  image_quote: 'HYDROMAGNESITE 5MgO·4CO2·5H2O'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  source_text_line: 605
+  column: entropy_s298
+  as_published: ''
+  printed_token: ''
+  ocr_token: '0.67'
+  published_page: 25
+  pdf_page: 31
+  correction_provenance: image_read_reconstruction
+  action: value_withheld
+  evidence: 'crop-verified PDF page 31 (folio 25), artinite uncertainty row'
+  image_quote: 'ARTINITE S°=232.92 ± 0.67 J/mol·K'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  source_text_line: 605
+  column: name_and_formula
+  ocr_token: '$Hg_{2}(OH)_{2}CO_{3} \cdot 3H_{2}O$'
+  printed_token: '$Mg_{2}(OH)_{2}CO_{3} \cdot 3H_{2}O$'
+  published_page: 25
+  pdf_page: 31
+  correction_provenance: image_read_reconstruction
+  action: image_verified_correction
+  evidence: 'crop-verified PDF page 31 (folio 25), artinite formula row'
+  image_quote: 'ARTINITE Mg2(OH)2CO3·3H2O'
+- record_id: robie-hemingway-fisher-1978-usgs-b1452-0003
+  census_id: thermodynamic-properties-at-298-15-k
+  source_text_line: 792
+  column: entropy_s298
+  as_published: ''
+  printed_token: ''
+  ocr_token: '2.51'
+  published_page: 29
+  pdf_page: 35
+  correction_provenance: image_read_reconstruction
+  action: value_withheld
+  evidence: 'crop-verified PDF page 35 (folio 29), analcime uncertainty row'
+  image_quote: 'ANALCIME S°=234.43 ± 2.51 J/mol·K'
