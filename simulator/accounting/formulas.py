@@ -298,6 +298,8 @@ def atoms_parse_formula_else_janaf(
     try:
         parsed = parse_formula(cleaned)
     except AccountingError:
+        if "." in cleaned or "·" in cleaned:
+            return None
         from simulator.reference_data.janaf import formula_composition
 
         return formula_composition(cleaned.replace(_DECIMAL_DOT_SENTINEL, "."))
@@ -647,6 +649,18 @@ def _has_empty_middle_dot_segment(formula: str) -> bool:
     )
 
 
+def _has_malformed_ascii_adduct(formula: str) -> bool:
+    for segment in formula.split("·"):
+        if segment.startswith(".") or segment.endswith(".") or ".." in segment:
+            return True
+        if re.search(r"\.0+$", segment):
+            return True
+        for unit in _ASCII_ADDUCT_UNITS_LONGEST_FIRST:
+            if re.search(rf"\.0+{re.escape(unit)}(?:$|\.)", segment):
+                return True
+    return False
+
+
 def _adduct_boundary(text: str, dot: int) -> int | None:
     """End index of one adduct unit that begins just after ``dot``.
 
@@ -737,9 +751,14 @@ def _split_formula_segments(formula: str) -> list[str]:
 
     if _has_empty_middle_dot_segment(formula):
         raise UnknownSpeciesError("formula has an empty middle-dot segment")
+    if _has_malformed_ascii_adduct(formula):
+        raise UnknownSpeciesError("formula has a malformed ASCII adduct")
 
     pieces: list[str] = []
     for part in formula.split("·"):
+        if re.match(r"^\d+\.\d+(?=[A-Z\[(])", part):
+            dot = part.index(".")
+            part = part[:dot] + _DECIMAL_DOT_SENTINEL + part[dot + 1 :]
         pieces.extend(_split_ascii_adducts(part))
     segments = [segment for segment in pieces if segment]
     if not segments:
@@ -748,13 +767,13 @@ def _split_formula_segments(formula: str) -> list[str]:
 
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:
-    match = re.match(r"(\d+/\d+|\d+(?:\.\d+)?)", segment)
+    match = re.match(r"(\d+/\d+|\d+(?:\.|\x00)\d+|\d+)", segment)
     if match is None:
         return 1.0, segment
     body = segment[match.end() :]
     if not body:
         raise UnknownSpeciesError(f"formula segment {segment!r} has no body")
-    number = match.group(0)
+    number = match.group(0).replace(_DECIMAL_DOT_SENTINEL, ".")
     if "/" in number:
         numerator, denominator = number.split("/", 1)
         if int(denominator) == 0:
