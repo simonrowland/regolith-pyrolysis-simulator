@@ -445,6 +445,31 @@ def load_extracts(root: Path) -> dict[str, dict]:
     return extracts
 
 
+def load_work_metadata(root: Path) -> dict[str, dict]:
+    """Load registered work citations for index rows without an extract or PDF."""
+    directory = root / "data/literature/works"
+    works = {}
+    if not directory.is_dir():
+        return works
+    for path in sorted(directory.glob("*.yaml")):
+        doc = load_yaml(path)
+        if not isinstance(doc, dict) or doc.get("schema_version") != "battery_work.v2.1":
+            continue
+        work = doc.get("work") or {}
+        if not isinstance(work, dict):
+            continue
+        source_files = work.get("source_files")
+        if not isinstance(source_files, dict) or source_files.get("files") != []:
+            continue
+        for source_id in work.get("source_ids") or []:
+            if not isinstance(source_id, str) or not source_id:
+                continue
+            metadata = works.setdefault(source_id, {"citation": None, "doi": None})
+            metadata["citation"] = metadata["citation"] or work.get("citation")
+            metadata["doi"] = metadata["doi"] or work.get("doi")
+    return works
+
+
 def load_source_aliases(root: Path, extract_ids: set[str]) -> dict[str, dict[str, str]]:
     """Load explicit source coverage declarations and refuse dangling targets."""
     path = root / "data/literature/source_aliases.yaml"
@@ -892,6 +917,7 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         except OSError:
             pass
     extracts, pdfs = load_extracts(root), load_pdfs(root)
+    work_metadata = load_work_metadata(root)
     measurements, presets = load_consumers(root)
     access_path = root / "data/literature/compilations/access-status.yaml"
     compilations = load_yaml(access_path) if access_path.is_file() else {}
@@ -916,7 +942,11 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         for stem in pdfs:
             if stem == extract_id or extract_id == f"kems-{stem}":
                 attached.setdefault(extract_id, stem)
-    source_ids = sorted(set(extracts) | {stem for stem in pdfs if stem not in extracts and stem not in attached.values()})
+    source_ids = sorted(
+        set(extracts)
+        | {stem for stem in pdfs if stem not in extracts and stem not in attached.values()}
+        | set(work_metadata)
+    )
     battery_path = root / "scripts/calibration_battery.py"
     quoted = set(re.findall(r"[\"']([^\"']+)[\"']", battery_path.read_text())) if battery_path.is_file() else set()
     rows = []
@@ -925,6 +955,10 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         pdf_stem = attached.get(source_id) or (source_id if source_id in pdfs else None)
         pdf = pdfs.get(pdf_stem) if pdf_stem else None
         src = dict(((extract or {}).get("doc") or {}).get("source") or {})
+        metadata = work_metadata.get(source_id) or {}
+        for key in ("citation", "doi"):
+            if not src.get(key):
+                src[key] = metadata.get(key)
         if pdf and pdf.get("sidecar"):
             for key in ("citation", "doi"):
                 if not src.get(key):

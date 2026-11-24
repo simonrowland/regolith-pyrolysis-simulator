@@ -9,7 +9,7 @@ scan:
   - hunt_ids column empty; --hunt-json not provided
   corpus_root: /Users/simonrowland/Repos/regolith-corpus
 counts:
-  sources: 861
+  sources: 869
   extracts: 854
   pdfs_present_in_worktree: 0
   extracts_with_private_locators: 88
@@ -4064,7 +4064,11 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/barin-1989.md
-  sidecar_missing_fields: [doi, license_or_oa_basis, sha256, retrieved_date]
+  sidecar_missing_fields:
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
   access_status: unknown
   extracts: []
   battery_datasets: []
@@ -6373,6 +6377,60 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: brisi-abbattista-1960
+  aliases: []
+  citation: Brisi & Abbattista (1960), Ann. Chim. (Rome) 50, 165–169.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/brisi-abbattista-1960/brisi-abbattista-1960.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/brisi-abbattista-1960/sidecar.yaml
+      present: false
+    text:
+      path: text/brisi-abbattista-1960
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/brisi-abbattista-1960
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/brisi-abbattista-1960.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/brisi-abbattista-1960.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: britt-2019-asteroid-simulants
   aliases: []
   citation: Britt, D. T., Cannon, K. M., Donaldson Hanna, K., Hogancamp, J., Poch, O., Beck, P., Martin,
@@ -10702,6 +10760,60 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: fields-1972
+  aliases: []
+  citation: Fields et al. (1972), J. Am. Ceram. Soc. 55(12), 585–588.
+  doi: 10.1111/j.1151-2916.1972.tb13448.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1972.tb13448.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/fields-1972/fields-1972.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/fields-1972/sidecar.yaml
+      present: false
+    text:
+      path: text/fields-1972
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/fields-1972
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/fields-1972.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/fields-1972.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: filiberto-lpsc2011-2064-volatiles
   aliases: []
   citation: 'Filiberto, J., Treiman, A. H. & Dasgupta, R. (2011), "Comparing the effects of H2O, F, and
@@ -11876,6 +11988,61 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: ganits-1979
+  aliases: []
+  citation: Ganits et al. (1979), SrO–Al2O3 fusion markers; cited via Ye et al. (2007), Table 4. Full
+    bibliographic details unknown.
+  doi: null
+  report_number: null
+  identifier: null
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ganits-1979/ganits-1979.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ganits-1979/sidecar.yaml
+      present: false
+    text:
+      path: text/ganits-1979
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ganits-1979
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ganits-1979.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ganits-1979.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: gca-366-210-berry-2024
   aliases: []
   citation: Berry, A.J., Doyle, P.M., Schofield, P.F., Miller, L.A., Le Losq, C., Burnham, A.D., & Mosselmans,
@@ -13922,6 +14089,114 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: huntelaar-1992-j-chem-thermodyn
+  aliases: []
+  citation: Huntelaar et al. (1992), J. Chem. Thermodyn. 24(2), 139–143.
+  doi: 10.1016/S0021-9614(05)80042-4
+  report_number: null
+  identifier: 10.1016/S0021-9614(05)80042-4
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/huntelaar-1992-j-chem-thermodyn/huntelaar-1992-j-chem-thermodyn.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/huntelaar-1992-j-chem-thermodyn/sidecar.yaml
+      present: false
+    text:
+      path: text/huntelaar-1992-j-chem-thermodyn
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/huntelaar-1992-j-chem-thermodyn
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/huntelaar-1992-j-chem-thermodyn.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/huntelaar-1992-j-chem-thermodyn.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
+- source_id: huntelaar-1992-j-phys-chem-solids
+  aliases: []
+  citation: Huntelaar et al. (1992), J. Phys. Chem. Solids 53(6), 805–806, Tables 4–5.
+  doi: 10.1016/0022-3697(92)90193-H
+  report_number: null
+  identifier: 10.1016/0022-3697(92)90193-H
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/huntelaar-1992-j-phys-chem-solids/huntelaar-1992-j-phys-chem-solids.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/huntelaar-1992-j-phys-chem-solids/sidecar.yaml
+      present: false
+    text:
+      path: text/huntelaar-1992-j-phys-chem-solids
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/huntelaar-1992-j-phys-chem-solids
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/huntelaar-1992-j-phys-chem-solids.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/huntelaar-1992-j-phys-chem-solids.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: iapws-95-psat-liquid
   aliases: []
   citation: 'Wagner, W. & Pruß, A. (2002), "The IAPWS Formulation 1995 for the Thermodynamic Properties
@@ -15043,7 +15318,11 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-nio-thermo.md
-  sidecar_missing_fields: [doi, license_or_oa_basis, sha256, retrieved_date]
+  sidecar_missing_fields:
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
   access_status: unknown
   extracts: []
   battery_datasets: []
@@ -15092,7 +15371,11 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/ivtan-zno-thermo.md
-  sidecar_missing_fields: [doi, license_or_oa_basis, sha256, retrieved_date]
+  sidecar_missing_fields:
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
   access_status: unknown
   extracts: []
   battery_datasets: []
@@ -15246,6 +15529,60 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: jacob-shreyas-2018
+  aliases: []
+  citation: Jacob & Shreyas (2018), J. Mater. Sci. 53, 1723–1730.
+  doi: 10.1007/s10853-017-1634-0
+  report_number: null
+  identifier: 10.1007/s10853-017-1634-0
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/jacob-shreyas-2018/jacob-shreyas-2018.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/jacob-shreyas-2018/sidecar.yaml
+      present: false
+    text:
+      path: text/jacob-shreyas-2018
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/jacob-shreyas-2018
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/jacob-shreyas-2018.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/jacob-shreyas-2018.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: jacobson-1989-metal-oxide-zirconia
   aliases: []
   citation: Jacobson, N. S. (1989). Thermodynamic Properties of Some Metal Oxide-Zirconia Systems. NASA
@@ -34680,6 +35017,60 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: richet-bottinga-tequi-1984
+  aliases: []
+  citation: Richet, Bottinga & Tequi (1984), J. Am. Ceram. Soc. 67, C-6–C-8.
+  doi: 10.1111/j.1151-2916.1984.tb19155.x
+  report_number: null
+  identifier: 10.1111/j.1151-2916.1984.tb19155.x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/richet-bottinga-tequi-1984/richet-bottinga-tequi-1984.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/richet-bottinga-tequi-1984/sidecar.yaml
+      present: false
+    text:
+      path: text/richet-bottinga-tequi-1984
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/richet-bottinga-tequi-1984
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/richet-bottinga-tequi-1984.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/richet-bottinga-tequi-1984.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: richter-2008-cai-like-liquids-lpsc-abstract
   aliases: []
   citation: Richter, F. M., Teng, F.-Z., Mendybaev, R. A., Davis, A. M. and Georg, R. B. (2008). Elemental
@@ -34985,7 +35376,10 @@ sources:
   pdf_sha256: null
   pdf_tracked: null
   sidecar_path: docs/references/pdfs/02-thermochemistry/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.md
-  sidecar_missing_fields: [license_or_oa_basis, sha256, retrieved_date]
+  sidecar_missing_fields:
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
   access_status: unknown
   extracts: []
   battery_datasets: []
@@ -50988,6 +51382,60 @@ sources:
       last_stage: null
       date: null
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: ye-2007
+  aliases: []
+  citation: Ye et al. (2007), J. Phase Equilib. Diffus. 28(4), 362–368.
+  doi: 10.1007/s11669-007-9086-x
+  report_number: null
+  identifier: 10.1007/s11669-007-9086-x
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/ye-2007/ye-2007.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/ye-2007/sidecar.yaml
+      present: false
+    text:
+      path: text/ye-2007
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/ye-2007
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/ye-2007.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/ye-2007.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: yokokawa-1984-alumina-carbon-volatilization
   aliases: []
   citation: Yokokawa H., Fujishige M., Ujiie S., Kameyama T., Dokiya M. and Fukuda K. (1984). Volatilization
