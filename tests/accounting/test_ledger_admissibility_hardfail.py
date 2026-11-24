@@ -307,6 +307,39 @@ def test_kernel_proposal_lot_round_trips_the_retained_species_amount() -> None:
     }
 
 
+def test_kernel_proposal_drops_species_whose_mass_underflows() -> None:
+    """SiO2 at 3.5e-323 mol has kg 0.0. 1e-30 mol of SiO2 does not."""
+
+    ledger = AtomLedger()
+    account = "process.wall_deposit_segment_stage_2_to_stage_4_bypass"
+    dust = _build_lots(
+        {account: {"SiO2": 3.5e-323}},
+        ledger.registry,
+        kind="credit",
+    )
+    assert dust == []
+
+    posted = _build_lots(
+        {account: {"SiO2": 1e-30}},
+        ledger.registry,
+        kind="credit",
+    )
+    assert len(posted) == 1
+    assert posted[0].species_kg["SiO2"] != 0.0
+    assert posted[0].species_moles_for(ledger.registry) == {"SiO2": 1e-30}
+
+    mixed = _build_lots(
+        {account: {"SiO2": 3.5e-323, "Fe": 1e-30}},
+        ledger.registry,
+        kind="credit",
+    )
+    assert len(mixed) == 1
+    assert "SiO2" not in mixed[0].species_kg
+    assert "SiO2" not in mixed[0].species_moles_for(ledger.registry)
+    assert mixed[0].species_kg["Fe"] != 0.0
+    assert mixed[0].species_moles_for(ledger.registry) == {"Fe": 1e-30}
+
+
 def test_gross_flow_records_the_retained_species_amount() -> None:
     ledger = AtomLedger()
     account = "process.overhead_gas"

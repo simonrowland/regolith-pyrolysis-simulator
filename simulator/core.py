@@ -659,6 +659,7 @@ from simulator.fe_redox import (
     normalize_redox_state,
 )
 from simulator.metal_saturation_floor import (
+    _FLOOR_BIND_TOLERANCE_DEX,
     activities_for_metal_saturation_floor,
     apply_melt_metal_saturation_floor,
     melt_metal_saturation_floor_log10_fO2_bar,
@@ -6024,16 +6025,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             _RESOLVE_MELT_REDOX_GATE_AUTHORITY
         ),
     ) -> None:
+        # Temperature shift only. The metal-saturation floor is the
+        # published end state. Writing it here hides a below-line deficit
+        # before native Fe can precipitate and book the oxygen that
+        # returns the melt to the line.
         fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
             temperature_K,
             gate_authority=gate_authority,
         )
-        floor_T_K = (
-            float(temperature_K)
-            if temperature_K is not None
-            else float(self.melt.temperature_C) + 273.15
-        )
-        fO2_log = self._floor_published_melt_fO2_log(fO2_log, floor_T_K)
         reservoir = self.melt.oxygen_reservoir
         reservoir.melt_intrinsic_fO2_log = fO2_log
         reservoir.reference_T_K = reference_T_K
@@ -6419,6 +6418,54 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         )
         return melt_mol_fractions_for_kress91(comp_wt)
 
+    def _ledger_consistent_melt_fO2_and_floor(
+        self,
+        T_K: float,
+    ) -> tuple[float, float | None, str]:
+        """Unfloored ledger fO2, the metal floor, and the path that chose them.
+
+        ``mode`` is ``no_iron``, ``passthrough``, ``snap``, or ``inverse``.
+        Does not write the reservoir and does not emit the floor notice.
+        ``_ledger_consistent_melt_fO2_log`` is the publisher. The native-Fe
+        extent reads this pair so a deficit the floor would hide stays
+        visible. ``no_iron`` and ``snap`` have no finite Kress inverse;
+        their unfloored value is the current reservoir log. ``inverse``
+        is the Kress inverse of q before the floor.
+        """
+
+        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
+        _feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
+        total_fe_mol = feot_equivalent_moles(melt_mol)
+        current = self._current_melt_redox_fO2_log()
+        if total_fe_mol <= 0.0:
+            return current, None, 'no_iron'
+        floor, _metal = melt_metal_saturation_floor_log10_fO2_bar(
+            float(T_K),
+            self._melt_metal_saturation_activities(float(T_K)),
+        )
+        if floor is None:
+            return current, None, 'passthrough'
+        ferric_fraction = (2.0 * fe2o3_mol) / total_fe_mol
+        if ferric_fraction <= 0.0 or ferric_fraction >= 1.0:
+            return current, float(floor), 'snap'
+        fractions = melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct())
+        if not fractions:
+            return current, float(floor), 'snap'
+        pressure_bar = floor_vacuum_pressure_bar(
+            float(self.melt.p_total_mbar) / 1000.0,
+            floor_bar=self._vacuum_floor_bar(),
+        )
+        try:
+            inverse = kress91_log10_fO2_from_fe3_over_sigma_fe(
+                fe3_over_sigma_fe=ferric_fraction,
+                mol_fractions=fractions,
+                T_K=float(T_K),
+                pressure_bar=pressure_bar,
+            )
+        except Kress91InvalidControls:
+            return current, float(floor), 'snap'
+        return float(inverse), float(floor), 'inverse'
+
     def _ledger_consistent_melt_fO2_log(self, T_K: float) -> float:
         """Published melt fO2 from the ledger Fe3+/ΣFe, floored at metal saturation.
 
@@ -6463,61 +6510,35 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         pure Si line is -24.112, and it binds once a_FeO is about 1e-6.
         """
 
-        melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
-        _feo_mol, fe2o3_mol = iron_oxide_values(melt_mol)
-        total_fe_mol = feot_equivalent_moles(melt_mol)
+        unfloored, floor, mode = self._ledger_consistent_melt_fO2_and_floor(
+            T_K,
+        )
         activities = self._melt_metal_saturation_activities(float(T_K))
-        current = self._current_melt_redox_fO2_log()
-        if total_fe_mol <= 0.0:
+        if mode == 'no_iron':
             floored, notice = apply_melt_metal_saturation_floor(
-                current,
+                unfloored,
                 float(T_K),
                 activities,
             )
             self._note_melt_metal_saturation_floor(notice)
             return floored
-        floor, _metal = melt_metal_saturation_floor_log10_fO2_bar(
-            float(T_K),
-            activities,
-        )
-        if floor is None:
-            return current
+        if mode == 'passthrough' or floor is None:
+            return unfloored
         ceiling = self._melt_redox_fO2_upper_bound_log()
-        ferric_fraction = (2.0 * fe2o3_mol) / total_fe_mol
-
-        def _snap_to_floor() -> float:
+        if mode == 'snap':
             # q is undefined. An Fe-bearing melt still publishes the
             # floor (d-463), which may be below the current fO2. The
             # notice is only the lower-bound bind, when current is
             # below that floor.
             _raised, notice = apply_melt_metal_saturation_floor(
-                current,
+                unfloored,
                 float(T_K),
                 activities,
             )
             self._note_melt_metal_saturation_floor(notice)
             return min(floor, ceiling)
-
-        if ferric_fraction <= 0.0 or ferric_fraction >= 1.0:
-            return _snap_to_floor()
-        fractions = melt_mol_fractions_for_kress91(self._melt_oxide_wt_pct())
-        if not fractions:
-            return _snap_to_floor()
-        pressure_bar = floor_vacuum_pressure_bar(
-            float(self.melt.p_total_mbar) / 1000.0,
-            floor_bar=self._vacuum_floor_bar(),
-        )
-        try:
-            inverse = kress91_log10_fO2_from_fe3_over_sigma_fe(
-                fe3_over_sigma_fe=ferric_fraction,
-                mol_fractions=fractions,
-                T_K=float(T_K),
-                pressure_bar=pressure_bar,
-            )
-        except Kress91InvalidControls:
-            return _snap_to_floor()
         floored, notice = apply_melt_metal_saturation_floor(
-            float(inverse),
+            unfloored,
             float(T_K),
             activities,
         )
@@ -7012,6 +7033,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 # The tangent is a predictor. A reducing step with no
                 # ferric left walks through the Fe line. The published
                 # value stops at metal saturation (Si once a_FeO is gone).
+                # The base above was not pre-floored, so this raise is
+                # only a shortfall. It does not add the climb again.
                 published_fO2_log = self._floor_published_melt_fO2_log(
                     candidate_fO2_log,
                     T_K,
@@ -7048,6 +7071,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             T_K=T_K,
             base_fO2_log=base_fO2_log,
         )
+        if skip_reason:
+            # The tangent path floors its own landing. A skip never
+            # reaches that line, and re-reference no longer floors, so
+            # the published state would otherwise keep a sentinel below
+            # the metal line. Raise only. applied_delta_ln stays 0: the
+            # term was not integrated, and the climb is not booked twice.
+            published_fO2_log = self._floor_published_melt_fO2_log(
+                float(reservoir.melt_intrinsic_fO2_log),
+                T_K,
+            )
+            if published_fO2_log != float(reservoir.melt_intrinsic_fO2_log):
+                reservoir.melt_intrinsic_fO2_log = (
+                    self._finite_oxygen_reservoir_fO2_log(
+                        published_fO2_log,
+                        context='redox_source_terms',
+                        source_terms_mol_o2_equiv=terms,
+                        net_o2_equiv_mol=net_o2_equiv_mol,
+                        melt_redox_capacity_mol_per_ln_fO2=C_m,
+                        candidate_fO2_log=published_fO2_log,
+                    )
+                )
         if terms:
             if skip_reason:
                 self._accumulate_redox_source_terms_for_hour(
@@ -8135,11 +8179,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # the credit above: y_O2 * P_total from the overhead inventory.
         # Solve dn against that target so the ledger move and the
         # potential stay paired. The melt is not driven by the
-        # effervescence bound. The published fO2 does not go below
-        # condensed-metal saturation. While FeO remains that is the
-        # wüstite line; once a_FeO is gone the next couple binds. The
-        # ledger publisher applies it once the ferric cap closes the
-        # tangent, and the write below applies the same lower bound.
+        # effervescence bound. This landing is not raised to the
+        # metal line. Native Fe precipitation, later in the hour,
+        # books the oxygen that returns a below-line melt, and the
+        # publication floor runs after that split.
         if not math.isfinite(log_drive_pO2) or log_drive_pO2 <= 0.0:
             raise AccountingError(
                 'oxygen reservoir exchange requires finite positive drive pO2; '
@@ -8244,15 +8287,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 apply_pressure_ceiling=False,
             )
         )
-        published_fO2_log = self._floor_published_melt_fO2_log(
-            candidate_fO2_log,
-            T_K,
-        )
-        applied_delta_ln = (
-            published_fO2_log - base_fO2_log
-        ) * math.log(10.0)
         reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
-            published_fO2_log,
+            candidate_fO2_log,
             context='oxygen_reservoir_exchange',
             melt_redox_capacity_mol_per_ln_fO2=C_m,
             delta_ln_fO2=applied_delta_ln,
@@ -9586,10 +9622,38 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
 
-        self._re_reference_melt_fO2_to_temperature(
+        # Extent reads the unfloored ledger. Flooring first puts the
+        # couple on its own boundary, native_fe_frac is 0, and no Fe
+        # or oxygen is booked. An invertible q below the floor is that
+        # ledger state, already at T_K, so it is not temperature-shifted
+        # again. q = 0 has no finite inverse; the deficit then lives in
+        # the temperature-referenced reservoir. Do not take the min of
+        # the two: a stale reservoir below a ledger already on the line
+        # would precipitate Fe the ledger does not require.
+        temp_fO2, reference_T_K = self._melt_fO2_reference_state_at_temperature(
             T_K,
             gate_authority=gate_authority,
         )
+        unfloored, floor_log, mode = (
+            self._ledger_consistent_melt_fO2_and_floor(T_K)
+        )
+        if (
+            mode == 'inverse'
+            and floor_log is not None
+            and unfloored + _FLOOR_BIND_TOLERANCE_DEX < floor_log
+        ):
+            extent_fO2 = unfloored
+            reference_T_K = T_K
+        else:
+            extent_fO2 = temp_fO2
+        reservoir = self.melt.oxygen_reservoir
+        reservoir.melt_intrinsic_fO2_log = self._finite_oxygen_reservoir_fO2_log(
+            extent_fO2,
+            context='native_fe_saturation_extent',
+            candidate_fO2_log=extent_fO2,
+        )
+        reservoir.reference_T_K = reference_T_K
+        self._sync_oxygen_reservoir_mirror()
         native_extent = self._compute_native_fe_saturation_extent()
         split = self._compute_fe_redox_split_diagnostic()
         native_frac = max(
@@ -9616,6 +9680,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 native_fe_source_account = 'process.metal_phase'
                 native_fe_intent = ChemistryIntent.NATIVE_FE_METALLIC_TAP
         if native_fe_mol <= 1.0e-12:
+            # Nothing precipitated. Publish the ledger fO2 (snap, floor,
+            # and effervescence ceiling). A raise-only floor would leave
+            # a q = 0 melt above the line that the pre-split respeciation
+            # used to snap down. The reference temperature is the one the
+            # extent already stored.
+            published_fO2_log = self._ledger_consistent_melt_fO2_log(T_K)
+            self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = (
+                self._finite_oxygen_reservoir_fO2_log(
+                    published_fO2_log,
+                    context='native_fe_saturation_no_inventory',
+                    candidate_fO2_log=published_fO2_log,
+                )
+            )
+            self._sync_oxygen_reservoir_mirror()
             event = {
                 'native_fe_event': 'no_native_fe_below_threshold',
                 'native_fe_event_reason': 'native_fe_inventory_below_threshold',
@@ -9783,6 +9861,23 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             gate_authority=gate_authority,
             honor_ferric_exhaustion=False,
         )
+        # FeO(l) = Fe(metal) + 1/2 O2.
+        # Premise: one mole of FeO leaving the melt releases 1/2 mol O2
+        # and removes 1 mol of O from the melt, so
+        #   Δn_O(melt) = -n_FeO = -2 n_O2.
+        # The fO2 climb that books that oxygen is the local tangent
+        #   Δln fO2 = n_O2 / C_m,
+        # and the O2 that reaches the onset from this same base is
+        #   n_O2,needed = C_m * (target - base) * ln(10).
+        # Units: C_m is mol per ln(fO2); (target - base) is dex; times
+        # ln(10) converts dex to a natural log and yields mol O2.
+        # Limit: base == target ⇒ needed = 0, and no credit is booked.
+        # The credit and the tangent in the redox-source call both start
+        # at base_fO2_log (the unfloored extent). The metal floor applies
+        # only to that tangent's landing, so the floor-to-base gap is not
+        # added on top of a base that was already raised. Oxygen released
+        # by the precipitation is the melt's O-inventory change and
+        # nothing more.
         needed_o2_equiv_mol = max(
             0.0,
             C_m * (target_fO2_log - base_fO2_log) * math.log(10.0),
@@ -17273,8 +17368,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         3. Apply passive oxygen-reservoir exchange from carried-in headspace
         4. Apply configured O2 bubbler redox source/pass-through
         5. Commit C3/MRE/C6/C7 source-producing reactions
-        6. Repartition FeO/Fe2O3 from the post-source redox state
-        7. Apply native-Fe split from the re-speciated melt state
+        6. Repartition FeO/Fe2O3 from the post-source redox state.
+           The reservoir is left unfloored.
+        7. Apply native-Fe split from that unfloored ledger fO2.
+           The metal-saturation floor is the publication after it.
         8. Refresh thermodynamic equilibrium (via melt backend)
         9. Calculate evaporation flux and route it through condensation
         10. Repartition any evaporation-induced FeO/Fe2O3 redox shift
@@ -17407,7 +17504,11 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._step_c7_ca_aluminothermic()
 
         evaporation_campaign = self.melt.campaign in EVAPORATION_ROUTE_PHASES
-        self._apply_fe_redox_respeciation()
+        # Move the ledger onto the unfloored control. Publishing here
+        # would snap q ≈ 0 up to the metal line and the split would
+        # see native_fe_frac = 0. The split publishes when nothing
+        # precipitates; the post-evaporation respeciation still publishes.
+        self._apply_fe_redox_respeciation(update_reservoir_state=False)
         self._apply_native_fe_saturation_split(sample_time_h=sample_time_h)
         self._refresh_oxygen_reservoir_transport_pO2_for_vapor()
 
