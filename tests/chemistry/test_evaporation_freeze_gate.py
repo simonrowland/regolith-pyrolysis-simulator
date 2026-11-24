@@ -6338,12 +6338,9 @@ def test_gate_memo_origin_keeps_producer_dependency_vector(
     assert set(record['origin']['producer_configuration']) == {
         'namespace_id',
         'vapor_pressure_provider_selection',
-        'sulfur_side',
         'model',
     }
-    assert set(
-        record['origin']['producer_configuration']['sulfur_side']
-    ) == {'sulfsat_available', 'sulfsat_provider_selection'}
+    assert 'sulfur_side' not in record['origin']['producer_configuration']
     assert set(record['origin']['producer_configuration']['model']) == {
         'model',
         'mode',
