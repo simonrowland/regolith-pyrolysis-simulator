@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+import simulator.fe_redox as fe_redox_module
 from simulator.fe_redox import (
     kress91_fe3_over_sigma_fe,
     kress91_ln_fO2_temperature_delta,
@@ -113,3 +114,19 @@ def test_kress91_pressure_rebase_is_zero_at_the_one_bar_reference() -> None:
             target_pressure_bar=1.0,
         )
         assert value.hex() == "-0x0.0p+0"
+
+
+def test_mutating_shared_pressure_owner_breaks_both_consumer_pins(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    original = fe_redox_module._kress91_pressure_terms
+
+    def perturbed(T_K: float, pressure_pa: float) -> tuple[float, float, float]:
+        first, second, third = original(T_K, pressure_pa)
+        return first * 1.01, second, third
+
+    monkeypatch.setattr(fe_redox_module, "_kress91_pressure_terms", perturbed)
+    with pytest.raises(AssertionError):
+        test_kress91_forward_pressure_path_stays_bit_identical()
+    with pytest.raises(AssertionError):
+        test_kress91_temperature_rebase_pressure_path_stays_bit_identical()

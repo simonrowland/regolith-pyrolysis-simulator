@@ -233,12 +233,52 @@ def _kress91_temperature_pressure_term(
             f'value or None, got {pressure_bar!r}'
         )
     p_pa = max(p_bar, 1.0e-9) * PA_PER_BAR
+    pressure_terms = _kress91_pressure_terms(float(T_K), p_pa)
+    term += pressure_terms[0]
+    term += pressure_terms[1]
+    term += pressure_terms[2]
+    return term
+
+
+def _kress91_pressure_terms(
+    T_K: float,
+    pressure_pa: float,
+) -> tuple[float, float, float]:
+    """Return Kress91's three pressure addends in their historical order.
+
+    Premise: at fixed melt composition and oxygen fugacity, the fitted
+    Fe2O3/FeO relation carries pressure through the pressure integral of the
+    redox reaction's volume difference. In Kress & Carmichael (1991)'s
+    coefficient convention, ``e`` represents ``-ΔCp/R`` (ΔCp in
+    J mol⁻¹ K⁻¹), ``f`` represents ``-ΔV/R`` (ΔV in m³ mol⁻¹), ``g``
+    represents ``-(dV/dT)/R`` (dV/dT in m³ mol⁻¹ K⁻¹), and ``h`` represents
+    ``-(1/2)(dV/dP)/R`` (dV/dP in m³ mol⁻¹ Pa⁻¹). Their fitted units are
+    respectively K Pa⁻¹, Pa⁻¹, and K Pa⁻² for f, g, and h.
+    ``R`` is ``GAS_CONSTANT`` in J mol⁻¹ K⁻¹; these mappings therefore give
+    ΔCp in J mol⁻¹ K⁻¹ and the volume derivatives in the stated SI units.
+
+    The temperature fit uses ``ΔG_T = ΔCp*((T-T0) -
+    T*ln(T/T0))``. The pressure derivation is ``ΔG_P = ΔV*ΔP +
+    (dV/dT)*(T-T0)*ΔP + 0.5*(dV/dP)*ΔP²`` and
+    ``Δln(ratio) = -ΔG/(R*T)``. With
+    ``T0 = 1673 K`` and pressure in Pa, the fitted absolute-pressure
+    addends in the dimensionless log ratio are ``f*P/T +
+    g*(T-T0)*P/T + h*P²/T``. Each product is dimensionless: the coefficient
+    units cancel Pa and K exactly. A temperature rebasing
+    subtracts the reference endpoint's fitted terms, so the incremental
+    pressure contribution is zero when target and reference are both at the
+    1-bar reference. The absolute fitted addends below are retained for
+    parity with the established forward relation.
+
+    The tuple keeps each historical addend separate so both callers perform
+    the same left-to-right floating-point additions as before consolidation.
+    """
+
     return (
-        term
-        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / float(T_K))
-        + KRESS91_PRESSURE_D_T_COEFFICIENT
-        * (((float(T_K) - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / float(T_K))
-        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / float(T_K))
+        KRESS91_PRESSURE_INV_T_COEFFICIENT * (pressure_pa / float(T_K)),
+        KRESS91_PRESSURE_D_T_COEFFICIENT
+        * (((float(T_K) - KRESS91_NONLINEAR_REFERENCE_T_K) * pressure_pa) / float(T_K)),
+        KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((pressure_pa ** 2.0) / float(T_K)),
     )
 
 
@@ -896,6 +936,7 @@ def _kress91_ln_ratio(
         fo2_term = KRESS91_LN_FO2_COEFFICIENT * float(fO2_log) * math.log(10.0)
     x = mol_fractions
     p_pa = max(float(pressure_bar), 1.0e-9) * PA_PER_BAR
+    pressure_terms = _kress91_pressure_terms(T_K, p_pa)
     return (
         fo2_term
         + KRESS91_INV_T_COEFFICIENT_K / float(T_K)
@@ -910,11 +951,9 @@ def _kress91_ln_ratio(
             - (KRESS91_NONLINEAR_REFERENCE_T_K / T_K)
             - math.log(T_K / KRESS91_NONLINEAR_REFERENCE_T_K)
         )
-        + KRESS91_PRESSURE_INV_T_COEFFICIENT * (p_pa / T_K)
-        + KRESS91_PRESSURE_D_T_COEFFICIENT * (
-            ((T_K - KRESS91_NONLINEAR_REFERENCE_T_K) * p_pa) / T_K
-        )
-        + KRESS91_PRESSURE_SQUARED_COEFFICIENT * ((p_pa ** 2.0) / T_K)
+        + pressure_terms[0]
+        + pressure_terms[1]
+        + pressure_terms[2]
     )
 
 
