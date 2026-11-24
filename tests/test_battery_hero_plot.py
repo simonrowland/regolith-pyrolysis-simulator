@@ -13,6 +13,7 @@ import tarfile
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from typing import Mapping
 
 import pytest
 
@@ -2032,6 +2033,102 @@ def test_hero_scorecard_cells_show_n_for_each_metric_and_exposure_bucket() -> No
     assert "held-out RMS 1.10 dex (n=5)" in text
     assert "SD 0.30 dex (n=5)" in text
     assert "median |dex| 0.80 dex (n=5)" in text
+
+
+def test_flagged_absolute_residual_has_separate_native_unit_tier(
+    tmp_path: Path,
+) -> None:
+    path = tmp_path / "flagged-absolute.jsonl"
+    dex = _record(
+        engine="openimcc", experiment="dex", formula="SiO2",
+        temperature_K=1200, residual=0.5,
+    )
+    absolute = _record(
+        engine="openimcc", experiment="absolute", formula="SiO2",
+        temperature_K=1200, residual=None,
+    )
+    absolute["numeric"] = {
+        "operation": "absolute", "unit": "wt_percent", "value": "-3",
+    }
+    absolute["notices"] = [{
+        "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+        "reason": "absolute metric is flagged",
+    }]
+    refused = _record(
+        engine="openimcc", experiment="refused", formula="SiO2",
+        temperature_K=1200, residual=None, status="refused",
+    )
+    refused["numeric"] = {
+        "operation": "absolute", "unit": "wt_percent", "value": "0",
+    }
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in (
+            {"kind": "battery_store_stamp", "revision": "flagged-absolute"},
+            dex,
+            absolute,
+            refused,
+        )),
+        encoding="utf-8",
+    )
+
+    data = read_scores(path)
+
+    metric = data.hero_all_numeric_metrics[("vapour", "openimcc")]
+    assert metric["rms_dex"] == "0.5"
+    assert metric["flagged_absolute_metrics"] == [{
+        "tier": "flagged_absolute",
+        "operation": "absolute",
+        "unit": "wt_percent",
+        "n": 1,
+        "rms": "3",
+        "flag_kinds": {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1},
+    }]
+    all_cell = hero_plot._hero_scorecard_rows(data, "vapour")[0][1]
+    assert "flagged absolute RMS 3 wt_percent (n=1" in all_cell
+    assert NoticeKind.OUT_OF_CERTIFIED_BAND.value in all_cell
+    summary_metric = hero_plot._hero_summary_payload(data)["vapour"][
+        "all_numeric_metrics_by_engine"
+    ]["openimcc"]["flagged_absolute_metrics"][0]
+    assert summary_metric == metric["flagged_absolute_metrics"][0]
+    assert data.summaries["openimcc"].refusals["unsupported_species"] == 1
+
+
+def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path = tmp_path / "dex-only-mutant.jsonl"
+    absolute = _record(
+        engine="openimcc", experiment="absolute", formula="SiO2",
+        temperature_K=1200, residual=None,
+    )
+    absolute["numeric"] = {
+        "operation": "absolute", "unit": "wt_percent", "value": "2",
+    }
+    absolute["notices"] = [{
+        "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+        "reason": "flagged absolute fixture",
+    }]
+    path.write_text(
+        "".join(json.dumps(row) + "\n" for row in (
+            {"kind": "battery_store_stamp", "revision": "dex-only-mutant"},
+            absolute,
+        )),
+        encoding="utf-8",
+    )
+
+    # Mutation: restore the old operation == dex gate. The feature pin below
+    # must then fail because the flagged absolute row disappears.
+    monkeypatch.setattr(
+        hero_plot,
+        "_residual_metric_tier",
+        lambda row: "dex"
+        if isinstance(row.get("numeric"), Mapping)
+        and row["numeric"].get("operation") == "dex"
+        else None,
+    )
+    with pytest.raises(AssertionError, match="flagged_absolute_metrics"):
+        metric = read_scores(path).hero_all_numeric_metrics[("vapour", "openimcc")]
+        assert metric.get("flagged_absolute_metrics"), "flagged_absolute_metrics missing"
 
 
 def _hero_metric_row(

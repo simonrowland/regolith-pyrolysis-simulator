@@ -115,6 +115,7 @@ from simulator.battery.score import (  # noqa: E402
     _battery_hero_fingerprint_band,
     _battery_hero_minor_foulant_facets,
     _flagged_payload_strata,
+    residual_metric_tier as _residual_metric_tier,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_create_fingerprint_values,
     _battery_hero_sweet_spot_bin_indices,
@@ -625,7 +626,7 @@ def _hero_metric_rows_database(
             not rail
             or not engine
             or not isinstance(numeric, Mapping)
-            or numeric.get("operation") != "dex"
+            or _residual_metric_tier(row) != "dex"
             or numeric.get("value") is None
         ):
             continue
@@ -663,6 +664,44 @@ def _hero_metric_rows_database(
             pending,
         )
     return database
+
+
+def _hero_flag_kinds(row: Mapping[str, object]) -> tuple[str, ...]:
+    notices = row.get("notices")
+    if not isinstance(notices, Sequence) or isinstance(notices, (str, bytes)):
+        return ()
+    return tuple(
+        sorted(
+            {
+                str(notice["kind"])
+                for notice in notices
+                if (
+                    isinstance(notice, Mapping)
+                    and notice.get("kind")
+                    and _flagged_payload_strata({"notices": [notice]})
+                )
+            }
+        )
+    )
+
+
+def _hero_flagged_absolute_records(
+    facts: Mapping[tuple[str, str, str], tuple[int, Decimal, Mapping[str, int]]],
+) -> dict[tuple[str, str], tuple[Mapping[str, object], ...]]:
+    records: dict[tuple[str, str], list[Mapping[str, object]]] = defaultdict(list)
+    for (rail, engine, unit), (count, squares, flag_counts) in sorted(facts.items()):
+        rms = (squares / Decimal(count)).sqrt()
+        records[(rail, engine)].append(
+            {
+                "tier": "flagged_absolute",
+                "operation": "absolute",
+                "unit": unit,
+                "n": count,
+                "rms": str(rms),
+                "flag_kinds": dict(sorted(flag_counts.items())),
+            }
+        )
+    return {key: tuple(value) for key, value in records.items()}
 
 
 def _hero_metric_records(
@@ -776,7 +815,7 @@ def _record_hero_diagnostic(
     numeric = row.get("numeric")
     if (
         not isinstance(numeric, Mapping)
-        or numeric.get("operation") != "dex"
+        or _residual_metric_tier(row) != "dex"
         or numeric.get("value") is None
     ):
         return
@@ -919,6 +958,9 @@ def read_scores(
     summaries: dict[str, EngineSummary] = defaultdict(EngineSummary)
     rails_seen: set[str] = set()
     source_disagreement_reasons: set[str] = set()
+    flagged_absolute_facts: dict[
+        tuple[str, str, str], tuple[int, Decimal, Counter[str]]
+    ] = {}
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
     hero_diagnostics: dict[tuple[str, str], dict[str, object]] = {}
@@ -1050,7 +1092,22 @@ def read_scores(
                 selected_rail = rail in selected
                 if rail not in retained_rails:
                     continue
-                if numeric.get("operation") != "dex":
+                metric_tier = _residual_metric_tier(row)
+                if metric_tier == "flagged_absolute":
+                    unit = str(numeric.get("unit") or "")
+                    value = _hero_decimal(numeric.get("value"))
+                    if value is not None:
+                        key = (rail, engine, unit)
+                        count, squares, flags = flagged_absolute_facts.get(
+                            key, (0, Decimal(0), Counter())
+                        )
+                        flags.update(_hero_flag_kinds(row))
+                        flagged_absolute_facts[key] = (
+                            count + 1,
+                            squares + value * value,
+                            flags,
+                        )
+                if metric_tier != "dex":
                     if selected_rail:
                         summary.non_dex_rows += 1
                     continue
@@ -1320,6 +1377,14 @@ def read_scores(
                 else None
             ),
         )
+        hero_flagged_absolute_metrics = _hero_flagged_absolute_records(
+            flagged_absolute_facts
+        )
+        for key, strata in hero_flagged_absolute_metrics.items():
+            metric = hero_all_numeric_metrics.setdefault(
+                key, {"rail": key[0], "engine": key[1]}
+            )
+            metric["flagged_absolute_metrics"] = list(strata)
         hero_comparisons = {
             (str(record["rail"]), str(record["primary_engine"])): record
             for record in _battery_hero_pair_comparison_records_from_database(
@@ -2373,7 +2438,10 @@ def _hero_metric_view_text(label: str, view: Mapping[str, object]) -> str:
 
 
 def _hero_scorecard_cell_text(
-    view: Mapping[str, object], *, include_no_temperature: bool = False
+    view: Mapping[str, object],
+    *,
+    include_no_temperature: bool = False,
+    flagged_absolute_metrics: Sequence[Mapping[str, object]] = (),
 ) -> str:
     count = _compact_count(view.get("n"))
     lines = [
@@ -2383,6 +2451,16 @@ def _hero_scorecard_cell_text(
     ]
     if include_no_temperature:
         lines.append(f"no T n={_compact_count(view.get('no_temperature_n'))}")
+        for metric in flagged_absolute_metrics:
+            flags = metric.get("flag_kinds")
+            flags = flags if isinstance(flags, Mapping) else {}
+            flag_text = ", ".join(
+                f"{kind}={count}" for kind, count in sorted(flags.items())
+            ) or "flag kind unavailable"
+            lines.append(
+                f"flagged absolute RMS {metric.get('rms')} {metric.get('unit')} "
+                f"(n={_compact_count(metric.get('n'))}; {flag_text})"
+            )
     for key, label in (
         ("source_disagreement_flagged", "source-disagreement flagged"),
         ("unflagged", "unflagged"),
@@ -2425,6 +2503,12 @@ def _hero_scorecard_rows(data: ScorePlotData, rail: str) -> list[list[str]]:
                 _hero_scorecard_cell_text(
                     view,
                     include_no_temperature=view_name == "all",
+                    flagged_absolute_metrics=(
+                        metric.get("flagged_absolute_metrics", ())
+                        if view_name == "all"
+                        and isinstance(metric.get("flagged_absolute_metrics", ()), Sequence)
+                        else ()
+                    ),
                 )
             )
         rows.append(row)
@@ -3370,7 +3454,7 @@ def _collection_row_database(
             numeric = row.get("numeric")
             if status is ResidualStatus.REFUSED or not isinstance(numeric, Mapping):
                 continue
-            if numeric.get("operation") != "dex":
+            if _residual_metric_tier(row) != "dex":
                 continue
             d139_uncalibrated_kems = _is_d139_uncalibrated_kems_row(row)
             residual = _finite_float(numeric.get("value"))

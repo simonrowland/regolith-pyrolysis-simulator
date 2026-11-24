@@ -25051,6 +25051,23 @@ def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
     return strata
 
 
+def residual_metric_tier(row: Mapping[str, object]) -> str | None:
+    """Classify a numeric residual for reporting, preserving metric and flag."""
+
+    numeric = row.get("numeric")
+    if not isinstance(numeric, Mapping) or numeric.get("value") is None:
+        return None
+    operation = numeric.get("operation")
+    if operation == MetricOperation.DEX.value:
+        return "dex"
+    if (
+        operation == MetricOperation.ABSOLUTE.value
+        and _flagged_payload_strata(row)
+    ):
+        return "flagged_absolute"
+    return None
+
+
 def _has_flagged_decision_notice(residual: Residual) -> bool:
     return any(
         _is_flagged_stratum_notice(notice)
