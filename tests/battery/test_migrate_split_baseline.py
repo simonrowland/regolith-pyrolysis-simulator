@@ -300,14 +300,17 @@ def _store_difference_details(
                 f"{path}: {'missing from store' if stored_bytes is None else 'unexpected in store'}"
             )
             if present_bytes is not None:
-                for observation_id, row in sorted(_observation_rows(present_bytes).items()):
-                    field = "row missing from store" if stored_bytes is None else "unexpected row"
-                    details["observations"].setdefault(path, {}).setdefault(field, []).append(
-                        observation_id
-                    )
+                observation_ids = sorted(_observation_rows(present_bytes))
                 details["observations"][path] = {
-                    field: _compact_observation_ids(observation_ids)
-                    for field, observation_ids in sorted(details["observations"][path].items())
+                    "fields": [
+                        "row missing from store" if stored_bytes is None else "unexpected row"
+                    ],
+                    "ids": _compact_observation_ids(
+                        [
+                            observation_id.removeprefix(f"{Path(path).stem}::")
+                            for observation_id in observation_ids
+                        ]
+                    ),
                 }
             continue
         if path.endswith(".md"):
@@ -346,24 +349,26 @@ def _store_difference_details(
             if stored_rows.get(observation_id) != regenerated_rows.get(observation_id)
         ]
         if changed_rows:
-            source_fields = details["observations"].setdefault(path, {})
+            source_fields = set()
             for observation_id in changed_rows:
                 differences = _field_differences(
                     "observation",
                     stored_rows.get(observation_id),
                     regenerated_rows.get(observation_id),
                 )
-                source_id = Path(path).stem
-                short_id = observation_id.removeprefix(f"{source_id}::")
                 field_paths = [
                     difference.split(": stored=", 1)[0]
                     for difference in differences
                 ] or ["bytes differ without a YAML field difference"]
-                for field in field_paths:
-                    source_fields.setdefault(field, []).append(short_id)
+                source_fields.update(field_paths)
             details["observations"][path] = {
-                field: _compact_observation_ids(observation_ids)
-                for field, observation_ids in sorted(source_fields.items())
+                "fields": sorted(source_fields),
+                "ids": _compact_observation_ids(
+                    [
+                        observation_id.removeprefix(f"{Path(path).stem}::")
+                        for observation_id in changed_rows
+                    ]
+                ),
             }
         else:
             details["other"].append(
