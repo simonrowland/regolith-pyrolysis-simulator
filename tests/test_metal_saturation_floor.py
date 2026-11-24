@@ -170,6 +170,19 @@ def test_post_shuttle_si_pressure_stays_under_pure_si_saturation() -> None:
     p_sat_pa = _crystal_si_saturation_pa(_T_K)
     assert p_si_pa < 1.0
     assert p_si_pa / p_sat_pa < 10.0
+    flag = result.diagnostic[
+        "vapour_metal_saturation_certification_flags"
+    ]["Si"]
+    assert flag["type"] == "typed_certification_flag"
+    assert flag["kind"] == "vapour_exceeds_metal_saturation:Si"
+    assert flag["ratio"] == pytest.approx(p_si_pa / p_sat_pa)
+    assert flag["temperature_K"] == pytest.approx(_T_K)
+    assert flag["pressure_source"]["runtime_label"] == result.diagnostic[
+        "vapor_pressures_source"
+    ]["Si"]
+    assert "NASA CEA" in flag["pressure_source"]["reaction_basis"]
+    assert flag["saturation_source"]["owner"] == "pure_component_antoine"
+    assert "Si(cr) Si-002" in flag["saturation_source"]["source"]
     assert any(
         str(warning).startswith("melt_fO2_metal_saturation_floor:Si")
         for warning in result.warnings

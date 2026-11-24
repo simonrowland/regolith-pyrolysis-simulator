@@ -4532,6 +4532,66 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             ),
             was_clamped=melt_dissociation_pO2_clamped,
         )
+        vapour_metal_saturation_certification_flags: dict[str, dict[str, Any]] = {}
+        if metal_saturation_floor_notice is not None:
+            metal = str(metal_saturation_floor_notice["metal"])
+            metal_pressure = vapor_pressures.get(metal)
+            metal_row = metals_data.get(metal, {}) or {}
+            if metal_pressure is not None and metal_row:
+                saturation_row, saturation_owner = (
+                    wall_condensation_antoine_coefficients(metal_row, T_K)
+                )
+                try:
+                    A_sat, B_sat, C_sat = _read_antoine_coefficients(
+                        saturation_row
+                    )
+                except _AntoineCoefficientRefusal:
+                    pass
+                else:
+                    saturation_pressure = _pow10_pressure_or_raise(
+                        _antoine_log10_pressure(A_sat, B_sat, C_sat, T_K),
+                        species=metal,
+                        field="pure_metal_saturation_pressure_Pa",
+                    )
+                    if saturation_pressure > 0.0:
+                        # At the binding metal floor a_M = 1, so the
+                        # corollary ratio is P_M / P_sat. Pa/Pa is
+                        # dimensionless; ratio <= 1 is the unflagged limit.
+                        ratio = float(metal_pressure) / saturation_pressure
+                        if ratio > 1.0:
+                            reaction = metal_row.get("reaction", {}) or {}
+                            saturation_block = (
+                                metal_row.get(COEFF_BLOCK_PURE_COMPONENT) or {}
+                            )
+                            vapour_metal_saturation_certification_flags[metal] = {
+                                "type": "typed_certification_flag",
+                                "kind": f"vapour_exceeds_metal_saturation:{metal}",
+                                "metal": metal,
+                                "ratio": ratio,
+                                "temperature_K": T_K,
+                                "metal_pressure_Pa": float(metal_pressure),
+                                "pure_metal_saturation_pressure_Pa": (
+                                    saturation_pressure
+                                ),
+                                "pressure_source": {
+                                    "runtime_label": vapor_pressure_sources.get(
+                                        metal
+                                    ),
+                                    "reaction_basis": str(
+                                        reaction.get("basis")
+                                        or reaction.get("formula")
+                                        or metal_row.get("source")
+                                        or ""
+                                    ),
+                                },
+                                "saturation_source": {
+                                    "owner": saturation_owner,
+                                    "source": str(
+                                        saturation_row.get("source")
+                                        or saturation_block.get("source", "")
+                                    ),
+                                },
+                            }
         if floor_inversion_notices:
             flagged = ",".join(sorted(floor_inversion_notices))
             warnings.append(
@@ -4583,6 +4643,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 melt_dissociation_pO2_clamped
             ),
             "pO2_floor_inversion_notices_by_species": floor_inversion_notices,
+            "vapour_metal_saturation_certification_flags": (
+                vapour_metal_saturation_certification_flags
+            ),
             "pO2_bar": transport_pO2_bar,
             "vacuum_floor_bar": vacuum_floor_bar,
             "extrapolated_beyond_valid_range_K": {
