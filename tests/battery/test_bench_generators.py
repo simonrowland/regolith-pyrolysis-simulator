@@ -223,20 +223,30 @@ def test_vacuum_total_pressure_supplies_flagged_oxygen_bound_to_engine():
         assert output["notice"] == oxygen.notice
 
 
-def test_converted_printed_run_vacuum_supplies_oxygen_bound():
-    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
-    experiment = _as_langmuir(experiment)
-    observation = _clear_sample_pressure(observation)
-    pressure = Located(
-        State.of(Value.point_of("0.01333223684210526315789473684")),
+def _torr_vacuum(original: Decimal, factor: Decimal) -> Located:
+    point = original * factor
+    return Located(
+        State.of(Value.point_of(point)),
         locator=f.loc(note="printed vacuum during run"),
         inference=Derivation(
             "Torr_to_Pa",
             ("P_Pa = P_Torr × 101325 / 760", "original_unit=Torr"),
-            (),
+            (
+                ("original", Located(State.of(original), locator=f.loc(note="printed Torr"))),
+                ("factor", Located(State.of(factor), locator=f.loc(note="Pa per Torr"))),
+            ),
             "Pa",
         ),
     )
+
+
+def test_converted_printed_run_vacuum_supplies_oxygen_bound():
+    from simulator.battery.migrate import PA_PER_TORR
+
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
+    pressure = _torr_vacuum(Decimal("1e-4"), PA_PER_TORR)
     experiment = replace(
         experiment,
         pressure_environment=replace(
@@ -247,6 +257,39 @@ def test_converted_printed_run_vacuum_supplies_oxygen_bound():
     assert selected is not None
     assert selected.route == "vacuum_total_pressure_upper_bound"
     assert selected.value.point == pytest.approx(Decimal("-6.8750969798670607"))
+    assert pressure.inference is not None
+    parameters = dict(pressure.inference.parameters)
+    assert parameters["original"].state.value == Decimal("1e-4")
+    assert parameters["factor"].state.value == PA_PER_TORR
+    assert pressure.state.value.point == Decimal("1e-4") * PA_PER_TORR
+
+
+def test_incomplete_or_fabricated_torr_conversion_is_not_a_vacuum_bound():
+    from simulator.battery.migrate import PA_PER_TORR
+
+    experiment, bench, observation = case(oxygen=False, pressure="1e-4")
+    experiment = _as_langmuir(experiment)
+    observation = _clear_sample_pressure(observation)
+    incomplete = Located(
+        State.of(Value.point_of(Decimal("1e-4") * PA_PER_TORR)),
+        locator=f.loc(note="printed vacuum during run"),
+        inference=Derivation(
+            "Torr_to_Pa",
+            ("P_Pa = P_Torr × 101325 / 760", "original_unit=Torr"),
+            (),
+            "Pa",
+        ),
+    )
+    fabricated = _torr_vacuum(Decimal("1e-4"), PA_PER_TORR + Decimal("1"))
+    for pressure in (incomplete, fabricated):
+        candidate = replace(
+            experiment,
+            pressure_environment=replace(
+                experiment.pressure_environment, total_pressure_Pa=pressure
+            ),
+        )
+        selected = oxygen_condition(candidate, bench, observation).selected
+        assert selected is None or selected.route != "vacuum_total_pressure_upper_bound"
 
 
 def test_approximate_printed_run_vacuum_stays_approximate():

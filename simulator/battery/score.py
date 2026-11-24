@@ -10371,16 +10371,37 @@ def _knudsen_oxygen_refusal_notices(
     return (fo2_refusal_notice(quantity),)
 
 
+def _payload_pressure_pa(payload: Mapping) -> Decimal | None:
+    """Exact pascals the activity owner wrote onto the payload."""
+
+    raw = payload.get("fO2_Pa")
+    if raw is None:
+        return None
+    try:
+        pressure = Decimal(raw if isinstance(raw, str) else str(raw))
+    except (ArithmeticError, ValueError):
+        return None
+    if not pressure.is_finite() or pressure <= 0:
+        return None
+    return pressure
+
+
 def _payload_fo2_notice(
     quantity: Quantity,
     payload: Mapping,
     *,
     identity: Identity | None = None,
     observation: Observation | None = None,
-) -> Notice | None:
+) -> tuple[Notice | None, Decimal | None]:
+    """The owner's tier notice and the exact pascals that notice commands.
+
+    Tier 4 keeps the pascals ``dp010_command_notice`` returns. Every other
+    tier keeps the pascal string the activity generator copied from the owner.
+    """
+
     tier = payload.get("fO2_tier")
     if tier is None:
-        return None
+        return None, None
     from simulator.battery.fo2_ladder import (
         ResolvedFo2,
         dp010_command_notice,
@@ -10395,12 +10416,13 @@ def _payload_fo2_notice(
         str(payload.get("fO2_route") or ""),
         bool(payload.get("fO2_borrowed")),
         None if bar is None else float(bar),
+        pressure_pa=_payload_pressure_pa(payload),
     )
     if int(tier) == 4:
         printed_log = _printed_condition_decimal(
             observation, "fO2_log"
         ) if observation is not None else None
-        notice, _command_log, _pressure_pa = dp010_command_notice(
+        notice, _command_log, pressure_pa = dp010_command_notice(
             quantity,
             resolved,
             identity=identity,
@@ -10410,8 +10432,8 @@ def _payload_fo2_notice(
                 else format(printed_log, "f")
             ),
         )
-        return notice
-    return fo2_tier_notice(quantity, resolved)
+        return notice, pressure_pa
+    return fo2_tier_notice(quantity, resolved), resolved.pressure_pa
 
 
 def _payload_fo2_bar(payload: Mapping) -> float | None:
@@ -10613,12 +10635,20 @@ def _oxygen_input_request(
                 commanded_pa.append(command_pa)
             bar = float(command_pa / PA_PER_BAR_DEC)
         else:
+            for extra in resolved.notices:
+                if extra not in input_notices:
+                    input_notices.append(extra)
             notice = fo2_tier_notice(quantity, resolved)
-            bar = (
-                resolved.po2_bar
-                if resolved.po2_bar is not None
-                else 10.0 ** resolved.log10_fO2_bar
-            )
+            if resolved.pressure_pa is not None:
+                if commanded_pa is not None:
+                    commanded_pa.append(resolved.pressure_pa)
+                bar = float(resolved.pressure_pa / PA_PER_BAR_DEC)
+            else:
+                bar = (
+                    resolved.po2_bar
+                    if resolved.po2_bar is not None
+                    else 10.0 ** resolved.log10_fO2_bar
+                )
         input_notices.append(notice)
         return Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
     return _input_refusal(
@@ -11687,11 +11717,22 @@ def _resolve_row_fo2(
     from simulator.battery.fo2_ladder import (
         absolute_frame_admission,
         absolute_oxygen_frame,
+        admit_waypoint_oxygen,
         admitted_score_oxygen,
-        oxygen_frame_receipts,
+        stored_absolute_pressure_pa,
+        _receipted_buffer,
+    )
+    from simulator.battery.waypoints import (
+        EXPERIMENT_RUN_OXYGEN_ROUTES,
+        TYPED_RUN_OXYGEN_ROUTES,
     )
 
     derived_condition = _derived_fo2_condition(observation)
+    # A receipted buffer's stored pascals precede a waypoint log.
+    if _receipted_buffer(observation):
+        admitted = absolute_frame_admission(observation, identity)
+        if admitted is not None:
+            return identity, admitted.log10_bar, admitted.notices
     if (
         not derived_condition
         and _has_printed_fo2(observation, identity)
@@ -11700,20 +11741,6 @@ def _resolve_row_fo2(
         admitted = absolute_frame_admission(observation, identity)
         if admitted is not None:
             return identity, admitted.log10_bar, admitted.notices
-        # The frame checks were forced true and no stored pressure exists.
-        # Reconstructing the printed log on the 1-bar factor is that defect.
-        # Production unknown frames do not enter this block.
-        receipts = oxygen_frame_receipts(observation)
-        printed_log = _printed_condition_decimal(observation, "fO2_log")
-        if printed_log is not None and printed_log.is_finite():
-            return (
-                replace(identity, fO2_Pa=State.of(log10_fo2_to_pa(printed_log))),
-                printed_log,
-                receipts,
-            )
-        fo2_log = _printed_fo2_log10_bar(identity)
-        if fo2_log is not None:
-            return identity, Decimal(str(fo2_log)), receipts
 
     if experiment is not None:
         from simulator.battery.waypoints import oxygen_condition
@@ -11721,24 +11748,24 @@ def _resolve_row_fo2(
         oxygen = oxygen_condition(experiment, bench, observation)
         waypoint = admitted_score_oxygen(oxygen, observation)
         if waypoint is not None:
-            if waypoint.route == "observation_fO2_log":
-                admitted = absolute_frame_admission(
-                    observation, identity, route=waypoint.route
+            tier = (
+                1
+                if waypoint.route == "observation_fO2_log"
+                or waypoint.route in TYPED_RUN_OXYGEN_ROUTES | EXPERIMENT_RUN_OXYGEN_ROUTES
+                or waypoint.route == "observation_fO2_Pa_to_log_fO2"
+                else 3
+            )
+            admitted = admit_waypoint_oxygen(
+                waypoint, experiment, observation, bench=bench, tier=tier
+            )
+            if admitted is not None:
+                current = stored_absolute_pressure_pa(identity)
+                resolved_identity = (
+                    identity
+                    if current == admitted.pressure_pa
+                    else replace(identity, fO2_Pa=State.of(admitted.pressure_pa))
                 )
-                if admitted is not None:
-                    return identity, admitted.log10_bar, admitted.notices
-            run_oxygen_log = as_decimal(waypoint.value.point)
-            if run_oxygen_log.is_finite():
-                receipts = (
-                    oxygen_frame_receipts(observation)
-                    if waypoint.route == "observation_fO2_log"
-                    else ()
-                )
-                return (
-                    replace(identity, fO2_Pa=State.of(log10_fo2_to_pa(run_oxygen_log))),
-                    run_oxygen_log,
-                    receipts,
-                )
+                return resolved_identity, admitted.log10_bar, admitted.notices
 
     printed_pressure = (
         printed_source_pressure(observation)
@@ -15346,7 +15373,12 @@ def _predict_with_engine(
             parent_activity = activity.thermodynamic_parent_activity()
             authority = Authority.BRIDGE
             notices: list[Notice] = list(input_notices)
-            tier_notice = _payload_fo2_notice(
+            from simulator.battery.fo2_ladder import _admission_notices
+
+            for extra in _admission_notices(observation):
+                if extra not in notices:
+                    notices.append(extra)
+            tier_notice, owned_pa = _payload_fo2_notice(
                 quantity,
                 activity_payload,
                 identity=identity,
@@ -15416,6 +15448,7 @@ def _predict_with_engine(
                     identity,
                     activity_fo2_bar,
                     preserve_existing=_has_printed_fo2(observation, identity),
+                    pressure_pa=owned_pa,
                 ),
                 requested_composition=requested,
                 version=activity.activity_model,
@@ -15614,7 +15647,12 @@ def _predict_with_engine(
         # The contract's oxygen point, or none. Never an engine default.
         # A payload bar is the printed pascal command; a log is 10**fO2_log.
         if "fO2_bar" in activity_payload or "fO2_log" in activity_payload:
-            tier_notice = _payload_fo2_notice(
+            from simulator.battery.fo2_ladder import _admission_notices
+
+            for extra in _admission_notices(observation):
+                if extra not in input_notices:
+                    input_notices.append(extra)
+            tier_notice, owned_pa = _payload_fo2_notice(
                 quantity,
                 activity_payload,
                 identity=identity,
@@ -15622,6 +15660,8 @@ def _predict_with_engine(
             )
             if tier_notice is not None:
                 input_notices.append(tier_notice)
+            if owned_pa is not None:
+                commanded_pa.append(owned_pa)
             bar = activity_fo2_bar
             po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=bar)
         else:
@@ -25049,6 +25089,61 @@ def residual_order_index_text(payload: Mapping[str, object]) -> list[str | None]
     return [numeric_text, band_text]
 
 
+def residual_order_sidecar_fields(
+    stable_order: tuple[str, int, int, int],
+    numeric_value: str | None,
+    band_value: str | None,
+) -> list[object]:
+    """Six sidecar fields: sort key, then the exact numeric and band text.
+
+    A four-field row is the legacy writer. Fan-in treats that as lost exact
+    text and does not honour an exact bit that disagrees with the field count.
+    """
+
+    return [
+        stable_order[0],
+        stable_order[1],
+        stable_order[2],
+        stable_order[3],
+        numeric_value,
+        band_value,
+    ]
+
+
+def order_sidecar_index_text(
+    order_value: object,
+    entry: ResidualOrderEntry,
+    payload: Mapping[str, object],
+) -> tuple[str | None, str | None]:
+    """Index strings for one shard sidecar row.
+
+    Six fields must match the residual line's exact text. Four fields are
+    the legacy float rendering of that line. Any other shape is the
+    parallel-summary failure.
+    """
+
+    if not isinstance(order_value, list):
+        raise AssertionError("parallel_summary")
+    if len(order_value) == 6:
+        if list(order_value[4:]) != residual_order_index_text(payload):
+            raise AssertionError("parallel_summary")
+        return entry.numeric_value, entry.band_value
+    if len(order_value) == 4:
+        numeric = payload.get("numeric")
+        raw_numeric = None
+        raw_band = None
+        if isinstance(numeric, Mapping):
+            raw_numeric = numeric.get("value")
+            band = numeric.get("decision_band")
+            if isinstance(band, Mapping):
+                raw_band = band.get("value")
+        return (
+            legacy_float_index_text(raw_numeric),
+            legacy_float_index_text(raw_band),
+        )
+    raise AssertionError("parallel_summary")
+
+
 def legacy_float_index_text(raw: object) -> str | None:
     """Float rendering of a dropped exact-text sidecar field.
 
@@ -25265,14 +25360,9 @@ class _ResidualJsonlStream:
             # residual line has exactly one recoverable serial-order entry.
             self._order_file.write(
                 json.dumps(
-                    [
-                        stable_order[0],
-                        stable_order[1],
-                        stable_order[2],
-                        stable_order[3],
-                        numeric_value,
-                        band_value,
-                    ],
+                    residual_order_sidecar_fields(
+                        stable_order, numeric_value, band_value
+                    ),
                     ensure_ascii=False,
                     separators=(",", ":"),
                 )

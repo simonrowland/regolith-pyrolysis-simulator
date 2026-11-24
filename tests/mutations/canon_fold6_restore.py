@@ -211,26 +211,14 @@ _CONVERSION = (
 _AIR_FREE = (
     (
         ROOT / "simulator/battery/oxygen_identity.py",
-        """    sample_air = re.search(
-        r"\\b(?:sample|melt|glass|charge)\\b(?:\\s+\\w+){0,8}\\s+"
-        r"(?:in|under|atmosphere)\\s+(?:ambient\\s+)?air\\b(?!\\s+free\\b)",
-        normalized_quote,
-    )
-    equilibration_air = re.search(
-        r"\\bequilibrat\\w*(?:\\s+\\w+){0,5}\\s+(?:in|under)\\s+(?:ambient\\s+)?air\\b"
-        r"(?!\\s+free\\b)",
-        normalized_quote,
-    )
-    sensor_or_room = re.search(r"\\b(?:sensor|room)\\b", normalized_quote)
-    positive = sample_air if sample_air is not None else equilibration_air
-    if positive is None or sensor_or_room is not None:
-        return None
-    if re.search(
-        r"\\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\\b",
-        positive.group(0),
-    ):
-        return None
-    return source_quote
+        """    for sentence in sentences:
+        if _AIR_SENSOR_OR_ROOM.search(sentence) is not None:
+            continue
+        if _AIR_SUBJECT.search(sentence) is None:
+            continue
+        if _AIR_EQUILIBRATION.search(sentence) is not None:
+            return source_quote
+    return None
 """,
         """    equilibration_air = re.search(
         r"\\bequilibrat\\w*(?:\\s+\\w+){0,5}\\s+(?:in|under)\\s+(?:ambient\\s+)?air\\b",
@@ -277,24 +265,16 @@ _UNCOVERED_COUNT = (
 _SUMMARY_ORDER = (
     (
         ROOT / "simulator/battery/score.py",
-        """                json.dumps(
-                    [
-                        stable_order[0],
-                        stable_order[1],
-                        stable_order[2],
-                        stable_order[3],
-                        numeric_value,
-                        band_value,
-                    ],
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                )
+        """    return [
+        stable_order[0],
+        stable_order[1],
+        stable_order[2],
+        stable_order[3],
+        numeric_value,
+        band_value,
+    ]
 """,
-        """                json.dumps(
-                    list(stable_order),
-                    ensure_ascii=False,
-                    separators=(",", ":"),
-                )
+        """    return list(stable_order)
 """,
     ),
 )
@@ -374,8 +354,7 @@ MUTATIONS = {
     ),
     "summary-order": (
         _SUMMARY_ORDER,
-        "tests/battery/test_score_workers.py::"
-        "test_parallel_scoring_matches_serial_rows_and_summary",
+        "tests/test_ror_canon7x1123_probe.py::test_decoded_summary_parity",
         "parallel_summary",
     ),
 }
@@ -437,7 +416,11 @@ def main(argv: list[str]) -> int:
     output = result.stdout + result.stderr
     if result.returncode == 0:
         raise SystemExit(f"{argv[0]}: pin did not fail\n" + output[-2000:])
-    if marker in output and "AssertionError" in output:
+    failed_assertion = any(
+        "AssertionError" in line and marker in line
+        for line in output.splitlines()
+    )
+    if failed_assertion:
         print(f"PASS: {argv[0]} restores the defect and fails {node}")
         return 0
     raise SystemExit(

@@ -92,23 +92,24 @@ def test_vapour_unknown_frame_carries_typed_DP010(monkeypatch):
     ), notices
 
 
-def test_frame_mutation_restores_wrong_bar_command(monkeypatch):
+def test_forced_frame_without_stored_pressure_stays_on_dp010(monkeypatch):
+    """Forcing the frame checks must not reconstruct the printed log.
+
+    The old raw-log fallback turned that forced predicate into a clean bar
+    command. Production now falls through to DP-010.
+    """
+
     row = frame_row(State.unknown(_BARE_LOG_SCALE_UNKNOWN))
-
-    def require_policy():
-        _identity, log, notices = score._resolve_row_fo2(
-            row.identity, row, None, {"SiO2": 100.0}, Decimal(1400), Quantity.ACTIVITY
-        )
-        assert log != 0 and any(
-            notice.policy is not None and notice.policy.id == "DP-010"
-            for notice in notices
-        ), "unknown log became a clean bar command"
-
-    require_policy()
     monkeypatch.setattr(fo2_ladder, "absolute_oxygen_frame", lambda _identity: True)
     monkeypatch.setattr(score, "_has_printed_fo2", lambda *_: True)
-    with pytest.raises(AssertionError, match="unknown log became a clean bar command"):
-        require_policy()
+    _identity, log, notices = score._resolve_row_fo2(
+        row.identity, row, None, {"SiO2": 100.0}, Decimal(1400), Quantity.ACTIVITY
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in notices
+    ), "unknown log became a clean bar command"
+    assert log != 0
 
 
 def _power_of_ten_context():
@@ -155,17 +156,26 @@ def summary_differences(tmp_path):
 
 
 def test_decoded_summary_parity(tmp_path):
-    assert summary_differences(tmp_path) == {}
+    assert summary_differences(tmp_path) == {}, "parallel_summary"
 
 
-def test_summary_mutation_drops_exact_index_text(tmp_path, monkeypatch):
-    parse = score.parse_residual_order_entry
+def test_summary_order_mutation_loses_exact_index_text(tmp_path, monkeypatch):
+    """A four-field sidecar is the production legacy reader, not a parser bit.
 
-    def discard_exact_text(value):
-        entry = parse(value)
-        return None if entry is None else replace(entry, exact=False)
+    Printed 1000 against prediction 1 is dex log10(0.001). The exact token
+    is ``-3`` and the legacy float text is ``-3.0``. Spawned workers would
+    not see an in-process patch, so the shards run in this process, which is
+    where the production writer and the fan-in both live.
+    """
 
-    monkeypatch.setattr(score, "parse_residual_order_entry", discard_exact_text)
+    def four_fields(stable_order, _numeric_value, _band_value):
+        return list(stable_order)
+
+    def run_workers_in_process(tasks, worker, *, initializer, initargs, **_kwargs):
+        initializer(*initargs)
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(score, "residual_order_sidecar_fields", four_fields)
+    monkeypatch.setattr(score, "supervised_process_map", run_workers_in_process)
     differences = summary_differences(tmp_path)
-    assert differences, "legacy float text did not change the decoded summary"
-    print("legacy summary changed keys:", tuple(differences))
+    assert differences, "parallel_summary"

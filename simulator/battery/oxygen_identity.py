@@ -109,6 +109,23 @@ def _dp002_applicability(
 
 # Negated or excluded air is not a run atmosphere. The categorical token is
 # matched before this, so a located value "air" is not sent through prose.
+# A sample, or the equilibration itself, held under argon is not an air run.
+# The match is one sentence. "argon sample" does not count: the gas has to
+# be the atmosphere the equilibration names.
+_ARGON_EQUILIBRATION = re.compile(
+    r"\b(?:samples|sample|melts|melt|glasses|glass|charges|charge|equilibrat\w*)\b"
+    r"(?:\s+\w+){0,8}\s+(?:in|under)\s+(?:flowing\s+|an?\s+)?argon\b"
+)
+_AIR_SUBJECT = re.compile(
+    r"\b(?:samples|sample|melts|melt|glasses|glass|charges|charge)\b"
+)
+_AIR_EQUILIBRATION = re.compile(
+    r"\bequilibrat\w*(?:\s+\w+){0,6}\s+"
+    r"(?:in|under|atmosphere)\s+(?:ambient\s+)?air\b(?!\s+free\b)"
+)
+_AIR_SENSOR_OR_ROOM = re.compile(r"\b(?:sensor|room)\b")
+
+
 _AIR_NEGATION = re.compile(
     r"(?:"
     r"\b(?:not|never|without|no|n't)\b(?:\s+\w+){0,6}\s+equilibrat"
@@ -154,29 +171,26 @@ def _air_composition_quote(
         return source_quote
     if _AIR_NEGATION.search(normalized_quote):
         return None
-    # The sample's atmosphere is a sample, melt, glass, or charge in air, or
-    # a run that equilibrated in air. "air-free" normalizes to "air free".
-    # A furnace sensor or room air anywhere in the quote is not that sample.
-    sample_air = re.search(
-        r"\b(?:sample|melt|glass|charge)\b(?:\s+\w+){0,8}\s+"
-        r"(?:in|under|atmosphere)\s+(?:ambient\s+)?air\b(?!\s+free\b)",
-        normalized_quote,
-    )
-    equilibration_air = re.search(
-        r"\bequilibrat\w*(?:\s+\w+){0,5}\s+(?:in|under)\s+(?:ambient\s+)?air\b"
-        r"(?!\s+free\b)",
-        normalized_quote,
-    )
-    sensor_or_room = re.search(r"\b(?:sensor|room)\b", normalized_quote)
-    positive = sample_air if sample_air is not None else equilibration_air
-    if positive is None or sensor_or_room is not None:
+    # Air has to be the sample atmosphere during equilibration. "Held in air
+    # before the run" is not that stage. A separate sentence that equilibrates
+    # the sample, or the equilibration itself, under argon rejects the quote.
+    # Sensor and room air reject only the sentence that contains them.
+    # "air-free" normalizes to "air free".
+    sentences = [
+        part.strip()
+        for part in re.split(r"[.;!?]+", normalized_quote)
+        if part.strip()
+    ]
+    if any(_ARGON_EQUILIBRATION.search(sentence) for sentence in sentences):
         return None
-    if re.search(
-        r"\b(?:argon|quenched|quench|displaced|replaced|before|after|then)\b",
-        positive.group(0),
-    ):
-        return None
-    return source_quote
+    for sentence in sentences:
+        if _AIR_SENSOR_OR_ROOM.search(sentence) is not None:
+            continue
+        if _AIR_SUBJECT.search(sentence) is None:
+            continue
+        if _AIR_EQUILIBRATION.search(sentence) is not None:
+            return source_quote
+    return None
 
 
 def _dp002_pressure_default(

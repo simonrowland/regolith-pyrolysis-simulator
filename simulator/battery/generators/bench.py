@@ -670,6 +670,8 @@ def melt_activity_requests(
                 payload["fO2_tier"] = shared.tier
                 payload["fO2_route"] = shared.route
                 payload["fO2_borrowed"] = shared.borrowed
+                if shared.pressure_pa is not None:
+                    payload["fO2_Pa"] = format(shared.pressure_pa, "f")
                 if shared.po2_bar is not None:
                     payload["fO2_bar"] = shared.po2_bar
                 routes["fO2_log"] = {

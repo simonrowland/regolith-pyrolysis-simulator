@@ -66,6 +66,7 @@ from simulator.battery.waypoints import (
     WaypointAuthority,
     WaypointResult,
     oxygen_condition,
+    route_source_pressure_pa,
 )
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
 from simulator.physical_constants import BAR_PA_DECIMAL, PA_PER_BAR
@@ -99,6 +100,11 @@ class ResolvedFo2:
     cell_material: str | None = None
     # Physics-95 rung is separate from the existing generic ``tier`` taxonomy.
     physics_rung: int | None = None
+    # Exact pascals from the oxygen owner. None when the route is a log by
+    # definition and no located pressure was read. Callers command
+    # ``pressure_pa`` and do not rebuild it from ``log10_fO2_bar``.
+    pressure_pa: Decimal | None = None
+    notices: tuple[Notice, ...] = ()
 
 
 _PHYSICS_RUNG_LABELS = {
@@ -295,10 +301,19 @@ def resolve_row_fo2(
         temperature = None
     routes = _oxygen_routes(experiment, bench, observation, oxygen)
     knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
+    physics_rung = 1 if knudsen_vapour else None
     rys_row_oxygen_unverified = (
         _rys_oxygen_measurement_status(observation, quantity)
         not in {None, "measured_independent"}
     )
+    # A DP-112 receipt already stored the absolute pressure. It precedes a
+    # buffer waypoint and any log reconstructed from one.
+    if _receipted_buffer(observation) and not rys_row_oxygen_unverified:
+        admitted = absolute_frame_admission(
+            observation, identity, physics_rung=physics_rung
+        )
+        if admitted is not None:
+            return resolved_from_admitted(admitted)
     for route in routes:
         if (
             rys_row_oxygen_unverified
@@ -309,42 +324,26 @@ def resolve_row_fo2(
         ):
             continue
         if _is_tier1(route, observation):
-            log = _log_point(route.value)
-            if log is not None:
-                # A grounded printed log keeps this route. The commanded
-                # number is the stored absolute pressure, so an atm frame
-                # is not sent on as the printed log.
-                if route.route == "observation_fO2_log":
-                    admitted = absolute_frame_admission(
-                        observation,
-                        identity,
-                        route=route.route,
-                        physics_rung=1 if knudsen_vapour else None,
-                    )
-                    if admitted is not None:
-                        return ResolvedFo2(
-                            float(admitted.log10_bar),
-                            1,
-                            route.route,
-                            False,
-                            po2_bar=admitted.command_bar(),
-                            physics_rung=admitted.physics_rung,
-                        )
-                return ResolvedFo2(
-                    log, 1, route.route, False,
-                    physics_rung=1 if knudsen_vapour else None,
-                )
-    printed = (
-        None
-        if rys_row_oxygen_unverified
-        else _printed_identity_bar(observation, identity)
-    )
-    if printed is not None:
-        bar, log = printed
-        return ResolvedFo2(
-            log, 1, "identity_fO2_Pa", False, po2_bar=bar,
-            physics_rung=1 if knudsen_vapour else None,
+            admitted = admit_waypoint_oxygen(
+                route,
+                experiment,
+                observation,
+                bench=bench,
+                tier=1,
+                physics_rung=physics_rung,
+            )
+            if admitted is not None:
+                return resolved_from_admitted(admitted)
+    if not rys_row_oxygen_unverified and (
+        observation is not None
+        and identity is not None
+        and has_printed_fo2(observation, identity)
+    ):
+        admitted = absolute_frame_admission(
+            observation, identity, physics_rung=physics_rung
         )
+        if admitted is not None:
+            return resolved_from_admitted(admitted)
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
     # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
     # does not replace the cell's explicit oxygen control or effusion balance.
@@ -359,12 +358,21 @@ def resolve_row_fo2(
                 or _receipted_buffer(observation)
             ):
                 continue
-            log = _log_point(route.value)
-            if log is not None:
-                return ResolvedFo2(
-                    log, 3, route.route, False,
-                    physics_rung=1 if knudsen_vapour else None,
-                )
+            admitted = admit_waypoint_oxygen(
+                route,
+                experiment,
+                observation,
+                bench=bench,
+                tier=3,
+                physics_rung=physics_rung,
+            )
+            if admitted is not None:
+                return resolved_from_admitted(admitted)
+    unresolved = admit_unresolved_buffer(
+        observation, experiment, tier=3, physics_rung=physics_rung
+    )
+    if unresolved is not None:
+        return resolved_from_admitted(unresolved[1])
     atmosphere = _gas_ratio_fo2(experiment, temperature)
     if atmosphere is not None:
         if knudsen_vapour:
@@ -443,9 +451,11 @@ def resolve_row_fo2(
         return None
     for route in routes:
         if route.route == _VACUUM_ROUTE:
-            log = _log_point(route.value)
-            if log is not None:
-                return ResolvedFo2(log, 3, route.route, False)
+            admitted = admit_waypoint_oxygen(
+                route, experiment, observation, bench=bench, tier=3
+            )
+            if admitted is not None:
+                return resolved_from_admitted(admitted)
     if _knudsen_blocks_intrinsic(experiment, observation, quantity):
         return None
     return _tier4(weights, temperature)
@@ -719,9 +729,8 @@ def absolute_frame_admission(
 ) -> AdmittedOxygen | None:
     """Admit the stored absolute pressure when the frame is already resolved.
 
-    A monkeypatched frame check with no stored pressure returns None. The
-    caller then reconstructs from the printed log; production unknown frames
-    never reach that reconstruction because ``absolute_oxygen_frame`` is false.
+    A monkeypatched frame check with no stored pressure returns None.
+    Callers do not reconstruct a bar command from the printed log.
     """
 
     if not absolute_oxygen_frame(identity):
@@ -736,6 +745,176 @@ def absolute_frame_admission(
         route=route,
         borrowed=False,
         notices=_admission_notices(observation),
+        physics_rung=physics_rung,
+    )
+
+
+_LOG_DEFINED_OXYGEN_ROUTES = frozenset({
+    "observation_gas_couple_equilibrium",
+    "graphite_c_co_buffer",
+    "buffer_relation",
+})
+_PA_BACKED_OXYGEN_ROUTES = (
+    TYPED_RUN_OXYGEN_ROUTES
+    | EXPERIMENT_RUN_OXYGEN_ROUTES
+    | frozenset({
+        "observation_fO2_Pa_to_log_fO2",
+        "vacuum_total_pressure_upper_bound",
+        "observation_gas_composition",
+    })
+)
+
+
+def resolved_from_admitted(admitted: AdmittedOxygen) -> ResolvedFo2:
+    """The ladder's float command plus the owner's exact pascals and notices."""
+
+    return ResolvedFo2(
+        float(admitted.log10_bar),
+        admitted.tier,
+        admitted.route,
+        admitted.borrowed,
+        po2_bar=admitted.command_bar(),
+        physics_rung=admitted.physics_rung,
+        pressure_pa=admitted.pressure_pa,
+        notices=admitted.notices,
+    )
+
+
+def _admit_log_defined(
+    route: Waypoint,
+    *,
+    tier: int,
+    observation: Observation | None,
+    physics_rung: int | None,
+) -> AdmittedOxygen | None:
+    """One conversion of an evaluated log. The log is the quantity."""
+
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    if not isinstance(route.value, Value) or route.value.kind is not ValueKind.POINT:
+        return None
+    point = route.value.point
+    if not isinstance(point, Decimal) or not point.is_finite():
+        return None
+    pressure_pa = log10_fo2_to_pa(point)
+    if not pressure_pa.is_finite() or pressure_pa <= 0:
+        return None
+    return AdmittedOxygen(
+        pressure_pa=pressure_pa,
+        log10_bar=point,
+        tier=tier,
+        route=route.route,
+        borrowed=False,
+        notices=_admission_notices(observation),
+        physics_rung=physics_rung,
+    )
+
+
+def admit_waypoint_oxygen(
+    route: Waypoint,
+    experiment: Experiment | None,
+    observation: Observation | None,
+    *,
+    bench: object | None = None,
+    tier: int,
+    physics_rung: int | None = None,
+) -> AdmittedOxygen | None:
+    """One typed admission for a score-time oxygen waypoint.
+
+    A route that started as pascals keeps those pascals. A route whose
+    quantity is an evaluated log converts once. A missing located pressure
+    is not recovered by inverting the waypoint log.
+    """
+
+    if route.route == "observation_fO2_log":
+        return absolute_frame_admission(
+            observation,
+            _identity(observation),
+            route=route.route,
+            tier=tier,
+            physics_rung=physics_rung,
+        )
+    if route.route in _PA_BACKED_OXYGEN_ROUTES:
+        if experiment is None:
+            return None
+        pressure_pa = route_source_pressure_pa(
+            experiment, bench, observation, route.route
+        )
+        if pressure_pa is None:
+            # An ideal-mixture interval has no single point. Keep its log.
+            if route.route == "observation_gas_composition":
+                return _admit_log_defined(
+                    route,
+                    tier=tier,
+                    observation=observation,
+                    physics_rung=physics_rung,
+                )
+            return None
+        return AdmittedOxygen(
+            pressure_pa=pressure_pa,
+            log10_bar=decimal_log10_bar(pressure_pa),
+            tier=tier,
+            route=route.route,
+            borrowed=False,
+            notices=_admission_notices(observation),
+            physics_rung=physics_rung,
+        )
+    if route.route in _LOG_DEFINED_OXYGEN_ROUTES:
+        return _admit_log_defined(
+            route,
+            tier=tier,
+            observation=observation,
+            physics_rung=physics_rung,
+        )
+    return None
+
+
+def admit_unresolved_buffer(
+    observation: Observation | None,
+    experiment: Experiment | None,
+    *,
+    tier: int = 3,
+    physics_rung: int | None = None,
+) -> tuple[Observation, AdmittedOxygen] | None:
+    """Resolve a calibration marker that DP-112 has not yet receipted.
+
+    The pressure is the resolver's stored pascals. Notices are only the
+    ones the resolver added. A marker the resolver cannot evaluate returns
+    None so later named routes still run.
+    """
+
+    if observation is None or not uncalibrated_buffer_awaits_receipt(observation):
+        return None
+    from simulator.battery.oxygen_identity import _resolve_score_time_buffer_identity
+
+    resolved = _resolve_score_time_buffer_identity(
+        observation,
+        ambient_pressure_evidence=(
+            None if experiment is None else experiment.ambient_pressure_evidence
+        ),
+    )
+    pressure_pa = stored_absolute_pressure_pa(
+        resolved.identity if isinstance(resolved.identity, Identity) else None
+    )
+    new_notices = tuple(
+        notice
+        for notice in resolved.notices
+        if notice not in observation.notices
+        and notice.policy is not None
+        and notice.policy.id in {"DP-002", "DP-112"}
+    )
+    if pressure_pa is None or not any(
+        notice.policy is not None and notice.policy.id == "DP-112"
+        for notice in new_notices
+    ):
+        return None
+    return resolved, AdmittedOxygen(
+        pressure_pa=pressure_pa,
+        log10_bar=decimal_log10_bar(pressure_pa),
+        tier=tier,
+        route="score:DP-112",
+        borrowed=False,
+        notices=new_notices,
         physics_rung=physics_rung,
     )
 

@@ -829,9 +829,13 @@ def test_scorer_commands_one_borrowed_fo2_for_a_multivalent_gap(monkeypatch):
     assert all(prediction.refusal_reason is None for prediction in predictions)
     assert all(
         any(
-            notice.origin == "fo2_ladder"
-            and notice.reason.startswith("fo2_tier=4;")
-            and notice.reason.endswith("; borrowed")
+            notice.policy is not None
+            and notice.policy.id == "DP-010"
+            and notice.reason.startswith("DP-010 physics_rung=4:")
+            and "commanded_default_log10_bar=" in notice.reason
+            and "original_missing_evidence=" in notice.reason
+            and "fo2_tier=4" in notice.reason
+            and "borrowed" in notice.reason
             for notice in prediction.notices
         )
         for prediction in predictions
@@ -1142,6 +1146,7 @@ def test_printed_oxygen_is_commanded_and_not_the_engine_default(monkeypatch):
     assert seen["mode"] == "commanded"
     assert seen["po2_bar"] == pytest.approx(1e-7)
     assert seen["mode"] != "engine_default"
+    assert prediction.value == Decimal("0.2")
 
 
 def test_unknown_frame_activity_commands_dp010_not_the_printed_zero():

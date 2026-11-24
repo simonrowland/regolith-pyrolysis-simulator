@@ -1803,6 +1803,8 @@ def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
         "The furnace sensor measured air outside the chamber during equilibration.",
         "The furnace sensor recorded air during equilibration.",
         "An argon sample was inside; air flowed in the room during equilibration.",
+        "Before the run, the sample was held in air. Equilibration was under argon.",
+        "The reference gas equilibrated in air. The sample equilibrated under argon.",
     ):
         false_evidence = AmbientPressureEvidence(
             AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
