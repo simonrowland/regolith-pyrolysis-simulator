@@ -1553,6 +1553,9 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
     unlocated_rows = [
         (
             row.observation_id,
+            row.identity.composition.reason
+            if row.identity.composition.is_unknown
+            else None,
             [
                 field
                 for field, present in (
@@ -1570,9 +1573,19 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
                         and row.point_conditions["temperature_K"].state.is_value,
                     ),
                     (
+                        "temperature_condition_locator",
+                        "temperature_K" in row.point_conditions
+                        and row.point_conditions["temperature_K"].locator is not None,
+                    ),
+                    (
                         "located_fO2_condition",
                         "fO2_log" in row.point_conditions
                         and row.point_conditions["fO2_log"].state.is_value,
+                    ),
+                    (
+                        "fO2_condition_locator",
+                        "fO2_log" in row.point_conditions
+                        and row.point_conditions["fO2_log"].locator is not None,
                     ),
                 )
                 if not present
@@ -1587,7 +1600,11 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
             and row.identity.composition.is_value
             and isinstance(row.identity.composition.value, Composition)
             and row.point_conditions["temperature_K"].state.is_value
+            and row.point_conditions["temperature_K"].locator is not None
             and row.point_conditions["fO2_log"].state.is_value
+            and row.point_conditions["fO2_log"].locator is not None
+            and row.point_conditions["temperature_K"].state.value
+            == row.identity.temperature_K.value
         )
     ]
     assert not unlocated_rows, unlocated_rows
