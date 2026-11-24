@@ -302,6 +302,9 @@ def test_manifest_table_census_and_phase_record_count(compilation):
     manifest, records = compilation
     record_files = sorted((COMPILATION_ROOT / "records").glob("*.json"))
     assert manifest["summary"] == expected_summary(manifest, records)
+    assert manifest["summary"]["correction_count"] == 102
+    assert manifest["summary"]["image_verified_correction_count"] == 17
+    assert manifest["summary"]["image_verified_locator_count"] == 3
     assert len(records) == len(record_files) == manifest["summary"]["record_count"]
     assert len({record["census_id"] for record in records}) == 400
     assert len(manifest["corpus_status"]["census_record_ids"]) == 400
@@ -380,19 +383,29 @@ def _assert_image_verified_corrections(records):
 def test_image_verified_corrections_and_mutation_probe(compilation):
     manifest, records = compilation
     _assert_image_verified_corrections(records)
-    corrections = [
+    all_corrections = [
         item
         for item in manifest["corrections"]
         if item.get("action") == "image_verified_correction"
-        and item.get("record_id") != f"{SOURCE_ID}-0003"
+    ]
+    assert len(all_corrections) == manifest["summary"]["image_verified_correction_count"] == 17
+    corrections = [
+        item for item in all_corrections if item.get("record_id") != f"{SOURCE_ID}-0003"
     ]
     assert len(corrections) == len(IMAGE_VERIFIED_CORRECTIONS) == 16
     assert {
-        (item["ocr_token"], item["printed_token"], item["correction_provenance"])
+        (
+            item["record_id"],
+            item["source_text_line"],
+            item["column"],
+            item["ocr_token"],
+            item["printed_token"],
+            item["correction_provenance"],
+        )
         for item in corrections
     } == {
-        (raw, printed, "image_read_reconstruction")
-        for _, _, _, raw, printed, _, _ in IMAGE_VERIFIED_CORRECTIONS
+        (record_id, line, column, raw, printed, "image_read_reconstruction")
+        for record_id, line, column, raw, printed, _, _ in IMAGE_VERIFIED_CORRECTIONS
     }
     mutated = copy.deepcopy(records)
     target = next(record for record in mutated if record["record_id"] == f"{SOURCE_ID}-0162")
@@ -415,6 +428,7 @@ def _assert_image_verified_locator_entry(item, record):
         "ocr_token",
         "printed_token",
         "value",
+        "uncertainty",
         "correction_provenance",
         "image_quote",
     ):
@@ -425,6 +439,8 @@ def _assert_image_verified_locator_entry(item, record):
     assert item["ocr_token"] == item["printed_token"]
     assert item["correction_provenance"] == "image_read_reconstruction"
     assert item["printed_token"] in item["image_quote"]
+    assert str(item["value"]) in item["image_quote"]
+    assert str(item["uncertainty"]) in item["image_quote"]
     row, = [
         row for row in record["rows"]
         if row["source_text_line"] == item["source_text_line"]
@@ -506,6 +522,15 @@ def test_image_verified_locators_preserve_original_tokens_and_mutation_probe(com
         if item.get("action") == "image_verified_locator"
     )
     del locator["pdf_page"]
+    with pytest.raises(AssertionError):
+        _assert_image_verified_locators(mutated_manifest, records)
+    mutated_manifest = copy.deepcopy(manifest)
+    locator = next(
+        item
+        for item in mutated_manifest["corrections"]
+        if item.get("action") == "image_verified_locator"
+    )
+    del locator["uncertainty"]
     with pytest.raises(AssertionError):
         _assert_image_verified_locators(mutated_manifest, records)
 

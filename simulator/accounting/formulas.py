@@ -111,6 +111,12 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+# Source: controller ruling for t-1795 lists H2O, D2O, CO2, NH3, SO3, and
+# HCl. SiO2 is an adduct unit in B1452's printed mullite formula
+# 3Al2O3·2SiO2. Keep this closed vocabulary beside the sole dot classifier.
+_ASCII_ADDUCT_UNITS = frozenset(
+    {"H2O", "D2O", "CO2", "NH3", "SO3", "HCl", "SiO2"}
+)
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -622,25 +628,14 @@ def _distinct_integer_elements(text: str) -> int | None:
     return len(elements)
 
 
-def _is_integer_compound_adduct(
-    text: str, *, require_explicit_multipliers: bool = False
-) -> bool:
-    """True when every ASCII dot separates multi-element integer formulas.
+def _is_ascii_adduct(text: str) -> bool:
+    """Recognize ASCII-dot adducts only when each tail is a known unit.
 
-    Split on '.' and strip one leading integer multiplier from each part
-    after the first. It is an adduct only if every part is an
-    integer-subscript formula with at least two distinct elements;
-    otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
-    ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
-    ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
-    ``Mg1.5SiO4``, and ``Fe2.3O4`` stay one species because a part is a
-    single element. ``FeO1.5`` stays one species because the part after the
-    dot has no element. ``SiO1.5C0.5`` stays one species because it has a
-    single-element part and an elementless part. An empty piece from a
-    leading, trailing, or doubled dot is not an adduct. The scoring adapter
-    can require explicit multipliers after the first part (with bare ``H2O``
-    allowed for a hydrate) to avoid interpreting unmultiplied extraction
-    fragments as adducts.
+    After normalization, an ASCII dot is an adduct separator only when the
+    following segment is an optional positive integer coefficient and one
+    unit in ``_ASCII_ADDUCT_UNITS``. All other dots between digits remain
+    decimal coefficients. This resolves ``Al2O3.3H2O`` while preserving
+    ``MgAl1.5SiO3``.
     """
 
     if not text or "." not in text or "·" in text:
@@ -648,25 +643,18 @@ def _is_integer_compound_adduct(
     parts = text.split(".")
     if any(part == "" for part in parts):
         return False
-    for index, part in enumerate(parts):
-        if (
-            require_explicit_multipliers
-            and index > 0
-            and not _NUMBER_RE.match(part)
-            and part != "H2O"
-        ):
-            return False
-        if index > 0:
-            multiplier_match = _NUMBER_RE.match(part)
-            if multiplier_match is not None:
-                if multiplier_match.end() == len(part):
-                    return False
-                multiplier = float(multiplier_match.group())
-                if multiplier <= 0.0 or not multiplier.is_integer():
-                    return False
-        body = part if index == 0 else _strip_one_leading_integer(part)
-        count = _distinct_integer_elements(body)
-        if count is None or count < 2:
+    if _distinct_integer_elements(parts[0]) is None:
+        return False
+    for part in parts[1:]:
+        multiplier = _NUMBER_RE.match(part)
+        if multiplier is None:
+            unit = part
+        else:
+            coefficient = multiplier.group()
+            if not coefficient.isdigit() or int(coefficient) <= 0:
+                return False
+            unit = part[multiplier.end() :]
+        if unit not in _ASCII_ADDUCT_UNITS:
             return False
     return True
 
@@ -674,7 +662,7 @@ def _is_integer_compound_adduct(
 def _split_ascii_adducts(text: str) -> list[str]:
     if not text:
         return []
-    if _is_integer_compound_adduct(text):
+    if _is_ascii_adduct(text):
         return text.split(".")
     return [text]
 
@@ -684,14 +672,12 @@ def _split_formula_segments(formula: str) -> list[str]:
 
     A middle dot (U+00B7) always separates segments: ``CuSO4·5H2O`` is
     five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. An ASCII
-    dot-string is an adduct only when splitting on '.' and stripping one
-    leading integer from each part after the first leaves every part an
-    integer-subscript formula of at least two distinct elements;
-    otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
-    ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
-    ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
-    ``Mg1.5SiO4``, ``Fe2.3O4``, ``FeO1.5``, and ``SiO1.5C0.5`` stay one
-    species.
+    dot-string is an adduct only when every tail, after an optional positive
+    integer coefficient, is in the closed corpus vocabulary
+    ``_ASCII_ADDUCT_UNITS``. Otherwise a dot between digits remains decimal.
+    Thus ``Al2O3.3H2O`` and ``3Al2O3.2SiO2`` split, while
+    ``Fe1.17Si3.13O8``, ``Mg1.5SiO3``, ``FeO1.5``, and ``SiO1.5C0.5`` stay
+    one species.
     """
 
     pieces: list[str] = []

@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import json
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import (
@@ -39,14 +41,14 @@ RECORDS_DIR = COMPILATION_ROOT / "records"
 ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
-# t-1620 parses the terbium decimals; empty cells are outside the token census.
-# Independent source-JSON census: nonblank formula weights, uncertainty
-# cells, and declared row columns total 54,104; the 1,603 blanks already
-# include the three withheld entropy-uncertainty cells.
+# Independent source scan: formula weights, uncertainty cells, and declared
+# row columns contain 54,104 nonblank cells; 1,603 blanks are outside the
+# census. The generator buckets are pinned separately: 15,226 stored + 19,642
+# refused + 19,236 excluded closes that scan and must hold on train regen.
 B1452_RAW = 54104
 B1452_STORED = 15226
 B1452_REFUSED = 19642
-B1452_EXCLUDED = 19233
+B1452_EXCLUDED = 19236
 B1452_MERGED_PROPOSED = 457
 B1452_MERGED_STORED = 376
 B1452_MERGED_REFUSED = 15
@@ -528,6 +530,22 @@ def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() 
     )
 
 
+def test_locator_evidence_requires_the_source_line_mutation(monkeypatch) -> None:
+    evidence = generator._image_evidence
+    test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator()
+
+    def wrong_source_line(token, *, action, raw_tokens):
+        return evidence(
+            replace(token, source_text_line=(token.source_text_line or 0) + 1),
+            action=action,
+            raw_tokens=raw_tokens,
+        )
+
+    monkeypatch.setattr(generator, "_image_evidence", wrong_source_line)
+    with pytest.raises(AssertionError):
+        test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator()
+
+
 def test_spinel_extra_dot_split_is_proposed_then_10x_refused() -> None:
     """Grain uniquely cuts Spinel 1800 K gef 2.29.48; the page is 229.482.
 
@@ -803,6 +821,41 @@ def test_ocr_suspect_without_image_correction_is_refused() -> None:
     assert entropy.value.point == Decimal("42.55")
 
 
+def test_historical_correction_uses_printed_token_and_source_line() -> None:
+    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0162"
+    payload = _load(record_id)
+    token, = [
+        token
+        for token in generator._iter_raw_numeric_tokens(payload)
+        if token.source_text_line == 21 and token.column == "heat_capacity"
+    ]
+    assert token.layout_as_extracted == "109e02"
+    assert token.as_published == "109.02"
+    assert generator._image_correction(token) is None
+    generated = generator.generate_record(payload)
+    assert any(
+        row["row_index"] == token.row_index
+        and row["column"] == "heat_capacity"
+        for row in generated.report["refusals"]
+    )
+
+
+def test_historical_ocr_lookup_mutation_recreates_admission_failure(monkeypatch) -> None:
+    evidence = generator._image_evidence
+    test_historical_correction_uses_printed_token_and_source_line()
+    monkeypatch.setattr(
+        generator,
+        "_image_evidence",
+        lambda token, *, action, raw_tokens: evidence(
+            token,
+            action=action,
+            raw_tokens=(token.layout_as_extracted, token.as_published),
+        ),
+    )
+    with pytest.raises(AssertionError):
+        test_historical_correction_uses_printed_token_and_source_line()
+
+
 def test_oxide_asterisk_is_basis_not_damage() -> None:
     generated = _generation(FAYALITE_OXIDES)
     gibbs = _observations_for(
@@ -1043,6 +1096,23 @@ def test_blank_cell_is_not_counted_as_an_exclusion() -> None:
     del row["cells"]["reference_cp"]
     without_cell = generator.generate_record(payload).report["cell_accounting"]
     assert with_blank == without_cell
+
+
+def test_blank_accounting_mutation_recreates_production_failure(monkeypatch) -> None:
+    generate = generator.generate_record
+    raw_tokens = generator._iter_raw_numeric_tokens
+    test_blank_cell_is_not_counted_as_an_exclusion()
+
+    def count_original_blanks(payload):
+        run = generate(payload)
+        blank = sum(not token.as_published.strip() for token in raw_tokens(payload))
+        run.report["cell_accounting"]["raw_numeric_tokens"] += blank
+        run.report["cell_accounting"]["excluded"] += blank
+        return run
+
+    monkeypatch.setattr(generator, "generate_record", count_original_blanks)
+    with pytest.raises(AssertionError):
+        test_blank_cell_is_not_counted_as_an_exclusion()
 
 
 def test_record_accounting_closes() -> None:

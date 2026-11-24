@@ -337,7 +337,7 @@ from simulator.battery.validity import (
 )
 from simulator.oxygen_buffers import feo_iw_log10_fO2_bar
 from simulator.diagnostic_helpers.species_rail import parse_formula_elements
-from simulator.reference_data.janaf import formula_composition
+from simulator.reference_data.janaf import PHASE_SUFFIX_RE, formula_composition
 
 # Explicit closed set. openimcc is the only IMCC producer. Do not build this from
 # resolve_backend, BATTERY_ENGINE_NAMES, or any probe of installed backends.
@@ -1203,10 +1203,7 @@ def parse_species_formula(
         text,
     )
     text = fold_subscript_digits(text)
-    has_explicit_decimal_subscript = re.search(
-        r"_\{?\d+\.\d+|[₀-₉]+\.\d+", formula
-    ) is not None
-    phase_labels = {
+    phase_labels: dict[str, Phase] = {
         "c": Phase.CR,
         "cr": Phase.CR,
         "s": Phase.CR,
@@ -1219,17 +1216,46 @@ def parse_species_formula(
         "vapor": Phase.G,
         "aq": Phase.AQ,
     }
-    annotation = re.search(r"\(([^()]*)\)$", text)
-    if annotation is not None:
+
+    # Peel the two terminal suffixes from the right, then validate charge
+    # before phase. This handles both ``Fe(g)+`` and ``Ba^{++}(aq)``.
+    annotated_charge: int | None = None
+    annotated_phase: Phase | None = None
+    phase_seen = False
+    charge_pattern = r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$"
+    for _ in range(2):
+        charge_annotation = re.search(charge_pattern, text)
+        if charge_annotation is not None:
+            if annotated_charge is not None:
+                return None
+            signs = next(
+                group for group in charge_annotation.groups() if group is not None
+            )
+            if any(sign != signs[0] for sign in signs):
+                return None
+            annotated_charge = len(signs) * (1 if signs[0] == "+" else -1)
+            text = text[: charge_annotation.start()]
+            continue
+
+        annotation = re.search(r"\(([^()]*)\)$", text)
+        if annotation is None:
+            break
         raw_label = annotation.group(1).strip()
         label = raw_label.lower()
         # An uppercase element symbol in a terminal group is formula syntax,
         # not the lowercase ``(c)`` phase annotation.
-        annotated_phase = None if raw_label == "C" else phase_labels.get(label)
-        if annotated_phase is not None:
-            if not _species_axis_matches_phase(species, annotated_phase):
+        if label in phase_labels and raw_label != "C":
+            if phase_seen:
                 return None
+            annotated_phase = phase_labels[label]
+            phase_seen = True
+            text = text[: annotation.start()]
+            continue
         else:
+            # JANAF strips these recognized tags before returning atoms. Tags
+            # without one scorer Phase axis must be rejected before that call.
+            if PHASE_SUFFIX_RE.fullmatch(f"({label})"):
+                return None
             from simulator.battery.polymorph_dictionary import coerce_polymorph_token
 
             try:
@@ -1240,57 +1266,47 @@ def parse_species_formula(
                 if species is None or polymorph_token(species) is not annotated_polymorph:
                     return None
                 text = text[: annotation.start()]
-        if annotated_phase is not None:
-            text = text[: annotation.start()]
+                continue
+            elif not raw_label[:1].isupper():
+                return None
+
+        break
+
+    if annotated_charge is not None and (
+        species is None or charge_value(species) != annotated_charge
+    ):
+        return None
+    if (
+        annotated_phase is not None
+        and species is not None
+        and not _species_axis_matches_phase(species, annotated_phase)
+    ):
+        return None
 
     # Accounting strips these terminal brackets with no species axis. Bare
     # [c] is not in that suffix list and stays unmatched.
     bracket = re.search(r"\[([^\[\]]*)\]$", text)
     if bracket is not None:
         label = bracket.group(1).strip().lower()
-        if label != "c":
+        if label != "c" and label in phase_labels:
             annotated_phase = phase_labels.get(label)
-            if annotated_phase is not None:
-                if not _species_axis_matches_phase(species, annotated_phase):
-                    return None
-                text = text[: bracket.start()]
-
-    charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
-    if charge_annotation is not None:
-        signs = next(group for group in charge_annotation.groups() if group is not None)
-        annotated_charge = len(signs) * (1 if signs[0] == "+" else -1)
-        if any(sign != signs[0] for sign in signs):
-            return None
-        if species is None or charge_value(species) != annotated_charge:
-            return None
-        text = text[: charge_annotation.start()]
+            if annotated_phase is None or not _species_axis_matches_phase(
+                species, annotated_phase
+            ):
+                return None
+            text = text[: bracket.start()]
 
     # Validate suffix axes before the JANAF parser can strip a terminal phase
     # label and return a composition without seeing the required species axis.
-    established = formula_composition(formula)
+    if "." in text and "·" not in text:
+        from simulator.accounting.formulas import _is_ascii_adduct
+
+        if _is_ascii_adduct(text):
+            return _accounting_formula_composition(text)
+
+    established = formula_composition(text)
     if established is not None:
         return established
-
-    if "." in text and "·" not in text:
-        from simulator.accounting.formulas import _is_integer_compound_adduct
-
-        is_adduct = _is_integer_compound_adduct(
-            text, require_explicit_multipliers=True
-        )
-        if has_explicit_decimal_subscript:
-            normalized_decimal = formula_composition(text)
-            if normalized_decimal is not None:
-                return normalized_decimal
-
-        # The raw fast path above preserves existing JANAF decimal parses.
-        # For spellings it cannot parse, the accounting owner decides whether
-        # an ASCII dot is an adduct or a decimal subscript.
-        if is_adduct:
-            return _accounting_formula_composition(text)
-    elif has_explicit_decimal_subscript:
-        normalized_decimal = formula_composition(text)
-        if normalized_decimal is not None:
-            return normalized_decimal
 
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)

@@ -4078,6 +4078,7 @@ def test_species_formula_parser_accepts_formula_owner_ascii_dot_adducts() -> Non
         ("Mg2(OH)2CO3.3H2O", "Mg2(OH)2CO3.3H2O"),
         ("NaAlSi2O6.H2O", "NaAlSi2O6.H2O"),
         ("5MgO.4CO2.5H2O", "5MgO.4CO2.5H2O"),
+        ("Al2O3.3H2O", "Al2O3.3H2O"),
         ("Al₂O₃.3H₂O", "Al2O3.3H2O"),
         ("$Al_2O_3.3H_2O$", "Al2O3.3H2O"),
         ("CoSO₄.7H₂O", "CoSO4.7H2O"),
@@ -4101,8 +4102,13 @@ def test_species_formula_parser_refuses_malformed_ascii_adducts() -> None:
     ):
         assert parse_species_formula(formula) is None
 
-    for formula in ("Fe0.947O", "Al2O3.3H2O"):
+    for formula in ("Fe0.947O",):
         assert parse_species_formula(formula) == score_mod.formula_composition(formula)
+    assert parse_species_formula("Al2O3.3H2O") == (
+        ("Al", 2.0),
+        ("H", 6.0),
+        ("O", 6.0),
+    )
     assert parse_species_formula(
         "Fe0.947O(c)", species=Species("Fe0.947O", Phase.CR)
     ) == score_mod.formula_composition("Fe0.947O")
@@ -4112,9 +4118,7 @@ def test_species_formula_parser_preserves_normalized_decimal_stoichiometry() -> 
     expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
     assert parse_species_formula("MgAl1.5SiO3") == expected
     assert parse_species_formula("MgAl₁.₅SiO₃") == expected
-    assert parse_species_formula("MgAl₁.5SiO₃") == expected
     assert parse_species_formula("$MgAl_1.5SiO_3$") == expected
-    assert parse_species_formula("$MgAl_{1.5}SiO_3$") == expected
 
 
 def test_species_formula_parser_checks_decimal_formula_annotations() -> None:
@@ -4132,35 +4136,49 @@ def test_species_formula_parser_checks_decimal_formula_annotations() -> None:
     assert parse_species_formula(
         ascii_formula, species=Species("MgAl1.5SiO3", Phase.G)
     ) == expected
+    combined_suffix = "MgAl1.5SiO3(g)+"
+    assert parse_species_formula(
+        combined_suffix, species=Species("MgAl1.5SiO3", Phase.G, charge=1)
+    ) == expected
+    assert parse_species_formula(
+        combined_suffix, species=Species("MgAl1.5SiO3", Phase.CR, charge=1)
+    ) is None
+    for janaf_phase in ("fl", "cr,l", "l,g", "ref"):
+        assert parse_species_formula(
+            f"MgAl1.5SiO3({janaf_phase})",
+            species=Species("MgAl1.5SiO3", Phase.G),
+        ) is None
 
 
-def test_species_formula_parser_honors_braced_decimal_before_hydrate_split() -> None:
-    assert parse_species_formula("$MgAl_{1.5}H_2O$") == (
-        ("Al", 1.5),
-        ("H", 2.0),
-        ("Mg", 1.0),
-        ("O", 1.0),
-    )
+def test_phase_axis_bypass_mutation_recreates_production_parser_failure(
+    monkeypatch,
+) -> None:
+    monkeypatch.setattr(score_mod, "_species_axis_matches_phase", lambda *_args: True)
+    with pytest.raises(AssertionError):
+        test_species_formula_parser_checks_decimal_formula_annotations()
 
 
-def test_decimal_precedence_mutation_recreates_wrong_atoms_and_axis_bypass() -> None:
-    from simulator.accounting.formulas import _is_integer_compound_adduct
-
+def test_species_formula_parser_honors_braced_and_mixed_decimal_subscripts() -> None:
     expected = (("Al", 1.5), ("Mg", 1.0), ("O", 3.0), ("Si", 1.0))
+    assert parse_species_formula("$MgAl_{1.5}SiO_3$") == expected
+    assert parse_species_formula("MgAl₁.5SiO₃") == expected
 
-    def adduct_first_mutation(formula: str):
-        text = formula.replace("₁", "1").replace("₃", "3")
-        if _is_integer_compound_adduct(text, require_explicit_multipliers=True):
-            return score_mod._accounting_formula_composition(text)
-        return score_mod.formula_composition(text)
 
-    assert adduct_first_mutation("MgAl₁.5SiO₃") != expected
-    assert adduct_first_mutation("MgAl₁.5SiO₃(g)") == expected
-    assert parse_species_formula("MgAl₁.5SiO₃(g)") is None
+def test_decimal_precedence_mutation_recreates_production_parser_failure(
+    monkeypatch,
+) -> None:
+    from simulator.accounting import formulas as formula_owner
 
-    janaf_first_mutation = score_mod.formula_composition("MgAl1.5SiO3(g)")
-    assert janaf_first_mutation == expected
-    assert parse_species_formula("MgAl1.5SiO3(g)") is None
+    is_adduct = formula_owner._is_ascii_adduct
+
+    def adduct_first(formula: str) -> bool:
+        if formula == "MgAl1.5SiO3":
+            return True
+        return is_adduct(formula)
+
+    monkeypatch.setattr(formula_owner, "_is_ascii_adduct", adduct_first)
+    with pytest.raises(AssertionError):
+        test_species_formula_parser_preserves_normalized_decimal_stoichiometry()
 
 
 def test_species_formula_parser_keeps_adjacent_parenthesized_groups() -> None:

@@ -300,6 +300,7 @@ class RawToken:
     formation_basis: str | None
     row_index: int | None
     table_kind: str
+    source_text_line: int | None = None
 
 
 def _table_kind(record: Mapping[str, Any]) -> str:
@@ -391,6 +392,7 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
         column: str,
         *,
         row_index: int | None = None,
+        source_text_line: int | None = None,
         formation_basis: str | None = None,
     ) -> None:
         parsed = _as_published_cell(cell)
@@ -417,6 +419,7 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
                 formation_basis=column_basis,
                 row_index=row_index,
                 table_kind=kind,
+                source_text_line=source_text_line,
             )
         )
 
@@ -431,57 +434,87 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
         if not isinstance(row, Mapping):
             raise ValueError(f"{record_id}: rows[{row_index}] is not a mapping")
         cells = row.get("cells") if isinstance(row.get("cells"), Mapping) else {}
+        raw_line = row.get("source_text_line")
         for column in column_ids:
             add(
                 f"rows[{row_index}].cells.{column}",
                 cells.get(column),
                 column,
                 row_index=row_index,
+                source_text_line=int(raw_line) if raw_line is not None else None,
             )
     return tokens
 
 
 @lru_cache(maxsize=1)
-def _corrections_by_token() -> dict[tuple[str, str, str], Mapping[str, Any]]:
+def _corrections_by_token() -> dict[tuple[str, int, str, str, str], Mapping[str, Any]]:
     manifest = load_cached_safe_yaml(
         (COMPILATION_ROOT / "manifest.yaml").read_text(encoding="utf-8")
     )
-    index: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    index: dict[tuple[str, int, str, str, str], Mapping[str, Any]] = {}
     for item in manifest.get("corrections") or ():
         if not isinstance(item, Mapping):
             continue
-        if item.get("action") not in {
-            "image_verified_correction",
-            "image_verified_locator",
-        }:
+        action = str(item.get("action") or "")
+        if action not in {"image_verified_correction", "image_verified_locator"}:
             continue
         record_id = str(item.get("record_id") or "")
+        source_text_line = item.get("source_text_line")
+        if not isinstance(source_text_line, int):
+            continue
         column = str(item.get("column") or "")
-        ocr = str(item.get("ocr_token") or item.get("as_published") or "")
-        index[(record_id, column, ocr)] = item
+        if action == "image_verified_correction" and record_id == TABLE_298K_RECORD_ID:
+            # The new 298 K correction is keyed by its image-verified printed
+            # token. Its captured OCR token remains provenance only.
+            token = str(item.get("printed_token") or "")
+        else:
+            # Preserve green's OCR-keyed lookup for every historical correction.
+            token = str(item.get("ocr_token") or item.get("as_published") or "")
+        index[(record_id, source_text_line, column, action, token)] = item
     return index
 
 
-def _image_evidence(token: RawToken) -> Mapping[str, Any] | None:
+def _image_evidence(
+    token: RawToken, *, action: str, raw_tokens: Sequence[str | None]
+) -> Mapping[str, Any] | None:
+    if token.source_text_line is None:
+        return None
     corrections = _corrections_by_token()
-    for raw_token in (token.layout_as_extracted, token.as_published):
+    for raw_token in raw_tokens:
         if raw_token is None:
             continue
         for candidate in (raw_token, _strip_oxide_marker(raw_token)):
-            item = corrections.get((token.record_id, token.column, candidate))
+            item = corrections.get(
+                (
+                    token.record_id,
+                    token.source_text_line,
+                    token.column,
+                    action,
+                    candidate,
+                )
+            )
             if item is not None:
                 return item
     return None
 
 
 def _image_correction(token: RawToken) -> Mapping[str, Any] | None:
-    item = _image_evidence(token)
-    return item if item and item.get("action") == "image_verified_correction" else None
+    # Historical correction admission stays on the printed token, as on
+    # green. The preserved OCR token is evidence provenance, not a lookup key.
+    return _image_evidence(
+        token,
+        action="image_verified_correction",
+        raw_tokens=(token.as_published,),
+    )
 
 
 def _image_locator(token: RawToken) -> Mapping[str, Any] | None:
-    item = _image_evidence(token)
-    return item if item and item.get("action") == "image_verified_locator" else None
+    # Locator entries bind the preserved OCR token to one source row.
+    return _image_evidence(
+        token,
+        action="image_verified_locator",
+        raw_tokens=(token.layout_as_extracted, token.as_published),
+    )
 
 
 def _image_verified(token: RawToken) -> bool:
@@ -1451,13 +1484,7 @@ def _observation(
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
     identity = fill_identity(quantity, species, **known)
-    source_text_line = None
-    rows = record.get("rows") or ()
-    if token.row_index is not None and token.row_index < len(rows):
-        raw_line = rows[token.row_index].get("source_text_line")
-        if raw_line is not None:
-            source_text_line = int(raw_line)
-    published_page, pdf_page = _pages(record, source_text_line)
+    published_page, pdf_page = _pages(record, token.source_text_line)
     if reconstruction is not None:
         if reconstruction.get("published_page") is not None:
             published_page = int(reconstruction["published_page"])
