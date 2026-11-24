@@ -10,8 +10,8 @@ from __future__ import annotations
 
 import base64
 import json
+import lzma
 import re
-import zlib
 from pathlib import Path
 from unittest.mock import patch
 
@@ -376,8 +376,8 @@ def _store_difference_details(
                 f"{len(regenerated_bytes)} regenerated); no observation-row difference"
             )
     raw = json.dumps(details, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    payload = base64.b64encode(zlib.compress(raw, level=9)).decode("ascii")
-    return f"store_delta_zlib_base64={payload}"
+    payload = base64.b64encode(lzma.compress(raw, preset=9)).decode("ascii")
+    return f"store_delta_lzma_base64={payload}"
 
 
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
