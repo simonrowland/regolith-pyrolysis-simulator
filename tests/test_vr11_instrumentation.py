@@ -21,6 +21,7 @@ from typing import Any
 import pytest
 import yaml
 
+import simulator.accounting.queries as accounting_queries
 from simulator.condensation import CondensationModel, CondensationTrain
 from simulator.evaporation import (
     EvaporationFluxRefusal,
@@ -1399,6 +1400,30 @@ def test_lab_plume_ceiling_breach_includes_typed_table() -> None:
     sio_row = next(r for r in table if r["legacy_key"] == "SiO")
     assert sio_row["breached"] is True
     assert sio_row["lookup_gas_id"] == "SiO"
+
+
+def test_lab_plume_ceiling_ignores_two_ulp_sum_roundoff(monkeypatch) -> None:
+    from simulator.accounting.queries import AccountingQueries
+    from tests.test_lab_oxygen_diagnostics import _plume_diagnostic_sim
+
+    ceiling = 5.089568621263579
+    monkeypatch.setattr(
+        accounting_queries,
+        "SOURCE_VAPOUR_CEILING_ROWS",
+        ({"legacy_key": "SiO", "ceiling_mol": ceiling},),
+    )
+    two_ulp_source = math.nextafter(
+        math.nextafter(ceiling, math.inf), math.inf
+    )
+    near = AccountingQueries(
+        _plume_diagnostic_sim(overhead={"SiO": two_ulp_source})
+    ).lab_plume_product_partition()
+    overdraw = AccountingQueries(
+        _plume_diagnostic_sim(overhead={"SiO": ceiling + 1e-9})
+    ).lab_plume_product_partition()
+
+    assert near["ceiling_breach"]["breached"] is False
+    assert overdraw["ceiling_breach"]["breached"] is True
 
 
 def test_ceiling_lookup_accepts_canonical_gas_id() -> None:

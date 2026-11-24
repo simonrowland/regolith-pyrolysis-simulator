@@ -8,7 +8,12 @@ import math
 
 import pytest
 
-from simulator.coating_lifespan import CampaignsToResinterTotal, FoulingProjectionError
+from simulator.coating_lifespan import (
+    CampaignsToResinterTotal,
+    FoulingProjectionError,
+    FoulingTerminalSnapshot,
+    cascade_knee_provisional,
+)
 from simulator.optimize.fouling_lifecycle import (
     FoulingLifecycleHarness,
     FoulingRunArtifact,
@@ -787,6 +792,22 @@ def test_cascade_knee_is_reported_as_provisional_shape_indicator() -> None:
 
     assert result.lifecycle_projection.cascade_knee_provisional == 3
     assert result.lifecycle_projection.service_life_authoritative is False
+
+
+def test_cascade_knee_ignores_two_ulp_slope_noise() -> None:
+    def knee(last_thickness: float) -> int | None:
+        snapshots = [
+            FoulingTerminalSnapshot({"duct_a": {"SiO": thickness}})
+            for thickness in (5.0, 10.0, last_thickness)
+        ]
+        return cascade_knee_provisional(
+            snapshots,
+            segment_area_m2={"duct_a": 1.0},
+            rho_deposit_kg_m3=1.0,
+        )
+
+    assert knee(math.nextafter(15.0, math.inf)) is None
+    assert knee(15.0 + 1e-9) == 3
 
 
 def test_harness_carries_explicit_c4b_deferred_seam_without_live_harvest() -> None:

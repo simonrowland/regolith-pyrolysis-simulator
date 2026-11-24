@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+import simulator.chemistry.organics_pyrolysis as organics_pyrolysis
 from simulator.account_ids import SOLID_CHAR_CARBON_ACCOUNT
 from simulator.accounting.formulas import resolve_species_formula
 from simulator.chemistry.organics_pyrolysis import (
@@ -133,6 +134,50 @@ def test_primary_pyrolysis_has_no_co_and_emits_h2() -> None:
         and note.get("species") == "CO"
     ]
     assert proven
+
+
+def test_primary_pyrolysis_keeps_roundoff_sized_carbon_excess(monkeypatch) -> None:
+    mobile_carbon = 5.089568621263579
+
+    def full_release(*_args, **_kwargs):
+        return {"fraction": 1.0}
+
+    monkeypatch.setattr(
+        organics_pyrolysis,
+        "voropaev_release_fraction",
+        full_release,
+    )
+    monkeypatch.setattr(
+        organics_pyrolysis,
+        "organic_co2_release_fraction",
+        full_release,
+    )
+    params = {
+        "nascent_char": {
+            "default_basis": "f_char_of_bulk_organic_C",
+            "f_char_of_bulk_organic_C": {"value": 0.0},
+        },
+        "primary_gas_yields_of_mobilized_C": {
+            "CH4": {"value": 1.0},
+            "CO2_organic": {"value": 2e-16},
+            "COS": {"value": 2e-16},
+        },
+    }
+    atoms = {
+        "C": mobile_carbon,
+        "H": 4.0 * mobile_carbon,
+        "O": 1e-6,
+        "S": 1e-14,
+    }
+
+    roundoff = primary_pyrolysis(atoms, 800.0, params)
+    params["primary_gas_yields_of_mobilized_C"]["CO2_organic"]["value"] = (
+        1e-9 / mobile_carbon
+    )
+    real_overdraw = primary_pyrolysis(atoms, 800.0, params)
+
+    assert roundoff.gas_mol["CH4"] == mobile_carbon
+    assert real_overdraw.gas_mol["CH4"] < mobile_carbon
 
 
 def test_missing_s_is_proven_zero_not_silent_zero() -> None:
