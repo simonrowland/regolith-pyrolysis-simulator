@@ -922,8 +922,9 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             'K2O': 1.0,
             'TiO2': 2.0,
             'Cr2O3': 1.0,
-            'MnO': 1.0,
-            'P2O5': 1.0,
+            # Keep the projected drops within the 1 wt% total allowance.
+            'MnO': 0.49,
+            'P2O5': 0.49,
         },
     )
     cell = equilibrate_cell(

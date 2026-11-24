@@ -535,10 +535,13 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_nonbaseline_notice_fields=True,
     )
-    # Numeric-only hash read from the 9c327c2 Studio-3 failure trace.
+    # OpenIMCC 7cf replaces L's 66ec pin. At 2400.65 K, Na2O activity moves
+    # 0.000135947754 -> 0.000141498454 and FeO moves 0.1352210562 ->
+    # 0.1395742027; Na vapor pressure moves 35354.0213 -> 36797.5141 Pa.
+    # Numeric-only hash from the paired Studio payload.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
-    ).hexdigest() == "3d1181198c3ed5425d44a1d1c4fb3f96d1d4a36f3ceff918eb7d7a0d7ecdc8e5"
+    ).hexdigest() == "451d4e0057affb174483a9ca2b4b7c1270c796aa0800f0371f8fbe10fb7066f0"
     # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
