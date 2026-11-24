@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 from dataclasses import replace
 from decimal import Decimal
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -48,6 +50,12 @@ EXPECTED_POLICY_FLAGS = {
     "method_unstated",
     "method_inferred",
 }
+
+
+def _policy_json_bytes(policy: object) -> bytes:
+    return json.dumps(policy, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
 
 
 def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
@@ -204,7 +212,19 @@ def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
         sample_mass_kg
     ).melt_surface_area_m2
     resolved = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+    policy_bytes = _policy_json_bytes(resolved.payload["policy"])
+    runner_sample_policy = resolve(
+        "DP-007", sample_mass_kg=0.01
+    ).payload["policy"]
 
+    assert (
+        hashlib.sha256(policy_bytes).hexdigest()
+        == "b538cb732135d3441ff6fe826811ef25c398f61e9dbbc2755e9849be4ab4ea96"
+    )
+    assert (
+        hashlib.sha256(_policy_json_bytes(runner_sample_policy)).hexdigest()
+        == "053e7537cc22fe756da0429942b746f28e2de91a0905b14b83e61b89992b2a12"
+    )
     assert resolved.value == Decimal(str(expected_area_m2))
     assert resolved.units == "m²"
     assert resolved.value < Decimal("0.2") / Decimal("1000")
