@@ -535,17 +535,26 @@ def test_successful_openimcc_physics_is_bit_identical() -> None:
         result,
         exclude_nonbaseline_notice_fields=True,
     )
-    # OpenIMCC 7cf replaces L's 66ec pin. At 2400.65 K, Na2O activity moves
-    # 0.000135947754 -> 0.000141498454 and FeO moves 0.1352210562 ->
-    # 0.1395742027; Na vapor pressure moves 35354.0213 -> 36797.5141 Pa.
-    # Numeric-only hash from the paired Studio payload.
+    # OpenIMCC 7cf (D066 v4) replaces L's 66ec pin. At 2400.65 K, Na2O
+    # activity moves 0.000135947754 -> 0.000141498454 and FeO moves
+    # 0.1352210562 -> 0.1395742027; Na vapor pressure moves
+    # 35354.0213 -> 36797.5141 Pa. The numeric-only hash is from the paired
+    # Studio payload.
     assert hashlib.sha256(
         json.dumps(numeric_payload, sort_keys=True).encode()
     ).hexdigest() == "451d4e0057affb174483a9ca2b4b7c1270c796aa0800f0371f8fbe10fb7066f0"
-    # Projected metadata digest captured from merged green cb20fb3d4 on studio-2.
+    # The paired metadata diff is the D066 pin: version 1.0.3-d066-v1 /
+    # digest 02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75
+    # -> version 1.0.6-d066-v4 / digest
+    # 0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0.
+    # For example, Al melt gamma moves 0.9180503771 -> 0.9136188127 and its
+    # P_eq moves 8.9959505519 -> 8.9525257728 Pa. The Hastie K notice moves
+    # from -1.17..-1.22 dex to -1.18..-1.24 dex and gains the K2Si2O5 source
+    # pointer; v4 also adds the k-al-over-sequestration notice. These are
+    # expected metadata leaves of the pinned pack, not numerical hash drift.
     assert hashlib.sha256(
         json.dumps((*numeric_payload, *metadata_payload), sort_keys=True).encode()
-    ).hexdigest() == "1064588935496b5f0ff99e1ff6e2908bc62f20e1845520ebe8aa321a91c76582"
+    ).hexdigest() == "8020fb4d4a0fe067476ad2c96454e2f72060cee7700c4e27cf99cb35892c609c"
 
 
 def test_1800_k_pre_switch_physics_pin() -> None:

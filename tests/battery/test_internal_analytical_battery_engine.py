@@ -922,7 +922,10 @@ def test_internal_analytical_battery_uses_freeze_gate_phase_basis(
             'K2O': 1.0,
             'TiO2': 2.0,
             'Cr2O3': 1.0,
-            # Keep the projected drops within the 1 wt% total allowance.
+            # The original 1 wt% + 1 wt% drops exceeded the projection's
+            # 1 wt% limit and selected the Kress fallback. Keep both dropped
+            # species while staying inside that limit so MAGEMin supplies the
+            # phase basis this receipt exercises.
             'MnO': 0.49,
             'P2O5': 0.49,
         },
