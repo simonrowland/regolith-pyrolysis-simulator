@@ -18,9 +18,15 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     scanned = scan_cache_sites(_REPO_ROOT)
     unregistered = sorted(set(scanned) - set(CACHE_SITES))
     stale = sorted(set(CACHE_SITES) - set(scanned))
-    assert not unregistered and not stale, {
+    line_changes = {
+        site_id: {"from": row["line"], "to": scanned[site_id]["line"]}
+        for site_id, row in CACHE_SITES.items()
+        if site_id in scanned and row["line"] != scanned[site_id]["line"]
+    }
+    assert not unregistered and not stale and not line_changes, {
         "unregistered": unregistered,
         "stale": stale,
+        "line_changes": line_changes,
     }
     for site_id, row in CACHE_SITES.items():
         assert row["line"] == scanned[site_id]["line"], site_id

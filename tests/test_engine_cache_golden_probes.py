@@ -327,7 +327,7 @@ def _live_engine_probe(
             module_file = Path(openimcc.__file__).resolve()
             source_files = sorted(module_file.parent.rglob("*.py"))
             source_hash_input = b"".join(
-                hashlib.sha256(path.read_bytes()).hexdigest().encode()
+                hashlib.sha1(path.read_bytes()).hexdigest().encode()
                 + b"  ./"
                 + path.relative_to(module_file.parent).as_posix().encode()
                 + b"\n"
@@ -335,7 +335,7 @@ def _live_engine_probe(
             )
             openimcc_import = {
                 "module_file": str(module_file),
-                "source_hash": hashlib.sha256(source_hash_input).hexdigest(),
+                "source_tree_hash": hashlib.sha1(source_hash_input).hexdigest()[:12],
             }
         return {
             "pid": os.getpid(),
