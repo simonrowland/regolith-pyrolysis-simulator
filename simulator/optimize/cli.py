@@ -31,7 +31,9 @@ from simulator.optimize.study import (
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.optimize.discovery import OPTIMIZER_CACHE_NAME, optimizer_run_dirs
 from simulator.optimize.import_bundle import (
-    is_optimizer_archive_store,
+    OptimizerStoreClassification,
+    StagedImportStoreError,
+    classify_optimizer_store,
 )
 from simulator.optimize.results_store import ResultStore, study_results_write_lock_path
 from simulator.optimize.save_bundle import PARETO_NAME
@@ -138,7 +140,8 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
     else:
         archive_stores = []
         for path in runs_root.rglob(OPTIMIZER_CACHE_NAME):
-            if is_optimizer_archive_store(path, runs_root):
+            classification = classify_optimizer_store(path, runs_root)
+            if classification is OptimizerStoreClassification.PUBLISHED_ARCHIVE:
                 archive_stores.append(path)
                 auto_archive_stores.add(path)
         stores = list(dict.fromkeys([
@@ -166,7 +169,12 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
                     continue
                 raise FileNotFoundError(f"optimizer result store not found: {path}")
             real_path = Path(os.path.realpath(path))
-            if is_optimizer_archive_store(real_path, runs_root):
+            classification = classify_optimizer_store(real_path, runs_root)
+            if classification is OptimizerStoreClassification.STAGED:
+                if args.store:
+                    raise StagedImportStoreError(real_path.parent)
+                continue
+            if classification is OptimizerStoreClassification.PUBLISHED_ARCHIVE:
                 report["stores"].append(
                     {"store": str(real_path), "artifact_kind": "archive", "status": "skipped"}
                 )
@@ -196,7 +204,7 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
                 report["retained_artifacts"].append(
                     {"path": str(pareto), "artifact_kind": "warm_start", "status": "kept"}
                 )
-    except Exception as exc:
+    except (Exception, KeyboardInterrupt) as exc:
         print(f"Prune aborted: {type(exc).__name__}: {exc}")
         print(
             json.dumps(

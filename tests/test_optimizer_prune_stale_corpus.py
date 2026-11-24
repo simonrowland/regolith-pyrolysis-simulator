@@ -2,9 +2,11 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import runpy
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 from threading import Thread
 
@@ -24,10 +26,12 @@ from simulator.optimize.import_bundle import (
     IMPORTED_DIR_NAME,
     IMPORT_OVERLAY_NAME,
     IMPORT_STAGING_PREFIX,
-    is_imported_path,
+    OptimizerStoreClassification,
+    StagedImportStoreError,
 )
 from simulator.optimize.save_bundle import (
     ARTIFACT_INDEX_NAME,
+    OPTIMIZER_CACHE_NAME,
     REQUIRED_MEMBERS,
     export_study_bundle,
 )
@@ -126,6 +130,43 @@ def test_cli_apply_honours_study_results_lock(tmp_path, monkeypatch):
             cli.main(["prune-stale-corpus", "--store", str(store.path), "--apply"])
 
     assert _keys(store) == {"stale-a", "current", "older-compatible", "unversioned"}
+
+
+def test_apply_interrupt_reports_previously_committed_store(
+    tmp_path, monkeypatch, capsys
+):
+    first = _store_with_versions(tmp_path / "first")
+    second = _store_with_versions(tmp_path / "second", timeout_ms=30_000)
+    monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
+
+    def interrupt_during_lock_wait(_seconds):
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr(results_store_module.time, "sleep", interrupt_during_lock_wait)
+    second_lock = study_results_write_lock_path(second.path.parent)
+    with ResultStoreWriteLock(second_lock, timeout_ms=1):
+        with pytest.raises(KeyboardInterrupt):
+            cli.main([
+                "prune-stale-corpus",
+                "--store", str(first.path),
+                "--store", str(second.path),
+                "--apply",
+            ])
+
+    assert _keys(first) == {"current", "older-compatible", "unversioned"}
+    assert _keys(second) == {"stale-a", "current", "older-compatible", "unversioned"}
+    lines = capsys.readouterr().out.splitlines()
+    assert lines[0].startswith("Prune aborted: KeyboardInterrupt:")
+    report = json.loads(lines[-1])
+    assert report["stores"] == [{
+        "store": str(first.path.resolve()),
+        "artifact_kind": "result_rows",
+        "stale": 1,
+        "kept": 2,
+        "unversioned": 1,
+        "deleted": 1,
+    }]
+    assert report["abort_reason"] == "KeyboardInterrupt: "
 
 
 def test_cli_prints_human_summary_and_json_line(tmp_path, monkeypatch, capsys):
@@ -347,18 +388,75 @@ def test_import_staging_store_is_not_discovered(tmp_path, monkeypatch, capsys):
     _assert_import_staging_is_not_discovered(tmp_path, monkeypatch, capsys)
 
 
-def test_import_staging_classifier_mutation_probe_rejects_old_rule(
+def _assert_explicit_staging_store_is_refused(tmp_path, monkeypatch, capsys):
+    root = tmp_path / "runs"
+    import_fixtures = runpy.run_path("tests/test_optimizer_import_bundle.py")
+    source_store = _store_with_versions(tmp_path / "source")
+    indexed_db = tmp_path / "indexed-cache.sqlite"
+    with closing(sqlite3.connect(source_store.path)) as conn:
+        conn.execute("VACUUM INTO ?", (str(indexed_db),))
+    members = import_fixtures["_members"](tmp_path)
+    members[OPTIMIZER_CACHE_NAME] = indexed_db.read_bytes()
+    bundle = import_fixtures["_write_zip"](tmp_path / "live-import.rpstudy.zip", members)
+    monkeypatch.setenv("OPTIMIZER_RUNS_DIR", str(root))
+    monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
+    replace = Path.replace
+    attempted_report = []
+    observed_staging = []
+
+    def prune_before_publish(staging, destination):
+        if staging.name.startswith(IMPORT_STAGING_PREFIX):
+            staging_store = staging / OPTIMIZER_CACHE_NAME
+            assert (staging / IMPORT_OVERLAY_NAME).is_file()
+            before_bytes = staging_store.read_bytes()
+            before_hash = hashlib.sha256(before_bytes).hexdigest()
+
+            def staging_keys():
+                with sqlite3.connect(staging_store) as conn:
+                    return {row[0] for row in conn.execute("SELECT cache_key FROM results")}
+
+            before_keys = staging_keys()
+            observed_staging.append(staging)
+            try:
+                cli.main([
+                    "prune-stale-corpus", "--store", str(staging_store), "--apply"
+                ])
+            except StagedImportStoreError as exc:
+                assert str(staging.resolve()) in str(exc)
+            else:
+                assert False, "explicit staging store was not refused"
+            assert staging_keys() == before_keys
+            assert staging_store.read_bytes() == before_bytes
+            assert hashlib.sha256(staging_store.read_bytes()).hexdigest() == before_hash
+            attempted_report.append(json.loads(capsys.readouterr().out.splitlines()[-1]))
+        return replace(staging, destination)
+
+    monkeypatch.setattr(Path, "replace", prune_before_publish)
+    published = import_bundle.import_study_bundle(bundle, root, verification_tier=0)
+
+    assert len(observed_staging) == 1
+    assert not observed_staging[0].exists()
+    assert attempted_report[0]["stores"] == []
+    assert attempted_report[0]["abort_reason"].startswith(
+        "StagedImportStoreError: refusing STAGED"
+    )
+    assert import_bundle.verify_import_hashes(published.path)["verdict"] == "confirmed"
+
+
+def test_explicit_staging_store_is_refused_without_mutation(tmp_path, monkeypatch, capsys):
+    _assert_explicit_staging_store_is_refused(tmp_path, monkeypatch, capsys)
+
+
+def test_explicit_staging_store_mutation_probe_rejects_old_boolean_rule(
     tmp_path, monkeypatch, capsys
 ):
-    def old_classifier(path, runs_root):
-        directory = Path(path).resolve().parent
-        return (directory / IMPORT_OVERLAY_NAME).is_file() or (
-            is_imported_path(directory, runs_root)
-        )
-
-    monkeypatch.setattr(cli, "is_optimizer_archive_store", old_classifier)
+    monkeypatch.setattr(
+        cli,
+        "classify_optimizer_store",
+        lambda path, runs_root: OptimizerStoreClassification.NATIVE,
+    )
     with pytest.raises(AssertionError):
-        _assert_import_staging_is_not_discovered(tmp_path, monkeypatch, capsys)
+        _assert_explicit_staging_store_is_refused(tmp_path, monkeypatch, capsys)
 
 
 def test_apply_reports_committed_stores_when_later_store_is_missing(
@@ -435,7 +533,15 @@ def test_quarantine_path_mutation_probe_rejects_marker_only_classifier(
             directory / ARTIFACT_INDEX_NAME
         ).is_file()
 
-    monkeypatch.setattr(cli, "is_optimizer_archive_store", marker_only_classifier)
+    monkeypatch.setattr(
+        cli,
+        "classify_optimizer_store",
+        lambda path, runs_root: (
+            OptimizerStoreClassification.PUBLISHED_ARCHIVE
+            if marker_only_classifier(path, runs_root)
+            else OptimizerStoreClassification.NATIVE
+        ),
+    )
     with pytest.raises(AssertionError):
         test_default_report_keeps_pareto_and_lists_quarantined_store(
             tmp_path, monkeypatch, capsys
@@ -483,6 +589,14 @@ def test_native_export_mutation_probe_rejects_artifact_index_classifier(
             directory / ARTIFACT_INDEX_NAME
         ).is_file()
 
-    monkeypatch.setattr(cli, "is_optimizer_archive_store", old_archive_classifier)
+    monkeypatch.setattr(
+        cli,
+        "classify_optimizer_store",
+        lambda path, runs_root: (
+            OptimizerStoreClassification.PUBLISHED_ARCHIVE
+            if old_archive_classifier(path, runs_root)
+            else OptimizerStoreClassification.NATIVE
+        ),
+    )
     with pytest.raises(AssertionError):
         _assert_native_export_is_pruned(tmp_path, monkeypatch, capsys)

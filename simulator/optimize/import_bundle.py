@@ -5,6 +5,7 @@ from __future__ import annotations
 import csv
 from dataclasses import dataclass
 from datetime import UTC, datetime
+from enum import Enum
 import hashlib
 import io
 import json
@@ -127,6 +128,20 @@ class ImportBundleError(ValueError):
 
 class ImportSafetyCapError(ImportBundleError):
     """Raised when an import safety cap is exceeded."""
+
+
+class StagedImportStoreError(ImportBundleError):
+    """Raised when pruning targets an import that has not been published."""
+
+    def __init__(self, path: Path) -> None:
+        self.path = path
+        super().__init__(f"refusing STAGED optimizer import store: {path}")
+
+
+class OptimizerStoreClassification(Enum):
+    NATIVE = "native"
+    STAGED = "staged"
+    PUBLISHED_ARCHIVE = "published_archive"
 
 
 @dataclass(frozen=True)
@@ -472,16 +487,20 @@ def is_imported_path(path: Path | str, runs_root: Path | str) -> bool:
     return True
 
 
-def is_optimizer_archive_store(path: Path | str, runs_root: Path | str) -> bool:
-    """Whether a result store has import provenance or is in import quarantine."""
+def classify_optimizer_store(
+    path: Path | str, runs_root: Path | str
+) -> OptimizerStoreClassification:
+    """Classify a cache store before callers decide whether it can be written."""
     directory = Path(path).resolve().parent
     in_import_quarantine = is_imported_path(directory, runs_root)
     is_import_staging = in_import_quarantine and directory.name.startswith(
         IMPORT_STAGING_PREFIX
     )
-    return not is_import_staging and (
-        (directory / IMPORT_OVERLAY_NAME).is_file() or in_import_quarantine
-    )
+    if is_import_staging:
+        return OptimizerStoreClassification.STAGED
+    if (directory / IMPORT_OVERLAY_NAME).is_file() or in_import_quarantine:
+        return OptimizerStoreClassification.PUBLISHED_ARCHIVE
+    return OptimizerStoreClassification.NATIVE
 
 
 def _extract_bundle_members(
