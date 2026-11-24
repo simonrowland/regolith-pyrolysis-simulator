@@ -7,8 +7,18 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.migrate import _initial_compositions_conflict, load_yaml, migrate
-from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_FLAG, as_decimal
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+from simulator.battery.migrate import (
+    _initial_compositions_conflict,
+    load_yaml,
+    migrate,
+    wt_pct_to_mole_fraction,
+)
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+    as_decimal,
+)
 from simulator.battery.waypoints import normalized_composition
 from tests.battery.factories import migrate_one_extract
 from tests.battery.test_migrate import (
@@ -564,16 +574,36 @@ def test_real_hashimoto_table5_points_resolve_declared_series_start() -> None:
         point = (observation.point_conditions or {}).get("composition")
         assert point is not None and point.state.is_value
         assert point.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert point.state.value.input_provenance == PRINTED_STARTING_BULK
+        identity = observation.identity.composition
+        assert identity is not None and identity.is_value
+        assert identity.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        assert identity.value.input_provenance == PRINTED_STARTING_BULK
+        proxy_notices = [
+            notice
+            for notice in observation.notices
+            if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        ]
+        # This row's initial_stage_vaporization_rate_F quantity is unsupported
+        # (extract line 5564; migrate.py lines 12369-12372), so _quantity_token
+        # returns None (migrate.py lines 15600-15605). The proxy owner adds a
+        # notice only for a supported quantity (migrate.py lines 9524-9536); the
+        # proxy flag/provenance remain on the composition values.
+        assert len(proxy_notices) == 0
         initial = experiment.sample.initial_composition
         assert initial is not None and initial.state.is_value
         assert initial.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
         assert not _initial_compositions_conflict(initial, point)
         norm = normalized_composition(experiment, None, observation)
         assert norm.selected is not None
-        assert norm.selected.route == "normalized_printed_composition", (
+        assert norm.selected.route == "observation_normalized_initial_composition", (
             observation.observation_id,
             norm.selected.route,
         )
+        printed_start = wt_pct_to_mole_fraction(
+            {oxide: as_decimal(weight) for oxide, weight in expected.items()}
+        )
+        assert norm.selected.value == printed_start.as_map()
 
 
 # Published Table 5 (p.122): Pb at the crucible bottom, P0 near the pump.

@@ -3227,6 +3227,63 @@ def test_redox_gate_distinguishes_numerical_failure_from_missing_provider_defaul
     assert sim.atom_ledger.mol_by_account() == before
 
 
+def test_held_path_runner_payload_outcome_is_a_json_string(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    """A held gate curve must survive golden_sections.nodes().
+
+    ``GateCurveProviderOutcome`` subclasses ``str``, but ``type(member) is str``
+    is false, and ``nodes`` rejects that. The runner walks the in-process
+    payload, so the refusal stores ``.value``.
+    """
+    from simulator.engine_pool import EngineWorkerTimeout
+    from tests.golden_sections import nodes
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    sim._remember_freeze_gate_provider_curve({
+        'source': 'gate_liquid_fraction',
+        'solidus_T_C': 1100.0,
+        'liquidus_T_C': 1400.0,
+        'path': ((1100.0, 0.0), (1400.0, 1.0)),
+    })
+    original = sim._dispatch_only
+
+    def timeout_gate(intent, *args, **kwargs):
+        if intent is ChemistryIntent.GATE_LIQUID_FRACTION:
+            raise EngineWorkerTimeout('magemin', 15.0, phase='call')
+        return original(intent, *args, **kwargs)
+
+    monkeypatch.setattr(sim, '_dispatch_only', timeout_gate)
+    curve = sim._melt_redox_liquidus_gate_curve()
+    refusal = curve['gate_provider_refusal']
+    assert refusal['qualification'] == 'held_last_good_curve'
+    assert type(refusal['outcome']) is str
+    assert refusal['outcome'] == GateCurveProviderOutcome.FAILED.value
+    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.FAILED
+    payload = {
+        'per_hour_summary': [{
+            'oxygen_reservoir': {
+                'liquid_fraction_gate': {'redox': curve},
+            },
+        }],
+    }
+    restored = json.loads(json.dumps(payload))
+    indexed = nodes(restored)
+    outcome_nodes = [
+        token for path, token in indexed.items() if path.endswith('/outcome')
+    ]
+    assert outcome_nodes
+    assert {token['kind'] for token in outcome_nodes} == {'string'}
+
+
 def test_redox_gate_propagates_keyerror_from_curve_notice_recording(
     monkeypatch,
     vapor_pressure_data,

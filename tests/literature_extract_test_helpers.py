@@ -1,6 +1,7 @@
 import subprocess
-from collections.abc import Iterable
+from collections.abc import Iterable, Mapping
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -40,6 +41,17 @@ def iter_locators(value: object):
     elif isinstance(value, list):
         for child in value:
             yield from iter_locators(child)
+
+
+def assert_all_physical_locators(document: Mapping[str, Any]) -> None:
+    """Require every nested source locator to use one-based physical pages."""
+
+    for locator in iter_locators(document):
+        page = locator.get("page")
+        index = locator.get("pdf_page_index")
+        assert isinstance(page, int) and not isinstance(page, bool)
+        assert isinstance(index, int) and not isinstance(index, bool)
+        assert page == index + 1, locator
 
 
 def source_page_text(source_id: str, page: int) -> str:

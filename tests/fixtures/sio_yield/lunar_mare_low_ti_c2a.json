@@ -5,14 +5,14 @@
   "alpha_provenance": "Wetzel & Gail 2013 A&A 553 A92 DOI 10.1051/0004-6361/201220803; alpha_s_SiO(T)=0.52*exp(-3685/T), UNCERTIFIED solid-SiO particle-growth proxy, not silicate-melt evaporation evidence",
   "sio_evolved_kg": 7.73192177231e-06,
   "sio_to_silica_fume_kg": {
-    "stage_1_fe_condenser_impurity": 0.0,
+    "stage_1_fe_condenser_impurity": 2.70967562649e-07,
     "stage_3_sio_zone_product": 0.0,
-    "stage_4_alkali_mg_carryover": 8.76551515134e-07,
-    "stage_4b_k_trap_carryover": 4.25293907048e-06,
+    "stage_4_alkali_mg_carryover": 8.77425273074e-07,
+    "stage_4b_k_trap_carryover": 4.25293903898e-06,
     "stage_5_dust_filter_carryover": 0.0,
-    "unreported_stage_silica_capture": 0.0,
+    "unreported_stage_silica_capture": 4.84348059196e-10,
     "condensation_train_silicon_coproduct": 2.39771221638e-06,
-    "terminal_offgas_escape": 2.04718841575e-07
+    "terminal_offgas_escape": 4.90852271684e-09
   },
   "wall_deposit_kg": {
     "Ca": 0.0,
@@ -33,21 +33,21 @@
   "fouling_rate": {
     "liner_material": "hot_wall_refractory_liner",
     "dominant_species": "none",
-    "dominant_species_wall_deposit_kg": null,
-    "wall_deposit_kg_per_campaign": null,
+    "dominant_species_wall_deposit_kg": 0.0,
+    "wall_deposit_kg_per_campaign": 0.0,
     "wall_deposit_basis": "total_wall_load_by_species",
     "resinter_threshold_kg": null,
     "resinter_threshold_basis": "fail_closed_no_qualified_positive_deposition",
-    "campaigns_to_resinter": null,
+    "campaigns_to_resinter": "infinite",
     "campaigns_to_resinter_by_segment": {},
-    "aggregate_campaigns_to_resinter": null,
+    "aggregate_campaigns_to_resinter": "infinite",
     "fast_fouling_campaign_threshold": 10,
     "output_status": "status_bearing",
     "authoritative": false,
     "authoritative_for_resinter": false,
     "verdict_authoritative": false,
     "status": "warning",
-    "status_reason": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, Cr2O3_gas=refused, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=status_bearing, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
+    "status_reason": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=status_bearing, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
     "sticking_alpha_authority": {
       "authoritative": false,
       "authoritative_for_deposit_mass": false,
@@ -697,6 +697,28 @@
             "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
             "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.CrO",
             "stage_number": 7
+          },
+          "stage_3": {
+            "species": "CrO",
+            "alpha_s": 0.8,
+            "source": "No species-specific wall/deposition sticking coefficient is configured; legacy high-capture fallback retained as status-bearing fouling default.",
+            "source_class": "uncertified_unknown_species_default",
+            "status": "UNCERTIFIED",
+            "output_status": "status_bearing",
+            "alpha_s_form": "scalar",
+            "alpha_s_temperature_K": 1323.15,
+            "alpha_s_extrapolated": false,
+            "source_url": null,
+            "citation_status": "UNCERTIFIED",
+            "temperature_range_K": "not_applicable_uncertified",
+            "envelope": [
+              0.0,
+              1.0
+            ],
+            "uncertainty_flag": "no_species_specific_sticking_coefficient",
+            "value_ref": "data/literature/vacuum_pyrolysis_sticking.yaml::unknown_species_default",
+            "material_source": "data/literature/vacuum_pyrolysis_sticking.yaml::species.CrO",
+            "stage_number": 3
           }
         },
         "Fe": {
@@ -5797,12 +5819,12 @@
           "species_id": "FeO_association_gas",
           "pressure": {
             "kind": "upper_bound",
-            "pa": 0.08013138854017329,
+            "pa": 0.014489544751255794,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "selected_runtime_pressure": {
             "kind": "upper_bound",
-            "pa": 0.08013138854017329,
+            "pa": 0.014489544751255794,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "flux": {
@@ -5838,12 +5860,29 @@
             "source_activity_origin": "pure_component_unit",
             "alpha_authority_status": "diagnostic_upper_bound",
             "alpha_inventory_policy": "diagnostic_only_no_inventory_debit",
-            "out_of_range": false,
-            "acquisition_flag": null,
-            "status": null
+            "out_of_range": true,
+            "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
+            "status": "out_of_range_conservative_continuation",
+            "extrapolation_notice": {
+              "temperature_K": 1638.15,
+              "valid_range_K": [
+                1809.0,
+                1900.0
+              ],
+              "authority_level": "extrapolated",
+              "certified_band": {
+                "temperature_K": [
+                  1809.0,
+                  1900.0
+                ]
+              },
+              "reason": "oxide_vapor_pressure_out_of_validated_range",
+              "status": "out_of_range_conservative_continuation",
+              "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas"
+            }
           },
-          "out_of_range": false,
-          "acquisition_flag": null,
+          "out_of_range": true,
+          "acquisition_flag": "evaporation_alpha_hkl_upper_bound_t609:FeO_association_gas",
           "activity_bound": null,
           "source_boundary": null,
           "source_reaction_activity": null,
@@ -8487,7 +8526,6 @@
         "Ca2",
         "CaO_gas",
         "Cr",
-        "Cr2O3_gas",
         "CrO",
         "CrO2",
         "CrO3",
@@ -8513,9 +8551,7 @@
         "TiO",
         "TiO2_gas"
       ],
-      "refused_carrier_species": [
-        "Cr2O3_gas"
-      ],
+      "refused_carrier_species": [],
       "proven_zero_carrier_species": [],
       "missing_carrier_authority_species": [],
       "not_applicable_carrier_species": [
@@ -8955,7 +8991,7 @@
         }
       },
       "grounding_target": "data/literature/vacuum_pyrolysis_sticking.yaml",
-      "message": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, Cr2O3_gas=refused, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=status_bearing, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
+      "message": "Wall routing carried non-authoritative vapour evidence (Al=status_bearing, Al2=status_bearing, Al2O=status_bearing, Al2O2=status_bearing, Al2O3_gas=status_bearing, AlO=status_bearing, AlO2=status_bearing, Ca=status_bearing, Ca2=status_bearing, CaO_gas=status_bearing, Cr=status_bearing, CrO=status_bearing, CrO2=status_bearing, CrO3=status_bearing, Fe=status_bearing, FeO_association_gas=status_bearing, K=status_bearing, K2=status_bearing, K2O_gas=status_bearing, Mg=status_bearing, Mg2=status_bearing, MgO_gas=status_bearing, Mn=status_bearing, MnO_gas=status_bearing, Na=status_bearing, Na2=status_bearing, Na2O_gas=status_bearing, Si=status_bearing, Si2=status_bearing, Si3=status_bearing, SiO=status_bearing, SiO2_gas=status_bearing, Ti=status_bearing, TiO=status_bearing, TiO2_gas=status_bearing); zero wall deposition cannot be certified from that evidence; numerical mass remains computed and ledger-visible, but coating and fouling readouts are non-authoritative. Wall saturation includes EXTRAPOLATED quantities; source bands and reasons remain attached.",
       "wall_saturation_pressure_extrapolations_by_species": {
         "K": {
           "stage_0_to_stage_1": {
@@ -9225,7 +9261,6 @@
       "surface_geometry_code": "wall_deposit_surface_geometry_provenance",
       "codes": [
         "wall_deposit_vapour_carrier_non_authoritative",
-        "wall_deposit_saturation_pressure_refused",
         "wall_deposit_sticking_alpha_provenance_missing",
         "wall_deposit_sticking_alpha_out_of_domain",
         "wall_deposit_sticking_alpha_uncertified"
@@ -9242,7 +9277,6 @@
         "Ca2": "status_bearing",
         "CaO_gas": "status_bearing",
         "Cr": "status_bearing",
-        "Cr2O3_gas": "refused",
         "CrO": "status_bearing",
         "CrO2": "status_bearing",
         "CrO3": "status_bearing",
@@ -9267,168 +9301,10 @@
         "Ti": "status_bearing",
         "TiO": "status_bearing",
         "TiO2_gas": "status_bearing"
-      },
-      "status_bearing_refusal_count": 1,
-      "wall_saturation_pressure_refused_species": [
-        "SiO"
-      ],
-      "wall_saturation_pressure_refusals_by_species": {
-        "SiO": {
-          "stage_0_to_stage_1": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1813.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1813.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1813.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_1_to_stage_2": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1473.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1473.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1473.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_2_to_stage_4_bypass": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1773.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1773.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1773.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_0_to_stage_1#2": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1849.817 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1849.8166666666666,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1849.8166666666666,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_1_to_stage_2#2": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1623.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1623.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1623.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_0_to_stage_1#3": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1886.483 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1886.4833333333331,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1886.4833333333331,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_1_to_stage_2#3": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1773.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1773.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1773.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_0_to_stage_1#4": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1923.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1923.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          },
-          "stage_1_to_stage_2#4": {
-            "status": "refused",
-            "reason": "wall_saturation_pressure_refused: species=SiO temperature_K=1923.150 reason=no extrapolation available: wall fit absent or outside its finite positive-denominator branch; valid_range_K=[1400.0, 2273.15]",
-            "output_status": "status_bearing",
-            "wall_temperature_K": 1923.15,
-            "wall_saturation_pressure_pa": null,
-            "temperature_K": 1923.15,
-            "authority_level": "unavailable",
-            "valid_range_K": [
-              1400.0,
-              2273.15
-            ],
-            "band_scope": "wall_saturation_pressure",
-            "refusal_type": "WallSaturationPressureRefusal"
-          }
-        }
       }
     },
-    "nominal_verdict": null,
-    "verdict": "non-authoritative",
-    "refusal": {
-      "reason": "Zero wall deposition cannot be certified from non-authoritative wall-routing evidence.",
-      "code": "wall_deposit_vapour_carrier_non_authoritative",
-      "authoritative": false,
-      "authoritative_for_deposit_mass": false,
-      "authoritative_for_coating": false,
-      "authoritative_for_resinter": false,
-      "severity": "warning",
-      "output_status": "status_bearing",
-      "refusal_events": 9,
-      "affected_species": [
-        "SiO"
-      ],
-      "authority_detail_path": "fouling_rate.sticking_alpha_authority"
-    }
+    "nominal_verdict": "slow-fouling",
+    "verdict": "non-authoritative"
   },
   "sio_yield_pct_of_feedstock": 7.73192177231e-07,
   "industrial_benchmark_pct": [

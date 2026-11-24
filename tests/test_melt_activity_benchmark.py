@@ -790,6 +790,8 @@ def test_coverage_non_pressure_engine_omits_pressure_columns():
     assert "domain_gate" in guard_contract and "domain projection" in guard_contract
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_vaporock_evaluate_empty_speciation_is_not_typed_ok(monkeypatch):
     class _Result:
         status = "not_converged"
@@ -1245,6 +1247,8 @@ def test_coverage_silicate_band_status_tracks_rail_band():
     assert admitted.details["failed_constraints"] == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_vaporock_activity_call_does_not_ask_the_library(monkeypatch):
     calls = []
 
@@ -1272,6 +1276,8 @@ def test_vaporock_activity_call_does_not_ask_the_library(monkeypatch):
     assert calls == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_vaporock_evaluate_returns_native_partial_pressures(monkeypatch):
     class _Result:
         status = "ok"
@@ -2602,6 +2608,8 @@ def test_benchmark_smoke_timeout_does_not_emit_absence(monkeypatch):
     benchmark.assert_run_not_self_contradictory(rows)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_benchmark_init_ood_smoke_is_not_absence(monkeypatch):
     """Red-by-revert: init-time physics-marked smoke is not engine absence.
 
@@ -2664,6 +2672,8 @@ def test_benchmark_init_ood_smoke_is_not_absence(monkeypatch):
     assert result.status != "unavailable"
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_benchmark_init_worker_timeout_is_not_absence(monkeypatch):
     """Red-by-revert: init EngineWorkerTimeout must not mint unavailable.
 

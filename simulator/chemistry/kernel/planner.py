@@ -669,6 +669,7 @@ class ChemistryKernel:
         from simulator.melt_backend.liquidus import LiquidusSampleError
         from simulator.engine_pool import EngineWorkerTimeout
         from simulator.reduced_real_determinism import (
+            failed_provider_attempt_is_environment,
             gate_curve_provider_diagnostic_reasons,
             gate_curve_provider_has_terminal_input,
         )
@@ -699,12 +700,16 @@ class ChemistryKernel:
             if result.status == 'ok':
                 break
             reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
-            attempts.append({
+            attempt_record = {
                 'provider': provider.capability_profile().provider_id,
                 'status': result.status,
                 'reason': '; '.join(reasons) or '; '.join(result.warnings) or result.status,
                 'diagnostic': diagnostic,
-            })
+            }
+            # The payload keeps the timeout. Digests drop attempts with this flag.
+            if failed_provider_attempt_is_environment(attempt_record):
+                attempt_record['disposition'] = 'environment'
+            attempts.append(attempt_record)
             # Missing/invalid controls remain typed terminal failures.
             if gate_curve_provider_has_terminal_input(reasons):
                 break

@@ -72,9 +72,11 @@ from simulator.battery.identity import (
 from simulator.battery.records import (
     Apparatus,
     ApparatusGeometry,
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Composition,
     Derivation,
     EngineTrace,
+    Experiment,
     Execution,
     Located,
     Notice,
@@ -96,6 +98,7 @@ from simulator.battery.validity import (
     underdetermined_apparatus,
 )
 from simulator.melt_backend.magemin import MAGEMIN_WORKER_LIFECYCLE_REASONS
+import simulator.battery.validity as validity_mod
 import simulator.battery.score as score_mod
 from simulator.battery.score import (
     SCORE_ELIGIBLE_CONJUNCTS,
@@ -834,6 +837,35 @@ def _uncalibrated_kems_partial_row(
         source_id="halwax_sergeev_mueller_schenk_2024",
     )
     return observation
+
+
+def _d274_sio_pressure_observation(
+    experiment: Experiment,
+    observation_id: str,
+    pressure_Pa: Decimal,
+    *,
+    composition: State[Composition],
+    temperature: State[Decimal],
+    fO2: State[Decimal],
+    point_conditions: Mapping[str, Located] | None,
+) -> Observation:
+    identity = replace(
+        _partial_identity(),
+        species=Species("SiO", Phase.G),
+        temperature_K=temperature,
+        fO2_Pa=fO2,
+        composition=composition,
+        reservoir=State.not_applicable("mixture partial pressure"),
+    )
+    observation = F.observation(
+        observation_id,
+        experiment.experiment_id,
+        identity,
+        pressure_Pa,
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="kems-pressure-gate-test",
+    )
+    return replace(observation, point_conditions=point_conditions)
 
 
 def test_compile_residual_refuses_prediction_unit_mismatch() -> None:
@@ -2380,6 +2412,434 @@ def test_kems_band_prefers_printed_envelope_over_replicate_scatter() -> None:
     assert band is not None
     assert band.value == Decimal("1.4").ln() / Decimal("10").ln()
     assert "source-printed pressure envelope" in band.rule
+
+
+def test_kems_printed_pressure_envelope_excludes_validation_flagged_rows() -> None:
+    from simulator.battery.score import (
+        FLAGGED_STRATUM_UNVERIFIED_APPARATUS,
+        _initial_charge_composition_notice,
+        _observation_flagged_strata,
+        derive_kems_partial_pressure_band,
+    )
+    from simulator.battery.records import INITIAL_CHARGE_ONLY_PROXY_NOTICE
+    from simulator.battery.validity import run_validity_gates
+
+    # Without printed orifice Kn or same-point conditions, pressure cannot
+    # verify the regime.
+    experiment = F.kems_experiment("initial-charge-proxy-band", kn=None)
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("CaO", Decimal("0.25")), ("SiO2", Decimal("0.75"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    proxy = replace(composition, proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG)
+    row = replace(
+        F.observation(
+            "validation-flagged-pressure-envelope-row",
+            experiment.experiment_id,
+            replace(_partial_identity(), composition=State.of(proxy)),
+            Decimal("10"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim="The source reports pressure errors no higher than 7%.",
+        ),
+        # The row has no point-condition record from which to admit a same-
+        # point pressure for the missing-Kn regime fallback.
+        point_conditions=None,
+    )
+    row = replace(
+        row,
+        evidence=replace(row.evidence, original_method_class="measured_direct"),
+    )
+    proxy_notice = _initial_charge_composition_notice(row)
+    assert proxy_notice is not None
+    row = replace(row, notices=(proxy_notice,))
+    assert INITIAL_CHARGE_ONLY_PROXY_NOTICE in proxy_notice.reason
+    gates = run_validity_gates(
+        experiment, row, point_observations=(row,)
+    )
+    strata = _observation_flagged_strata(
+        row,
+        {experiment.experiment_id: experiment},
+        {experiment.experiment_id: (row,)},
+    )
+    band = derive_kems_partial_pressure_band(
+        {row.observation_id: row}, {experiment.experiment_id: experiment}
+    )
+
+    assert not gates.passed
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert gates.primary_check == "in_cell_partial_pressure_sum"
+    assert FLAGGED_STRATUM_UNVERIFIED_APPARATUS in strata
+    assert band is None
+
+
+@pytest.mark.parametrize("raw_pressure", ("<1e-5", "NaN"))
+def test_unknown_composition_skips_invalid_same_point_pressure_candidate(
+    raw_pressure: str,
+) -> None:
+    experiment = F.kems_experiment("invalid-same-point-pressure", kn=None)
+    identity = replace(_partial_identity(), composition=None)
+    observation = F.observation(
+        "invalid-same-point-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1e-5"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    observation = replace(
+        observation,
+        point_conditions={"same_point": F.located("same point", page=5)},
+    )
+    # Simulate a malformed legacy/raw point that bypassed Value's constructor.
+    # The validator must report it as unusable evidence instead of aborting the
+    # whole score shard while Decimal parses the printed token.
+    object.__setattr__(observation.value, "point", raw_pressure)
+
+    gates = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=observation,
+        point_observations=(observation,),
+    )
+
+    assert gates.passed is False
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.detail["reason"] == (
+        "no admitted printed partial pressures at this exact point"
+    )
+    assert pressure_check.detail["typed_reason"] == (
+        RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+    )
+    assert pressure_check.detail["skipped_pressure_candidates"] == [
+        {
+            "observation_id": "invalid-same-point-pressure",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "detail": "candidate pressure point is not a finite positive decimal",
+        }
+    ]
+
+
+def _raw_composition(components: object) -> Composition:
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    object.__setattr__(composition, "components", components)
+    return composition
+
+
+@pytest.mark.parametrize("raw_amount", ("<0.03", "tr"))
+@pytest.mark.parametrize(
+    ("candidate_temperature", "composition_detail_expected"),
+    (("1500", True), ("1600", False)),
+)
+def test_malformed_candidate_composition_is_skipped_after_point_filters(
+    raw_amount: str,
+    candidate_temperature: str,
+    composition_detail_expected: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    experiment = F.kems_experiment("invalid-same-experiment-composition", kn=None)
+    composition = Composition(
+        basis="printed_mole_fraction",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    identity = replace(
+        _partial_identity(),
+        temperature_K=State.of(Decimal("1500")),
+        composition=State.of(composition),
+    )
+    observation = F.observation(
+        "valid-same-point-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    # Raw legacy extract data can bypass Composition's typed constructor.
+    malformed_composition = _raw_composition((("Na2O", raw_amount),))
+    malformed_state = State.of(malformed_composition)
+    candidate_identity = replace(
+        identity,
+        temperature_K=State.of(Decimal(candidate_temperature)),
+        composition=malformed_state,
+    )
+    candidate = F.observation(
+        f"malformed-composition-{candidate_temperature}-{raw_amount}",
+        experiment.experiment_id,
+        candidate_identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+
+    original_composition_components = validity_mod._composition_components
+    malformed_composition_calls = []
+
+    def count_malformed_composition_calls(value, **kwargs):
+        if value is malformed_state:
+            malformed_composition_calls.append(value)
+        return original_composition_components(value, **kwargs)
+
+    monkeypatch.setattr(
+        validity_mod, "_composition_components", count_malformed_composition_calls
+    )
+
+    gates = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=observation,
+        point_observations=(observation, candidate),
+    )
+
+    assert gates.passed is True
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    if composition_detail_expected:
+        assert len(malformed_composition_calls) == 1
+        assert pressure_check.detail["skipped_composition_candidates"] == [
+            {
+                "observation_id": candidate.observation_id,
+                "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+                "detail": "composition component amount is not a decimal",
+            }
+        ]
+    else:
+        assert malformed_composition_calls == []
+        assert "skipped_composition_candidates" not in pressure_check.detail
+
+
+# The resolver reads identity first, then point-condition aliases in mapping
+# order. Exercise both alias orders and probe sample-start as an excluded source.
+_POINT_COMPOSITION_ALIAS_ORDERS = (
+    validity_mod._POINT_COMPOSITION_CONDITION_ALIASES,
+    tuple(reversed(validity_mod._POINT_COMPOSITION_CONDITION_ALIASES)),
+)
+_COMPOSITION_SOURCE_ORDERS = tuple(
+    (
+        "identity.composition",
+        *(f"point_conditions.{alias}" for alias in alias_order),
+        "experiment.sample.initial_composition",
+    )
+    for alias_order in _POINT_COMPOSITION_ALIAS_ORDERS
+)
+_MALFORMED_LATER_COMPOSITION_SOURCE_PAIRS = tuple(
+    (source_order, source_order[earlier], source_order[later])
+    for source_order in _COMPOSITION_SOURCE_ORDERS
+    for earlier in range(len(source_order))
+    for later in range(earlier + 1, len(source_order))
+)
+
+
+@pytest.mark.parametrize(
+    ("source_order", "malformed_source", "valid_later_source"),
+    _MALFORMED_LATER_COMPOSITION_SOURCE_PAIRS,
+    ids=[
+        f"{'-'.join(source_order[1:-1])}:{earlier}-before-{later}"
+        for source_order, earlier, later in _MALFORMED_LATER_COMPOSITION_SOURCE_PAIRS
+    ],
+)
+def test_first_declared_composition_source_controls_pressure_candidate_matching(
+    source_order: tuple[str, ...],
+    malformed_source: str,
+    valid_later_source: str,
+) -> None:
+    composition = _raw_composition((("Na2O", Decimal("1")),))
+    # Raw legacy extract data can bypass Composition's typed constructor.
+    malformed_composition = _raw_composition((("Na2O", "tr"),))
+    point_condition_alias_order = tuple(
+        source.partition(".")[2]
+        for source in source_order
+        if source.startswith("point_conditions.")
+    )
+
+    def score_candidate(*, include_malformed_source: bool):
+        experiment = F.kems_experiment(
+            f"composition-source-order-{include_malformed_source}", kn=None
+        )
+        experiment = replace(
+            experiment,
+            sample=replace(
+                experiment.sample,
+                initial_composition=F.located(composition),
+            ),
+        )
+        identity = replace(
+            _partial_identity(),
+            temperature_K=State.of(Decimal("1500")),
+            composition=State.of(composition),
+        )
+        valid_observation = F.observation(
+            "valid-one-pascal-reading",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        candidate_identity = replace(identity, composition=None)
+        if include_malformed_source and malformed_source == "identity.composition":
+            candidate_identity = replace(
+                candidate_identity,
+                composition=State.of(malformed_composition),
+            )
+
+        target_conditions = dict(valid_observation.point_conditions or {})
+        candidate_conditions = dict(target_conditions)
+        for alias in point_condition_alias_order:
+            source = f"point_conditions.{alias}"
+            if source == valid_later_source:
+                condition = F.located(composition)
+                target_conditions[alias] = condition
+                candidate_conditions[alias] = condition
+            elif include_malformed_source and source == malformed_source:
+                condition = F.located(malformed_composition)
+                target_conditions[alias] = condition
+                candidate_conditions[alias] = condition
+        valid_observation = replace(
+            valid_observation, point_conditions=target_conditions
+        )
+        malformed_candidate = F.observation(
+            f"eleven-pascal-reading-{include_malformed_source}",
+            experiment.experiment_id,
+            candidate_identity,
+            Decimal("11"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+        )
+        malformed_candidate = replace(
+            malformed_candidate, point_conditions=candidate_conditions
+        )
+        gates = effusion_regime_unverified(
+            experiment,
+            Quantity.P_PARTIAL,
+            observation=valid_observation,
+            point_observations=(valid_observation, malformed_candidate),
+        )
+        pressure_check = next(
+            check
+            for check in gates.checks
+            if check.name == "in_cell_partial_pressure_sum"
+        )
+        return valid_observation, malformed_candidate, gates, pressure_check
+
+    valid_observation, malformed_candidate, gates, pressure_check = score_candidate(
+        include_malformed_source=True
+    )
+    assert gates.passed is True
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "1"
+    assert pressure_check.detail["included_observation_ids"] == [
+        valid_observation.observation_id
+    ]
+    assert pressure_check.detail["skipped_composition_candidates"] == [
+        {
+            "observation_id": malformed_candidate.observation_id,
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "detail": "composition component amount is not a decimal",
+        }
+    ]
+
+    valid_observation, candidate, gates, pressure_check = score_candidate(
+        include_malformed_source=False
+    )
+    if valid_later_source == "experiment.sample.initial_composition":
+        # The initial charge is not a run-composition source for this gate.
+        assert gates.passed is True
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "1"
+        assert pressure_check.detail["included_observation_ids"] == [
+            valid_observation.observation_id
+        ]
+        assert "skipped_composition_candidates" not in pressure_check.detail
+    else:
+        # An absent earlier source permits the later declared alias to match.
+        assert gates.passed is False
+        assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+        assert pressure_check.detail["included_observation_ids"] == [
+            candidate.observation_id
+        ]
+
+
+@pytest.mark.parametrize(
+    ("components", "expected_detail"),
+    (
+        (
+            (("Na2O", "tr"),),
+            "composition component amount is not a decimal",
+        ),
+        (
+            (("Na2O", Decimal("-0.1")),),
+            "composition component amount is negative",
+        ),
+        (
+            (("Na2O", Decimal("NaN")),),
+            "composition component amount is not finite",
+        ),
+        ((("Na2O",),), "composition component entry is malformed"),
+        ((), "composition component list is empty or malformed"),
+    ),
+    ids=("not-decimal", "negative", "non-finite", "malformed-entry", "empty"),
+)
+def test_malformed_candidate_composition_shapes_have_typed_gate_details(
+    components: object,
+    expected_detail: str,
+) -> None:
+    composition = _raw_composition((("Na2O", Decimal("1")),))
+    malformed_composition = _raw_composition(components)
+    experiment = F.kems_experiment("malformed-composition-shapes", kn=None)
+    identity = replace(
+        _partial_identity(),
+        temperature_K=State.of(Decimal("1500")),
+        composition=State.of(composition),
+    )
+    valid_observation = F.observation(
+        "valid-one-pascal-composition-shape",
+        experiment.experiment_id,
+        identity,
+        Decimal("1"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    candidate = F.observation(
+        "malformed-eleven-pascal-composition-shape",
+        experiment.experiment_id,
+        replace(identity, composition=State.of(malformed_composition)),
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+    )
+    candidate = replace(
+        candidate,
+        point_conditions=valid_observation.point_conditions,
+    )
+
+    gates = effusion_regime_unverified(
+        experiment,
+        Quantity.P_PARTIAL,
+        observation=valid_observation,
+        point_observations=(valid_observation, candidate),
+    )
+
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.passed is True
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "1"
+    assert pressure_check.detail["included_observation_ids"] == [
+        valid_observation.observation_id
+    ]
+    assert pressure_check.detail["skipped_composition_candidates"] == [
+        {
+            "observation_id": candidate.observation_id,
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "detail": expected_detail,
+        }
+    ]
 
 
 def test_kems_inter_source_catalog_excludes_uncalibrated_pressures(
@@ -5803,6 +6263,8 @@ def test_kems_activity_pressure_sum_over_limit_still_refuses(
     assert residual.status is ResidualStatus.REFUSED
     assert residual.refusal is not None
     assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_sum_Pa"] == "11"
+    assert residual.refusal.detail["limit_Pa"] == "10"
 
 
 def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses() -> None:
@@ -5884,6 +6346,378 @@ def test_d274_incomplete_printed_pressure_lower_bound_over_limit_still_refuses()
         point_observations=point_observations,
     )
     # d-274 preserves refusal when the printed lower bound alone exceeds the limit.
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert residual.refusal.detail["in_cell_pressure_lower_bound_Pa"] == "11"
+    assert residual.refusal.detail["limit_Pa"] == "10"
+    assert not any(
+        notice.kind is NoticeKind.UNVERIFIED_APPARATUS
+        and "in_cell_partial_pressure_sum" in notice.reason
+        for notice in residual.notices
+    )
+
+
+@pytest.mark.parametrize(
+    "composition_source", ("absent_point_conditions", "loader_unknown_alias")
+)
+def test_d274_own_pressure_over_limit_survives_incomplete_measurement_context(
+    composition_source: str,
+) -> None:
+    experiment = F.kems_experiment(
+        f"d274-{composition_source}-own-pressure",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    if composition_source == "absent_point_conditions":
+        identity = replace(
+            _partial_identity(),
+            composition=State.unknown("run composition not reported"),
+        )
+        malformed_composition_alias = None
+    else:
+        from simulator.battery.migrate import _composition_located_from_plain
+
+        identity = replace(_partial_identity(), composition=None)
+        malformed_composition_alias = _composition_located_from_plain(
+            {"state": {"tag": "invalid"}}
+        )
+    pressure = F.observation(
+        f"d274-{composition_source}-11-Pa-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    if composition_source == "absent_point_conditions":
+        pressure = replace(pressure, point_conditions=None)
+    else:
+        pressure = replace(
+            pressure,
+            point_conditions={
+                "composition": malformed_composition_alias
+            },
+        )
+
+    point_observations = (pressure,)
+    gates = run_validity_gates(
+        experiment, pressure, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    if composition_source == "absent_point_conditions":
+        assert pressure_check.detail["reason"] == (
+            "same-point temperature/point_conditions are incomplete"
+        )
+    else:
+        assert pressure_check.detail["reason"] == (
+            "composition is unknown; printed species coverage cannot be established"
+        )
+        assert malformed_composition_alias is not None
+        assert pressure_check.detail["composition_scope_details"] == [
+            malformed_composition_alias.state.reason
+        ]
+
+    context = _context(F.work(), experiment, pressure, review="reviewed")
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
+    assert residual.status is ResidualStatus.REFUSED
+    assert residual.numeric is None
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+
+
+@pytest.mark.parametrize(
+    "conditions_case", ("absent", "incomplete", "unknown", "complete")
+)
+@pytest.mark.parametrize("composition_case", ("unknown_alias", "unary", "multi"))
+@pytest.mark.parametrize("pressure_text", ("0.4", "11"))
+def test_d274_coverage_never_uses_the_scored_row_exemption(
+    conditions_case: str,
+    composition_case: str,
+    pressure_text: str,
+) -> None:
+    experiment = F.kems_experiment(
+        f"d274-{conditions_case}-{composition_case}-{pressure_text}",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    composition_value = (
+        Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("1")),),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        if composition_case == "unary"
+        else Composition(
+            basis="ordered_complete_mole_inventory",
+            components=(("SiO2", Decimal("0.5")), ("Al2O3", Decimal("0.5"))),
+            amount_basis=AmountBasis.MOLE_FRACTION,
+        )
+        if composition_case == "multi"
+        else None
+    )
+    composition_state = (
+        State.of(composition_value)
+        if composition_value is not None
+        else State.unknown("run composition not published")
+    )
+    temperature_state = (
+        State.unknown("temperature not published")
+        if conditions_case == "incomplete"
+        else State.of(Decimal("1500"))
+    )
+    fO2_state = (
+        State.unknown("not published")
+        if conditions_case == "unknown"
+        else State.of(Decimal("1e-8"))
+    )
+    point_conditions: Mapping[str, Located] | None
+    if conditions_case == "absent":
+        point_conditions = None
+    elif conditions_case == "incomplete":
+        point_conditions = {
+            "composition": (
+                Located(composition_state, locator=F.loc())
+                if composition_case == "unknown_alias"
+                else F.located(composition_value)
+            )
+        }
+    else:
+        composition_condition = (
+            Located(composition_state, locator=F.loc())
+            if composition_case == "unknown_alias"
+            else F.located(composition_value)
+        )
+        oxygen_condition = (
+            Located(fO2_state, locator=F.loc())
+            if fO2_state.is_unknown
+            else F.located(fO2_state.value)
+        )
+        point_conditions = {
+            "temperature_K": F.located(Decimal("1500")),
+            "composition": composition_condition,
+            "fO2_Pa": oxygen_condition,
+        }
+    pressure = _d274_sio_pressure_observation(
+        experiment,
+        f"d274-{conditions_case}-{composition_case}-{pressure_text}-SiO",
+        Decimal(pressure_text),
+        composition=composition_state,
+        temperature=temperature_state,
+        fO2=fO2_state,
+        point_conditions=point_conditions,
+    )
+
+    pressure_sum, detail = validity_mod._printed_in_cell_pressure_sum(
+        experiment, pressure, (pressure,)
+    )
+    base_coverage_eligible = (
+        validity_mod._point_temperature(pressure) is not None
+        and bool(pressure.point_conditions)
+        and validity_mod._same_point_conditions(pressure, pressure)
+    )
+    assert pressure_sum is None or base_coverage_eligible
+    if conditions_case != "complete" or composition_case != "unary":
+        assert pressure_sum is None
+        assert detail["printed_partial_pressure_lower_bound_Pa"] == pressure_text
+    else:
+        assert pressure_sum == Decimal(pressure_text)
+        assert detail["printed_partial_pressure_sum_Pa"] == pressure_text
+
+
+@pytest.mark.parametrize("pressure_text", ("0.4", "11"))
+def test_d274_unknown_point_condition_keeps_own_pressure_refusal_detail(
+    pressure_text: str,
+) -> None:
+    experiment = F.kems_experiment(
+        f"d274-unknown-fo2-{pressure_text}",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("SiO2", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    conditions = {
+        "temperature_K": F.located(Decimal("1500")),
+        "composition": F.located(composition),
+        "fO2_Pa": Located(State.unknown("not published"), locator=F.loc()),
+    }
+    pressure = _d274_sio_pressure_observation(
+        experiment,
+        f"d274-unknown-fo2-{pressure_text}-SiO",
+        Decimal(pressure_text),
+        composition=State.of(composition),
+        temperature=State.of(Decimal("1500")),
+        fO2=State.unknown("not published"),
+        point_conditions=conditions,
+    )
+    point_observations = (pressure,)
+    gates = run_validity_gates(
+        experiment, pressure, point_observations=point_observations
+    )
+    pressure_check = next(
+        check
+        for check in gates.checks
+        if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert pressure_check.passed is False
+    assert pressure_check.detail["reason"] == (
+        "incomplete printed species coverage; pressure sum is only a lower bound"
+    )
+    assert pressure_check.detail["missing_species"] == ["Si"]
+    assert (
+        pressure_check.detail["printed_partial_pressure_lower_bound_Pa"]
+        == pressure_text
+    )
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    if Decimal(pressure_text) > Decimal("10"):
+        assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == pressure_text
+    else:
+        # The scored row's own pressure is a lower bound only. Unknown fO2
+        # fails the same-point check, so coverage is not established.
+        assert "printed_partial_pressure_sum_Pa" not in pressure_check.detail
+
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, pressure, review="reviewed"),
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), pressure.identity
+        ),
+        point_observations=point_observations,
+    )
+    if Decimal(pressure_text) > Decimal("10"):
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+        assert (
+            residual.refusal.detail["in_cell_pressure_lower_bound_Pa"]
+            == pressure_text
+        )
+        assert residual.refusal.detail["limit_Pa"] == "10"
+    else:
+        # SiO(g) from SiO2(l) needs pO2. Unknown fO2 is a missing identity
+        # input and refuses before the apparatus flag. The gate above is what
+        # shows coverage was not established.
+        assert residual.status is ResidualStatus.REFUSED
+        assert residual.numeric is None
+        assert residual.refusal is not None
+        assert residual.refusal.reason is RefusalReason.IDENTITY_UNKNOWN
+        assert residual.refusal.detail["fields"] == ["fO2_Pa"]
+
+
+@pytest.mark.parametrize(
+    "composition_source", ("proxy", "sample_only", "malformed_own")
+)
+def test_d274_over_limit_pressure_still_refuses_without_run_composition(
+    composition_source: str,
+) -> None:
+    composition = Composition(
+        basis="ordered_complete_mole_inventory",
+        components=(("Na2O", Decimal("1")),),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    experiment = F.kems_experiment(
+        f"d274-{composition_source}-over-limit-pressure",
+        orifice_area=None,
+        clausing=None,
+        kn=None,
+        calibrated=False,
+    )
+    identity = _partial_identity()
+    if composition_source == "proxy":
+        identity = replace(
+            identity,
+            composition=State.of(
+                replace(composition, proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG)
+            ),
+        )
+    else:
+        if composition_source == "sample_only":
+            identity = replace(
+                identity,
+                composition=State.unknown("run composition not reported"),
+            )
+            experiment = replace(
+                experiment,
+                sample=replace(
+                    experiment.sample,
+                    initial_composition=F.located(composition),
+                ),
+            )
+        else:
+            identity = replace(
+                identity,
+                composition=State.of(_raw_composition((("Na2O", "tr"),))),
+            )
+    pressure = F.observation(
+        f"d274-{composition_source}-11-Pa-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("11"),
+        evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="stolyarova-1996-cao-alumina-silica-kems",
+    )
+    point_observations = (pressure,)
+    gates = run_validity_gates(
+        experiment, pressure, point_observations=point_observations
+    )
+    pressure_check = next(
+        check for check in gates.checks if check.name == "in_cell_partial_pressure_sum"
+    )
+    assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
+    assert pressure_check.passed is False
+    assert pressure_check.detail["printed_partial_pressure_lower_bound_Pa"] == "11"
+    assert pressure_check.detail["printed_partial_pressure_sum_Pa"] == "11"
+    assert pressure_check.detail["pressure_limit_Pa"] == "10"
+    assert "required_dominant_species" not in pressure_check.detail
+    assert pressure_check.detail["reason"] == (
+        "composition is unknown; printed species coverage cannot be established"
+    )
+    if composition_source == "malformed_own":
+        assert pressure_check.detail["composition_scope_details"] == [
+            "composition component amount is not a decimal"
+        ]
+        assert "skipped_composition_candidates" not in pressure_check.detail
+
+    context = _context(F.work(), experiment, pressure, review="reviewed")
+    residual, _ = compile_residual(
+        pressure,
+        Engine.INTERNAL_ANALYTICAL,
+        context=context,
+        comparison_ids={pressure.observation_id},
+        predict=lambda _engine, _reference, **_kwargs: _predict(
+            Decimal("0.2"), identity
+        ),
+        point_observations=point_observations,
+    )
     assert residual.status is ResidualStatus.REFUSED
     assert residual.numeric is None
     assert residual.refusal is not None
@@ -6613,6 +7447,51 @@ def test_hastie_initial_charge_notice_reaches_residual() -> None:
     assert flagged_strata(residual.notices) == (
         FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT,
     )
+
+
+def test_persisted_initial_charge_notice_still_strips_global_kems_band() -> None:
+    from simulator.battery.score import _initial_charge_composition_notice
+
+    experiment = F.kems_experiment("initial-charge-band-neutral", kn=Decimal("20"))
+    identity = _partial_identity()
+    assert identity.composition is not None and identity.composition.is_value
+    identity = replace(
+        identity,
+        composition=State.of(
+            replace(
+                identity.composition.value,
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            )
+        ),
+    )
+    reference = F.observation(
+        "persisted-initial-charge-model-pressure",
+        experiment.experiment_id,
+        identity,
+        Decimal("0.2"),
+        evidence=EvidenceClass.MODEL_DERIVED,
+        source_id="shornikov-2026-wollastonite-kems",
+    )
+    notice = _initial_charge_composition_notice(reference)
+    assert notice is not None
+    reference = replace(reference, notices=(notice,))
+
+    residual, _candidate = compile_residual(
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        context=_context(F.work(), experiment, reference, review="reviewed"),
+        prediction=_partial_prediction(Engine.INTERNAL_ANALYTICAL, reference),
+        derived_band=DecisionBand(
+            Decimal("0.1"),
+            "dimensionless",
+            "KEMS p_partial measured uncertainty: source-printed pressure envelope",
+        ),
+    )
+
+    assert residual.numeric is not None
+    assert residual.numeric.decision_band is None
+    assert residual.status is ResidualStatus.NO_BAND
+    assert notice in residual.notices
 
 
 def test_figure_only_evidence_adds_notice_to_scored_residual() -> None:
@@ -7819,7 +8698,9 @@ def test_studio_dispatch_uses_caller_host(
 
     monkeypatch.setenv("REGOLITH_STUDIO_HOST", "example-studio.invalid")
     monkeypatch.setattr(battery_score.socket, "gethostname", lambda: "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+    # Dispatch passes the cache path as an argument. It must not publish or
+    # clear the runner cache in this process. CI sets that variable on purpose.
+    cache_before = os.environ.get("REGOLITH_ENGINE_CACHE")
     engine_cache_path = tmp_path / "engine-cache.sqlite"
 
     def record_host(
@@ -7851,7 +8732,7 @@ def test_studio_dispatch_uses_caller_host(
                 str(engine_cache_path),
             ]
         )
-    assert "REGOLITH_ENGINE_CACHE" not in os.environ
+    assert os.environ.get("REGOLITH_ENGINE_CACHE") == cache_before
 
 
 def test_battery_score_wrapper_matches_direct_score_store(tmp_path: Path) -> None:
@@ -10790,6 +11671,8 @@ def test_hashimoto_worker_infrastructure_failures_are_not_cohort_cached(
     assert prediction.refusal_detail["reason"] == reason
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     ("failure_kind", "expected_reason", "expected_state", "expected_refusal"),
     (

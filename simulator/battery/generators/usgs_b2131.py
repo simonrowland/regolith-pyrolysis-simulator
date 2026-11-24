@@ -59,8 +59,8 @@ from simulator.battery.records import (
     Uncertainty,
     Value,
 )
+from simulator.battery.source_declarations import B2131_SOURCE_ID as SOURCE_ID
 
-SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
 _PREFIX = f"data/literature/compilations/{SOURCE_ID}"
 
 # Printed high-temperature columns. enthalpy_function and gibbs_function are

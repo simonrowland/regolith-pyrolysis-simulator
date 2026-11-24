@@ -29,6 +29,11 @@ from engines.builtin.evaporation_flux import (
     _series_resistance_evaporation_flux_kg_m2_s,
 )
 from simulator.accounting.formulas import load_species_formulas, resolve_species_formula
+from simulator.source_ids import (
+    FEDKIN_SOURCE_ID,
+    SCHAEFER_FEGLEY_SOURCE_ID,
+    SOSSI_SOURCE_ID,
+)
 from simulator.evaporation import _load_evaporation_alpha_by_species
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.yaml_cache import load_cached_safe_yaml
@@ -233,7 +238,7 @@ _REDOX_EVIDENCE: tuple[EvidenceRow, ...] = (
 
 _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
     EvidenceRow(
-        source_id="kems-005-fedkin-2006",
+        source_id=FEDKIN_SOURCE_ID,
         observation_id="fedkin_2006_na_yu_langmuir",
         species="Na",
         system_class="silicate_melt",
@@ -244,7 +249,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.26,
     ),
     EvidenceRow(
-        source_id="kems-005-fedkin-2006",
+        source_id=FEDKIN_SOURCE_ID,
         observation_id="fedkin_2006_k_yu_langmuir",
         species="K",
         system_class="silicate_melt",
@@ -255,7 +260,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.13,
     ),
     EvidenceRow(
-        source_id="kems-012-sossi-2019",
+        source_id=SOSSI_SOURCE_ID,
         observation_id="sossi_2019_na_alpha_e_authors_adopted_unity",
         species="Na",
         system_class="silicate_melt",
@@ -266,7 +271,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=1.0,
     ),
     EvidenceRow(
-        source_id="kems-012-sossi-2019",
+        source_id=SOSSI_SOURCE_ID,
         observation_id="sossi_2019_k_open_furnace_alpha_e_context",
         species="K",
         system_class="silicate_melt",
@@ -280,7 +285,7 @@ _MODIFIER_EVIDENCE: tuple[EvidenceRow, ...] = (
 
 _OXIDE_SURVEY_EVIDENCE: tuple[EvidenceRow, ...] = (
     EvidenceRow(
-        source_id="kems-008-schaefer-fegley-2004",
+        source_id=SCHAEFER_FEGLEY_SOURCE_ID,
         observation_id="schaefer_fegley_2004_sio_alpha_s_survey",
         species="SiO",
         system_class="pure_oxide_condensed",
@@ -291,7 +296,7 @@ _OXIDE_SURVEY_EVIDENCE: tuple[EvidenceRow, ...] = (
         alpha=0.2,
     ),
     EvidenceRow(
-        source_id="kems-008-schaefer-fegley-2004",
+        source_id=SCHAEFER_FEGLEY_SOURCE_ID,
         observation_id="schaefer_fegley_2004_mg_forsterite_alpha_s_survey",
         species="Mg",
         system_class="pure_oxide_condensed",

@@ -47,6 +47,17 @@ from simulator.battery.score import (
 )
 
 
+def test_d443_assumed_band_cannot_enter_printed_or_derived_numeric_path():
+    band = DecisionBand(
+        Decimal("0.096910013"), "dimensionless", "assumed_band: fixture",
+        band_basis="method_class_assumed",
+    )
+    for keyword in ("printed_band", "derived_band"):
+        assert decision_band_for(
+            Quantity.P_SAT, SourceRelation.INDEPENDENT, **{keyword: band}
+        ) is None
+
+
 # Quantity token → operation. Read off QUANTITY_METRIC. A quantity absent
 # from that table is None: fugacity, log10_K_reaction,
 # activity_coefficient_temperature_fit, mass_loss_areal_density, valence_ratio.

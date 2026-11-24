@@ -665,6 +665,22 @@ observations:
               note: row=15
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r02::T=1358.15:h=15dfe064f50c
@@ -810,6 +826,22 @@ observations:
               table: I
               note: row=15
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -973,6 +1005,22 @@ observations:
               table: I
               note: row=15
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r02::T=1358.15:h=006b8b28892c
@@ -2132,6 +2180,22 @@ observations:
               note: row=18
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r05::T=1273.15:h=c47da59b0032
@@ -2277,6 +2341,22 @@ observations:
               table: I
               note: row=18
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -2440,6 +2520,22 @@ observations:
               table: I
               note: row=18
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r05::T=1273.15:h=30b3673375f6
@@ -2621,6 +2717,22 @@ observations:
               note: row=19
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r06::T=1473.15:h=780b0e648018
@@ -2766,6 +2878,22 @@ observations:
               table: I
               note: row=19
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -2929,6 +3057,22 @@ observations:
               table: I
               note: row=19
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r06::T=1473.15:h=780b0e648018
@@ -3110,6 +3254,22 @@ observations:
               note: row=20
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r07::T=1573.15:h=e93759b74d70
@@ -3255,6 +3415,22 @@ observations:
               table: I
               note: row=20
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -3418,6 +3594,22 @@ observations:
               table: I
               note: row=20
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ce_r07::T=1573.15:h=e93759b74d70
@@ -4089,6 +4281,22 @@ observations:
               note: row=34
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r02::T=1358.15:h=4a72738904ba
@@ -4234,6 +4442,22 @@ observations:
               table: I
               note: row=34
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -4398,6 +4622,22 @@ observations:
               table: I
               note: row=34
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r02::T=1358.15:h=0b418dd78a0e
@@ -5069,6 +5309,22 @@ observations:
               note: row=36
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r04::T=1273.15:h=6de40680bdab
@@ -5214,6 +5470,22 @@ observations:
               table: I
               note: row=36
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -5378,6 +5650,22 @@ observations:
               table: I
               note: row=36
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r04::T=1273.15:h=3e3788cd1a77
@@ -5559,6 +5847,22 @@ observations:
               note: row=37
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r05::T=1473.15:h=dfc20d7d552e
@@ -5704,6 +6008,22 @@ observations:
               table: I
               note: row=37
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -5868,6 +6188,22 @@ observations:
               table: I
               note: row=37
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r05::T=1473.15:h=dfc20d7d552e
@@ -6049,6 +6385,22 @@ observations:
               note: row=38
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r06::T=1573.15:h=6d479bd9f59d
@@ -6194,6 +6546,22 @@ observations:
               table: I
               note: row=38
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -6358,6 +6726,22 @@ observations:
               table: I
               note: row=38
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_co_r06::T=1573.15:h=6d479bd9f59d
@@ -7028,6 +7412,22 @@ observations:
               note: row=27
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r02::T=1358.15:h=cb5b083d86b2
@@ -7173,6 +7573,22 @@ observations:
               table: I
               note: row=27
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -7336,6 +7752,22 @@ observations:
               table: I
               note: row=27
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r02::T=1358.15:h=9a98c0a39c00
@@ -8495,6 +8927,22 @@ observations:
               note: row=30
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r05::T=1273.15:h=c535371f7dbf
@@ -8640,6 +9088,22 @@ observations:
               table: I
               note: row=30
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -8803,6 +9267,22 @@ observations:
               table: I
               note: row=30
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r05::T=1273.15:h=c535371f7dbf
@@ -8984,6 +9464,22 @@ observations:
               note: row=31
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r06::T=1473.15:h=606d1e724c48
@@ -9129,6 +9625,22 @@ observations:
               table: I
               note: row=31
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -9292,6 +9804,22 @@ observations:
               table: I
               note: row=31
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r06::T=1473.15:h=00d5c84792c0
@@ -9473,6 +10001,22 @@ observations:
               note: row=32
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r07::T=1573.15:h=87ccccf29d75
@@ -9618,6 +10162,22 @@ observations:
               table: I
               note: row=32
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -9781,6 +10341,22 @@ observations:
               table: I
               note: row=32
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_mn_r07::T=1573.15:h=5bf94a645fc0
@@ -10452,6 +11028,22 @@ observations:
               note: row=40
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ni_r02::T=1358.15:h=d1ab2c51eb12
@@ -10597,6 +11189,22 @@ observations:
               table: I
               note: row=40
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -10761,6 +11369,22 @@ observations:
               table: I
               note: row=40
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_ni_r02::T=1358.15:h=d1ab2c51eb12
@@ -11467,6 +12091,22 @@ observations:
               note: row=22
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_sb_r02::T=1358.15:h=aea7532fc8e5
@@ -11621,6 +12261,22 @@ observations:
               table: I
               note: row=22
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -11793,6 +12449,22 @@ observations:
               table: I
               note: row=22
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_sb_r02::T=1358.15:h=00b136d96fd4
@@ -12463,6 +13135,22 @@ observations:
               note: row=24
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_sb_r04::T=1473.15:h=851238ca08ed
@@ -12608,6 +13296,22 @@ observations:
               table: I
               note: row=24
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -12771,6 +13475,22 @@ observations:
               table: I
               note: row=24
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_sb_r04::T=1473.15:h=851238ca08ed
@@ -12952,6 +13672,22 @@ observations:
               note: row=25
         output_unit: K
         references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: johnston-1965-sodium-disilicate-redox::johnston_1965_t1_sb_r05::T=1573.15:h=ed8d27affe3a
@@ -13097,6 +13833,22 @@ observations:
               table: I
               note: row=25
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   provenance:
     printed_phase: glass
@@ -13260,6 +14012,22 @@ observations:
               table: I
               note: row=25
         output_unit: K
+        references: []
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 3
+        published_page: 186
+        pdf_page_index: 2
+        table: I
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=Air
+        parameters: []
+        output_unit: log10(fO2/bar)
         references: []
   derived_from:
   - johnston-1965-sodium-disilicate-redox::johnston_1965_t1_sb_r05::T=1573.15:h=72dbc3691007

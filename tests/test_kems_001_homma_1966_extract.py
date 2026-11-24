@@ -63,3 +63,10 @@ def test_isolated_migration_has_no_hard_issues(tmp_path: Path) -> None:
         for observation in result.observations.values()
     }
     assert set(EXPECTED) <= migrated_ids
+    context_ids = {
+        row["observation_id"]
+        for rows in result.context_by_work.values()
+        for row in rows
+    }
+    assert "homma_1966_crucible_area_numeric_b1" in context_ids
+    assert "homma_1966_crucible_area_numeric_b1" not in migrated_ids

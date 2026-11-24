@@ -152,12 +152,13 @@ def test_isolated_migration_binds_redox_axes_and_exact_parents(tmp_path: Path) -
         row = migrated[observation_id]
         assert row.identity.temperature_K is not None
         assert row.identity.temperature_K.is_value
-        assert row.identity.composition is not None and row.identity.composition.is_unknown
-        assert "per-run composition is not published" in row.identity.composition.reason
+        assert row.identity.composition is not None and row.identity.composition.is_value
+        assert row.identity.composition.value.proxy_flag == "initial_charge_only"
         assert row.identity.fO2_Pa is not None and row.identity.fO2_Pa.is_value
         assert row.identity.total_pressure_Pa is None or not row.identity.total_pressure_Pa.is_value
         assert row.point_conditions["temperature_K"].state.is_value
-        assert row.point_conditions["composition"].state.is_unknown
+        assert row.point_conditions["composition"].state.is_value
+        assert row.point_conditions["composition"].state.value.proxy_flag == "initial_charge_only"
         assert row.point_conditions["fO2_Pa"].state.is_value
         assert "total_pressure_Pa" not in row.point_conditions
 
@@ -183,7 +184,8 @@ def test_isolated_migration_binds_redox_axes_and_exact_parents(tmp_path: Path) -
         f"{SID}::wang2010_table4_sample_1_cro_partial_pressure",
         f"{SID}::wang2010_table4_sample_1_cro2_partial_pressure",
     }
-    assert kems_ratio.identity.composition.is_unknown
+    assert kems_ratio.identity.composition.is_value
+    assert kems_ratio.identity.composition.value.proxy_flag == "initial_charge_only"
     starting_kems_mix = _source_rows(document)[
         "wang2010_table4_sample_1_xcro_over_xcro15_eq7"
     ]["point_conditions"]["composition"]["state"]["value"]

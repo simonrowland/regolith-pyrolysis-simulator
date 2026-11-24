@@ -71,9 +71,10 @@ def test_sossi_geometry_is_declared_from_bead_mass_without_residue_inputs() -> N
     ]
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -> None:
     pytest.importorskip("openimcc")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     import openimcc
 
     import simulator.battery.residue as residue
@@ -164,6 +165,8 @@ def test_sossi_prediction_provenance_pins_engine_binding_identity(monkeypatch) -
     assert mno_extension["activity_provenance"] == expected_mno_activity.provenance()
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     openimcc = pytest.importorskip("openimcc")
 
@@ -242,6 +245,8 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     assert prediction.primary_element_ppm["Ti"] > 0.0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -284,6 +289,8 @@ def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sossi_worker_start_failure_after_residue_scoring_worker(
     monkeypatch: pytest.MonkeyPatch,
     _close_openimcc_worker_between_tests,
@@ -325,6 +332,8 @@ def test_sossi_worker_start_failure_after_residue_scoring_worker(
     _assert_sossi_worker_start_failure_recorded(monkeypatch)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_sossi_worker_start_failure_is_recorded_as_transport_error(
     monkeypatch: pytest.MonkeyPatch,
     _close_openimcc_worker_between_tests,

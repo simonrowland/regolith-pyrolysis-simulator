@@ -8,6 +8,7 @@ import yaml
 from simulator.battery.enums import (
     AmountBasis,
     EvidenceClass,
+    NoticeKind,
     PhaseRole,
     Quantity,
     ValueKind,
@@ -79,7 +80,18 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         assert row.derivation.raw_inputs.state.value.value == "not_printed"
         assert row.point_conditions["atmosphere"].state.value == "air"
         assert row.point_conditions["quench"].state.value == "water quench"
-        assert row.notices == ()
+        # The source states air but no total pressure; do not infer 1 atm.
+        oxygen_log = row.point_conditions["fO2_log"]
+        assert oxygen_log.state.is_unknown
+        assert oxygen_log.state.reason == (
+            "missing input: printed air fO2 requires stated total pressure"
+        )
+        assert len(row.notices) == 1
+        assert row.notices[0].kind is NoticeKind.INPUT_OMITTED
+        assert row.notices[0].reason == (
+            "missing input: printed air fO2 requires stated total pressure"
+        )
+        assert row.notices[0].origin == row.observation_id
 
     s75_point = next(row for row in rows if row.value.point == Decimal("0.577"))
     printed_composition = {

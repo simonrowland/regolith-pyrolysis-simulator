@@ -135604,7 +135604,7 @@ observations:
       reason: No source composition is reported for this row.
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '1'
@@ -135636,6 +135636,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_c1-air_gamma_k
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -135734,6 +135739,27 @@ observations:
         published_page: 39
         pdf_page_index: 39
         table: '2'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-5.678898900802177548242073382'
+          interval_high: '-5.678898900802177548242073382'
+          approximate: false
+      locator:
+        page: 40
+        published_page: 39
+        pdf_page_index: 39
+        table: '2'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_c1-air_gamma_na
@@ -135782,7 +135808,7 @@ observations:
       reason: No source composition is reported for this row.
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '1'
@@ -135814,6 +135840,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_c1-air_gamma_na
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -135912,6 +135943,27 @@ observations:
         published_page: 39
         pdf_page_index: 39
         table: '2'
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-5.678898900802177548242073382'
+          interval_high: '-5.678898900802177548242073382'
+          approximate: false
+      locator:
+        page: 40
+        published_page: 39
+        pdf_page_index: 39
+        table: '2'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_c1-h2_gamma_k
@@ -147296,7 +147348,7 @@ observations:
       reason: No source composition is reported for this row.
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: value
       value:
@@ -147333,6 +147385,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_not-reported_gamma_k
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -147434,6 +147491,22 @@ observations:
         published_page: 39
         pdf_page_index: 39
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 40
+        published_page: 39
+        pdf_page_index: 39
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_not-reported_gamma_na
@@ -147482,7 +147555,7 @@ observations:
       reason: No source composition is reported for this row.
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: invalid total pressure for printed air fO2; no value assigned
     total_pressure_Pa:
       tag: value
       value:
@@ -147519,6 +147592,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: invalid total pressure for printed air fO2; no value assigned
+    origin: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_table2_not-reported_gamma_na
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -147620,6 +147698,22 @@ observations:
         published_page: 39
         pdf_page_index: 39
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: invalid total pressure for printed air fO2; no value assigned
+      locator:
+        page: 40
+        published_page: 39
+        pdf_page_index: 39
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: l
 - observation_id: richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation::richter_2011_text_alpha_diff_co2_h2_theoretical

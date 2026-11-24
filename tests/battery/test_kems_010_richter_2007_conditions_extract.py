@@ -16,7 +16,6 @@ SOURCE_ID = "kems-010-richter-2007"
 
 SCHEMA_GAP_QUANTITIES = {
     "vacuum_evaporation_flux_J_Mg_vs_T",
-    "sample_surface_area_series",
     "published_mass_loss_and_reduced_flux_time_series",
     "published_reduced_silicon_flux_time_series",
     "qualitative_non_loss_bound",
@@ -93,7 +92,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
     document = load_yaml(EXTRACT)
     source_rows = list(_source_observations(document))
 
-    assert len(rows) == 350
+    assert len(rows) == 342
     composition_links = [
         source_row["values"]["composition_role"]["locator"]
         for source_row in source_rows
@@ -107,6 +106,52 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         and locator["row"] == "Starting material"
         for locator in composition_links
     )
+    area_context = {
+        row["observation_id"]: row
+        for context_rows in result.context_by_work.values()
+        for row in context_rows
+        if row["observation_id"].startswith(
+            "richter_2007_mg_table1_numeric_areas_b1_"
+        )
+    }
+    assert len(area_context) == 8
+    assert all(row["type"] == "sample_geometry" for row in area_context.values())
+    assert all(
+        row["locator"]["page"] == 6
+        and row["locator"]["published_page"] == 5549
+        and row["locator"]["pdf_page_index"] == 5
+        for row in area_context.values()
+    )
+    migrated_ids = {
+        row.observation_id.rsplit("::", 1)[-1] for row in rows.values()
+    }
+    assert not area_context.keys() & migrated_ids
+    expected_area_samples = {
+        "R3-12": (2.5, 1900, 22.4, 21.3),
+        "R3-10": (2.5, 1900, 24.0, 18.9),
+        "R3-11": (2.5, 1900, 20.9, 15.9),
+        "R-8": (6.0, 1800, 87.5, 83.4),
+        "R-9": (6.0, 1800, 82.6, 76.6),
+        "R-11": (6.0, 1800, 91.3, 80.0),
+        "R2-4": (6.0, 1800, 88.5, 75.5),
+        "R-16": (1.0, 1800, 5.9, 5.8),
+    }
+    assert len(expected_area_samples) == len(area_context) == 8
+    assert {
+        row["values"]["samples"][0]["sample"] for row in area_context.values()
+    } == set(expected_area_samples)
+    for row in area_context.values():
+        sample_name = row["values"]["samples"][0]["sample"]
+        diam, temp, initial, final = expected_area_samples[sample_name]
+        assert row["values"]["samples"] == [
+            {
+                "sample": sample_name,
+                "diam_mm": diam,
+                "T_C": temp,
+                "init_area_mm2": initial,
+                "final_area_mm2": final,
+            }
+        ]
     assert not result.validation.hard_issues
     assert sum(_complete_identity(row) for row in rows.values()) == 0
     assert not Counter(
@@ -138,7 +183,6 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         if row.get("values", {}).get("quantity") in SCHEMA_GAP_QUANTITIES
     ) == {
         "vacuum_evaporation_flux_J_Mg_vs_T": 1,
-        "sample_surface_area_series": 8,
         "published_mass_loss_and_reduced_flux_time_series": 51,
         "published_reduced_silicon_flux_time_series": 32,
         "qualitative_non_loss_bound": 4,
@@ -171,7 +215,7 @@ def test_richter_2007_conditions_row_counts_and_render_pins():
         assert temperature.locator is not None
         assert temperature.locator.page == temperature.locator.published_page - 5543
         temperature_kinds["value" if temperature.state.is_value else "unknown"] += 1
-    assert temperature_kinds == {"value": 345, "unknown": 5}
+    assert temperature_kinds == {"value": 337, "unknown": 5}
 
     mutated_conditions = dict(next(iter(rows.values())).point_conditions)
     mutated_conditions.pop("total_pressure_Pa")

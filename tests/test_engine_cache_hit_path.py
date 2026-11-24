@@ -3,7 +3,11 @@ from pathlib import Path
 import subprocess
 import sys
 
+import pytest
+
 from simulator import engine_cache
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_bloom_definite_miss_skips_the_disk_lookup(tmp_path, monkeypatch):

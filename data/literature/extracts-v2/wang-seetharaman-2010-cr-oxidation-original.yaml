@@ -44,9 +44,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4962002695212142063520448367'
+        - - SiO2
+          - '0.4631163975490759704176716528'
+        - - Cr2O3
+          - '0.04068333292970982323028351077'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.00283'
@@ -93,7 +103,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_08d_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -134,15 +145,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4962002695212142063520448367'
+          - - SiO2
+            - '0.4631163975490759704176716528'
+          - - Cr2O3
+            - '0.04068333292970982323028351077'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=3; table_column_number=5; row_label=08D
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -223,9 +244,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4159769688522200812955795723'
+        - - SiO2
+          - '0.5517122305572033990040274272'
+        - - Cr2O3
+          - '0.03231080059057651970039300028'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000179'
@@ -272,7 +303,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_10b_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -313,15 +345,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4159769688522200812955795723'
+          - - SiO2
+            - '0.5517122305572033990040274272'
+          - - Cr2O3
+            - '0.03231080059057651970039300028'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=4; table_column_number=5; row_label=10B
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -402,9 +444,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3344889090956833956164657873'
+        - - SiO2
+          - '0.6243741010055636186085614044'
+        - - Cr2O3
+          - '0.04113698989875298577497280806'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.000179'
@@ -451,7 +503,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_10c_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -492,15 +545,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3344889090956833956164657873'
+          - - SiO2
+            - '0.6243741010055636186085614044'
+          - - Cr2O3
+            - '0.04113698989875298577497280806'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=5; table_column_number=5; row_label=10C
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -581,9 +644,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.5430668278457580868481892918'
+        - - SiO2
+          - '0.4372893883150169957267878149'
+        - - Cr2O3
+          - '0.01964378383922491742502289336'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000283'
@@ -630,7 +703,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_12a_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -671,15 +745,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.5430668278457580868481892918'
+          - - SiO2
+            - '0.4372893883150169957267878149'
+          - - Cr2O3
+            - '0.01964378383922491742502289336'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=6; table_column_number=5; row_label=12A
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -760,9 +844,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4962002695212142063520448367'
+        - - SiO2
+          - '0.4631163975490759704176716528'
+        - - Cr2O3
+          - '0.04068333292970982323028351077'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000283'
@@ -809,7 +903,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_12d_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -850,15 +945,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4962002695212142063520448367'
+          - - SiO2
+            - '0.4631163975490759704176716528'
+          - - Cr2O3
+            - '0.04068333292970982323028351077'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=7; table_column_number=5; row_label=12D
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -939,9 +1044,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.5430668278457580868481892918'
+        - - SiO2
+          - '0.4372893883150169957267878149'
+        - - Cr2O3
+          - '0.01964378383922491742502289336'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000663'
@@ -988,7 +1103,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21a_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -1029,15 +1145,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.5430668278457580868481892918'
+          - - SiO2
+            - '0.4372893883150169957267878149'
+          - - Cr2O3
+            - '0.01964378383922491742502289336'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=8; table_column_number=5; row_label=21A
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -1118,9 +1244,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4159769688522200812955795723'
+        - - SiO2
+          - '0.5517122305572033990040274272'
+        - - Cr2O3
+          - '0.03231080059057651970039300028'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000663'
@@ -1167,7 +1303,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21b_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -1208,15 +1345,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4159769688522200812955795723'
+          - - SiO2
+            - '0.5517122305572033990040274272'
+          - - Cr2O3
+            - '0.03231080059057651970039300028'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=9; table_column_number=5; row_label=21B
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -1297,9 +1444,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3344889090956833956164657873'
+        - - SiO2
+          - '0.6243741010055636186085614044'
+        - - Cr2O3
+          - '0.04113698989875298577497280806'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000663'
@@ -1346,7 +1503,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21c_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -1387,15 +1545,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3344889090956833956164657873'
+          - - SiO2
+            - '0.6243741010055636186085614044'
+          - - Cr2O3
+            - '0.04113698989875298577497280806'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=10; table_column_number=5; row_label=21C
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -1476,9 +1644,19 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.4962002695212142063520448367'
+        - - SiO2
+          - '0.4631163975490759704176716528'
+        - - Cr2O3
+          - '0.04068333292970982323028351077'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000663'
@@ -1525,7 +1703,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table3_21d_xcro_over_xcro15_xanes
   - kind: admission_defaulted
     affected_quantities:
@@ -1566,15 +1745,25 @@ observations:
         note: Absolute pO2 as printed; gas equilibrium pressure was calculated with ThermoCalc and SSUB3.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.4962002695212142063520448367'
+          - - SiO2
+            - '0.4631163975490759704176716528'
+          - - Cr2O3
+            - '0.04068333292970982323028351077'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: III
-        note: table_row_number=11; table_column_number=5; row_label=21D
+        page: 2
+        published_page: 947
+        pdf_page_index: 1
+        table: I
+        note: Table I starting mixture; the equilibrated melt composition is not reported and chromium dissolves into Pt
     gas_mix:
       state:
         tag: value
@@ -1655,9 +1844,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.091'
+        - - Fe_nO
+          - '0.063'
+        - - MgO
+          - '0.149'
+        - - CaO
+          - '0.552'
+        - - Al2O3
+          - '0.01'
+        - - SiO2
+          - '0.135'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0019'
@@ -1694,7 +1899,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -1736,15 +1942,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.091'
+          - - Fe_nO
+            - '0.063'
+          - - MgO
+            - '0.149'
+          - - CaO
+            - '0.552'
+          - - Al2O3
+            - '0.01'
+          - - SiO2
+            - '0.135'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=10; table_row_number=12; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -1806,9 +2028,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.091'
+        - - Fe_nO
+          - '0.063'
+        - - MgO
+          - '0.149'
+        - - CaO
+          - '0.552'
+        - - Al2O3
+          - '0.01'
+        - - SiO2
+          - '0.135'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0019'
@@ -1845,7 +2083,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -1887,15 +2126,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.091'
+          - - Fe_nO
+            - '0.063'
+          - - MgO
+            - '0.149'
+          - - CaO
+            - '0.552'
+          - - Al2O3
+            - '0.01'
+          - - SiO2
+            - '0.135'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=10; table_row_number=12; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -1957,9 +2212,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.091'
+        - - Fe_nO
+          - '0.063'
+        - - MgO
+          - '0.149'
+        - - CaO
+          - '0.552'
+        - - Al2O3
+          - '0.01'
+        - - SiO2
+          - '0.135'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0019'
@@ -2006,7 +2277,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -2048,15 +2320,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.091'
+          - - Fe_nO
+            - '0.063'
+          - - MgO
+            - '0.149'
+          - - CaO
+            - '0.552'
+          - - Al2O3
+            - '0.01'
+          - - SiO2
+            - '0.135'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=10
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_10_cro2_partial_pressure
@@ -2112,9 +2400,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.168'
+        - - Fe_nO
+          - '0.072'
+        - - MgO
+          - '0.055'
+        - - CaO
+          - '0.538'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.159'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0028'
@@ -2151,7 +2455,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -2193,15 +2498,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.168'
+          - - Fe_nO
+            - '0.072'
+          - - MgO
+            - '0.055'
+          - - CaO
+            - '0.538'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.159'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=1; table_row_number=3; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -2263,9 +2584,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.168'
+        - - Fe_nO
+          - '0.072'
+        - - MgO
+          - '0.055'
+        - - CaO
+          - '0.538'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.159'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0028'
@@ -2302,7 +2639,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -2344,15 +2682,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.168'
+          - - Fe_nO
+            - '0.072'
+          - - MgO
+            - '0.055'
+          - - CaO
+            - '0.538'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.159'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=1; table_row_number=3; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -2414,9 +2768,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.168'
+        - - Fe_nO
+          - '0.072'
+        - - MgO
+          - '0.055'
+        - - CaO
+          - '0.538'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.159'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0028'
@@ -2463,7 +2833,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -2505,15 +2876,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.168'
+          - - Fe_nO
+            - '0.072'
+          - - MgO
+            - '0.055'
+          - - CaO
+            - '0.538'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.159'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=1
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_1_cro2_partial_pressure
@@ -2569,9 +2956,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.149'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.105'
+        - - CaO
+          - '0.54'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.152'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0014'
@@ -2608,7 +3011,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -2650,15 +3054,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.149'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.105'
+          - - CaO
+            - '0.54'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.152'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=2; table_row_number=4; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -2720,9 +3140,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.149'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.105'
+        - - CaO
+          - '0.54'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.152'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0014'
@@ -2759,7 +3195,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -2801,15 +3238,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.149'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.105'
+          - - CaO
+            - '0.54'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.152'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=2; table_row_number=4; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -2871,9 +3324,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.149'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.105'
+        - - CaO
+          - '0.54'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.152'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0014'
@@ -2920,7 +3389,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -2962,15 +3432,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.149'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.105'
+          - - CaO
+            - '0.54'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.152'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_2_cro2_partial_pressure
@@ -3026,9 +3512,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.111'
+        - - Fe_nO
+          - '0.049'
+        - - MgO
+          - '0.057'
+        - - CaO
+          - '0.617'
+        - - Al2O3
+          - '0.013'
+        - - SiO2
+          - '0.153'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0014'
@@ -3065,7 +3567,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -3107,15 +3610,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.111'
+          - - Fe_nO
+            - '0.049'
+          - - MgO
+            - '0.057'
+          - - CaO
+            - '0.617'
+          - - Al2O3
+            - '0.013'
+          - - SiO2
+            - '0.153'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=3; table_row_number=5; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -3177,9 +3696,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.111'
+        - - Fe_nO
+          - '0.049'
+        - - MgO
+          - '0.057'
+        - - CaO
+          - '0.617'
+        - - Al2O3
+          - '0.013'
+        - - SiO2
+          - '0.153'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0014'
@@ -3216,7 +3751,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -3258,15 +3794,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.111'
+          - - Fe_nO
+            - '0.049'
+          - - MgO
+            - '0.057'
+          - - CaO
+            - '0.617'
+          - - Al2O3
+            - '0.013'
+          - - SiO2
+            - '0.153'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=3; table_row_number=5; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -3328,9 +3880,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.111'
+        - - Fe_nO
+          - '0.049'
+        - - MgO
+          - '0.057'
+        - - CaO
+          - '0.617'
+        - - Al2O3
+          - '0.013'
+        - - SiO2
+          - '0.153'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0014'
@@ -3377,7 +3945,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -3419,15 +3988,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.111'
+          - - Fe_nO
+            - '0.049'
+          - - MgO
+            - '0.057'
+          - - CaO
+            - '0.617'
+          - - Al2O3
+            - '0.013'
+          - - SiO2
+            - '0.153'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=3
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_3_cro2_partial_pressure
@@ -3483,9 +4068,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.08'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.124'
+        - - CaO
+          - '0.583'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.157'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0025'
@@ -3522,7 +4123,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -3564,15 +4166,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.08'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.124'
+          - - CaO
+            - '0.583'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.157'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=4; table_row_number=6; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -3634,9 +4252,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.08'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.124'
+        - - CaO
+          - '0.583'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.157'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0025'
@@ -3673,7 +4307,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -3715,15 +4350,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.08'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.124'
+          - - CaO
+            - '0.583'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.157'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=4; table_row_number=6; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -3785,9 +4436,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.08'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.124'
+        - - CaO
+          - '0.583'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.157'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0025'
@@ -3834,7 +4501,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -3876,15 +4544,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.08'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.124'
+          - - CaO
+            - '0.583'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.157'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=4
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_4_cro2_partial_pressure
@@ -3940,9 +4624,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.078'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.135'
+        - - CaO
+          - '0.578'
+        - - Al2O3
+          - '0.012'
+        - - SiO2
+          - '0.153'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0012'
@@ -3979,7 +4679,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -4021,15 +4722,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.078'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.135'
+          - - CaO
+            - '0.578'
+          - - Al2O3
+            - '0.012'
+          - - SiO2
+            - '0.153'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=5; table_row_number=7; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -4091,9 +4808,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.078'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.135'
+        - - CaO
+          - '0.578'
+        - - Al2O3
+          - '0.012'
+        - - SiO2
+          - '0.153'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0012'
@@ -4130,7 +4863,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -4172,15 +4906,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.078'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.135'
+          - - CaO
+            - '0.578'
+          - - Al2O3
+            - '0.012'
+          - - SiO2
+            - '0.153'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=5; table_row_number=7; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -4242,9 +4992,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.078'
+        - - Fe_nO
+          - '0.045'
+        - - MgO
+          - '0.135'
+        - - CaO
+          - '0.578'
+        - - Al2O3
+          - '0.012'
+        - - SiO2
+          - '0.153'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0012'
@@ -4291,7 +5057,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -4333,15 +5100,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.078'
+          - - Fe_nO
+            - '0.045'
+          - - MgO
+            - '0.135'
+          - - CaO
+            - '0.578'
+          - - Al2O3
+            - '0.012'
+          - - SiO2
+            - '0.153'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=5
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_5_cro2_partial_pressure
@@ -4397,9 +5180,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.076'
+        - - Fe_nO
+          - '0.051'
+        - - MgO
+          - '0.126'
+        - - CaO
+          - '0.592'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.144'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0033'
@@ -4436,7 +5235,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -4478,15 +5278,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.076'
+          - - Fe_nO
+            - '0.051'
+          - - MgO
+            - '0.126'
+          - - CaO
+            - '0.592'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.144'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=6; table_row_number=8; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -4548,9 +5364,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.076'
+        - - Fe_nO
+          - '0.051'
+        - - MgO
+          - '0.126'
+        - - CaO
+          - '0.592'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.144'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0033'
@@ -4587,7 +5419,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -4629,15 +5462,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.076'
+          - - Fe_nO
+            - '0.051'
+          - - MgO
+            - '0.126'
+          - - CaO
+            - '0.592'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.144'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=6; table_row_number=8; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -4699,9 +5548,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.076'
+        - - Fe_nO
+          - '0.051'
+        - - MgO
+          - '0.126'
+        - - CaO
+          - '0.592'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.144'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0033'
@@ -4748,7 +5613,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -4790,15 +5656,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.076'
+          - - Fe_nO
+            - '0.051'
+          - - MgO
+            - '0.126'
+          - - CaO
+            - '0.592'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.144'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=6
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_6_cro2_partial_pressure
@@ -4854,9 +5736,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.086'
+        - - Fe_nO
+          - '0.061'
+        - - MgO
+          - '0.125'
+        - - CaO
+          - '0.577'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.141'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0036'
@@ -4893,7 +5791,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -4935,15 +5834,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.086'
+          - - Fe_nO
+            - '0.061'
+          - - MgO
+            - '0.125'
+          - - CaO
+            - '0.577'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.141'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=7; table_row_number=9; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -5005,9 +5920,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.086'
+        - - Fe_nO
+          - '0.061'
+        - - MgO
+          - '0.125'
+        - - CaO
+          - '0.577'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.141'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0036'
@@ -5044,7 +5975,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -5086,15 +6018,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.086'
+          - - Fe_nO
+            - '0.061'
+          - - MgO
+            - '0.125'
+          - - CaO
+            - '0.577'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.141'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=7; table_row_number=9; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -5156,9 +6104,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.086'
+        - - Fe_nO
+          - '0.061'
+        - - MgO
+          - '0.125'
+        - - CaO
+          - '0.577'
+        - - Al2O3
+          - '0.011'
+        - - SiO2
+          - '0.141'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0036'
@@ -5205,7 +6169,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -5247,15 +6212,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.086'
+          - - Fe_nO
+            - '0.061'
+          - - MgO
+            - '0.125'
+          - - CaO
+            - '0.577'
+          - - Al2O3
+            - '0.011'
+          - - SiO2
+            - '0.141'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=7
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_7_cro2_partial_pressure
@@ -5311,9 +6292,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.132'
+        - - Fe_nO
+          - '0.044'
+        - - MgO
+          - '0.162'
+        - - CaO
+          - '0.519'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.133'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0024'
@@ -5350,7 +6347,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -5392,15 +6390,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.132'
+          - - Fe_nO
+            - '0.044'
+          - - MgO
+            - '0.162'
+          - - CaO
+            - '0.519'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.133'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=8; table_row_number=10; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -5462,9 +6476,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.132'
+        - - Fe_nO
+          - '0.044'
+        - - MgO
+          - '0.162'
+        - - CaO
+          - '0.519'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.133'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0024'
@@ -5501,7 +6531,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -5543,15 +6574,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.132'
+          - - Fe_nO
+            - '0.044'
+          - - MgO
+            - '0.162'
+          - - CaO
+            - '0.519'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.133'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=8; table_row_number=10; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -5613,9 +6660,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.132'
+        - - Fe_nO
+          - '0.044'
+        - - MgO
+          - '0.162'
+        - - CaO
+          - '0.519'
+        - - Al2O3
+          - '0.009'
+        - - SiO2
+          - '0.133'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0024'
@@ -5662,7 +6725,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -5704,15 +6768,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.132'
+          - - Fe_nO
+            - '0.044'
+          - - MgO
+            - '0.162'
+          - - CaO
+            - '0.519'
+          - - Al2O3
+            - '0.009'
+          - - SiO2
+            - '0.133'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=8
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_8_cro2_partial_pressure
@@ -5768,9 +6848,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.097'
+        - - Fe_nO
+          - '0.05'
+        - - MgO
+          - '0.082'
+        - - CaO
+          - '0.625'
+        - - Al2O3
+          - '0.01'
+        - - SiO2
+          - '0.137'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0021'
@@ -5807,7 +6903,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_cro2_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -5849,15 +6946,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.097'
+          - - Fe_nO
+            - '0.05'
+          - - MgO
+            - '0.082'
+          - - CaO
+            - '0.625'
+          - - Al2O3
+            - '0.01'
+          - - SiO2
+            - '0.137'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=9; table_row_number=11; table_column_number=3; column_header=CrO2
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -5919,9 +7032,25 @@ observations:
       tag: unknown
       reason: source condensed reservoir not grounded
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.097'
+        - - Fe_nO
+          - '0.05'
+        - - MgO
+          - '0.082'
+        - - CaO
+          - '0.625'
+        - - Al2O3
+          - '0.01'
+        - - SiO2
+          - '0.137'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0021'
@@ -5958,7 +7087,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - p_partial
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_cro_partial_pressure
   - kind: admission_defaulted
     affected_quantities:
@@ -6000,15 +7130,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.097'
+          - - Fe_nO
+            - '0.05'
+          - - MgO
+            - '0.082'
+          - - CaO
+            - '0.625'
+          - - Al2O3
+            - '0.01'
+          - - SiO2
+            - '0.137'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        table: IV
-        note: row_label=9; table_row_number=11; table_column_number=2; column_header=CrO
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derivation:
     relation: 'Equation (6) converts the sample/reference ion-current ratio to partial pressure: p_i = (I_i/I0_i) p0_i.; species.phase=gas
       derived from quantity=partial_pressure (partial pressure is a gas-phase quantity)'
@@ -6070,9 +7216,25 @@ observations:
       tag: not_applicable
       reason: profile valence_ratio does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_starting_charge
+        components:
+        - - Cr2O3
+          - '0.097'
+        - - Fe_nO
+          - '0.05'
+        - - MgO
+          - '0.082'
+        - - CaO
+          - '0.625'
+        - - Al2O3
+          - '0.01'
+        - - SiO2
+          - '0.137'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0021'
@@ -6119,7 +7281,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - valence_ratio
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_xcro_over_xcro15_eq7
   - kind: admission_defaulted
     affected_quantities:
@@ -6161,15 +7324,31 @@ observations:
           separately imposed or measured fO2.
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_starting_charge
+          components:
+          - - Cr2O3
+            - '0.097'
+          - - Fe_nO
+            - '0.05'
+          - - MgO
+            - '0.082'
+          - - CaO
+            - '0.625'
+          - - Al2O3
+            - '0.01'
+          - - SiO2
+            - '0.137'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
-        page: 5
-        published_page: 950
-        pdf_page_index: 4
-        equation: '7'
-        note: row_label=9
+        page: 4
+        published_page: 949
+        pdf_page_index: 3
+        table: II
+        note: Table II weighed-in oxide mole fractions; Fe_nO is retained as printed.
   derived_from:
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_cro_partial_pressure
   - wang-seetharaman-2010-cr-oxidation-original::wang2010_table4_sample_9_cro2_partial_pressure

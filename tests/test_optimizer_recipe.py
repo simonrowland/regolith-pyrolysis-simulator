@@ -146,14 +146,14 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # Merging green f8baa3402 into that tree moves the resolved bytes again.
     # This is the sha256 of the merged resolved setpoints, not a rerun golden.
     assert resolved_digest == (
-        "644b3aad38a7327533545b69386a320a8910910711811f825e3075c7d3f8f6a9"
+        "91a039d8174d09336a8f8505534e9138bc51d2f836e0ef9c5eb74e25c0b773b3"
     )
     # C2's loader-scalar pressure pairs add coupled constraints to the sampling
     # domain, which the bounds digest tracks without an allowlist_version bump.
     # b-282: upstream wall search floor leaves the SiO-quiescent 1400 C
     # figure and becomes the coldest downstream collector interface (20 C).
     assert schema.bounds_digest == (
-        "924bcffff0ce77444cfd851929faefa132f8441929df26d5196704b996941b04"
+        "b0f8c15b944285a2a0935e01bb89e5f5fcfa87e2ce68e6769bb5543e72508868"
     )
     assert schema.bounds_digest != (
         "32e9d2e945bd870a2af90d5fc46259dd7b724404d9066c4505d98921b8fd4252"
@@ -166,7 +166,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # pre-Stage-3 bounds digest recovers
     # 17f2abb0d76c5234e709641b2f5a6b666b031dd7f94b287832f4daad9d2e1786.
     assert empty.recipe_id(schema) == (
-        "0df7598273ce6b4f9a8e436eb93bcb6371b0ab49a1b5f7112f297929f110521f"
+        "36600a53be559d56756caa0ec06aeb52ce386241347ef1692e2d5b4d031df0a8"
     )
     assert empty.recipe_id(schema) != (
         "defd94f2daff77987fe73577ffa5b87df51072d418794d41530accd88caf5907"
@@ -184,7 +184,7 @@ def test_t155_empty_patch_bytes_are_epoch_neutral_and_identity_moves() -> None:
     # bounds digest and dropping those four paths recovers
     # d40d619c3228beccd37ca6b683c5213a7894edcbe07ffc105a2ef58ff2c6ec55.
     assert identity_digest == (
-        "8744ed2c41d68c6cde9722d7d45cc9963c4861e6d0ea5b2dd4424658b108d069"
+        "d927aa6e90e0c73017c85dec06b309ad96d658a4b506bb7b350a90be6bc893e6"
     )
     subspace_digests = [
         c5_sampler_context(schema, active=active).conditional_subspace_digest
@@ -760,7 +760,9 @@ def test_no_pin_schema_is_golden_neutral_for_search_and_evalspec_hash() -> None:
     # cache_key(spec) with that default-off policy.
     # 2026-11-12 b260: recomputed for t-1720 (d-389 carrier cost in the
     # objective).
-    assert cache_key(spec) == "8d41af13498d7c9be4c2b39053f64c9c439e2d2ef109fac255f8d027cb4d8861"
+    # 2026-11-19 C2A staged-pressure runtime results changed; recomputed from
+    # cache_key(spec) for the new analytical corpus epoch.
+    assert cache_key(spec) == "bfa65ea9105b78b35ca7e46ec47dbdfa50c9f5c5488c468696e0900ac2813d29"
 
 
 def test_bounds_and_type_checks_for_allowlisted_knob() -> None:
@@ -1593,7 +1595,7 @@ def test_c2a_staged_depletion_log_slope_neutral_fixed_schedule() -> None:
             )
         ]
 
-        assert targets == pytest.approx(expected_targets)
+        assert targets == expected_targets
         assert end_hours[0] == 8
         assert manager._c2a_staged_stage_idx == 0
 
@@ -1788,7 +1790,7 @@ def test_recipe_id_is_stable_and_schema_versioned() -> None:
     # and this versioned recipe id move with it.
     assert (
         first.recipe_id()
-                == "6b9e45a34fdc8bf972cc3488bdb170538c4f807d45ceec2012d0fd12fe921937"
+                == "f600bcaa1c6e6c80a655d8d6db7e0b08bb8e07d5bc6a61e5be6d63ffbac25489"
     )
     assert first.recipe_id(recipe_schema_version="recipe-schema-v2") != first.recipe_id()
     assert RecipePatch({PO2_DEFAULT: 8.0}).validated().recipe_id() != first.recipe_id()

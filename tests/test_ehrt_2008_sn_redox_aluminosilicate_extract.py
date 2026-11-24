@@ -4,7 +4,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import ValueKind
+from simulator.battery.enums import NoticeKind, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -140,7 +140,17 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
             assert observation.identity.total_pressure_Pa is not None
             assert observation.identity.total_pressure_Pa.is_value
             assert observation.identity.total_pressure_Pa.value == expected_pressure_value
-        assert not observation.notices
+        atmosphere = observation.point_conditions["atmosphere"]
+        if atmosphere.state.value == "air":
+            oxygen_log = observation.point_conditions["fO2_log"]
+            assert oxygen_log.locator == atmosphere.locator
+            assert oxygen_log.state.is_value
+            assert oxygen_log.state.value.kind is ValueKind.INTERVAL
+            assert len(observation.notices) == 1
+            assert observation.notices[0].kind is NoticeKind.INPUT_OMITTED
+            assert "interval condition not yet scorable" in observation.notices[0].reason
+        else:
+            assert not observation.notices
     fig6_as = [
         observation
         for observation in redox_observations

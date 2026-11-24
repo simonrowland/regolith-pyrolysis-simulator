@@ -1382,6 +1382,49 @@ def _load_evaporation_alpha_envelope_by_species(
     return envelope_by_species
 
 
+def gate_dispatch_curve_notices(
+    diagnostic: Mapping[str, Any],
+) -> dict[str, Any]:
+    """Notices a single gate dispatch publishes on its own curve.
+
+    Module-level: the notices depend only on the dispatch diagnostic, not on
+    simulator state, so callers (including test stand-ins for the mixin) need
+    no bound method.
+    """
+
+    notices: dict[str, Any] = {}
+    fallback_provider = diagnostic.get('kernel_fallback_used')
+    if fallback_provider == 'alphamelts-diagnostic':
+        # Step 3 supplies measured-bracket validation. Until then this
+        # diagnostic prediction must not earn the primary MAGEMin
+        # binding's cache admission through the shared fallback slot.
+        notices['calibration_status'] = 'pending_validation'
+    step_down = diagnostic.get('gate_provider_step_down')
+    if step_down:
+        notices['gate_provider_step_down'] = step_down
+    backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
+    if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
+        for attempt in (step_down or {}).get('failed_providers', ()):
+            details = attempt['diagnostic'].get('backend_diagnostics') or {}
+            if 'condensed_phase_reference_pressure_bar' in details:
+                backend_diagnostic = details
+    if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
+        notices['alphamelts_reference_pressure'] = {
+            key: backend_diagnostic[key] for key in (
+                'physical_overhead_pressure_bar',
+                'condensed_phase_reference_pressure_bar',
+            )
+        }
+        for key in (
+            'solidus_bracket_C', 'liquidus_bracket_C', 'numerical_path_warning',
+            'commissioning_notice', 'authority', 'certified_band',
+        ):
+            if key in backend_diagnostic:
+                notices['alphamelts_reference_pressure'][key] = (
+                    backend_diagnostic[key]
+                )
+    return notices
+
 class EvaporationMixin:
     def _evaporation_bulk_partial_pressure_pa(self, species: str) -> float:
         """Return upstream melt-headspace backpressure for evaporation."""
@@ -3533,6 +3576,8 @@ class EvaporationMixin:
         self,
         curve: dict[str, Any],
     ) -> dict[str, Any]:
+        from simulator.reduced_real_determinism import _identity_gate_curve
+
         realized_provider = curve.get('gate_provider_step_down', {}).get(
             'realized_provider'
         )
@@ -3544,7 +3589,8 @@ class EvaporationMixin:
         self._freeze_gate_last_good_curve = {
             'provider': self._liquid_fraction_provider,
             'realized_provider': realized_provider,
-            'curve': copy.deepcopy(curve),
+            'curve': copy.deepcopy(_identity_gate_curve(curve)),
+
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
             'magemin_domain_identity': magemin_domain_identity,
@@ -3576,6 +3622,8 @@ class EvaporationMixin:
         *,
         timeout_reason: str | None = None,
     ) -> dict[str, Any] | None:
+        from simulator.reduced_real_determinism import _identity_gate_curve
+
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
             return None
@@ -3629,7 +3677,11 @@ class EvaporationMixin:
             abs(composition.get(oxide, 0.0) - previous_composition.get(oxide, 0.0))
             for oxide in sorted(composition.keys() | previous_composition.keys())
         )
-        curve = copy.deepcopy(previous['curve'])
+        # Identity of the solved curve. This hour's retry environment is
+        # attached by the caller and is not retained with the held curve.
+        curve = copy.deepcopy(_identity_gate_curve(previous['curve']))
+        diagnostic = failure['provider_diagnostic']
+
         curve['gate_provider_refusal'] = {
             **failure,
             'reason': (
@@ -3671,6 +3723,8 @@ class EvaporationMixin:
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import (
             GateCurveProviderOutcome,
+            _gate_curve_live_publication,
+            _identity_gate_curve,
             gate_curve_memo_is_cacheable,
             gate_curve_memo_record,
             record_repair_notice,
@@ -3688,7 +3742,9 @@ class EvaporationMixin:
                     'analytical_gate_no_cleaned_melt',
                     {'provider': 'analytical', 'reason': 'no_cleaned_melt'},
                 )
-            return gate_curve_memo_record(curve, None, (), 'live')
+            return _gate_curve_live_publication(
+                gate_curve_memo_record(curve, None, (), 'live'), curve
+            )
 
         self._reduced_real_uncacheable_reasons = []
         self._last_reduced_real_replay_notices = None
@@ -3743,7 +3799,9 @@ class EvaporationMixin:
                 if published is not None:
                     record = copy.deepcopy(held_record)
                     record['law_disclosures'] = published
-                    return record
+                    return _gate_curve_live_publication(
+                        record, held_record['curve']
+                    )
                 self._freeze_gate_held_curve_record = None
         store_getter = getattr(self, '_pt0_store', None)
         store = store_getter() if callable(store_getter) else None
@@ -3773,7 +3831,7 @@ class EvaporationMixin:
                 # measurement onto the record. A second accept here would
                 # count the same read twice. None means the hit was unknown.
                 published = getattr(store, '_accepted_hit_disclosures', None)
-                return gate_curve_memo_record(
+                replay_record = gate_curve_memo_record(
                     curve,
                     None,
                     replay_notices if isinstance(replay_notices, list) else (),
@@ -3784,6 +3842,7 @@ class EvaporationMixin:
                         else {}
                     ),
                 )
+                return _gate_curve_live_publication(replay_record, curve)
         cache = getattr(self, '_freeze_gate_liquid_fraction_cache', None)
         cached_curve = cache.get('curve') if isinstance(cache, dict) else None
         cached_notices = cache.get('repair_notices') if isinstance(cache, dict) else None
@@ -3841,7 +3900,7 @@ class EvaporationMixin:
                                 law_disclosures=published,
                                 **redox_state_kwargs,
                             )
-                    return hit
+                    return _gate_curve_live_publication(hit, curve)
 
         # Opt-in caller-owned memo for workflows that build fresh simulator
         # instances for equivalent rows. Reuse is based on the quantized
@@ -3923,7 +3982,7 @@ class EvaporationMixin:
                                 law_disclosures=published,
                                 **redox_state_kwargs,
                             )
-                        return record
+                        return _gate_curve_live_publication(record, curve)
 
         previous_in_progress = bool(
             getattr(self, '_freeze_gate_curve_in_progress', False)
@@ -3980,7 +4039,7 @@ class EvaporationMixin:
                         'domain_identity': magemin_domain_identity,
                         'record': copy.deepcopy(record),
                     }
-                    return record
+                    return _gate_curve_live_publication(record, curve)
 
                 # Invalid projected bounds are not a liquidus. The Kress floor
                 # remains the qualified out-of-domain prediction and
@@ -4088,7 +4147,11 @@ class EvaporationMixin:
                     redox_state=redox_state,
                 )
                 last_good = self._freeze_gate_last_good_curve
-                if last_good is not None and last_good['curve'] == curve:
+                if (
+                    last_good is not None
+                    and _identity_gate_curve(last_good['curve'])
+                    == _identity_gate_curve(curve)
+                ):
                     last_good['origin'] = origin
                 if cache_eligible:
                     self._freeze_gate_liquid_fraction_cache = {
@@ -4140,7 +4203,7 @@ class EvaporationMixin:
                     law_disclosures=disclosures,
                     **redox_state_kwargs,
                 )
-            return record
+            return _gate_curve_live_publication(record, curve)
 
     @staticmethod
     def _freeze_gate_liquidus_fO2_log(fO2_log: float) -> float:
@@ -4569,6 +4632,58 @@ class EvaporationMixin:
             amount_kg=sum(mass_by_species.values()),
         )
 
+    def _abandoned_gate_environment_record(
+        self,
+        diagnostic: Mapping[str, Any],
+        status: str,
+        timeout_reason: str,
+    ) -> dict[str, Any]:
+        """One visible record for the dispatch the retry abandoned.
+
+        Includes every row and notice from that dispatch, physics rows
+        included. A timeout that leaves ``_dispatch_only`` has no planner
+        step-down; the row is synthesized here so the retry does not drop it.
+        """
+
+        from simulator.reduced_real_determinism import (
+            failed_provider_attempt_is_environment,
+            gate_curve_provider_diagnostic_reasons,
+        )
+
+        owned = dict(diagnostic)
+        step_down = owned.get('gate_provider_step_down')
+        failed = list(step_down.get('failed_providers', ())) if isinstance(
+            step_down, Mapping,
+        ) else []
+        if not failed:
+            reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+            attempt = {
+                'provider': (
+                    diagnostic.get('kernel_fallback_used')
+                    or self._liquid_fraction_provider
+                ),
+                'status': status,
+                'reason': '; '.join(reasons) or str(
+                    diagnostic.get('reason') or status
+                ),
+                'diagnostic': dict(diagnostic),
+            }
+            if failed_provider_attempt_is_environment(attempt):
+                attempt['disposition'] = 'environment'
+            step_down = {
+                'failed_providers': [attempt],
+                'realized_provider': None,
+            }
+            owned['gate_provider_step_down'] = step_down
+        record = {
+            'disposition': 'environment',
+            'reason': timeout_reason,
+            'status': status,
+            'hour': int(self.melt.hour),
+        }
+        record.update(gate_dispatch_curve_notices(owned))
+        return record
+
     def _freeze_gate_curve_from_gate_dispatch(
         self,
         reasons: list[str],
@@ -4578,8 +4693,10 @@ class EvaporationMixin:
         redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import (
+            ENVIRONMENT_RETRIES_KEY,
             GateCurveProviderOutcome,
             gate_curve_provider_outcome_for_status,
+            gate_curve_provider_outcome_token,
             gate_curve_provider_timeout_reason,
             mark_uncacheable_replay_disposition,
             record_gate_curve_provider_outcome,
@@ -4611,9 +4728,13 @@ class EvaporationMixin:
             self, '_freeze_gate_current_magemin_domain_identity', None,
         )
         timeout_reason = None
-        step_down = None
-        failed_providers = []
-        for attempt in range(2):
+        # The final dispatch is published as that dispatch produced it.
+        # The abandoned dispatch, including its non-timeout rows and
+        # notices, is one environment record. A second timeout still
+        # publishes the final dispatch, so hold-last-good still sees
+        # alphamelts. d-298/d-299's hold decision is unchanged.
+        abandoned_environment = None
+        for attempt_index in range(2):
             try:
                 result = self._dispatch_only(
                     ChemistryIntent.GATE_LIQUID_FRACTION,
@@ -4640,39 +4761,43 @@ class EvaporationMixin:
                     or 'unavailable'
                 )
                 warnings = list(getattr(result, 'warnings', ()) or ())
-            if diagnostic.get('gate_provider_step_down'):
-                step_down = diagnostic['gate_provider_step_down']
-                failed_providers.extend(step_down['failed_providers'])
             timeout_reason = gate_curve_provider_timeout_reason(diagnostic)
-            if timeout_reason is None or attempt == 1:
-                break
+            if timeout_reason is not None and attempt_index == 0:
+                abandoned_environment = self._abandoned_gate_environment_record(
+                    diagnostic,
+                    status,
+                    timeout_reason,
+                )
+                continue
+            break
 
         path = tuple(diagnostic.get('liquid_fraction_path') or ())
         source = 'gate_liquid_fraction'
         fallback_provider = diagnostic.get('kernel_fallback_used')
-        if step_down:
-            # Retry recovery changes the curve provider, not the work already attempted.
+        if fallback_provider:
+            source = f'gate_liquid_fraction:fallback:{fallback_provider}'
+        notices = gate_dispatch_curve_notices(diagnostic)
+        if abandoned_environment is not None:
+            notices[ENVIRONMENT_RETRIES_KEY] = abandoned_environment
+        step_down = diagnostic.get('gate_provider_step_down')
+        if isinstance(step_down, Mapping):
+            # Preserve attempted-provider details while recording the provider
+            # selected by the final dispatch.
             diagnostic['gate_provider_step_down'] = {
                 **step_down,
-                'failed_providers': failed_providers,
-                'realized_provider': fallback_provider if status == 'ok' else None,
+                'realized_provider': (
+                    fallback_provider if status == 'ok' else None
+                ),
                 'magemin_sourced': (
                     diagnostic.get('magemin_sourced') is True
                 ),
             }
-        if fallback_provider:
-            source = f'gate_liquid_fraction:fallback:{fallback_provider}'
-        notices = {}
-        if fallback_provider == 'alphamelts-diagnostic':
-            # Step 3 supplies measured-bracket validation. Until then this
-            # diagnostic prediction must not earn the primary MAGEMin
-            # binding's cache admission through the shared fallback slot.
-            notices['calibration_status'] = 'pending_validation'
-        if diagnostic.get('gate_provider_step_down'):
-            notices['gate_provider_step_down'] = diagnostic['gate_provider_step_down']
+            notices['gate_provider_step_down'] = diagnostic[
+                'gate_provider_step_down'
+            ]
         backend_diagnostic = diagnostic.get('backend_diagnostics') or {}
         if 'condensed_phase_reference_pressure_bar' not in backend_diagnostic:
-            for attempt in diagnostic.get('gate_provider_step_down', {}).get('failed_providers', ()):
+            for attempt in (step_down or {}).get('failed_providers', ()):
                 details = attempt['diagnostic'].get('backend_diagnostics') or {}
                 if 'condensed_phase_reference_pressure_bar' in details:
                     backend_diagnostic = details
@@ -4692,16 +4817,7 @@ class EvaporationMixin:
                     value = diagnostic.get(field) or backend_diagnostic.get(field)
                     if value is not None:
                         notices[field] = copy.deepcopy(value)
-        if 'condensed_phase_reference_pressure_bar' in backend_diagnostic:
-            notices['alphamelts_reference_pressure'] = {
-                key: backend_diagnostic[key] for key in (
-                    'physical_overhead_pressure_bar', 'condensed_phase_reference_pressure_bar',
-                )
-            }
-            for key in ('solidus_bracket_C', 'liquidus_bracket_C', 'numerical_path_warning',
-                        'commissioning_notice', 'authority', 'certified_band'):
-                if key in backend_diagnostic:
-                    notices['alphamelts_reference_pressure'][key] = backend_diagnostic[key]
+
         status_outcome = gate_curve_provider_outcome_for_status(
             status,
             diagnostic,
@@ -4735,12 +4851,14 @@ class EvaporationMixin:
             failure = {
                 'provider': self._liquid_fraction_provider,
                 'reason': timeout_reason or 'liquid_fraction_provider_failed',
-                'outcome': status_outcome,
+                'outcome': gate_curve_provider_outcome_token(status_outcome),
                 'provider_diagnostic': diagnostic,
                 'status': status,
                 'warnings': warnings,
-                **({'backend_failure_disposition': 'environment'}
-                   if timeout_reason is not None else {}),
+                **({
+                    'backend_failure_disposition': 'environment',
+                    'disposition': 'environment',
+                } if timeout_reason is not None else {}),
                 **({'detail': diagnostic['exception_message']}
                    if diagnostic.get('exception_message') else {}),
             }
@@ -4753,6 +4871,10 @@ class EvaporationMixin:
                     timeout_reason=timeout_reason,
                 )
                 if held is not None:
+                    if 'gate_provider_step_down' in notices:
+                        held['gate_provider_step_down'] = notices['gate_provider_step_down']
+                    if ENVIRONMENT_RETRIES_KEY in notices:
+                        held[ENVIRONMENT_RETRIES_KEY] = notices[ENVIRONMENT_RETRIES_KEY]
                     current_step_down = diagnostic.get(
                         'gate_provider_step_down'
                     )
@@ -4778,6 +4900,7 @@ class EvaporationMixin:
                                 )
                             )
                         held['gate_provider_step_down'] = held_step_down
+
                     return self._record_freeze_gate_magemin_timeout_fallback_notice(
                         held,
                         timeout_reason=timeout_reason,
@@ -4856,7 +4979,7 @@ class EvaporationMixin:
                 held = self._hold_freeze_gate_provider_curve({
                     'provider': self._liquid_fraction_provider,
                     'status': status,
-                    'outcome': status_outcome,
+                    'outcome': gate_curve_provider_outcome_token(status_outcome),
                     'provider_diagnostic': {
                         **diagnostic,
                         'backend_status_reason': invalid_notice['reason'],
@@ -4868,6 +4991,8 @@ class EvaporationMixin:
                             invalid_notice, bounds_source=str(held['source']),
                         )
                     )
+                    if ENVIRONMENT_RETRIES_KEY in notices:
+                        held[ENVIRONMENT_RETRIES_KEY] = notices[ENVIRONMENT_RETRIES_KEY]
                     return held
             if _diagnostic_names_composition_projected(diagnostic):
                 if not any(

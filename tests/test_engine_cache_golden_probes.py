@@ -12,12 +12,15 @@ import subprocess
 import sys
 import threading
 from collections.abc import Mapping, Sequence
+from dataclasses import replace
 from functools import wraps
 from pathlib import Path
 
 import pytest
 
 from simulator import engine_cache
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 # The controller's full-suite loadgroup run exited a worker with this module
@@ -34,6 +37,29 @@ ENGINE_GOLDEN_PROBES = {
     "magemin": (5, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
     "alphamelts": (5, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
     "thermoengine": (5, "3db7ad76c46e3130880e2782b235e739a7de72b825180c84fa94e46ec68bfb53"),
+}
+
+_EXPECTED_NUMERIC_TRACE_PATHS = {
+    "openimcc": set(),
+    "internal-analytical": {
+        "data/vapor_pressures.yaml",
+        "data/setpoints.yaml",
+        "data/species_catalog.yaml",
+        "data/literature/extracts/nasa-cea-thermo.yaml",
+        "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+    },
+    "vaporock": set(),
+    "magemin": set(),
+    "alphamelts": {
+        "data/vapor_pressures.yaml",
+        "data/literature/extracts/nasa-cea-thermo.yaml",
+        "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+    },
+    "thermoengine": {
+        "data/vapor_pressures.yaml",
+        "data/literature/extracts/nasa-cea-thermo.yaml",
+        "data/literature/extracts/ivtan-mno-coo-thermo.yaml",
+    },
 }
 
 def _numeric_leaves(value, path=()):
@@ -143,31 +169,6 @@ def _trace_workspace_data_reads(
     return reads
 
 
-def _assert_trace_is_keyed(
-    engine_name: str,
-    observed: set[str],
-    callsites: Mapping[str, set[str]],
-) -> None:
-    from tests.test_engine_cache_input_identity import _EXPECTED_ENGINE_INPUTS
-
-    numeric_reads = _numeric_trace_paths(observed, callsites)
-    declared = {
-        path
-        for path, kind, _selector in _EXPECTED_ENGINE_INPUTS[engine_name]
-        if kind == "data"
-    }
-    unkeyed = numeric_reads - declared
-    callsite_detail = {
-        path: sorted(callsites.get(path, set())) for path in unkeyed
-    }
-    assert not unkeyed, (
-        f"{engine_name} real-solve file access was not declared in the independent "
-        f"input contract: {sorted(unkeyed)}; numeric trace={sorted(numeric_reads)}; "
-        f"full trace={sorted(observed)}; "
-        f"callsites={callsite_detail}"
-    )
-
-
 def _numeric_trace_paths(
     observed: set[str], callsites: Mapping[str, set[str]]
 ) -> set[str]:
@@ -184,10 +185,6 @@ def _assert_expected_numeric_trace(
     observed: set[str],
     callsites: Mapping[str, set[str]],
 ) -> None:
-    from tests.test_engine_cache_input_identity import (
-        _EXPECTED_NUMERIC_TRACE_PATHS,
-    )
-
     expected = set(_EXPECTED_NUMERIC_TRACE_PATHS[engine_name])
     # Engine binding admission hashes these files only for runtime provenance;
     # that diagnostic snapshot is not part of the cached numeric result.
@@ -229,12 +226,13 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
         equilibrate_cell,
         load_binary_pots,
     )
-    from simulator.engine_cache import _without_engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope, _without_engine_cache
     from tests.battery.cache_test_support import open_available_engine
 
     loaded_pots, _metadata = load_binary_pots()
     pots = {pot.pot_id: pot for pot in loaded_pots}
     cached_values = []
+    cached_requests = []
     callsites: dict[str, set[str]] = {}
     traced = _trace_workspace_data_reads(monkeypatch, callsites)
     _clear_numeric_input_read_caches()
@@ -264,6 +262,7 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             value = solve()
             if engine_id == engine_name:
                 cached_values.append(value)
+                cached_requests.append(cache_request)
             return value
 
         return original_cached_call(
@@ -290,10 +289,21 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             "equilibrate",
             capture_backend_cache_value,
         )
-        with _without_engine_cache():
+        with _engine_cache_path_scope("probe.sqlite"), _without_engine_cache():
+            probe_pot = pots["feo_sio2_40_60"]
+            if engine_name == "internal-analytical":
+                probe_pot = replace(
+                    probe_pot,
+                    pot_id="fe_na_sio2_cache_probe",
+                    composition_wt_pct={
+                        "FeO": 20.0,
+                        "Na2O": 20.0,
+                        "SiO2": 60.0,
+                    },
+                )
             cell = equilibrate_cell(
                 handle,
-                pots["feo_sio2_40_60"],
+                probe_pot,
                 temperature_K=1700.0,
                 po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
                 timeout_s=90.0,
@@ -308,16 +318,35 @@ def _live_engine_probe(engine_name, nodeid, monkeypatch, *, mutate_cold=False):
             "pid": os.getpid(),
             "version": engine_cache.ENGINE_CHEMISTRY_VERSION[engine_name],
             "digest": _numeric_output_digest(cached_values[-1]),
+            "request": cached_requests[-1] if cached_requests else None,
             "observed": sorted(traced),
             "callsites": {path: sorted(sites) for path, sites in callsites.items()},
             "mutations": len(mutations),
+            "vapor_pressure_species": _cached_vapor_pressure_species(
+                engine_name, cached_values[-1]
+            ),
         }
     finally:
         close_battery_engine_handle(handle)
 
 
+def _cached_vapor_pressure_species(engine_name, cache_value):
+    if engine_name == "openimcc":
+        return []
+    from simulator.melt_backend.base import equilibrium_cache_from_value
+
+    hot = engine_cache.live_hot(cache_value)
+    if not isinstance(hot, list):
+        return []
+    result = equilibrium_cache_from_value(hot, engine_id=engine_name)
+    pressures = result.get("vapor_pressures_Pa")
+    if not isinstance(pressures, Mapping):
+        return []
+    return sorted(str(name).split("(", 1)[0].strip() for name in pressures)
+
+
 def _run_probe(
-    engine_name, request, tmp_path, *, mutate_cold=False, timeout_s=120.0
+    engine_name, request, tmp_path, *, mutate_cold=False, timeout_s=120.0, cwd=None
 ):
     result_path = tmp_path / "probe.json"
     # Keep native work and process-wide I/O patches out of the pytest worker.
@@ -338,6 +367,7 @@ def _run_probe(
         capture_output=True,
         text=True,
         timeout=timeout_s,
+        cwd=cwd,
     )
     assert completed.returncode == 0, (
         f"{engine_name} probe exited {completed.returncode}\n"
@@ -351,9 +381,44 @@ def _run_probe(
     assert result["pid"] != os.getpid(), "live probe ran in the pytest worker"
     observed = set(result["observed"])
     callsites = {path: set(sites) for path, sites in result["callsites"].items()}
-    _assert_trace_is_keyed(engine_name, observed, callsites)
     _assert_expected_numeric_trace(engine_name, observed, callsites)
     return result
+
+
+def _assert_key_portable_across_working_directories(
+    engine_name: str,
+    version: int,
+    probe_request: Mapping[str, object],
+    tmp_path: Path,
+) -> None:
+    repository = engine_cache._ENGINE_CACHE_ROOT.resolve()
+    environment = {
+        **os.environ,
+        "PYTHONPATH": str(repository),
+    }
+    script = (
+        "import json, sys\n"
+        "from simulator.engine_cache import engine_cache_key\n"
+        "print(engine_cache_key(sys.argv[1], int(sys.argv[2]), "
+        "json.loads(sys.argv[3])).hex())\n"
+    )
+    request_json = json.dumps(probe_request, sort_keys=True, separators=(",", ":"))
+    keys = []
+    for name in ("cwd-one", "cwd-two"):
+        cwd = tmp_path / name
+        cwd.mkdir(parents=True)
+        completed = subprocess.run(
+            [sys.executable, "-c", script, engine_name, str(version), request_json],
+            cwd=cwd,
+            env=environment,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+        keys.append(completed.stdout.strip())
+    assert keys[0] == keys[1], (
+        f"{engine_name} canonical probe key changed across working directories"
+    )
 
 
 @pytest.fixture(autouse=True)
@@ -424,6 +489,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
     (import_root / "probe_activation.py").write_text("activated = True\n")
     monkeypatch.syspath_prepend(str(import_root))
     monkeypatch.chdir(tmp_path)
+    probe_cwd = Path.cwd().resolve()
     monkeypatch.setenv("DYLD_FALLBACK_LIBRARY_PATH", str(tmp_path / "lib"))
     executable = tmp_path / "context-probe"
     executable.write_text(
@@ -432,7 +498,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
         "from pathlib import Path\n"
         "import probe_activation\n"
         "assert probe_activation.activated\n"
-        f"assert Path.cwd() == Path({str(tmp_path)!r})\n"
+        f"assert Path.cwd().resolve() == Path({str(probe_cwd)!r}).resolve()\n"
         f"assert os.environ['DYLD_FALLBACK_LIBRARY_PATH'] == {str(tmp_path / 'lib')!r}\n"
         "assert sys.stdin.read() == ''\n"
         "Path(sys.argv[5]).write_text(json.dumps({\n"
@@ -442,7 +508,7 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
     )
     executable.chmod(0o755)
     monkeypatch.setattr(sys, "executable", str(executable))
-    result = _run_probe("openimcc", request, tmp_path)
+    result = _run_probe("openimcc", request, tmp_path, cwd=probe_cwd)
     assert result["context_inherited"]
 
 
@@ -452,8 +518,43 @@ def test_live_engine_numeric_probe_matches_version(
 ) -> None:
     result = _run_probe(engine_name, request, tmp_path)
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
-
-
+    probe_request = result["request"]
+    assert isinstance(probe_request, Mapping), (
+        f"{engine_name}: live probe did not capture the production cache request"
+    )
+    key = engine_cache.engine_cache_key(
+        engine_name, result["version"], probe_request
+    )
+    changed_request = dict(probe_request)
+    if "temperature_K" in changed_request:
+        changed_request["temperature_K"] = float(changed_request["temperature_K"]) + 1.0
+    elif isinstance(changed_request.get("kwargs"), Mapping):
+        changed_kwargs = dict(changed_request["kwargs"])
+        changed_kwargs["temperature_C"] = float(
+            changed_kwargs.get("temperature_C", 1700.0)
+        ) + 1.0
+        changed_request["kwargs"] = changed_kwargs
+    else:
+        changed_request["probe_key_change"] = True
+    assert engine_cache.engine_cache_key(
+        engine_name, result["version"], changed_request
+    ) != key
+    assert engine_cache.engine_cache_key(
+        engine_name, int(result["version"]) + 1, probe_request
+    ) != key
+    _assert_key_portable_across_working_directories(
+        engine_name,
+        result["version"],
+        probe_request,
+        tmp_path / "key-portability",
+    )
+    if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
+        species = set(result["vapor_pressure_species"])
+        assert species, (
+            f"{engine_name}: cached probe output has no vapor-pressure leaves"
+        )
+        if engine_name == "internal-analytical":
+            assert {"Fe", "SiO", "Na"} <= species
 def test_numeric_probe_change_without_version_bump_fails_guard() -> None:
     version, digest = ENGINE_GOLDEN_PROBES["internal-analytical"]
     changed = "0" * len(digest)

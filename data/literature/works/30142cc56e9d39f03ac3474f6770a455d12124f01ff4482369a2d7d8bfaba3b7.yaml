@@ -1,0 +1,20 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 30142cc56e9d39f03ac3474f6770a455d12124f01ff4482369a2d7d8bfaba3b7
+  citation: Barin, I. (1989). *Thermochemical Data of Pure Substances*, 1st ed., Parts I and II. VCH, Weinheim and New York.
+    ISBN 3-527-27812-5 and 0-89573-866-X.
+  source_ids:
+  - barin-1989
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e1dbb239851508a1a3635ff8a7eec9400953b826
+    files:
+    - asset_id: unknown:barin-1989
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []

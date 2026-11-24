@@ -556,11 +556,34 @@ def test_source_band_catalog_preserves_series_cell_alignment_groups(
     monkeypatch.setattr(
         score_module, "_source_alignment_group_key", count_group_key_calls
     )
+    import simulator.battery.compilation_tier as compilation_tier
+
+    built_cells = []
+    original_cell = compilation_tier._series_point_cell
+
+    def count_series_cells(*args, **kwargs):
+        cell = original_cell(*args, **kwargs)
+        built_cells.append(cell.observation_id)
+        return cell
+
+    iterated = []
+    original_iter = compilation_tier._iter_compilation_series_cells
+
+    def count_series_expansion(observation, origin=None):
+        iterated.append(observation.observation_id)
+        return original_iter(observation, origin)
+
+    monkeypatch.setattr(compilation_tier, "_series_point_cell", count_series_cells)
+    monkeypatch.setattr(
+        compilation_tier, "_iter_compilation_series_cells", count_series_expansion
+    )
 
     bands, records, _no_band_reasons = _source_band_catalog(context, {})
 
     assert len(expected_tokens) == 2
     assert len(group_key_calls) == len(series_rows)
+    assert len(built_cells) == len(series_rows)
+    assert iterated == []
     assert set(bands) == expected_tokens
     assert [record["aligned_T_K"] for record in records] == ["1000", "1100"]
     assert all(band.value == _Z95 * _MAD_NORMAL_SCALE for band in bands.values())

@@ -602,7 +602,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -651,6 +651,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_01_haf_6
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -690,12 +695,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -919,7 +936,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -968,6 +985,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_02_hafc16_6
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -1009,12 +1031,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1238,7 +1272,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -1287,6 +1321,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_03_haf_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -1326,12 +1365,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1555,7 +1606,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -1604,6 +1655,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_04_hafc5_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -1645,12 +1701,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -1874,7 +1942,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -1923,6 +1991,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_05_hafc11_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -1964,12 +2037,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2193,7 +2278,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -2242,6 +2327,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_06_hafc16_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -2283,12 +2373,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2512,7 +2614,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -2561,6 +2663,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_07_hafs_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -2602,12 +2709,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -2831,7 +2950,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -2880,6 +2999,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_08_hafc5s_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -2921,12 +3045,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3150,7 +3286,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -3199,6 +3335,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_09_hafc11s_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -3240,12 +3381,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3469,7 +3622,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -3518,6 +3671,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_10_hafc16s_3
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -3559,12 +3717,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -3788,7 +3958,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -3837,6 +4007,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_11_haf_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -3876,12 +4051,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4105,7 +4292,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -4154,6 +4341,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_12_hafc5_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -4195,12 +4387,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4424,7 +4628,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -4473,6 +4677,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_13_hafc11_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -4514,12 +4723,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -4743,7 +4964,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -4792,6 +5013,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_14_hafc16_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -4833,12 +5059,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5062,7 +5300,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -5111,6 +5349,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_15_hafs_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -5152,12 +5395,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5381,7 +5636,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -5430,6 +5685,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_16_hafc5s_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -5471,12 +5731,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -5700,7 +5972,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -5749,6 +6021,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_17_hafc11s_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -5790,12 +6067,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6019,7 +6308,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -6068,6 +6357,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_18_hafc16s_4
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -6109,12 +6403,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6340,7 +6646,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -6389,6 +6695,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_19_daf_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -6428,12 +6739,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -6677,7 +7000,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -6726,6 +7049,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_20_dafn8_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -6767,12 +7095,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7016,7 +7356,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -7065,6 +7405,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_21_dafn15_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -7106,12 +7451,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7355,7 +7712,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -7404,6 +7761,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_22_dafs_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -7445,12 +7807,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -7694,7 +8068,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -7743,6 +8117,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_23_dafsn7_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -7784,12 +8163,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8033,7 +8424,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -8082,6 +8473,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_24_dafsn15_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -8123,12 +8519,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8372,7 +8780,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -8421,6 +8829,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_25_dafa_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -8462,12 +8875,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -8711,7 +9136,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -8760,6 +9185,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_26_dafan8_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -8801,12 +9231,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9050,7 +9492,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -9099,6 +9541,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_27_dafan16_93
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -9140,12 +9587,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9389,7 +9848,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -9438,6 +9897,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_28_daf_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -9479,12 +9943,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -9728,7 +10204,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -9777,6 +10253,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_29_dafn8_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -9818,12 +10299,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10067,7 +10560,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -10116,6 +10609,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_30_dafn15_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -10157,12 +10655,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10406,7 +10916,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -10455,6 +10965,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_31_dafs_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -10496,12 +11011,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -10745,7 +11272,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -10794,6 +11321,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_32_dafsn7_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -10835,12 +11367,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11084,7 +11628,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -11133,6 +11677,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_33_dafsn15_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -11174,12 +11723,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11423,7 +11984,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -11472,6 +12033,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_34_dafa_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -11513,12 +12079,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -11762,7 +12340,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -11811,6 +12389,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_35_dafan8_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -11852,12 +12435,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12101,7 +12696,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -12150,6 +12745,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_36_dafan16_94
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -12191,12 +12791,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12440,7 +13052,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -12489,6 +13101,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_37_dafs_14
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -12528,12 +13145,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -12777,7 +13406,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -12826,6 +13455,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_38_dafsk12_14
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -12867,12 +13501,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13116,7 +13762,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -13165,6 +13811,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_39_dafsk25_14
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -13206,12 +13857,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13455,7 +14118,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -13504,6 +14167,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_40_hafs_14
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -13545,12 +14213,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -13794,7 +14474,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -13843,6 +14523,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_41_hafsk13_14
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -13884,12 +14569,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14133,7 +14830,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -14182,6 +14879,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_42_hafsk26_14
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -14223,12 +14925,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14472,7 +15186,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -14521,6 +15235,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_43_dafs_13
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -14560,12 +15279,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -14809,7 +15540,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -14858,6 +15589,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_44_dafsk12_13
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -14899,12 +15635,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15148,7 +15896,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -15197,6 +15945,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_45_dafsk25_13
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -15238,12 +15991,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15487,7 +16252,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -15536,6 +16301,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_46_hafs_13
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -15577,12 +16347,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -15826,7 +16608,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -15875,6 +16657,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_47_hafsk13_13
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -15916,12 +16703,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -16165,7 +16964,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -16214,6 +17013,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_48_hafsk26_13
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -16255,12 +17059,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -16504,7 +17320,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -16553,6 +17369,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_49_dafs_15
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -16592,12 +17413,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
-        page: 4
-        pdf_page_index: 3
+        page: 5
+        pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -16841,7 +17674,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -16890,6 +17723,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_50_dafsk12_15
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -16931,12 +17769,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
         page: 5
         pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -17180,7 +18030,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -17229,6 +18079,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_51_dafsk25_15
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -17270,12 +18125,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
         page: 5
         pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -17519,7 +18386,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -17568,6 +18435,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_52_hafs_15
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -17609,12 +18481,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
         page: 5
         pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -17858,7 +18742,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -17907,6 +18791,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_53_hafsk13_15
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -17948,12 +18837,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
         page: 5
         pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value
@@ -18197,7 +19098,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -18246,6 +19147,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: borisov-2017-network-modifiers-fe-redox::borisov_2017_table1_fe3_fe2_row_54_hafsk26_15
   - kind: admission_defaulted
     affected_quantities:
     - valence_ratio
@@ -18287,12 +19193,24 @@ observations:
         table: '1'
     fO2_log:
       state:
-        tag: unknown
-        reason: The experiments were made in air, but no numerical log fO2 is printed.
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6731822883884469100650683629'
+          interval_high: '-0.6731822883884469100650683629'
+          approximate: false
       locator:
         page: 5
         pdf_page_index: 4
         table: '1'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
     total_pressure_Pa:
       state:
         tag: value

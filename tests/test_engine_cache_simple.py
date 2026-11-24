@@ -26,6 +26,8 @@ from simulator.melt_backend.base import (
 )
 from simulator.engine_pool import EngineWorkerPool, WarmEngineWorker
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def _cached_engine_call():
     call = getattr(engine_cache, "cached_engine_call", None)
@@ -319,7 +321,14 @@ def test_cache_uses_canonical_request_and_wal_sqlite(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-        assert tables == [("engine_outputs",), ("provenance",), ("box_sequences",)]
+        # Species rows live in this file. They name the stored HOT request.
+        # A separate file would be written for a value that has no cold part.
+        assert tables == [
+            ("engine_outputs",),
+            ("provenance",),
+            ("box_sequences",),
+            ("engine_output_species",),
+        ]
         columns = connection.execute("PRAGMA table_info(engine_outputs)").fetchall()
         assert [column[1] for column in columns] == [
             "key", "value", "engine", "chem_version", "source_box", "row_seq", "provenance_id"
@@ -347,12 +356,18 @@ def test_engine_cache_writes_only_the_hot_database(
         tables = connection.execute(
             "SELECT name FROM sqlite_master WHERE type='table'"
         ).fetchall()
-    assert tables == [("engine_outputs",), ("provenance",), ("box_sequences",)]
+    assert tables == [
+        ("engine_outputs",),
+        ("provenance",),
+        ("box_sequences",),
+        ("engine_output_species",),
+    ]
 
 
 def test_schema_mismatch_refuses_without_deleting_rows(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     database = tmp_path / "engine-cache.sqlite"
     with sqlite3.connect(database) as connection:
@@ -365,13 +380,32 @@ def test_schema_mismatch_refuses_without_deleting_rows(
             "INSERT INTO engine_outputs VALUES (?, ?, ?)",
             (b"existing-key", b"existing-value", "keep-me"),
         )
+    before = database.read_bytes()
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    _engine_cache_counters(reset=True)
 
-    with pytest.raises(engine_cache.EngineCacheSchemaMismatch, match="unexpected"):
-        _cached_engine_call()(
+    with caplog.at_level("WARNING", logger=engine_cache.__name__):
+        result = _cached_engine_call()(
             "openimcc", {"call": "schema-mismatch"}, lambda: {"answer": 42}
         )
 
+    assert result == {"answer": 42}
+    counts = _engine_cache_counters()["openimcc"]
+    assert counts["hits"] == 0
+    assert counts["stores"] == 0
+    assert counts["not_stored:schema_mismatch"] == 1
+    notices = [
+        record.getMessage()
+        for record in caplog.records
+        if record.getMessage().startswith("engine_cache_schema_mismatch")
+    ]
+    assert len(notices) == 1
+    assert "where=engine_outputs" in notices[0]
+    assert "unexpected" in notices[0]
+    assert "scripts/engine_cache_sync.py migrate" in notices[0]
+    assert database.read_bytes() == before
     with sqlite3.connect(database) as connection:
         columns = [
             row[1] for row in connection.execute("PRAGMA table_info(engine_outputs)")
@@ -379,6 +413,125 @@ def test_schema_mismatch_refuses_without_deleting_rows(
         rows = connection.execute("SELECT key, value FROM engine_outputs").fetchall()
     assert columns == ["key", "value", "unexpected"]
     assert rows == [(b"existing-key", b"existing-value")]
+
+
+def _assert_bad_file_solves_uncached(
+    path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+    *,
+    where: str,
+    expected: str,
+    found: str,
+) -> None:
+    """A bad cache file is one notice, then uncached solves, and is not migrated."""
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    before = path.read_bytes()
+    calls = {"solve": 0, "connect": 0}
+    real_connect = engine_cache.sqlite3.connect
+
+    def connect(*args, **kwargs):
+        calls["connect"] += 1
+        return real_connect(*args, **kwargs)
+
+    def solve() -> dict[str, int]:
+        calls["solve"] += 1
+        return {"answer": 42}
+
+    request = {"call": "bad-cache-file"}
+    monkeypatch.setattr(engine_cache.sqlite3, "connect", connect)
+    with caplog.at_level("WARNING", logger=engine_cache.__name__):
+        first = engine_cache.cached_engine_call("openimcc", request, solve)
+        second = engine_cache.cached_engine_call("openimcc", request, solve)
+        warmed = engine_cache.engine_cache_counters()["openimcc"]
+        notices = [
+            record.getMessage()
+            for record in caplog.records
+            if record.getMessage().startswith("engine_cache_schema_mismatch")
+        ]
+        engine_cache.engine_cache_counters(reset=True)
+        third = engine_cache.cached_engine_call("openimcc", request, solve)
+        notices_after_reset = [
+            record.getMessage()
+            for record in caplog.records
+            if record.getMessage().startswith("engine_cache_schema_mismatch")
+        ]
+    assert first == second == third == {"answer": 42}
+    assert calls["solve"] == 3
+    assert calls["connect"] == 1
+    assert warmed["hits"] == 0
+    assert warmed["stores"] == 0
+    assert warmed["misses"] == 2
+    assert warmed["not_stored:schema_mismatch"] == 2
+    assert warmed.get("read_error", 0) == 0
+    assert warmed.get("not_stored:readonly", 0) == 0
+    counts = engine_cache.engine_cache_counters()["openimcc"]
+    assert counts["hits"] == 0
+    assert counts["stores"] == 0
+    assert counts["misses"] == 1
+    assert counts["not_stored:schema_mismatch"] == 1
+    assert counts.get("read_error", 0) == 0
+    assert counts.get("not_stored:readonly", 0) == 0
+    assert notices == notices_after_reset
+    assert len(notices) == 1
+    identity = os.path.realpath(path)
+    assert f"path={identity} " in notices[0]
+    assert f"where={where} " in notices[0]
+    assert f"expected={expected} " in notices[0]
+    assert f"found={found} " in notices[0]
+    assert notices[0].endswith(f"fix=scripts/engine_cache_sync.py migrate {identity}")
+    assert path.read_bytes() == before
+
+
+def test_schema3_file_solves_uncached_and_notifies_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    from tests.test_engine_cache_species import _schema_v3
+
+    path = tmp_path / "schema3.sqlite"
+    with _schema_v3(path):
+        pass
+    _assert_bad_file_solves_uncached(
+        path,
+        monkeypatch,
+        caplog,
+        where="user_version",
+        expected="4",
+        found="3",
+    )
+    with sqlite3.connect(path) as connection:
+        assert connection.execute("PRAGMA user_version").fetchone()[0] == 3
+        names = {
+            row[0]
+            for row in connection.execute(
+                "SELECT name FROM sqlite_master WHERE type='table'"
+            )
+        }
+    assert "engine_output_species" not in names
+
+
+def test_garbage_file_solves_uncached_and_notifies_once(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    path = tmp_path / "garbage.sqlite"
+    path.write_bytes(b"this is not sqlite\n")
+    _assert_bad_file_solves_uncached(
+        path,
+        monkeypatch,
+        caplog,
+        where="file",
+        expected="4",
+        found="not-a-sqlite-database",
+    )
 
 
 def test_engine_cache_key_preserves_exact_float_values() -> None:
@@ -1395,10 +1548,15 @@ def test_readonly_mode_serves_hits_and_solves_misses_without_writing(
     assert engine_cache.cached_engine_call(
         "vaporock", {"temperature_K": 901.0}, lambda: {"pressure": 3.0}
     ) == {"pressure": 3.0}
-    assert _engine_cache_counters(reset=True)["vaporock"] == {
+    counts = _engine_cache_counters(reset=True)["vaporock"]
+    assert counts == {
         "hits": 1, "misses": 1, "stores": 0,
         "store_error": 0, "read_error": 0, "conflicts": 0,
+        "not_stored:readonly": 1,
     }
+    assert counts["misses"] == counts["stores"] + sum(
+        value for key, value in counts.items() if key.startswith("not_stored:")
+    )
     with sqlite3.connect(database) as connection:
         assert connection.execute("SELECT count(*) FROM engine_outputs").fetchone()[0] == 1
 
@@ -1477,6 +1635,8 @@ def test_exceptions_and_typed_refusals_are_not_stored(
         "store_error": 0,
         "read_error": 0,
         "conflicts": 0,
+        "not_stored:refusal:untyped": 2,
+        "not_stored:exception:ValueError": 1,
     }
 
 

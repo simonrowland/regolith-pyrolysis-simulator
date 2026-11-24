@@ -13,12 +13,12 @@ from typing import Iterable, Mapping
 from simulator.battery.enums import AdmissionStatus, EvidenceClass, NoticeKind, Phase, Quantity, UncertaintyKind, ValueKind
 from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.records import Bench, Derivation, Located, Locator, Notice, Observation, Species, State, Uncertainty, Value, _is_source_internally_inconsistent
+from simulator.battery.source_declarations import source_rule_enabled
 from simulator.battery.waypoints import identity_composition_waypoint
 from simulator.physical_constants import GAS_CONSTANT, PA_PER_BAR
 
 SOURCE_OXYGEN_RELATION = "source_oxygen_condition;"
 CO_MEASURED_CONSISTENCY_ORIGIN = "co-measured oxygen consistency"
-RYS_SOURCE_ID = "rys-2007-alkali-oxide-thermodynamics"
 
 
 def oxygen_pressure_point(row: Observation) -> Located | None:
@@ -600,7 +600,7 @@ def resolve_source_oxygen(
         ):
             continue
         if (
-            row.source_id == RYS_SOURCE_ID
+            source_rule_enabled(row.source_id, "oxygen_measurement_status_required")
             and (row.provenance or {}).get("oxygen_measurement_status")
             != "measured_independent"
         ):

@@ -7,7 +7,7 @@ import yaml
 
 from simulator.battery.enums import NoticeKind, ValueKind
 from simulator.battery.migrate import Migrator
-from tests.battery.test_b716_composition_role import _assert_initial_charge_is_context
+from tests.battery.test_b716_composition_role import _assert_initial_charge_proxy
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -78,8 +78,12 @@ def test_shi_tables_migrate_printed_values_species_and_run_conditions():
                     assert record.identity.fO2_Pa.is_value
                     assert record.identity.fO2_Pa.value == Decimal("0.0000026040525")
                     assert record.identity.composition is not None
-                    assert record.identity.composition.is_unknown
-                    _assert_initial_charge_is_context(record.point_conditions)
+                    assert record.identity.composition.is_value
+                    assert (
+                        record.identity.composition.value.proxy_flag
+                        == "initial_charge_only"
+                    )
+                    _assert_initial_charge_proxy(record.point_conditions)
                     assert any(
                         notice.kind is NoticeKind.SOURCE_DISAGREEMENT
                         and "composition_role=initial_charge_only" in notice.reason

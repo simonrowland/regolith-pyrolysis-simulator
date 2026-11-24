@@ -15,7 +15,10 @@ from types import MappingProxyType, SimpleNamespace
 import pytest
 import numpy as np
 
-from simulator.corpus_version import current_corpus_version
+from simulator.corpus_version import (
+    current_corpus_version,
+    interoperable_corpus_versions,
+)
 from simulator.chemistry.kernel.dto import DEGRADING_INTENT_RESULT_STATUSES
 from simulator.backend_names import (
     ANALYTICAL_BACKEND_SERIALIZATION_TOKEN,
@@ -2713,6 +2716,27 @@ def test_lookup_fetch_and_selectors_miss_stale_corpus_rows(tmp_path) -> None:
         code_version=spec.code_version,
         data_digests=spec.data_digests,
     ) is None
+
+
+def test_pre_c2a_pressure_optimizer_rows_miss_after_corpus_bump(tmp_path) -> None:
+    previous_corpus = "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+    assert previous_corpus in interoperable_corpus_versions()
+    spec = _base_spec()
+    store = ResultStore(
+        tmp_path / "pre-c2a-pressure.sqlite",
+        current_code_version=spec.code_version,
+        current_data_digests=spec.data_digests,
+    )
+    key = cache_key(spec)
+    store.store(spec, _scored(spec), created_at="2026-11-18T00:00:00Z")
+
+    with sqlite3.connect(tmp_path / "pre-c2a-pressure.sqlite") as conn:
+        conn.execute(
+            "UPDATE results SET corpus_version = ? WHERE cache_key = ?",
+            (previous_corpus, key),
+        )
+
+    assert store.fetch(key) is None
 
 
 def test_query_selector_is_code_and_data_fingerprint_neutral(tmp_path) -> None:

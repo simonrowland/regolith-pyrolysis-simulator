@@ -240,6 +240,14 @@ def test_pin_measured_headline_table_unchanged_by_hull() -> None:
 # PIN_RECORD_KEYS and PIN_SUMMARY_SHA256 re-recorded on
 # review/empirical-ror-batch2 c9fd86c9c (still before the hull): its b-693
 # dual headline puts the all_numeric records first in summary["records"].
+# d-443 re-pin: headline statistics are unchanged (melt rms/median/median_abs
+# 0.3162277660168379331998893544 / 0.10 / 0.20; vapour n/rms/median
+# 2 / 0.1118033988749894848204586834 / -0.05; melt counts 4, 1, 3, 2).
+# The summary gains assumed_band={label: assumed band — literature method
+# precision; confidence not stated, records: [], refusal_counts: {}}.
+# No fixture row enters that stratum. Chain Ban-ya Fe_tO (t-1802 Eq. 23 /
+# d-432) does not move it: cf2a0c7fe and f96f7cace hash the same payload.
+# PIN_SUMMARY_SHA256 before d-443: 30345d844ade8f69a341c7b7f99ca2400ca340244cf4c39a9ff96aef9f625588
 PIN_MELT_STATS = ("0.3162277660168379331998893544", "0.10", "0.20")
 PIN_VAPOUR_STATS = (2, "0.1118033988749894848204586834", "-0.05")
 PIN_RECORD_KEYS = [
@@ -248,7 +256,7 @@ PIN_RECORD_KEYS = [
     "n_inside_band", "n_no_band", "n_score_eligible", "rail", "rms_dex",
     "sources", "tier",
 ]
-PIN_SUMMARY_SHA256 = "30345d844ade8f69a341c7b7f99ca2400ca340244cf4c39a9ff96aef9f625588"
+PIN_SUMMARY_SHA256 = "41816516c6f9167c34736bfef368925e4754b4867ade0ab218fb73027e350b6f"
 PIN_HEADLINE_LINES = (
     "| melt_activity | internal-analytical | — | 4 | 1 | 3 | 3 | 2 | "
     "0.3162277660168379331998893544 | 0.10 | 0.20 | 0.3 | "

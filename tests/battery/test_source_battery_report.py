@@ -65,8 +65,8 @@ def test_landed_richter_source_report_known_counts_and_refusal_reason_tally(
         scratch_out_dir=tmp_path / "source-report",
     )
 
-    assert report["extract_rows"] == 197
-    assert report["migrated_observations"] == 350
+    assert report["extract_rows"] == 189
+    assert report["migrated_observations"] == 342
     assert report["candidates"]["admitted"]["count"] == 254
     assert report["candidates"]["pending"]["count"] == 85
     assert report["hard_issue_count"] == 0

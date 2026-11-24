@@ -151,15 +151,18 @@ def _composition_map_expression(
             node.value, map_field, composition_names, constants
         )
     if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+        # Only ``.get(composition_wt_pct)`` yields the map. ``.get`` of any
+        # other key, and every other method, returns a value. Treating that
+        # call as the map made ``value = result["composition_wt_pct"].get(formula)``
+        # an alias, and the alias set then flagged mole-fraction
+        # ``components.get("FeO")`` reads that are not feedstock maps.
         if (
             node.func.attr == "get"
             and node.args
             and _literal_string(node.args[0], constants) == map_field
         ):
             return True
-        return _composition_map_expression(
-            node.func.value, map_field, composition_names, constants
-        )
+        return False
     return False
 
 
@@ -313,6 +316,27 @@ def test_raw_feedstock_iron_values_are_read_only_by_the_owner() -> None:
 )
 def test_guard_detects_mutated_raw_iron_reads(mutated_consumer: str) -> None:
     assert _iron_composition_reads(mutated_consumer)
+
+
+def test_a_value_read_from_the_map_does_not_alias_later_component_lookups() -> None:
+    """The named failure: score.py's mole-fraction FeO lookup is not feedstock iron."""
+
+    source = (
+        "def project(result):\n"
+        "    value = result[\"composition_wt_pct\"].get(result[\"formula\"])\n"
+        "    return value\n"
+        "def band(composition):\n"
+        "    components = dict(composition.components)\n"
+        "    feo = components.get(\"FeO\", 0)\n"
+        "    return feo, components[\"Fe2O3\"]\n"
+    )
+    direct = (
+        "def project(result):\n"
+        "    return result[\"composition_wt_pct\"].get(\"FeO\")\n"
+    )
+
+    assert _iron_composition_reads(source) == ()
+    assert _iron_composition_reads(direct) == (2,)
 
 
 def test_guard_detects_subscript_and_get_reads_in_a_mutated_consumer() -> None:

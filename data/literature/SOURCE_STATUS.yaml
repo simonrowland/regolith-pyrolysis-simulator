@@ -11,8 +11,8 @@ counts:
   sources: 2338
   by_stage:
     unknown: 358
-    in_progress: 192
-    inbox: 1250
+    in_progress: 198
+    inbox: 1244
     ingested_complete: 149
     located: 206
     ingested_partial: 183
@@ -25,7 +25,7 @@ anti_loss:
     ids: []
   extract_mirror_parity:
     simulator_only:
-      count: 418
+      count: 424
       ids:
       - 1997jonesthermo
       - abdeyazdan-2026-na-sn-si-phase-thermodynamics
@@ -97,6 +97,7 @@ anti_loss:
       - chen-2022-sio2-mno-slag-activities
       - cheng-2021-fe-ca-si-o-phase-equilibria
       - christensen-conway-kelley-1960-ri5565-aluminate-ferrite-thermal
+      - cohen-2006-iron-silicate-reduction-isotopes
       - colson-colson-1995-chromium-dimer-lpsc
       - colson-floden-1998-lpsc-co-nickel-activity
       - colson-floden-haugen-2005-nio-feo-o2-activities
@@ -136,6 +137,7 @@ anti_loss:
       - ferkl-2026-waste-glass-thermal-redox
       - filsinger-1990-silica-silicon-carbothermic-kinetics
       - florin-2025-cu-silicate-evaporation
+      - floss-1998-corundum-hibonite-evaporation-residues
       - forsberg-2002-ca-fe-o-incongruent-melting
       - fortin-2014-sulfur-saturation-natural-melts-thesis
       - fredrickson-chasanov-1973-na2o-enthalpy-1300k
@@ -273,6 +275,7 @@ anti_loss:
       - nagahara-ozawa-1996-forsterite-hydrogen-evaporation
       - nagata-1989-emf-calcium-aluminates
       - nam-2025-cmas-vanadium-thesis
+      - navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
       - nazarov-2015-dhofar-silicides
       - nbs-1981-tn270-8-alkali-thermochemistry
       - nekhoroshev-2024-cao-sio2-thermodynamic-reoptimization
@@ -297,6 +300,7 @@ anti_loss:
       - park-morita-2025-vanadium-activity
       - pickrell-1994-gaseous-alkali-corrosion
       - powell-1971-alkali-sulfate-metasilicate-vapour
+      - pretorius-muan-1992-chromium-oxide-activities
       - qi-1987-fe-c-v-interaction
       - raberg-2007-salt-stability-na2s-thermochemistry-thesis
       - ramteke-2026-alkali-vapor-corrosion-spinels
@@ -364,6 +368,7 @@ anti_loss:
       - shyrokykh-2021-vanadium-vaporization
       - simeonov-sano-1985-na-bearing-mno-activities
       - sineva-2023-ni-sn-zn-slag-copper
+      - smythe-2013-cerium-thesis
       - smythe-brenan-2015-cerium-redox
       - sossi-2020-magma-ocean-redox
       - stolyarova-2021-ti-al-kems-ru
@@ -402,6 +407,7 @@ anti_loss:
       - van-der-waal-2023-volatile-loss-isotope-fractionation
       - van-ende-2008-mn-cr-slag-steel
       - van-limpt-2006-sodium-evaporation
+      - van-westrenen-1999-garnet-melt-trace-partitioning
       - vanlimpt-2011-boron-evaporation-part1
       - vickerfalt-2020-mgo-v2o3
       - vickerfalt-2024-al-si-v-phase-diagram
@@ -3586,8 +3592,8 @@ sources:
     decided_by: ingested_partial
     artefacts:
     - data/literature/extracts-v2/banya-hino-takezoe-1985-na-fe-silicate-redox.yaml
-    reason: v2.1 store present; 26/46 rows battery-usable
-  usable_rows: 26
+    reason: v2.1 store present; 45/46 rows battery-usable
+  usable_rows: 45
   total_rows: 46
   inbox_exclusion_reason: null
 - source_id: banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity
@@ -6291,12 +6297,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: cohen-2006-iron-silicate-reduction-isotopes
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/cohen-2006-iron-silicate-reduction-isotopes/cohen-2006-iron-silicate-reduction-isotopes.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/cohen-2006-iron-silicate-reduction-isotopes.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -8354,123 +8360,12 @@ sources:
   total_rows: 99
   inbox_exclusion_reason: null
 - source_id: floss-1998-corundum-hibonite-evaporation-residues
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/SOURCE.md
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/floss-1998-corundum-hibonite-evaporation-residues.pdf
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/DONE
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/mineru.log
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/07384fb1c7d694c00255ae87c29085ba9ff59eb54a8007b5b7997a71675d641e.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/0cce5c49644b5b07694e70c6b487995e5aa223c2c63c1a5019d6982fd10ba64a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/0d3ce703ab2eeb44f41fed8fe709cd79ec7550c68d717500955987226ad1b725.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/1a3525d068c9ce27f6eda931c8a552a01f44f0e734c56bd05e0bffb9392b92f2.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/22ced0e46f2c0d8a45060bed35ba73ae5edcf414d7317b337252200dc83f22dc.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/2306d7c82085e039a998729f031cfbd662d4369153f740d36eb58cf561a97be2.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/230bd890d27a06638fa14fff84924d52c3c4abf1d5192d9f0a867b9bc6a35fdf.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/2ac09441c5ecc64b7b3121ef0775d2396b690a8008eb6e6fcf549f7dd1eaeb9a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/330672320bfa820b5613013584a5c011b2931df5a3e84b60291d16e6a1104576.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/331fae19ebb222d9e5e5dedc504867b0f6e66792c7002be70946818efb416c62.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/33757046832749fc2ca218309ce20d997deb88c9ee4f8575a4ce12612f879de4.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/3a7f4bf83e31958d06caf133c8b8e47223203c35148cd34637fc5d4544802af7.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/3fa3116120667fecb5bfdb55eea9d57b54b1d74cdf79109f3aba88d1fd590382.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/42f11607158b029eeca6fdcf06baaf71cc487ee903356bd0e13d679155a69b1d.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/4742ee79d9192fa90c3053a574f33fe23c61f00515a167c986a164e96f69c5cd.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/47545dc741df5dde21a2b451931cc026865e5add35f0f7993b184467316be8a5.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/48f121f4d35201a293dd4054953b6577e2be0ce8a9f384d1bad3b88cfd46a7a0.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/4c6b2d731894414cb8d6e3d7491646779f253cdd9f164ea998ad35f4b5666177.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/53049b452131d15b4850d58f4ee0d98f42e181e22c4da62455a5aa4b5ef8d73e.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/639406558b2ad258eb3a16ae29d154761efa7ca2f14bc300acfd50700b37e7a7.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/65195e3231824edecdc98a73625aa64a5aad0cbb82f8c16a0149767cac5ac53a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/6bc697b0fefb51da184a24c07a9b2b8597d483ccd70becad8c35ea23ccfa2d2b.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/70752cf1084e0bae08323496920915d8a5c4f1e5ef5f6b97532e45e9b9b76d4b.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/711215591446bb8cb2b1cb5c451913ac71dbd0e0fe1f8edd32b1f8eafc48a05a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/72f3faa374b3e45edfdad6686dcf7696a321f0d495ce49bb46d74659770bcfad.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/7692f5ce6c21da5e88d4f1298270363a64e2e457e085a441812524627427b8fb.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/796afd8c7f40993af78384e233a56c98e96f8ec86c101224ea945eba527a35fb.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/8c74c7ee6a9edcf0042097d166ee73da83c0927886ef29b800cd99cd82ea0610.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/8d44231daf943640f5b92ab2f972502f5f3b4fcf93aa3f77aecf44aa6e5ade9d.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/95381fd5928d8f53de2cd222d27b5c3b1f773e392a4dc357bb0ca835c86e5c7c.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/98f0924300c5ebbc3c2af22b71445109a6b9953f7517303182ebc6464aa90ed8.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/ab2457b18bda46f265c852b858d3baed266250532b1d23cf851d2a16d86d1f9f.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/abde8973f3de3a953b17974404f585d9dcd87967d7f3c416a1a733824b07f2a1.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b02f093ccac4b72675bbe73bf41fe3dfcf9fe10070c162579008b75de0efd58f.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b2ddb8c7490608d3042b68de80c99390121c917d672fff5311369ba589588516.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b52316638897061244a773abc6a82b8e94d63abfe6edf67a9ea04f00c76451f3.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b6066d8a22a3e04c21cb5b20d94fedcdf77434d7c7372e11b9071e6dc9f55aaa.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/c5a76b9a7fdf44f89eaf09fa5d933ad1aa971860764bd8f6a746d20fa9512f62.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/ce3ff0a759065375b77f2e35b61332d5e450b9676ecb38c723c22858b436d433.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d0155fb413772b6f92588505e5033df775d1fe459a84c65fbe960cd452e9c5e4.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d0c38cf10d7f2e316e64b7f3772b50a7a556467c825171ec959ff08af68fa154.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d26d9dfad53527f0bb1679420bb4a21d706b8e645b022b24656d5a63e8d14cb9.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d621f1992b6e5790e1aa9a65f9eca20515e0b6ef2e23ca49d95ce88e3ec76643.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/db620a1a02a31be25e008011027b811c226e39438d6f37001c1099f37a6cbfa7.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/e1ddc3e51827fa69187044a56dcebeb6eb0cb99d4948714e8f76874591160c98.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/e1e80bd2a4bf1ab6fa2fc020aa552aa0f7e869c157f444c294e9fd23390a77fe.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/e7590329825174e408da3055b4eed1849cb410c3a1eeb12b5e575413d0c38c56.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/ec501517b434003ec6a7f5cfb5c8bc6d074ed7a091e4168a267187ce17a70deb.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/src-floss-1998-corundum-hibonite-residues-p001-p016.md
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/src-floss-1998-corundum-hibonite-residues-p001-p016_content_list.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/src-floss-1998-corundum-hibonite-residues-p001-p016_content_list_v2.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/src-floss-1998-corundum-hibonite-residues-p001-p016_middle.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/floss-1998-corundum-hibonite-residues/p001-p016/out/src-floss-1998-corundum-hibonite-residues-p001-p016/vlm/src-floss-1998-corundum-hibonite-residues-p001-p016_model.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/DONE
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/mineru.log
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/07384fb1c7d694c00255ae87c29085ba9ff59eb54a8007b5b7997a71675d641e.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/0cce5c49644b5b07694e70c6b487995e5aa223c2c63c1a5019d6982fd10ba64a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/0d3ce703ab2eeb44f41fed8fe709cd79ec7550c68d717500955987226ad1b725.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/1a3525d068c9ce27f6eda931c8a552a01f44f0e734c56bd05e0bffb9392b92f2.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/22ced0e46f2c0d8a45060bed35ba73ae5edcf414d7317b337252200dc83f22dc.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/2306d7c82085e039a998729f031cfbd662d4369153f740d36eb58cf561a97be2.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/230bd890d27a06638fa14fff84924d52c3c4abf1d5192d9f0a867b9bc6a35fdf.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/2ac09441c5ecc64b7b3121ef0775d2396b690a8008eb6e6fcf549f7dd1eaeb9a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/330672320bfa820b5613013584a5c011b2931df5a3e84b60291d16e6a1104576.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/331fae19ebb222d9e5e5dedc504867b0f6e66792c7002be70946818efb416c62.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/33757046832749fc2ca218309ce20d997deb88c9ee4f8575a4ce12612f879de4.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/3a7f4bf83e31958d06caf133c8b8e47223203c35148cd34637fc5d4544802af7.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/3fa3116120667fecb5bfdb55eea9d57b54b1d74cdf79109f3aba88d1fd590382.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/42f11607158b029eeca6fdcf06baaf71cc487ee903356bd0e13d679155a69b1d.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/4742ee79d9192fa90c3053a574f33fe23c61f00515a167c986a164e96f69c5cd.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/47545dc741df5dde21a2b451931cc026865e5add35f0f7993b184467316be8a5.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/48f121f4d35201a293dd4054953b6577e2be0ce8a9f384d1bad3b88cfd46a7a0.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/4c6b2d731894414cb8d6e3d7491646779f253cdd9f164ea998ad35f4b5666177.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/53049b452131d15b4850d58f4ee0d98f42e181e22c4da62455a5aa4b5ef8d73e.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/639406558b2ad258eb3a16ae29d154761efa7ca2f14bc300acfd50700b37e7a7.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/65195e3231824edecdc98a73625aa64a5aad0cbb82f8c16a0149767cac5ac53a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/6bc697b0fefb51da184a24c07a9b2b8597d483ccd70becad8c35ea23ccfa2d2b.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/70752cf1084e0bae08323496920915d8a5c4f1e5ef5f6b97532e45e9b9b76d4b.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/711215591446bb8cb2b1cb5c451913ac71dbd0e0fe1f8edd32b1f8eafc48a05a.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/72f3faa374b3e45edfdad6686dcf7696a321f0d495ce49bb46d74659770bcfad.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/7692f5ce6c21da5e88d4f1298270363a64e2e457e085a441812524627427b8fb.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/796afd8c7f40993af78384e233a56c98e96f8ec86c101224ea945eba527a35fb.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/8c74c7ee6a9edcf0042097d166ee73da83c0927886ef29b800cd99cd82ea0610.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/8d44231daf943640f5b92ab2f972502f5f3b4fcf93aa3f77aecf44aa6e5ade9d.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/95381fd5928d8f53de2cd222d27b5c3b1f773e392a4dc357bb0ca835c86e5c7c.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/98f0924300c5ebbc3c2af22b71445109a6b9953f7517303182ebc6464aa90ed8.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/ab2457b18bda46f265c852b858d3baed266250532b1d23cf851d2a16d86d1f9f.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/abde8973f3de3a953b17974404f585d9dcd87967d7f3c416a1a733824b07f2a1.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b02f093ccac4b72675bbe73bf41fe3dfcf9fe10070c162579008b75de0efd58f.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b2ddb8c7490608d3042b68de80c99390121c917d672fff5311369ba589588516.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b52316638897061244a773abc6a82b8e94d63abfe6edf67a9ea04f00c76451f3.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/b6066d8a22a3e04c21cb5b20d94fedcdf77434d7c7372e11b9071e6dc9f55aaa.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/c5a76b9a7fdf44f89eaf09fa5d933ad1aa971860764bd8f6a746d20fa9512f62.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/ce3ff0a759065375b77f2e35b61332d5e450b9676ecb38c723c22858b436d433.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d0155fb413772b6f92588505e5033df775d1fe459a84c65fbe960cd452e9c5e4.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d0c38cf10d7f2e316e64b7f3772b50a7a556467c825171ec959ff08af68fa154.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d26d9dfad53527f0bb1679420bb4a21d706b8e645b022b24656d5a63e8d14cb9.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/d621f1992b6e5790e1aa9a65f9eca20515e0b6ef2e23ca49d95ce88e3ec76643.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/db620a1a02a31be25e008011027b811c226e39438d6f37001c1099f37a6cbfa7.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/e1ddc3e51827fa69187044a56dcebeb6eb0cb99d4948714e8f76874591160c98.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/e1e80bd2a4bf1ab6fa2fc020aa552aa0f7e869c157f444c294e9fd23390a77fe.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/e7590329825174e408da3055b4eed1849cb410c3a1eeb12b5e575413d0c38c56.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/images/ec501517b434003ec6a7f5cfb5c8bc6d074ed7a091e4168a267187ce17a70deb.jpg
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/src--floss-1998-corundum-hibonite-residues-p001-p016.md
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/src--floss-1998-corundum-hibonite-residues-p001-p016_content_list.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/src--floss-1998-corundum-hibonite-residues-p001-p016_content_list_v2.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/src--floss-1998-corundum-hibonite-residues-p001-p016_middle.json
-    - raw/floss-1998-corundum-hibonite-evaporation-residues/mineru/p001-p016/out/src--floss-1998-corundum-hibonite-residues-p001-p016/vlm/src--floss-1998-corundum-hibonite-residues-p001-p016_model.json
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/floss-1998-corundum-hibonite-evaporation-residues.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -25119,12 +25014,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: navrotsky-koryttseva-2023-oxide-acid-base-calorimetry
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/navrotsky-koryttseva-2023-oxide-acid-base-calorimetry.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -27303,12 +27198,12 @@ sources:
   total_rows: 290
   inbox_exclusion_reason: null
 - source_id: pretorius-muan-1992-chromium-oxide-activities
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/pretorius-muan-1992-chromium-oxide-activities/pretorius-muan-1992-chromium-oxide-activities.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/pretorius-muan-1992-chromium-oxide-activities.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -33201,12 +33096,12 @@ sources:
   total_rows: 0
   inbox_exclusion_reason: null
 - source_id: smythe-2013-cerium-thesis
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/smythe-2013-cerium-thesis/smythe-2013-cerium-thesis.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/smythe-2013-cerium-thesis.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -35989,12 +35884,12 @@ sources:
   total_rows: 9
   inbox_exclusion_reason: null
 - source_id: van-westrenen-1999-garnet-melt-trace-partitioning
-  stage: inbox
+  stage: in_progress
   evidence:
-    decided_by: inbox
+    decided_by: in_progress
     artefacts:
-    - raw/van-westrenen-1999-garnet-melt-trace-partitioning/van-westrenen-1999-garnet-melt-trace-partitioning.pdf
-    reason: document in corpus raw/; no extract
+    - data/literature/extracts/van-westrenen-1999-garnet-melt-trace-partitioning.yaml
+    reason: extract present; no v2.1 store work
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: null
@@ -38996,8 +38891,8 @@ sources:
     - raw/zhao-2019-ce2o3-ternary-public-appendix/reading/table-9.png
     - raw/zhao-2019-ce2o3-ternary-public-appendix/reading/table-9.svg
     - raw/zhao-2019-ce2o3-ternary-public-appendix/zhao-2019-ce2o3-ternary-public-appendix.html
-    reason: 'covered_by: source is covered by zhao-2019-ce2o3-ternary-thermodynamics; The appendix adds no
-      distinct numeric rows (189/189 rows match Tables AI-AXX).'
+    reason: 'covered_by: source is covered by zhao-2019-ce2o3-ternary-thermodynamics; The appendix adds
+      no distinct numeric rows (189/189 rows match Tables AI-AXX).'
   usable_rows: 0
   total_rows: 0
   inbox_exclusion_reason: 'covered_by: source is covered by zhao-2019-ce2o3-ternary-thermodynamics; The

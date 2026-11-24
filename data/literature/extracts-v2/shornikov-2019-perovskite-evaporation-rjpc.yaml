@@ -54,6 +54,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -94,7 +95,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1791:h=93307cad1c23
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -116,6 +123,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -263,6 +271,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -303,7 +312,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1845:h=9024516cf019
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -325,6 +340,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -472,6 +488,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -512,7 +529,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1875:h=e0c3f9388cb5
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -534,6 +557,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -681,6 +705,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -721,7 +746,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1920:h=c915af4751ca
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -743,6 +774,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -890,6 +922,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -930,7 +963,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1941:h=385f21078fb3
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -952,6 +991,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -1099,6 +1139,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1139,7 +1180,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1956:h=49d96c210ff5
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -1161,6 +1208,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -1308,6 +1356,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1348,7 +1397,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1976:h=be08c7ccddd2
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -1370,6 +1425,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -1517,6 +1573,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1557,7 +1614,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=1992:h=874a494c6aa6
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -1579,6 +1642,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -1726,6 +1790,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1766,7 +1831,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=2027:h=413d5f9bc9c6
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -1788,6 +1859,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -1935,6 +2007,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -1975,7 +2048,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=2037:h=e7fb43d14905
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -1997,6 +2076,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -2144,6 +2224,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2184,7 +2265,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=2051:h=54c2b001f9b0
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -2206,6 +2293,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -2353,6 +2441,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2393,7 +2482,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=2100:h=cc4da37e077d
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -2415,6 +2510,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -2562,6 +2658,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2602,7 +2699,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq22_23_atomic_oxygen_pressure::T=2182:h=6b9cbc89259e
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -2624,6 +2727,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -2771,6 +2875,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -2812,7 +2917,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=1920:h=370b99881357
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -2834,6 +2945,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -2981,6 +3093,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3022,7 +3135,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=1941:h=2b4abbfa1165
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -3044,6 +3163,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -3191,6 +3311,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3232,7 +3353,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=1956:h=80f39bc4f318
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -3254,6 +3381,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -3401,6 +3529,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3442,7 +3571,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=1976:h=610155955992
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -3464,6 +3599,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -3611,6 +3747,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3652,7 +3789,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=1992:h=38ee5efae319
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -3674,6 +3817,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -3821,6 +3965,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -3862,7 +4007,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=2027:h=ae101cc52694
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -3884,6 +4035,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -4031,6 +4183,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4072,7 +4225,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=2037:h=4890045dfa07
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -4094,6 +4253,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -4241,6 +4401,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4282,7 +4443,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=2051:h=6a8fee15f319
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -4304,6 +4471,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -4451,6 +4619,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4492,7 +4661,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=2100:h=5e03101c06ca
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -4514,6 +4689,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -4661,6 +4837,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4702,7 +4879,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq24_atomic_oxygen_pressure::T=2182:h=8feef4a5d1eb
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -4724,6 +4907,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -4871,6 +5055,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -4912,7 +5097,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=1875:h=b228553eb86d
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -4934,6 +5125,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -5081,6 +5273,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5122,7 +5315,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=1920:h=b1d0027f187b
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -5144,6 +5343,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -5291,6 +5491,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5332,7 +5533,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=1941:h=4adc90d4fbcd
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -5354,6 +5561,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -5501,6 +5709,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5542,7 +5751,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=1956:h=ba0f71798ed9
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -5564,6 +5779,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -5711,6 +5927,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5752,7 +5969,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=1976:h=f045dd6c98fb
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -5774,6 +5997,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -5921,6 +6145,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -5962,7 +6187,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=1992:h=b1c66525f02f
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -5984,6 +6215,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -6131,6 +6363,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6172,7 +6405,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=2027:h=336126de4333
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -6194,6 +6433,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -6341,6 +6581,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6382,7 +6623,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=2037:h=ad7162c9ed76
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -6404,6 +6651,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -6551,6 +6799,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6592,7 +6841,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=2051:h=030d95a1aecc
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -6614,6 +6869,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -6761,6 +7017,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -6802,7 +7059,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=2100:h=75f4cd9d3d1c
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -6824,6 +7087,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -6971,6 +7235,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7012,7 +7277,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq25_atomic_oxygen_pressure::T=2182:h=7a2f799db6b8
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -7034,6 +7305,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -7181,6 +7453,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7222,7 +7495,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1791:h=674b4da32e57
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -7244,6 +7523,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -7391,6 +7671,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7432,7 +7713,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1845:h=0d6642631de6
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -7454,6 +7741,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -7601,6 +7889,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7642,7 +7931,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1875:h=565be55109af
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -7664,6 +7959,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -7811,6 +8107,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -7852,7 +8149,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1920:h=d58773c8cf61
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -7874,6 +8177,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -8021,6 +8325,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8062,7 +8367,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1941:h=5673f419f1fc
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -8084,6 +8395,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -8231,6 +8543,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8272,7 +8585,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1956:h=2190d28e6d53
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -8294,6 +8613,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -8441,6 +8761,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8482,7 +8803,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1976:h=7b025640439b
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -8504,6 +8831,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -8651,6 +8979,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8692,7 +9021,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=1992:h=844a90e6a1bb
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -8714,6 +9049,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -8861,6 +9197,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -8902,7 +9239,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=2027:h=41f51cd2dece
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -8924,6 +9267,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -9071,6 +9415,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9112,7 +9457,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=2037:h=1c5f3a5a0857
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -9134,6 +9485,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -9281,6 +9633,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9322,7 +9675,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=2051:h=61d5e9651bfe
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -9344,6 +9703,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -9491,6 +9851,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9532,7 +9893,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=2100:h=f3453dd0ca76
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -9554,6 +9921,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -9701,6 +10069,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9742,7 +10111,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq26_atomic_oxygen_pressure::T=2182:h=0f402e45df23
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -9764,6 +10139,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -9911,6 +10287,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -9952,7 +10329,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=1956:h=92b16d723154
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -9974,6 +10357,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -10121,6 +10505,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10162,7 +10547,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=1976:h=993a01f43720
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -10184,6 +10575,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -10331,6 +10723,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10372,7 +10765,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=1992:h=e3c1b82d884a
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -10394,6 +10793,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -10541,6 +10941,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10582,7 +10983,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=2027:h=5532a8468008
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -10604,6 +11011,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -10751,6 +11159,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -10792,7 +11201,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=2037:h=cf8c018a4379
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -10814,6 +11229,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -10961,6 +11377,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11002,7 +11419,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=2051:h=6b5ccbea29b4
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -11024,6 +11447,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -11171,6 +11595,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11212,7 +11637,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=2100:h=7164d97c70e3
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -11234,6 +11665,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -11381,6 +11813,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11422,7 +11855,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq27_atomic_oxygen_pressure::T=2182:h=c756b13a6887
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -11444,6 +11883,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -11591,6 +12031,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11632,7 +12073,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1791:h=325b1f5bae23
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -11654,6 +12101,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -11801,6 +12249,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -11842,7 +12291,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1845:h=eb6bb32a2748
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -11864,6 +12319,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -12011,6 +12467,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -12052,7 +12509,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1875:h=14842e09b5c2
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -12074,6 +12537,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -12221,6 +12685,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -12262,7 +12727,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1920:h=d905bf33ff50
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -12284,6 +12755,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -12431,6 +12903,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -12472,7 +12945,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1941:h=8b6edaace986
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -12494,6 +12973,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -12641,6 +13121,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -12682,7 +13163,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1956:h=f48905585057
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -12704,6 +13191,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -12851,6 +13339,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -12892,7 +13381,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1976:h=6ded152a86b6
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -12914,6 +13409,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -13061,6 +13557,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -13102,7 +13599,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=1992:h=c0e741501f99
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -13124,6 +13627,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -13271,6 +13775,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -13312,7 +13817,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=2027:h=2f7657ea977e
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -13334,6 +13845,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -13481,6 +13993,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -13522,7 +14035,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=2037:h=086a6119f8be
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -13544,6 +14063,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -13691,6 +14211,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -13732,7 +14253,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=2051:h=20c531d23466
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -13754,6 +14281,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -13901,6 +14429,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -13942,7 +14471,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=2100:h=7db6f79ffd8c
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -13964,6 +14499,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024
@@ -14111,6 +14647,7 @@ observations:
           - '1'
         amount_basis: mol_inventory
         proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: unknown
       reason: no fO2_Pa mapped from source
@@ -14152,7 +14689,13 @@ observations:
         published_page: 1029
         pdf_page_index: 5
         table: '3'
-  notices: []
+  notices:
+  - kind: source_disagreement
+    affected_quantities:
+    - p_partial
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
+    origin: shornikov-2019-perovskite-evaporation-rjpc::shornikov_2019_rjpc_table3_eq28_atomic_oxygen_pressure::T=2182:h=3e8c4303b3e3
   source_id: shornikov-2019-perovskite-evaporation-rjpc
   locator:
     page: 6
@@ -14174,6 +14717,7 @@ observations:
             - '1'
           amount_basis: mol_inventory
           proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 1
         published_page: 1024

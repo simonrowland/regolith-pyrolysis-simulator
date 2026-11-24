@@ -8,8 +8,12 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import sqlite3
 import subprocess
+import sys
+import threading
 import time
+import _thread
 from types import SimpleNamespace
 
 import pytest
@@ -262,6 +266,416 @@ def test_parallel_score_shards_reuse_parent_store_stamp(
     assert derive_calls == 1
     header = path.with_name(path.name + ".partial").read_bytes().splitlines()[0]
     assert json.loads(header) == parent_stamp
+
+
+def test_parallel_workers_inherit_prepared_run_and_reference_ids(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery import score_run
+    from simulator.battery.score_run import _PreparedScoreRun
+
+    context = _worker_fixture(experiment_count=4)
+    captured: dict[str, object] = {}
+
+    def run_workers_in_process(tasks, worker, *, initializer, initargs, mp_context, **_kwargs):
+        captured["tasks"] = tasks
+        captured["initargs"] = initargs
+        captured["method"] = mp_context.get_start_method()
+        captured["inherited"] = score_run._INHERITED_SCORE_RUN is not None
+        initializer(*initargs)
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(score_run, "_score_fork_blockers", lambda **_kwargs: ())
+    monkeypatch.setattr(score_mod, "supervised_process_map", run_workers_in_process)
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "inherited-prepared.jsonl",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=2,
+    )
+
+    initargs = captured["initargs"]
+    tasks = captured["tasks"]
+    assert written > 0
+    assert captured["method"] == "fork"
+    assert captured["inherited"] is True
+    assert isinstance(initargs, tuple)
+    assert initargs
+    assert all(not isinstance(arg, _PreparedScoreRun) for arg in initargs)
+    assert initargs[-2] is None
+    assert isinstance(initargs[-1], dict)
+    assert tasks
+    assert all(isinstance(ref_id, str) for task in tasks for ref_id in task[2])
+    assert score_run._INHERITED_SCORE_RUN is None
+
+
+def test_dirty_process_pickles_the_prepared_run_once_and_spawns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import pickle
+
+    import simulator.battery.score as score_mod
+    from simulator.battery import score_run
+
+    context = _worker_fixture(experiment_count=4)
+    captured: dict[str, object] = {}
+    dumped: list[str] = []
+    original_dump = pickle.dump
+
+    def counting_dump(value, handle, *args, **kwargs):
+        dumped.append(type(value).__name__)
+        return original_dump(value, handle, *args, **kwargs)
+
+    def run_workers_in_process(tasks, worker, *, initializer, initargs, mp_context, **_kwargs):
+        captured["initargs"] = initargs
+        captured["method"] = mp_context.get_start_method()
+        captured["inherited"] = score_run._INHERITED_SCORE_RUN
+        initializer(*initargs)
+        loaded_ids = tuple(score_run._SCORE_WORKER_REFS)
+        captured["loaded_ids"] = loaded_ids
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(
+        score_run,
+        "_score_fork_blockers",
+        lambda **_kwargs: ("threads:score-fork-blocker",),
+    )
+    monkeypatch.setattr(pickle, "dump", counting_dump)
+    monkeypatch.setattr(score_mod, "supervised_process_map", run_workers_in_process)
+    written, _metadata = _score_store_to_jsonl(
+        context,
+        tmp_path / "spawn-prepared.jsonl",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=2,
+    )
+
+    initargs = captured["initargs"]
+    assert written > 0
+    assert captured["method"] == "spawn"
+    assert captured["inherited"] is None
+    assert dumped == ["_PreparedScoreRun"]
+    assert isinstance(initargs, tuple)
+    assert isinstance(initargs[-2], str)
+    assert isinstance(initargs[-1], dict)
+    assert captured["loaded_ids"]
+    assert score_run._INHERITED_SCORE_RUN is None
+
+
+def test_score_fork_blockers_name_threads_modules_and_cache_connections() -> None:
+    import sys
+    import types
+
+    from simulator import engine_cache
+    from simulator.battery.score_run import _score_fork_blockers
+
+    release = threading.Event()
+    started = threading.Event()
+
+    def _hold() -> None:
+        started.set()
+        release.wait(5)
+
+    thread = threading.Thread(target=_hold, name="score-fork-blocker")
+    thread.start()
+    assert started.wait(5)
+    try:
+        reasons = _score_fork_blockers()
+    finally:
+        release.set()
+        thread.join(5)
+    assert any(
+        reason.startswith("threads:") and "score-fork-blocker" in reason
+        for reason in reasons
+    )
+
+    inserted_module = "rubicon.objc" not in sys.modules
+    if inserted_module:
+        sys.modules["rubicon.objc"] = types.ModuleType("rubicon.objc")
+    try:
+        reasons = _score_fork_blockers()
+    finally:
+        if inserted_module:
+            del sys.modules["rubicon.objc"]
+    assert any(
+        reason.startswith("modules:") and "rubicon.objc" in reason
+        for reason in reasons
+    )
+
+    before = _score_fork_blockers()
+    connection = sqlite3.connect(":memory:")
+    engine_cache._CONNECTIONS[("score-fork-blocker", False)] = connection
+    try:
+        after = _score_fork_blockers()
+    finally:
+        del engine_cache._CONNECTIONS[("score-fork-blocker", False)]
+        connection.close()
+
+    def _connection_count(reasons: tuple[str, ...]) -> int:
+        for reason in reasons:
+            if reason.startswith("cache_connections:"):
+                return int(reason.removeprefix("cache_connections:"))
+        return 0
+
+    assert _connection_count(after) == _connection_count(before) + 1
+    assert _score_fork_blockers(residual_sqlite_open=True)[-1] == (
+        "residual sqlite is open"
+    )
+
+
+def _recorded_start_method(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> str:
+    import simulator.battery.score as score_mod
+
+    captured: dict[str, object] = {}
+
+    def run_workers_in_process(
+        tasks, worker, *, initializer, initargs, mp_context, **_kwargs
+    ):
+        captured["method"] = mp_context.get_start_method()
+        initializer(*initargs)
+        return [worker(task) for task in tasks]
+
+    monkeypatch.setattr(score_mod, "supervised_process_map", run_workers_in_process)
+    written, _metadata = _score_store_to_jsonl(
+        _worker_fixture(experiment_count=2),
+        tmp_path / "fork-block.jsonl",
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        predict=_worker_test_predict,
+        workers=2,
+    )
+    assert written > 0
+    method = captured["method"]
+    assert isinstance(method, str)
+    return method
+
+
+def test_raw_interpreter_thread_refuses_fork(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """A thread started outside threading still makes os.fork warn."""
+
+    from simulator.battery.score_run import _score_fork_blockers
+
+    hold = _thread.allocate_lock()
+    hold.acquire()
+    started = _thread.allocate_lock()
+    started.acquire()
+
+    def _hold() -> None:
+        started.release()
+        hold.acquire()
+        hold.release()
+
+    before_idents = {thread.ident for thread in threading.enumerate()}
+    _thread.start_new_thread(_hold, ())
+    assert started.acquire(timeout=5)
+    try:
+        enum_idents = {thread.ident for thread in threading.enumerate()}
+        frame_idents = set(sys._current_frames())
+        assert enum_idents == before_idents
+        assert frame_idents - enum_idents
+        assert len(frame_idents) > 1
+        thread_reasons = [
+            reason
+            for reason in _score_fork_blockers()
+            if reason.startswith("threads:")
+        ]
+        assert thread_reasons
+        count = int(thread_reasons[0].rsplit("count:", 1)[1])
+        assert count >= len(frame_idents)
+        assert count > 1
+        assert _recorded_start_method(tmp_path, monkeypatch) == "spawn"
+    finally:
+        hold.release()
+
+
+def test_phaseobjc_loader_marks_runtime_and_spawns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.engine_local_config as config
+    from simulator.battery.score_run import _score_fork_blockers
+
+    monkeypatch.setattr(config, "_THERMOENGINE_PHASEOBJC_LOADED", False)
+    loaded: list[str] = []
+    real_cdll = config.ctypes.CDLL
+
+    def fake_cdll(path, *args, **kwargs):
+        if str(path).endswith("libphaseobjc.dylib"):
+            loaded.append(str(path))
+            return object()
+        return real_cdll(path, *args, **kwargs)
+
+    monkeypatch.setattr(config.ctypes, "CDLL", fake_cdll)
+    monkeypatch.setattr(
+        config,
+        "_thermoengine_phaseobjc_library_path",
+        lambda: Path("/configured/libphaseobjc.dylib"),
+    )
+    loaded_path = config._load_thermoengine_phaseobjc_library()
+    assert loaded_path == Path("/configured/libphaseobjc.dylib")
+    assert loaded == ["/configured/libphaseobjc.dylib"]
+    assert config.thermoengine_phaseobjc_runtime_loaded() is True
+    assert "native_runtime:thermoengine_phaseobjc" in _score_fork_blockers()
+    assert _recorded_start_method(tmp_path, monkeypatch) == "spawn"
+
+
+def test_failed_phaseobjc_load_does_not_mark_runtime(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import simulator.engine_local_config as config
+    from simulator.battery.score_run import _score_fork_blockers
+
+    monkeypatch.setattr(config, "_THERMOENGINE_PHASEOBJC_LOADED", False)
+    real_cdll = config.ctypes.CDLL
+
+    def boom(path, *args, **kwargs):
+        if str(path).endswith("libphaseobjc.dylib"):
+            raise OSError("dlopen failed")
+        return real_cdll(path, *args, **kwargs)
+
+    monkeypatch.setattr(config.ctypes, "CDLL", boom)
+    monkeypatch.setattr(
+        config,
+        "_thermoengine_phaseobjc_library_path",
+        lambda: Path("/missing/libphaseobjc.dylib"),
+    )
+    with pytest.raises(ImportError, match="could not be loaded"):
+        config._load_thermoengine_phaseobjc_library()
+    assert config.thermoengine_phaseobjc_runtime_loaded() is False
+    assert "native_runtime:thermoengine_phaseobjc" not in _score_fork_blockers()
+
+
+def _fresh_python(script: str) -> subprocess.CompletedProcess[str]:
+    """Run a script in a new interpreter. Pytest's threads must not count."""
+
+    root = Path(__file__).resolve().parents[2]
+    env = os.environ.copy()
+    env["PYTHONPATH"] = os.pathsep.join(
+        [str(root), env.get("PYTHONPATH", "")]
+    ).removesuffix(os.pathsep)
+    return subprocess.run(
+        [sys.executable, "-c", script],
+        cwd=root,
+        env=env,
+        capture_output=True,
+        text=True,
+        timeout=120,
+        check=False,
+    )
+
+
+def test_fresh_interpreter_has_no_fork_blocker() -> None:
+    """A new score process still has nothing that makes fork unsafe."""
+
+    result = _fresh_python(
+        """
+import socket
+from simulator.battery.score_run import _score_fork_blockers
+reasons = _score_fork_blockers()
+print("HOST", socket.gethostname())
+print("BLOCKERS", len(reasons))
+for reason in reasons:
+    print("REASON", reason)
+"""
+    )
+    output = result.stdout + result.stderr
+    assert result.returncode == 0, output
+    assert "BLOCKERS 0" in result.stdout, output
+
+
+def test_real_phaseobjc_cdll_blocks_fork() -> None:
+    """The production loader maps libphaseobjc with ctypes.CDLL."""
+
+    result = _fresh_python(
+        """
+from simulator.engine_local_config import (
+    _load_thermoengine_phaseobjc_library,
+    thermoengine_phaseobjc_runtime_loaded,
+)
+from simulator.battery.score_run import _score_fork_blockers
+_load_thermoengine_phaseobjc_library()
+print("FLAG", int(thermoengine_phaseobjc_runtime_loaded()))
+for reason in _score_fork_blockers():
+    print("REASON", reason)
+"""
+    )
+    output = result.stdout + result.stderr
+    assert result.returncode == 0, output
+    assert "FLAG 1" in result.stdout
+    assert "REASON native_runtime:thermoengine_phaseobjc" in result.stdout
+
+
+def test_mach_probe_failure_does_not_abort_fork_classification(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A ctypes stand-in with no library handle must not raise."""
+
+    import ctypes
+
+    from simulator.battery.score_run import _score_fork_blockers
+
+    def broken_cdll(path, *args, **kwargs):
+        return object()
+
+    monkeypatch.setattr(ctypes, "CDLL", broken_cdll)
+    assert isinstance(_score_fork_blockers(), tuple)
+
+
+def test_open_engine_cache_sqlite_spawns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator import engine_cache
+    from simulator.battery.score_run import _score_fork_blockers
+
+    connection = sqlite3.connect(":memory:")
+    engine_cache._CONNECTIONS[("score-fork-open", False)] = connection
+    try:
+        assert any(
+            reason.startswith("cache_connections:")
+            for reason in _score_fork_blockers()
+        )
+        assert _recorded_start_method(tmp_path, monkeypatch) == "spawn"
+    finally:
+        del engine_cache._CONNECTIONS[("score-fork-open", False)]
+        connection.close()
+
+
+def test_open_residual_order_sqlite_spawns(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.score as score_mod
+    from simulator.battery import score_run
+
+    original = score_mod._ResidualJsonlStream
+    seen: dict[str, object] = {}
+
+    class _OpenDuringForkCheck(original):
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+            self._probe = sqlite3.connect(":memory:")
+            self._database = self._probe
+
+        def _ensure_order_index(self):
+            if self._database is getattr(self, "_probe", None):
+                self._probe.close()
+                self._probe = None
+                self._database = None
+            super()._ensure_order_index()
+
+    real_blockers = score_run._score_fork_blockers
+
+    def recording_blockers(**kwargs):
+        seen.update(kwargs)
+        return real_blockers(**kwargs)
+
+    monkeypatch.setattr(score_mod, "_ResidualJsonlStream", _OpenDuringForkCheck)
+    monkeypatch.setattr(score_run, "_score_fork_blockers", recording_blockers)
+    assert _recorded_start_method(tmp_path, monkeypatch) == "spawn"
+    assert seen.get("residual_sqlite_open") is True
 
 
 @pytest.mark.parametrize("workers", (1, 2), ids=("serial", "worker"))
@@ -624,7 +1038,7 @@ def test_group_partition_keeps_series_and_sossi_cohort_together() -> None:
 
 class _SortAggregate:
     def __init__(self, *args, **kwargs) -> None:
-        self.tier_accumulator = SimpleNamespace(selected=None)
+        self.tier_accumulator = SimpleNamespace(selected=set())
 
     def add(self, _payload):
         return None

@@ -1,10 +1,46 @@
 """Pin that q6 conversion follows the source-stated confidence level."""
 
 from decimal import Decimal
+from pathlib import Path
+
+import yaml
 
 from simulator.battery.enums import Quantity, UncertaintyKind
 from simulator.battery.records import Uncertainty
 from simulator.battery.score import _printed_uncertainty_band
+
+
+def test_d443_table_preserves_cited_precision_and_unstated_confidence() -> None:
+    from simulator.battery.enums import MetricOperation
+    from simulator.battery.score import _metric_uncertainty_width
+
+    path = Path(__file__).resolve().parents[2] / "data/battery/method_class_bands.yaml"
+    table = yaml.safe_load(path.read_text())
+    classes = table["classes"]
+    expected = {
+        "kems_absolute_pressure_weight_loss_calibrated": ("0.20", "720", "0.096910013"),
+        "kems_direct_comparison_activity": ("0.10", "724", "0.045757491"),
+        "knudsen_weight_loss_collection_torsion_pressure": ("0.20", "720", "0.096910013"),
+        "transpiration_mass_spectrometry_pressure": ("0.20", "721", "0.096910013"),
+        "mossbauer_fe_glass_ferric_fraction": ("0.01", "117", None),
+        "xanes_fe_glass_ferric_fraction": ("0.01", "114", None),
+        "drop_calorimetry_heat_content_copper_block": ("0.003", "486", None),
+    }
+    assert table["ruling"] == "d-443"
+    assert set(classes) == set(expected)
+    for class_id, (precision, page, dex_width) in expected.items():
+        entry = classes[class_id]
+        assert entry["precision"]["value"] == precision
+        assert entry["precision"]["confidence"] == "unstated"
+        assert entry["citation"]["printed_page"] == page
+        assert entry["citation"]["pdf_page"] > 0
+        assert entry["applicability"]
+        if dex_width is not None:
+            width = _metric_uncertainty_width(
+                MetricOperation.DEX, Quantity(entry["quantities"][0]),
+                Decimal(1), Decimal(precision), "fraction",
+            )
+            assert width.quantize(Decimal("0.000000001")) == Decimal(dex_width)
 
 
 def test_sigma_field_name_does_not_supply_confidence_level() -> None:

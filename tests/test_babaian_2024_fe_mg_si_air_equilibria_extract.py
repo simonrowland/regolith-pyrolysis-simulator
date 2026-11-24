@@ -173,6 +173,28 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
         assert temperature.locator.page == int(row["page"])
         assert temperature.locator.pdf_page_index == int(row["page"]) - 1
         assert observation.point_conditions["atmosphere"].state.value == "air"
+        # Table 2 states air and does not state total pressure. Do not infer
+        # 1 atm. The typed gap is the only notice on the paper's own runs.
+        oxygen_log = observation.point_conditions["fO2_log"]
+        assert oxygen_log.locator == observation.point_conditions["atmosphere"].locator
+        assert oxygen_log.state.is_unknown
+        assert oxygen_log.state.reason == (
+            "missing input: printed air fO2 requires stated total pressure"
+        )
+        assert observation.identity.fO2_Pa.is_unknown
+        air_notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is NoticeKind.INPUT_OMITTED
+        ]
+        assert len(air_notices) == 1
+        assert air_notices[0].reason == oxygen_log.state.reason
+        assert air_notices[0].origin == observation.observation_id
+        other_notices = [
+            notice
+            for notice in observation.notices
+            if notice.kind is not NoticeKind.INPUT_OMITTED
+        ]
         if row["sigma"]:
             assert observation.uncertainty.kind is UncertaintyKind.PRINTED
             assert Decimal(str(observation.uncertainty.verbatim["sigma"])) == Decimal(row["sigma"])
@@ -180,17 +202,17 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
         if row["table"] == "2":
-            # This paper's own runs: no notice of any kind.
-            assert not observation.notices
+            # This paper's own runs: the air-pressure gap is the only notice.
+            assert other_notices == []
         else:
             # Values the paper quotes from its references may carry admission_status
             # quoted_attributed; the legacy-token mapping admits those with one notice naming
             # the old token. No other notice kind is allowed on any row.
             assert all(
                 notice.kind is NoticeKind.ADMISSION_FROM_LEGACY_TOKEN
-                for notice in observation.notices
+                for notice in other_notices
             )
-            assert len(observation.notices) <= 1
+            assert len(other_notices) <= 1
 
     assert sum(row["table"] == "2" for row in fixture) == 147
     assert sum(row["table"] == "2" and Decimal(row["component_amount"]) > 0 for row in fixture) == 144

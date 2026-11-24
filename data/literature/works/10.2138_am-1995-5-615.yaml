@@ -1,0 +1,33 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: 10.2138/am-1995-5-615
+  citation: 'Robie, R. A., Huebner, J. S. & Hemingway, B. S. (1995). “Heat capacities and thermodynamic properties of braunite
+    (Mn7SiO12) and rhodonite (MnSiO3).” *American Mineralogist*, 80(5–6), 560–575. DOI: 10.2138/am-1995-5-615.'
+  source_ids:
+  - robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e1dbb239851508a1a3635ff8a7eec9400953b826
+    files:
+    - asset_id: pdf:robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      role: pdf
+      path: raw/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics.pdf
+      sha256:
+        tag: value
+        value: 8e8798268f9ffa06fa345ee9bd8f2a23e3b82b7896744e24b809ff81756b4c2b
+    - asset_id: pdftotext:robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      role: pdftotext
+      path: text/robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      sha256:
+        tag: unknown
+        reason: INDEX does not give text sha256
+    - asset_id: unknown:robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+  doi: 10.2138/am-1995-5-615
+experiments: []

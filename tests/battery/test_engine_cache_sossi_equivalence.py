@@ -12,6 +12,8 @@ from tests.battery.engine_cache_score_equivalence import (
 )
 from tests.battery.test_sossi_residue_predictions import ROOT, SOURCE
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
     tmp_path: Path,

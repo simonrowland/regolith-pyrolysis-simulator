@@ -58,6 +58,13 @@ def test_residual_bytes_are_pinned_before_score_overhead_refactor() -> None:
     )
 
     output = dumps_residual_line(residual, candidate).encode("utf-8")
+    # d-443 additive stratum. The numeric stays -0.1 kJ, status no_band,
+    # score_eligible true. The line gains only
+    # assumed_band_details={eligible: false, evidence_class: measured_direct,
+    # refusal: method_class_applicability_unknown}. The row does not enter
+    # the band. Chain Ban-ya Fe_tO (t-1802 Eq. 23 / d-432) does not move
+    # this fixture: cf2a0c7fe and f96f7cace serialize the same bytes.
+    # sha before d-443: 559d10350ef88aa3dc3214689823e59becbbbd31325af0f87ece2438a0a47bf2
     assert hashlib.sha256(output).hexdigest() == (
-        "559d10350ef88aa3dc3214689823e59becbbbd31325af0f87ece2438a0a47bf2"
+        "0975f71271ab7924f9f0253650ca5f5661fb4f69243130d0d5f7e1e287023ddf"
     )

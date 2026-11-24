@@ -79,11 +79,15 @@ sulfur = []
 # addopts depends on (`-n auto` needs pytest-xdist; `--timeout=1800` needs
 # pytest-timeout). Without these declared, a clean checkout doing
 # `pip install -e .[dev]` would let pytest abort during argument parsing
-# before any test runs. Per autoreview 2026-05-27 finding.
+# before any test runs. Keep versions aligned with the studio base venv: the
+# layered remote-CI venv must match it; bump deliberately. Per autoreview
+# 2026-05-27 finding.
 dev = [
-    "pytest>=8.0",
-    "pytest-xdist>=3.8",
-    "pytest-timeout>=2.4",
+    "pytest==9.0.3",
+    "pytest-xdist==3.8.0",
+    "pytest-timeout==2.4.0",
+    # Required by the whole-tree undefined-name test.
+    "pyflakes>=4.1.0",
 ]
 
 [tool.pytest.ini_options]
@@ -119,6 +123,7 @@ markers = [
     "xdist_group(name): run marked tests on the same xdist worker under --dist loadgroup",
     "browser_e2e: requires the optional Playwright browser test dependency",
     "live_engine: requires a responsive optional live chemistry engine",
+    "engine_cache_off: do not use the runner engine cache; the test owns a cache or must run a real engine solve",
     "nightly: campaign-length physics; full coverage nightly; excluded from the PR tier",
     "cpu_budget(seconds): process CPU seconds allowed per test; wall hang guard scales by six unless timeout(seconds) overrides it",
 ]

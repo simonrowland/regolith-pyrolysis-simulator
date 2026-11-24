@@ -328,6 +328,8 @@ def decision_band_for(
     band = printed_band if printed_band is not None else derived_band
     if band is None:
         return None
+    if band.band_basis == "method_class_assumed":
+        return None
     kems_pressure_band = band.rule.startswith(
         "KEMS p_partial measured uncertainty:"
     )

@@ -34,6 +34,7 @@ import yaml
 from simulator.state_types import StateTag
 from simulator.yaml_cache import load_cached_safe_yaml
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.literature_extract_test_helpers import iter_locators
 from tests.helpers.regression import assert_regression_raises_assertion_without_skip
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -5438,6 +5439,255 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
     assert match_errors == [], "\n".join(match_errors)
 
 
+def test_aithala_s5_preserves_all_61_row_addressable_series_summaries():
+    extract_path = EXTRACTS / "aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    si_path = (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c-si.pdf"
+    )
+    si_sha256 = "ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa"
+    article_path = (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c.pdf"
+    )
+    s5_locators = [
+        locator for locator in iter_locators(doc) if locator.get("table") == "S-5"
+    ]
+    assert len(s5_locators) == 187
+
+    def points_to_si(locator):
+        return (
+            locator.get("source_path") == si_path
+            and locator.get("source_sha256") == si_sha256
+            and (locator.get("page"), locator.get("pdf_page_index"))
+            in {(16, 15), (17, 16)}
+        )
+
+    assert all(points_to_si(locator) for locator in s5_locators)
+
+    article_sha256 = "4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261"
+    article_locators = [
+        locator
+        for locator in iter_locators(doc)
+        if str(locator.get("published_page")) in {"18", "19", "20"}
+    ]
+    assert len(article_locators) == 14
+    assert all(
+        locator.get("source_path") == article_path
+        and locator.get("source_sha256") == article_sha256
+        and locator.get("pdf_page_index") == locator.get("page") - 1
+        for locator in article_locators
+    )
+
+    mutated = copy.deepcopy(doc)
+    mutated_s5 = next(
+        locator
+        for locator in iter_locators(mutated)
+        if locator.get("table") == "S-5"
+    )
+    mutated_s5["source_path"] = article_path
+    assert not points_to_si(mutated_s5)
+
+    source_pdf = regolith_corpus_root() / si_path
+    if source_pdf.is_file():
+        assert hashlib.sha256(source_pdf.read_bytes()).hexdigest() == si_sha256
+        import subprocess
+
+        page16 = subprocess.run(
+            ["pdftotext", "-f", "16", "-l", "16", "-layout", str(source_pdf), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        page17 = subprocess.run(
+            ["pdftotext", "-f", "17", "-l", "17", "-layout", str(source_pdf), "-"],
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        assert "Table S-5" in page16 and "SI-10" in page16
+        assert "HAFS" in page17 and "SI-11" in page17
+
+    observations = doc["species"]["Fe"]["observations"]
+    rows = [
+        row for row in observations
+        if row.get("observation_id", "").startswith("aithala_2026_s5_")
+    ]
+
+    assert len(rows) == 61
+    assert len({row["provenance"]["series_id"] for row in rows}) == 61
+    summary_experiments = {
+        item["experiment_id"]: item
+        for item in doc["experiments"]
+        if item["experiment_id"].startswith("aithala-2026-s5-")
+    }
+    assert len(summary_experiments) == 61
+    assert {row["experiment"] for row in rows} == set(summary_experiments)
+    for row in rows:
+        experiment = summary_experiments[row["experiment"]]
+        values = row["values"]
+        note = experiment["locator"]["note"]
+        assert note.startswith(
+            f"Table S-5 series regression summary over n={values['n']} experiments;"
+        )
+        assert f"temperature-series label: {values['series_name']}" in note
+        assert experiment["conditions"].keys() == {"temperature_K"}
+        assert (
+            experiment["conditions"]["temperature_K"]["state"]["value"]["kind"]
+            == "interval"
+        )
+    humphrey_experiment = summary_experiments["aithala-2026-s5-humphrey"]
+    assert "12 overlapping Aithala runs" in humphrey_experiment["locator"]["note"]
+    assert Counter(row["locator"]["page"] for row in rows) == Counter(
+        {16: 34, 17: 27}
+    )
+    assert Counter(row["values"]["source_code_as_printed"] for row in rows) == Counter(
+        {
+            "Present Study": 1,
+            "Ken48": 1,
+            "Kil83": 8,
+            "KC88": 1,
+            "M95": 2,
+            "BM2010": 6,
+            "B13-18": 42,
+        }
+    )
+    assert all(row["values"]["atmosphere"] == "air" for row in rows)
+    source_attributions = {
+        "Present Study": "Aithala, Macris & Hirschmann (2026), present study",
+        "Ken48": "Kennedy (1948)",
+        "Kil83": "Kilinc et al. (1983)",
+        "KC88": "Kress and Carmichael (1988)",
+        "M95": "Moore et al. (1995)",
+        "BM2010": "Borisov and McCammon (2010)",
+        "B13-18": "Borisov et al. (2013, 2015, 2017, 2018)",
+    }
+    for row in rows:
+        values = row["values"]
+        assert row["locator"]["table"] == "S-5"
+        original_source = source_attributions[values["source_code_as_printed"]]
+        expected_attribution = (
+            original_source
+            if values["source_code_as_printed"] == "Present Study"
+            else f"compiled from {original_source}"
+        )
+        assert values["attribution"] == expected_attribution
+        assert values["temperature_range_C"]["as_printed"]
+        assert values["temperature_range_C"]["min"]
+        assert values["temperature_range_C"]["max"]
+        assert values["h_c"]["unit"] == "K"
+        assert values["composition_context_as_printed"]["SiO2_wt_pct"]
+        assert values["composition_context_as_printed"]["FeO_star_wt_pct"]
+        if values["h_c"]["as_printed"].endswith("*"):
+            assert values["n"] == 2
+            assert values["h_c"]["uncertainty"]["state"]["tag"] == "unknown"
+        else:
+            assert "±" in values["h_c"]["as_printed"]
+            assert values["h_c"]["uncertainty"]["state"]["tag"] == "value"
+            assert values["h_c"]["uncertainty"]["confidence"] == "1-sigma"
+    assert all(
+        row["values"]["quantity"]
+        == "regressed_log10_fe3_fe2_vs_inverse_temperature_slope"
+        and row["values"]["schema_gap"] == "no_matching_quantity_token"
+        for row in rows
+    )
+    assert all("fO2" not in row["values"] for row in rows)
+
+    by_name = {row["values"]["series_name"]: row for row in rows}
+    assert by_name["Humphrey"]["values"]["attribution"] == (
+        "Aithala, Macris & Hirschmann (2026), present study"
+    )
+    assert by_name["Humphrey"]["values"]["h_c"]["as_printed"] == "4894±232.5"
+    assert by_name["NMF"]["values"]["attribution"] == "compiled from Kennedy (1948)"
+    assert by_name["IC-2"]["values"]["temperature_range_C"] == {
+        "as_printed": "1342–1443",
+        "min": "1342",
+        "max": "1443",
+    }
+    assert by_name["IC-2"]["values"]["h_c"]["as_printed"] == "-1960±406"
+    assert by_name["IC-2"]["locator"]["page"] == 16
+    assert by_name["IC-2"]["values"]["composition_context_as_printed"] == {
+        "SiO2_wt_pct": "73.76",
+        "FeO_star_wt_pct": "3.24",
+    }
+    assert by_name["121"]["values"]["h_c"]["as_printed"] == "-909.0*"
+    assert by_name["121"]["values"]["h_c"]["uncertainty"]["state"] == {
+        "tag": "unknown",
+        "reason": "two-point series; no fitted uncertainty is printed (Table S-5 asterisk note)",
+    }
+    assert by_name["HAFS"]["values"]["h_c"]["as_printed"] == "10190±4510"
+    assert by_name["HAFS"]["locator"]["page"] == 17
+
+    table = next(
+        row for row in doc["species"]["Fe"]["context"]
+        if row.get("locator", {}).get("table") == "S-5"
+    )
+    assert table["values"]["series_count"] == 61
+    assert "regressed slope of log(XFe3+/XFe2+)" in table["values"]["slope_definition_as_printed"]
+    assert table["values"]["log_base"] == 10
+    assert "Inferred" in table["values"]["log_base_basis"]
+    assert "two experiments" in table["values"]["asterisk_note_as_printed"]
+
+
+def test_aithala_locators_resolve_to_their_pdf_asset():
+    from simulator.battery.migrate import Migrator, choose_read_from
+    from simulator.battery.records import Locator
+
+    source_id = "aithala-2026-magmatic-iron-redox-to-2100c"
+    extract_path = EXTRACTS / f"{source_id}.yaml"
+    doc = load_cached_safe_yaml(extract_path.read_text(encoding="utf-8"))
+    index = yaml.safe_load((REPO_ROOT / "data/literature/INDEX.yaml").read_text())
+    index_row = next(row for row in index["sources"] if row["source_id"] == source_id)
+    migrator = Migrator(root=REPO_ROOT, index={source_id: index_row}, aliases={})
+    migrator._migrate_extract(extract_path)
+    work = next(
+        work for work in migrator.result.works.values() if source_id in work.source_ids
+    )
+    assets = {asset.asset_id: asset for asset in work.source_files.files}
+    article_path = index_row["corpus"]["raw"]["path"]
+    article_sha256 = index_row["corpus"]["raw"]["sha256"]
+    si_asset_id = f"pdf:{source_id}-si"
+    si_path = (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c-si.pdf"
+    )
+    si_sha256 = "ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa"
+    assert assets[si_asset_id].path == si_path
+    assert assets[si_asset_id].sha256.value == si_sha256
+
+    def assert_assets_resolve(extract):
+        locators = list(iter_locators(extract))
+        assert len(locators) == 437
+        for locator in locators:
+            is_si = str(locator.get("published_page", "")).startswith("SI-")
+            expected_path, expected_sha, expected_asset = (
+                (si_path, si_sha256, si_asset_id)
+                if is_si
+                else (article_path, article_sha256, f"pdf:{source_id}")
+            )
+            read_from = choose_read_from(
+                work, Locator(source_path=locator["source_path"])
+            )
+            assert read_from == expected_asset
+            assert locator["source_path"] == expected_path
+            assert locator["source_sha256"] == expected_sha
+            assert assets[read_from].path == expected_path
+            assert assets[read_from].sha256.value == expected_sha
+
+    assert_assets_resolve(doc)
+    mutated = copy.deepcopy(doc)
+    si_locator = next(
+        locator
+        for locator in iter_locators(mutated)
+        if str(locator.get("published_page", "")).startswith("SI-")
+    )
+    si_locator["source_path"] = article_path
+    assert_regression_raises_assertion_without_skip(
+        lambda: assert_assets_resolve(mutated)
+    )
+
+
 # Measured on this corpus. Six ``observations[<integer>]`` pins are positions
 # and do not cover; counting them would report 46,335 observations in 524
 # extracts. Equipment pins also do not cover a measured payload
@@ -5517,17 +5767,36 @@ def test_fidelity_sample_matches_extract(extract_path: Path):
 # group are one number. No extract is review_status reviewed and no sample
 # has reviewed_by, so the source matcher does not run. Recount held at the
 # same ceilings.
-# Both coverage ceilings may only fall.
+# Existing extract contributions may only fall. New extracts add only their
+# measured warning contributions, with the per-extract changes recorded below.
 # b261 landing: the main join adds 67 extracts (782 -> 849). Re-derived with
 # vle.fidelity_source_warnings over every extract on the regen tree cf19376f3:
 # uncovered observations 48664 -> 50791, uncovered extracts 617 -> 639,
 # unattested 3131 -> 3385; pilot pins unchanged at 57. New extracts, not a
 # fidelity regression in existing ones.
-# The current merged extract inventory adds one unattested-sample warning;
-# the non-finite-evidence ceiling remains independent and may only fall.
-_UNCOVERED_OBSERVATIONS_CEILING = 50791
-_UNCOVERED_EXTRACTS_CEILING = 639
-_UNATTESTED_SAMPLES_CEILING = 3385
+# 2026-11-16 t-1859 Cohen: uncovered observations 50791 -> 50806, extracts 639 -> 640, unattested samples 3385 -> 3389.
+# 2026-11-16 t-1859 Navrotsky: uncovered observations 50806 -> 50856, extracts 640 -> 641, unattested samples 3389 -> 3395.
+# 2026-11-16 t-1859 Pretorius: uncovered observations 50856 -> 51560, extracts 641 -> 642, unattested samples 3395 -> 3396.
+# 2026-11-16 t-1859 Smythe: uncovered observations 51560 -> 51564, extracts 642 -> 643, unattested samples 3396 -> 3399.
+# 2026-11-16 t-1859 Van Westrenen: uncovered observations 51564 -> 51590, extracts 643 -> 644, unattested samples 3399 -> 3402.
+# t-1859 recovery (2026-11-16): re-derived with vle.fidelity_source_warnings;
+# the Floss extract contributes 641 uncovered observations, 1 uncovered
+# extract, and 3 unattested samples. Existing extract counts are unchanged:
+# uncovered observations 50791 -> 51432, extracts 639 -> 640, samples
+# 3385 -> 3388.
+# The six t-1859 extracts add no source_blind_pin warnings on b268r2; the
+# unmounted corpus-wide total remains 124, and the corpus root opens those pins.
+# The merged-tree fidelity resolver recounts 3,406 unattested samples.
+# Each ceiling may only fall.
+# 2026-11-17 t-1645: Table S-5 adds 61 row-addressable observations to the
+# already-uncovered Aithala extract and 3 located fidelity samples (uncovered
+# extracts unchanged; the source was already counted). 2026-11-18 combined with
+# the fam13/Floss replay (t-1859), whose own recount gave 52231 / 645 / 3406:
+# 52231 + 61 = 52292 observations, 645 extracts, 3406 + 3 = 3409 samples.
+# No reviewed_by was added. These ceilings may only fall.
+_UNCOVERED_OBSERVATIONS_CEILING = 52292
+_UNCOVERED_EXTRACTS_CEILING = 645
+_UNATTESTED_SAMPLES_CEILING = 3409
 _PILOT_PIN_EXTRACTS_CEILING = 57
 # The warning count, not the number of extracts that have at least one.
 # A second pilot pin inside an already-affected extract must still fail.
@@ -5712,9 +5981,21 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     assert "fidelity_samples[0]" in shults_warning.detail
     assert "reviewed_by is required" in shults_warning.detail
     assert "reviewed_on must be an ISO YYYY-MM-DD date" in shults_warning.detail
-    # This one source sample is pinned separately by identity; the aggregate
-    # ceiling remains at the pre-merge 3,385 for every other unattested sample.
-    unattested_samples -= shults_warning.count
+    # Its identity and reason are pinned separately; its warning remains part
+    # of the merged-corpus aggregate below.
+    floss_doc = next(
+        doc
+        for label, doc in documents
+        if label == "floss-1998-corundum-hibonite-evaporation-residues"
+    )
+    floss_warnings = Counter()
+    for warning in vle.fidelity_source_warnings(
+        floss_doc, label="floss-1998-corundum-hibonite-evaporation-residues"
+    ):
+        floss_warnings[warning.kind] += warning.count
+    assert floss_warnings == Counter(
+        {"uncovered_observation": 641, "unattested_sample": 3}
+    )
     pilot_pins = unmounted["auto_migrated_pilot_pin"]
     pilot_extracts = unmounted_extract_counts["auto_migrated_pilot_pin"]
     source_blind_pins = unmounted["source_blind_pin"]
@@ -14623,7 +14904,7 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
             "hastie-1981-pt-kms",
             "hastie-1981-kms",
             "KMS data with Pt-cell orifice diameter of 0.34 mm.",
-            "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906",
+            None,
         ),
         (
             "metsoc-2019-6005.yaml",
@@ -14648,8 +14929,32 @@ def test_printed_experiment_bench_links_carry_locator(tmp_path: Path):
         assert experiment.locator is not None
         assert quote in (experiment.locator.note or "")
         assert experiment.bench_id in result.benches
-        for observation in observations_named(result, obs_local):
-            assert observation.experiment_id == experiment.experiment_id
+        if obs_local is not None:
+            for observation in observations_named(result, obs_local):
+                assert observation.experiment_id == experiment.experiment_id
+
+    hastie_extract = yaml.safe_load(
+        (EXTRACTS / "kems-020-hastie-1981-nbsir.yaml").read_text(encoding="utf-8")
+    )
+    orifice_id = "hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906"
+    assert all(
+        row.get("observation_id") != orifice_id
+        for species in hastie_extract["species"].values()
+        for row in species.get("observations", ())
+    )
+    orifice = hastie_extract["source_metadata"]["effusion_orifice"]
+    assert orifice["diameter_mm"] == 0.34
+    assert "0.34 mm" in orifice["quote"]
+
+    gamma_id = "hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906"
+    assert gamma_id in {
+        row["observation_id"]
+        for row in hastie_extract["species"]["K2O"].get("context", ())
+    }
+    assert gamma_id not in {
+        row["observation_id"]
+        for row in hastie_extract["species"]["K"].get("context", ())
+    }
 
     hastie = _migrate_real_extract(tmp_path / "hastie-unlinked", "kems-020-hastie-1981-nbsir.yaml")
     table2 = observations_named(hastie, "hastie_1981_table2_k_logP_coefficients")

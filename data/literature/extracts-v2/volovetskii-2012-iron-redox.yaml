@@ -67,7 +67,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: source fO2 is bounded or not absolute; no point fO2_Pa assigned
+      reason: bounded or qualitative fO2 retained as a typed condition
     total_pressure_Pa:
       tag: value
       value: '101325'
@@ -97,7 +97,12 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - fe3_fe2_ratio
+    reason: bound_type=printed_inequality; interval condition not yet scorable
+    origin: volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1498.15:h=c13a26b4a50c
   source_id: volovetskii-2012-iron-redox
   locator:
     page: 4

@@ -50,6 +50,17 @@ from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
     supervised_process_map,
 )
+from simulator.battery.source_declarations import (
+    HASHIMOTO_RESIDUE_PREDICTOR,
+    SOSSI_RESIDUE_PREDICTOR,
+    declared_residue_predictor as _declared_residue_predictor,
+    source_rule_enabled as _source_rule_enabled,
+)
+from simulator.source_ids import (
+    HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
+    SF04_WORKBOOK_SOURCE_ID,
+    SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+)
 from simulator.battery.enums import (
     QUANTITY_UNITS,
     AdmissionStatus,
@@ -101,6 +112,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import (
     Identity,
     SweepIdentity,
+    ValenceBasis,
     WallIdentity,
     IdentityEqualKind,
     IdentityEqualOutcome,
@@ -143,7 +155,12 @@ from simulator.battery.input_provenance import (
     printed_single_melt_evidence,
     single_phase_printed_bulk_policy,
 )
-from simulator.physical_constants import ATM_PA_DECIMAL, GAS_CONSTANT, PA_PER_BAR
+from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
+    GAS_CONSTANT,
+    GAS_CONSTANT_DECIMAL,
+    PA_PER_BAR,
+)
 
 if TYPE_CHECKING:
     from simulator.diagnostic_helpers.binary_pot_battery import Po2Request
@@ -176,13 +193,17 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
+    effective_run_composition,
+    invalid_run_composition,
     ALPHA_GAS_SYSTEM_H2,
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     Bench,
     CandidateRequest,
@@ -225,12 +246,14 @@ from simulator.battery.score_report import (
     _e15_number,
     _score_shard_failure_report_lines,
     format_element_retention_diagnostics,
+    format_assumed_band_report,
     format_store_stamp_report_lines,
     render_legacy_score_report_markdown,
     render_payload_score_report_markdown,
     store_stamp_has_known_revision,
 )
 from simulator.battery.score_report_data import (
+    AssumedBandReport,
     eligibility_failure_census,
     element_retention_report_data,
 )
@@ -410,9 +433,6 @@ def _score_identity_equal(
 
 TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
 TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
-# Engines that consume the SF04 magma companion workbook. Never score them
-# against those rows (chunk-3 carried ruling).
-SF04_WORKBOOK_SOURCE_ID = "sf04-magma-companion-workbook"
 SF04_WORKBOOK_REGIME = "magma_model_companion_workbook"
 
 INTERNAL_CONSISTENCY_STEMS: frozenset[str] = frozenset(
@@ -553,13 +573,13 @@ COEFFICIENT_SOURCE_STORE_IDS: dict[str, tuple[str, ...]] = {
     # B677 and B689 are different bulletins from the B672 Mn rows and
     # are not coefficient sources.
     "ellingham": ("janaf-4th", "nasa-cea-thermo", "nasa-glenn"),
-    "imcc-sf04-v1.0.2": ("sf04-magma-companion-workbook",),
-    "imcc-sf04-ext-v4": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.2-ext-sp-2": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-ext-v1": ("sf04-magma-companion-workbook",),
-    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": ("sf04-magma-companion-workbook",),
+    "imcc-sf04-v1.0.2": (SF04_WORKBOOK_SOURCE_ID,),
+    "imcc-sf04-ext-v4": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.2": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.2-ext-sp-2": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-v1": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-ext-v1": (SF04_WORKBOOK_SOURCE_ID,),
+    "openimcc-v1.0.3-d066-v1-kcaalsi2o7": (SF04_WORKBOOK_SOURCE_ID,),
 }
 _ENGINE_SOURCE_ALIASES: frozenset[str] = frozenset(
     alias for aliases in ENGINE_COEFFICIENT_SOURCES.values() for alias in aliases
@@ -1971,7 +1991,7 @@ def is_internal_consistency(origin: str | None) -> bool:
 
 
 def is_sf04_workbook(observation: Observation) -> bool:
-    if observation.source_id == SF04_WORKBOOK_SOURCE_ID:
+    if _source_rule_enabled(observation.source_id, "sf04_workbook"):
         return True
     evidence = observation.evidence
     if evidence.original_method_class == SF04_WORKBOOK_REGIME:
@@ -2042,18 +2062,26 @@ def _initial_charge_composition_notice(reference: Observation) -> Notice | None:
         for state in states
     ):
         return None
-    if reference.source_id == "kems-020-hastie-1981-nbsir":
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            "composition_role=initial_charge_only: composition = printed initial "
-            "charge; run composition evolves during vaporization"
-        )
-    else:
-        reason = (
-            f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
-            f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: the printed "
-            "composition is the starting charge, not the state of this datum"
-        )
+    existing_proxy_notice = next(
+        (
+            notice
+            for notice in reference.notices
+            if notice.kind is NoticeKind.SOURCE_DISAGREEMENT
+            and notice.reason.startswith(SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX)
+            and INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
+        ),
+        None,
+    )
+    if existing_proxy_notice is not None:
+        # The persisted notice is also the scoring flag that strips bands from
+        # this proxy-backed residual. Keep it in flagged_notices so the band
+        # policy sees it; union_notices deduplicates it in the final row.
+        return existing_proxy_notice
+    reason = (
+        f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+        f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+        f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
+    )
     return Notice(
         kind=NoticeKind.SOURCE_DISAGREEMENT,
         affected_quantities=(quantity,),
@@ -2151,7 +2179,7 @@ def _unverified_apparatus_notices(
     experiment: Experiment | None,
     gates: GateOutcome,
 ) -> tuple[Notice, ...]:
-    """Return the narrow predict-and-flag admission for printed KEMS rows."""
+    """Return apparatus notices for KEMS rows."""
 
     if experiment is None:
         return ()
@@ -2190,6 +2218,11 @@ def _unverified_apparatus_notices(
         and isinstance(reference_state.value, StandardState)
         and phase_token(reference_state.value.endmember) in CONDENSED_PHASES
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
@@ -2218,11 +2251,6 @@ def _unverified_apparatus_notices(
         and author_reported_pressure
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
-    )
-    figure_only_partial_pressure = (
-        quantity is Quantity.P_PARTIAL
-        and reference.evidence.class_.is_value
-        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
     )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
@@ -2330,26 +2358,28 @@ def _unverified_apparatus_notices(
                 )
             )
             continue
+        if fact == "calibration_not_grounded":
+            reason = (
+                f"calibration_not_grounded: "
+                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (f" ({calibration_reason})" if calibration_reason else "")
+            )
+        elif fact == "method_unknown" and unknown_method_activity:
+            reason = (
+                "method_unknown: published activity has a typed condensed "
+                "reference but its experiment method is not stated"
+            )
+        elif fact == "method_unknown":
+            reason = "method_unknown: " + str(
+                detail.get("reason") or "pressure series method is not stated"
+            )
+        else:
+            reason = f"apparatus_unverified:{fact}"
         notices.append(
             Notice(
                 kind=NoticeKind.UNVERIFIED_APPARATUS,
                 affected_quantities=(quantity,),
-                reason=(
-                "calibration_not_grounded: "
-                f"{calibration_notice or 'Calibration is not grounded.'}"
-                + (
-                    f" ({calibration_reason})"
-                    if calibration_reason
-                    else ""
-                )
-                if fact == "calibration_not_grounded"
-                else (
-                    "method_unknown: published activity has a typed condensed "
-                    "reference but its experiment method is not stated"
-                    if fact == "method_unknown"
-                    else f"apparatus_unverified:{fact}"
-                )
-                ),
+                reason=reason,
                 origin=reference.observation_id,
             )
         )
@@ -3924,7 +3954,30 @@ _HOLZHEID_PRINTED_FACTOR_1400_C = "1.94"
 _HOLZHEID_PRINTED_FACTOR_1600_C = "1.66"
 _FEO_WUSTITE_FORMULA = "Fe(1-x)O"
 _FEO_STOICHIOMETRIC_FORMULA = "FeO"
-_DISTIN_SOURCE_ID = "distin-1971-ferrous-silicate-melts"
+# There is no shared observation field linking the printed equation to its
+# activity rows: Takezoe keeps it as context, while the Yuge extract omits its
+# Eqs. 25–27. The repo-wide scan found these three cohorts with the
+# nonstoichiometric Fe_tO(l), Fe-saturated reference. Watanabe 1977 explicitly
+# uses Raoultian pure-liquid FeO; Ohta 1996 reports a different γ(Fe_tO), and
+# the 1993 slag extract carries a separate conversion relation.
+_BANYA_FETO_ACTIVITY_RELATIONS = {
+    # Ban-ya 1980 uses the same Fe_tO(l), Fe-saturated reference as the
+    # conversion printed in Ban-ya, Hino & Takezoe 1985 Eq. 23.
+    "banya-chiba-hikosaka-1980-feto-binary-solid-iron": (
+        "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770 "
+        "(same Fe_tO(l), Fe-saturated reference as the 1980 data)"
+    ),
+    "banya-hino-takezoe-1985-na-fe-silicate-redox": (
+        "Ban-ya, Hino & Takezoe 1985 Eq. 23, p. 1770"
+    ),
+    "banya-hino-yuge-1985-tetsu-feto-sio2-mno-activity": (
+        "Ban-ya, Hino & Yuge 1985 Eqs. 25–27, p. 4 / folio 856"
+    ),
+}
+_TOTAL_IRON_BASIS_RELATION = "total_iron_basis"
+_SOLID_WUSTITE_REFERENCE_UNGROUNDED = (
+    "solid_wustite_reference_conversion_not_grounded"
+)
 # Ruled Darken & Gurry iron–liquid-oxide saturation, Tables III A/B, at the
 # three Table III B temperatures. These are the owner's anchors. A linear fit
 # of the stored line-CN r column does not reproduce them, so they are not
@@ -4153,6 +4206,89 @@ def _feo_reference_factor(
     return (
         (delta_g - delta_f_g) / (JANAF_R_J_PER_MOL_K * temperature_K)
     ).exp()
+
+
+def _banya_feto_to_feo_rs_factor(temperature_K: Decimal) -> Decimal:
+    """Convert Ban-ya's iron-saturated liquid Fe_tO activity to FeO(R.S.).
+
+    Premise: the source reaction is Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.),
+    and at iron saturation a_Fe = 1. Thus K = a_FeO /
+    (a_FetO * a_Fe**(1-t)) = exp(-ΔG19 / RT), giving
+    log10(a_FeO) = log10(a_FetO) - ΔG19[J/mol] / (R T ln 10).
+    Ban-ya, Hino & Takezoe 1985 prints this relation as Eq. 23 (p. 1770;
+    controller physics ruling d-432 calls it Eq. 19); Ban-ya, Hino & Yuge
+    1985 independently prints the same relation in Eqs. 25–27 (p. 4 / folio
+    856). The 1980 set uses the same Fe-saturated Fe_tO reference. The
+    printed ΔG is -2040 + 1.707 T cal/mol. Convert with the owned
+    THERMOCHEMICAL_CALORIE_J; T is K and the owned CODATA
+    GAS_CONSTANT_DECIMAL is J/(mol K), so the exponent is dimensionless.
+    At 1673.15 K, ΔG19 is
+    816.1 cal/mol and the log10 shift is -0.1066 dex (a_FeO = 0.7824
+    a_FetO); ΔG19 = 0 gives equal activities. This relation already performs
+    the reference change and must not receive the D&G/JANAF or N0 factors.
+    """
+
+    delta_g_cal = Decimal("-2040") + Decimal("1.707") * temperature_K
+    delta_g_J = THERMOCHEMICAL_CALORIE_J * delta_g_cal
+    return (-delta_g_J / (GAS_CONSTANT_DECIMAL * temperature_K)).exp()
+
+
+def _banya_feto_activity_comparison(
+    reference: Observation,
+    *,
+    identity: Identity,
+    standard_state: StandardState,
+    quantity: Quantity,
+    temperature_K: Decimal,
+    relation_citation: str,
+) -> Observation:
+    factor = _banya_feto_to_feo_rs_factor(temperature_K)
+    converted = reference.value.point * factor
+    conversion_notice = Notice(
+        kind=NoticeKind.DERIVATION_USES_COMPILATION,
+        affected_quantities=(quantity,),
+        reason=(
+            f"source_relation={relation_citation}; "
+            "Fe_tO(l) + (1-t) Fe(s,l) = FeO(R.S.); "
+            "source_standard=Fe_tO(l), Fe-saturated; "
+            "destination_standard=FeO(R.S.); "
+            f"source_value={reference.value.point}; "
+            f"converted_value={converted}; "
+            f"factor={_display_decimal(factor, '0.001')}; "
+            f"T={temperature_K} K"
+        ),
+        origin=reference.observation_id,
+    )
+    assumption_notice = Notice(
+        kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+        affected_quantities=(quantity,),
+        reason=(
+            "model_basis_assumption: FeO(l) D&G/Masson is treated as "
+            "identical to source FeO(R.S.) for prediction"
+        ),
+        origin=reference.observation_id,
+    )
+    notices: tuple[Notice, ...] = (conversion_notice, assumption_notice)
+    row_band = _printed_uncertainty_band(
+        quantity,
+        reference.uncertainty,
+        reference.value.point,
+        source_observation=reference,
+    )
+    if row_band.notice is not None:
+        notices += (row_band.notice,)
+    stoichiometric = _stoichiometric_standard(standard_state)
+    if identity.species.formula == "Fe_tO":
+        identity = replace(
+            identity,
+            species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
+        )
+    return replace(
+        reference,
+        identity=replace(identity, reference_state=State.of(stoichiometric)),
+        value=replace(reference.value, point=converted),
+        notices=union_notices(reference.notices, notices),
+    )
 
 
 def _feo_jackknife_factors(
@@ -4490,9 +4626,10 @@ def _iron_saturated_feo_calibration() -> tuple[
 def _iron_saturated_feo_comparison(
     reference: Observation, *, engine: Engine | None
 ) -> Observation | None:
-    """Retag iron-saturated Fe(1-x)O(l) onto the comparison FeO frame.
+    """Retag iron-saturated wüstite activity onto the comparison FeO frame.
 
-    An iron-saturated Fe(1-x)O standard has chemical potential
+    Ban-ya's Fe_tO sources use their printed Fe_tO(l) -> FeO(R.S.) relation.
+    Other iron-saturated Fe(1-x)O sources have chemical potential
     mu_FeO = mu_Fe + mu_O; a_Fe = 1 fixes mu_Fe. The gas-ratio factor f
     carries that partial onto JANAF Fe-019. iron_saturation_composition owns
     the typed saturation composition and its comparison band; N0 is not a
@@ -4529,6 +4666,20 @@ def _iron_saturated_feo_comparison(
     if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
         return None
     standard_state = identity.reference_state.value
+    banya_relation_citation = _BANYA_FETO_ACTIVITY_RELATIONS.get(
+        reference.source_id
+    )
+    banya_source_relation = banya_relation_citation is not None
+    species_formulas = (
+        {_FEO_STOICHIOMETRIC_FORMULA, "Fe_tO"}
+        if banya_source_relation
+        else {_FEO_STOICHIOMETRIC_FORMULA}
+    )
+    standard_formulas = (
+        {_FEO_WUSTITE_FORMULA, "Fe_tO"}
+        if banya_source_relation
+        else {_FEO_WUSTITE_FORMULA}
+    )
     if standard_state.convention is ReferenceStateConvention.TEMKIN:
         # Route Temkin through this function's recorded iron-saturation owner.
         pass
@@ -4538,9 +4689,9 @@ def _iron_saturated_feo_comparison(
     ):
         return None
     if (
-        identity.species.formula != _FEO_STOICHIOMETRIC_FORMULA
-        or standard_state.endmember.formula != _FEO_WUSTITE_FORMULA
-        or standard_state.component_basis != _FEO_WUSTITE_FORMULA
+        identity.species.formula not in species_formulas
+        or standard_state.endmember.formula not in standard_formulas
+        or standard_state.component_basis != standard_state.endmember.formula
         or phase_token(standard_state.endmember) is not Phase.L
         or reference.value.kind is not ValueKind.POINT
         or reference.value.point is None
@@ -4564,9 +4715,23 @@ def _iron_saturated_feo_comparison(
                 "has no temperature_K"
             ),
             origin=reference.observation_id,
-            band="Darken & Gurry iron-boundary conversion requires temperature_K",
+            band=(
+                "Ban-ya Fe_tO to FeO(R.S.) conversion requires temperature_K"
+                if banya_source_relation
+                else "Darken & Gurry iron-boundary conversion requires temperature_K"
+            ),
         )
         return replace(reference, notices=union_notices(reference.notices, (notice,)))
+    if banya_relation_citation is not None:
+        return _banya_feto_activity_comparison(
+            reference,
+            identity=identity,
+            standard_state=standard_state,
+            quantity=quantity,
+            temperature_K=temperature_K,
+            relation_citation=banya_relation_citation,
+        )
+
     composition_decision = iron_saturation_composition(reference)
     composition_notice = _composition_notice(
         reference, composition_decision, quantity
@@ -4678,11 +4843,12 @@ def fusion_comparison_reference(
     """Single owner of reference-state selection for the scorer and the melt benchmark.
 
     Crystal activities move onto the liquid endmember by the JANAF fusion
-    energy. Iron-saturated Fe(1-x)O(l) activities, including Distin's
-    tabulated oxygen ratio, move onto stoichiometric FeO(l) by the Darken
-    & Gurry factor f alone (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)
-    from the measured Fe/oxide equilibrium and JANAF). N0 parameterises the
-    iron-saturation composition and its d-333 band; it is not a second divisor.
+    energy. Ban-ya Fe_tO activities use the source's Fe_tO(l) -> FeO(R.S.)
+    relation. Other iron-saturated Fe(1-x)O(l) activities, including Distin's
+    oxygen ratio, use the Darken & Gurry factor f to reach stoichiometric
+    FeO(l) (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)). N0
+    parameterises the other sources' iron-saturation composition and band; it
+    is not an additional activity factor.
     """
 
     iron_saturated = _iron_saturated_feo_comparison(reference, engine=engine)
@@ -4690,6 +4856,35 @@ def fusion_comparison_reference(
         return iron_saturated
 
     identity = reference.identity
+    if (
+        reference.admission.status is AdmissionStatus.ADMITTED
+        and isinstance(identity, Identity)
+        and quantity_token(identity)
+        in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}
+        and identity.reference_state is not None
+        and identity.reference_state.is_value
+        and isinstance(identity.reference_state.value, StandardState)
+    ):
+        standard = identity.reference_state.value
+        if (
+            standard.endmember.formula
+            in {_FEO_WUSTITE_FORMULA, "Fe0.947O"}
+            and phase_token(standard.endmember) is Phase.CR
+        ):
+            notice = Notice(
+                kind=NoticeKind.OUT_OF_GAMMA_DOMAIN,
+                affected_quantities=(quantity_token(identity),),
+                reason=_SOLID_WUSTITE_REFERENCE_UNGROUNDED,
+                origin=reference.observation_id,
+                band=(
+                    "solid wüstite to stoichiometric FeO requires a sourced "
+                    "stoichiometry correction and solid/liquid standard-state term"
+                ),
+            )
+            return replace(
+                reference,
+                notices=union_notices(reference.notices, (notice,)),
+            )
     if (
         reference.admission.status is not AdmissionStatus.ADMITTED
         or not isinstance(identity, Identity)
@@ -6453,6 +6648,67 @@ def _metric_uncertainty_width(
     return None
 
 
+def _assumed_method_class_band(
+    observation: Observation, experiment: Experiment | None, reference: Decimal,
+) -> dict[str, object]:
+    selected = select_method_class_band(observation, experiment)
+    if "refusal" in selected:
+        return selected
+    quantity = quantity_token(observation.identity)
+    operation = _residual_metric_operation(quantity, observation)
+    precision = selected["precision"]
+    amount = Decimal(precision["value"])
+    amount_unit = "fraction"
+    if precision["basis"] == "ferric_fraction":
+        fraction_form = (
+            quantity is Quantity.VALENCE_RATIO
+            and _fe_valence_named_form(observation.identity) == "fraction"
+        )
+        if quantity is Quantity.VALENCE_RATIO and _fe_valence_named_form(
+            observation.identity
+        ) not in {"fraction", "ratio"}:
+            return {"refusal": {"reason": "method_class_fe_observable_unmatched"}}
+        fraction = reference if fraction_form else next(
+            (
+                condition.state.value
+                for name, condition in (observation.point_conditions or {}).items()
+                if name in FERRIC_FRACTION_FIELDS
+                and condition.locator is not None and condition.state.is_value
+            ),
+            None,
+        )
+        if not isinstance(fraction, Decimal) or (
+            not fraction_form
+            and fe3_fe2_ratio_from_ferric_fraction(fraction) != reference
+        ):
+            return {"refusal": {"reason": "method_class_ferric_fraction_unknown"}}
+        propagated, reason = _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+            fraction, amount
+        )
+        if propagated is None:
+            return {"refusal": {"reason": reason}}
+        amount, amount_unit = (
+            (amount, "dimensionless") if fraction_form else (propagated, "dex")
+        )
+    width = _metric_uncertainty_width(
+        operation, quantity, reference, amount, amount_unit
+    )
+    if width is None or not width.is_finite() or width <= 0:
+        return {"refusal": {"reason": "method_class_metric_domain"}}
+    return {
+        "class_id": selected["class_id"],
+        "version": selected["version"],
+        "citation": selected["citation"],
+        "precision": precision,
+        "band": DecisionBand(
+            width,
+            "dimensionless" if operation is not MetricOperation.ABSOLUTE else QUANTITY_UNITS[quantity],
+            f"assumed_band: {selected['class_id']}; confidence unstated",
+            band_basis="method_class_assumed",
+        ),
+    }
+
+
 def _combine_independent_standard_uncertainties(
     first: Decimal,
     second: Decimal,
@@ -6587,6 +6843,84 @@ def _is_standard_pressure_ambiguity_uncertainty(
     )
 
 
+def _total_iron_basis_band(
+    quantity: Quantity,
+    uncertainty: Uncertainty,
+    source_observation: Observation | None,
+) -> _PrintedBandResolution:
+    derivation = uncertainty.derivation
+    if (
+        uncertainty.kind is not UncertaintyKind.DERIVED
+        or derivation is None
+        or derivation.relation != _TOTAL_IRON_BASIS_RELATION
+    ):
+        return _PrintedBandResolution()
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_quantity_unmapped"}
+        )
+    if source_observation is None:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_source_observation_missing"}
+        )
+    located = (source_observation.point_conditions or {}).get("composition")
+    composition = (
+        located.state.value
+        if isinstance(located, Located) and located.state.is_value
+        else None
+    )
+    if (
+        not isinstance(composition, Composition)
+        or composition.amount_basis is not AmountBasis.MOLE_FRACTION
+    ):
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_mole_composition_missing"}
+        )
+    components = dict(composition.components)
+    feo = components.get("FeO", Decimal(0))
+    if "Fe2O3" not in components:
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_ferric_analysis_missing"}
+        )
+    fe2o3 = components["Fe2O3"]
+    total_iron = feo + 2 * fe2o3
+    if (
+        not feo.is_finite()
+        or not fe2o3.is_finite()
+        or feo <= 0
+        or total_iron <= 0
+    ):
+        return _PrintedBandResolution(
+            refusal={"reason": "total_iron_basis_ferric_split_invalid"}
+        )
+
+    # FetO counts all Fe as FeO. On the source mole-fraction oxide basis,
+    # FeO contributes one ferrous Fe per formula unit and Fe2O3 contributes
+    # two ferric Fe. Thus f_Fe2+ = x_FeO/(x_FeO + 2*x_Fe2O3). The largest
+    # log10 activity shift hidden by total-iron reporting is |log10(f_Fe2+)|;
+    # applying it symmetrically gives the conservative per-row half-width.
+    fe2plus_fraction = feo / total_iron
+    width_dex = abs(fe2plus_fraction.log10())
+    band = DecisionBand(
+        width_dex,
+        "dimensionless",
+        "total_iron_basis: source FeO/Fe2O3 ferric split bounds hidden Fe3+",
+        band_basis="derived_bound",
+    )
+    notice = Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason=(
+            "total_iron_basis: FetO counts total Fe as FeO; the score band "
+            f"uses source f_Fe2+={fe2plus_fraction}"
+        ),
+        origin=source_observation.observation_id,
+        band=f"{width_dex} dex",
+        authority=Authority.DERIVED,
+    )
+    return _PrintedBandResolution(band=band, notice=notice)
+
+
 def _printed_uncertainty_band(
     quantity: Quantity,
     uncertainty: Uncertainty | None,
@@ -6599,6 +6933,15 @@ def _printed_uncertainty_band(
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
+    total_iron = _total_iron_basis_band(
+        quantity, uncertainty, source_observation
+    )
+    if (
+        uncertainty.kind is UncertaintyKind.DERIVED
+        and uncertainty.derivation is not None
+        and uncertainty.derivation.relation == _TOTAL_IRON_BASIS_RELATION
+    ):
+        return total_iron
     if _is_standard_pressure_ambiguity_uncertainty(uncertainty):
         width = uncertainty.value
         if (
@@ -6983,6 +7326,16 @@ def _alignment_axes(profile: object) -> tuple[str, ...]:
     )
 
 
+def _accepted_axis_value(name: str, value: object, profile: object) -> object | None:
+    """Plain token of a value axis, or None when this profile rejects that axis."""
+
+    required = name in profile.required
+    permitted_na = name in profile.permitted_not_applicable
+    if not required and not permitted_na:
+        return None
+    return to_plain(value)
+
+
 def _axis_alignment_value(identity: Identity, name: str, profile: object) -> object | None:
     state = getattr(identity, name)
     required = name in profile.required
@@ -6990,9 +7343,7 @@ def _axis_alignment_value(identity: Identity, name: str, profile: object) -> obj
     if state is None:
         return {"state": "not_applicable"} if not required else None
     if state.is_value:
-        if not required and not permitted_na:
-            return None
-        return to_plain(state.value)
+        return _accepted_axis_value(name, state.value, profile)
     if state.is_not_applicable and permitted_na and not required:
         return {"state": "not_applicable"}
     return None
@@ -7101,7 +7452,9 @@ def _source_band_catalog(
     ratchet_entries: Mapping[str, Mapping[str, object]],
 ) -> tuple[dict[str, DecisionBand], list[dict[str, object]], dict[str, str]]:
     from simulator.battery.compilation_tier import (
+        _compilation_series_slots,
         _iter_compilation_series_cells,
+        _series_point_cell,
         is_compilation_evidence,
     )
 
@@ -7134,37 +7487,64 @@ def _source_band_catalog(
             continue
         alignment_template: dict[str, object] | None = None
         alignment_profile: object | None = None
-        for cell in _iter_compilation_series_cells(parent, origin):
-            if not isinstance(cell.identity, Identity):
-                continue
-            quantity = quantity_token(cell.identity)
-            if quantity is None:
-                continue
-            magnitude = point_magnitude(cell.value)
-            if magnitude is None or not magnitude.is_finite():
+        template_identity: Identity | None = None
+        slots = _compilation_series_slots(parent, origin)
+        if slots is None:
+            for cell in _iter_compilation_series_cells(parent, origin):
+                if not isinstance(cell.identity, Identity):
+                    continue
+                quantity = quantity_token(cell.identity)
+                if quantity is None:
+                    continue
+                magnitude = point_magnitude(cell.value)
+                if magnitude is None or not magnitude.is_finite():
+                    continue
+                key_doc = _source_alignment_group_key(cell, tier=tier)
+                if key_doc is None:
+                    continue
+                key = _group_token(key_doc)
+                group_keys[key] = key_doc
+                identities[key] = cell.identity
+                source = sources[key].setdefault(
+                    parent.source_id,
+                    {"values": set()},
+                )
+                source["values"].add(magnitude)
+            continue
+        for temperature, magnitude, occurrence in slots:
+            if not magnitude.is_finite():
                 continue
             if alignment_template is None:
+                cell = _series_point_cell(parent, temperature, magnitude, occurrence)
+                if not isinstance(cell.identity, Identity):
+                    continue
+                if quantity_token(cell.identity) is None:
+                    continue
                 key_doc = _source_alignment_group_key(cell, tier=tier)
                 if key_doc is None:
                     continue
                 alignment_template = key_doc
                 alignment_profile = profile_for(cell.identity)
+                template_identity = cell.identity
+                recorded_identity = cell.identity
             else:
+                assert template_identity is not None
                 key_doc = dict(alignment_template)
                 axes = dict(alignment_template["axes"])
                 if "temperature_K" in axes:
                     assert alignment_profile is not None
-                    temperature_axis = _axis_alignment_value(
-                        cell.identity, "temperature_K", alignment_profile
+                    temperature_axis = _accepted_axis_value(
+                        "temperature_K", temperature, alignment_profile
                     )
                     if temperature_axis is None:
                         continue
                     axes["temperature_K"] = temperature_axis
                 key_doc["axes"] = axes
-                key_doc["aligned_T_K"] = _source_aligned_temperature(cell.identity)
+                key_doc["aligned_T_K"] = to_plain(temperature)
+                recorded_identity = template_identity
             key = _group_token(key_doc)
             group_keys[key] = key_doc
-            identities[key] = cell.identity
+            identities[key] = recorded_identity
             source = sources[key].setdefault(
                 parent.source_id,
                 {"values": set()},
@@ -8571,6 +8951,32 @@ class _FeRedoxRefusal:
     detail: dict[str, object]
 
 
+def _scored_valence_basis_shape(basis: ValenceBasis) -> tuple[int, str] | None:
+    """Single-numerator fraction or oxidation-state ratio, or None.
+
+    A fraction uses the total element as its denominator. A ratio or
+    log10 ratio uses one other oxidation state. Callers still decide
+    which states that element is allowed to score. Iron rejects a
+    log10 printing itself; this shape does not.
+    """
+
+    numerator = basis.numerator_oxidation_states
+    if len(numerator) != 1:
+        return None
+    if (
+        basis.value_form is ValenceValueForm.FRACTION
+        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
+    ):
+        return numerator[0], "fraction"
+    if (
+        basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
+        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
+        and basis.denominator_oxidation_state is not None
+    ):
+        return numerator[0], "ratio"
+    return None
+
+
 def _openimcc_candidate_valence_fields(
     identity: Identity,
 ) -> Mapping[int, str] | None:
@@ -8586,20 +8992,18 @@ def _openimcc_candidate_valence_fields(
     basis_state = identity.valence_basis
     if basis_state is None or not basis_state.is_value:
         return None
-    basis = basis_state.value
-    numerator = basis.numerator_oxidation_states
-    if len(numerator) != 1 or numerator[0] not in fields:
+    shaped = _scored_valence_basis_shape(basis_state.value)
+    if shaped is None:
         return None
-    if (
-        basis.value_form is ValenceValueForm.FRACTION
-        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    ):
+    numerator_state, kind = shaped
+    if numerator_state not in fields:
+        return None
+    if kind == "fraction":
         return fields
+    denominator_state = basis_state.value.denominator_oxidation_state
     if (
-        basis.value_form in {ValenceValueForm.RATIO, ValenceValueForm.LOG10_RATIO}
-        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
-        and basis.denominator_oxidation_state in fields
-        and basis.denominator_oxidation_state != numerator[0]
+        denominator_state in fields
+        and denominator_state != numerator_state
     ):
         return fields
     return None
@@ -9013,7 +9417,12 @@ def _openimcc_redox_result_evidence(
 def _distin_has_fe_metal_saturation(
     observation: Observation, experiment: Experiment | None
 ) -> bool:
-    if observation.source_id != _DISTIN_SOURCE_ID or experiment is None:
+    if (
+        not _source_rule_enabled(
+            observation.source_id, "distin_fe_metal_saturation"
+        )
+        or experiment is None
+    ):
         return False
     condition = experiment.fe_metal_saturated
     return (
@@ -9329,14 +9738,10 @@ def _predict_redox(
             if candidate_fields is not None and identity.species is not None
             else "Fe"
         )
-        if inventory.get("Fe", 0.0) <= 0.0:
-            return refused(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {
-                    "reason": "missing_input",
-                    "input": "total_iron",
-                },
-            )
+        # The scored element is the missing input for this row. Iron is a
+        # solver requirement (openimcc refuses a zero Fe inventory), checked
+        # after the scored element so a Cr or Ti row that also lacks iron is
+        # not reported as total_iron.
         if (
             redox_element != "Fe"
             and inventory.get(redox_element, 0.0) <= 0.0
@@ -9346,6 +9751,14 @@ def _predict_redox(
                 {
                     "reason": "missing_input",
                     "input": f"total_{redox_element.lower()}",
+                },
+            )
+        if inventory.get("Fe", 0.0) <= 0.0:
+            return refused(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {
+                    "reason": "missing_input",
+                    "input": "total_iron",
                 },
             )
         try:
@@ -11048,19 +11461,16 @@ def _fe_valence_named_form(identity: Identity) -> str:
     if basis_state is None or not basis_state.is_value:
         return "other_fe"
     basis = basis_state.value
-    numerator = basis.numerator_oxidation_states
+    shaped = _scored_valence_basis_shape(basis)
+    # Iron scores Fe3+/Fe2+ only as a straight ratio. A log10 printing of
+    # the same states stays refused.
     if (
-        numerator == (3,)
+        shaped == (3, "ratio")
         and basis.value_form is ValenceValueForm.RATIO
-        and basis.denominator_kind is ValenceDenominatorKind.OXIDATION_STATE
         and basis.denominator_oxidation_state == 2
     ):
         return "ratio"
-    if (
-        numerator == (3,)
-        and basis.value_form is ValenceValueForm.FRACTION
-        and basis.denominator_kind is ValenceDenominatorKind.TOTAL_ELEMENT
-    ):
+    if shaped == (3, "fraction"):
         return "fraction"
     return "other_fe"
 
@@ -14244,7 +14654,9 @@ def _predict_with_engine(
         )
 
     distin_feo_activity = (
-        observation.source_id == _DISTIN_SOURCE_ID
+        _source_rule_enabled(
+            observation.source_id, "distin_fe_metal_saturation"
+        )
         and quantity is Quantity.ACTIVITY
         and formula.strip().casefold() == "feo"
     )
@@ -14500,14 +14912,46 @@ def _predict_with_engine(
                 requested_composition=requested,
                 version=activity.activity_model,
             )
-    elif identity.composition is not None and identity.composition.is_value:
+    elif quantity in _VAPOUR_EQUILIBRIUM and invalid_run_composition(
+        run_composition := effective_run_composition(
+            identity, observation.point_conditions
+        )
+    ):
+        # An invalid printed run map refuses before the pure-reservoir
+        # fallback. The charge proxy is not a substitute for that map.
+        assert run_composition is not None
+        return _input_refusal(
+            engine=engine,
+            channel=channel,
+            sources=sources,
+            identity=identity,
+            requested=None,
+            reason=RefusalReason.INVALID_SOURCE,
+            detail={
+                "reason": run_composition.reason
+                or RefusalReason.INVALID_SOURCE.value,
+                "consumer": "vapour",
+            },
+            notices=_knudsen_oxygen_refusal_notices(quantity, experiment),
+        )
+    elif (
+        identity.composition is not None
+        and identity.composition.is_value
+        and (
+            run_composition := effective_run_composition(
+                identity, observation.point_conditions
+            )
+        )
+        is not None
+        and run_composition.is_value
+    ):
         if sample_phase_detail is not None:
             return _sample_phase_not_observable_prediction(
                 engine, identity, sample_phase_detail
             )
-        requested = identity.composition
-        assert identity.composition.value is not None
-        composition_value = identity.composition.value
+        requested = run_composition
+        assert run_composition.value is not None
+        composition_value = run_composition.value
     elif quantity in _VAPOUR_EQUILIBRIUM and (
         point_composition := _printed_point_composition(observation)[0]
     ) is not None:
@@ -16025,9 +16469,6 @@ def candidate_observation(
     )
 
 
-_HASHIMOTO_SOURCE_ID = "kems-015-hashimoto-1983"
-
-
 def _openimcc_liquid_row_extrapolated_notice(
     *,
     reason: str,
@@ -16289,7 +16730,8 @@ def _hashimoto_residue_prediction(
             observations = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _HASHIMOTO_SOURCE_ID
+                if _declared_residue_predictor(row.source_id)
+                == HASHIMOTO_RESIDUE_PREDICTOR
                 and row.observation_id.startswith(_HASHIMOTO_SOURCE_ID + "::")
                 and (
                     test_experiment_ids is None
@@ -16322,7 +16764,7 @@ def _hashimoto_residue_prediction(
                 )
             source_path = (
                 REPO_ROOT
-                / "data/literature/extracts/kems-015-hashimoto-1983.yaml"
+                / f"data/literature/extracts/{_HASHIMOTO_SOURCE_ID}.yaml"
             )
             source = load_yaml(source_path)
             geometry = next(
@@ -16619,9 +17061,6 @@ def _hashimoto_residue_prediction(
         )
 
 
-_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
-
-
 def _knudsen_residue_prediction(
     context,
     reference,
@@ -16872,7 +17311,8 @@ def _sossi_residue_prediction(
             live_rows = [
                 row
                 for row in context.observations.values()
-                if row.source_id == _SOSSI_SOURCE_ID
+                if _declared_residue_predictor(row.source_id)
+                == SOSSI_RESIDUE_PREDICTOR
                 and (
                     test_experiment_ids is None
                     or row.experiment_id in test_experiment_ids
@@ -16923,7 +17363,7 @@ def _sossi_residue_prediction(
                     f"{expected_count}",
                 )
             source = load_yaml(
-                REPO_ROOT / "data/literature/extracts/kems-012-sossi-2019.yaml"
+                REPO_ROOT / f"data/literature/extracts/{_SOSSI_SOURCE_ID}.yaml"
             )
             source_experiments = {
                 str(item.get("experiment_id")): item
@@ -17850,9 +18290,48 @@ def _compile_residual_with_lineage(
                 execution=Execution(state=ExecutionState.NOT_PROBED),
             )
     if not gates.passed and not apparatus_flagged:
+        refusal_detail: dict[str, object] = {
+            "primary_check": gates.primary_check,
+            "checks": [check.name for check in gates.checks],
+        }
+        pressure_check = next(
+            (
+                check
+                for check in gates.checks
+                if check.name == "in_cell_partial_pressure_sum" and not check.passed
+            ),
+            None,
+        )
+        if pressure_check is not None:
+            pressure_detail = pressure_check.detail
+            if gates.reason is RefusalReason.METHOD_UNKNOWN:
+                method_check = next(
+                    (
+                        check
+                        for check in gates.checks
+                        if check.name == "method" and not check.passed
+                    ),
+                    None,
+                )
+                if method_check is not None:
+                    refusal_detail["missing_facts"] = {
+                        "method": method_check.detail.get("reason"),
+                        "in_cell_partial_pressure_sum": pressure_detail.get("reason"),
+                    }
+            lower_bound = pressure_detail.get(
+                "printed_partial_pressure_lower_bound_Pa"
+            )
+            pressure_sum = pressure_detail.get("printed_partial_pressure_sum_Pa")
+            if lower_bound is not None:
+                refusal_detail["in_cell_pressure_lower_bound_Pa"] = lower_bound
+            elif pressure_sum is not None:
+                refusal_detail["in_cell_pressure_sum_Pa"] = pressure_sum
+            limit = pressure_detail.get("pressure_limit_Pa")
+            if limit is not None:
+                refusal_detail["limit_Pa"] = limit
         return _refused(
             gates.reason or RefusalReason.INVALID_SOURCE,
-            {"primary_check": gates.primary_check, "checks": [c.name for c in gates.checks]},
+            refusal_detail,
             execution=Execution(state=ExecutionState.NOT_PROBED),
             exclusions=("validity_gates_pass", "status_match_or_mismatch"),
         )
@@ -18514,6 +18993,11 @@ def _compile_residual_with_lineage(
         ref_point = _phase_component_reference_wt_percent(identity, ref_point)
     printed = _PrintedBandResolution()
     fusion_band_refusal: Mapping[str, object] | None = None
+    # The measurement's own refusal, captured before a fusion conversion
+    # replaces ``printed.refusal``. ``conversion_uncertainty_unprinted`` is a
+    # missing JANAF sigma, not a printed uncertainty. d-443 still reads the row.
+    measurement_printed_refusal = None
+    reference_phase_resolved = False
     if implied_alpha:
         numeric, metric_reason, metric_detail = _implied_alpha_numeric(prediction.value)
     else:
@@ -18620,6 +19104,7 @@ def _compile_residual_with_lineage(
             notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
             for notice in reference.notices
         )
+        reference_phase_resolved = not source_phase_missing
         fusion_conversion = any(
             _is_fusion_conversion_notice(notice) for notice in reference.notices
         )
@@ -18708,6 +19193,7 @@ def _compile_residual_with_lineage(
                     standard_uncertainty_dex=sigma_total_dex,
                     two_sigma_band=two_sigma_band,
                 )
+        measurement_printed_refusal = printed.refusal
         if fusion_band_refusal is not None:
             reason = str(fusion_band_refusal["reason"])
             printed = replace(
@@ -18879,6 +19365,21 @@ def _compile_residual_with_lineage(
         NoticeKind.FIGURE_ONLY,
         NoticeKind.REACTIVE_CELL_NOT_MODELLED,
     }
+    initial_charge_figure_band = (
+        numeric.decision_band is not None
+        and numeric.decision_band.band_basis == "row_printed"
+        and evidence_class.is_value
+        and evidence_class.value is EvidenceClass.FIGURE_ONLY
+        and reference.identity.composition is not None
+        and reference.identity.composition.is_value
+        and isinstance(reference.identity.composition.value, Composition)
+        and reference.identity.composition.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    if initial_charge_figure_band:
+        band_preserving_kinds.update(
+            {NoticeKind.SOURCE_DISAGREEMENT, NoticeKind.UNVERIFIED_APPARATUS}
+        )
     if (
         evidence_class.is_value
         and evidence_class.value is EvidenceClass.FIGURE_ONLY
@@ -18927,6 +19428,37 @@ def _compile_residual_with_lineage(
     if is_sf04_workbook(reference):
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
     eligible = conjuncts.eligible()
+    assumed_details = None
+    # d-443 controller clarification: keep NO_BAND, eligibility and all old
+    # headline contributions intact. A literature band is additive metadata.
+    # Gate on the measurement refusal and successful reference-phase
+    # resolution. A fusion-conversion refusal stays on the headline residual
+    # and is not a printed uncertainty.
+    if (
+        not implied_alpha
+        and evidence_class.is_value and evidence_class.value in MEASURED_EVIDENCE
+        and numeric.decision_band is None
+        and printed.band is None
+        and derived_band is None
+        and measurement_printed_refusal is None
+        and reference_phase_resolved
+        and source_method_uncertainty is None
+        and (
+            source_reference.uncertainty.kind is UncertaintyKind.NONE
+            or _verbatim_denies_printed_uncertainty(source_reference.uncertainty)
+        )
+    ):
+        assumed_details = _assumed_method_class_band(
+            source_reference, experiment, ref_point
+        )
+        assumed_details["eligible"] = (
+            "band" in assumed_details and eligible and not has_no_band_flag
+        )
+        if "band" in assumed_details:
+            assumed_details["inside_band"] = match_status(
+                replace(numeric, decision_band=assumed_details["band"])
+            ) is ResidualStatus.MATCH
+        assumed_details["evidence_class"] = evidence_class.value.value
     return (
         Residual(
             key=_key_for_fo2_mode(key, result_mode),
@@ -18936,6 +19468,8 @@ def _compile_residual_with_lineage(
             status=status,
             source_relation=source_relation,
             score_eligible=eligible,
+            assumed_band=True if assumed_details is not None and "band" in assumed_details else None,
+            assumed_band_details=assumed_details,
             exclusions=conjuncts.exclusions(),
             notices=notices,
             candidate=candidate.observation_id,
@@ -23152,6 +23686,21 @@ def all_numeric_payload_records(
 HEADLINE_SUMMARY_KIND = "battery_headline_summary"
 
 
+def _assumed_band_summary(
+    rows: Iterable[Mapping[str, object]],
+    observations: Mapping[str, Observation] | None = None,
+) -> dict[str, object]:
+    report = AssumedBandReport()
+    for row in rows:
+        observation = (observations or {}).get(str(row.get("reference") or ""))
+        quantity = None if observation is None else quantity_token(observation.identity)
+        report.add(
+            row, engine=_engine_from_payload(row),
+            quantity=quantity.value if quantity is not None else _residual_key_quantity(row.get("key")),
+        )
+    return report.payload()
+
+
 def headline_summary_payload(
     records: Sequence[Mapping[str, object]],
     *,
@@ -23183,6 +23732,9 @@ def write_headline_summary_json(
     payload = headline_summary_payload(
         headline_records(residuals, context=context, engines=engines),
         store_stamp=stamp,
+    )
+    payload["assumed_band"] = _assumed_band_summary(
+        (to_plain(row) for row in residuals), context.observations
     )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
@@ -23632,7 +24184,7 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return report
+    return format_assumed_band_report(report, aggregate.assumed_bands.payload())
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -23992,26 +24544,7 @@ class _ResidualJsonlStream:
         self._database: sqlite3.Connection | None = None
         self._order_path: Path | None = None
         self._order_file: TextIO | None = None
-        if sort_on_finalize:
-            self._temporary = tempfile.TemporaryDirectory(
-                prefix="battery-score-index-"
-            )
-            self._database = sqlite3.connect(
-                Path(self._temporary.name) / "residual-order.sqlite"
-            )
-            self._database.execute("PRAGMA cache_size=-16384")
-            self._database.execute("PRAGMA temp_store=FILE")
-            self._database.execute("PRAGMA journal_mode=OFF")
-            self._database.execute("PRAGMA synchronous=OFF")
-            self._database.execute(
-                "CREATE TABLE residual_order ("
-                "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
-                "key TEXT NOT NULL, offset INTEGER NOT NULL, "
-                "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
-                "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
-                "order_subrow INTEGER NOT NULL)"
-            )
-        else:
+        if not sort_on_finalize:
             self._order_path = self.partial_path.with_name(
                 f"{self.partial_path.name}.order"
             )
@@ -24136,6 +24669,7 @@ class _ResidualJsonlStream:
         offset = self.file.tell()
         self.file.write(line + b"\n")
         if self.sort_on_finalize:
+            self._ensure_order_index()
             self._pending.append(
                 (
                     rail,
@@ -24157,6 +24691,29 @@ class _ResidualJsonlStream:
         now = time.monotonic()
         if self.count % self._FLUSH_LINES == 0 or now - self._last_flush >= 5:
             self.flush()
+
+    def _ensure_order_index(self) -> None:
+        # After the score pool forks. An open sqlite connection would be inherited.
+        if self._database is not None or not self.sort_on_finalize:
+            return
+        self._temporary = tempfile.TemporaryDirectory(
+            prefix="battery-score-index-"
+        )
+        self._database = sqlite3.connect(
+            Path(self._temporary.name) / "residual-order.sqlite"
+        )
+        self._database.execute("PRAGMA cache_size=-16384")
+        self._database.execute("PRAGMA temp_store=FILE")
+        self._database.execute("PRAGMA journal_mode=OFF")
+        self._database.execute("PRAGMA synchronous=OFF")
+        self._database.execute(
+            "CREATE TABLE residual_order ("
+            "seq INTEGER PRIMARY KEY, rail TEXT NOT NULL, reference TEXT NOT NULL, "
+            "key TEXT NOT NULL, offset INTEGER NOT NULL, "
+            "band_value TEXT, numeric_value TEXT, order_ref TEXT NOT NULL, "
+            "order_point INTEGER NOT NULL, order_engine INTEGER NOT NULL, "
+            "order_subrow INTEGER NOT NULL)"
+        )
 
     def _flush_index(self) -> None:
         if not self._pending:
@@ -24186,6 +24743,7 @@ class _ResidualJsonlStream:
         self.flush()
         if not self.sort_on_finalize:
             return
+        self._ensure_order_index()
         assert self._database is not None
         self._flush_index()
         self._database.execute(
@@ -24652,6 +25210,7 @@ class _ScorePayloadAccumulator:
             str, dict[tuple[str, str, str], dict[str, object]]
         ] = {"measured": {}, "compilation": {}}
         self.all_numeric = _AllNumericHeadline()
+        self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
         self.report_engine_names: set[str] = set()
@@ -24929,6 +25488,14 @@ class _ScorePayloadAccumulator:
         from simulator.battery.compilation_tier import _tier_cell_from_payload_fields
 
         metadata = row_metadata or self._row_metadata(row)
+        assumed_quantity = (
+            None if metadata.observation is None
+            else quantity_token(metadata.observation.identity)
+        )
+        self.assumed_bands.add(
+            row, engine=metadata.engine,
+            quantity=assumed_quantity.value if assumed_quantity is not None else _residual_key_quantity(row.get("key")),
+        )
         self.count += 1
         if row.get("score_eligible"):
             self.scored_count += 1
@@ -25226,11 +25793,13 @@ class _ScorePayloadAccumulator:
         )
 
     def summary_payload(self, store_stamp: Mapping[str, object] | None) -> dict[str, object]:
-        return headline_summary_payload(
+        payload = headline_summary_payload(
             self.headline_records(),
             store_stamp=store_stamp,
             static_refusals=self.static_refusals,
         )
+        payload["assumed_band"] = self.assumed_bands.payload()
+        return payload
 
 
 def write_headline_summary_from_payloads_json(
@@ -25242,6 +25811,7 @@ def write_headline_summary_from_payloads_json(
     origins: Mapping[str, str] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
+    rows = tuple(rows)
     payload = headline_summary_payload(
         headline_payload_records(
             rows,
@@ -25251,6 +25821,7 @@ def write_headline_summary_from_payloads_json(
         ),
         store_stamp=store_stamp,
     )
+    payload["assumed_band"] = _assumed_band_summary(rows, observations)
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25450,6 +26021,9 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+    )
+    report = format_assumed_band_report(
+        report, _assumed_band_summary(rows, observations)
     )
     if observations is None:
         return report

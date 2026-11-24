@@ -257,12 +257,52 @@ def magemin_subprocess_lock_dir(tmp_path, monkeypatch):
     return lock_dir
 
 
-@pytest.fixture(autouse=True)
-def _box_for_test_owned_engine_caches(monkeypatch: pytest.MonkeyPatch) -> None:
-    """Only a test's explicit temporary cache may serve or store its doubles."""
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+def apply_test_engine_cache_env(
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    cache_off: bool,
+) -> None:
+    """Set the laptop box and, when ``cache_off``, drop the inherited cache.
+
+    The autouse fixture and a test that re-applies the opt-out after seeding
+    an inherited file both call this. ``cache_off`` is ``engine_cache_off``:
+    that test neither reads nor writes the runner file. Every other test
+    keeps it. CI uses that file read-only by default.
+    """
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    if cache_off:
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
+        monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+
+
+@pytest.fixture(autouse=True)
+def _box_for_test_owned_engine_caches(
+    monkeypatch: pytest.MonkeyPatch,
+    request: pytest.FixtureRequest,
+) -> Iterator[None]:
+    """Leave the runner engine cache in place unless this test opts out.
+
+    The cache exists to speed up CI, gates, the accuracy scorecard, user
+    runs, and the optimizer. CI uses it read-only by default. Engines are
+    stateless: the same engine, chemistry version, and request always give
+    the same prediction, so a cached value is the engine's answer and
+    serving it here is valid. Do not delete the cache to isolate a test.
+    ``engine_cache_off`` is the one opt-out, for a test of the cache itself
+    or a test that must run a real engine solve. The key is engine + version
+    + request.
+    """
+
+    from simulator import engine_cache
+
+    apply_test_engine_cache_env(
+        monkeypatch,
+        cache_off=request.node.get_closest_marker("engine_cache_off") is not None,
+    )
+    with engine_cache.runner_engine_cache_snapshot(
+        os.environ.get("REGOLITH_ENGINE_CACHE") or None,
+        os.environ.get("REGOLITH_ENGINE_CACHE_MODE") or "",
+    ):
+        yield
 
 
 @pytest.fixture(autouse=True)

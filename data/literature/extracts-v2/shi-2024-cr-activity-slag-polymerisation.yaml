@@ -4222,9 +4222,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3678685736025514563083123715'
+        - - CaF2
+          - '0.03796271852984615028787222795'
+        - - MgO
+          - '0.1470787959917720144056328574'
+        - - Al2O3
+          - '0.0581390674474714183337133679'
+        - - SiO2
+          - '0.3470902722245738439650329824'
+        - - MnO
+          - '0.0417825684536021776478635527'
+        - - Cr2O3
+          - '0.00007800375018293905157263974702'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -4270,7 +4288,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n1_cro15_activity::T=1823:row=1:h=0a786d798afd
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -4354,9 +4373,27 @@ observations:
         note: Table 3 sample No. 1, CrO1.5 activity.; row=1
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3678685736025514563083123715'
+          - - CaF2
+            - '0.03796271852984615028787222795'
+          - - MgO
+            - '0.1470787959917720144056328574'
+          - - Al2O3
+            - '0.0581390674474714183337133679'
+          - - SiO2
+            - '0.3470902722245738439650329824'
+          - - MnO
+            - '0.0417825684536021776478635527'
+          - - Cr2O3
+            - '0.00007800375018293905157263974702'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -4431,9 +4468,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3678685736025514563083123715'
+        - - CaF2
+          - '0.03796271852984615028787222795'
+        - - MgO
+          - '0.1470787959917720144056328574'
+        - - Al2O3
+          - '0.0581390674474714183337133679'
+        - - SiO2
+          - '0.3470902722245738439650329824'
+        - - MnO
+          - '0.0417825684536021776478635527'
+        - - Cr2O3
+          - '0.00007800375018293905157263974702'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -4479,7 +4534,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n1_cro15_activity_coefficient::T=1823:row=1:h=412656e5d472
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -4563,9 +4619,27 @@ observations:
         note: Table 3 sample No. 1, CrO1.5 activity_coefficient.; row=1
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3678685736025514563083123715'
+          - - CaF2
+            - '0.03796271852984615028787222795'
+          - - MgO
+            - '0.1470787959917720144056328574'
+          - - Al2O3
+            - '0.0581390674474714183337133679'
+          - - SiO2
+            - '0.3470902722245738439650329824'
+          - - MnO
+            - '0.0417825684536021776478635527'
+          - - Cr2O3
+            - '0.00007800375018293905157263974702'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -4641,9 +4715,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3678685736025514563083123715'
+        - - CaF2
+          - '0.03796271852984615028787222795'
+        - - MgO
+          - '0.1470787959917720144056328574'
+        - - Al2O3
+          - '0.0581390674474714183337133679'
+        - - SiO2
+          - '0.3470902722245738439650329824'
+        - - MnO
+          - '0.0417825684536021776478635527'
+        - - Cr2O3
+          - '0.00007800375018293905157263974702'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -4689,7 +4781,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n1_cro_activity::T=1823:row=1:h=be1ff797521b
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -4773,9 +4866,27 @@ observations:
         note: Table 3 sample No. 1, CrO activity.; row=1
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3678685736025514563083123715'
+          - - CaF2
+            - '0.03796271852984615028787222795'
+          - - MgO
+            - '0.1470787959917720144056328574'
+          - - Al2O3
+            - '0.0581390674474714183337133679'
+          - - SiO2
+            - '0.3470902722245738439650329824'
+          - - MnO
+            - '0.0417825684536021776478635527'
+          - - Cr2O3
+            - '0.00007800375018293905157263974702'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -4849,9 +4960,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3678685736025514563083123715'
+        - - CaF2
+          - '0.03796271852984615028787222795'
+        - - MgO
+          - '0.1470787959917720144056328574'
+        - - Al2O3
+          - '0.0581390674474714183337133679'
+        - - SiO2
+          - '0.3470902722245738439650329824'
+        - - MnO
+          - '0.0417825684536021776478635527'
+        - - Cr2O3
+          - '0.00007800375018293905157263974702'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -4897,7 +5026,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n1_cro_activity_coefficient::T=1823:row=1:h=ad99aaeac9bc
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -4981,9 +5111,27 @@ observations:
         note: Table 3 sample No. 1, CrO activity_coefficient.; row=1
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3678685736025514563083123715'
+          - - CaF2
+            - '0.03796271852984615028787222795'
+          - - MgO
+            - '0.1470787959917720144056328574'
+          - - Al2O3
+            - '0.0581390674474714183337133679'
+          - - SiO2
+            - '0.3470902722245738439650329824'
+          - - MnO
+            - '0.0417825684536021776478635527'
+          - - Cr2O3
+            - '0.00007800375018293905157263974702'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -5060,9 +5208,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3679344258144505027860050632'
+        - - CaF2
+          - '0.03796951424213113669939214075'
+        - - MgO
+          - '0.1471051245904469614578836974'
+        - - Al2O3
+          - '0.05814947493118678533950640839'
+        - - SiO2
+          - '0.3468563681798380704377924548'
+        - - MnO
+          - '0.04179004795782986343918238644'
+        - - Cr2O3
+          - '0.0001950442841166798402378485119'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -5108,7 +5274,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n2_cro15_activity::T=1823:row=2:h=01548ec0a4a5
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -5192,9 +5359,27 @@ observations:
         note: Table 3 sample No. 2, CrO1.5 activity.; row=2
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3679344258144505027860050632'
+          - - CaF2
+            - '0.03796951424213113669939214075'
+          - - MgO
+            - '0.1471051245904469614578836974'
+          - - Al2O3
+            - '0.05814947493118678533950640839'
+          - - SiO2
+            - '0.3468563681798380704377924548'
+          - - MnO
+            - '0.04179004795782986343918238644'
+          - - Cr2O3
+            - '0.0001950442841166798402378485119'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -5269,9 +5454,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3679344258144505027860050632'
+        - - CaF2
+          - '0.03796951424213113669939214075'
+        - - MgO
+          - '0.1471051245904469614578836974'
+        - - Al2O3
+          - '0.05814947493118678533950640839'
+        - - SiO2
+          - '0.3468563681798380704377924548'
+        - - MnO
+          - '0.04179004795782986343918238644'
+        - - Cr2O3
+          - '0.0001950442841166798402378485119'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -5317,7 +5520,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n2_cro15_activity_coefficient::T=1823:row=2:h=aace0c22c6a4
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -5401,9 +5605,27 @@ observations:
         note: Table 3 sample No. 2, CrO1.5 activity_coefficient.; row=2
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3679344258144505027860050632'
+          - - CaF2
+            - '0.03796951424213113669939214075'
+          - - MgO
+            - '0.1471051245904469614578836974'
+          - - Al2O3
+            - '0.05814947493118678533950640839'
+          - - SiO2
+            - '0.3468563681798380704377924548'
+          - - MnO
+            - '0.04179004795782986343918238644'
+          - - Cr2O3
+            - '0.0001950442841166798402378485119'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -5479,9 +5701,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3679344258144505027860050632'
+        - - CaF2
+          - '0.03796951424213113669939214075'
+        - - MgO
+          - '0.1471051245904469614578836974'
+        - - Al2O3
+          - '0.05814947493118678533950640839'
+        - - SiO2
+          - '0.3468563681798380704377924548'
+        - - MnO
+          - '0.04179004795782986343918238644'
+        - - Cr2O3
+          - '0.0001950442841166798402378485119'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -5527,7 +5767,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n2_cro_activity::T=1823:row=2:h=49c100a1b40e
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -5611,9 +5852,27 @@ observations:
         note: Table 3 sample No. 2, CrO activity.; row=2
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3679344258144505027860050632'
+          - - CaF2
+            - '0.03796951424213113669939214075'
+          - - MgO
+            - '0.1471051245904469614578836974'
+          - - Al2O3
+            - '0.05814947493118678533950640839'
+          - - SiO2
+            - '0.3468563681798380704377924548'
+          - - MnO
+            - '0.04179004795782986343918238644'
+          - - Cr2O3
+            - '0.0001950442841166798402378485119'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -5687,9 +5946,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3679344258144505027860050632'
+        - - CaF2
+          - '0.03796951424213113669939214075'
+        - - MgO
+          - '0.1471051245904469614578836974'
+        - - Al2O3
+          - '0.05814947493118678533950640839'
+        - - SiO2
+          - '0.3468563681798380704377924548'
+        - - MnO
+          - '0.04179004795782986343918238644'
+        - - Cr2O3
+          - '0.0001950442841166798402378485119'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -5735,7 +6012,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n2_cro_activity_coefficient::T=1823:row=2:h=32790ade4dac
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -5819,9 +6097,27 @@ observations:
         note: Table 3 sample No. 2, CrO activity_coefficient.; row=2
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3679344258144505027860050632'
+          - - CaF2
+            - '0.03796951424213113669939214075'
+          - - MgO
+            - '0.1471051245904469614578836974'
+          - - Al2O3
+            - '0.05814947493118678533950640839'
+          - - SiO2
+            - '0.3468563681798380704377924548'
+          - - MnO
+            - '0.04179004795782986343918238644'
+          - - Cr2O3
+            - '0.0001950442841166798402378485119'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -5898,9 +6194,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3675722715676353698253591589'
+        - - CaF2
+          - '0.03798671984211112713281972615'
+        - - MgO
+          - '0.1471717841719356664283675961'
+        - - Al2O3
+          - '0.05817582492866982730631840927'
+        - - SiO2
+          - '0.3468160962849788939524944268'
+        - - MnO
+          - '0.04180898480394598272045933853'
+        - - Cr2O3
+          - '0.000468318400723132634181344106'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -5946,7 +6260,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n3_cro15_activity::T=1823:row=3:h=d2b3d3b0a99a
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -6030,9 +6345,27 @@ observations:
         note: Table 3 sample No. 3, CrO1.5 activity.; row=3
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3675722715676353698253591589'
+          - - CaF2
+            - '0.03798671984211112713281972615'
+          - - MgO
+            - '0.1471717841719356664283675961'
+          - - Al2O3
+            - '0.05817582492866982730631840927'
+          - - SiO2
+            - '0.3468160962849788939524944268'
+          - - MnO
+            - '0.04180898480394598272045933853'
+          - - Cr2O3
+            - '0.000468318400723132634181344106'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -6107,9 +6440,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3675722715676353698253591589'
+        - - CaF2
+          - '0.03798671984211112713281972615'
+        - - MgO
+          - '0.1471717841719356664283675961'
+        - - Al2O3
+          - '0.05817582492866982730631840927'
+        - - SiO2
+          - '0.3468160962849788939524944268'
+        - - MnO
+          - '0.04180898480394598272045933853'
+        - - Cr2O3
+          - '0.000468318400723132634181344106'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -6155,7 +6506,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n3_cro15_activity_coefficient::T=1823:row=3:h=d6dac693df85
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -6239,9 +6591,27 @@ observations:
         note: Table 3 sample No. 3, CrO1.5 activity_coefficient.; row=3
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3675722715676353698253591589'
+          - - CaF2
+            - '0.03798671984211112713281972615'
+          - - MgO
+            - '0.1471717841719356664283675961'
+          - - Al2O3
+            - '0.05817582492866982730631840927'
+          - - SiO2
+            - '0.3468160962849788939524944268'
+          - - MnO
+            - '0.04180898480394598272045933853'
+          - - Cr2O3
+            - '0.000468318400723132634181344106'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -6317,9 +6687,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3675722715676353698253591589'
+        - - CaF2
+          - '0.03798671984211112713281972615'
+        - - MgO
+          - '0.1471717841719356664283675961'
+        - - Al2O3
+          - '0.05817582492866982730631840927'
+        - - SiO2
+          - '0.3468160962849788939524944268'
+        - - MnO
+          - '0.04180898480394598272045933853'
+        - - Cr2O3
+          - '0.000468318400723132634181344106'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -6365,7 +6753,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n3_cro_activity::T=1823:row=3:h=94f4d4d12c31
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -6449,9 +6838,27 @@ observations:
         note: Table 3 sample No. 3, CrO activity.; row=3
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3675722715676353698253591589'
+          - - CaF2
+            - '0.03798671984211112713281972615'
+          - - MgO
+            - '0.1471717841719356664283675961'
+          - - Al2O3
+            - '0.05817582492866982730631840927'
+          - - SiO2
+            - '0.3468160962849788939524944268'
+          - - MnO
+            - '0.04180898480394598272045933853'
+          - - Cr2O3
+            - '0.000468318400723132634181344106'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -6525,9 +6932,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3675722715676353698253591589'
+        - - CaF2
+          - '0.03798671984211112713281972615'
+        - - MgO
+          - '0.1471717841719356664283675961'
+        - - Al2O3
+          - '0.05817582492866982730631840927'
+        - - SiO2
+          - '0.3468160962849788939524944268'
+        - - MnO
+          - '0.04180898480394598272045933853'
+        - - Cr2O3
+          - '0.000468318400723132634181344106'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -6573,7 +6998,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n3_cro_activity_coefficient::T=1823:row=3:h=596684d6526c
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -6657,9 +7083,27 @@ observations:
         note: Table 3 sample No. 3, CrO activity_coefficient.; row=3
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3675722715676353698253591589'
+          - - CaF2
+            - '0.03798671984211112713281972615'
+          - - MgO
+            - '0.1471717841719356664283675961'
+          - - Al2O3
+            - '0.05817582492866982730631840927'
+          - - SiO2
+            - '0.3468160962849788939524944268'
+          - - MnO
+            - '0.04180898480394598272045933853'
+          - - Cr2O3
+            - '0.000468318400723132634181344106'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -6736,9 +7180,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3672317215615663018791395742'
+        - - CaF2
+          - '0.03800621093119346525241219772'
+        - - MgO
+          - '0.1472472984139556327718783764'
+        - - Al2O3
+          - '0.05820567510238412063221358771'
+        - - SiO2
+          - '0.3466977257230663924831421392'
+        - - MnO
+          - '0.04183043710755742671796266337'
+        - - Cr2O3
+          - '0.0007809311602766602632514608093'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -6784,7 +7246,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n4_cro15_activity::T=1823:row=4:h=1f8c643e5764
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -6868,9 +7331,27 @@ observations:
         note: Table 3 sample No. 4, CrO1.5 activity.; row=4
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3672317215615663018791395742'
+          - - CaF2
+            - '0.03800621093119346525241219772'
+          - - MgO
+            - '0.1472472984139556327718783764'
+          - - Al2O3
+            - '0.05820567510238412063221358771'
+          - - SiO2
+            - '0.3466977257230663924831421392'
+          - - MnO
+            - '0.04183043710755742671796266337'
+          - - Cr2O3
+            - '0.0007809311602766602632514608093'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -6945,9 +7426,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3672317215615663018791395742'
+        - - CaF2
+          - '0.03800621093119346525241219772'
+        - - MgO
+          - '0.1472472984139556327718783764'
+        - - Al2O3
+          - '0.05820567510238412063221358771'
+        - - SiO2
+          - '0.3466977257230663924831421392'
+        - - MnO
+          - '0.04183043710755742671796266337'
+        - - Cr2O3
+          - '0.0007809311602766602632514608093'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -6993,7 +7492,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n4_cro15_activity_coefficient::T=1823:row=4:h=f9d532792011
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -7077,9 +7577,27 @@ observations:
         note: Table 3 sample No. 4, CrO1.5 activity_coefficient.; row=4
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3672317215615663018791395742'
+          - - CaF2
+            - '0.03800621093119346525241219772'
+          - - MgO
+            - '0.1472472984139556327718783764'
+          - - Al2O3
+            - '0.05820567510238412063221358771'
+          - - SiO2
+            - '0.3466977257230663924831421392'
+          - - MnO
+            - '0.04183043710755742671796266337'
+          - - Cr2O3
+            - '0.0007809311602766602632514608093'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -7155,9 +7673,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3672317215615663018791395742'
+        - - CaF2
+          - '0.03800621093119346525241219772'
+        - - MgO
+          - '0.1472472984139556327718783764'
+        - - Al2O3
+          - '0.05820567510238412063221358771'
+        - - SiO2
+          - '0.3466977257230663924831421392'
+        - - MnO
+          - '0.04183043710755742671796266337'
+        - - Cr2O3
+          - '0.0007809311602766602632514608093'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -7203,7 +7739,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n4_cro_activity::T=1823:row=4:h=6e9265514dfc
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -7287,9 +7824,27 @@ observations:
         note: Table 3 sample No. 4, CrO activity.; row=4
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3672317215615663018791395742'
+          - - CaF2
+            - '0.03800621093119346525241219772'
+          - - MgO
+            - '0.1472472984139556327718783764'
+          - - Al2O3
+            - '0.05820567510238412063221358771'
+          - - SiO2
+            - '0.3466977257230663924831421392'
+          - - MnO
+            - '0.04183043710755742671796266337'
+          - - Cr2O3
+            - '0.0007809311602766602632514608093'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -7363,9 +7918,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3672317215615663018791395742'
+        - - CaF2
+          - '0.03800621093119346525241219772'
+        - - MgO
+          - '0.1472472984139556327718783764'
+        - - Al2O3
+          - '0.05820567510238412063221358771'
+        - - SiO2
+          - '0.3466977257230663924831421392'
+        - - MnO
+          - '0.04183043710755742671796266337'
+        - - Cr2O3
+          - '0.0007809311602766602632514608093'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -7411,7 +7984,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n4_cro_activity_coefficient::T=1823:row=4:h=4c3257ea4b63
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -7495,9 +8069,27 @@ observations:
         note: Table 3 sample No. 4, CrO activity_coefficient.; row=4
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3672317215615663018791395742'
+          - - CaF2
+            - '0.03800621093119346525241219772'
+          - - MgO
+            - '0.1472472984139556327718783764'
+          - - Al2O3
+            - '0.05820567510238412063221358771'
+          - - SiO2
+            - '0.3466977257230663924831421392'
+          - - MnO
+            - '0.04183043710755742671796266337'
+          - - Cr2O3
+            - '0.0007809311602766602632514608093'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -7574,9 +8166,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3670443597489792574931730457'
+        - - CaF2
+          - '0.03804163517917527201089430417'
+        - - MgO
+          - '0.1473845424244967085479824018'
+        - - Al2O3
+          - '0.05825992655808719467049718608'
+        - - SiO2
+          - '0.3460322069898174807285353514'
+        - - MnO
+          - '0.04186942578180249053877888343'
+        - - Cr2O3
+          - '0.001367903317641596010138827286'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -7622,7 +8232,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n5_cro15_activity::T=1823:row=5:h=7d7171f983a0
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -7706,9 +8317,27 @@ observations:
         note: Table 3 sample No. 5, CrO1.5 activity.; row=5
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3670443597489792574931730457'
+          - - CaF2
+            - '0.03804163517917527201089430417'
+          - - MgO
+            - '0.1473845424244967085479824018'
+          - - Al2O3
+            - '0.05825992655808719467049718608'
+          - - SiO2
+            - '0.3460322069898174807285353514'
+          - - MnO
+            - '0.04186942578180249053877888343'
+          - - Cr2O3
+            - '0.001367903317641596010138827286'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -7783,9 +8412,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3670443597489792574931730457'
+        - - CaF2
+          - '0.03804163517917527201089430417'
+        - - MgO
+          - '0.1473845424244967085479824018'
+        - - Al2O3
+          - '0.05825992655808719467049718608'
+        - - SiO2
+          - '0.3460322069898174807285353514'
+        - - MnO
+          - '0.04186942578180249053877888343'
+        - - Cr2O3
+          - '0.001367903317641596010138827286'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -7831,7 +8478,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n5_cro15_activity_coefficient::T=1823:row=5:h=407eb7652671
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -7915,9 +8563,27 @@ observations:
         note: Table 3 sample No. 5, CrO1.5 activity_coefficient.; row=5
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3670443597489792574931730457'
+          - - CaF2
+            - '0.03804163517917527201089430417'
+          - - MgO
+            - '0.1473845424244967085479824018'
+          - - Al2O3
+            - '0.05825992655808719467049718608'
+          - - SiO2
+            - '0.3460322069898174807285353514'
+          - - MnO
+            - '0.04186942578180249053877888343'
+          - - Cr2O3
+            - '0.001367903317641596010138827286'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -7993,9 +8659,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3670443597489792574931730457'
+        - - CaF2
+          - '0.03804163517917527201089430417'
+        - - MgO
+          - '0.1473845424244967085479824018'
+        - - Al2O3
+          - '0.05825992655808719467049718608'
+        - - SiO2
+          - '0.3460322069898174807285353514'
+        - - MnO
+          - '0.04186942578180249053877888343'
+        - - Cr2O3
+          - '0.001367903317641596010138827286'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -8041,7 +8725,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n5_cro_activity::T=1823:row=5:h=3bef6756010e
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -8125,9 +8810,27 @@ observations:
         note: Table 3 sample No. 5, CrO activity.; row=5
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3670443597489792574931730457'
+          - - CaF2
+            - '0.03804163517917527201089430417'
+          - - MgO
+            - '0.1473845424244967085479824018'
+          - - Al2O3
+            - '0.05825992655808719467049718608'
+          - - SiO2
+            - '0.3460322069898174807285353514'
+          - - MnO
+            - '0.04186942578180249053877888343'
+          - - Cr2O3
+            - '0.001367903317641596010138827286'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -8201,9 +8904,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3670443597489792574931730457'
+        - - CaF2
+          - '0.03804163517917527201089430417'
+        - - MgO
+          - '0.1473845424244967085479824018'
+        - - Al2O3
+          - '0.05825992655808719467049718608'
+        - - SiO2
+          - '0.3460322069898174807285353514'
+        - - MnO
+          - '0.04186942578180249053877888343'
+        - - Cr2O3
+          - '0.001367903317641596010138827286'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -8249,7 +8970,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n5_cro_activity_coefficient::T=1823:row=5:h=debe285dddf1
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -8333,9 +9055,27 @@ observations:
         note: Table 3 sample No. 5, CrO activity_coefficient.; row=5
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3670443597489792574931730457'
+          - - CaF2
+            - '0.03804163517917527201089430417'
+          - - MgO
+            - '0.1473845424244967085479824018'
+          - - Al2O3
+            - '0.05825992655808719467049718608'
+          - - SiO2
+            - '0.3460322069898174807285353514'
+          - - MnO
+            - '0.04186942578180249053877888343'
+          - - Cr2O3
+            - '0.001367903317641596010138827286'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -8412,9 +9152,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3658222302759962302302259751'
+        - - CaF2
+          - '0.03807981752063750300699542763'
+        - - MgO
+          - '0.1475324721046642792439167644'
+        - - Al2O3
+          - '0.05831840197321927395804949492'
+        - - SiO2
+          - '0.3463795190814766554144079764'
+        - - MnO
+          - '0.04191145007188620032325297676'
+        - - Cr2O3
+          - '0.001956108972119857823151385138'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -8460,7 +9218,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n6_cro15_activity::T=1823:row=6:h=1c92546f68b7
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -8544,9 +9303,27 @@ observations:
         note: Table 3 sample No. 6, CrO1.5 activity.; row=6
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3658222302759962302302259751'
+          - - CaF2
+            - '0.03807981752063750300699542763'
+          - - MgO
+            - '0.1475324721046642792439167644'
+          - - Al2O3
+            - '0.05831840197321927395804949492'
+          - - SiO2
+            - '0.3463795190814766554144079764'
+          - - MnO
+            - '0.04191145007188620032325297676'
+          - - Cr2O3
+            - '0.001956108972119857823151385138'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -8621,9 +9398,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3658222302759962302302259751'
+        - - CaF2
+          - '0.03807981752063750300699542763'
+        - - MgO
+          - '0.1475324721046642792439167644'
+        - - Al2O3
+          - '0.05831840197321927395804949492'
+        - - SiO2
+          - '0.3463795190814766554144079764'
+        - - MnO
+          - '0.04191145007188620032325297676'
+        - - Cr2O3
+          - '0.001956108972119857823151385138'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -8669,7 +9464,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n6_cro15_activity_coefficient::T=1823:row=6:h=75ff68925581
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -8753,9 +9549,27 @@ observations:
         note: Table 3 sample No. 6, CrO1.5 activity_coefficient.; row=6
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3658222302759962302302259751'
+          - - CaF2
+            - '0.03807981752063750300699542763'
+          - - MgO
+            - '0.1475324721046642792439167644'
+          - - Al2O3
+            - '0.05831840197321927395804949492'
+          - - SiO2
+            - '0.3463795190814766554144079764'
+          - - MnO
+            - '0.04191145007188620032325297676'
+          - - Cr2O3
+            - '0.001956108972119857823151385138'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -8831,9 +9645,27 @@ observations:
       tag: not_applicable
       reason: profile activity does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3658222302759962302302259751'
+        - - CaF2
+          - '0.03807981752063750300699542763'
+        - - MgO
+          - '0.1475324721046642792439167644'
+        - - Al2O3
+          - '0.05831840197321927395804949492'
+        - - SiO2
+          - '0.3463795190814766554144079764'
+        - - MnO
+          - '0.04191145007188620032325297676'
+        - - Cr2O3
+          - '0.001956108972119857823151385138'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -8879,7 +9711,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n6_cro_activity::T=1823:row=6:h=a12cb689d60b
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -8963,9 +9796,27 @@ observations:
         note: Table 3 sample No. 6, CrO activity.; row=6
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3658222302759962302302259751'
+          - - CaF2
+            - '0.03807981752063750300699542763'
+          - - MgO
+            - '0.1475324721046642792439167644'
+          - - Al2O3
+            - '0.05831840197321927395804949492'
+          - - SiO2
+            - '0.3463795190814766554144079764'
+          - - MnO
+            - '0.04191145007188620032325297676'
+          - - Cr2O3
+            - '0.001956108972119857823151385138'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897
@@ -9039,9 +9890,27 @@ observations:
       tag: not_applicable
       reason: profile activity_coefficient does not use reservoir
     composition:
-      tag: unknown
-      reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-        only'
+      tag: value
+      value:
+        basis: printed_oxides
+        components:
+        - - CaO
+          - '0.3658222302759962302302259751'
+        - - CaF2
+          - '0.03807981752063750300699542763'
+        - - MgO
+          - '0.1475324721046642792439167644'
+        - - Al2O3
+          - '0.05831840197321927395804949492'
+        - - SiO2
+          - '0.3463795190814766554144079764'
+        - - MnO
+          - '0.04191145007188620032325297676'
+        - - Cr2O3
+          - '0.001956108972119857823151385138'
+        amount_basis: mole_fraction
+        proxy_flag: initial_charge_only
+        input_provenance: printed_starting_bulk
     fO2_Pa:
       tag: value
       value: '0.0000026040525'
@@ -9087,7 +9956,8 @@ observations:
   - kind: source_disagreement
     affected_quantities:
     - activity_coefficient
-    reason: 'composition_role=initial_charge_only: printed initial charge is sample context; per-run composition is not published'
+    reason: 'source_internally_inconsistent: composition_role=initial_charge_only: composition = printed initial charge; run
+      composition evolves during vaporization'
     origin: shi-2024-cr-activity-slag-polymerisation::shi2024_table3_n6_cro_activity_coefficient::T=1823:row=6:h=b842a18eda53
   source_id: shi-2024-cr-activity-slag-polymerisation
   locator:
@@ -9171,9 +10041,27 @@ observations:
         note: Table 3 sample No. 6, CrO activity_coefficient.; row=6
     composition:
       state:
-        tag: unknown
-        reason: 'missing input: per-run composition is not published; the printed initial charge is retained as sample context
-          only'
+        tag: value
+        value:
+          basis: printed_oxides
+          components:
+          - - CaO
+            - '0.3658222302759962302302259751'
+          - - CaF2
+            - '0.03807981752063750300699542763'
+          - - MgO
+            - '0.1475324721046642792439167644'
+          - - Al2O3
+            - '0.05831840197321927395804949492'
+          - - SiO2
+            - '0.3463795190814766554144079764'
+          - - MnO
+            - '0.04191145007188620032325297676'
+          - - Cr2O3
+            - '0.001956108972119857823151385138'
+          amount_basis: mole_fraction
+          proxy_flag: initial_charge_only
+          input_provenance: printed_starting_bulk
       locator:
         page: 5
         published_page: 897

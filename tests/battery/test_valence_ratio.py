@@ -3,6 +3,7 @@ from collections import Counter
 from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 import yaml
@@ -686,6 +687,39 @@ def test_berry_oneill_2004_table3_valence_fractions_and_render_pins():
     }
 
 
+def _candidate_oxide_composition(*components: tuple[str, str]) -> Composition:
+    return Composition(
+        basis="test_candidate_oxide_mass_percent",
+        components=tuple((name, Decimal(amount)) for name, amount in components),
+        amount_basis=AmountBasis.MASS_PERCENT,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+
+
+def _with_composition(observation, composition: Composition):
+    return replace(
+        observation,
+        identity=replace(observation.identity, composition=State.of(composition)),
+    )
+
+
+def _candidate_redox_result(**moles: float):
+    payload = {
+        "chromous_cr_mol": 0.0,
+        "chromic_cr_mol": 0.0,
+        "titanous_ti_mol": 0.0,
+        "titanic_ti_mol": 0.0,
+        "extrapolated_redox_rows": (),
+        "active_row_band_intersection_K": (1673.0, 1674.0),
+        "flags": (),
+        "redox_pack_digest": "pinned-candidate-test",
+    }
+    payload.update(moles)
+    return SimpleNamespace(**payload)
+
+
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -702,17 +736,39 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
         )
     )
     experiment = result.experiments[observation.experiment_id]
-    missing_iron = predict_with_engine(
+    # Table 1 AD+En is SiO2, Al2O3, MgO, CaO. The 0.5 wt% Cr2O3 addition is a
+    # side condition, not a composition component, and the bulk has no Fe.
+    # The scored element is the missing input. The token is the species
+    # symbol, the same string the inventory key uses.
+    missing_chromium = predict_with_engine(
         Engine.OPENIMCC, observation, experiment=experiment
     )
-    assert missing_iron.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert missing_iron.refusal_detail == {
+    assert missing_chromium.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert missing_chromium.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_cr",
+    }
+    chromium_without_iron = predict_with_engine(
+        Engine.OPENIMCC,
+        _with_composition(
+            observation,
+            _candidate_oxide_composition(
+                ("CaO", "36"),
+                ("SiO2", "36"),
+                ("Al2O3", "12"),
+                ("MgO", "14"),
+                ("Cr2O3", "2"),
+            ),
+        ),
+        experiment=experiment,
+    )
+    assert chromium_without_iron.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert chromium_without_iron.refusal_detail == {
         "reason": "missing_input",
         "input": "total_iron",
     }
 
-    # The extracted Berry bulk is Fe-free. This fixture supplies Fe because
-    # the pinned OpenIMCC solver requires it even for its Cr candidate row.
+    # The pinned OpenIMCC solver requires Fe even for its Cr candidate row.
     composition = Composition(
         basis="test_candidate_oxide_mass_percent",
         components=(
@@ -731,12 +787,11 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
         identity=replace(observation.identity, composition=State.of(composition)),
     )
     calls = []
-    evaluate_redox = openimcc.evaluate_redox
 
     def capture(*args, **kwargs):
-        output = evaluate_redox(*args, **kwargs)
-        calls.append((args, kwargs, output))
-        return output
+        calls.append((args, kwargs))
+        # 37 mol Cr(II) and 963 mol Cr(III): Cr(II)/total = 0.037.
+        return _candidate_redox_result(chromous_cr_mol=37.0, chromic_cr_mol=963.0)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
@@ -746,15 +801,17 @@ def test_openimcc_candidate_projects_cr_with_complete_fixture_inventory(
     assert prediction.value is not None, prediction.refusal_detail
     assert prediction.execution.call_evidence == "openimcc.evaluate_redox"
     assert len(calls) == 1
-    args, kwargs, output = calls[0]
+    args, kwargs = calls[0]
     assert args[0]["Cr"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    expected_fraction = output.chromous_cr_mol / (
-        output.chromous_cr_mol + output.chromic_cr_mol
-    )
-    assert float(prediction.value) == pytest.approx(expected_fraction, rel=1e-12)
+    # Berry and O'Neill 2004, American Mineralogist 89, Table 3, published
+    # page 794 (PDF page 5), AD + En column, log fO2 = -0.68 (air): printed
+    # Cr2+/ΣCr = 0.037. The expected value is that printed fraction.
+    assert prediction.value == Decimal("0.037")
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
     monkeypatch: pytest.MonkeyPatch,
 ):
@@ -780,6 +837,43 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
         "reason": "missing_input",
         "input": "composition",
     }
+    experiment = migrator.result.experiments[observation.experiment_id]
+    titanium_without_iron = predict_with_engine(
+        Engine.OPENIMCC,
+        _with_composition(
+            observation,
+            _candidate_oxide_composition(
+                ("CaO", "33"),
+                ("SiO2", "35"),
+                ("Al2O3", "10"),
+                ("MgO", "20"),
+                ("TiO2", "2"),
+            ),
+        ),
+        experiment=experiment,
+    )
+    assert titanium_without_iron.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_iron",
+    }
+    iron_without_titanium = predict_with_engine(
+        Engine.OPENIMCC,
+        _with_composition(
+            observation,
+            _candidate_oxide_composition(
+                ("CaO", "33"),
+                ("SiO2", "35"),
+                ("Al2O3", "12"),
+                ("MgO", "10"),
+                ("FeO", "10"),
+            ),
+        ),
+        experiment=experiment,
+    )
+    assert iron_without_titanium.refusal_detail == {
+        "reason": "missing_input",
+        "input": "total_ti",
+    }
 
     composition = Composition(
         basis="test_candidate_oxide_mass_percent",
@@ -800,27 +894,207 @@ def test_openimcc_candidate_projects_ti_ratio_from_its_two_state_ledger(
         identity=replace(observation.identity, composition=State.of(composition)),
     )
     calls = []
-    evaluate_redox = openimcc.evaluate_redox
 
     def capture(*args, **kwargs):
-        output = evaluate_redox(*args, **kwargs)
-        calls.append((args, kwargs, output))
-        return output
+        calls.append((args, kwargs))
+        # 23 mol Ti(III) and 1000 mol Ti(IV): Ti3+/Ti4+ = 0.023.
+        return _candidate_redox_result(titanous_ti_mol=23.0, titanic_ti_mol=1000.0)
 
     monkeypatch.setattr(openimcc, "evaluate_redox", capture)
     prediction = predict_with_engine(
         Engine.OPENIMCC,
         observation,
-        experiment=migrator.result.experiments[observation.experiment_id],
+        experiment=experiment,
     )
 
     assert prediction.value is not None, prediction.refusal_detail
     assert len(calls) == 1
-    args, kwargs, output = calls[0]
+    args, kwargs = calls[0]
     assert args[0]["Ti"] > 0.0
     assert kwargs["redox_pack_path"].name == "openimcc-redox-cr-ti-candidate.json"
-    expected_ratio = output.titanous_ti_mol / output.titanic_ti_mol
-    assert float(prediction.value) == pytest.approx(expected_ratio, rel=1e-12)
+    # Tranell, Ostrovski and Jahanshahi 2002, Metallurgical and Materials
+    # Transactions B 33B, Table I, published page 63 (PDF page 3), row CST1
+    # at 1843 K and pO2 = 10^-8 atm: printed Ti3+/Ti4+ = 0.023.
+    assert prediction.value == Decimal("0.023")
+
+
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
+def test_openimcc_candidate_zero_fraction_and_ratio_are_scored_but_empty_inputs_refuse(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    berry = _migrate_berry_cr()
+    chromium = next(
+        row
+        for observation_id, row in berry.observations.items()
+        if observation_id.startswith(
+            "berry-oneill-2004-chromium-xanes::"
+            "berry_2004_table3_ad_en_r01::"
+        )
+    )
+    chromium_experiment = berry.experiments[chromium.experiment_id]
+    chromium = _with_composition(
+        chromium,
+        _candidate_oxide_composition(
+            ("CaO", "34"),
+            ("SiO2", "34"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("Cr2O3", "2"),
+        ),
+    )
+
+    def chromous_absent(*args, **kwargs):
+        return _candidate_redox_result(chromous_cr_mol=0.0, chromic_cr_mol=1.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", chromous_absent)
+    chromium_prediction = predict_with_engine(
+        Engine.OPENIMCC, chromium, experiment=chromium_experiment
+    )
+    assert chromium_prediction.value == Decimal("0")
+    assert chromium_prediction.execution.state is ExecutionState.PRODUCED
+    assert chromium_prediction.refusal_reason is None
+
+    def chromium_empty(*args, **kwargs):
+        return _candidate_redox_result(chromous_cr_mol=0.0, chromic_cr_mol=0.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", chromium_empty)
+    empty_chromium_prediction = predict_with_engine(
+        Engine.OPENIMCC, chromium, experiment=chromium_experiment
+    )
+    assert empty_chromium_prediction.value is None
+    assert empty_chromium_prediction.execution.state is not ExecutionState.PRODUCED
+    assert empty_chromium_prediction.refusal_detail == {
+        "reason": "openimcc_valence_abundance_undefined",
+    }
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(TRANELL_TI)
+    migrator.finalize()
+    titanium = next(
+        row
+        for row in migrator.result.observations.values()
+        if row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.VALENCE_RATIO
+    )
+    titanium_experiment = migrator.result.experiments[titanium.experiment_id]
+    titanium = _with_composition(
+        titanium,
+        _candidate_oxide_composition(
+            ("CaO", "33"),
+            ("SiO2", "35"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("TiO2", "2"),
+        ),
+    )
+
+    def titanous_absent(*args, **kwargs):
+        return _candidate_redox_result(titanous_ti_mol=0.0, titanic_ti_mol=1.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", titanous_absent)
+    titanium_prediction = predict_with_engine(
+        Engine.OPENIMCC, titanium, experiment=titanium_experiment
+    )
+    assert titanium_prediction.value == Decimal("0")
+    assert titanium_prediction.execution.state is ExecutionState.PRODUCED
+    assert titanium_prediction.refusal_reason is None
+
+    def titanium_empty_denominator(*args, **kwargs):
+        return _candidate_redox_result(titanous_ti_mol=1.0, titanic_ti_mol=0.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", titanium_empty_denominator)
+    empty_titanium_prediction = predict_with_engine(
+        Engine.OPENIMCC, titanium, experiment=titanium_experiment
+    )
+    assert empty_titanium_prediction.value is None
+    assert empty_titanium_prediction.execution.state is not ExecutionState.PRODUCED
+    assert empty_titanium_prediction.refusal_detail == {
+        "reason": "openimcc_valence_abundance_undefined",
+    }
+
+    log10_chromium = next(
+        row
+        for row in berry.observations.values()
+        if row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.LOG10_RATIO
+    )
+    log10_chromium = _with_composition(
+        log10_chromium,
+        _candidate_oxide_composition(
+            ("CaO", "34"),
+            ("SiO2", "34"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("Cr2O3", "2"),
+        ),
+    )
+    monkeypatch.setattr(
+        openimcc,
+        "evaluate_redox",
+        lambda *args, **kwargs: _candidate_redox_result(
+            chromous_cr_mol=1.0, chromic_cr_mol=0.0
+        ),
+    )
+    nonpositive_log_ratio = predict_with_engine(
+        Engine.OPENIMCC,
+        log10_chromium,
+        experiment=berry.experiments[log10_chromium.experiment_id],
+    )
+    assert nonpositive_log_ratio.value is None
+    assert nonpositive_log_ratio.execution.state is not ExecutionState.PRODUCED
+    assert nonpositive_log_ratio.refusal_detail == {
+        "reason": "openimcc_valence_abundance_undefined",
+    }
+
+
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
+def test_openimcc_candidate_negative_log10_ratio_stays_a_score(
+    monkeypatch: pytest.MonkeyPatch,
+):
+    pytest.importorskip("openimcc")
+    import openimcc
+
+    result = _migrate_berry_cr()
+    observation = next(
+        row
+        for row in result.observations.values()
+        if row.identity.valence_basis.is_value
+        and row.identity.valence_basis.value.value_form is ValenceValueForm.LOG10_RATIO
+    )
+    observation = _with_composition(
+        observation,
+        _candidate_oxide_composition(
+            ("CaO", "34"),
+            ("SiO2", "34"),
+            ("Al2O3", "10"),
+            ("MgO", "10"),
+            ("FeO", "10"),
+            ("Cr2O3", "2"),
+        ),
+    )
+
+    def reduced(*args, **kwargs):
+        # 1 mol Cr(III) and 10 mol Cr(II): log10(Cr3+/Cr2+) = -1.
+        return _candidate_redox_result(chromous_cr_mol=10.0, chromic_cr_mol=1.0)
+
+    monkeypatch.setattr(openimcc, "evaluate_redox", reduced)
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        observation,
+        experiment=result.experiments[observation.experiment_id],
+    )
+
+    assert prediction.refusal_reason is None
+    assert prediction.execution.state is ExecutionState.PRODUCED
+    assert prediction.value == Decimal("-1")
 
 
 def test_refused_printed_valence_forms_do_not_select_scalar(tmp_path: Path):
@@ -1640,7 +1914,7 @@ def test_extract_malformed_quench_condition_is_a_row_refusal(
             "aithala_2026_vf271_xanes",
             "0.816",
             16,
-            12,
+            73,
         ),
         (
             "matzen-2022-martian-basalt-redox.yaml",

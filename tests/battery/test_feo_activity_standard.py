@@ -39,12 +39,20 @@ _OPENIMCC_DEFAULT_PACK_DIGEST = (
 _OPENIMCC_DEFAULT_REDOX_PACK_DIGEST = (
     "28ac36dfef019b8f0fe3e11a86030c65dbfdae6733d10532d2bdb942cf3dc67b"
 )
+# d-443 additive stratum. Both digests stay 0 dex, no_band. Each line gains
+# only assumed_band_details={eligible: false, evidence_class: measured_direct,
+# refusal: method_class_applicability_unknown}. Neither row enters the band.
+# OpenIMCC exclusions stay (source_relation_independent_complete_ancestry,)
+# and score_eligible stays false. Chain Ban-ya Fe_tO (t-1802 Eq. 23 / d-432)
+# does not move these fixtures: cf2a0c7fe and f96f7cace serialize the same bytes.
+# internal-analytical before d-443: eb6b8cce0b5487f44c7f6a0705d92a3f4ffc4a0248af489784610026544f624d
+# openimcc before d-443: 803a03d510720e9d63f7644f9e91546eee250b35d286fadaea69c48bfcd74a24
 _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
     Engine.INTERNAL_ANALYTICAL: (
-        "eb6b8cce0b5487f44c7f6a0705d92a3f4ffc4a0248af489784610026544f624d"
+        "61b0c0bb1105c233265d2e0175899f2c28bb0db324798c8e850025c8864acac0"
     ),
     Engine.OPENIMCC: (
-        "803a03d510720e9d63f7644f9e91546eee250b35d286fadaea69c48bfcd74a24"
+        "87e4d99db4de9feed4a80902d51b1ef2f8c137b548b07ab44fc768dd6bcee33e"
     ),
 }
 # b217 pinned the N_Fe2+^0 multiply:
@@ -52,8 +60,15 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
 # The numeric pin is green; the digest captures the current JANAF and d-333 notices.
+# d-443 adds assumed_band_details only. Dex stays -0.10057837869175247.
+# Provenance value_Pa stays 0.01295993251002745564044143855. Status stays
+# no_band. The row does not enter the band: eligible false, evidence_class
+# measured_reduced, refusal method_class_applicability_unknown. Chain Ban-ya
+# Fe_tO (t-1802 Eq. 23 / d-432) does not move this row: cf2a0c7fe and
+# f96f7cace serialize the same bytes.
+# sha before d-443: 6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "6ca537f3aebbf954650edbfa6a1c2cac43c4daef05def1348711beccf0123a9a"
+    "1afb5a6feb9b8910c54d307bbc93cb7bece1d2a94b6d94f2ac2be98636a7c842"
 )
 _DISTIN_1880_RESIDUAL_DEX = Decimal("-0.10057837869175247")
 
@@ -219,6 +234,8 @@ def test_openimcc_closed_redox_feo_row_refuses_changed_redox_pack_digest() -> No
     }
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_feo_row_refuses_when_gas_load_loses_condensate_identity(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

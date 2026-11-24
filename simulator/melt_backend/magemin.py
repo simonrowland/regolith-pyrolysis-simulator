@@ -2351,7 +2351,11 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 domain_warnings = []
                 refusal_reason = 'missing_input'
             else:
-                refusal_reason = domain_reason or 'missing_input'
+                refusal_reason = (
+                    domain_reason or OutOfDomainReason.INVALID_INPUT.value
+                )
+            empty_diagnostics = dict(projection_diagnostics)
+            empty_diagnostics['backend_status_reason'] = refusal_reason
             return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
                 pressure_bar=pressure_bar,
@@ -2363,7 +2367,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                     'MAGEMin received empty melt composition; returning empty '
                     'equilibrium result',
                 ],
-                diagnostics=projection_diagnostics,
+                diagnostics=empty_diagnostics,
             ), reason=refusal_reason)
 
         if bulk_projection is None:
@@ -2374,10 +2378,18 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 else 'MAGEMin bulk projection produced no submitted bulk'
             )
             self._last_error = message
+            # The domain helper owns bulk construction. Its construction
+            # failures are invalid input; projected or domain refusals retain
+            # their typed reason.
+            failure_reason = (
+                OutOfDomainReason.INVALID_INPUT.value
+                if message.startswith('MAGEMin bulk projection failed:')
+                else domain_reason or 'out_of_domain'
+            )
             diagnostics = dict(projection_diagnostics)
             diagnostics.update({
                 'backend_status': 'out_of_domain',
-                'backend_status_reason': domain_reason,
+                'backend_status_reason': failure_reason,
             })
             return typed_failure_result(EquilibriumResult(
                 temperature_C=temperature_C,
@@ -2386,7 +2398,7 @@ class MAGEMinBackend(MeltBackend, RealBackendAuthority):
                 status='out_of_domain',
                 warnings=[*prior_warnings, *domain_warnings],
                 diagnostics=diagnostics,
-            ), reason=domain_reason or 'out_of_domain')
+            ), reason=failure_reason)
 
         result_diagnostics = projection_diagnostics_for_melt_input(
             backend='MAGEMin',

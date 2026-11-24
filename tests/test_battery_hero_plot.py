@@ -1762,9 +1762,9 @@ def test_fingerprint_traffic_light_cells_have_no_count_text() -> None:
             x_limits=(0, len(fills) * 0.05),
             temperature_limits=(1000, 1100),
         )
-        assert [patch.get_facecolor() for patch in axis.patches] == pytest.approx(
-            [to_rgba(fill) for fill in fills]
-        )
+        assert [patch.get_facecolor() for patch in axis.patches] == [
+            to_rgba(fill) for fill in fills
+        ]
         assert not axis.texts
         assert all(patch.get_hatch() is None for patch in axis.patches)
     finally:
@@ -2297,8 +2297,8 @@ def test_source_disagreement_flag_uses_notice_kind_for_other_reason_strings() ->
     ]
     for row in rows:
         row["notices"][0]["reason"] = (
-            "composition_role=initial_charge_only: printed initial charge is "
-            "sample context; per-run composition is not published"
+            "composition_role=initial_charge_only: composition = printed initial "
+            "charge; run composition evolves during vaporization"
         )
 
     metric = hero_plot._hero_metric_records(

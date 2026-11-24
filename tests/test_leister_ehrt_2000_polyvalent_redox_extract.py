@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import EvidenceClass, Phase, Quantity, ValueKind
+from simulator.battery.enums import EvidenceClass, NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import fe3_fe2_ratio_from_ferric_fraction
 from tests.battery.factories import migrate_one_extract
 
@@ -187,7 +187,6 @@ def test_migrated_fe_values_species_temperature_atmosphere_and_composition():
     assert all(o.identity.quantity.value is Quantity.FE3_FE2_RATIO for o in observations)
     assert all(o.value.kind is ValueKind.POINT for o in observations)
     assert all(o.evidence.class_.value is EvidenceClass.MEASURED_REDUCED for o in observations)
-    assert all(not o.notices for o in observations)
     assert all(
         observation_source["derivation"]["raw_inputs"]["state"]["value"]
         == "not_printed"
@@ -203,6 +202,23 @@ def test_migrated_fe_values_species_temperature_atmosphere_and_composition():
     by_identity = {}
     for point, observation in zip(source_points, observations):
         atmosphere = point["atmosphere_as_published"]
+        if atmosphere.casefold() == "air":
+            # Table 1 prints air but no total pressure, so the oxygen condition
+            # stays typed unknown instead of assuming a one-atmosphere run.
+            oxygen_log = observation.point_conditions["fO2_log"]
+            assert oxygen_log.locator == observation.point_conditions["atmosphere"].locator
+            assert oxygen_log.state.is_unknown
+            assert oxygen_log.state.reason == (
+                "missing input: printed air fO2 requires stated total pressure"
+            )
+            assert observation.identity.fO2_Pa.is_unknown
+            assert len(observation.notices) == 1
+            assert observation.notices[0].kind is NoticeKind.INPUT_OMITTED
+            assert observation.notices[0].reason == (
+                "missing input: printed air fO2 requires stated total pressure"
+            )
+        else:
+            assert not observation.notices
         composition = observation.identity.composition
         assert composition is not None and composition.is_value
         composition_map = composition.value.as_map()

@@ -2970,7 +2970,9 @@
       "accepted_species": [
         "Cr",
         "Cr2O3",
+        "CrO",
         "CrO2",
+        "CrO3",
         "Mn"
       ],
       "designated_species_kg": {},
@@ -4537,12 +4539,12 @@
           "species_id": "FeO_association_gas",
           "pressure": {
             "kind": "upper_bound",
-            "pa": 81268.97254233372,
+            "pa": 6.324477854214118e-16,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "selected_runtime_pressure": {
             "kind": "upper_bound",
-            "pa": 81268.97254233372,
+            "pa": 6.324477854214118e-16,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "flux": {
@@ -4584,13 +4586,13 @@
             "extrapolation_notice": {
               "temperature_K": 478.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -9116,12 +9118,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 81268.97254233372,
+              "pa": 6.324477854214118e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 81268.97254233372,
+              "pa": 6.324477854214118e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -9163,13 +9165,13 @@
               "extrapolation_notice": {
                 "temperature_K": 478.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -12921,12 +12923,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 81268.97254233372,
+              "pa": 6.324477854214118e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 81268.97254233372,
+              "pa": 6.324477854214118e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -12968,13 +12970,13 @@
               "extrapolation_notice": {
                 "temperature_K": 478.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -17702,12 +17704,12 @@
           "species_id": "FeO_association_gas",
           "pressure": {
             "kind": "upper_bound",
-            "pa": 81268.97254233372,
+            "pa": 6.324477854214118e-16,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "selected_runtime_pressure": {
             "kind": "upper_bound",
-            "pa": 81268.97254233372,
+            "pa": 6.324477854214118e-16,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "flux": {
@@ -17749,13 +17751,13 @@
             "extrapolation_notice": {
               "temperature_K": 478.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -20119,43 +20121,43 @@
     },
     "unmeasured_alpha_evaporation_fallback": {
       "engaged": true,
-      "total_count": 36,
+      "total_count": 6,
       "by_hour": [
         {
           "campaign": "C2A",
           "hour": 6,
           "campaign_hour": 6,
-          "count": 6
+          "count": 1
         },
         {
           "campaign": "C2A",
           "hour": 7,
           "campaign_hour": 7,
-          "count": 6
+          "count": 1
         },
         {
           "campaign": "C2A",
           "hour": 8,
           "campaign_hour": 8,
-          "count": 6
+          "count": 1
         },
         {
           "campaign": "C2A",
           "hour": 9,
           "campaign_hour": 9,
-          "count": 6
+          "count": 1
         },
         {
           "campaign": "C2A",
           "hour": 10,
           "campaign_hour": 10,
-          "count": 6
+          "count": 1
         },
         {
           "campaign": "C2A",
           "hour": 11,
           "campaign_hour": 11,
-          "count": 6
+          "count": 1
         }
       ]
     },
@@ -20459,7 +20461,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -20625,7 +20627,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -24083,7 +24085,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -24249,7 +24251,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -27707,7 +27709,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -27873,7 +27875,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -31331,7 +31333,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -31497,7 +31499,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -34955,7 +34957,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -35121,7 +35123,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -38579,7 +38581,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -38745,7 +38747,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -42203,7 +42205,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -42369,7 +42371,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -43997,12 +43999,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 26996536.227428008,
+              "pa": 1.801757789240514e-19,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 26996536.227428008,
+              "pa": 1.801757789240514e-19,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -44044,13 +44046,13 @@
               "extrapolation_notice": {
                 "temperature_K": 403.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -46538,13 +46540,13 @@
             "FeO_association_gas": {
               "temperature_K": 403.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -50095,7 +50097,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -50261,7 +50263,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -51889,12 +51891,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -51936,13 +51938,13 @@
               "extrapolation_notice": {
                 "temperature_K": 418.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -54430,13 +54432,13 @@
             "FeO_association_gas": {
               "temperature_K": 418.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -57987,7 +57989,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -58153,7 +58155,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -59781,12 +59783,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 1971661.7658123954,
+              "pa": 6.644427974337872e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 1971661.7658123954,
+              "pa": 6.644427974337872e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -59828,13 +59830,13 @@
               "extrapolation_notice": {
                 "temperature_K": 433.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -62322,13 +62324,13 @@
             "FeO_association_gas": {
               "temperature_K": 433.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -65879,7 +65881,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -66045,7 +66047,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -67673,12 +67675,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 623814.7529433642,
+              "pa": 3.3614136423002497e-17,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 623814.7529433642,
+              "pa": 3.3614136423002497e-17,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -67720,13 +67722,13 @@
               "extrapolation_notice": {
                 "temperature_K": 448.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -70214,13 +70216,13 @@
             "FeO_association_gas": {
               "temperature_K": 448.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -73771,7 +73773,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -73937,7 +73939,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -75565,12 +75567,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 216133.87940798202,
+              "pa": 1.5296563368085787e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 216133.87940798202,
+              "pa": 1.5296563368085787e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -75612,13 +75614,13 @@
               "extrapolation_notice": {
                 "temperature_K": 463.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -78106,13 +78108,13 @@
             "FeO_association_gas": {
               "temperature_K": 463.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -81663,7 +81665,7 @@
                     "phase_masses_kg": {},
                     "liquid_fraction": 1.0,
                     "mode": "subprocess",
-                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:6c623e220e5fa10ebdc063f5c8ea80cda52b06593e98d59be677e25de9ee4d28)",
+                    "engine_version": "MAGEMin    1.9.6 04/06/2026] (digest=sha256:52302582d47ec439f560784f6903bab2e1608b3a1ac0ac893ef5291ce106c8a1)",
                     "backend_status": "out_of_domain",
                     "backend_warnings": [
                       "MAGEMin: database 'ig' merged FeO->FeOt+O",
@@ -81829,7 +81831,7 @@
                     "applied_fe3fet": 0.0,
                     "intrinsic_fO2_log": -9.0,
                     "mode": "subprocess",
-                    "engine_version": "alphaMELTS (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
+                    "engine_version": "alphaMELTS 2.3.1 (digest=sha256:d91bd8baee106dee03136e7bf16a9e2c6c17d0dda6c978ff1bfd698c0b073a85)",
                     "backend_status": "not_converged",
                     "backend_warnings": [
                       "CommissioningNotice: out of certified band; authority=extrapolated; engine will run",
@@ -83457,12 +83459,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 81268.97254233372,
+              "pa": 6.324477854214118e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 81268.97254233372,
+              "pa": 6.324477854214118e-16,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -83504,13 +83506,13 @@
               "extrapolation_notice": {
                 "temperature_K": 478.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -85998,13 +86000,13 @@
             "FeO_association_gas": {
               "temperature_K": 478.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },

@@ -4627,7 +4627,12 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     )
 
     scanned = scan_cache_sites(_ROOT)
-    assert set(scanned) == set(CACHE_SITES)
+    unregistered = sorted(set(scanned) - set(CACHE_SITES))
+    stale = sorted(set(CACHE_SITES) - set(scanned))
+    assert not unregistered and not stale, {
+        "unregistered": unregistered,
+        "stale": stale,
+    }
     for site_id, row in CACHE_SITES.items():
         assert row["line"] == scanned[site_id]["line"], site_id
         assert row["path"] == scanned[site_id]["path"], site_id

@@ -14,6 +14,8 @@ import pytest
 from simulator import engine_cache as cache
 from simulator.engine_cache import EngineCacheValue, Provenance, pack, unpack
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 @pytest.fixture(autouse=True)
 def isolated_cache(monkeypatch):
@@ -43,7 +45,9 @@ def rows(path):
 
 def cold_rows(path):
     with sqlite3.connect(str(path) + ".cold") as connection:
-        return connection.execute("SELECT key,value FROM engine_values ORDER BY key").fetchall()
+        return connection.execute(
+            "SELECT row_seq,value FROM engine_values ORDER BY row_seq"
+        ).fetchall()
 
 
 def invoke(capsys, *args, status=0):
@@ -74,6 +78,40 @@ def test_merge_is_incremental_idempotent_and_preserves_disjoint_sequences(tmp_pa
     result = cache.merge_cache_files(master, [first, second])
     assert result["read"] == result["inserted"] == 1
     assert rows(master) == sorted(rows(first) + rows(second))
+
+
+def test_merge_keeps_the_master_build_when_values_match(tmp_path, monkeypatch):
+    """A different forensic build id is not a value conflict.
+
+    The kept row stays the master's value and the build id already stored
+    with it. The incoming identity may be recorded, but it does not replace
+    the value.
+    """
+
+    first, second, master = (
+        tmp_path / name for name in ("first", "second", "master")
+    )
+    value = EngineCacheValue({"answer": 1}, {"enthalpy": 2.0})
+    write_box(monkeypatch, first, "s1", [(1, value)])
+    write_box(monkeypatch, second, "s2", [(1, value)])
+    with sqlite3.connect(str(first) + ".cold") as connection:
+        expected_identity = connection.execute(
+            "SELECT identity FROM engine_builds"
+        ).fetchone()[0]
+    with sqlite3.connect(str(second) + ".cold") as connection:
+        connection.execute(
+            "UPDATE engine_builds SET identity=?", ("different-build",)
+        )
+
+    result = cache.merge_cache_files(master, [first, second])
+
+    assert result["conflicts"] == 0
+    with sqlite3.connect(str(master) + ".cold") as connection:
+        stored_identity = connection.execute(
+            "SELECT b.identity FROM engine_values v "
+            "JOIN engine_builds b ON b.id=v.engine_build_id"
+        ).fetchone()[0]
+    assert stored_identity == expected_identity
 
 
 def test_conflicts_keep_master_report_both_origins_and_strict_only_exit(tmp_path, monkeypatch, capsys):
@@ -208,12 +246,21 @@ def test_failed_cold_write_rolls_back_the_entire_solve(tmp_path, monkeypatch):
 @pytest.mark.parametrize("retry_kind", ["cold", "empty_cold", "hot_only"])
 def test_failure_after_legacy_cold_commit_retry_keeps_matching_pair(tmp_path, monkeypatch, retry_kind):
     live, snapshot, master = (tmp_path / name for name in ("live", "snapshot", "master"))
-    key = cache.engine_cache_key("openimcc", 1, {"request": 1})
+    first_seq = cache.ENGINE_CACHE_BOX_RANGES["s1"][0]
     cache._connect(live, readonly=False)
     # Reproduce the persisted orphan left by the old independent COLD commit.
+    # The retry writes the first s1 sequence, so the orphan sits on that row_seq.
     with sqlite3.connect(str(live) + ".cold") as cold:
         cache._initialize_cold(cold)
-        cold.execute("INSERT INTO engine_values VALUES (?,?)", (key, zlib.compress(pack({"enthalpy": 111.0}))))
+        cold.execute(
+            "INSERT INTO engine_builds(engine, identity) VALUES (?, ?)",
+            ("openimcc", "orphan"),
+        )
+        build_id = cold.execute("SELECT id FROM engine_builds").fetchone()[0]
+        cold.execute(
+            "INSERT INTO engine_values (row_seq,value,engine_build_id) VALUES (?,?,?)",
+            (first_seq, zlib.compress(pack({"enthalpy": 111.0})), build_id),
+        )
     original = cache._store_cold
 
     def fail_after_cold_write(*args):
@@ -237,9 +284,10 @@ def test_failure_after_legacy_cold_commit_retry_keeps_matching_pair(tmp_path, mo
         stored = rows(path)
         assert len(stored) == 1
         assert cache._decode_hot(stored[0][1], stored[0][6]) == answer
-        assert {k: unpack(zlib.decompress(v)) for k, v in cold_rows(path)} == (
-            {key: expected_cold} if expected_cold else {}
-        )
+        assert {
+            row_seq: unpack(zlib.decompress(value))
+            for row_seq, value in cold_rows(path)
+        } == ({first_seq: expected_cold} if expected_cold else {})
 
 
 def test_racing_writer_keeps_the_committed_hot_and_cold_pair(tmp_path, monkeypatch):
@@ -291,9 +339,9 @@ with c._engine_cache_path_scope(Path(sys.argv[1])):
         assert writer.stdout.readline().strip() == "ready"
         assert Path(str(live) + "-wal").stat().st_size > 0
         cache.snapshot_cache(live, snapshot)
-        hot_keys = {row[0] for row in rows(snapshot)}
-        assert hot_keys
-        assert {key for key, _ in cold_rows(snapshot)} == hot_keys
+        hot_seqs = {row[5] for row in rows(snapshot)}
+        assert hot_seqs
+        assert {row_seq for row_seq, _value in cold_rows(snapshot)} == hot_seqs
     finally:
         stop.touch()
         writer.wait(timeout=30)
@@ -310,3 +358,61 @@ def test_space_report_and_vacuum_is_explicit(tmp_path, monkeypatch):
     warnings.warn("sync-space " + json.dumps({k: result[k] for k in ("hot", "cold")}), stacklevel=1)
     assert result["vacuumed"] is False
     assert cache.merge_cache_files(master, [source], vacuum=True)["vacuumed"] is True
+
+
+def test_expire_cli_is_a_dry_run_until_apply(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "cli.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+    with cache._engine_cache_path_scope(path):
+        cache.cached_engine_call(
+            "openimcc",
+            {"composition_wt_pct": {"SiO2": 1.0}},
+            lambda: {"answer": 1},
+        )
+        cache.cached_engine_call(
+            "openimcc",
+            {"composition_wt_pct": {"MgO": 1.0}},
+            lambda: {"answer": 2},
+        )
+    cache._close_connections()
+    dry = invoke(capsys, "expire", path, "--engine", "openimcc", "--species", "SiO2,MgO")
+    assert dry["dry_run"] is True
+    assert dry["apply"] is False
+    assert dry["deleted_by_engine"]["openimcc"] == 0
+    assert dry["matched_by_engine"]["openimcc"] == 2
+    assert "openimcc" in dry["rows_by_engine"]
+    assert len(rows(path)) == 2
+    from scripts.engine_cache_sync import main
+
+    with pytest.raises(SystemExit) as caught:
+        main([
+            "expire", str(path), "--engine", "openimcc", "--species", "SiO2",
+            "--apply", "--dry-run",
+        ])
+    assert caught.value.code == 2
+    capsys.readouterr()
+    assert len(rows(path)) == 2
+    applied = invoke(
+        capsys, "expire", path, "--engine", "openimcc", "--species", "SiO2", "--apply"
+    )
+    assert applied["deleted_by_engine"]["openimcc"] == 1
+    assert applied["vacuumed"] is True
+    assert len(rows(path)) == 1
+
+
+def test_prune_cli_dry_run_prints_per_engine_counts(tmp_path, monkeypatch, capsys):
+    path = tmp_path / "prune.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+    with cache._engine_cache_path_scope(path):
+        cache.cached_engine_call(
+            "openimcc", {"temperature_K": 1700.0}, lambda: {"answer": 1}
+        )
+    cache._close_connections()
+    with sqlite3.connect(path) as connection:
+        connection.execute("UPDATE engine_outputs SET chem_version='0'")
+    report = invoke(capsys, "prune", path)
+    assert report["dry_run"] is True
+    assert report["rows_by_engine"]["openimcc"] == 1
+    assert report["matched_by_engine"]["openimcc"] == 1
+    assert report["deleted_by_engine"]["openimcc"] == 0
+    assert len(rows(path)) == 1

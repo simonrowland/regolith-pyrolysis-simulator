@@ -84,6 +84,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - transition_temperature
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -94,6 +99,26 @@ observations:
     page: 6
     section: '2.3'
   read_from: pdf:deffrennes-2020-ca-o-calphad
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.2017776460825151109470454784'
+          interval_high: '-0.2017776460825151109470454784'
+          approximate: false
+      locator:
+        page: 6
+        section: '2.3'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air (oxidizing)
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:
@@ -280,6 +305,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - transition_temperature
+    reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -290,6 +320,26 @@ observations:
     page: 23
     section: '5'
   read_from: pdf:deffrennes-2020-ca-o-calphad
+  point_conditions:
+    fO2_log:
+      state:
+        tag: value
+        value:
+          kind: interval
+          interval_low: '-0.6788989008021775482420733816'
+          interval_high: '-0.6788989008021775482420733816'
+          approximate: false
+      locator:
+        page: 23
+        section: '5'
+      inference:
+        relation: air_interval_from_total_pressure; pO2=0.20946*P_total; degenerate interval
+        inputs:
+        - atmosphere=air (oxidizing)
+        - point_conditions.total_pressure_Pa
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: identity.total_pressure_Pa=experiment.pressure_environment.total_pressure_Pa (printed experiment scope)
     inputs:

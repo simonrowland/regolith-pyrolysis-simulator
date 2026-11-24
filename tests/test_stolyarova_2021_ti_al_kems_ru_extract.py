@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import copy
 import subprocess
-from collections.abc import Iterator
 from decimal import Decimal
 from pathlib import Path
 
@@ -12,6 +11,7 @@ import yaml
 from simulator.battery.enums import Phase, Quantity, ValueKind
 from simulator.battery.migrate import Migrator
 from tests.helpers.corpus_paths import regolith_corpus_root
+from tests.literature_extract_test_helpers import iter_locators
 
 ROOT = Path(__file__).resolve().parents[1]
 SID = "stolyarova-2021-ti-al-kems-ru"
@@ -19,19 +19,6 @@ EXTRACT = ROOT / f"data/literature/extracts/{SID}.yaml"
 CORPUS_ROOT = regolith_corpus_root()
 PDF = CORPUS_ROOT / "raw" / SID / f"{SID}.pdf"
 
-
-def iter_locators(node: object) -> Iterator[dict[str, object]]:
-    if isinstance(node, dict):
-        if "page" in node and any(
-            key in node
-            for key in ("pdf_page_index", "published_page", "table", "figure", "section")
-        ):
-            yield node
-        for value in node.values():
-            yield from iter_locators(value)
-    elif isinstance(node, list):
-        for value in node:
-            yield from iter_locators(value)
 
 # Independent transcription of every Table 3 cell from the 600-dpi render of
 # physical page 6. The time field is the printed row label; None is a dash or

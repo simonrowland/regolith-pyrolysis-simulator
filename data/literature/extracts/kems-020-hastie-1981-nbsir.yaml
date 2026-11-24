@@ -753,138 +753,6 @@ species:
             published_page: 22
             pdf_page_index: 27
             paragraph: Table 2 potassium pressures as TMS under neutral conditions
-    - observation_id: hastie_1981_table2_17k2o_A_as_printed_note
-      type: psat_series
-      locator:
-        table: '2'
-        page: 29
-        published_page: 23
-        pdf_page_index: 28
-        note: rotated Table 2 ~17[K2O] row; report p. 23
-      T_range_K:
-      - 1600.0
-      - 2000.0
-      phase: K2O-Al2O3-SiO2_phases_uncertain
-      regime: kems_effusion
-      units: dimensionless coefficient as printed
-      values:
-        quantity: table2_A_spelling_note
-        status: typed_refusal
-        reason: >-
-          Parent row hastie_1981_table2_k_logP_coefficients stores A as 6.35
-          (70a5c569). Rotated Table 2 prints 6.350. Parent left unchanged;
-          this sibling cites the printed spelling.
-        admission_status: note_parent_unaltered
-        printed_A: 6.350
-        parent_A: 6.35
-        printed_B: 20693
-        semantics: bound_not_point_ordering
-      uncertainty:
-        note: not applicable
-    - observation_id: hastie_1981_k2_slag_orifice_0p34mm
-      experiment: hastie-1981-pt-kms
-      type: psat_series
-      locator:
-        page: 28
-        paragraph: relatively small effusion orifice (0.34 mm diameter)
-        figure: '20'
-      T_range_K:
-      - 1470.0
-      - 1820.0
-      phase: K2_slag_liquid
-      regime: kems_effusion
-      units: m2
-      values:
-        quantity: effusion_orifice_on_K2_slag_runs
-        status: typed_refusal
-        reason: >-
-          Diameter printed for slag-run apparatus (report p. 28; Fig. 20 caption
-          repeats 0.34 mm). Not a P(T) series. Not attached to the Table 2
-          compilation parent.
-        admission_status: equipment_metadata
-        orifice_diameter_mm_as_printed: 0.34
-        semantics: bound_not_point_ordering
-      uncertainty:
-        note: diameter as printed; area inferred
-      equipment:
-        orifice_area:
-          value: 9.079226e-08
-          units: m2
-          diameter_m: 0.00034
-          orifice_shape: circular_effusion
-          inferred: true
-          inference: area = π (d/2)^2 from stated 0.34 mm effusion orifice
-          locator:
-            page: 28
-            paragraph: relatively small effusion orifice (0.34 mm diameter)
-        residual_pressure_Pa_as_printed:
-          value: "KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)"
-          quote: "KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)"
-          locator:
-            page: 9
-            paragraph: upper pressure limits of 10^-4 and one atm
-    - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
-      type: psat_series
-      locator:
-        figure: '4'
-        page: 51
-        note: also Figs 8-9; caption list report p. 51
-      T_range_K:
-      - 1550.0
-      - 2085.0
-      phase: illite_and_MHD_slag
-      regime: kems_effusion
-      units: atm
-      values:
-        quantity: P_K_P_O2_P_SiO_vs_T
-        status: typed_refusal
-        reason: >-
-          Fig. 4 (illite K, O2, SiO) and Figs 8-9 (MHD slag K/O2) are plotted
-          curves. Digitizing forbidden. Table 2 holds the logP coefficients only.
-        admission_status: rejected_no_figure_reading
-        original_source: Hastie et al. (1979) illite; Plante and Cook (1978) slags
-        access_path: NBSIR 81-2279 figures
-        semantics: bound_not_point_ordering
-      uncertainty:
-        note: not applicable
-    - observation_id: hastie_1981_remaining_figures_ledger
-      type: psat_series
-      locator:
-        page: 51
-        section: '15'
-        note: figure captions report pp. 51-53; figures PDF 61-81
-      T_range_K:
-      - 1100.0
-      - 2150.0
-      phase: K-bearing_oxide_and_slag_mix
-      regime: mixed_kms_tms
-      units: atm
-      values:
-        quantity: figure_completeness_ledger
-        status: typed_refusal
-        admission_status: figure_only_or_proxy
-        kinetic_alpha: true_absence
-        mass_loss_mg_series: true_absence
-        figures:
-          '1': {role: apparatus, status: not_numeric}
-          '2': {role: K2SO4_g_over_K2SO4_l, status: figure_only, detail_elsewhere: Plante et al. 1981}
-          '3': {role: KOH_and_KOH2_over_KOH_l, status: figure_only, detail_elsewhere: Hastie et al. 1981}
-          '7': {role: nonequilibrium_KAlSiO4, status: figure_only, proxy: non_equilibrium_not_Psat}
-          '8': {role: Western_Eastern_slag_K, status: figure_only, table2_covers: true}
-          '9': {role: Eastern_slag_K_and_O2, status: figure_only, table2_covers: true}
-          '10': {role: K1_initial_volatiles_vs_T_time, status: figure_only, note: time series without numeric table}
-          '12': {role: K2_slag_K_and_O2, status: figure_only, table2_covers: true}
-          '13': {role: K_ion_intensity_vs_time, status: figure_only, note: 'rate_series plot, no mg or s table'}
-          '14': {role: K2O_dissociation_pressure_product_plasma_vs_slag, status: model_proxy, note: Table 2 P_K recast vs SOLGASMIX plasma}
-          '16': {role: silica_activity_function_illite_vs_quartz_plus_H2, status: figure_only, note: 1-2 orders below JANAF unit-activity SiO2}
-          '17': {role: H2O_dissociation_Kp, status: figure_only, note: gas-equilibrium check vs JANAF}
-          '18': {role: K_and_O2_vs_H2O_at_1655K_K2_slag, status: figure_only}
-          '19': {role: K_vs_H2O_isothermal_1610K, status: figure_only}
-          '20': {role: KOH_vs_H2O_at_1794K, status: figure_only}
-          '21': {role: SOLGASMIX_alkali_speciation_vs_T, status: model_proxy, table3_covers: true}
-        semantics: bound_not_point_ordering
-      uncertainty:
-        note: not applicable
     - observation_id: hastie_1981_table2_k_logP_coefficients_quoted_20260906
       supersedes: hastie_1981_table2_k_logP_coefficients
       experiment: hastie-1981-table2-quoted-fits
@@ -1280,30 +1148,149 @@ species:
         - 2000
         A_as_printed: '6.350'
         note: Printed spelling only; numeric value unchanged.
-    - observation_id: hastie_1981_k2_slag_orifice_0p34mm_quoted_20260906
+    context:
+    - observation_id: hastie_1981_table2_17k2o_A_as_printed_note
+      type: table_note
+      locator:
+        table: '2'
+        page: 29
+        published_page: 23
+        pdf_page_index: 28
+        note: rotated Table 2 ~17[K2O] row; report p. 23
+      T_range_K:
+      - 1600.0
+      - 2000.0
+      phase: K2O-Al2O3-SiO2_phases_uncertain
+      regime: kems_effusion
+      units: dimensionless coefficient as printed
+      values:
+        quantity: table2_A_spelling_note
+        status: typed_refusal
+        reason: >-
+          Parent row hastie_1981_table2_k_logP_coefficients stores A as 6.35
+          (70a5c569). Rotated Table 2 prints 6.350. Parent left unchanged;
+          this sibling cites the printed spelling.
+        admission_status: note_parent_unaltered
+        printed_A: 6.350
+        parent_A: 6.35
+        printed_B: 20693
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: hastie_1981_k2_slag_orifice_0p34mm
       experiment: hastie-1981-pt-kms
-      supersedes: hastie_1981_k2_slag_orifice_0p34mm
-      type: psat_series
-      class_tag: derived
+      type: apparatus
       locator:
         page: 59
         published_page: 53
-        figure: '20'
         pdf_page_index: 58
-      quote: KMS data with Pt-cell orifice diameter of 0.34 mm.
+        figure: '20'
+      T_range_K:
+      - 1470.0
+      - 1820.0
       phase: K2_slag_liquid
       regime: kems_effusion
       units: m2
       values:
-        quantity: equipment_metadata_pointer
-        method_class: derived
+        quantity: effusion_orifice_on_K2_slag_runs
         status: typed_refusal
+        reason: >-
+          Diameter printed for slag-run apparatus (report p. 28; Fig. 20 caption
+          repeats 0.34 mm). Not a P(T) series. Not attached to the Table 2
+          compilation parent.
         admission_status: equipment_metadata
+        orifice_diameter_mm_as_printed: 0.34
         semantics: bound_not_point_ordering
-        reason: Geometry retained in source_metadata; not pressure or rate evidence.
+      uncertainty:
+        note: diameter as printed; area inferred
+      equipment:
+        orifice_area:
+          value: 9.079226e-08
+          units: m2
+          diameter_m: 0.00034
+          orifice_shape: circular_effusion
+          inferred: true
+          inference: area = π (d/2)^2 from stated 0.34 mm effusion orifice
+          locator:
+            page: 59
+            published_page: 53
+            pdf_page_index: 58
+            figure: '20'
+        residual_pressure_Pa_as_printed:
+          value: "KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)"
+          quote: "KMS upper limit ~1e-4 atm as stated for the method (section 6 / printed p. 9)"
+          locator:
+            page: 9
+            paragraph: upper pressure limits of 10^-4 and one atm
+    - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
+      type: figure
+      locator:
+        figure: '4'
+        page: 57
+        published_page: 51
+        pdf_page_index: 56
+        note: also Figs 8-9; caption list report p. 51
+      T_range_K:
+      - 1550.0
+      - 2085.0
+      phase: illite_and_MHD_slag
+      regime: kems_effusion
+      units: atm
+      values:
+        quantity: P_K_P_O2_P_SiO_vs_T
+        status: typed_refusal
+        reason: >-
+          Fig. 4 (illite K, O2, SiO) and Figs 8-9 (MHD slag K/O2) are plotted
+          curves. Digitizing forbidden. Table 2 holds the logP coefficients only.
+        admission_status: rejected_no_figure_reading
+        original_source: Hastie et al. (1979) illite; Plante and Cook (1978) slags
+        access_path: NBSIR 81-2279 figures
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
+    - observation_id: hastie_1981_remaining_figures_ledger
+      type: figure_ledger
+      locator:
+        page: 57
+        published_page: 51
+        pdf_page_index: 56
+        section: '15'
+        note: figure captions report pp. 51-53; figures PDF 61-81
+      T_range_K:
+      - 1100.0
+      - 2150.0
+      phase: K-bearing_oxide_and_slag_mix
+      regime: mixed_kms_tms
+      units: atm
+      values:
+        quantity: figure_completeness_ledger
+        status: typed_refusal
+        admission_status: figure_only_or_proxy
+        kinetic_alpha: true_absence
+        mass_loss_mg_series: true_absence
+        figures:
+          '1': {role: apparatus, status: not_numeric}
+          '2': {role: K2SO4_g_over_K2SO4_l, status: figure_only, detail_elsewhere: Plante et al. 1981}
+          '3': {role: KOH_and_KOH2_over_KOH_l, status: figure_only, detail_elsewhere: Hastie et al. 1981}
+          '7': {role: nonequilibrium_KAlSiO4, status: figure_only, proxy: non_equilibrium_not_Psat}
+          '8': {role: Western_Eastern_slag_K, status: figure_only, table2_covers: true}
+          '9': {role: Eastern_slag_K_and_O2, status: figure_only, table2_covers: true}
+          '10': {role: K1_initial_volatiles_vs_T_time, status: figure_only, note: time series without numeric table}
+          '12': {role: K2_slag_K_and_O2, status: figure_only, table2_covers: true}
+          '13': {role: K_ion_intensity_vs_time, status: figure_only, note: 'rate_series plot, no mg or s table'}
+          '14': {role: K2O_dissociation_pressure_product_plasma_vs_slag, status: model_proxy, note: Table 2 P_K recast vs SOLGASMIX plasma}
+          '16': {role: silica_activity_function_illite_vs_quartz_plus_H2, status: figure_only, note: 1-2 orders below JANAF unit-activity SiO2}
+          '17': {role: H2O_dissociation_Kp, status: figure_only, note: gas-equilibrium check vs JANAF}
+          '18': {role: K_and_O2_vs_H2O_at_1655K_K2_slag, status: figure_only}
+          '19': {role: K_vs_H2O_isothermal_1610K, status: figure_only}
+          '20': {role: KOH_vs_H2O_at_1794K, status: figure_only}
+          '21': {role: SOLGASMIX_alkali_speciation_vs_T, status: model_proxy, table3_covers: true}
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
     - observation_id: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked_quoted_20260906
       supersedes: hastie_1981_fig4_9_illite_slag_PO2_figure_only_blocked
-      type: psat_series
+      type: figure
       class_tag: figure_only
       locator:
         page: 57
@@ -1324,7 +1311,7 @@ species:
         reason: Plotted evidence, not a printed numeric table. See completeness ledger for individual figures.
     - observation_id: hastie_1981_remaining_figures_ledger_quoted_20260906
       supersedes: hastie_1981_remaining_figures_ledger
-      type: psat_series
+      type: figure_ledger
       class_tag: figure_only
       locator:
         page: 59
@@ -1739,6 +1726,17 @@ species:
           initial 17.0. Time-integrated CO2 and excess Na give 0.45 wt.%
           impurity Na2CO3 (p. 20). Caption: KMS(1) 17.0 to 16.7; KMS(3) 15.6
           to 13.3; TMS(1) 17.0; TMS(2) 16.9 wt.%.
+        caption_depletion_columns:
+          columns: [Na2O_wt_pct]
+          locator:
+            page: 51
+            pdf_page: 57
+            note: >-
+              Fig. 5 caption, folio 51 (physical PDF page 57). Start-to-end
+              Na2O wt% depletion, not the run composition at the pressure
+              point. The depletion discussion is report p. 19.
+          quote: >-
+            KMS(1) 17.0 to 16.7; KMS(3) 15.6 to 13.3; TMS(1) 17.0; TMS(2) 16.9 wt.%.
         points:
         - series: KMS_1
           T_K: 1488.8
@@ -1772,32 +1770,6 @@ species:
           (0.45 wt.%), not surface depletion.
       uncertainty:
         note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.004 dex). KMS(1) vertical bar is the authors' maximum conceivable error.
-    - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only
-      experiment: hastie-1981-measured-soda-lime-glass-tms
-      type: activity_coefficient
-      locator:
-        figure: '6'
-        page: 66
-        published_page: 60
-        pdf_page_index: 65
-      T_range_K:
-      - 1200.0
-      - 1700.0
-      phase: soda_lime_silica_glass
-      regime: transpiration_mass_spectrometry
-      units: dimensionless
-      values:
-        quantity: gamma_Na2CO3_in_glass
-        status: typed_refusal
-        reason: >-
-          Fig. 6 plots log(activity coefficient) of 0.45 wt.% Na2CO3 in the
-          soda-lime glass (TMS). Ideal-solution dashed line is printed. No
-          numeric table. Open circles increasing-T, squares decreasing-T.
-        admission_status: figure_only
-        Na2CO3_wt_pct: 0.45
-        semantics: bound_not_point_ordering
-      uncertainty:
-        note: not applicable
     - observation_id: hastie_1981_nacl_liquid_logP_prose_quoted_20260906
       supersedes: hastie_1981_nacl_liquid_logP_prose
       type: psat_series
@@ -2143,10 +2115,37 @@ species:
         semantics: bound_not_point_ordering
         reason: Parent digitization retained unchanged as archival derived evidence; plotted point coordinates
           are not printed numeric cells. No re-digitization or invented cell quote in this deepening.
+    context:
+    - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only
+      experiment: hastie-1981-measured-soda-lime-glass-tms
+      type: figure
+      locator:
+        figure: '6'
+        page: 66
+        published_page: 60
+        pdf_page_index: 65
+      T_range_K:
+      - 1200.0
+      - 1700.0
+      phase: soda_lime_silica_glass
+      regime: transpiration_mass_spectrometry
+      units: dimensionless
+      values:
+        quantity: gamma_Na2CO3_in_glass
+        status: typed_refusal
+        reason: >-
+          Fig. 6 plots log(activity coefficient) of 0.45 wt.% Na2CO3 in the
+          soda-lime glass (TMS). Ideal-solution dashed line is printed. No
+          numeric table. Open circles increasing-T, squares decreasing-T.
+        admission_status: figure_only
+        Na2CO3_wt_pct: 0.45
+        semantics: bound_not_point_ordering
+      uncertainty:
+        note: not applicable
     - observation_id: hastie_1981_fig6_na2co3_gamma_figure_only_quoted_20260906
       experiment: hastie-1981-measured-soda-lime-glass-tms
       supersedes: hastie_1981_fig6_na2co3_gamma_figure_only
-      type: activity_coefficient
+      type: figure
       class_tag: figure_only
       locator:
         page: 57
@@ -2354,7 +2353,7 @@ species:
       regime: mixed_kms_tms
       units: dimensionless
       values:
-        quantity: apparent_gamma_K2O
+        quantity: activity_coefficient
         method_class: figure_only
         admission_status: admitted
         system_class: mixed_oxide_slag
@@ -2621,9 +2620,9 @@ species:
       experiment: hastie-1981-pt-tms
       locator:
         figure: '11'
-        page: 58
-        published_page: 52
-        pdf_page_index: 57
+        page: 71
+        published_page: 61
+        pdf_page_index: 70
         note: >-
           Caption identifies the open square as TMS, run 1, 1575 K. The plotted
           point was digitized from Figure 11 on page 61 (PDF page 71).
@@ -2644,7 +2643,7 @@ species:
       regime: transpiration_mass_spectrometry
       units: dimensionless
       values:
-        quantity: apparent_gamma_K2O
+        quantity: activity_coefficient
         method_class: figure_only
         admission_status: admitted
         system_class: mixed_oxide_slag
@@ -2701,8 +2700,9 @@ species:
         expression_as_printed: log Kp [K2O(l)] = -23751/T + 11.7723
         note: Authors combine JANAF solid data, fusion data and an estimated liquid heat capacity; no validity
           range printed here.
+    context:
     - observation_id: hastie_1981_fig11_k1_slag_k2o_gamma_digitized_quoted_20260906
-      type: activity_coefficient
+      type: figure
       class_tag: figure_only
       locator:
         page: 58
@@ -2736,7 +2736,7 @@ species:
       T_range_K:
       - 1702.0
       - 1977.1
-      phase: illite_liquid
+      phase: g
       regime: kems_effusion
       units: atm as published
       values:
@@ -2972,7 +2972,13 @@ species:
           10^4/T~6.3 and 6.6 with large error bars. Not digitized as points
           (error bars larger than the digitization budget).
       uncertainty:
-        note: digitisation ±0.10 dex (tick-calibrated; pass-2 residual ≤0.002 dex); authors do not restate a per-point sigma on Fig. 4
+        value: 0.10
+        units: dex
+        scope: every point in this series
+        as_printed: ±0.10 dex
+        note: >-
+          Archival digitisation uncertainty from tick calibration; pass-2
+          residual ≤0.002 dex. Authors do not restate a per-point sigma on Fig. 4.
     - observation_id: hastie_1981_fig4_illite_K_SiO_digitized_quoted_20260906
       supersedes: hastie_1981_fig4_illite_K_SiO_digitized
       type: psat_series
@@ -3102,9 +3108,10 @@ species:
         quote: about 50 min.; About six percent; ~ 10^4
         note: Approximation qualifiers retained; no numeric sigma stated.
   KCl:
-    observations:
+    observations: []
+    context:
     - observation_id: hastie_1981_fig15_kcl_std_pressure_printed
-      type: psat_series
+      type: reference_metadata
       locator:
         figure: '15'
         page: 75
@@ -3127,7 +3134,7 @@ species:
         note: not restated on the figure
     - observation_id: hastie_1981_fig15_kcl_std_pressure_printed_quoted_20260906
       supersedes: hastie_1981_fig15_kcl_std_pressure_printed
-      type: psat_series
+      type: reference_metadata
       class_tag: derived
       locator:
         page: 58

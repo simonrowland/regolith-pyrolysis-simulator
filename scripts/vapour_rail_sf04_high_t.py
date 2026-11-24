@@ -32,13 +32,16 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.yaml_cache import load_cached_safe_yaml  # noqa: E402
+from simulator.source_ids import (  # noqa: E402
+    SF04_WORKBOOK_SOURCE_ID,
+)
 
 DEFAULT_EXTRACT = (
     ROOT
     / "data"
     / "literature"
     / "extracts"
-    / "sf04-magma-companion-workbook.yaml"
+    / f"{SF04_WORKBOOK_SOURCE_ID}.yaml"
 )
 DEFAULT_OUTPUT = (
     ROOT / "validation-data" / "vapour_rail_sf04_high_t_residuals.csv"
@@ -148,7 +151,7 @@ def _vaporock_checkout_identity(source_path: Path) -> dict[str, str]:
 
 def load_extract(path: Path = DEFAULT_EXTRACT) -> dict[str, Any]:
     document = load_cached_safe_yaml(path.read_text(encoding="utf-8")) or {}
-    if document.get("source_id") != "sf04-magma-companion-workbook":
+    if document.get("source_id") != SF04_WORKBOOK_SOURCE_ID:
         raise ValueError(f"unexpected SF04 extract at {path}")
     return document
 

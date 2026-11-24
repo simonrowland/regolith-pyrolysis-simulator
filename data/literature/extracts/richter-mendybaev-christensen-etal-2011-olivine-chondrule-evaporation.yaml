@@ -104,7 +104,12 @@ benches:
 experiments:
 - experiment_id: richter-2011-iiab1-1
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: &richter_vacuum_method_locator
+    page: 16
+    pdf_page_index: 15
+    published_page: 15
+    section: 4.2 Vacuum Evaporation Experiments
   locator: &id001
     page: 39
     pdf_page_index: 38
@@ -209,7 +214,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-2
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id002
     page: 39
     pdf_page_index: 38
@@ -309,7 +315,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-3
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id004
     page: 39
     pdf_page_index: 38
@@ -409,7 +416,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-4
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id005
     page: 39
     pdf_page_index: 38
@@ -509,7 +517,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-5
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id006
     page: 39
     pdf_page_index: 38
@@ -609,7 +618,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-6
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id007
     page: 39
     pdf_page_index: 38
@@ -709,7 +719,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-7
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id008
     page: 39
     pdf_page_index: 38
@@ -809,7 +820,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-8
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id009
     page: 39
     pdf_page_index: 38
@@ -909,7 +921,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab1-9
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id010
     page: 39
     pdf_page_index: 38
@@ -1009,7 +1022,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-1
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id011
     page: 39
     pdf_page_index: 38
@@ -1114,7 +1128,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-2
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id012
     page: 39
     pdf_page_index: 38
@@ -1214,7 +1229,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-3
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id014
     page: 39
     pdf_page_index: 38
@@ -1314,7 +1330,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-4
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: *id013
   sample:
     sample_id: IIAB2-4
@@ -1409,7 +1426,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-5
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id015
     page: 39
     pdf_page_index: 38
@@ -1509,7 +1527,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-6
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id016
     page: 39
     pdf_page_index: 38
@@ -1609,7 +1628,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-7
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id017
     page: 39
     pdf_page_index: 38
@@ -1709,7 +1729,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-11
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id018
     page: 39
     pdf_page_index: 38
@@ -1792,7 +1813,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-12
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id019
     page: 39
     pdf_page_index: 38
@@ -1875,7 +1897,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-13
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id020
     page: 39
     pdf_page_index: 38
@@ -1958,7 +1981,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-15
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id021
     page: 39
     pdf_page_index: 38
@@ -2041,7 +2065,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-17
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id022
     page: 39
     pdf_page_index: 38
@@ -2124,7 +2149,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-23
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id023
     page: 39
     pdf_page_index: 38
@@ -2207,7 +2233,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-28
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id024
     page: 39
     pdf_page_index: 38
@@ -2290,7 +2317,8 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-29
   bench_id: richter-2011-vacuum-furnace
-  method: vacuum_evaporation
+  method: langmuir_free_evaporation
+  method_locator: *richter_vacuum_method_locator
   locator: &id025
     page: 39
     pdf_page_index: 38
@@ -2373,7 +2401,14 @@ experiments:
     furnace_as_printed: vacuum furnace
 - experiment_id: richter-2011-iiab2-14
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: &richter_one_bar_method_unknown
+    tag: unknown
+    reason: "The paper describes one-bar flowing-gas evaporation but does not infer vapour pressure from carrier-gas saturation; no closed method token applies."
+  method_locator: &richter_flowing_method_locator
+    page: 17
+    pdf_page_index: 16
+    published_page: 16
+    section: 4.3 One-bar Hydrogen Evaporation Experiments
   locator: &id026
     page: 39
     pdf_page_index: 38
@@ -2453,7 +2488,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab2-16
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id027
     page: 39
     pdf_page_index: 38
@@ -2533,7 +2569,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab2-18
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id028
     page: 39
     pdf_page_index: 38
@@ -2613,7 +2650,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab2-19
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id029
     page: 39
     pdf_page_index: 38
@@ -2693,7 +2731,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab2-20
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id030
     page: 39
     pdf_page_index: 38
@@ -2773,7 +2812,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab2-27
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id031
     page: 39
     pdf_page_index: 38
@@ -2853,7 +2893,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-1
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id032
     page: 39
     pdf_page_index: 38
@@ -2955,7 +2996,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-2
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id033
     page: 39
     pdf_page_index: 38
@@ -3052,7 +3094,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-3
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id035
     page: 39
     pdf_page_index: 38
@@ -3149,7 +3192,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-4
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id036
     page: 39
     pdf_page_index: 38
@@ -3246,7 +3290,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-18
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id037
     page: 39
     pdf_page_index: 38
@@ -3343,7 +3388,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-20
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id038
     page: 39
     pdf_page_index: 38
@@ -3440,7 +3486,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-15
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id039
     page: 39
     pdf_page_index: 38
@@ -3537,7 +3584,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-19
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id040
     page: 39
     pdf_page_index: 38
@@ -3634,7 +3682,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-21
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id041
     page: 39
     pdf_page_index: 38
@@ -3731,7 +3780,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-iiab5-22
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id042
     page: 39
     pdf_page_index: 38
@@ -3828,7 +3878,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-5
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id043
     page: 39
     pdf_page_index: 38
@@ -3930,7 +3981,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-1
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id044
     page: 39
     pdf_page_index: 38
@@ -4027,7 +4079,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-2
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id046
     page: 39
     pdf_page_index: 38
@@ -4124,7 +4177,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-9
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id047
     page: 39
     pdf_page_index: 38
@@ -4221,7 +4275,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-10
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id048
     page: 39
     pdf_page_index: 38
@@ -4315,7 +4370,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-12
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id049
     page: 39
     pdf_page_index: 38
@@ -4409,7 +4465,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-3
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id050
     page: 39
     pdf_page_index: 38
@@ -4503,7 +4560,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-7
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id051
     page: 39
     pdf_page_index: 38
@@ -4597,7 +4655,8 @@ experiments:
     furnace_as_printed: vertical gas-mixing tube furnace
 - experiment_id: richter-2011-50di50le-6
   bench_id: richter-2011-gas-mixing-furnace
-  method: one_bar_flowing_gas_evaporation
+  method: *richter_one_bar_method_unknown
+  method_locator: *richter_flowing_method_locator
   locator: &id052
     page: 39
     pdf_page_index: 38

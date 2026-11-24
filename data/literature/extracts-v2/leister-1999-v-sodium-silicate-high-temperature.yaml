@@ -55,7 +55,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -112,7 +112,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_disilicate_esr_v4::T=1573.15:row=na2o.2sio2,-1300-air:h=633b5253a141
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -185,6 +190,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: V4+ is quantified from the integrated ESR signal relative to the CuSO4·5H2O standard, then expressed as a fraction
       of total V.
@@ -557,7 +578,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -614,7 +635,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_disilicate_esr_v4::T=1873.15:row=na2o.2sio2,-1600-air:h=888702b800a3
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -687,6 +713,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: V4+ is quantified from the integrated ESR signal relative to the CuSO4·5H2O standard, then expressed as a fraction
       of total V.
@@ -1561,7 +1603,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -1619,7 +1661,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_disilicate_optical_v4::T=1573.15:row=na2o.2sio2,-1300-air:h=326c6c04b9a2
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -1692,6 +1739,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Optical absorption intensities are interpreted with the Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
       from Table 1 to determine valence fractions.
@@ -2065,7 +2128,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -2123,7 +2186,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_disilicate_optical_v4::T=1873.15:row=na2o.2sio2,-1600-air:h=e2093e137089
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -2196,6 +2264,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Optical absorption intensities are interpreted with the Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
       from Table 1 to determine valence fractions.
@@ -3073,7 +3157,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -3131,7 +3215,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_disilicate_optical_v5::T=1573.15:row=na2o.2sio2,-1300-air:h=1d3d0a1acb80
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -3204,6 +3293,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Optical absorption intensities are interpreted with the Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
       from Table 1 to determine valence fractions.
@@ -3577,7 +3682,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -3635,7 +3740,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_disilicate_optical_v5::T=1873.15:row=na2o.2sio2,-1600-air:h=a7e229d701ae
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -3708,6 +3818,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Optical absorption intensities are interpreted with the Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
       from Table 1 to determine valence fractions.
@@ -5841,7 +5967,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -5899,7 +6025,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_silica_rich_optical_v4::T=1873.15:row=na2o.5·67sio2,-1600-air:h=139348049f97
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -5972,6 +6103,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Optical absorption intensities are interpreted with the Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
       from Table 1 to determine valence fractions.
@@ -7101,7 +7248,7 @@ observations:
         amount_basis: mole_fraction
     fO2_Pa:
       tag: unknown
-      reason: no fO2_Pa mapped from source
+      reason: 'missing input: printed air fO2 requires stated total pressure'
     total_pressure_Pa:
       tag: unknown
       reason: no total_pressure_Pa mapped from source
@@ -7159,7 +7306,12 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
-  notices: []
+  notices:
+  - kind: input_omitted
+    affected_quantities:
+    - valence_ratio
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: leister-1999-v-sodium-silicate-high-temperature::leister99_silica_rich_optical_v5::T=1873.15:row=na2o.5·67sio2,-1600-air:h=3fe61866dd3c
   source_id: leister-1999-v-sodium-silicate-high-temperature
   locator:
     page: 4
@@ -7232,6 +7384,22 @@ observations:
         published_page: 322
         pdf_page_index: 3
         table: '2'
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 4
+        published_page: 322
+        pdf_page_index: 3
+        table: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   derivation:
     relation: Optical absorption intensities are interpreted with the Lambert-Beer equation E(λ)=ε(λ)c d and extinction coefficients
       from Table 1 to determine valence fractions.

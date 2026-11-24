@@ -3353,6 +3353,13 @@ species:
     - observation_id: bch80_t1_c_b_1_activity
       experiment: bch80_t1_c_b_1_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -3369,17 +3376,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -3400,7 +3406,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.985
         method_class: measured_tabulated
         T_C: 1400
@@ -3485,6 +3492,13 @@ species:
     - observation_id: bch80_t1_c_b_2_activity
       experiment: bch80_t1_c_b_2_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -3501,17 +3515,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -3532,7 +3545,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.961
         method_class: measured_tabulated
         T_C: 1400
@@ -3617,6 +3631,13 @@ species:
     - observation_id: bch80_t1_c_b_4_activity
       experiment: bch80_t1_c_b_4_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -3633,17 +3654,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -3664,7 +3684,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.924
         method_class: measured_tabulated
         T_C: 1400
@@ -3749,6 +3770,13 @@ species:
     - observation_id: bch80_t1_c_b_3_activity
       experiment: bch80_t1_c_b_3_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -3765,17 +3793,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -3796,7 +3823,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.907
         method_class: measured_tabulated
         T_C: 1400
@@ -3881,6 +3909,13 @@ species:
     - observation_id: bch80_t1_c_b_6_activity
       experiment: bch80_t1_c_b_6_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -3897,17 +3932,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -3928,7 +3962,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.869
         method_class: measured_tabulated
         T_C: 1400
@@ -4013,6 +4048,13 @@ species:
     - observation_id: bch80_t1_c_b_5_activity
       experiment: bch80_t1_c_b_5_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4029,17 +4071,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4060,7 +4101,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.859
         method_class: measured_tabulated
         T_C: 1400
@@ -4145,6 +4187,13 @@ species:
     - observation_id: bch80_t1_c_b_8_activity
       experiment: bch80_t1_c_b_8_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4161,17 +4210,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4192,7 +4240,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.809
         method_class: measured_tabulated
         T_C: 1400
@@ -4277,6 +4326,13 @@ species:
     - observation_id: bch80_t1_c_b_7_activity
       experiment: bch80_t1_c_b_7_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4293,17 +4349,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4324,7 +4379,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.805
         method_class: measured_tabulated
         T_C: 1400
@@ -4409,6 +4465,13 @@ species:
     - observation_id: bch80_t1_c_b_9_activity
       experiment: bch80_t1_c_b_9_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4425,17 +4488,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4456,7 +4518,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.767
         method_class: measured_tabulated
         T_C: 1400
@@ -4541,6 +4604,13 @@ species:
     - observation_id: bch80_t1_c_b_10_activity
       experiment: bch80_t1_c_b_10_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4557,17 +4627,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4588,7 +4657,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.756
         method_class: measured_tabulated
         T_C: 1400
@@ -4673,6 +4743,13 @@ species:
     - observation_id: bch80_t1_c_b_12_activity
       experiment: bch80_t1_c_b_12_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4689,17 +4766,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4720,7 +4796,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.711
         method_class: measured_tabulated
         T_C: 1400
@@ -4805,6 +4882,13 @@ species:
     - observation_id: bch80_t1_c_b_11_activity
       experiment: bch80_t1_c_b_11_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4821,17 +4905,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4852,7 +4935,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.705
         method_class: measured_tabulated
         T_C: 1400
@@ -4937,6 +5021,13 @@ species:
     - observation_id: bch80_t1_c_b_14_activity
       experiment: bch80_t1_c_b_14_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -4953,17 +5044,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -4984,7 +5074,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.655
         method_class: measured_tabulated
         T_C: 1400
@@ -5069,6 +5160,13 @@ species:
     - observation_id: bch80_t1_c_b_13_activity
       experiment: bch80_t1_c_b_13_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -5085,17 +5183,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5116,7 +5213,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.651
         method_class: measured_tabulated
         T_C: 1400
@@ -5201,6 +5299,13 @@ species:
     - observation_id: bch80_t1_c_b_15_activity
       experiment: bch80_t1_c_b_15_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -5217,17 +5322,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5248,7 +5352,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.607
         method_class: measured_tabulated
         T_C: 1400
@@ -5333,6 +5438,13 @@ species:
     - observation_id: bch80_t1_c_b_16_activity
       experiment: bch80_t1_c_b_16_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -5349,17 +5461,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5380,7 +5491,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.579
         method_class: measured_tabulated
         T_C: 1400
@@ -5465,6 +5577,13 @@ species:
     - observation_id: bch80_t1_c_b_17_activity
       experiment: bch80_t1_c_b_17_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -5481,17 +5600,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5512,7 +5630,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.563
         method_class: measured_tabulated
         T_C: 1400
@@ -5597,6 +5716,13 @@ species:
     - observation_id: bch80_t1_c_b_18_activity
       experiment: bch80_t1_c_b_18_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -5613,17 +5739,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5644,7 +5769,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.515
         method_class: measured_tabulated
         T_C: 1400
@@ -5729,6 +5855,13 @@ species:
     - observation_id: bch80_t1_c_b_19_activity
       experiment: bch80_t1_c_b_19_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 2
         published_page: 1485
@@ -5745,17 +5878,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5776,7 +5908,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.468
         method_class: measured_tabulated
         T_C: 1400
@@ -5861,6 +5994,13 @@ species:
     - observation_id: bch80_t2_c_a_1_activity
       experiment: bch80_t2_c_a_1_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -5877,17 +6017,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -5908,7 +6047,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 1.001
         method_class: measured_tabulated
         T_C: 1400
@@ -5993,6 +6133,13 @@ species:
     - observation_id: bch80_t2_c_a_2_activity
       experiment: bch80_t2_c_a_2_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6009,17 +6156,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6040,7 +6186,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.976
         method_class: measured_tabulated
         T_C: 1400
@@ -6125,6 +6272,13 @@ species:
     - observation_id: bch80_t2_c_a_3_activity
       experiment: bch80_t2_c_a_3_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6141,17 +6295,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6172,7 +6325,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.957
         method_class: measured_tabulated
         T_C: 1400
@@ -6257,6 +6411,13 @@ species:
     - observation_id: bch80_t2_c_a_6_activity
       experiment: bch80_t2_c_a_6_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6273,17 +6434,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6304,7 +6464,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.899
         method_class: measured_tabulated
         T_C: 1400
@@ -6389,6 +6550,13 @@ species:
     - observation_id: bch80_t2_c_a_7_activity
       experiment: bch80_t2_c_a_7_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6405,17 +6573,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6436,7 +6603,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.819
         method_class: measured_tabulated
         T_C: 1400
@@ -6521,6 +6689,13 @@ species:
     - observation_id: bch80_t2_c_a_11_activity
       experiment: bch80_t2_c_a_11_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6537,17 +6712,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6568,7 +6742,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.764
         method_class: measured_tabulated
         T_C: 1400
@@ -6653,6 +6828,13 @@ species:
     - observation_id: bch80_t2_c_a_10_activity
       experiment: bch80_t2_c_a_10_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6669,17 +6851,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6700,7 +6881,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.759
         method_class: measured_tabulated
         T_C: 1400
@@ -6785,6 +6967,13 @@ species:
     - observation_id: bch80_t2_c_a_12_activity
       experiment: bch80_t2_c_a_12_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6801,17 +6990,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6832,7 +7020,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.698
         method_class: measured_tabulated
         T_C: 1400
@@ -6917,6 +7106,13 @@ species:
     - observation_id: bch80_t2_c_a_13_activity
       experiment: bch80_t2_c_a_13_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -6933,17 +7129,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -6964,7 +7159,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.65
         method_class: measured_tabulated
         T_C: 1400
@@ -7049,6 +7245,13 @@ species:
     - observation_id: bch80_t2_c_a_14_activity
       experiment: bch80_t2_c_a_14_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -7065,17 +7268,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7096,7 +7298,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.592
         method_class: measured_tabulated
         T_C: 1400
@@ -7181,6 +7384,13 @@ species:
     - observation_id: bch80_t2_c_a_16_activity
       experiment: bch80_t2_c_a_16_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -7197,17 +7407,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7228,7 +7437,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.536
         method_class: measured_tabulated
         T_C: 1400
@@ -7313,6 +7523,13 @@ species:
     - observation_id: bch80_t2_c_a_18_activity
       experiment: bch80_t2_c_a_18_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 3
         published_page: 1486
@@ -7329,17 +7546,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7360,7 +7576,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.442
         method_class: measured_tabulated
         T_C: 1400
@@ -7445,6 +7662,13 @@ species:
     - observation_id: bch80_t3_cc_1_activity
       experiment: bch80_t3_cc_1_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -7461,17 +7685,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7492,7 +7715,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.992
         method_class: measured_tabulated
         T_C: 1400
@@ -7577,6 +7801,13 @@ species:
     - observation_id: bch80_t3_hc_1_activity
       experiment: bch80_t3_hc_1_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -7593,17 +7824,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7624,7 +7854,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.98
         method_class: measured_tabulated
         T_C: 1400
@@ -7709,6 +7940,13 @@ species:
     - observation_id: bch80_t3_cc_2_activity
       experiment: bch80_t3_cc_2_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -7725,17 +7963,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7756,7 +7993,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.906
         method_class: measured_tabulated
         T_C: 1400
@@ -7841,6 +8079,13 @@ species:
     - observation_id: bch80_t3_cc_3_activity
       experiment: bch80_t3_cc_3_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -7857,17 +8102,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -7888,7 +8132,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.858
         method_class: measured_tabulated
         T_C: 1400
@@ -7973,6 +8218,13 @@ species:
     - observation_id: bch80_t3_hc_3_activity
       experiment: bch80_t3_hc_3_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -7989,17 +8241,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8020,7 +8271,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.838
         method_class: measured_tabulated
         T_C: 1400
@@ -8105,6 +8357,13 @@ species:
     - observation_id: bch80_t3_cc_4_activity
       experiment: bch80_t3_cc_4_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8121,17 +8380,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8152,7 +8410,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.799
         method_class: measured_tabulated
         T_C: 1400
@@ -8237,6 +8496,13 @@ species:
     - observation_id: bch80_t3_hc_4_activity
       experiment: bch80_t3_hc_4_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8253,17 +8519,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8284,7 +8549,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.797
         method_class: measured_tabulated
         T_C: 1400
@@ -8369,6 +8635,13 @@ species:
     - observation_id: bch80_t3_hc_5_activity
       experiment: bch80_t3_hc_5_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8385,17 +8658,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8416,7 +8688,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.777
         method_class: measured_tabulated
         T_C: 1400
@@ -8501,6 +8774,13 @@ species:
     - observation_id: bch80_t3_cc_5_activity
       experiment: bch80_t3_cc_5_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8517,17 +8797,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8548,7 +8827,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.768
         method_class: measured_tabulated
         T_C: 1400
@@ -8633,6 +8913,13 @@ species:
     - observation_id: bch80_t3_hc_6_activity
       experiment: bch80_t3_hc_6_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8649,17 +8936,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8680,7 +8966,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.753
         method_class: measured_tabulated
         T_C: 1400
@@ -8765,6 +9052,13 @@ species:
     - observation_id: bch80_t3_cc_6_activity
       experiment: bch80_t3_cc_6_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8781,17 +9075,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8812,7 +9105,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.741
         method_class: measured_tabulated
         T_C: 1400
@@ -8897,6 +9191,13 @@ species:
     - observation_id: bch80_t3_hc_8_activity
       experiment: bch80_t3_hc_8_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -8913,17 +9214,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -8944,7 +9244,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.647
         method_class: measured_tabulated
         T_C: 1400
@@ -9029,6 +9330,13 @@ species:
     - observation_id: bch80_t3_cc_8_activity
       experiment: bch80_t3_cc_8_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9045,17 +9353,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9076,7 +9383,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.642
         method_class: measured_tabulated
         T_C: 1400
@@ -9161,6 +9469,13 @@ species:
     - observation_id: bch80_t3_hc_9_activity
       experiment: bch80_t3_hc_9_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9177,17 +9492,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9208,7 +9522,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.612
         method_class: measured_tabulated
         T_C: 1400
@@ -9293,6 +9608,13 @@ species:
     - observation_id: bch80_t3_cc_9_activity
       experiment: bch80_t3_cc_9_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9309,17 +9631,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9340,7 +9661,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.601
         method_class: measured_tabulated
         T_C: 1400
@@ -9425,6 +9747,13 @@ species:
     - observation_id: bch80_t3_cc_10_activity
       experiment: bch80_t3_cc_10_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9441,17 +9770,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9472,7 +9800,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.556
         method_class: measured_tabulated
         T_C: 1400
@@ -9557,6 +9886,13 @@ species:
     - observation_id: bch80_t3_hc_10_activity
       experiment: bch80_t3_hc_10_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9573,17 +9909,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9604,7 +9939,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.524
         method_class: measured_tabulated
         T_C: 1400
@@ -9689,6 +10025,13 @@ species:
     - observation_id: bch80_t3_cc_11_activity
       experiment: bch80_t3_cc_11_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9705,17 +10048,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9736,7 +10078,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.515
         method_class: measured_tabulated
         T_C: 1400
@@ -9821,6 +10164,13 @@ species:
     - observation_id: bch80_t3_cc_12_activity
       experiment: bch80_t3_cc_12_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9837,17 +10187,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -9868,7 +10217,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.503
         method_class: measured_tabulated
         T_C: 1400
@@ -9953,6 +10303,13 @@ species:
     - observation_id: bch80_t3_hc_11_activity
       experiment: bch80_t3_hc_11_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -9969,17 +10326,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10000,7 +10356,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.491
         method_class: measured_tabulated
         T_C: 1400
@@ -10085,6 +10442,13 @@ species:
     - observation_id: bch80_t3_cc_13_activity
       experiment: bch80_t3_cc_13_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10101,17 +10465,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10132,7 +10495,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.485
         method_class: measured_tabulated
         T_C: 1400
@@ -10217,6 +10581,13 @@ species:
     - observation_id: bch80_t3_cc_14_activity
       experiment: bch80_t3_cc_14_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10233,17 +10604,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10264,7 +10634,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.475
         method_class: measured_tabulated
         T_C: 1400
@@ -10349,6 +10720,13 @@ species:
     - observation_id: bch80_t3_hc_12_activity
       experiment: bch80_t3_hc_12_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10365,17 +10743,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10396,7 +10773,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.462
         method_class: measured_tabulated
         T_C: 1400
@@ -10481,6 +10859,13 @@ species:
     - observation_id: bch80_t3_cc_16_activity
       experiment: bch80_t3_cc_16_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10497,17 +10882,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10528,7 +10912,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.46
         method_class: measured_tabulated
         T_C: 1400
@@ -10613,6 +10998,13 @@ species:
     - observation_id: bch80_t3_cc_15_activity
       experiment: bch80_t3_cc_15_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10629,17 +11021,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10660,7 +11051,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.459
         method_class: measured_tabulated
         T_C: 1400
@@ -10745,6 +11137,13 @@ species:
     - observation_id: bch80_t3_hc_13_activity
       experiment: bch80_t3_hc_13_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10761,17 +11160,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10792,7 +11190,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.448
         method_class: measured_tabulated
         T_C: 1400
@@ -10877,6 +11276,13 @@ species:
     - observation_id: bch80_t3_cc_17_activity
       experiment: bch80_t3_cc_17_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 4
         published_page: 1487
@@ -10893,17 +11299,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -10924,7 +11329,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.444
         method_class: measured_tabulated
         T_C: 1400
@@ -11009,6 +11415,13 @@ species:
     - observation_id: bch80_t4_h_d_2_activity
       experiment: bch80_t4_h_d_2_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11025,17 +11438,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11056,7 +11468,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.992
         method_class: measured_tabulated
         T_C: 1400
@@ -11141,6 +11554,13 @@ species:
     - observation_id: bch80_t4_h_d_1_activity
       experiment: bch80_t4_h_d_1_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11157,17 +11577,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11188,7 +11607,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.98
         method_class: measured_tabulated
         T_C: 1400
@@ -11273,6 +11693,13 @@ species:
     - observation_id: bch80_t4_c_d_3_activity
       experiment: bch80_t4_c_d_3_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11289,17 +11716,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11320,7 +11746,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.975
         method_class: measured_tabulated
         T_C: 1400
@@ -11405,6 +11832,13 @@ species:
     - observation_id: bch80_t4_c_d_4_activity
       experiment: bch80_t4_c_d_4_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11421,17 +11855,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11452,7 +11885,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.973
         method_class: measured_tabulated
         T_C: 1400
@@ -11537,6 +11971,13 @@ species:
     - observation_id: bch80_t4_c_d_1_activity
       experiment: bch80_t4_c_d_1_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11553,17 +11994,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11584,7 +12024,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.964
         method_class: measured_tabulated
         T_C: 1400
@@ -11669,6 +12110,13 @@ species:
     - observation_id: bch80_t4_h_d_3_activity
       experiment: bch80_t4_h_d_3_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11685,17 +12133,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11716,7 +12163,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.949
         method_class: measured_tabulated
         T_C: 1400
@@ -11801,6 +12249,13 @@ species:
     - observation_id: bch80_t4_h_d_4_activity
       experiment: bch80_t4_h_d_4_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11817,17 +12272,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11848,7 +12302,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.926
         method_class: measured_tabulated
         T_C: 1400
@@ -11933,6 +12388,13 @@ species:
     - observation_id: bch80_t4_c_d_5_activity
       experiment: bch80_t4_c_d_5_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -11949,17 +12411,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -11980,7 +12441,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.919
         method_class: measured_tabulated
         T_C: 1400
@@ -12065,6 +12527,13 @@ species:
     - observation_id: bch80_t4_c_d_6_activity
       experiment: bch80_t4_c_d_6_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -12081,17 +12550,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -12112,7 +12580,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.897
         method_class: measured_tabulated
         T_C: 1400
@@ -12197,6 +12666,13 @@ species:
     - observation_id: bch80_t4_h_d_5_activity
       experiment: bch80_t4_h_d_5_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -12213,17 +12689,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -12244,7 +12719,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.896
         method_class: measured_tabulated
         T_C: 1400
@@ -12329,6 +12805,13 @@ species:
     - observation_id: bch80_t4_c_d_7_activity
       experiment: bch80_t4_c_d_7_run
       type: activity_coefficient
+      uncertainty:
+        kind: derived
+        derivation:
+          relation: total_iron_basis
+          inputs:
+          - point_conditions.composition
+          output_unit: dex
       locator:
         page: 5
         published_page: 1488
@@ -12345,17 +12828,16 @@ species:
           value:
             convention: raoultian_pure_endmember
             endmember:
-              formula: Fe_tO
+              formula: Fe(1-x)O
               phase:
                 tag: value
                 value: l
               polymorph:
                 tag: not_applicable
                 reason: not_applicable
-            component_basis: Fe_tO
+            component_basis: Fe(1-x)O
         inferred: false
-        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; activity
-          remains on the FetO basis, with no conversion to a different iron-oxide standard.'
+        note: 'Printed standard: pure liquid FetO (the FeO-Fe2O3 liquid oxide) in equilibrium with solid iron; represented as iron-saturated liquid Fe(1-x)O for reference conversion.'
         locator:
           page: 2
           published_page: 1485
@@ -12376,7 +12858,8 @@ species:
           quote: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         composition_derivation: "Table reports the full oxide mass percentages as printed; retained on the printed wt% basis."
         quantity: activity
-        component: Fe_tO
+        formula: FeO
+        component: FeO
         activity: 0.867
         method_class: measured_tabulated
         T_C: 1400

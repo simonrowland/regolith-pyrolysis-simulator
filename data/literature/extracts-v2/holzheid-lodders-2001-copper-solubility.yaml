@@ -65827,6 +65827,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_Al2O3
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -65896,6 +65901,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=AD
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_CaO
@@ -65981,6 +66002,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_CaO
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66050,6 +66076,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=AD
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_FeO
@@ -66129,6 +66171,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_FeO
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66198,6 +66245,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=AD
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_MgO
@@ -66283,6 +66346,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_MgO
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66352,6 +66420,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=AD
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_SiO2
@@ -66437,6 +66521,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_AD_SiO2
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66506,6 +66595,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=AD
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_Al2O3
@@ -66591,6 +66696,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_Al2O3
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66660,6 +66770,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=BK
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_CaO
@@ -66745,6 +66871,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_CaO
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66814,6 +66945,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=BK
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_FeO
@@ -66899,6 +67046,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_FeO
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -66968,6 +67120,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=BK
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_MgO
@@ -67053,6 +67221,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_MgO
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -67122,6 +67295,22 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=BK
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass
 - observation_id: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_SiO2
@@ -67207,6 +67396,11 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: input_omitted
+    affected_quantities:
+    - equilibrium_phase_composition
+    reason: 'missing input: printed air fO2 requires stated total pressure'
+    origin: holzheid-lodders-2001-copper-solubility::hl01_t1_BK_SiO2
   - kind: admission_defaulted
     affected_quantities:
     - equilibrium_phase_composition
@@ -67276,5 +67470,21 @@ observations:
         pdf_page_index: 1
         table: '1'
         note: row=BK
+    fO2_log:
+      state:
+        tag: unknown
+        reason: 'missing input: printed air fO2 requires stated total pressure'
+      locator:
+        page: 2
+        published_page: 1934
+        pdf_page_index: 1
+        section: '2'
+      inference:
+        relation: air_fO2_requires_stated_total_pressure
+        inputs:
+        - atmosphere=air
+        parameters: []
+        output_unit: log10(fO2/bar)
+        references: []
   provenance:
     printed_phase: glass

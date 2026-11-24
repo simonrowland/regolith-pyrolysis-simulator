@@ -24,6 +24,10 @@ from simulator.battery.oxygen_balance import (
     _solve_vacuum_oxygen_balance,
 )
 from simulator.battery.records import nominal_pressure_pa
+from simulator.source_ids import (
+    HASHIMOTO_SOURCE_ID,
+    SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+)
 from simulator.chemistry.kernel.capabilities import ChemistryIntent
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
@@ -208,6 +212,21 @@ class ResidueEngineNonconvergence(RuntimeError):
             "message": self.detail,
             "retry": self.retry,
         }
+
+
+class IsolatedOpenImccWorkerError(RuntimeError):
+    """OpenIMCC exception reported across the residue worker pipe.
+
+    The child sends the class name and the message, not the package
+    ``code``. ``error_name`` is that class name. Deterministic input
+    names are stored by ``_cached_isolated_openimcc_state``; callers
+    still see this exception after a hit.
+    """
+
+    def __init__(self, error_name: str, detail: str) -> None:
+        self.error_name = str(error_name)
+        self.detail = str(detail)
+        super().__init__(f"isolated OpenIMCC {self.error_name}: {self.detail}")
 
 
 class ResidueEngineTransportError(ResidueEngineNonconvergence):
@@ -434,10 +453,84 @@ def _evaluate_openimcc_isolated(
             raise ResidueEngineTransportError(str(detail))
         if error_name == "ImccNonconvergenceError":
             raise ResidueEngineNonconvergence("openimcc", str(detail))
-        raise RuntimeError(f"isolated OpenIMCC {error_name}: {detail}")
+        raise IsolatedOpenImccWorkerError(error_name, str(detail))
     finally:
         if not process.is_alive():
             _close_openimcc_evaluation_worker()
+
+
+def _cached_isolated_openimcc_state(
+    composition_mol: Mapping[str, float],
+    temperature_K: float,
+    *,
+    timeout_s: float,
+    allow_extrapolation: bool,
+    allow_out_of_envelope: bool,
+) -> Any:
+    """Cache one isolated OpenIMCC evaluation and re-raise a stored refusal.
+
+    Both residue pressure models call this. A deterministic input refusal
+    is stored, then raised again so the caller still sees the worker error.
+    Nonconvergence, transport errors, and timeouts propagate unstored.
+    """
+
+    from simulator.engine_cache import CACHEABLE_REFUSAL_CODES, cached_engine_call
+    from simulator.melt_backend import openimcc_bridge
+    from simulator.melt_backend.openimcc_bridge import (
+        ISOLATED_OPENIMCC_CACHEABLE_ERRORS,
+        OpenImccBridgeResult,
+        _evaluate_request_vector,
+    )
+
+    def solve() -> Any:
+        try:
+            return _evaluate_openimcc_isolated(
+                openimcc_bridge._evaluate_uncached,
+                timeout_s=timeout_s,
+                composition_mol=composition_mol,
+                temperature_K=temperature_K,
+                allow_extrapolation=allow_extrapolation,
+                allow_out_of_envelope=allow_out_of_envelope,
+            ).to_hot()
+        except IsolatedOpenImccWorkerError as exc:
+            code = ISOLATED_OPENIMCC_CACHEABLE_ERRORS.get(exc.error_name)
+            if code is None or code not in CACHEABLE_REFUSAL_CODES:
+                raise
+            return {
+                "status": "refusal",
+                "refusal_reason": code,
+                "engine_status": "out_of_domain",
+                "detail": exc.detail,
+            }
+
+    payload = cached_engine_call(
+        "openimcc",
+        _evaluate_request_vector(
+            composition_mol=composition_mol,
+            temperature_K=temperature_K,
+            allow_extrapolation=allow_extrapolation,
+            allow_out_of_envelope=allow_out_of_envelope,
+        ),
+        solve,
+    )
+    if (
+        isinstance(payload, Mapping)
+        and payload.get("status") == "refusal"
+        and payload.get("refusal_reason")
+    ):
+        code = str(payload["refusal_reason"])
+        error_name = next(
+            (
+                name
+                for name, mapped in ISOLATED_OPENIMCC_CACHEABLE_ERRORS.items()
+                if mapped == code
+            ),
+            code,
+        )
+        raise IsolatedOpenImccWorkerError(
+            error_name, str(payload.get("detail") or ""),
+        )
+    return OpenImccBridgeResult.from_hot(payload)
 
 
 def _component_exhaustion_floor_mol(sample_total_mol: float) -> float:
@@ -1487,29 +1580,13 @@ def _make_residue_pressure_model(
                 }
                 try:
                     timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                    from simulator.engine_cache import cached_engine_call
-                    from simulator.melt_backend.openimcc_bridge import (
-                        OpenImccBridgeResult,
+                    state = _cached_isolated_openimcc_state(
+                        current_composition,
+                        temperature_K,
+                        timeout_s=timeout_s,
+                        allow_extrapolation=True,
+                        allow_out_of_envelope=True,
                     )
-
-                    state_payload = cached_engine_call(
-                        "openimcc",
-                        openimcc_bridge._evaluate_request_vector(
-                            composition_mol=current_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        ),
-                        lambda: _evaluate_openimcc_isolated(
-                            openimcc_bridge._evaluate_uncached,
-                            timeout_s=timeout_s,
-                            composition_mol=current_composition,
-                            temperature_K=temperature_K,
-                            allow_extrapolation=True,
-                            allow_out_of_envelope=True,
-                        ).to_hot(),
-                    )
-                    state = OpenImccBridgeResult.from_hot(state_payload)
                 except ImccNonconvergenceError as exc:
                     raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
                 except TimeoutError as exc:
@@ -3406,7 +3483,7 @@ def _predict_hashimoto_residue_cohort(
                 }
                 provenance = {
                     "experiment_id": experiment_id,
-                    "source_id": "kems-015-hashimoto-1983",
+                    "source_id": HASHIMOTO_SOURCE_ID,
                     "run_locator": dict(experiment.get("locator") or {}),
                     "temperature_K": temperature_K,
                     "duration_s": duration_s,
@@ -3546,7 +3623,6 @@ def _predict_hashimoto_residue_cohort(
         )
     return tuple(prediction_rows)
 
-_SOSSI_SOURCE_ID = "kems-012-sossi-2019"
 _SOSSI_TRACE_PARENTS = {"Mn": "MnO", "Ti": "TiO2"}
 _SOSSI_GEOMETRIES = (
     "pt_loop_bead_sphere_constant",
@@ -3839,30 +3915,14 @@ def _sossi_openimcc_pressure_model(
                     openimcc_bridge._cleaned_melt_policy(composition)
                 )
                 melt_activity_input_policy.update(activity_input_policy)
-                from simulator.engine_cache import cached_engine_call
-                from simulator.melt_backend.openimcc_bridge import (
-                    OpenImccBridgeResult,
-                )
-
                 timeout_s = _ENGINE_OUTER_TIMEOUT_S["openimcc"]
-                state_payload = cached_engine_call(
-                    "openimcc",
-                    openimcc_bridge._evaluate_request_vector(
-                        composition_mol=activity_composition,
-                        temperature_K=temperature_K,
-                        allow_extrapolation=True,
-                        allow_out_of_envelope=True,
-                    ),
-                    lambda: _evaluate_openimcc_isolated(
-                        openimcc_bridge._evaluate_uncached,
-                        timeout_s=timeout_s,
-                        composition_mol=activity_composition,
-                        temperature_K=temperature_K,
-                        allow_extrapolation=True,
-                        allow_out_of_envelope=True,
-                    ).to_hot(),
+                state = _cached_isolated_openimcc_state(
+                    activity_composition,
+                    temperature_K,
+                    timeout_s=timeout_s,
+                    allow_extrapolation=True,
+                    allow_out_of_envelope=True,
                 )
-                state = OpenImccBridgeResult.from_hot(state_payload)
             except nonconvergence_error as exc:
                 raise ResidueEngineNonconvergence("openimcc", str(exc)) from exc
             except TimeoutError as exc:

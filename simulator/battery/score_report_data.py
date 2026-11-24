@@ -127,6 +127,58 @@ class EligibilityFailureCensus(NamedTuple):
     engine_counts: tuple[tuple[str, str, int, int, int | None], ...]
 
 
+class AssumedBandReport:
+    """Additive d-443 diagnostics; never consumes or modifies headline stats."""
+
+    def __init__(self) -> None:
+        self.groups: dict[tuple[str, ...], dict[str, object]] = {}
+        self.observations: dict[tuple[str, ...], set[str]] = defaultdict(set)
+        self.refusals: dict[str, int] = defaultdict(int)
+
+    def add(self, row: Mapping[str, object], *, engine: str, quantity: str) -> None:
+        details = row.get("assumed_band_details")
+        if not isinstance(details, Mapping):
+            return
+        refusal = details.get("refusal")
+        if isinstance(refusal, Mapping):
+            self.refusals[str(refusal["reason"])] += 1
+            return
+        band, numeric = details.get("band"), row.get("numeric")
+        if row.get("assumed_band") is not True or not isinstance(band, Mapping) or not isinstance(numeric, Mapping):
+            return
+        key = (
+            str(row.get("rail") or ""), engine, quantity,
+            str(numeric["operation"]), str(numeric["unit"]), str(details["class_id"]),
+            str(details.get("evidence_class") or "unknown"),
+        )
+        group = self.groups.setdefault(key, {
+            "stratum": "assumed_band", "rail": key[0], "engine": engine,
+            "quantity": quantity, "operation": key[3], "unit": key[4],
+            "class_id": key[5], "citation": details["citation"],
+            "evidence_class": key[6],
+            "precision": details["precision"], "n": 0, "n_inside_band": 0,
+            "n_eligible": 0, "n_eligible_inside_band": 0,
+        })
+        inside, eligible = details["inside_band"] is True, details.get("eligible") is True
+        group["n"] += 1
+        group["n_inside_band"] += int(inside)
+        group["n_eligible"] += int(eligible)
+        group["n_eligible_inside_band"] += int(eligible and inside)
+        self.observations[key].add(str(row["reference"]))
+
+    def payload(self) -> dict[str, object]:
+        return {
+            "label": "assumed band — literature method precision; confidence not stated",
+            "records": [
+                {**group, "n_observations": len(self.observations[key]),
+                 "n_outside_band": group["n"] - group["n_inside_band"],
+                 "match_rate": group["n_inside_band"] / group["n"]}
+                for key, group in sorted(self.groups.items())
+            ],
+            "refusal_counts": dict(sorted(self.refusals.items())),
+        }
+
+
 def eligibility_failure_census(
     rows: Iterable[Mapping[str, object]],
     *,

@@ -274,9 +274,10 @@ species:
         - {sample: OPRL2N, total_crystalline_silica_wt_pct: 0.29, passing_lt_10um_pct: 16.8, total_respi_crystalline_silica_wt_pct: 0.05, analysis_year: 2023}
       uncertainty: {note: "'<0.01' is retained as the printed detection-limit bound; No data cells omitted, not zero."}
 
+    context:
     - observation_id: nasa_tm_2024_high_temperature_vacuum_guidance
-      type: rate_series
-      locator: {pdf_page_index: 99, published_page: 83, section: 6.2.2.B.(ii) High Temperatures, figure: '24'}
+      type: source_summary
+      locator: {page: 93, published_page: 83, pdf_page_index: 92, section: 6.2.2.B.(ii) High Temperatures, figure: '24'}
       phase: CSM-LHT-1G_simulant
       standard_state: cited vacuum-sintering evolved-gas observations and guide summary
       regime: high_temperature_vacuum_simulant_processing
@@ -295,8 +296,8 @@ species:
       uncertainty: {note: Figure traces and source-specific uncertainties are not printed as numeric tables in this guide.}
 
     - observation_id: nasa_tm_2024_figure24_evolved_species
-      type: rate_series
-      locator: {pdf_page_index: 99, published_page: 83, figure: '24', section: 6.2.2.B.(ii) High Temperatures}
+      type: figure
+      locator: {page: 93, published_page: 83, pdf_page_index: 92, figure: '24', section: 6.2.2.B.(ii) High Temperatures}
       phase: CSM-LHT-1G_simulant
       standard_state: selected mass spectra traces as plotted
       regime: vacuum_mass_spectrometry

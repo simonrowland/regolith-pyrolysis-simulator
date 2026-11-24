@@ -7,7 +7,7 @@ from decimal import Decimal
 
 import yaml
 
-from simulator.battery.enums import Quantity, ValueKind
+from simulator.battery.enums import Quantity, UncertaintyKind, ValueKind
 from simulator.battery.migrate import Migrator, REPO_ROOT
 from tools.validate_literature_extracts import validate_extract_document
 
@@ -108,6 +108,47 @@ def test_tables_match_rendered_rows_and_migrate_all_typed_values_as_points() -> 
         Quantity.ION_INTENSITY_RATIO: 15,
         Quantity.ACTIVITY: 32,
     }
+
+    activity_rows = [
+        (formula, row)
+        for formula, body in document["species"].items()
+        for row in body["observations"]
+        if row["values"]["quantity"] == "activity"
+    ]
+    assert len(activity_rows) == 32
+    for _formula, row in activity_rows:
+        assert row["uncertainty"] is None
+        migrated = migrator.result.observations[
+            f"{EXTRACT.stem}::{row['observation_id']}"
+        ]
+        assert migrated.uncertainty.kind is UncertaintyKind.NONE
+        assert migrated.locator is not None
+        assert migrated.locator.page == 6
+        assert migrated.locator.published_page == 246
+        assert migrated.locator.table == "2"
+        assert row["locator"]["note"] == (
+            "No numeric uncertainty is printed for the activity cell."
+        )
+        assert row["locator"]["note"] in migrated.locator.note
+
+    ion_rows = [
+        (formula, row)
+        for formula, body in document["species"].items()
+        for row in body["observations"]
+        if row["values"]["quantity"] != "activity"
+    ]
+    assert len(ion_rows) == 45
+    for _formula, row in ion_rows:
+        assert row["uncertainty"] is None
+        migrated = migrator.result.observations[
+            f"{EXTRACT.stem}::{row['observation_id']}"
+        ]
+        assert migrated.uncertainty.kind is UncertaintyKind.NONE
+        assert migrated.locator is not None
+        assert row["locator"]["note"] == (
+            "No numeric uncertainty is printed for this ion-current or ratio cell."
+        )
+        assert row["locator"]["note"] in migrated.locator.note
 
     ratios = [
         (row["values"]["x_SiO2_as_printed"], row["values"]["ion_intensity_ratio"])

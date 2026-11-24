@@ -4106,6 +4106,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             return
 
         from simulator.campaigns import (
+            C2A_STAGED_PN2_KNUDSEN_FLOOR_ACTION,
             C2A_STAGED_PN2_SWEEP_MAX_MBAR,
             C2A_STAGED_PN2_SWEEP_MIN_MBAR,
         )
@@ -4139,8 +4140,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if isinstance(staged_control, dict):
             staged_control['pN2_mbar'] = applied_pN2_mbar
             staged_control['p_total_mbar'] = applied_total_mbar
+            staged_control['pn2_band_action'] = C2A_STAGED_PN2_KNUDSEN_FLOOR_ACTION
             staged_control['knudsen_pressure_adjustment'] = dict(adjustment)
         self.melt.validate_melt_pressures()
+
+    def _apply_teststand_chamber_pressure(self) -> None:
+        # Today's process step is one hour. dt_s is that existing hour in
+        # seconds, passed through so a later sub-hour step can supply its
+        # own length. This method does not add a timestep.
+        from simulator.teststand import apply_process_chamber_pressure
+
+        apply_process_chamber_pressure(self, dt_s=3600.0)
 
     def _active_lab_schedule(self) -> Mapping[str, Any] | None:
         getter = getattr(self.campaign_mgr, "_lab_schedule", None)
@@ -5537,6 +5547,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         from simulator.reduced_real_determinism import (
             GATE_CURVE_DOMAIN_KEYS,
             GATE_CURVE_NOTICE_KEYS,
+            _identity_gate_curve,
+            _gate_curve_live_publication,
             gate_curve_memo_record,
             gate_curve_memo_is_cacheable,
             record_repair_notice,
@@ -5796,7 +5808,9 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             isinstance(validated_cache, dict)
             and validated_cache.get('key') == key
             and isinstance(validated_curve, Mapping)
-            and dict(validated_curve) == normalized_curve
+            and _identity_gate_curve(validated_curve) == _identity_gate_curve(
+                normalized_curve
+            )
             and gate_curve_memo_reuse_eligible(
                 self,
                 normalized_curve,
@@ -5849,7 +5863,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
         self._stamp_kress_floor_diagnostic(gate_diagnostic)
         self._last_melt_redox_liquidus_gate_diagnostic = gate_diagnostic
-        return normalized_record
+        return _gate_curve_live_publication(normalized_record, normalized_curve)
 
     def _melt_redox_liquid_fraction_factor(
         self,
@@ -16608,6 +16622,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # --- 2. Temperature ramp and carried-in passive exchange ---
         self._update_temperature()
         self._apply_c2a_knudsen_pressure_adjustment()
+        self._apply_teststand_chamber_pressure()
         self._establish_melt_redox_gate_authority_for_current_hour()
         self._apply_oxygen_reservoir_exchange()
         self._apply_o2_bubbler()
@@ -17360,7 +17375,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             current_area_m2 <= 0.0
             or math.isclose(current_area_m2, 0.2, rel_tol=0.0, abs_tol=1e-12)
         ):
-            self.melt.melt_surface_area_m2 = crucible_area_m2
+            # condensation imports core at module level.
+            from simulator.condensation import read_gram_lab_exposed_melt_area
+
+            declared_area_m2 = read_gram_lab_exposed_melt_area(
+                self.setpoints.get('lab_geometry'),
+            )
+            self.melt.melt_surface_area_m2 = (
+                crucible_area_m2
+                if declared_area_m2 is None
+                else declared_area_m2
+            )
 
         pipe = self._equipment.pipe
         geometry_config = copy.deepcopy(self._overhead_condenser_geometry_config)

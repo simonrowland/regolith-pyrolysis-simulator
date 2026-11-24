@@ -9,7 +9,16 @@ import pytest
 import yaml
 
 from tests.helpers.corpus_paths import regolith_corpus_root
-from simulator.battery.enums import AmountBasis, FO2Channel, Phase, Quantity, QuenchState, UncertaintyKind, ValueKind
+from simulator.battery.enums import (
+    AmountBasis,
+    FO2Channel,
+    NoticeKind,
+    Phase,
+    Quantity,
+    QuenchState,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.migrate import Migrator
 from tests.literature_extract_test_helpers import iter_locators
 
@@ -151,7 +160,19 @@ def test_migration_types_all_rows_and_binds_temperature_atmosphere_and_quench() 
         assert conditions["T_C"].state.value == Decimal(values["T_C"])
         assert conditions["duration_h"].state.value == Decimal(values["duration_h"])
         assert conditions["atmosphere"].state.value == "air"
-        assert conditions["fO2_log"].state.is_unknown
+        # The paper states air and one-atmosphere total pressure; fO2 remains
+        # unscorable as a point, so migration preserves the degenerate interval.
+        oxygen_log = conditions["fO2_log"]
+        assert oxygen_log.state.is_value
+        assert oxygen_log.state.value.kind is ValueKind.INTERVAL
+        interval_notices = [
+            notice
+            for notice in record.notices
+            if "interval condition not yet scorable" in notice.reason
+        ]
+        assert len(interval_notices) == 1
+        assert interval_notices[0].kind is NoticeKind.INPUT_OMITTED
+        assert interval_notices[0].origin == record.observation_id
         assert conditions["total_pressure_Pa"].state.value == Decimal("101325")
         composition = conditions["composition"]
         assert composition.state.is_value

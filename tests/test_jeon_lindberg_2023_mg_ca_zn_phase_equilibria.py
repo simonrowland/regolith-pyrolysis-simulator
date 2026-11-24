@@ -7,7 +7,18 @@ from pathlib import Path
 import pytest
 import yaml
 
+from simulator.battery.enums import NoticeKind
 from tests.battery.test_migrate import _migrate_real_extract
+
+# The methods text says Air and does not state total pressure. Do not infer 1 atm.
+_AIR_FO2_REQUIRES_TOTAL_PRESSURE = (
+    "missing input: printed air fO2 requires stated total pressure"
+)
+# Printed mol% is not a phase-basis token, so the identity profile leaves
+# fO2_Pa not applicable. The air gap is the point-condition, not that axis.
+_PHASE_COMPOSITION_OMITS_FO2 = (
+    "profile equilibrium_phase_composition does not use fO2_Pa"
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 EXTRACT = ROOT / "data/literature/extracts/jeon-lindberg-2023-mg-ca-zn-oxide-equilibria.yaml"
@@ -220,7 +231,21 @@ def test_isolated_migration_preserves_every_point_species_temperature_and_condit
             assert composition.state.value.components == ROW_12_RATIO
             assert composition.inference is None
             assert temperature == Decimal("1773.15")
-        assert not item.notices
+        atmosphere = item.point_conditions["atmosphere"].state.value
+        if atmosphere == "Air":
+            oxygen_log = item.point_conditions["fO2_log"]
+            assert oxygen_log.locator == item.point_conditions["atmosphere"].locator
+            assert oxygen_log.state.is_unknown
+            assert oxygen_log.state.reason == _AIR_FO2_REQUIRES_TOTAL_PRESSURE
+            assert item.identity.fO2_Pa.is_not_applicable
+            assert item.identity.fO2_Pa.reason == _PHASE_COMPOSITION_OMITS_FO2
+            assert len(item.notices) == 1
+            assert item.notices[0].kind is NoticeKind.INPUT_OMITTED
+            assert item.notices[0].reason == _AIR_FO2_REQUIRES_TOTAL_PRESSURE
+            assert item.notices[0].origin == item.observation_id
+        else:
+            assert atmosphere == "Ar"
+            assert not item.notices
         if item.uncertainty.kind.value == "printed":
             assert item.uncertainty.verbatim["reported_status"] == "printed"
             assert item.uncertainty.verbatim["as_published"] != "± 0"

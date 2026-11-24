@@ -590,6 +590,8 @@ def test_projected_solve_status_survives_actual_adapter_wrapping(
         backend.close()
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(('error_type', 'error_number'), [
     (BlockingIOError, errno.EAGAIN),
     (ConnectionResetError, errno.ECONNRESET),
@@ -632,7 +634,7 @@ def test_actual_magemin_launch_oserror_is_typed_environment_refusal(
             sim._melt_redox_liquidus_gate_curve()
 
         assert error.value.diagnostic['reason'] == 'liquid_fraction_provider_failed'
-        assert error.value.diagnostic['outcome'] is GateCurveProviderOutcome.FAILED
+        assert error.value.diagnostic['outcome'] == GateCurveProviderOutcome.FAILED
         assert diagnostics
         projected = diagnostics[-1]['backend_diagnostics'][
             'projected_liquidus_diagnostics'
@@ -695,7 +697,7 @@ def test_magemin_launch_environment_errors_keep_type_in_every_execution_mode(
                 sim._melt_redox_liquidus_gate_curve()
             failure = error.value.diagnostic
             assert failure['reason'] == 'liquid_fraction_provider_failed'
-        assert failure['outcome'] is GateCurveProviderOutcome.FAILED
+        assert failure['outcome'] == GateCurveProviderOutcome.FAILED
         projected = failure['provider_diagnostic'][
             'backend_diagnostics'
         ]['projected_liquidus_diagnostics']

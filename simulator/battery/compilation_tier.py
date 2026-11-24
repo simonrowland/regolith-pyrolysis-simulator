@@ -32,7 +32,7 @@ from pathlib import Path
 from typing import Callable, Iterable, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token
-from simulator.battery.source_declarations import SOURCE_DECLARATIONS
+from simulator.battery.source_declarations import B677_SOURCE_ID, SOURCE_DECLARATIONS
 from simulator.battery.enums import (
     EQUILIBRIUM_FIT_QUANTITIES,
     FORMATION_QUANTITIES,
@@ -574,7 +574,12 @@ def _is_janaf_compilation_observation(
         _score_predicates()
     )
     source_id = observation.source_id or ""
-    janaf_source = source_id in {"janaf", "janaf-4th", "nist-janaf-4th"} or (
+    compilation_family = SOURCE_DECLARATIONS.get(source_id, {}).get(
+        "compilation_family"
+    )
+    janaf_source = (
+        compilation_family is not None and compilation_family.value == "janaf"
+    ) or (
         (origin or "").replace("\\", "/").startswith("compilations-janaf/")
     )
     compilation_source = is_compilation_evidence(observation) or is_compilation_source(
@@ -620,31 +625,63 @@ def _compilation_series_point_count(
     return 1 if pairs is None else len(pairs)
 
 
+def _series_point_cell(
+    observation: Observation,
+    temperature: Decimal,
+    magnitude: Decimal,
+    occurrence: int,
+) -> _CompilationSeriesCell:
+    """One printed series cell. The catalog and the scorer share this constructor."""
+
+    identity = replace(observation.identity, temperature_K=State.of(temperature))
+    return _CompilationSeriesCell(
+        parent=observation,
+        observation_id=compilation_point_id(
+            observation.observation_id, temperature, magnitude, occurrence
+        ),
+        identity=identity,
+        value=Value.point_of(magnitude),
+        notices=observation.notices,
+    )
+
+
+def _compilation_series_slots(
+    observation: Observation,
+    origin: str | None = None,
+):
+    """Yield ``(temperature, magnitude, occurrence)`` without building cells.
+
+    ``None`` means this observation is not a compilation series. Occurrence
+    matches ``_series_point_cell`` so a later caller can build one cell.
+    """
+
+    pairs = _compilation_series_pairs(observation, origin)
+    if pairs is None:
+        return None
+    seen: dict[str, int] = {}
+
+    def generate():
+        for temperature, magnitude in pairs:
+            temp_d = as_decimal(temperature)
+            mag_d = as_decimal(magnitude)
+            key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
+            occurrence = seen.get(key, 0)
+            seen[key] = occurrence + 1
+            yield temp_d, mag_d, occurrence
+
+    return generate()
+
+
 def _iter_compilation_series_cells(
     observation: Observation,
     origin: str | None = None,
 ) -> Iterable[Observation | _CompilationSeriesCell]:
-    pairs = _compilation_series_pairs(observation, origin)
-    if pairs is None:
+    slots = _compilation_series_slots(observation, origin)
+    if slots is None:
         yield observation
         return
-    seen: dict[str, int] = {}
-    for temperature, magnitude in pairs:
-        temp_d = as_decimal(temperature)
-        mag_d = as_decimal(magnitude)
-        key = f"{_decimal_token(temp_d)}|{_decimal_token(mag_d)}"
-        occurrence = seen.get(key, 0)
-        seen[key] = occurrence + 1
-        identity = replace(observation.identity, temperature_K=State.of(temp_d))
-        yield _CompilationSeriesCell(
-            parent=observation,
-            observation_id=compilation_point_id(
-                observation.observation_id, temp_d, mag_d, occurrence
-            ),
-            identity=identity,
-            value=Value.point_of(mag_d),
-            notices=observation.notices,
-        )
+    for temperature, magnitude, occurrence in slots:
+        yield _series_point_cell(observation, temperature, magnitude, occurrence)
 
 
 def _state_value(state: object) -> object | None:
@@ -2745,17 +2782,18 @@ def _b1259_element_reference_phase_refusal(
 ) -> ThermoAttempt | None:
     if quantity is not Quantity.S:
         return None
+    phase_protocol = SOURCE_DECLARATIONS.get(observation.source_id or "", {}).get(
+        "element_reference_phase_protocol"
+    )
+    if phase_protocol is None or phase_protocol.value != "b1259":
+        return None
     from simulator.battery.generators.usgs_b1259 import (
-        SOURCE_ID as b1259_source,
         _is_element_reference_state_record_id,
     )
 
     source_record = _locator_table_id(observation)
-    if (
-        observation.source_id != b1259_source
-        or not _is_element_reference_state_record_id(
-            source_record, identity.species.formula
-        )
+    if not _is_element_reference_state_record_id(
+        source_record, identity.species.formula
     ):
         return None
     observed_phase = phase_token(identity.species)
@@ -2795,7 +2833,7 @@ def _b677_printed_ideal_gas_h298(source_path: str, formula: str, table_id: str) 
     if _janaf_gas_table_ids().get(formula, ()) != (table_id,):
         return False
     norm = source_path.replace("\\", "/")
-    if "pankratz-1984-usbm-b677/records/" not in norm or not norm.endswith(".json"):
+    if f"{B677_SOURCE_ID}/records/" not in norm or not norm.endswith(".json"):
         return False
     from simulator.battery.migrate import (
         REPO_ROOT,
@@ -2862,20 +2900,21 @@ def _tabulated_gas_basis_matches(
         return _locator_table_id(observation) == table_id
     source_id = observation.source_id or ""
     from simulator.battery.generators.usgs_b1259 import (
-        SOURCE_ID as b1259_source,
         reference_enthalpy_zero_is_ideal_gas as b1259_ideal_gas,
         reference_enthalpy_zero_is_ideal_gas_span as b1259_ideal_gas_span,
     )
     from simulator.battery.generators.usgs_b1452 import (
-        SOURCE_ID as b1452_source,
         reference_enthalpy_zero_is_ideal_gas as b1452_ideal_gas,
     )
 
-    if source_id == b1259_source:
+    enthalpy_protocol = SOURCE_DECLARATIONS.get(source_id, {}).get(
+        "reference_enthalpy_zero_protocol"
+    )
+    if enthalpy_protocol is not None and enthalpy_protocol.value == "b1259":
         return b1259_ideal_gas(formula) or b1259_ideal_gas_span(
             _locator_table_id(observation)
         )
-    if source_id == b1452_source:
+    if enthalpy_protocol is not None and enthalpy_protocol.value == "b1452":
         return b1452_ideal_gas(formula)
     b677_enthalpy_zero = SOURCE_DECLARATIONS.get(source_id, {}).get(
         "ideal_gas_enthalpy_zero"

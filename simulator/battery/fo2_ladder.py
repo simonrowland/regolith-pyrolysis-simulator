@@ -58,7 +58,7 @@ from simulator.battery.records import (
     Value,
     nominal_pressure_pa,
 )
-from simulator.battery.source_oxygen import RYS_SOURCE_ID
+from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
     Waypoint,
     WaypointAuthority,

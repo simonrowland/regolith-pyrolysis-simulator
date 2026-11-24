@@ -24,7 +24,11 @@ from simulator.engine_pool import (
 from simulator.melt_backend.magemin import MAGEMinBackend
 
 
-pytestmark = [pytest.mark.live_engine, pytest.mark.serial]
+pytestmark = [
+    pytest.mark.live_engine,
+    pytest.mark.serial,
+    pytest.mark.engine_cache_off,
+]
 
 # Hang bounds for reaping synthetic load workers after SIGTERM/SIGKILL. Not a
 # latency claim about the engine under test.

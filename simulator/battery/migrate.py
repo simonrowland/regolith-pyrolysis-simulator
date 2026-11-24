@@ -74,16 +74,33 @@ from typing import (
 
 import yaml
 
+from simulator.reference_data.hemingway_haas_robinson_1982_usgs_b1544_loader import (
+    SOURCE_ID as _B1544_SOURCE_ID,
+)
+from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
+    SOURCE_ID as _B1452_SOURCE_ID,
+)
+from simulator.reference_data.robie_waldbaum_1968_usgs_b1259_loader import (
+    SOURCE_ID as _B1259_SOURCE_ID,
+)
 from simulator.accounting.formulas import ATOMIC_WEIGHTS_G_PER_MOL
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
 from simulator.battery import schema_gap as sg
-from simulator.battery.source_declarations import SOURCE_DECLARATIONS
+from simulator.battery.source_declarations import (
+    B677_SOURCE_ID,
+    B2131_SOURCE_ID as _B2131_SOURCE_ID,
+    KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
+    SOURCE_DECLARATIONS,
+)
+from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 from simulator.battery.oxygen_identity import (
+    _AIR_O2_MOLE_FRACTION,
     _ATM_BAR,
     _atmosphere_kind,
     _display_fo2_dex,
     _gas_mixture_evaluation_temperature,
     _last_printed_digit,
+    _oxygen_pressure_point,
     _printed_sccm_gas_mixture,
     _row_printed_atmospheres,
     log10_fo2_to_pa,
@@ -207,6 +224,8 @@ from simulator.battery.stable_ids import (
 )
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+    SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX,
     AmbientPressureEvidence,
     Admission,
     AdmissionDecision,
@@ -999,6 +1018,10 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
     return token, has_suffix
 
 
+_MALFORMED_DECLARED_AMOUNT_PREFIX = "malformed declared amount"
+_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX = "malformed printed component amount"
+
+
 def parse_declared_amount(value: object) -> Decimal:
     """Single owner for source-declared numeric amounts.
 
@@ -1007,11 +1030,11 @@ def parse_declared_amount(value: object) -> Decimal:
     """
 
     if value is None or value == "" or isinstance(value, bool):
-        raise ValueError(f"malformed declared amount: {value!r}")
+        raise ValueError(f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}: {value!r}")
     try:
         return _parse_declared_decimal(value)
     except _InvalidDecimalValue as exc:
-        raise ValueError(f"malformed declared amount: {value!r}") from exc
+        raise ValueError(f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}: {value!r}") from exc
 
 
 def _provenance_with_printed_phase(
@@ -2034,6 +2057,12 @@ def _percent_composition_closure_error(
 class _CompositionRefusal:
     reason: str
     closure_refusal: bool = False
+
+
+class _CompositionProxyInputClass(Enum):
+    INVALID = "invalid"
+    NOT_PRINTED = "not_printed"
+    VALID_RUN = "valid_run"
 
 
 @dataclass(frozen=True)
@@ -5263,6 +5292,8 @@ _COMPOSITION_COMPONENTS: dict[str, tuple[str, str, bool]] = {
     # the CrO1.5 formula-unit amount because M(Cr2O3) = 2 M(CrO1.5).
     # The printed key remains CrO1.5; only its identity component is canonical.
     "CrO1.5": ("Cr2O3", "Cr2O3", True),
+    # FeO1.5 is likewise half of canonical Fe2O3 on a formula-unit basis.
+    "FeO1.5": ("Fe2O3", "Fe2O3", True),
     "CrO": ("CrO", "CrO", False),
     # Despite the map's historical oxide-oriented name, Liu prints CaF2 as a
     # slag component; retain it in the printed-composition identity.
@@ -6182,7 +6213,7 @@ def _oxide_mass_percent_components(
             diagnostics.append(
                 (
                     source,
-                    "malformed printed component amount for "
+                    f"{_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX} for "
                     f"{raw_name!r}: {raw_amount!r}",
                 )
             )
@@ -7682,12 +7713,14 @@ def _kume_formula_unit_oxide(
         and name != "AlO1.5"
     ):
         return None
-    if name not in {"AlO1.5", "CrO1.5"}:
+    if name not in {"AlO1.5", "CrO1.5", "FeO1.5"}:
         return None if component is None else (component[1], Decimal("1"))
 
-    # AlO1.5 and CrO1.5 are half an Al2O3 and Cr2O3 formula unit respectively.
-    # Reuse the formula-unit resolver so mole-basis maps apply the 0.5 factor;
-    # mass percent is invariant, so the printed wt% path only renames the key.
+    # AlO1.5, CrO1.5, and FeO1.5 are half an Al2O3, Cr2O3, and Fe2O3
+    # formula unit respectively. Per formula unit, FeO1.5 = 1/2 Fe2O3, so
+    # x(Fe2O3) = x(FeO1.5)/2 before renormalisation; this keeps Fe atoms
+    # conserved. Reuse the resolver for mole-basis maps; mass percent is
+    # invariant, so the printed wt% path only renames the key.
     # For mole-to-mass, x [mol/mol] * M [g/mol] = relative mass [g/mol].
     # Sanity check: 50:50 CaO:AlO1.5 becomes 2/3 CaO, 1/3 Al2O3.
     from simulator.chemistry.structural_activity import normalize_formula_unit_moles
@@ -8118,6 +8151,52 @@ def _initial_oxide_map_from_values(
     return None
 
 
+def _caption_depletion_columns(*mappings: object) -> frozenset[str]:
+    """Columns the extract marks as caption depletion, not a run composition."""
+
+    names: set[str] = set()
+    for values in mappings:
+        if not isinstance(values, Mapping):
+            continue
+        declared = values.get("caption_depletion_columns")
+        columns: object = None
+        if isinstance(declared, Mapping):
+            columns = declared.get("columns")
+        elif isinstance(declared, (list, tuple)):
+            columns = declared
+        if isinstance(columns, (list, tuple)):
+            names.update(str(column) for column in columns)
+    return frozenset(names)
+
+
+def _flat_run_composition_columns(
+    point: object,
+    parent: object,
+    units: object,
+) -> bool:
+    """Parent-declared run composition supplied as flat point columns.
+
+    A bare ``*_wt_pct`` cell is a run input only when the parent declares a
+    composition map and the extract does not mark that column as caption
+    depletion. A named map on the point is not this case.
+    """
+
+    if not isinstance(point, Mapping):
+        return False
+    if not _declared_wt_composition_point_map(parent, units):
+        return False
+    skipped = _caption_depletion_columns(point, parent)
+    return any(
+        str(key) not in skipped
+        and not _is_composition_condition_key(str(key))
+        and (
+            key in _COMPOSITION_COMPONENTS
+            or _mass_percent_component_key(str(key))[1]
+        )
+        for key in point
+    )
+
+
 def _declared_wt_composition_point_map(values: object, units: object) -> bool:
     if not isinstance(values, Mapping):
         return False
@@ -8290,17 +8369,21 @@ def _declared_composition_mol_basis(values: Mapping[str, object], raw: object) -
     return None
 
 
-def _mole_fraction_composition_error(
-    exc: ValueError, values: Mapping[str, object]
-) -> tuple[str, str]:
-    detail = str(exc)
-    if not detail.startswith("malformed declared amount"):
-        raise exc
-    composition_key = (
+def _mole_fraction_composition_source_key(values: Mapping[str, object]) -> str:
+    return (
         "composition_mol"
         if isinstance(values.get("composition_mol"), Mapping)
         else "composition_mole_fraction"
     )
+
+
+def _mole_fraction_composition_error(
+    exc: ValueError, values: Mapping[str, object]
+) -> tuple[str, str]:
+    detail = str(exc)
+    if not detail.startswith(_MALFORMED_DECLARED_AMOUNT_PREFIX):
+        raise exc
+    composition_key = _mole_fraction_composition_source_key(values)
     return detail, composition_key
 
 
@@ -8543,11 +8626,110 @@ def composition_unknown_reason(refusal_reasons: Sequence[str] = ()) -> str:
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
 
 
+# Stored reasons that mean the run composition was printed and is unusable.
+# A missing field or an unavailable initial charge is not in this list.
+_INVALID_RUN_COMPOSITION_PREFIXES = (
+    "malformed declared amount",
+    "unsupported component",
+    "mass-percent composition",
+    "partial_composition:",
+    "partial analysis contains unsupported component",
+    "explicit printed point composition map is unusable",
+    "printed point composition is unusable",
+)
+
+
+def invalid_run_composition(state: State[Any] | None) -> bool:
+    """True when a stored composition state is invalid run input.
+
+    Not-printed and not-applicable compositions are not this case. The
+    writer applies the declared-map gate before storing a bare malformed
+    printed amount, so a stored state with that reason is invalid.
+    """
+
+    return _reason_is_invalid_run_composition(
+        None if state is None or not state.is_unknown else state.reason,
+        declared_map=True,
+    )
+
+
+def _reason_is_invalid_run_composition(
+    reason: str | None, *, declared_map: bool
+) -> bool:
+    folded = (reason or "").casefold()
+    if not folded:
+        return False
+    if folded.startswith(_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX):
+        return declared_map
+    return any(
+        folded.startswith(prefix) for prefix in _INVALID_RUN_COMPOSITION_PREFIXES
+    )
+
+
 def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str:
     return (
         "partial_composition: unusable component(s): "
         + ", ".join(omitted_components)
     )
+
+
+def _initial_charge_omitted_component_issue(
+    *,
+    observation_id: str,
+    source_key: str,
+    omitted_components: Sequence[str],
+    composition_role: str | None,
+) -> ValidationIssue | None:
+    """Hard issue for a non-formula key on an initial-charge mole map.
+
+    Other omissions stay typed absence or a queue entry. This is the only
+    place that turns that omission into ``INVALID_SOURCE``.
+    """
+
+    if (
+        not omitted_components
+        or source_key != "composition_mol"
+        or composition_role != INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ):
+        return None
+    return ValidationIssue(
+        path=f"observations.{observation_id}.values.{source_key}",
+        reason=RefusalReason.INVALID_SOURCE,
+        detail=partial_composition_unknown_reason(omitted_components),
+    )
+
+
+def effective_run_composition(
+    identity: Identity,
+    point_conditions: Mapping[str, Located[Any]] | None,
+) -> State[Any] | None:
+    """Run composition every prediction consumer reads.
+
+    The proxy writer stores one decision on identity and on the point. An
+    unknown point composition outranks an initial-charge proxy, so a refused
+    run map cannot be scored as the printed charge.
+    """
+
+    point = (point_conditions or {}).get("composition")
+    point_state = point.state if isinstance(point, Located) else None
+    identity_state = identity.composition
+    identity_is_charge_proxy = (
+        identity_state is not None
+        and identity_state.is_value
+        and isinstance(identity_state.value, Composition)
+        and identity_state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    if (
+        identity_is_charge_proxy
+        and point_state is not None
+        and point_state.is_unknown
+    ):
+        return point_state
+    if identity_state is not None and identity_state.is_value:
+        return identity_state
+    if point_state is not None and point_state.is_value:
+        return point_state
+    return identity_state if identity_state is not None else point_state
 
 
 def _sample_label_formula_candidate(
@@ -8702,8 +8884,8 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
     """Return (role, refusal) from the first ``composition_role`` declared.
 
     The row is read before its parent values block. ``initial_charge_only``
-    marks a printed starting charge that stays sample context and cannot supply
-    a later datum's composition. ``datum_state`` marks the sample composition
+    marks a printed starting charge that may supply a later datum as a flagged
+    proxy. ``datum_state`` marks the sample composition
     at this datum's measurement state, including a bulk two-phase sample; it
     applies to the observation's point conditions and never marks the
     experiment's starting charge. Each typed declaration is a bare token or a
@@ -8724,17 +8906,6 @@ def _declared_composition_role(*roots: object) -> tuple[str | None, str | None]:
             f"{sorted(_COMPOSITION_ROLE_TOKENS)}; composition left unstamped"
         )
     return None, None
-
-
-def _has_printed_initial_series_start(role: str | None, values: object) -> bool:
-    """The declared initial charge supplies points in its printed series."""
-
-    return (
-        role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        and isinstance(values, Mapping)
-        and isinstance(values.get("series"), list)
-        and bool(values["series"])
-    )
 
 
 # A closed-system equilibrium experiment's printed starting bulk is the
@@ -9358,22 +9529,77 @@ def _apply_equilibrium_starting_bulk(
     return point_conditions, notices
 
 
-def _initial_charge_only_missing_composition(
+def _initial_charge_only_composition_proxy(
     identity: Identity,
     point_conditions: Mapping[str, Located[Any]] | None,
     notices: Sequence[Notice],
     *,
     role: str | None,
-    printed_series_start: bool,
     quantity: Quantity | None,
     quantity_as_printed: object,
     locator: Locator | None,
     origin: str,
+    initial_charge_context: Mapping[str, Any] | None = None,
+    composition_refusal_reasons: Sequence[str] = (),
+    malformed_composition_reason: str | None = None,
+    omitted_composition_components: Sequence[str] = (),
+    declared_composition_state: State[Any] | None = None,
+    point_composition_context: Mapping[str, Any] | None = None,
+    point_oxide_map: Mapping[str, Decimal] | None = None,
+    point_declared_component_map: Mapping[str, Any] | None = None,
+    point_composition_map_declared: bool = False,
+    run_composition_columns_declared: bool = False,
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
-    if (
+    conditions = dict(point_conditions or {})
+    point_composition = conditions.get("composition")
+    existing_initial_charge_proxy = (
+        identity.composition is not None
+        and identity.composition.is_value
+        and isinstance(identity.composition.value, Composition)
+        and identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    ) or (
+        isinstance(point_composition, Located)
+        and point_composition.state.is_value
+        and isinstance(point_composition.state.value, Composition)
+        and point_composition.state.value.proxy_flag
+        == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    )
+    outside_initial_charge_proxy_scope = (
         role != INITIAL_CHARGE_ONLY_PROXY_FLAG
-        or printed_series_start
-        or quantity in {
+        and not existing_initial_charge_proxy
+    )
+    if outside_initial_charge_proxy_scope:
+        malformed_state_reason = None
+        incoming_compositions = (
+            point_composition.state
+            if isinstance(point_composition, Located)
+            else None,
+            identity.composition,
+        )
+        for incoming in incoming_compositions:
+            if (
+                incoming is not None
+                and incoming.is_unknown
+                and (incoming.reason or "").startswith(
+                    f"{_MALFORMED_DECLARED_AMOUNT_PREFIX}:"
+                )
+            ):
+                malformed_state_reason = incoming.reason
+                break
+        if malformed_state_reason is not None:
+            invalid = Located(
+                State.unknown(malformed_state_reason), locator=locator
+            )
+            conditions["composition"] = invalid
+            return (
+                replace(identity, composition=invalid.state),
+                conditions,
+                list(notices),
+            )
+    if (
+        outside_initial_charge_proxy_scope
+        or quantity
+        in {
             Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
             Quantity.RESIDUE_COMPONENT_COMPOSITION,
         }
@@ -9383,32 +9609,236 @@ def _initial_charge_only_missing_composition(
         )
     ):
         return identity, point_conditions, list(notices)
-    reason = (
-        "missing input: per-run composition is not published; the printed "
-        "initial charge is retained as sample context only"
+
+    point_composition_state = (
+        point_composition.state if isinstance(point_composition, Located) else None
     )
-    conditions = {
-        **(point_conditions or {}),
-        "composition": Located(State.unknown(reason), locator=locator),
-    }
+    identity_composition_state = identity.composition
+    if any(
+        state is not None and state.is_not_applicable
+        for state in (point_composition_state, identity_composition_state)
+    ):
+        return identity, point_conditions, list(notices)
+
+    # A malformed bare column is a run input only when the extract declared
+    # that column as run composition. Caption-depletion columns are not.
+    refusal_reasons = [
+        reason
+        for reason in composition_refusal_reasons
+        if point_composition_map_declared
+        or not reason.casefold().startswith(
+            _MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX
+        )
+    ]
+    if malformed_composition_reason is not None:
+        refusal_reasons.insert(0, malformed_composition_reason)
+    elif omitted_composition_components:
+        refusal_reasons.insert(
+            0, partial_composition_unknown_reason(omitted_composition_components)
+        )
+    identity_invalid_reason = None
+    for state in (
+        point_composition_state,
+        declared_composition_state,
+        identity_composition_state,
+    ):
+        if state is None or not state.is_unknown:
+            continue
+        state_reason = state.reason or ""
+        if _reason_is_invalid_run_composition(
+            state_reason,
+            declared_map=point_composition_map_declared,
+        ):
+            identity_invalid_reason = state_reason
+            break
+    if identity_invalid_reason is not None and not refusal_reasons:
+        refusal_reasons.append(identity_invalid_reason)
+    invalid_input = bool(refusal_reasons)
+    classification = (
+        _CompositionProxyInputClass.INVALID
+        if invalid_input
+        else _CompositionProxyInputClass.NOT_PRINTED
+    )
+    if classification is _CompositionProxyInputClass.INVALID:
+        # The refusal is the run composition. The printed charge must not
+        # occupy identity while the point carries the refusal.
+        reason = refusal_reasons[0] if refusal_reasons else None
+        reason = reason or composition_unknown_reason()
+        invalid = Located(State.unknown(reason), locator=locator)
+        conditions["composition"] = invalid
+        return (
+            replace(identity, composition=invalid.state),
+            conditions,
+            list(notices),
+        )
+
+    if run_composition_columns_declared:
+        classification = _CompositionProxyInputClass.VALID_RUN
+    if classification is _CompositionProxyInputClass.VALID_RUN:
+        # Flat columns the parent declared are the run composition. A valid
+        # map is not re-stamped as the initial-charge proxy.
+        declared_map = point_oxide_map or point_declared_component_map
+        initial = None
+        if declared_map is not None:
+            initial = _owner_initial_from_printed(
+                Located(State.of(declared_map), locator=locator),
+                closure_context=point_composition_context,
+            )
+        if (
+            initial is not None
+            and initial.state.is_value
+            and isinstance(initial.state.value, Composition)
+        ):
+            run = replace(
+                initial.state.value,
+                proxy_flag=None,
+                input_provenance=None,
+            )
+            located_run = Located(
+                State.of(run), locator=initial.locator or locator
+            )
+            conditions["composition"] = located_run
+            return (
+                replace(identity, composition=located_run.state),
+                conditions,
+                list(notices),
+            )
+        reason = (
+            initial.state.reason
+            if initial is not None and initial.state.is_unknown
+            else "explicit printed point composition map is unusable"
+        )
+        unknown = Located(State.unknown(reason), locator=locator)
+        conditions["composition"] = unknown
+        return (
+            replace(identity, composition=unknown.state),
+            conditions,
+            list(notices),
+        )
+
+    composition = None
+    composition_locator = locator
+    if point_composition_map_declared:
+        declared_map = point_declared_component_map or point_oxide_map
+        initial = None
+        if declared_map is not None:
+            initial = _owner_initial_from_printed(
+                Located(State.of(declared_map), locator=locator),
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                closure_context=point_composition_context,
+            )
+        if (
+            initial is not None
+            and initial.state.is_value
+            and isinstance(initial.state.value, Composition)
+        ):
+            composition = initial.state.value
+            composition_locator = initial.locator or locator
+        elif initial is not None and initial.state.is_unknown:
+            refusal_reasons.append(
+                initial.state.reason or "printed point composition is unusable"
+            )
+        if composition is None and declared_map is not None:
+            reason = refusal_reasons[0] if refusal_reasons else (
+                "explicit printed point composition map is unusable"
+            )
+            unknown = Located(State.unknown(reason), locator=locator)
+            conditions["composition"] = unknown
+            return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    if composition is None and initial_charge_context is not None:
+        initial_map = _named_printed_composition_map(initial_charge_context)
+        if initial_map:
+            initial = _owner_initial_from_printed(
+                Located(State.of(initial_map), locator=locator),
+                proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+                closure_context=initial_charge_context,
+            )
+            if (
+                initial is not None
+                and initial.state.is_value
+                and isinstance(initial.state.value, Composition)
+            ):
+                composition = initial.state.value
+                composition_locator = initial.locator or locator
+            else:
+                reason = (
+                    initial.state.reason
+                    if initial is not None and initial.state.is_unknown
+                    else "printed initial charge is not a usable composition proxy"
+                )
+                unknown = Located(State.unknown(reason), locator=locator)
+                conditions["composition"] = unknown
+                return replace(identity, composition=unknown.state), conditions, list(notices)
+
+    printed = conditions.get("printed_composition")
+    if (
+        composition is None
+        and isinstance(printed, Located)
+        and printed.state.is_value
+    ):
+        initial = _owner_initial_from_printed(
+            printed,
+            proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            closure_context=initial_charge_context,
+        )
+        if initial is not None and initial.state.is_value:
+            candidate = initial.state.value
+            if isinstance(candidate, Composition):
+                composition = candidate
+                composition_locator = initial.locator or locator
+        if composition is None:
+            refusal_reasons.append("printed initial charge is not a usable composition proxy")
+    if composition is None:
+        located = conditions.get("composition")
+        if isinstance(located, Located) and located.state.is_value:
+            candidate = located.state.value
+            if isinstance(candidate, Composition):
+                composition = candidate
+                composition_locator = located.locator or locator
+    if composition is None and identity.composition is not None:
+        if identity.composition.is_value and isinstance(
+            identity.composition.value, Composition
+        ):
+            composition = identity.composition.value
+
     updated_notices = list(notices)
+    if composition is None:
+        if refusal_reasons:
+            reason = refusal_reasons[0]
+        elif point_composition_map_declared:
+            reason = "explicit printed point composition map is unusable"
+        else:
+            reason = (
+                "missing input: printed initial charge is unavailable for "
+                "initial_charge_only composition proxy"
+            )
+        unknown = Located(State.unknown(reason), locator=locator)
+        conditions["composition"] = unknown
+        return replace(identity, composition=unknown.state), conditions, updated_notices
+
+    composition = replace(
+        composition,
+        proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        input_provenance=PRINTED_STARTING_BULK,
+    )
+    located_proxy = Located(State.of(composition), locator=composition_locator)
+    conditions["composition"] = located_proxy
+    updated_identity = replace(identity, composition=State.of(composition))
     if quantity is not None:
         updated_notices.append(
             Notice(
                 kind=NoticeKind.SOURCE_DISAGREEMENT,
                 affected_quantities=(quantity,),
                 reason=(
-                    "composition_role=initial_charge_only: printed initial "
-                    "charge is sample context; per-run composition is not published"
+                    f"{SOURCE_INTERNALLY_INCONSISTENT_REASON_PREFIX} "
+                    f"composition_role={INITIAL_CHARGE_ONLY_PROXY_FLAG}: "
+                    f"{INITIAL_CHARGE_ONLY_PROXY_NOTICE}"
                 ),
                 origin=origin,
             )
         )
-    return (
-        replace(identity, composition=State.unknown(reason)),
-        conditions,
-        updated_notices,
-    )
+    return updated_identity, conditions, updated_notices
 
 
 def _owner_initial_from_printed(
@@ -9423,6 +9853,23 @@ def _owner_initial_from_printed(
         return None
     raw = printed.state.value
     locator = printed.locator
+    if isinstance(raw, Composition):
+        composition = raw
+        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition = replace(composition, proxy_flag=proxy_flag)
+        return Located(State.of(composition), locator=locator)
+    if (
+        isinstance(raw, Mapping)
+        and _enum(AmountBasis, raw.get("amount_basis"))
+        is AmountBasis.MOLE_PERCENT
+    ):
+        try:
+            composition = _composition_from_plain(raw)
+        except ValueError as exc:
+            return Located(State.unknown(str(exc)), locator=locator)
+        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            composition = replace(composition, proxy_flag=proxy_flag)
+        return Located(State.of(composition), locator=locator)
     if isinstance(raw, Mapping) and sum(
         isinstance(value, Mapping) for value in raw.values()
     ) > 1:
@@ -12341,7 +12788,7 @@ class CompilationColumnSeries:
 
 
 _PANKRATZ_H298_REFERENCE_K = {
-    "pankratz-1984-usbm-b677": Decimal("298.15"),
+    B677_SOURCE_ID: Decimal("298.15"),
     "pankratz-1987-usbm-b689": Decimal("298.15"),
     "pankratz-1994-usbm-b696": Decimal("298.15"),
 }
@@ -13362,6 +13809,15 @@ def _yield_point_admission(
 def uncertainty_for(raw: object) -> Uncertainty:
     if raw is None or raw == "":
         return Uncertainty(kind=UncertaintyKind.NONE)
+    if (
+        isinstance(raw, Mapping)
+        and raw.get("kind") == UncertaintyKind.DERIVED.value
+    ):
+        if "derivation" not in raw:
+            return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=raw)
+        # Keep the existing typed uncertainty shape intact when an extract
+        # carries a derived comparison band instead of author-printed prose.
+        return _uncertainty_from_plain(raw)
     if isinstance(raw, (str, Mapping)):
         return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=raw)
     return Uncertainty(kind=UncertaintyKind.PRINTED, verbatim=str(raw))
@@ -18390,6 +18846,7 @@ _WALK_SKIP_KEYS = {
     "supersession_note",
     "missing_for_motzfeldt",
     "missing_note",
+    "caption_depletion_columns",
 }
 
 
@@ -19992,13 +20449,23 @@ class PrintedOxygenFacts:
     bare_log: bool = False
 
 
-# Tokens the buffer owner can evaluate. Longer tokens are first so the
-# alternation cannot take a prefix. Any other non-empty
-# oxygen_buffer_as_published string, including CO-CO2 with no ratio, stays
-# a typed missing-input refusal. The curve is not applied to a bounded or
-# approximate print.
-_BUFFER_TOKEN = r"mo-moo2|m-h|fmq|qfm|nno|mh|mw|iw"
-_BUFFER_NAME_TOKENS = ("mo-moo2", "m-h", "fmq", "qfm", "nno", "mh", "mw", "iw")
+# Longer tokens are first so the alternation cannot take a prefix. CO-CO2 is
+# recognized as a family, but still refuses without the ratio it requires.
+# The curve is not applied to a bounded or approximate print.
+_BUFFER_RELATIVE_MARKERS = ("delta", "dlog", "log", "d", "Δ", "∆", "relative to", "relative")
+_BUFFER_RELATIVE_MARKER = (
+    "(?:" + "|".join(
+        re.escape(item).replace(r"\ ", r"\s+") for item in _BUFFER_RELATIVE_MARKERS
+    ) + ")"
+)
+_BUFFER_FAMILY_TOKEN = (
+    r"(?:magnetite(?:-|\s+)hematite|iron(?:-|\s+)w[uü]stite(?:\s+buffer)?|"
+    r"mo-moo2|co[-–]co2|m-h|fmq|qfm|nno|mh|mw|iw)"
+)
+_BUFFER_TOKEN = (
+    rf"(?:{_BUFFER_RELATIVE_MARKER}[-_\s]*)?{_BUFFER_FAMILY_TOKEN}"
+    rf"(?:[-_\s]*{_BUFFER_RELATIVE_MARKER})?"
+)
 _BOUNDED_FO2_REASON = (
     "source fO2 is bounded or not absolute; no point fO2_Pa assigned"
 )
@@ -20110,6 +20577,23 @@ class _BufferRequest:
     source_id: str | None = None
 
 
+class _PrintedOxygenRefusalCode(Enum):
+    BUFFER_RELATIVE = "buffer_relative"
+
+
+@dataclass(frozen=True)
+class _BufferRefusal:
+    reason: str
+    code: _PrintedOxygenRefusalCode
+
+
+def _buffer_refusal(reason: str) -> _BufferRefusal:
+    return _BufferRefusal(
+        reason=reason,
+        code=_PrintedOxygenRefusalCode.BUFFER_RELATIVE,
+    )
+
+
 @dataclass(frozen=True)
 class PrintedOxygenDecision:
     """Identity outcome for one printed oxygen fact.
@@ -20134,6 +20618,17 @@ class PrintedOxygenDecision:
     notices: tuple[PrintedOxygenNotice, ...] = ()
     buffer_request: _BufferRequest | None = None
     pressure_pa_used: Decimal | None = None
+    interval_condition: Located[Any] | None = None
+    interval_notice_reason: str | None = None
+    refusal_code: _PrintedOxygenRefusalCode | None = None
+
+
+def _buffer_refusal_decision(refusal: _BufferRefusal) -> PrintedOxygenDecision:
+    return PrintedOxygenDecision(
+        "refusal",
+        State.unknown(refusal.reason),
+        refusal_code=refusal.code,
+    )
 
 
 def _janaf_gas_formation_inputs(
@@ -20155,19 +20650,6 @@ def _janaf_gas_formation_inputs(
     return gibbs, float(JANAF_R_J_PER_MOL_K)
 
 
-def _oxygen_pressure_point(located: object) -> Decimal | None:
-    if not isinstance(located, Located) or not located.state.is_value:
-        return None
-    raw = located.state.value
-    if isinstance(raw, Value):
-        if raw.kind is not ValueKind.POINT or raw.point is None:
-            return None
-        raw = raw.point
-    if isinstance(raw, Decimal) and raw.is_finite():
-        return raw
-    return None
-
-
 def _bare_log_frame_decision(
     log10_fO2: Decimal,
     temperature_K: Decimal | None,
@@ -20179,8 +20661,8 @@ def _bare_log_frame_decision(
 ) -> PrintedOxygenDecision:
     """Check a printed fO2 against its stated atmosphere.
 
-    These anchors are all log10(fO2/bar): air is -0.6788 at 1 bar total and
-    -0.6731 at 1 atm total (0.2095 × 1.01325 bar); pure O2 is 0.0000 at
+    These anchors are all log10(fO2/bar): air is -0.6789 at 1 bar total and
+    -0.6732 at 1 atm total (0.20946 × 1.01325 bar); pure O2 is 0.0000 at
     1 bar total and +0.0057 at 1 atm total. Convert the printed log with
     1 bar = 100000 Pa regardless of which total-pressure anchor matches.
     The anchors differ by log10(1.01325) = 0.0057 dex, below the 0.01 dex
@@ -20584,7 +21066,7 @@ def _printed_oxygen_buffer_text(
         and isinstance(buffer_control.state.value, str)
     ):
         control_text = buffer_control.state.value
-        if any(token in control_text.casefold() for token in _BUFFER_NAME_TOKENS):
+        if _BUFFER_TOKEN_RE.search(control_text):
             return control_text
     if not isinstance(raw_item, Mapping):
         return None
@@ -20596,47 +21078,45 @@ def _printed_oxygen_buffer_text(
         if not isinstance(raw_log, Mapping):
             continue
         units = str(raw_log.get("units") or raw_log.get("unit") or "")
-        if any(token in units.casefold() for token in _BUFFER_NAME_TOKENS):
+        if _BUFFER_TOKEN_RE.search(units):
             return units
     return None
 
 
+_BUFFER_OFFSET_NUMBER_TOKEN = r"(?:\d+(?:\.\d*)?|\.\d+)(?:[eE][+-]?\d+)?"
+
+
 _BUFFER_OFFSET_TEXT_RE = re.compile(
-    r"^\s*(?:Δ\s*)?(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
-    r"\s*([+−-])\s*((?:\d+(?:\.\d*)?|\.\d+))\s*$",
+    rf"^\s*({_BUFFER_TOKEN})"
+    rf"\s*([+−-])\s*({_BUFFER_OFFSET_NUMBER_TOKEN})\s*$",
     re.IGNORECASE,
 )
 # A printed log whose unit is the buffer name is the offset, not an absolute
 # pressure. log10(bar) and log10(atm) stay absolute frames.
 _LOG_BUFFER_UNITS_RE = re.compile(
     r"^\s*log(?:10)?\s*\(\s*"
-    r"(IW|FMQ|QFM|NNO|CO[-–]CO2|M[-–]H|MH|MW|Mo[-–]MoO2)"
+    rf"({_BUFFER_TOKEN})"
     r"\s*\)\s*$",
     re.IGNORECASE,
 )
 _RELATIVE_LOG_FIELD_NAMES = frozenset({"logfo2", "log10fo2", "fo2log"})
-_MAVROGENES_SOURCE_ID = "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas"
-_KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 
 
 def _canonical_buffer_name(text: str) -> str:
     lowered = text.casefold().replace("−", "-").replace("–", "-")
-    if "fmq" in lowered or "qfm" in lowered:
-        return "QFM"
-    if "iw" in lowered:
-        return "IW"
-    if "nno" in lowered:
-        return "NNO"
-    if "co-co2" in lowered:
-        return "CO-CO2"
-    if "mo-moo2" in lowered:
-        return "Mo-MoO2"
-    if "m-h" in lowered:
-        return "M-H"
-    if "mh" in lowered:
-        return "MH"
-    if "mw" in lowered:
-        return "MW"
+    match = _BUFFER_TOKEN_RE.search(lowered)
+    if match is not None:
+        token = re.sub(
+            rf"^(?:{_BUFFER_RELATIVE_MARKER})[-_\s]*|[-_\s]*(?:{_BUFFER_RELATIVE_MARKER})$",
+            "",
+            match.group("buf"),
+            flags=re.IGNORECASE,
+        )
+        token = token.casefold().replace("ü", "u")
+        token = re.sub(r"\s+", "-", token)
+        return _BUFFER_FAMILY[token]
+    if "co-co2" in lowered or "coco2" in re.sub(r"[^a-z0-9]", "", lowered):
+        return _BUFFER_FAMILY["co-co2"]
     return text.strip()
 
 
@@ -20652,24 +21132,33 @@ def _buffer_named_by_log_units(units: object) -> str | None:
 
 
 def _relative_buffer_for_field(name: str) -> str | None:
-    normalized = re.sub(r"[^a-z0-9]", "", name.casefold())
-    suffixes = (
-        ("iw", "IW"),
-        ("fmq", "QFM"),
-        ("qfm", "QFM"),
-        ("nno", "NNO"),
-        ("coco2", "CO-CO2"),
-        ("momoo2", "Mo-MoO2"),
-        ("mw", "MW"),
-        ("mh", "M-H" if re.search(r"m\s*[-–]\s*h", name, re.I) else "MH"),
-    )
-    prefixes = ("delta", "d", "fo2delta", "logfo2asdelta")
-    for suffix, buffer in suffixes:
-        if any(normalized == f"{prefix}{suffix}" for prefix in prefixes) or any(
-            normalized == f"{prefix}{suffix}asprinted" for prefix in prefixes
-        ):
-            return buffer
-    return None
+    match = _BUFFER_TOKEN_RE.search(name)
+    if match is None:
+        return None
+    token = match.group("buf")
+    if not _has_relative_buffer_marker(token):
+        return None
+    prefix = re.sub(r"[^a-z0-9]", "", name[: match.start()].casefold())
+    suffix = re.sub(r"[^a-z0-9]", "", name[match.end() :].casefold())
+    if prefix not in {"", "fo2", "fo2log", "logfo2as"}:
+        return None
+    if suffix not in {"", "asprinted"}:
+        return None
+    family = _canonical_buffer_name(token)
+    return family if family in set(_BUFFER_FAMILY.values()) else None
+
+
+def _has_relative_buffer_marker(text: str) -> bool:
+    """Detect markers in prose/units independently of valid field-name syntax."""
+
+    return any(
+        re.fullmatch(_BUFFER_FAMILY_TOKEN, match.group("buf"), re.IGNORECASE) is None
+        for match in _BUFFER_TOKEN_RE.finditer(text)
+    ) or re.search(
+        rf"(?<![a-z0-9]){_BUFFER_RELATIVE_MARKER}(?![a-z0-9])",
+        text,
+        re.IGNORECASE,
+    ) is not None
 
 
 def _relative_offset_value(raw: object) -> tuple[Decimal, str] | None:
@@ -20693,12 +21182,22 @@ def _relative_offset_value(raw: object) -> tuple[Decimal, str] | None:
                 return None
             original = state.get("value")
             raw = original
-        elif "value" in raw:
-            original = raw.get("value")
-            raw = original
-    value = _printed_decimal(raw)
-    if value is None:
+        else:
+            key = next(
+                (
+                    name
+                    for name in ("delta_as_published", "delta", "value")
+                    if name in raw
+                ),
+                None,
+            )
+            if key is not None:
+                original = raw.get(key)
+                raw = original
+    parsed = _offset_number(raw)
+    if parsed is None:
         return None
+    value, _printed = parsed
     return value, str(original if original is not None else raw).strip()
 
 
@@ -20731,15 +21230,9 @@ def _printed_relative_oxygen(
             if located is not None:
                 candidates.append((buffer, located[0], located[1]))
     if buffer_text:
-        match = _BUFFER_OFFSET_TEXT_RE.match(buffer_text)
-        if match is not None:
-            buffer = _canonical_buffer_name(match.group(1))
-            signed = match.group(3)
-            if match.group(2) in {"-", "−"}:
-                signed = f"-{signed}"
-            elif match.group(2) == "+":
-                signed = f"+{signed}"
-            candidates.append((buffer, Decimal(signed), buffer_text.strip()))
+        buffer, offset, printed, is_prose = _classify_buffer_phrase(buffer_text)
+        if not is_prose and offset is not None and printed is not None:
+            candidates.append((buffer, offset, buffer_text.strip()))
     unique = {(buffer, offset) for buffer, offset, _printed in candidates}
     if not unique:
         return None
@@ -20748,7 +21241,7 @@ def _printed_relative_oxygen(
     buffer, offset = next(iter(unique))
     if buffer_text:
         control_buffer = _canonical_buffer_name(buffer_text)
-        known_buffers = {"IW", "QFM", "NNO", "CO-CO2", "M-H", "MH", "MW", "Mo-MoO2"}
+        known_buffers = {*_BUFFER_FAMILY.values()}
         if control_buffer in known_buffers and control_buffer != buffer:
             return ("ambiguous", Decimal(0), "offset and buffer control disagree")
     printed = next(
@@ -20799,30 +21292,12 @@ def _delta_iw_ideal_ratio_notice(quoted_definition: str) -> str | None:
 
 
 def _relative_method_notice(source_id: str | None, buffer: str) -> str | None:
-    if (
-        source_id == _MAVROGENES_SOURCE_ID
-        and buffer == "IW"
-    ):
-        # Mavrogenes & O'Neill (1999), Eq. 12 and Table 2 footnote: log fO2
-        # uses a_FeO=1.7 X_FeO from Holzheid et al. (1997), not an ideal ratio.
-        return (
-            "delta_iw_activity_corrected_gamma_model=Holzheid1997_FeO_gamma_1.7; "
-            "source definition: log fO2 = -ΔG°(11)/22.3RT + "
-            "2 log a_FeO^silicate - 2 log a_Fe^metal; a_FeO=1.7 X_FeO"
-        )
-    if source_id == _KEMS_137_SOURCE_ID and buffer == "IW":
-        # Bischof et al. (2023), abstract: experiments span ΔIW+1.5 to
-        # ΔIW+2.5 and define IW as the iron-wüstite buffer. The paper does not
-        # define ΔIW by an ideal x_FeO/x_Fe ratio.
-        definition = (
-            "log(fO2) range ΔIW+1.5 to ΔIW+2.5 "
-            "(IW = iron-wüstite buffer)"
-        )
-        ideal_ratio_notice = _delta_iw_ideal_ratio_notice(definition)
-        if ideal_ratio_notice is not None:
-            return ideal_ratio_notice
-        return f"delta_iw_reference=iron_wustite_buffer; source definition: {definition}"
-    return None
+    if buffer != "IW":
+        return None
+    rule = SOURCE_DECLARATIONS.get(source_id or "", {}).get(
+        "relative_oxygen_notice"
+    )
+    return rule.value if rule is not None and isinstance(rule.value, str) else None
 
 
 def _relative_buffer_calibration(
@@ -21068,19 +21543,17 @@ def _relative_oxygen_decision(
         return None
     buffer, offset, offset_as_printed = relative
     if buffer == "ambiguous":
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 "buffer-relative fO2 is ambiguous; no fO2_Pa assigned"
-            ),
+            )
         )
     if temperature_K is None or not temperature_K.is_finite() or temperature_K <= 0:
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 f"buffer-relative fO2 ({buffer} {offset_as_printed}) has no "
                 "finite run temperature; no fO2_Pa assigned"
-            ),
+            )
         )
     pressure_bar = (
         pressure_bar
@@ -21103,12 +21576,11 @@ def _relative_oxygen_decision(
             if calibration_text
             else f"buffer {buffer} has no cited canonical calibration"
         )
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(
+        return _buffer_refusal_decision(
+            _buffer_refusal(
                 f"buffer-relative fO2 ({buffer}, offset {offset_as_printed}) "
                 f"refused: {cited}; no fO2_Pa assigned"
-            ),
+            )
         )
     calibration_log = calibrated[0]
     absolute_log = Decimal(str(calibration_log)) + offset
@@ -21139,17 +21611,16 @@ _BUFFER_TOKEN_RE = re.compile(
 )
 _BUFFER_OFFSET_RE = re.compile(
     rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])"
-    r"(?:\s*=)?\s*(?P<off>[+-]\s*\d+(?:\.\d+)?)?",
+    # Unsigned numbers need '='; otherwise a sign must introduce the offset.
+    r"(?P<equals>\s*=)?\s*(?:(?P<off>(?(equals)[+-]?|[+-])\s*"
+    rf"{_BUFFER_OFFSET_NUMBER_TOKEN})\.?(?=$|[\s,;()])"
+    r"|(?P<invalid_off>(?(equals)|[+-])\s*[^\s,;()]*))?",
     re.IGNORECASE,
 )
-# A sign or equals with no number is an offset that failed to parse.
-# It must not fall through to the bare-name offset of 0.
-_BUFFER_OFFSET_INTRO_RE = re.compile(
-    rf"(?<![a-z0-9])(?:{_BUFFER_TOKEN})(?![a-z0-9])\s*(?:=|[+-])",
-    re.IGNORECASE,
-)
-_LOG_UNITS_PHRASE_RE = re.compile(
-    r"(?P<n>[+-]?\d+(?:\.\d+)?)\s+log\s+units?\s+(?P<dir>below|above)\s+"
+_BUFFER_DISTANCE_PHRASE_RE = re.compile(
+    # Capture the whole supplied token; the offset decoder validates it.
+    r"(?<!\S)(?P<n>[+\-.\d]\S*|\S+(?=\s+log\s+units?\s+))"
+    r"\s+(?:log\s+units?\s+)?(?P<dir>below|above)\s+"
     rf"(?<![a-z0-9])(?P<buf>{_BUFFER_TOKEN})(?![a-z0-9])",
     re.IGNORECASE,
 )
@@ -21163,24 +21634,18 @@ _IDEAL_FEO_FE_RE = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 _BUFFER_FAMILY = {
+    "co-co2": "CO-CO2",
     "iw": "IW",
+    "iron-wustite": "IW",
+    "iron-wustite-buffer": "IW",
     "qfm": "QFM",
     "fmq": "QFM",
     "nno": "NNO",
     "mo-moo2": "Mo-MoO2",
+    "magnetite-hematite": "MH",
     "mh": "MH",
     "m-h": "MH",
     "mw": "MW",
-}
-_DELTA_FIELD_FAMILY = {
-    "fO2_delta_IW": "IW",
-    "delta_IW": "IW",
-    "fO2_delta_QFM": "QFM",
-    "delta_QFM": "QFM",
-    "fO2_delta_FMQ": "QFM",
-    "delta_FMQ": "QFM",
-    "fO2_delta_NNO": "NNO",
-    "delta_NNO": "NNO",
 }
 _CALIBRATION_TEXT_FIELDS = (
     "buffer_calibration",
@@ -21189,10 +21654,6 @@ _CALIBRATION_TEXT_FIELDS = (
     "fo2_calibration",
 )
 _BUFFER_NAME_WORDS = (
-    "iron-wüstite",
-    "iron-wustite",
-    "iron wüstite",
-    "iron wustite",
     "fayalite-magnetite-quartz",
     "fayalite magnetite quartz",
     "nickel-nickel oxide",
@@ -21201,8 +21662,7 @@ _BUFFER_NAME_WORDS = (
 
 
 def _units_name_buffer(units: str) -> bool:
-    folded = units.casefold()
-    return any(token in folded for token in _BUFFER_NAME_TOKENS)
+    return _BUFFER_TOKEN_RE.search(units) is not None
 
 
 def _buffer_named_in_mapping(mapping: Mapping[str, Any]) -> bool:
@@ -21248,6 +21708,8 @@ def _offset_number(raw: object) -> tuple[Decimal, str] | None:
     )
     if normalized.endswith("."):
         normalized = normalized[:-1]
+    if re.fullmatch(rf"[+-]?{_BUFFER_OFFSET_NUMBER_TOKEN}", normalized) is None:
+        return None
     try:
         number = Decimal(normalized)
     except (InvalidOperation, ValueError):
@@ -21356,9 +21818,13 @@ def _normalize_offset_dashes(text: str) -> str:
 
 def _leftover_buffer_words(text: str) -> str:
     folded = _normalize_offset_dashes(text).casefold()
+    # A citation/units parenthesis decorates a label; its year is not an offset.
+    folded = re.sub(r"\([^()]*\)", " ", folded)
     for word in _BUFFER_NAME_WORDS:
         folded = folded.replace(word.casefold(), " ")
     folded = _BUFFER_OFFSET_RE.sub(" ", folded)
+    folded = re.sub(r"\blog\s+units?\b", " ", folded)
+    folded = re.sub(rf"\b{_BUFFER_RELATIVE_MARKER}\b", " ", folded)
     return re.sub(r"[^a-z]+", " ", folded).strip()
 
 
@@ -21367,8 +21833,10 @@ def _classify_buffer_phrase(
 ) -> tuple[str, Decimal | None, str | None, bool]:
     """Return family, offset, offset-as-printed, and whether the phrase is prose.
 
-    A bare buffer name is offset 0. ``delta-IW`` with no number is prose.
-    A printed sign or ``=`` whose number does not parse is prose, not offset 0.
+    A bare buffer name is offset 0 with printed=None (zero by statement).
+    ``delta-IW`` with no number is prose, even inside decorated labels.
+    A printed sign or ``=`` whose number does not parse is prose, not offset 0;
+    its raw offset token remains in the third item so callers cannot default it.
     ``IW = -2`` is offset -2. Unicode minus, en dash, and em dash are minus.
     """
 
@@ -21377,19 +21845,19 @@ def _classify_buffer_phrase(
         family = None
         match = _BUFFER_TOKEN_RE.search(text.casefold())
         if match is not None:
-            family = _BUFFER_FAMILY[match.group("buf").casefold()]
+            family = _canonical_buffer_name(match.group("buf"))
         return family or "", None, None, True
-    phrase = _LOG_UNITS_PHRASE_RE.search(text)
+    phrase = _BUFFER_DISTANCE_PHRASE_RE.search(text)
     if phrase is not None:
         number, _printed = _offset_number(phrase.group("n")) or (None, None)
         if number is None:
-            return "", None, None, True
+            return _canonical_buffer_name(phrase.group("buf")), None, phrase.group("n"), True
         if phrase.group("dir").casefold() == "below":
             number = -abs(number)
         else:
             number = abs(number)
         return (
-            _BUFFER_FAMILY[phrase.group("buf").casefold()],
+            _canonical_buffer_name(phrase.group("buf")),
             number,
             phrase.group("n"),
             False,
@@ -21397,71 +21865,88 @@ def _classify_buffer_phrase(
     matches = list(_BUFFER_OFFSET_RE.finditer(text))
     if not matches:
         return "", None, None, False
-    families = {_BUFFER_FAMILY[item.group("buf").casefold()] for item in matches}
+    invalid_offsets = [
+        item.group("invalid_off") for item in matches
+        if item.group("invalid_off") is not None
+    ]
+    if invalid_offsets:
+        return _canonical_buffer_name(matches[0].group("buf")), None, invalid_offsets[0], True
+    families = {_canonical_buffer_name(item.group("buf")) for item in matches}
     if len(families) != 1:
         return "", None, None, True
     family = next(iter(families))
     offsets = [item.group("off") for item in matches if item.group("off")]
+    parsed_offsets = [_offset_number(item) for item in offsets]
+    if None in parsed_offsets:
+        return family, None, offsets[0], True
     if _leftover_buffer_words(text):
         return family, None, None, True
-    if len(offsets) > 1 and len({item.replace(" ", "") for item in offsets}) > 1:
+    if len({item[0] for item in parsed_offsets}) > 1:
         return family, None, None, True
     if not offsets:
-        if _BUFFER_OFFSET_INTRO_RE.search(text):
+        if _has_relative_buffer_marker(text):
             return family, None, None, True
-        return family, Decimal(0), "0", False
-    number, _printed = _offset_number(offsets[0]) or (None, None)
-    if number is None:
-        return family, None, None, True
-    return family, number, offsets[0].replace(" ", ""), False
+        return family, Decimal(0), None, False
+    return family, parsed_offsets[0][0], offsets[0].replace(" ", ""), False
 
 
 def _push_point(
     points: list[tuple[str, Decimal, str, str, bool]],
     family: str,
     offset: Decimal,
-    offset_as_printed: str,
+    offset_as_printed: str | None,
     source: str,
     *,
     bare_name: bool,
 ) -> None:
     # bare_name marks a buffer word with no printed number (IW, iron-wüstite).
     # It is offset 0 only when nothing else on the row supplies the offset.
-    points.append((family, offset, offset_as_printed, source, bare_name))
+    printed = offset_as_printed if offset_as_printed is not None else "0 (at buffer by statement)"
+    points.append((family, offset, printed, source, bare_name))
 
 
 def _buffer_request_from_row(
     raw_item: object,
     point_conditions: Mapping[str, Any] | None,
     temperature_K: Decimal | None,
-) -> _BufferRequest | str | None:
-    """A buffer point, a refusal sentence, or None when the row names no buffer."""
+) -> _BufferRequest | _BufferRefusal | None:
+    """A buffer point, a typed refusal, or None when the row names no buffer."""
 
     points: list[tuple[str, Decimal, str, str, bool]] = []
     prose: list[tuple[str, str]] = []
     unknown: list[str] = []
     oxygen_text: list[str] = []
     calibration_bits: list[str] = []
+    relative_field_families: set[str] = set()
+    relative_markers_without_offset: list[str] = []
     for mapping in _buffer_mappings(raw_item, point_conditions):
         for key in _CALIBRATION_TEXT_FIELDS:
             raw_bit = mapping.get(key)
             if isinstance(raw_bit, str) and raw_bit.strip():
                 calibration_bits.append(raw_bit.strip())
                 oxygen_text.append(raw_bit.strip())
-        control = mapping.get("fO2_control")
-        for piece in _text_pieces(control):
+        for piece in (
+            *_text_pieces(mapping.get("fO2_control")),
+            *_text_pieces(mapping.get("oxygen_fugacity_buffer_relation")),
+        ):
             oxygen_text.append(piece)
             family, offset, printed, is_prose = _classify_buffer_phrase(piece)
             if is_prose:
+                if printed is not None:
+                    return _buffer_refusal(
+                        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=piece)
+                    )
                 prose.append((family, piece))
+                if family and _has_relative_buffer_marker(piece):
+                    relative_markers_without_offset.append(piece)
             elif offset is not None and family:
                 _push_point(
                     points,
                     family,
                     offset,
-                    printed or "0",
+                    printed,
                     piece,
-                    bare_name=printed == "0",
+                    bare_name=printed is None,
                 )
         raw_buffer = mapping.get("oxygen_buffer_as_published")
         if isinstance(raw_buffer, str) and raw_buffer.strip():
@@ -21492,15 +21977,21 @@ def _buffer_request_from_row(
             ):
                 unknown.append(raw_buffer.strip())
             elif is_prose:
+                if printed is not None:
+                    return _buffer_refusal(
+                        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=raw_buffer.strip())
+                    )
                 prose.append((family, raw_buffer.strip()))
+                if family and _has_relative_buffer_marker(raw_buffer):
+                    relative_markers_without_offset.append(raw_buffer.strip())
             elif offset is not None and family:
                 _push_point(
                     points,
                     family,
                     offset,
-                    printed or "0",
+                    printed,
                     raw_buffer.strip(),
-                    bare_name=printed == "0",
+                    bare_name=printed is None,
                 )
         for key in _PRINTED_LOG_FO2_KEYS:
             node = mapping.get(key)
@@ -21511,37 +22002,41 @@ def _buffer_request_from_row(
                 continue
             oxygen_text.append(units)
             match = _BUFFER_TOKEN_RE.search(units.casefold())
-            parsed = _offset_number(node.get("value"))
+            parsed = _relative_offset_value(node)
             if match is None or parsed is None:
                 prose.append(("", units))
+                # A log field naming a buffer is a relative frame even when
+                # the units print only IW or log10(IW), without 'delta'.
+                relative_markers_without_offset.append(units)
                 continue
             number, printed = parsed
             _push_point(
                 points,
-                _BUFFER_FAMILY[match.group("buf").casefold()],
+                _canonical_buffer_name(match.group("buf")),
                 number,
                 printed,
                 units,
                 bare_name=False,
             )
-        for key, family in _DELTA_FIELD_FAMILY.items():
-            if key not in mapping:
+        for key, raw in mapping.items():
+            family = _relative_buffer_for_field(str(key))
+            if family is None:
                 continue
-            payload = _condition_payload(mapping.get(key))
-            oxygen_text.extend(_text_pieces(mapping.get(key)))
-            raw_delta: object = payload
+            payload = _condition_payload(raw)
+            oxygen_text.extend(_text_pieces(raw))
             if isinstance(payload, Mapping):
-                raw_delta = payload.get("delta_as_published", payload.get("delta"))
                 reference = payload.get("reference_buffer")
                 if isinstance(reference, str) and reference.strip():
                     ref_family, _, _, ref_prose = _classify_buffer_phrase(reference)
                     if ref_family and ref_family != family and not ref_prose:
                         prose.append((ref_family, reference.strip()))
-            parsed = _offset_number(raw_delta)
+            parsed = _relative_offset_value(payload)
             if parsed is None:
                 prose.append((family, key))
+                relative_markers_without_offset.append(key)
                 continue
             number, printed = parsed
+            relative_field_families.add(family)
             source = key
             if isinstance(payload, Mapping) and isinstance(payload.get("reference_buffer"), str):
                 source = payload["reference_buffer"].strip() or key
@@ -21555,21 +22050,32 @@ def _buffer_request_from_row(
         numbered = [item for item in points if not item[4]]
         if numbered:
             points = numbered
+        elif relative_markers_without_offset:
+            label = relative_markers_without_offset[0]
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+            )
         families = {item[0] for item in points}
         offsets = {item[1] for item in points}
         if len(families) != 1 or len(offsets) != 1:
-            return _BUFFER_RELATIVE_CONFLICT.format(
-                buffer=" / ".join(item[3] for item in points)
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=" / ".join(item[3] for item in points)
+                )
             )
         family, offset, offset_printed, source, _bare = points[0]
         for prose_family, prose_text in prose:
             if prose_family and prose_family != family:
-                return _BUFFER_RELATIVE_CONFLICT.format(
-                    buffer=f"{source} / {prose_text}"
+                return _buffer_refusal(
+                    _BUFFER_RELATIVE_CONFLICT.format(
+                        buffer=f"{source} / {prose_text}"
+                    )
                 )
         if unknown:
-            return _BUFFER_RELATIVE_CONFLICT.format(
-                buffer=f"{source} / {unknown[0]}"
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_CONFLICT.format(
+                    buffer=f"{source} / {unknown[0]}"
+                )
             )
         if (
             temperature_K is None
@@ -21577,7 +22083,18 @@ def _buffer_request_from_row(
             or not temperature_K.is_finite()
             or temperature_K <= 0
         ):
-            return _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+            return _buffer_refusal(
+                _BUFFER_RELATIVE_NO_TEMPERATURE.format(buffer=source)
+            )
+        if family in relative_field_families and _relative_buffer_calibration(
+            family,
+            float(temperature_K),
+            1.0,
+            _printed_buffer_calibration(raw_item, source, point_conditions),
+        ) is None:
+            # The relative-oxygen resolver owns typed refusals for families
+            # without an applicable cited or canonical migration calibration.
+            return None
         matched = match_printed_calibration(family, joined)
         unmatched = None
         if matched is None and calibration_bits:
@@ -21597,9 +22114,13 @@ def _buffer_request_from_row(
             ),
         )
     if unknown:
-        return _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+        return _buffer_refusal(
+            _BUFFER_RELATIVE_FO2_REASON.format(buffer=unknown[0])
+        )
     label = next((text for _family, text in prose if text), "buffer")
-    return _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+    return _buffer_refusal(
+        _BUFFER_RELATIVE_NOT_A_POINT.format(buffer=label)
+    )
 
 
 def _band_text(width: Decimal | None) -> str:
@@ -21645,11 +22166,34 @@ def _decision_for_buffer(
         and request.calibration_id is None
         and request.calibration_text is None
     ):
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
+            )
+        )
+    if request.buffer == "CO-CO2":
+        printed_buffer = (request.buffer_as_printed or "").strip()
+        if printed_buffer.removesuffix(".").casefold() != request.buffer.casefold():
+            printed_buffer = request.buffer
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                f"{printed_buffer} buffer-relative fO2 requires the printed "
+                "CO/CO2 ratio; "
+                "no fO2_Pa assigned"
+            )
+        )
+    calibration_rule = SOURCE_DECLARATIONS.get(request.source_id or "", {}).get(
+        "printed_oxygen_requires_calibration"
+    )
+    if (
+        calibration_rule is not None
+        and calibration_rule.value is True
+        and request.calibration_id is None
+        and request.calibration_text is None
+    ):
         return PrintedOxygenDecision(
             "refusal",
-            State.unknown(
-                "Bischof ΔIW has no cited buffer calibration; no fO2_Pa assigned"
-            ),
+            State.unknown(calibration_rule.reason),
         )
     pressure_bar = (
         total_pressure_pa / _BAR_PA
@@ -21820,8 +22364,8 @@ def _buffer_relative_decision(
     outcome = _buffer_request_from_row(raw_item, point_conditions, run_temperature_K)
     if outcome is None:
         return None
-    if isinstance(outcome, str):
-        return PrintedOxygenDecision("refusal", State.unknown(outcome))
+    if isinstance(outcome, _BufferRefusal):
+        return _buffer_refusal_decision(outcome)
     outcome = replace(outcome, source_id=source_id)
     resolved = _point_total_pressure_pa(point_conditions)
     if resolved is None:
@@ -21846,6 +22390,231 @@ def _refresh_buffer_decision(
     ):
         return decision
     return _decision_for_buffer(decision.buffer_request, total_pressure_pa)
+
+
+def _printed_fo2_interval(
+    raw_item: object,
+    point_conditions: Mapping[str, Any] | None,
+    *,
+    total_pressure_pa: Decimal | None,
+) -> tuple[Located[Any], str] | None:
+    """Retain a printed fO2 bound or qualitative air/buffer condition."""
+
+    def value_condition(
+        payload: Mapping[str, Any],
+        locator: Locator | None,
+        inference: Derivation,
+    ) -> Located[Any]:
+        located = _point_condition_from_plain(
+            {"state": {"tag": StateTag.VALUE.value, "value": payload}},
+            key="fO2_log",
+        )
+        return replace(
+            located,
+            locator=locator or located.locator,
+            inference=inference,
+        )
+
+    located = (point_conditions or {}).get("fO2_log")
+    if isinstance(located, Located) and located.state.is_value:
+        value = located.state.value
+        if isinstance(value, Value) and value.kind in {
+            ValueKind.BOUND,
+            ValueKind.INTERVAL,
+        }:
+            return (
+                located,
+                "bound_type=printed_inequality; interval condition not yet scorable",
+            )
+
+    mappings = list(_buffer_mappings(raw_item, point_conditions))
+    texts: list[tuple[str, str, Locator | None]] = []
+    for mapping in mappings:
+        for key in (
+            "fO2_control",
+            "oxygen_buffer_as_published",
+            "oxygen_fugacity_buffer_relation",
+            "atmosphere_as_published",
+            "atmosphere",
+        ):
+            candidates = [(mapping.get(key), mapping.get(key))]
+            if key == "fO2_control" and isinstance(mapping.get(key), Mapping):
+                candidates.append((mapping[key].get("buffer"), mapping[key]))
+            for candidate, locator_source in candidates:
+                if isinstance(locator_source, Located):
+                    locator = locator_source.locator
+                elif isinstance(locator_source, Mapping):
+                    locator = _locator_from_plain(locator_source.get("locator"))
+                else:
+                    locator = None
+                if locator is None:
+                    locator = _locator_from_plain(mapping.get("locator"))
+                for text in _text_pieces(candidate):
+                    texts.append((key, text.strip(), locator))
+
+    for mapping in mappings:
+        node = mapping.get("oxygen_partial_pressure")
+        if not isinstance(node, Mapping):
+            continue
+        raw_value = node.get("value")
+        if not isinstance(raw_value, str):
+            continue
+        comparison = re.fullmatch(
+            r"\s*(?P<operator><=|>=|<|>|≤|≥)\s*(?P<amount>.*?)\s*",
+            raw_value,
+        )
+        if comparison is None:
+            continue
+        amount = _printed_decimal(comparison.group("amount"))
+        units = str(node.get("units") or node.get("unit") or "").strip()
+        pressure_pa, conversion = convert_pressure_to_pa(amount, units)
+        if amount is None or amount <= 0 or pressure_pa is None or pressure_pa <= 0:
+            continue
+        operator = {"≤": "<=", "≥": ">="}.get(
+            comparison.group("operator"), comparison.group("operator")
+        )
+        log_bar = (pressure_pa / PA_PER_BAR_DEC).log10()
+        locator = _locator_from_plain(node.get("locator")) or _locator_from_plain(
+            mapping.get("locator")
+        )
+        condition = value_condition(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": operator,
+                "bound_value": log_bar,
+            },
+            locator,
+            Derivation(
+                relation="printed_oxygen_pressure_inequality_to_log_fO2_bound",
+                inputs=(
+                    f"values.oxygen_partial_pressure={raw_value}",
+                    f"units={units}",
+                    f"pressure_conversion={conversion}",
+                ),
+                parameters=(),
+                output_unit="log10(fO2/bar)",
+            ),
+        )
+        return (
+            condition,
+            "bound_type=printed_oxygen_pressure_inequality; "
+            "frame=log10(fO2/bar); interval condition not yet scorable",
+        )
+
+    for key, text, locator in texts:
+        atmosphere = _atmosphere_kind(text)
+        is_air = (
+            atmosphere is not None and atmosphere[0] == "air"
+        ) or (
+            "/" not in text
+            and not re.search(r"\b(?:ratio|mixture)\b", text, re.IGNORECASE)
+            and bool(re.search(r"\bair\b", text, re.IGNORECASE))
+        )
+        if is_air:
+            total_pa = total_pressure_pa
+            explicit_total_bar = atmosphere[2] if atmosphere is not None else None
+            if explicit_total_bar is not None:
+                total_pa = explicit_total_bar * PA_PER_BAR_DEC
+            if total_pa is None or not total_pa.is_finite() or total_pa <= 0:
+                has_pressure_input = any(
+                    "total_pressure_Pa" in mapping for mapping in mappings
+                )
+                reason = (
+                    "invalid total pressure for printed air fO2; no value assigned"
+                    if has_pressure_input or total_pa is not None
+                    else "missing input: printed air fO2 requires stated total pressure"
+                )
+                return (
+                    Located(
+                        State.unknown(reason),
+                        locator=locator,
+                        inference=Derivation(
+                            relation="air_fO2_requires_stated_total_pressure",
+                            inputs=(f"{key}={text}",),
+                            parameters=(),
+                            output_unit="log10(fO2/bar)",
+                        ),
+                    ),
+                    reason,
+                )
+            po2_pa = total_pa * _AIR_O2_MOLE_FRACTION
+            log_bar = (po2_pa / PA_PER_BAR_DEC).log10()
+            condition = value_condition(
+                {
+                    "kind": ValueKind.INTERVAL.value,
+                    "interval_low": log_bar,
+                    "interval_high": log_bar,
+                },
+                locator,
+                Derivation(
+                    relation=(
+                        "air_interval_from_total_pressure; "
+                        f"pO2={_dec_str(_AIR_O2_MOLE_FRACTION)}*P_total; "
+                        "degenerate interval"
+                    ),
+                    inputs=(f"{key}={text}", "point_conditions.total_pressure_Pa"),
+                    parameters=(),
+                    output_unit="log10(fO2/bar)",
+                ),
+            )
+            return (
+                condition,
+                "bound_type=degenerate_air_interval; computed pO2="
+                f"{_dec_str(_AIR_O2_MOLE_FRACTION)} x stated total pressure; "
+                "interval condition not yet scorable",
+            )
+
+        buffer_text = _normalize_offset_dashes(text)
+        if _BUFFER_DISTANCE_PHRASE_RE.search(buffer_text) is not None:
+            continue
+        bound_match = re.search(
+            r"\b(?P<direction>below|under|less than|above|over|greater than)\s+"
+            rf"(?P<buffer>{_BUFFER_FAMILY_TOKEN})(?![a-z0-9])"
+            r"(?P<threshold_offset>\s*[+-]\s*[^\s,;()]*)?",
+            buffer_text,
+            re.IGNORECASE,
+        )
+        if bound_match is None:
+            continue
+        buffer = _canonical_buffer_name(bound_match.group("buffer"))
+        direction = (
+            BoundDirection.UPPER
+            if bound_match.group("direction").casefold()
+            in {"below", "under", "less than"}
+            else BoundDirection.LOWER
+        )
+        threshold_offset = bound_match.group("threshold_offset")
+        if threshold_offset is None:
+            bound = Decimal(0)
+        else:
+            parsed_offset = _offset_number(threshold_offset)
+            if parsed_offset is None:
+                continue
+            bound = parsed_offset[0]
+        frame = f"log10({buffer})"
+        condition = value_condition(
+            {
+                "kind": ValueKind.BOUND.value,
+                "bound_operator": "<" if direction is BoundDirection.UPPER else ">",
+                "bound_value": bound,
+            },
+            locator,
+            Derivation(
+                relation=(
+                    f"buffer_relative_fO2_inequality; buffer={buffer}; "
+                    f"frame={frame}"
+                ),
+                inputs=(f"{key}={text}",),
+                parameters=(),
+                output_unit=frame,
+            ),
+        )
+        return (
+            condition,
+            f"bound_type={direction.value}; buffer={buffer}; frame={frame}; "
+            "interval condition not yet scorable",
+        )
+    return None
 
 
 def printed_oxygen_decision(
@@ -21929,6 +22698,30 @@ def printed_oxygen_decision(
         if not absolute
         else None
     )
+    interval = (
+        _printed_fo2_interval(
+            raw_item,
+            point_conditions,
+            total_pressure_pa=total_pressure_pa,
+        )
+        if not absolute
+        else None
+    )
+    if interval is not None:
+        interval_condition, interval_notice = interval
+        interval_state = (
+            interval_condition.state
+            if interval_condition.state.is_unknown
+            else State.unknown(
+                "bounded or qualitative fO2 retained as a typed condition"
+            )
+        )
+        return PrintedOxygenDecision(
+            "interval",
+            interval_state,
+            interval_condition=interval_condition,
+            interval_notice_reason=interval_notice,
+        )
     # An absolute log is an explicit point even when the same source row also
     # reports its buffer-relative offset. The absolute value takes precedence.
     if not absolute and not facts.rejected_log_fO2 and non_point_reason is None:
@@ -21987,9 +22780,10 @@ def printed_oxygen_decision(
     if relative_decision is not None:
         return relative_decision
     if buffer_text is not None:
-        return PrintedOxygenDecision(
-            "refusal",
-            State.unknown(_BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)),
+        return _buffer_refusal_decision(
+            _buffer_refusal(
+                _BUFFER_RELATIVE_FO2_REASON.format(buffer=buffer_text)
+            )
         )
     return None
 
@@ -22206,7 +23000,7 @@ def _printed_oxygen_state_for(
         and current.reason != decision.state.reason
         and decision.state.reason != _BOUNDED_FO2_REASON
         and decision.state.reason != _BARE_LOG_SCALE_UNKNOWN
-        and not (decision.state.reason or "").startswith("buffer-relative fO2 (")
+        and decision.refusal_code is not _PrintedOxygenRefusalCode.BUFFER_RELATIVE
     ):
         return None
     if (
@@ -22224,6 +23018,42 @@ def _printed_oxygen_state_for(
     ):
         return None
     return decision.state
+
+
+def _retain_printed_fo2_interval(
+    point_conditions: Mapping[str, Located[Any]] | None,
+    decision: PrintedOxygenDecision | None,
+    *,
+    locator: Locator | None,
+) -> Mapping[str, Located[Any]] | None:
+    if decision is None or decision.interval_condition is None:
+        return point_conditions
+    condition = decision.interval_condition
+    if condition.state.is_value and condition.locator is None:
+        condition = replace(condition, locator=locator)
+    return {
+        **(point_conditions or {}),
+        "fO2_log": condition,
+    }
+
+
+def _printed_fo2_interval_notice(
+    decision: PrintedOxygenDecision | None,
+    quantity: object,
+    origin: str,
+) -> Notice | None:
+    if (
+        decision is None
+        or decision.interval_notice_reason is None
+        or not isinstance(quantity, Quantity)
+    ):
+        return None
+    return Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(quantity,),
+        reason=decision.interval_notice_reason,
+        origin=origin,
+    )
 
 
 def _fO2_conventional_reference_pressure_pa(condition: object) -> Decimal | None:
@@ -23482,11 +24312,6 @@ def _is_nist_janaf_table(path: Path, doc: Mapping[str, Any]) -> bool:
     return index + 1 < len(parts) and parts[index + 1] == "janaf"
 
 
-_B1544_SOURCE_ID = "hemingway-haas-robinson-1982-usgs-b1544"
-_B1452_SOURCE_ID = "robie-hemingway-fisher-1978-usgs-b1452"
-_B1259_SOURCE_ID = "robie-waldbaum-1968-usgs-b1259"
-
-
 def _is_usgs_b1544_record(path: Path, doc: Mapping[str, Any]) -> bool:
     if not doc.get("record_id"):
         return False
@@ -23569,9 +24394,6 @@ def discover_extracts(directory: Path | None = None) -> list[Path]:
 # Source-printed basis for compilation rows the engine can score
 # ---------------------------------------------------------------------------
 
-_B677_SOURCE_ID = "pankratz-1984-usbm-b677"
-_B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
-_B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
 _B677_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S, Quantity.H_MINUS_H298})
 _B592_GAS_QUANTITIES = frozenset({Quantity.CP, Quantity.S})
 _H_MINUS_H298_ANCHOR = "H(T)-H(298.15 K)"
@@ -23741,13 +24563,17 @@ def compilation_source_basis(
     """Basis the publication prints for this row. Empty leaves the axis unknown."""
 
     temperatures = _basis_temperatures(value, temperature_K)
-    if source_id == _B677_SOURCE_ID and quantity in _B677_GAS_QUANTITIES:
+    basis_protocol = SOURCE_DECLARATIONS.get(source_id, {}).get(
+        "printed_basis_protocol"
+    )
+    protocol = None if basis_protocol is None else basis_protocol.value
+    if protocol == "b677" and quantity in _B677_GAS_QUANTITIES:
         return _b677_gas_basis(formula, phase, quantity, temperatures)
-    if source_id == _B677_SOURCE_ID and quantity is Quantity.DELTA_FG:
+    if protocol == "b677" and quantity is Quantity.DELTA_FG:
         return _b677_formation_basis(formula)
-    if source_id == _B592_SOURCE_ID and quantity in _B592_GAS_QUANTITIES:
+    if protocol == "b592" and quantity in _B592_GAS_QUANTITIES:
         return _b592_gas_basis(formula, phase, quantity, temperatures)
-    if source_id == _B2131_SOURCE_ID and quantity in (
+    if protocol == "b2131" and quantity in (
         Quantity.LOG10_KF,
         Quantity.DELTA_FG,
     ):
@@ -25551,6 +26377,7 @@ class Migrator:
             phase_analysis_parent_ids
         )
         source_context["same_run_initial_melts"] = _same_run_initial_melts(rows)
+        source_context["fidelity_samples"] = doc.get("fidelity_samples")
         source_context["same_row_composition_closure_components"] = (
             _same_row_composition_closure_components(rows)
         )
@@ -26356,6 +27183,15 @@ class Migrator:
         else:
             initial_composition, omitted_components = None, ()
         if omitted_components:
+            partial_composition_key = _mole_fraction_composition_source_key(values)
+            omitted_issue = _initial_charge_omitted_component_issue(
+                observation_id=obs_id,
+                source_key=partial_composition_key,
+                omitted_components=omitted_components,
+                composition_role=composition_role,
+            )
+            if omitted_issue is not None:
+                self.result.registry_issues.append(omitted_issue)
             self.result.add_queue(
                 work.work_id,
                 locator,
@@ -27757,10 +28593,18 @@ class Migrator:
                 if raw_starting_ppm is None or raw_starting_ppm == ""
                 else _parse_declared_decimal(raw_starting_ppm)
             )
-            raw_uncertainty = obs.get("uncertainty")
+            raw_fidelity_samples = context.get("fidelity_samples")
+            starting_samples = [
+                sample
+                for sample in raw_fidelity_samples
+                if isinstance(sample, Mapping)
+                and sample.get("species") == formula
+                and sample.get("observation_id") == raw_obs_id
+                and sample.get("field") == "starting_measured_ppm"
+            ] if isinstance(raw_fidelity_samples, list) else []
             starting_locator = (
-                _locator_from_plain(raw_uncertainty.get("locator"))
-                if isinstance(raw_uncertainty, Mapping)
+                _locator_from_plain(starting_samples[0].get("locator"))
+                if len(starting_samples) == 1
                 else None
             )
             if starting_ppm is not None and starting_locator is not None:
@@ -28076,6 +28920,9 @@ class Migrator:
                     self.result.experiments.get(experiment_id)
                 )
             ),
+        )
+        point_conditions = _retain_printed_fo2_interval(
+            point_conditions, oxygen_decision, locator=locator
         )
         oxygen_state = _printed_oxygen_state_for(
             fill_identity(
@@ -29050,18 +29897,34 @@ class Migrator:
                     row_temperature_K, uncertainty, observation_id=obs_id
                 )
         identity, point_conditions, observation_notices = (
-            _initial_charge_only_missing_composition(
+            _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 observation_notices,
                 role=composition_role,
-                printed_series_start=_has_printed_initial_series_start(
-                    composition_role, values
+                initial_charge_context=(
+                    values if isinstance(values, Mapping) else None
+                ),
+                composition_refusal_reasons=composition_refusal,
+                malformed_composition_reason=malformed_composition_amount,
+                omitted_composition_components=(
+                    omitted_components
+                    if _mole_fraction_composition_source_key(values)
+                    == "composition_mol"
+                    else ()
+                ),
+                declared_composition_state=(
+                    source_composition_located.state
+                    if source_composition_located is not None
+                    else None
                 ),
                 quantity=q_token,
                 quantity_as_printed=values.get("quantity"),
                 locator=locator,
                 origin=obs_id,
+                point_composition_map_declared=_declared_wt_composition_point_map(
+                    values, None
+                ),
             )
         )
         if total_iron_notice is not None:
@@ -29180,6 +30043,11 @@ class Migrator:
         )
         if oxygen_conversion_notice is not None:
             observation_notices.append(oxygen_conversion_notice)
+        interval_notice = _printed_fo2_interval_notice(
+            oxygen_decision, q_token, obs_id
+        )
+        if interval_notice is not None:
+            observation_notices.append(interval_notice)
         observation_notices.extend(
             _buffer_conversion_notices(
                 oxygen_decision,
@@ -29594,7 +30462,7 @@ class Migrator:
             isinstance(raw_item, Mapping)
             and isinstance(row_method_class, str)
             and (
-                source_id == "kems-041-sossi-fegley-2018"
+                source_id == SOSSI_FEGLEY_SOURCE_ID
                 or (
                     METHOD_CLASS_MAP.get(row_method_class)
                     is EvidenceClass.AUTHOR_ESTIMATE
@@ -29605,7 +30473,7 @@ class Migrator:
         ):
             row_attribution = raw_item.get("references_as_published")
             row_model = raw_item.get("evidence_model")
-            if source_id != "kems-041-sossi-fegley-2018":
+            if source_id != SOSSI_FEGLEY_SOURCE_ID:
                 if not isinstance(row_attribution, str):
                     row_attribution = evidence.attribution
                 if not isinstance(row_model, str):
@@ -29635,9 +30503,12 @@ class Migrator:
         point_oxide_map: dict[str, Decimal] | None = None
         point_map_declared = False
         point_map_explicit = False
+        point_named_run_map = False
+        point_run_columns = False
         point_composition_refusal: list[str] = []
         point_composition_refusal_classifications: list[_CompositionRefusal] = []
         point_composition_located: Located[Composition] | None = None
+        point_composition_omitted_components: tuple[str, ...] = ()
         point_printed_composition: Located[Mapping[str, Any]] | None = None
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
@@ -29672,19 +30543,13 @@ class Migrator:
             point_map_declared = _declared_wt_composition_point_map(
                 parent_values, units
             )
-            point_map_explicit = _declared_wt_composition_point_map(
+            point_named_run_map = _declared_wt_composition_point_map(
                 raw_item, units
-            ) or (
-                point_map_declared
-                and any(
-                    not _is_composition_condition_key(str(key))
-                    and (
-                        key in _COMPOSITION_COMPONENTS
-                        or _mass_percent_component_key(str(key))[1]
-                    )
-                    for key in raw_item
-                )
             )
+            point_run_columns = _flat_run_composition_columns(
+                raw_item, parent_values, units
+            )
+            point_map_explicit = point_named_run_map or point_run_columns
             if (
                 not point_composition_axis_required
                 and (
@@ -29797,7 +30662,7 @@ class Migrator:
                 and (
                     q_for_species is Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT
                     or (
-                        source_id == "kems-041-sossi-fegley-2018"
+                        source_id == SOSSI_FEGLEY_SOURCE_ID
                         and q_for_species is Quantity.ACTIVITY_COEFFICIENT
                     )
                 )
@@ -29866,7 +30731,7 @@ class Migrator:
                     or locator
                 )
             try:
-                point_composition, _point_omitted = (
+                point_composition, point_composition_omitted_components = (
                     _mole_fraction_composition_from_values(raw_item)
                 )
             except ValueError as exc:
@@ -29995,6 +30860,19 @@ class Migrator:
                     detail=malformed_composition_amount,
                 )
             )
+        point_mole_source_key = (
+            _mole_fraction_composition_source_key(raw_item)
+            if isinstance(raw_item, Mapping)
+            else ""
+        )
+        omitted_issue = _initial_charge_omitted_component_issue(
+            observation_id=point_id,
+            source_key=point_mole_source_key,
+            omitted_components=point_composition_omitted_components,
+            composition_role=point_composition_role,
+        )
+        if omitted_issue is not None:
+            self.result.registry_issues.append(omitted_issue)
         if point_catalogue is not None:
             ident_kwargs["composition"] = point_catalogue.state
             point_composition_located = point_catalogue
@@ -31055,6 +31933,9 @@ class Migrator:
                 )
             ),
         )
+        point_conditions = _retain_printed_fo2_interval(
+            point_conditions, oxygen_decision, locator=point_locator
+        )
         oxygen_state = _printed_oxygen_state_for(
             identity,
             oxygen_decision,
@@ -31310,13 +32191,28 @@ class Migrator:
                 )
             )
         identity, point_conditions, child_notices = (
-            _initial_charge_only_missing_composition(
+            _initial_charge_only_composition_proxy(
                 identity,
                 point_conditions,
                 child_notices,
                 role=point_composition_role,
-                printed_series_start=_has_printed_initial_series_start(
-                    point_composition_role, parent_values
+                initial_charge_context=(
+                    parent_values if isinstance(parent_values, Mapping) else None
+                ),
+                composition_refusal_reasons=point_composition_refusal,
+                malformed_composition_reason=malformed_composition_amount,
+                omitted_composition_components=(
+                    point_composition_omitted_components
+                    if point_mole_source_key == "composition_mol"
+                    else ()
+                ),
+                declared_composition_state=(
+                    point_composition_located.state
+                    if point_composition_located is not None
+                    else point_conditions["composition"].state
+                    if isinstance(point_conditions, Mapping)
+                    and isinstance(point_conditions.get("composition"), Located)
+                    else None
                 ),
                 quantity=q_token_point,
                 quantity_as_printed=(
@@ -31328,16 +32224,22 @@ class Migrator:
                 ),
                 locator=point_locator,
                 origin=point_id,
+                point_composition_context=(
+                    raw_item if isinstance(raw_item, Mapping) else None
+                ),
+                point_oxide_map=point_oxide_map,
+                point_declared_component_map=point_declared_component_map,
+                point_composition_map_declared=(
+                    point_named_run_map or point_run_columns
+                ),
+                run_composition_columns_declared=(
+                    point_run_columns and not point_named_run_map
+                ),
             )
         )
         if notice_composition_located is None:
             notice_composition_located = (point_conditions or {}).get(
                 "composition"
-            )
-        if malformed_composition_amount is not None:
-            identity = replace(
-                identity,
-                composition=State.unknown(malformed_composition_amount),
             )
         notice_point_conditions = point_conditions
         if notice_composition_located is not None:
@@ -31466,6 +32368,11 @@ class Migrator:
         )
         if oxygen_conversion_notice is not None:
             child_notices.append(oxygen_conversion_notice)
+        interval_notice = _printed_fo2_interval_notice(
+            oxygen_decision, q_token_point, point_id
+        )
+        if interval_notice is not None:
+            child_notices.append(interval_notice)
         child_notices.extend(
             _buffer_conversion_notices(
                 oxygen_decision,
@@ -32560,6 +33467,9 @@ class Migrator:
             count.metadata_in += 1
             return
         source_id = str(doc.get("source_id") or path.parent.parent.name)
+        source_basis_protocol = SOURCE_DECLARATIONS.get(source_id, {}).get(
+            "printed_basis_protocol"
+        )
         src = doc.get("source") if isinstance(doc.get("source"), Mapping) else {}
         citation = str((src or {}).get("citation") or source_id)
         doi = extract_doi((src or {}).get("doi"), citation)
@@ -32606,7 +33516,10 @@ class Migrator:
         formula = self._normalize_compilation_formula(doc, formula)
         printed_phase = compilation_phase_text(doc)
         phase, _unmapped = map_phase(printed_phase)
-        if source_id == "kelley-king-1961-usbm-b592":
+        if (
+            source_basis_protocol is not None
+            and source_basis_protocol.value == "b592"
+        ):
             formula, suffix_phase = _kelley_king_formula_phase_suffix(
                 formula, printed_phase
             )
@@ -32624,7 +33537,10 @@ class Migrator:
         t = _compilation_temperature_state(doc)
         p_std = None
         column_series = compilation_column_series_from_record(doc)
-        if source_id == _B2131_SOURCE_ID:
+        if (
+            source_basis_protocol is not None
+            and source_basis_protocol.value == "b2131"
+        ):
             # Phase windows own formation Gibbs. A converted column series
             # would put every printed phase in one series.
             column_series = tuple(
@@ -32786,7 +33702,8 @@ class Migrator:
             )
         formation_windows = (
             _b2131_formation_gibbs_windows(doc)
-            if source_id == _B2131_SOURCE_ID
+            if source_basis_protocol is not None
+            and source_basis_protocol.value == "b2131"
             else ()
         )
         if formation_windows:
@@ -34083,9 +35000,9 @@ def write_outputs(result: MigrationResult, root: Path | None = None) -> None:
                 dest = observations_v2 / "compilations-janaf" / f"janaf-{element}.yaml"
                 key = f"compilation:janaf:{element}"
             elif family in {
-                "hemingway-haas-robinson-1982-usgs-b1544",
-                "robie-hemingway-fisher-1978-usgs-b1452",
-                "robie-waldbaum-1968-usgs-b1259",
+                _B1544_SOURCE_ID,
+                _B1452_SOURCE_ID,
+                _B1259_SOURCE_ID,
             }:
                 dest = (
                     observations_v2

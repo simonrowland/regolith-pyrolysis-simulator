@@ -2356,6 +2356,8 @@ def _install_fake_magemin_subprocess_with_qfm_readback(monkeypatch, stdout):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
@@ -2394,6 +2396,8 @@ def test_magemin_subprocess_parser_renormalises_rounding_excess_with_notice(
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_hour156_mode_sum_is_renormalised_to_one(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
@@ -2887,6 +2891,8 @@ def test_magemin_duplicate_liquid_modes_are_summed_from_captured_output():
     assert result.liquid_fraction == pytest.approx(0.7176672, abs=1e-7)
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_plante_mode_deficit_is_typed_out_of_domain(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
@@ -3786,6 +3792,8 @@ def test_magemin_liquidus_finder_invalid_budget_is_refused(budget):
     assert calls == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
@@ -3824,6 +3832,8 @@ def test_magemin_subprocess_timeout_clamped_to_remaining_budget(
     assert 0.0 < seen_timeouts[0] <= 1.5
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_liquidus_subprocess_path_preserves_sample_timeout_diagnostics(
     monkeypatch, magemin_subprocess_lock_dir,
 ):
@@ -4792,6 +4802,8 @@ def test_magemin_equilibrate_invalid_declared_scalar_is_typed_refusal(
         assert calls == []
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize(
     'stdout',
     (
@@ -4828,6 +4840,8 @@ def test_magemin_equilibrate_invalid_engine_output_is_typed_not_converged(
     assert 'MAGEMin Mode' in result.diagnostics['backend_failure_message']
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 @pytest.mark.parametrize('local_error', (KeyError, TypeError, ValueError))
 def test_magemin_equilibrate_parser_local_defect_propagates(
     monkeypatch, magemin_subprocess_lock_dir, local_error,
@@ -5351,6 +5365,8 @@ def test_magemin_live_native_activity_matches_direct_same_point_output(request):
     assert result.diagnostics["magemin_iterations"] > 0
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_magemin_nonfinite_requested_native_activity_returns_not_converged(
     monkeypatch, magemin_subprocess_lock_dir,
 ):

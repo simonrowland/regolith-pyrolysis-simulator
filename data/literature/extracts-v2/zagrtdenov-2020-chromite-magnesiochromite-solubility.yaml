@@ -104,7 +104,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_al2o3
@@ -112,18 +112,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_al2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_al2o3
     band: '0.2544'
     authority: extrapolated
@@ -333,7 +333,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cao
@@ -341,18 +341,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cao
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cao
     band: '0.2544'
     authority: extrapolated
@@ -555,7 +555,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cr2o3
@@ -563,18 +563,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cr2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_cr2o3
     band: '0.2544'
     authority: extrapolated
@@ -784,7 +784,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_feo
@@ -792,18 +792,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_feo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_feo
     band: '0.2544'
     authority: extrapolated
@@ -1013,7 +1013,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_k2o
@@ -1021,18 +1021,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_k2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_k2o
     band: '0.2544'
     authority: extrapolated
@@ -1242,7 +1242,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mgo
@@ -1250,18 +1250,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mgo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mgo
     band: '0.2544'
     authority: extrapolated
@@ -1471,7 +1471,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mno
@@ -1479,18 +1479,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mno
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_mno
     band: '0.2544'
     authority: extrapolated
@@ -1700,7 +1700,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_na2o
@@ -1708,18 +1708,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_na2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_na2o
     band: '0.2544'
     authority: extrapolated
@@ -1913,7 +1913,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_p2o5
@@ -1921,18 +1921,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_p2o5
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_p2o5
     band: '0.2544'
     authority: extrapolated
@@ -2142,7 +2142,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_sio2
@@ -2150,18 +2150,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_sio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_sio2
     band: '0.2544'
     authority: extrapolated
@@ -2371,7 +2371,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_tio2
@@ -2379,18 +2379,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_tio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E19_tio2
     band: '0.2544'
     authority: extrapolated
@@ -22443,7 +22443,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_al2o3
@@ -22451,18 +22451,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_al2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_al2o3
     band: '0.2544'
     authority: extrapolated
@@ -22672,7 +22672,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cao
@@ -22680,18 +22680,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cao
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cao
     band: '0.2544'
     authority: extrapolated
@@ -22901,7 +22901,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cr2o3
@@ -22909,18 +22909,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cr2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_cr2o3
     band: '0.2544'
     authority: extrapolated
@@ -23130,7 +23130,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_feo
@@ -23138,18 +23138,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_feo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_feo
     band: '0.2544'
     authority: extrapolated
@@ -23359,7 +23359,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_k2o
@@ -23367,18 +23367,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_k2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_k2o
     band: '0.2544'
     authority: extrapolated
@@ -23588,7 +23588,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mgo
@@ -23596,18 +23596,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mgo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mgo
     band: '0.2544'
     authority: extrapolated
@@ -23817,7 +23817,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mno
@@ -23825,18 +23825,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mno
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_mno
     band: '0.2544'
     authority: extrapolated
@@ -24046,7 +24046,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_na2o
@@ -24054,18 +24054,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_na2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_na2o
     band: '0.2544'
     authority: extrapolated
@@ -24259,7 +24259,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_p2o5
@@ -24267,18 +24267,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_p2o5
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_p2o5
     band: '0.2544'
     authority: extrapolated
@@ -24488,7 +24488,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_sio2
@@ -24496,18 +24496,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_sio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_sio2
     band: '0.2544'
     authority: extrapolated
@@ -24717,7 +24717,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_tio2
@@ -24725,18 +24725,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_tio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E31_tio2
     band: '0.2544'
     authority: extrapolated
@@ -24946,7 +24946,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_al2o3
@@ -24954,18 +24954,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_al2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_al2o3
     band: '0.2544'
     authority: extrapolated
@@ -25175,7 +25175,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cao
@@ -25183,18 +25183,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cao
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cao
     band: '0.2544'
     authority: extrapolated
@@ -25404,7 +25404,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cr2o3
@@ -25412,18 +25412,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cr2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_cr2o3
     band: '0.2544'
     authority: extrapolated
@@ -25633,7 +25633,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_feo
@@ -25641,18 +25641,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_feo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_feo
     band: '0.2544'
     authority: extrapolated
@@ -25846,7 +25846,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_k2o
@@ -25854,18 +25854,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_k2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_k2o
     band: '0.2544'
     authority: extrapolated
@@ -26075,7 +26075,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mgo
@@ -26083,18 +26083,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mgo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mgo
     band: '0.2544'
     authority: extrapolated
@@ -26288,7 +26288,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mno
@@ -26296,18 +26296,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mno
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_mno
     band: '0.2544'
     authority: extrapolated
@@ -26517,7 +26517,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_na2o
@@ -26525,18 +26525,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_na2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_na2o
     band: '0.2544'
     authority: extrapolated
@@ -26730,7 +26730,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_p2o5
@@ -26738,18 +26738,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_p2o5
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_p2o5
     band: '0.2544'
     authority: extrapolated
@@ -26959,7 +26959,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_sio2
@@ -26967,18 +26967,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_sio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_sio2
     band: '0.2544'
     authority: extrapolated
@@ -27172,7 +27172,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_tio2
@@ -27180,18 +27180,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_tio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E32_tio2
     band: '0.2544'
     authority: extrapolated
@@ -27401,7 +27401,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_al2o3
@@ -27409,18 +27409,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_al2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_al2o3
     band: '0.2544'
     authority: extrapolated
@@ -27630,7 +27630,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cao
@@ -27638,18 +27638,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cao
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cao
     band: '0.2544'
     authority: extrapolated
@@ -27852,7 +27852,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cr2o3
@@ -27860,18 +27860,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cr2o3
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_cr2o3
     band: '0.2544'
     authority: extrapolated
@@ -28065,7 +28065,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_feo
@@ -28073,18 +28073,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_feo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_feo
     band: '0.2544'
     authority: extrapolated
@@ -28278,7 +28278,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_k2o
@@ -28286,18 +28286,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_k2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_k2o
     band: '0.2544'
     authority: extrapolated
@@ -28507,7 +28507,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mgo
@@ -28515,18 +28515,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mgo
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mgo
     band: '0.2544'
     authority: extrapolated
@@ -28720,7 +28720,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mno
@@ -28728,18 +28728,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mno
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_mno
     band: '0.2544'
     authority: extrapolated
@@ -28949,7 +28949,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_na2o
@@ -28957,18 +28957,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_na2o
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_na2o
     band: '0.2544'
     authority: extrapolated
@@ -29162,7 +29162,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_p2o5
@@ -29170,18 +29170,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_p2o5
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_p2o5
     band: '0.2544'
     authority: extrapolated
@@ -29391,7 +29391,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_sio2
@@ -29399,18 +29399,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_sio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_sio2
     band: '0.2544'
     authority: extrapolated
@@ -29604,7 +29604,7 @@ observations:
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0; calibration=oneill_1987_ammin_72_reaction2_emf;
+    reason: 'buffer_relative_fO2_converted: buffer=QFM; offset_as_printed=0 (at buffer by statement); calibration=oneill_1987_ammin_72_reaction2_emf;
       T=1713.15 K; authority=primary_EMF; calibration_range=900–1420 K; band=±0.0184413 dex; band_basis=absolute canonical-to-Frost
       1991 spread; pressure=1.01325 bar; pressure correction=Frost 1991 molar-volume ΔV term; prediction_flags=predict_and_flag_outside_range_900_1420_K'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_tio2
@@ -29612,18 +29612,18 @@ observations:
   - kind: buffer_calibration_not_printed_canonical_used
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_tio2
     band: '0.2544'
     authority: extrapolated
   - kind: out_of_certified_band
     affected_quantities:
     - equilibrium_phase_composition
-    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 calibration=oneill_1987_ammin_72_reaction2_emf T_K=1713.15
-      P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf pressure_coefficient_spread=yes
-      buffer_as_printed=FMQ'
+    reason: 'buffer-relative fO2 converted: buffer=QFM offset=0 (at buffer by statement) calibration=oneill_1987_ammin_72_reaction2_emf
+      T_K=1713.15 P_bar=1.01325 authority=extrapolated band_dex=0.2544 log10_fO2_bar=-5.932653852157838 provenance=primary_emf
+      pressure_coefficient_spread=yes buffer_as_printed=FMQ'
     origin: zagrtdenov-2020-chromite-magnesiochromite-solubility::zagrtdenov_2020_E33_tio2
     band: '0.2544'
     authority: extrapolated

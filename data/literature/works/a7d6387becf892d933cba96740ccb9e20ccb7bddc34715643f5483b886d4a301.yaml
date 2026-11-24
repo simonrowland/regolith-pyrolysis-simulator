@@ -1,0 +1,20 @@
+schema_version: battery_work.v2.1
+work:
+  work_id: a7d6387becf892d933cba96740ccb9e20ccb7bddc34715643f5483b886d4a301
+  citation: Bergman, G. A., Gusarov, A. V. & Leonidov, V. Ya. (n.d.). IVTANTHERMO electronic table 2026, nickel oxide NiO(s,
+    l), Moscow State University, Faculty of Chemistry. https://www.chem.msu.ru/rus/tsiv/Ni/print-NiO_c.html
+  source_ids:
+  - ivtan-nio-thermo
+  source_files:
+    corpus_repo: regolith-corpus
+    corpus_commit:
+      tag: value
+      value: e1dbb239851508a1a3635ff8a7eec9400953b826
+    files:
+    - asset_id: unknown:ivtan-nio-thermo
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
+experiments: []

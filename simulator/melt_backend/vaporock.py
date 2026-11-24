@@ -239,7 +239,9 @@ EMPTY_SPECIATION_REASON_BY_CAUSE: Mapping[EmptySpeciationCause, str] = {
 EMPTY_SPECIATION_REASON = EMPTY_SPECIATION_REASON_BY_CAUSE[
     EmptySpeciationCause.NO_FINITE_VALUES
 ]
-EMPTY_SPECIATION_STATUS_REASON = 'speciation_no_finite_values'
+EMPTY_SPECIATION_STATUS_REASON = (
+    OutOfDomainReason.SPECIATION_NO_FINITE_VALUES.value
+)
 if set(EMPTY_SPECIATION_REASON_BY_CAUSE) != set(EmptySpeciationCause):
     raise RuntimeError(
         'EMPTY_SPECIATION_REASON_BY_CAUSE must cover every '
@@ -1807,6 +1809,9 @@ class VapoRockBackend(MeltBackend):
                 warnings=['VapoRock backend not initialized'],
                 diagnostics={
                     **melt_envelope_diagnostics,
+                    'backend_status_reason': (
+                        OutOfDomainReason.BACKEND_UNAVAILABLE.value
+                    ),
                     **(
                         {
                             'backend_failure_disposition': (
@@ -1905,7 +1910,7 @@ class VapoRockBackend(MeltBackend):
                 pressure_diag = repr(pressure_bar)
             diagnostics = {
                 **melt_envelope_diagnostics,
-                'backend_status_reason': 'invalid_pressure_bar',
+                'backend_status_reason': OutOfDomainReason.INVALID_PRESSURE_BAR.value,
                 'temperature_K': float(temperature_K),
                 'requested_pressure_bar': pressure_diag,
                 'pressure_control_authoritative': False,
@@ -1934,7 +1939,7 @@ class VapoRockBackend(MeltBackend):
                 fo2_diag = repr(fO2_log)
             diagnostics = {
                 **melt_envelope_diagnostics,
-                'backend_status_reason': 'invalid_fo2_log',
+                'backend_status_reason': OutOfDomainReason.INVALID_FO2_LOG.value,
                 'temperature_K': float(temperature_K),
                 'requested_pressure_bar': float(pressure_bar),
                 'fO2_log': fo2_diag,
@@ -2001,7 +2006,9 @@ class VapoRockBackend(MeltBackend):
         )))
         if nonfinite_keys:
             diagnostics = dict(projection_diagnostics)
-            diagnostics['backend_status_reason'] = 'non_finite_composition'
+            diagnostics['backend_status_reason'] = (
+                OutOfDomainReason.NON_FINITE_COMPOSITION.value
+            )
             diagnostics['temperature_K'] = float(temperature_K)
             diagnostics['non_finite_composition_keys'] = nonfinite_keys
             diagnostics['pressure_control_authoritative'] = False
@@ -2142,6 +2149,9 @@ class VapoRockBackend(MeltBackend):
                 warnings=[*prior_warnings, message],
                 diagnostics={
                     **projection_diagnostics,
+                    'backend_status_reason': (
+                        OutOfDomainReason.NOT_CONVERGED.value
+                    ),
                     'engine_exception': external_type,
                     'engine_exception_message': external_message,
                     **(
@@ -2252,7 +2262,9 @@ class VapoRockBackend(MeltBackend):
             projection_diagnostics['finite_prediction'] = False
             projection_diagnostics['empty_speciation_cause'] = cause.value
             projection_diagnostics['backend_status_reason'] = (
-                f'speciation_{cause.value}'
+                EMPTY_SPECIATION_STATUS_REASON
+                if cause is EmptySpeciationCause.NO_FINITE_VALUES
+                else f'speciation_{cause.value}'
             )
 
         # Hollow speciation did not produce a usable result. Status is

@@ -4285,6 +4285,8 @@ class ExtractionMixin:
         captured_ca_mol: float,
         diagnostics: list[dict],
     ) -> None:
+        from simulator.chemistry.kernel.capabilities import ChemistryIntent
+
         ca_shuttle = self._c7_nested(cfg.get('ca_shuttle'))
         if not self._c7_bool(ca_shuttle.get('enabled'), False):
             return

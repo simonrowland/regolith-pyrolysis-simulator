@@ -11,8 +11,12 @@ import time
 import warnings
 import zlib
 
+import pytest
+
 from scripts import cache_smoke
 from simulator import engine_cache
+
+pytestmark = pytest.mark.engine_cache_off
 
 
 def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> None:
@@ -123,19 +127,21 @@ def test_every_engine_smoke_rows_are_identical(tmp_path: Path, monkeypatch) -> N
                 check_strings(item)
 
     with sqlite3.connect(cache) as connection:
-        stored = connection.execute("SELECT engine,key,value FROM engine_outputs").fetchall()
+        stored = connection.execute(
+            "SELECT engine,row_seq,value FROM engine_outputs"
+        ).fetchall()
     cold_path = Path(str(cache) + ".cold")
     cold_rows = {}
     if cold_path.exists():
         with sqlite3.connect(cold_path) as connection:
-            cold_rows = dict(connection.execute("SELECT key,value FROM engine_values"))
+            cold_rows = dict(connection.execute("SELECT row_seq,value FROM engine_values"))
     sizes = {}
-    for engine, key, value in stored:
+    for engine, row_seq, value in stored:
         check_strings(unpack(value))
         assert len(value) <= 1024, (engine, [
             (index, len(pack(item))) for index, item in enumerate(unpack(value))
         ])
-        cold = cold_rows.get(key)
+        cold = cold_rows.get(row_seq)
         sizes.setdefault(engine, []).append(len(cold) if cold is not None else 0)
         if cold is not None:
             check_strings(unpack(zlib.decompress(cold)))

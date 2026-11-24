@@ -6,6 +6,7 @@ import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from tests.chemistry.test_condensation_green_pins import (
     _without_engine_versions,
+    deterministic_gate_payload,
 )
 
 
@@ -77,11 +78,24 @@ class StopRunLoop(Exception):
 
 
 def _without_host_engine_versions(trace):
-    # Two one-hour campaigns, three oxygen-reservoir copies each (the gate
-    # record, the tick's per_hour_summary_delta, and per_hour_summary), and
-    # two engine identities on each copy: 2 * 3 * 2 = 12.
-    stripped, count = _without_engine_versions(trace)
-    assert count == 12
+    # Each engine_version sits in one failed-provider diagnostic of the
+    # liquid-fraction gate's step-down record
+    # (oxygen_reservoir.liquid_fraction_gate.redox.gate_provider_step_down).
+    # Count = campaigns * oxygen-reservoir copies per campaign * failed
+    # providers per copy, after dropping environment attempts:
+    # - two one-hour campaigns;
+    # - two copies each: the tick's per_hour_summary_delta and the
+    #   per_hour_summary event. The tick used to carry a third, top-level
+    #   copy; 2139b70810 drops it when the delta already carries the
+    #   reservoir (web/events.py, "The per-hour row already carries
+    #   oxygen_reservoir");
+    # - two failed providers per copy: magemin-shadow (composition_projected,
+    #   MnO and P2O5 have no ig endmember) and alphamelts-diagnostic.
+    # 2 * 2 * 2 = 8 (was 2 * 3 * 2 = 12 before that dedup).
+    # A recovered engine_worker_timeout is an environment attempt. It stays
+    # in the production payload and is omitted here, so the count stays 8.
+    stripped, count = _without_engine_versions(deterministic_gate_payload(trace))
+    assert count == 8
     return stripped
 
 

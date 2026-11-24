@@ -11,6 +11,8 @@ import simulator.melt_backend.openimcc_bridge as openimcc_bridge_module
 from simulator.runner import PyrolysisRun
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_is_retried_after_a_single_hour_refusal(monkeypatch) -> None:
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",

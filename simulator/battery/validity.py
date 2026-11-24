@@ -42,7 +42,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping, Sequence
 
 from simulator.battery.enums import (
@@ -65,6 +65,7 @@ from simulator.battery.identity import (
 )
 from simulator.battery.records import (
     ApparatusGeometry,
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
     Composition,
     Experiment,
     Located,
@@ -809,9 +810,30 @@ def effusion_regime_unverified(
 
     method_state = experiment.method
     checks: list[GateCheck] = []
-    if method_state.tag is not StateTag.VALUE or method_state.value is None:
-        return _pass(checks)  # not an effusion claim
-    if method_state.value is not MethodToken.KNUDSEN_EFFUSION:
+    if method_state.is_unknown:
+        evidence_state = None if observation is None else observation.evidence.class_
+        pressure_quantity = quantity in {
+            Quantity.P_SAT,
+            Quantity.P_PARTIAL,
+            Quantity.P_REFERENCE,
+        }
+        evidence_needs_regime_check = (
+            evidence_state is not None
+            and (
+                evidence_state.is_unknown
+                or (
+                    evidence_state.is_value
+                    and evidence_state.value is EvidenceClass.FIGURE_ONLY
+                )
+            )
+        )
+        if not pressure_quantity or not evidence_needs_regime_check:
+            return _pass(checks)
+        # A figure-only or evidence-unknown pressure claim cannot rule out
+        # effusion. Require the conservative same-point in-cell fallback.
+    elif method_state.tag is not StateTag.VALUE or method_state.value is None:
+        return _pass(checks)
+    elif method_state.value is not MethodToken.KNUDSEN_EFFUSION:
         return _pass(checks)
     if quantity not in {
         Quantity.P_SAT,
@@ -959,7 +981,11 @@ def effusion_regime_unverified(
             )
         )
         return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            (
+                RefusalReason.METHOD_UNKNOWN
+                if method_state.is_unknown
+                else RefusalReason.EFFUSION_REGIME_UNVERIFIED
+            ),
             checks,
             "in_cell_partial_pressure_sum",
         )
@@ -1035,54 +1061,126 @@ def _same_point_conditions(left: Observation, right: Observation) -> bool:
     return True
 
 
+def _record_composition_failure(
+    failure_details: list[str] | None,
+    detail: str,
+) -> None:
+    if failure_details is not None:
+        failure_details.append(detail)
+
+
 def _composition_components(
     value: object | None,
+    *,
+    failure_details: list[str] | None = None,
 ) -> tuple[tuple[str, Decimal], ...] | None:
+    if isinstance(value, Located):
+        value = value.state
     if isinstance(value, State):
         if not value.is_value:
+            _record_composition_failure(
+                failure_details,
+                value.reason or f"composition state is {value.tag.value}",
+            )
             return None
         value = value.value
-    if isinstance(value, Located):
-        if not value.state.is_value:
-            return None
-        value = value.state.value
     if isinstance(value, Composition):
+        # An initial-charge proxy is an engine input for prediction, not a
+        # measurement-state composition that can establish in-cell species
+        # coverage.
+        if value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
+            return None
         value = value.components
     elif isinstance(value, Mapping):
         value = value.get("components", tuple(value.items()))
     if not isinstance(value, (tuple, list)) or not value:
+        _record_composition_failure(
+            failure_details,
+            "composition component list is empty or malformed",
+        )
         return None
     components: list[tuple[str, Decimal]] = []
     for item in value:
         if not isinstance(item, (tuple, list)) or len(item) != 2:
+            _record_composition_failure(
+                failure_details,
+                "composition component entry is malformed",
+            )
             return None
         formula, raw_amount = item
         try:
             amount = as_decimal(raw_amount)
-        except (TypeError, ValueError):
+        except (InvalidOperation, TypeError, ValueError):
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is not a decimal",
+            )
             return None
-        if not amount.is_finite() or amount < 0:
+        if not amount.is_finite():
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is not finite",
+            )
+            return None
+        if amount < 0:
+            _record_composition_failure(
+                failure_details,
+                "composition component amount is negative",
+            )
             return None
         components.append((str(formula), amount))
     return tuple(sorted(components))
 
 
+_POINT_COMPOSITION_CONDITION_ALIASES = ("composition", "sample_composition")
+
+
 def _observation_composition(
-    experiment: Experiment,
     observation: Observation,
+    *,
+    composition_failure_details: list[str] | None = None,
 ) -> tuple[tuple[str, Decimal], ...] | None:
+    discovered_details: list[str] = []
     identity = observation.identity
     if isinstance(identity, Identity) and identity.composition is not None:
-        components = _composition_components(identity.composition)
+        components = _composition_components(
+            identity.composition,
+            failure_details=discovered_details,
+        )
         if components is not None:
             return components
+        if composition_failure_details is not None:
+            composition_failure_details.extend(discovered_details)
+        return None
     if observation.point_conditions:
         for key, located in observation.point_conditions.items():
-            if key.lower() in {"composition", "sample_composition"}:
-                components = _composition_components(located)
-                if components is not None:
-                    return components
-    return _composition_components(experiment.sample.initial_composition)
+            if key.lower() not in _POINT_COMPOSITION_CONDITION_ALIASES:
+                continue
+            components = _composition_components(
+                located,
+                failure_details=discovered_details,
+            )
+            if components is not None:
+                return components
+            if composition_failure_details is not None:
+                composition_failure_details.extend(discovered_details)
+            return None
+    if composition_failure_details is not None:
+        composition_failure_details.extend(discovered_details)
+    # Sample.initial_composition describes the starting charge. It is not a
+    # run-composition source for measured in-cell pressure coverage.
+    return None
+
+
+def _skipped_composition_candidate_detail(
+    observation_id: str,
+    details: list[str],
+) -> dict[str, str]:
+    return {
+        "observation_id": observation_id,
+        "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+        "detail": "; ".join(details),
+    }
 
 
 def _point_temperature(observation: Observation) -> Decimal | None:
@@ -1156,18 +1254,31 @@ def _printed_in_cell_pressure_sum(
     point_observations: Iterable[Observation],
 ) -> tuple[Decimal | None, dict[str, Any]]:
     temperature = _point_temperature(observation)
-    composition = _observation_composition(experiment, observation)
+    composition_failure_details: list[str] = []
+    composition = _observation_composition(
+        observation,
+        composition_failure_details=composition_failure_details,
+    )
     conditions = observation.point_conditions
-    if temperature is None or not conditions:
-        return None, {"reason": "same-point temperature/point_conditions are incomplete"}
-    if composition is None:
-        return None, {
-            "reason": "composition is unknown; printed species coverage cannot be established",
-            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
-        }
+    point_context_incomplete = temperature is None or not conditions
+    incomplete_point_context_reason = (
+        "same-point temperature/point_conditions are incomplete"
+    )
     printed: dict[str, list[tuple[Decimal, str]]] = {}
-    for candidate in point_observations:
+    coverage_species: set[str] = set()
+    skipped_pressure_candidates: list[dict[str, str]] = []
+    skipped_composition_candidates: list[dict[str, str]] = []
+    candidates = tuple(point_observations)
+    if not any(
+        candidate.observation_id == observation.observation_id
+        for candidate in candidates
+    ):
+        candidates += (observation,)
+    for candidate in candidates:
         identity = candidate.identity
+        is_scored_observation = (
+            candidate.observation_id == observation.observation_id
+        )
         if (
             candidate.experiment_id != observation.experiment_id
             or not isinstance(identity, Identity)
@@ -1177,20 +1288,77 @@ def _printed_in_cell_pressure_sum(
             or candidate.evidence.class_.value not in MEASURED_EVIDENCE
             or candidate.locator is None
             or not candidate.locator.has_location()
-            or _point_temperature(candidate) != temperature
-            or _observation_composition(experiment, candidate) != composition
-            or not _same_point_conditions(observation, candidate)
-            or candidate.value.kind is not ValueKind.POINT
-            or candidate.value.point is None
+            or (
+                not is_scored_observation
+                and (
+                    temperature is None
+                    or _point_temperature(candidate) != temperature
+                )
+            )
         ):
             continue
-        pressure = candidate.value.point
-        if pressure.is_finite() and pressure > 0:
-            printed.setdefault(identity.species.formula, []).append(
-                (pressure, candidate.observation_id)
+        if composition is None:
+            if not is_scored_observation:
+                continue
+        else:
+            candidate_composition_details: list[str] = []
+            candidate_composition = _observation_composition(
+                candidate,
+                composition_failure_details=candidate_composition_details,
             )
+            if candidate_composition != composition:
+                if candidate_composition_details:
+                    skipped_composition_candidates.append(
+                        _skipped_composition_candidate_detail(
+                            candidate.observation_id,
+                            candidate_composition_details,
+                        )
+                    )
+                continue
+        if candidate.value.kind is not ValueKind.POINT:
+            continue
+        # The scored row may establish a pressure lower bound, but only the
+        # base same-point predicate can establish measured species coverage.
+        same_point_conditions = _same_point_conditions(observation, candidate)
+        if not is_scored_observation and not same_point_conditions:
+            continue
+        raw_pressure = candidate.value.point
+        try:
+            pressure = as_decimal(raw_pressure)
+        except (InvalidOperation, TypeError, ValueError, ArithmeticError):
+            pressure = None
+        if pressure is None or not pressure.is_finite() or pressure <= 0:
+            skipped_pressure_candidates.append(
+                {
+                    "observation_id": candidate.observation_id,
+                    "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+                    "detail": "candidate pressure point is not a finite positive decimal",
+                }
+            )
+            continue
+        printed.setdefault(identity.species.formula, []).append(
+            (pressure, candidate.observation_id)
+        )
+        if same_point_conditions:
+            coverage_species.add(identity.species.formula)
     if not printed:
-        return None, {"reason": "no admitted printed partial pressures at this exact point"}
+        detail: dict[str, Any] = {
+            "reason": (
+                incomplete_point_context_reason
+                if point_context_incomplete
+                else "no admitted printed partial pressures at this exact point"
+            )
+        }
+        if skipped_pressure_candidates:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["skipped_pressure_candidates"] = skipped_pressure_candidates
+        if composition_failure_details:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["composition_scope_details"] = composition_failure_details
+        if skipped_composition_candidates:
+            detail["typed_reason"] = RefusalReason.EFFUSION_REGIME_UNVERIFIED.value
+            detail["skipped_composition_candidates"] = skipped_composition_candidates
+        return None, detail
     # Repeated determinations for one species are not distinct gases. The
     # largest admitted value per species is a conservative lower bound even
     # when the printed species coverage is incomplete.
@@ -1204,11 +1372,33 @@ def _printed_in_cell_pressure_sum(
             species: str(row[0]) for species, row in sorted(selected.items())
         },
         "included_observation_ids": sorted(row[1] for row in selected.values()),
-        "point_condition_keys": sorted(conditions),
+        "point_condition_keys": sorted(conditions or {}),
     }
+    if skipped_pressure_candidates:
+        sum_detail["skipped_pressure_candidates"] = skipped_pressure_candidates
+    if composition_failure_details:
+        sum_detail["composition_scope_details"] = composition_failure_details
+    if skipped_composition_candidates:
+        sum_detail["skipped_composition_candidates"] = skipped_composition_candidates
     lower_bound_detail = {
         "printed_partial_pressure_lower_bound_Pa": str(pressure_sum)
     }
+    if point_context_incomplete:
+        return None, {
+            "reason": incomplete_point_context_reason,
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            **lower_bound_detail,
+            **sum_detail,
+        }
+    if composition is None:
+        detail = {
+            "reason": "composition is unknown; printed species coverage cannot be established",
+            "typed_reason": RefusalReason.EFFUSION_REGIME_UNVERIFIED.value,
+            "printed_species": sorted(printed),
+            **lower_bound_detail,
+            **sum_detail,
+        }
+        return None, detail
     expected = _expected_dominant_vapours(composition)
     if expected is None:
         return None, {
@@ -1219,7 +1409,7 @@ def _printed_in_cell_pressure_sum(
             **sum_detail,
         }
     covered = set()
-    for formula in printed:
+    for formula in coverage_species:
         elements = formula_composition(formula)
         if elements is not None:
             covered.update(element for element, _ in elements)

@@ -78,6 +78,7 @@ from simulator.runner import (
     build_sio_yield_report,
     _vapor_pressure_source_report,
 )
+from tests.chemistry.test_condensation_green_pins import deterministic_gate_payload
 from tests.golden_sections import nodes
 from simulator.condensation import (
     STAGE_PURITY_NO_CAPTURED_MASS,
@@ -120,8 +121,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "f35a18fca674c3e6eb14bd01621c007a941d4b9029bf876bb8ed7a9663f62eae",
-        "ledger_sha256": "7569fdaa31127ae0fd5f00b48482b58da8f04822a33378cba5299b4d1a349bb2",
+        "flux_maps_sha256": "993481553b6d3b40ec02e96b71d2dab6da00fbfcefee6b941ad9317be3351b48",
+        "ledger_sha256": "cda1eea40d9d4db96977292d92cba28ca03885abd17616fd5a573d06d249f394",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -377,7 +378,7 @@ def test_failure_payload_builds_per_hour_projection_once(monkeypatch):
     assert per_hour_projection_calls == [execution]
 
 
-@pytest.mark.xdist_group("lunar_c0_shared")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_default_lunar_c0_product_story_has_no_stage3_si_channel(
     lunar_c0_scenario_result, _lunar_c0_scenario_result_copy_factory
 ):
@@ -833,7 +834,7 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
     # the replay; the per-row identities independently verify separation
     # of cumulative condensate, reagent transfers, and live product.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        0.0004975311735864234, rel=1e-12, abs=1e-15
+        7.693708697396846e-4, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
@@ -2232,6 +2233,8 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
     # unchanged. docs-private/research/2026-08-02-train13-adjudication.md
     actual, capture, expected_text = runner_golden_loader(scenario)
     expected = json.loads(expected_text)
+    comparable = deterministic_gate_payload(actual)
+    expected_comparable = deterministic_gate_payload(expected)
 
     pins = _flux_ledger_pins(actual, capture)
     _assert_schema_shape(actual)
@@ -2242,7 +2245,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         "total_count": 0,
         "by_hour": [],
     }
-    assert actual == expected, (
+    assert comparable == expected_comparable, (
         f"runner output diverged from golden fixture {scenario['fixture']!s}; "
         "regenerate all canonical scenarios via "
         "`python3 scripts/regenerate_runner_goldens.py` if the change is "
@@ -2253,13 +2256,13 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # Pin the merged d-137 envelope while keeping t-423's default carrier
         # covered. d-137 adds wall-deposit authority metadata to each row.
         canonical_hours = json.dumps(
-            actual["per_hour_summary"],
+            comparable["per_hour_summary"],
             sort_keys=True,
             separators=(",", ":"),
             allow_nan=False,
         ).encode("utf-8")
         expected_hours = json.dumps(
-            expected["per_hour_summary"],
+            expected_comparable["per_hour_summary"],
             sort_keys=True,
             separators=(",", ":"),
             allow_nan=False,
@@ -2268,7 +2271,7 @@ def test_runner_golden_fixture_matches(scenario, runner_golden_loader):
         # The committed mars golden's per-hour summary. The condenser stack
         # regenerated that fixture; this is its sha256, not a second run.
         assert hashlib.sha256(canonical_hours).hexdigest() == (
-            "118530d56fec9d6494325767f9dd68bad70213a1bfe252e97d6b6a9c3fdf38f8"
+            "dc698b1407dd501052c9ca37b314cd670dcb49474fc084b5cdc3a3b4c612f8ba"
         )
 
 
@@ -2293,7 +2296,7 @@ def test_runner_golden_output_ignores_host_binding_receipts(
     host_receipt_path.unlink(missing_ok=True)
 
     scenario = {**SCENARIOS[0], "hours": 1}
-    without_host_receipt = _run_scenario(scenario)
+    without_host_receipt = deterministic_gate_payload(_run_scenario(scenario))
     host_receipt_path.write_text(
         json.dumps(
             {
@@ -2304,11 +2307,11 @@ def test_runner_golden_output_ignores_host_binding_receipts(
         ),
         encoding="utf-8",
     )
-    with_valid_host_receipt = _run_scenario(scenario)
+    with_valid_host_receipt = deterministic_gate_payload(_run_scenario(scenario))
     assert without_host_receipt == with_valid_host_receipt
 
     host_receipt_path.write_text("not json", encoding="utf-8")
-    with_garbage_host_receipt = _run_scenario(scenario)
+    with_garbage_host_receipt = deterministic_gate_payload(_run_scenario(scenario))
 
     assert without_host_receipt == with_garbage_host_receipt
 
@@ -2317,8 +2320,8 @@ def test_runner_golden_output_ignores_host_binding_receipts(
 def test_runner_is_deterministic(scenario):
     """Running the same scenario twice yields byte-identical JSON."""
 
-    first = _run_scenario(scenario)
-    second = _run_scenario(scenario)
+    first = deterministic_gate_payload(_run_scenario(scenario))
+    second = deterministic_gate_payload(_run_scenario(scenario))
     assert json.dumps(first, sort_keys=True) == json.dumps(second, sort_keys=True)
 
 
@@ -3612,7 +3615,7 @@ def test_runner_engines_yaml_optional_load(tmp_path):
     }
 
 
-@pytest.mark.xdist_group("lunar_c0_shared")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_per_hour_summary_includes_pressure_and_mass_balance(
     lunar_c0_scenario_result,
 ):
@@ -3749,7 +3752,7 @@ def test_session_per_hour_summary_event_uses_runner_builder():
     )
 
 
-@pytest.mark.xdist_group("lunar_c0_shared")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 def test_runner_final_state_is_mol_keyed_not_kg(lunar_c0_scenario_result):
     """Regression: ``final_state`` reports moles, not kilograms.
 

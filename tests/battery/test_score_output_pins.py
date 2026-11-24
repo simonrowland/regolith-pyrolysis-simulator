@@ -266,6 +266,11 @@ PIN_RESIDUAL_JSONL = """\
 # Route pin: routed-away compilation engine pairs are summarized, removing their refusal strata.
 PIN_SUMMARY_JSON = """\
 {
+  "assumed_band": {
+    "label": "assumed band — literature method precision; confidence not stated",
+    "records": [],
+    "refusal_counts": {}
+  },
   "kind": "battery_headline_summary",
   "records": [
     {
@@ -1066,6 +1071,11 @@ All mapped legacy keys have a v2.1 comparison slot.
 # Route pin: routed-away compilation engine pairs are summarized in payload output, removing their refusal strata.
 PIN_PAYLOAD_SUMMARY_JSON = """\
 {
+  "assumed_band": {
+    "label": "assumed band — literature method precision; confidence not stated",
+    "records": [],
+    "refusal_counts": {}
+  },
   "kind": "battery_headline_summary",
   "records": [
     {
@@ -1803,6 +1813,24 @@ No mapped outcome changes.
 
 All mapped legacy keys have a v2.1 comparison slot.
 """
+
+PIN_ASSUMED_BAND_SECTION = """\
+## Assumed band
+
+assumed band — literature method precision; confidence not stated
+
+Separate diagnostics; existing headline counts and bands are unchanged.
+
+| rail | engine | quantity | metric | unit | class | evidence | n | observations | inside band | eligible | citation |
+|---|---|---|---|---|---|---|---:|---:|---:|---:|---|
+| (none) | — | — | — | — | — | — | 0 | 0 | 0 | 0 | — |
+
+Applicability / conversion refusals:
+
+None.
+"""
+PIN_REPORT += "\n" + PIN_ASSUMED_BAND_SECTION
+PIN_PAYLOAD_REPORT += "\n" + PIN_ASSUMED_BAND_SECTION
 
 PIN_ELEMENT_RETENTION_SECTION = """\
 ## Element retention diagnostics

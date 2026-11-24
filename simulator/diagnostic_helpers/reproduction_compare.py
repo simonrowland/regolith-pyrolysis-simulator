@@ -5,9 +5,17 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+from bisect import bisect_right
 from dataclasses import asdict, dataclass, is_dataclass
 from typing import Any, Mapping, Sequence
 
+from simulator.diagnostic_helpers.timeseries_concordance import trapezoid_integral
+
+
+STANDARD_MOLAR_VOLUME_L_PER_MOL = 22.414
+O2_RELEASE_RATE_DEPENDENCY = (
+    "w1119dt, review/w1119dt @ 7fce7ebce (not yet landed)"
+)
 
 COMPARISON_STATUSES = frozenset(
     {
@@ -188,6 +196,25 @@ class ComparisonRecord:
         }
 
 
+class TimeSeriesComparisonRefusal(ValueError):
+    """Typed refusal when a time-series comparison lacks usable runtime data."""
+
+    def __init__(
+        self,
+        reason_code: str,
+        detail: str,
+        *,
+        dependency: str | None = None,
+    ) -> None:
+        self.reason_code = str(reason_code)
+        self.detail = str(detail)
+        self.dependency = dependency
+        message = f"{self.reason_code}: {self.detail}"
+        if dependency is not None:
+            message = f"{message}; dependency: {dependency}"
+        super().__init__(message)
+
+
 def _validated_uncertainty(
     uncertainty: Mapping[str, Any],
 ) -> tuple[str, float]:
@@ -201,6 +228,319 @@ def _validated_uncertainty(
     if kind not in {"absolute", "relative_fraction", "log10_decades"}:
         raise ValueError(f"unsupported uncertainty kind: {kind!r}")
     return kind, tolerance
+
+
+def o2_release_molar_flow_to_ppm(
+    o2_release_mol_min: float | None,
+    *,
+    argon_flow_nl_min: float,
+) -> float:
+    """Convert released O2 molar flow to ppm by mole in the Ar carrier."""
+
+    if o2_release_mol_min is None:
+        raise TimeSeriesComparisonRefusal(
+            "o2_release_rate_missing",
+            "runtime has no per-step O2 release molar-flow sample",
+            dependency=O2_RELEASE_RATE_DEPENDENCY,
+        )
+    o2_rate = float(o2_release_mol_min)
+    argon_flow = float(argon_flow_nl_min)
+    if not math.isfinite(o2_rate) or o2_rate < 0.0:
+        raise ValueError("O2 release molar flow must be finite and non-negative")
+    if not math.isfinite(argon_flow) or argon_flow <= 0.0:
+        raise ValueError("argon NL/min flow must be finite and positive")
+
+    # The Robinot preset supplies 0.3 NL/min Ar; at 0 °C and 1 atm,
+    # n_dot_Ar = 0.3 / 22.414 mol/min. With both outlet streams in mol/min,
+    # x_O2 = n_dot_O2 / (n_dot_Ar + n_dot_O2), and ppm = x_O2 * 1e6.
+    n_dot_ar = argon_flow / STANDARD_MOLAR_VOLUME_L_PER_MOL
+    x_o2 = o2_rate / (n_dot_ar + o2_rate)
+    return x_o2 * 1_000_000.0
+
+
+def compare_o2_release_time_series(
+    *,
+    case_id: str,
+    source_id: str,
+    observable_id: str,
+    observation_points: Sequence[Mapping[str, Any]],
+    runtime_rate_samples: Sequence[Mapping[str, Any]] | None,
+    argon_flow_nl_min: float,
+    evidence_scope: str,
+    source_locator: Mapping[str, Any] | str,
+    recipe: Mapping[str, Any],
+    observation: Mapping[str, Any],
+    runtime: Mapping[str, Any],
+    species: str = "O2",
+) -> tuple[ComparisonRecord, ...]:
+    """Compare observed O2 ppm with per-step runtime release rates."""
+
+    if not runtime_rate_samples:
+        raise TimeSeriesComparisonRefusal(
+            "o2_release_rate_series_missing",
+            "runtime exposes no per-step O2 release samples at the observation resolution",
+            dependency=O2_RELEASE_RATE_DEPENDENCY,
+        )
+    runtime_ppm_samples = []
+    for index, sample in enumerate(runtime_rate_samples):
+        if not isinstance(sample, Mapping):
+            raise ValueError(f"runtime_rate_samples[{index}] must be a mapping")
+        time_min = sample.get("time_min")
+        rate = sample.get("o2_release_mol_min")
+        runtime_ppm_samples.append(
+            {
+                "time_min": time_min,
+                "value": o2_release_molar_flow_to_ppm(
+                    rate,
+                    argon_flow_nl_min=argon_flow_nl_min,
+                ),
+            }
+        )
+    return compare_time_series(
+        case_id=case_id,
+        source_id=source_id,
+        observable_id=observable_id,
+        species=species,
+        observation_points=observation_points,
+        runtime_samples=runtime_ppm_samples,
+        series_semantics="rate",
+        units="ppm",
+        evidence_scope=evidence_scope,
+        source_locator=source_locator,
+        recipe=recipe,
+        observation=observation,
+        runtime=runtime,
+    )
+
+
+def compare_time_series(
+    *,
+    case_id: str,
+    source_id: str,
+    observable_id: str,
+    observation_points: Sequence[Mapping[str, Any]],
+    runtime_samples: Sequence[Mapping[str, Any]],
+    series_semantics: str,
+    units: str,
+    evidence_scope: str,
+    source_locator: Mapping[str, Any] | str,
+    recipe: Mapping[str, Any],
+    observation: Mapping[str, Any],
+    runtime: Mapping[str, Any],
+    species: str | None = None,
+    unsupported_speciation: bool = False,
+    assumed_input: bool = False,
+    out_of_domain: bool = False,
+) -> tuple[ComparisonRecord, ...]:
+    """Compare a trajectory pointwise and, for rates, by signed time integral.
+
+    Runtime values are linearly interpolated onto observation times. The
+    interpolation requires bracketing samples, never extrapolates, and refuses
+    explicit missing values instead of replacing them with zero. Integral
+    uncertainty is a fully correlated sum of pointwise absolute bounds, so
+    digitization or analyzer systematics do not shrink as if independent.
+    """
+
+    observations = _normalise_observation_points(observation_points)
+    samples = _normalise_runtime_samples(runtime_samples)
+    if series_semantics not in {"rate", "cumulative"}:
+        raise TimeSeriesComparisonRefusal(
+            "unsupported_series_semantics",
+            f"series semantics {series_semantics!r} must be rate or cumulative",
+        )
+    if len(observations) < 2:
+        raise ValueError("time-series integral requires at least two observations")
+    sample_times = [time_min for time_min, _ in samples]
+    actual_values = [
+        _interpolate_runtime_sample(time_min, samples, sample_times)
+        for time_min, _, _, _ in observations
+    ]
+
+    records = []
+    for (time_min, expected, uncertainty, point_locator), actual in zip(
+        observations, actual_values
+    ):
+        records.append(
+            compare_values(
+                case_id=case_id,
+                source_id=source_id,
+                observable_id=observable_id,
+                species=species,
+                coordinate={"time_min": time_min},
+                expected_value=expected,
+                expected_uncertainty=uncertainty,
+                actual_value=actual,
+                units=units,
+                evidence_scope=evidence_scope,
+                source_locator=_series_point_locator(source_locator, point_locator),
+                recipe=recipe,
+                observation=observation,
+                runtime=runtime,
+                unsupported_speciation=unsupported_speciation,
+                assumed_input=assumed_input,
+                out_of_domain=out_of_domain,
+            )
+        )
+
+    if series_semantics == "rate":
+        times = [time_min for time_min, _, _, _ in observations]
+        expected_values = [expected for _, expected, _, _ in observations]
+        observed_curve = list(zip(times, expected_values))
+        runtime_curve = list(zip(times, actual_values))
+        integral_uncertainty = _integral_uncertainty_bound(observations)
+        records.append(
+            compare_values(
+                case_id=case_id,
+                source_id=source_id,
+                observable_id=f"{observable_id}:integral",
+                species=species,
+                coordinate={
+                    "window_start_min": times[0],
+                    "window_end_min": times[-1],
+                },
+                expected_value=trapezoid_integral(
+                    observed_curve,
+                    allow_negative_values=True,
+                ),
+                expected_uncertainty={
+                    "kind": "absolute",
+                    "value": integral_uncertainty,
+                },
+                actual_value=trapezoid_integral(
+                    runtime_curve,
+                    allow_negative_values=True,
+                ),
+                units=f"{units} min",
+                evidence_scope=f"{evidence_scope}; signed trapezoidal rate integral",
+                source_locator=_series_point_locator(
+                    source_locator,
+                    {"integral_of": observable_id, "method": "trapezoid"},
+                ),
+                recipe=recipe,
+                observation=observation,
+                runtime=runtime,
+                unsupported_speciation=unsupported_speciation,
+                assumed_input=assumed_input,
+                out_of_domain=out_of_domain,
+            )
+        )
+    return tuple(records)
+
+
+def _series_point_locator(
+    series_locator: Mapping[str, Any] | str,
+    point_locator: Mapping[str, Any] | str | None,
+) -> Mapping[str, Any] | str:
+    if point_locator is None:
+        return series_locator
+    if isinstance(series_locator, Mapping) and isinstance(point_locator, Mapping):
+        return {**series_locator, **point_locator}
+    return point_locator
+
+
+def _normalise_observation_points(
+    points: Sequence[Mapping[str, Any]],
+) -> list[tuple[float, float, Mapping[str, Any], Any]]:
+    normalised = []
+    for index, point in enumerate(points):
+        if not isinstance(point, Mapping):
+            raise ValueError(f"observation_points[{index}] must be a mapping")
+        time_min = float(point["time_min"])
+        expected_value = float(point["expected_value"])
+        uncertainty = point.get("expected_uncertainty")
+        if not math.isfinite(time_min):
+            raise ValueError(f"observation_points[{index}].time_min must be finite")
+        if not math.isfinite(expected_value):
+            raise ValueError(f"observation_points[{index}].expected_value must be finite")
+        if not isinstance(uncertainty, Mapping):
+            raise ValueError(
+                f"observation_points[{index}] requires cited expected_uncertainty"
+            )
+        _validated_uncertainty(uncertainty)
+        normalised.append(
+            (time_min, expected_value, dict(uncertainty), point.get("source_locator"))
+        )
+    normalised.sort(key=lambda row: row[0])
+    if len({time_min for time_min, _, _, _ in normalised}) != len(normalised):
+        raise ValueError("observation times must be unique")
+    return normalised
+
+
+def _normalise_runtime_samples(
+    samples: Sequence[Mapping[str, Any]],
+) -> list[tuple[float, float]]:
+    if not samples:
+        raise TimeSeriesComparisonRefusal(
+            "runtime_samples_missing", "runtime returned no time-series samples"
+        )
+    normalised = []
+    for index, sample in enumerate(samples):
+        if not isinstance(sample, Mapping):
+            raise ValueError(f"runtime_samples[{index}] must be a mapping")
+        time_min = float(sample["time_min"])
+        value = sample.get("value")
+        if not math.isfinite(time_min):
+            raise ValueError(f"runtime_samples[{index}].time_min must be finite")
+        if value is None:
+            raise TimeSeriesComparisonRefusal(
+                "runtime_sample_missing",
+                f"runtime sample at {time_min:g} min has no value",
+            )
+        actual = float(value)
+        if not math.isfinite(actual):
+            raise ValueError(f"runtime_samples[{index}].value must be finite")
+        normalised.append((time_min, actual))
+    normalised.sort(key=lambda row: row[0])
+    if len({time_min for time_min, _ in normalised}) != len(normalised):
+        raise ValueError("runtime sample times must be unique")
+    return normalised
+
+
+def _interpolate_runtime_sample(
+    time_min: float,
+    samples: Sequence[tuple[float, float]],
+    sample_times: Sequence[float],
+) -> float:
+    right = bisect_right(sample_times, time_min)
+    if right and sample_times[right - 1] == time_min:
+        return samples[right - 1][1]
+    if right == 0 or right == len(samples):
+        raise TimeSeriesComparisonRefusal(
+            "runtime_time_coverage_missing",
+            f"runtime does not bracket observation time {time_min:g} min",
+        )
+    left_time, left_value = samples[right - 1]
+    right_time, right_value = samples[right]
+    fraction = (time_min - left_time) / (right_time - left_time)
+    return left_value + fraction * (right_value - left_value)
+
+
+def _integral_uncertainty_bound(
+    observations: Sequence[tuple[float, float, Mapping[str, Any], Any]],
+) -> float:
+    weights = [0.0] * len(observations)
+    for index, (left, right) in enumerate(zip(observations, observations[1:])):
+        half_interval = (right[0] - left[0]) / 2.0
+        weights[index] += half_interval
+        weights[index + 1] += half_interval
+    bound = 0.0
+    for weight, (_, expected, uncertainty, _) in zip(weights, observations):
+        kind, value = _validated_uncertainty(uncertainty)
+        if kind == "absolute":
+            absolute = value
+        elif kind == "relative_fraction":
+            absolute = abs(expected) * value
+        else:
+            if expected <= 0.0:
+                raise ValueError(
+                    "log10 uncertainty requires positive integral observations"
+                )
+            absolute = max(
+                expected * (10.0**value - 1.0),
+                expected * (1.0 - 10.0 ** (-value)),
+            )
+        bound += weight * absolute
+    return bound
 
 
 def _matches_uncertainty(

@@ -72,6 +72,7 @@ from simulator.diagnostic_helpers.reproduction_compare import (
     compare_values,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
+from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 EXTRACTS_DIR = REPO_ROOT / "data" / "literature" / "extracts"
@@ -215,7 +216,7 @@ _ORDERING_SPECIES_TO_ENGINE = {
 _SOSSI_FEGLEY_2018_SOURCE_MARKERS = (
     "sossi-fegley-2018",
     "sossi_fegley_2018",
-    "kems-041-sossi-fegley-2018",
+    SOSSI_FEGLEY_SOURCE_ID,
 )
 
 

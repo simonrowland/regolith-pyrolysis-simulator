@@ -51,9 +51,11 @@ from simulator.battery.enums import (
 )
 from simulator.battery.identity import atm_to_pa, identity_equal, quantity_token
 from simulator.battery.score import (
+    ScoreContext,
     liquid_model_subsolidus_sample_notice,
     parse_migration_headline,
     predict_with_engine,
+    score_store,
 )
 from simulator.battery.migrate import (
     REPO_ROOT,
@@ -103,10 +105,13 @@ from simulator.battery.migrate import (
     compilation_column_series_from_record,
     _provenance_from_extract,
     _source_method_uncertainty_from_plain,
+    _initial_charge_only_composition_proxy,
+    _named_material_mixture_binding,
     _named_fraction_bound_selection,
     _queue_work_counts,
     _initial_oxide_map_from_values,
     _located_printed_and_initial,
+    fill_identity,
     load_migrated_store,
     expand_queue_entries,
     group_queue_entries,
@@ -366,8 +371,11 @@ def test_reference_phase_convention_notice_round_trips_and_legacy_notice_stays_v
     assert decoded_legacy.certification is None
     assert to_plain(decoded_legacy) == legacy
 from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     Bench,
     BenchIdentity,
+    Composition,
     Derivation,
     Located,
     Locator,
@@ -2231,6 +2239,107 @@ def test_fo2_gas_ratio_round_trips_as_a_located_printed_value() -> None:
     assert ratio["value"]["locator"] == {"published_page": 800, "table": "I"}
 
 
+def test_aithala_s5_regression_summaries_migrate_as_typed_quantity_gaps() -> None:
+    extract = (
+        REPO_ROOT
+        / "data/literature/extracts/aithala-2026-magmatic-iron-redox-to-2100c.yaml"
+    )
+    source = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    source_rows = {
+        row["observation_id"]: row
+        for row in source["species"]["Fe"]["observations"]
+        if row.get("observation_id", "").startswith("aithala_2026_s5_")
+    }
+    migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
+    migrator._migrate_extract(extract)
+    migrator.finalize()
+
+    rows = {
+        observation.observation_id.rsplit("::", 1)[-1]: observation
+        for observation in migrator.result.observations.values()
+        if observation.source_id == "aithala-2026-magmatic-iron-redox-to-2100c"
+        and observation.observation_id.rsplit("::", 1)[-1].startswith(
+            "aithala_2026_s5_"
+        )
+    }
+    assert len(rows) == 61
+    summary_experiments = {
+        key.rsplit("::", 1)[-1]: experiment
+        for key, experiment in migrator.result.experiments.items()
+        if key.rsplit("::", 1)[-1].startswith("aithala-2026-s5-")
+    }
+    assert len(summary_experiments) == 61
+    for observation_id, observation in rows.items():
+        source_row = source_rows[observation.observation_id.rsplit("::", 1)[-1]]
+        experiment = migrator.result.experiments[observation.experiment_id]
+        source_values = source_row["values"]
+        assert experiment.locator is not None
+        assert experiment.locator.table == "S-5"
+        assert experiment.locator.note.startswith(
+            f"Table S-5 series regression summary over n={source_values['n']} experiments;"
+        )
+        assert f"temperature-series label: {source_values['series_name']}" in experiment.locator.note
+        composition = source_values["composition_context_as_printed"]
+        assert f"SiO2 {composition['SiO2_wt_pct']} wt.%" in experiment.locator.note
+        assert f"FeO* {composition['FeO_star_wt_pct']} wt.%" in experiment.locator.note
+        assert len(experiment.conditions) == 1
+        temperature = experiment.conditions["temperature_K"].state.value
+        source_range = source_values["temperature_range_C"]
+        assert temperature.kind is ValueKind.INTERVAL
+        assert temperature.interval_low == convert_temperature_to_k(
+            source_range["min"], "C"
+        )[0]
+        assert temperature.interval_high == convert_temperature_to_k(
+            source_range["max"], "C"
+        )[0]
+    assert len({row.provenance["series_id"] for row in rows.values()}) == 61
+    assert all(row.identity.quantity.is_unknown for row in rows.values())
+    assert all(
+        "unsupported quantity" in row.identity.quantity.reason
+        for row in rows.values()
+    )
+    assert all(row.value.kind is ValueKind.UNAVAILABLE for row in rows.values())
+    assert all(row.admission.status is AdmissionStatus.PENDING for row in rows.values())
+    assert all(row.admission.reason for row in rows.values())
+
+    nmf = rows["aithala_2026_s5_nmf"]
+    assert nmf.evidence.class_.value is EvidenceClass.QUOTED_ATTRIBUTED
+    assert nmf.evidence.attribution == "compiled from Kennedy (1948)"
+    assert nmf.identity.quantity.reason == (
+        "unsupported quantity 'regressed_log10_fe3_fe2_vs_inverse_temperature_slope'"
+    )
+
+    present = rows["aithala_2026_s5_humphrey"]
+    assert present.evidence.class_.value is EvidenceClass.AUTHOR_ESTIMATE
+    assert "n=10" in migrator.result.experiments[present.experiment_id].locator.note
+    assert "12 overlapping Aithala runs" in migrator.result.experiments[
+        present.experiment_id
+    ].locator.note
+
+    missing_experiment_id = present.experiment_id
+    experiments_without_summary = dict(migrator.result.experiments)
+    del experiments_without_summary[missing_experiment_id]
+    context_rows = {
+        str(row["context_id"]): row
+        for work_rows in migrator.result.context_by_work.values()
+        for row in work_rows
+    }
+    mutated = validate_corpus(
+        migrator.result.works,
+        experiments_without_summary,
+        migrator.result.observations,
+        residuals=None,
+        benches=migrator.result.benches,
+        context_rows=context_rows,
+    )
+    assert any(
+        issue.reason is RefusalReason.REFERENTIAL_INTEGRITY
+        and issue.path.endswith(".experiment_id")
+        and missing_experiment_id in issue.detail
+        for issue in mutated.hard_issues
+    )
+
+
 def test_darken_gurry_equilibrium_compositions_migrate_with_conditions() -> None:
     extract = REPO_ROOT / "data/literature/extracts/darken-gurry-1946-iron-oxygen-ii.yaml"
     migrator = Migrator(root=REPO_ROOT, index=None, aliases={})
@@ -2472,7 +2581,7 @@ def test_model_derived_raw_input_method_rejects_non_string_values(
     )
 
 
-def test_hastie_initial_charges_stay_contextual_for_figure_points(
+def test_hastie_initial_charges_use_flagged_proxies_for_figure_points(
     tmp_path: Path,
 ) -> None:
     from simulator.battery.fo2_ladder import resolve_row_fo2
@@ -2502,23 +2611,20 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
             )
         for observation in rows:
             composition = observation.identity.composition
-            assert composition is not None and composition.is_unknown
-            assert "per-run composition is not published" in composition.reason
+            assert composition is not None and composition.is_value
+            assert composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
             point_composition = (observation.point_conditions or {}).get(
                 "composition"
             )
             assert point_composition is not None
-            assert point_composition.state.is_unknown
-            assert (
-                "per-run composition is not published"
-                in point_composition.state.reason
-            )
+            assert point_composition.state.is_value
+            assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
 
 
             role_notices = [
                 notice
                 for notice in observation.notices
-                if "composition_role=initial_charge_only" in notice.reason
+                if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
             ]
             assert len(role_notices) == 1
             assert role_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -2588,12 +2694,12 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
     assert moved_observation.identity.temperature_K.is_value
     assert moved_observation.identity.temperature_K.value == Decimal("1575.0")
     moved_composition = moved_observation.identity.composition
-    assert moved_composition is not None and moved_composition.is_unknown
-    assert "per-run composition is not published" in moved_composition.reason
+    assert moved_composition is not None and moved_composition.is_value
+    assert moved_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
     moved_notices = [
         notice
         for notice in moved_observation.notices
-        if "composition_role=initial_charge_only" in notice.reason
+        if INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason
     ]
     assert len(moved_notices) == 1
     assert moved_notices[0].kind is NoticeKind.SOURCE_DISAGREEMENT
@@ -2604,18 +2710,22 @@ def test_hastie_initial_charges_stay_contextual_for_figure_points(
         moved_observation,
         quantity=Quantity.ACTIVITY_COEFFICIENT,
     )
-    assert moved_fo2 is None
+    assert moved_fo2 is not None
+    assert moved_fo2.route == "intrinsic_melt_fO2"
+    assert moved_fo2.tier == 4
+    assert moved_fo2.borrowed
     moved_prediction = predict_with_engine(
         Engine.OPENIMCC,
         moved_observation,
         experiment=moved_experiment,
     )
     assert moved_prediction.value is None
-    assert moved_prediction.refusal_reason is RefusalReason.INVALID_SOURCE
-    assert moved_prediction.refusal_detail["reason"] == "invalid_source"
-    gap, = moved_prediction.refusal_detail["gaps"]
-    assert gap["waypoint"] == "normalized_composition"
-    assert gap["reason"] == "unsupported_print_form"
+    assert moved_prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert (
+        moved_prediction.refusal_detail["reason"]
+        == "species_unmatched_in_engine_output"
+    )
+    assert moved_prediction.refusal_detail["formula"] == "K2O"
 
     na_kms = next(
         row
@@ -9505,10 +9615,24 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # Table 1 oxide cells. Its 325th printed oxide cell is <0.01 Na2O and remains
     # typed-refused. The count moved because these data became visible, not
     # because a check was relaxed; mismatches stay 0.
-    assert census.get("residue_component_composition") == 8112
+    # Provisional: fam13/Floss adds 225 Cohen and 623 Floss residue cells to
+    # b268r2's 8112. The base Su & Zhang retyped cells remain excluded from the
+    # numeric census; controller confirms totals with scratch regen + j01.
+    assert census.get("residue_component_composition") == 8960
     assert per_source.get("su-zhang-2023-lunar-orange-glass-na-k-cu-degassing") == {
         "residue_component_composition": 3435
     }
+    assert per_source.get("cohen-2006-iron-silicate-reduction-isotopes") == {
+        "isotope_delta": 49,
+        "residue_component_composition": 225,
+    }
+    assert per_source.get(
+        "floss-1998-corundum-hibonite-evaporation-residues"
+    ) == {"residue_component_composition": 623}
+    assert per_source.get(
+        "navrotsky-koryttseva-2023-oxide-acid-base-calorimetry"
+    ) == {"H_minus_H298": 95}
+    assert per_source.get("smythe-2013-cerium-thesis") == {"valence_ratio": 46}
     assert per_source.get(
         "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
     ) == {"isotope_delta": 21, "residue_component_composition": 324}
@@ -9549,7 +9673,8 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # unavailable; their printed cells remain unchanged and are pinned by
     # test_sc475_incr_frame_extracts. Ozawa's 86 flat Table 1 rows are not
     assert census.get("cp") == 1764
-    assert census.get("H_minus_H298") == 451
+    # Provisional: fam13 adds 95 H_minus_H298 cells to b268r2's 451.
+    assert census.get("H_minus_H298") == 546
     assert per_source.get("fredrickson-chasanov-1973-na2o-enthalpy-1300k") == {
         "H_minus_H298": 74,
         "cp": 12,
@@ -9584,10 +9709,14 @@ def test_j01_store_census_series_numeric_matches_declared_field(
     # printed 0.00 starting-material values remain metadata, not observations.
     # The count moved because the cells became visible, not because a check was
     # relaxed; mismatches stay 0.
-    assert census.get("isotope_delta") == 235
+    # Provisional: Cohen adds 49 isotope_delta cells to b268r2's 235.
+    assert census.get("isotope_delta") == 284
     assert per_source.get("sossi-2020-cu-zn-isotope-evap-formalism") == {
         "isotope_delta": 22
     }
+    # Provisional: Smythe adds 46 valence_ratio cells to b268r2's 45;
+    # controller confirms this total with scratch regen + j01.
+    assert census.get("valence_ratio") == 91
     # Family car (F39-F50): Bonnand, Bruand, Matzen et al. (2020) adds 14 printed
     # Fe3+/Fe2+ stays the car census (Kress-Carmichael 13, Bonnand 14,
     # store 65). n_numeric is the car 8267 minus the 67 refused
@@ -9599,7 +9728,12 @@ def test_j01_store_census_series_numeric_matches_declared_field(
         "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite"
     ) == {"fe3_fe2_ratio": 14}
     assert census.get("fe3_fe2_ratio") == 65
-    assert n_numeric == 12505, (n_numeric, census, n_unavailable)
+    # Fam13/Floss adds 1,038 series cells: Cohen 274 (225 residue + 49 isotope),
+    # Floss 623 residue, Navrotsky–Koryttseva 95 enthalpy, and Smythe 46 ratios.
+    # Pretorius–Muan's 704 and van Westrenen's 26 migrated rows are flat values,
+    # so they do not enter this series-only census. Provisional total is
+    # b268r2's 12,505 + 1,038; controller confirms with scratch regen + j01.
+    assert n_numeric == 13543, (n_numeric, census, n_unavailable)
 
 
 def test_j01_isotope_delta_census_uses_migrator_source_field() -> None:
@@ -10278,6 +10412,20 @@ def test_dacko_partial_composition_is_typed_refusal_not_scored(tmp_path: Path) -
         composition = obs.identity.composition
         assert composition is not None and composition.is_unknown
         assert "partial_composition" in (composition.reason or "")
+        issue_path = f"observations.{obs.observation_id}.values.composition_mol"
+        hard = result.validation.hard_issues if result.validation is not None else ()
+        assert not any(
+            issue.reason is RefusalReason.INVALID_SOURCE and issue.path == issue_path
+            for issue in hard
+        )
+        queue_rows = [
+            entry for entry in result.queue
+            if entry.observation_id == obs.observation_id
+        ]
+        assert any(
+            entry.why.startswith("unusable composition component(s):")
+            for entry in queue_rows
+        )
         prediction = predict_with_engine(Engine.OPENIMCC, obs)
         assert prediction.execution.state is ExecutionState.NOT_PROBED
         assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
@@ -14088,6 +14236,663 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
         "SiO2": Decimal("0.40148624821939094"),
         "MgO": Decimal("0.5985137517806091"),
     }
+
+
+def _score_initial_charge_composition_path(
+    tmp_path: Path,
+    *,
+    path: str,
+    invalid_kind: str | None,
+    consumer: str = "melt",
+    starting_wt_pct: dict[str, int] | None = None,
+):
+    starting_composition = (
+        {"SiO2": 50, "MgO": 50}
+        if starting_wt_pct is None
+        else starting_wt_pct
+    )
+    if consumer == "vapour":
+        quantity = "p_partial"
+        units = "Pa"
+        obs_type = "p_partial"
+    elif path == "yield_series":
+        quantity = "mass_loss_fraction"
+        units = "percent"
+        obs_type = "mass_loss"
+    else:
+        quantity = "activity"
+        units = "dimensionless"
+        obs_type = "activity_coefficient"
+    values = {
+        "quantity": quantity,
+        "activity": 0.2,
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "composition_wt_pct": starting_composition,
+    }
+    values["composition_role"] = INITIAL_CHARGE_ONLY_PROXY_FLAG
+    malformed_map = {
+        "SiO2": "0.5",
+        "MgO": "not-a-number",
+        "CaO": "0.4",
+    }
+    valid_mole_map = {"SiO2": "0.5", "MgO": "0.5"}
+    partial_map = {"SiO2": "0.5", "MgO": "0.4", "minor constituents": "0.1"}
+    refused_wt_map = {"SiO2": 40, "MgO": 20}
+    if path == "scalar":
+        target = values
+    else:
+        point = (
+            {"T_K": 1773.15, "mass_loss_pct": 20.0}
+            if path == "yield_series"
+            else {"T_K": 1773.15, "P": 1.0e-4}
+            if consumer == "vapour"
+            else {"T_K": 1773.15, "activity": 0.2}
+        )
+        container = "points" if path == "yield_series" else path
+        values[container] = [point]
+        target = point
+    if invalid_kind == "malformed_amount":
+        target["composition_mol"] = malformed_map
+    elif invalid_kind == "partial_component":
+        target["composition_mol"] = partial_map
+    elif invalid_kind == "printed_wt_refusal":
+        target["composition_wt_pct"] = refused_wt_map
+    elif invalid_kind == "malformed_amount_with_wt_refusal":
+        target["composition_mol"] = malformed_map
+        target["composition_wt_pct"] = refused_wt_map
+    elif invalid_kind == "valid_mole_with_wt_refusal":
+        target["composition_mol"] = valid_mole_map
+        target["composition_wt_pct"] = refused_wt_map
+    elif invalid_kind == "unsupported_map":
+        target["composition_wt_pct"] = {"SiO2": 50, "MgO": 40, "XxO": 10}
+    extract = _scalar_extract(
+        quantity=quantity,
+        units=units,
+        values=values,
+        obs_type=obs_type,
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.update(
+        {
+            "experiment": "sample",
+            "T_K": 1773.15,
+            "standard_state": "Raoultian pure liquid MgO",
+        }
+    )
+    extract["species"] = {"MgO": {"observations": [row]}}
+    experiment = {
+        "experiment_id": "sample",
+        "sample": {
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": starting_composition,
+                },
+                "locator": {"table": "1", "page": 1},
+            }
+        },
+    }
+    if path == "yield_series" and consumer != "vapour":
+        experiment["method"] = MethodToken.LANGMUIR_FREE_EVAPORATION.value
+    extract["experiments"] = [experiment]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observations = tuple(result.observations.values())
+    assert len(observations) == 1, (path, invalid_kind, observations)
+    observation = observations[0]
+    validation = result.validation
+    context = ScoreContext(
+        result.works,
+        result.experiments,
+        result.observations,
+        benches=result.benches,
+        hard_issues_by_observation=(
+            validation.hard_issues_by_observation if validation is not None else {}
+        ),
+    )
+    residuals, _candidates = score_store(
+        context,
+        engines=(Engine.OPENIMCC,),
+        include_diagnostics=False,
+    )
+    return observation, tuple(
+        residual
+        for residual in residuals
+        if residual.reference == observation.observation_id
+    ), result
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["scalar", "points", "rows", "series", "yield_series", "tests"],
+    ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
+)
+@pytest.mark.parametrize(
+    ("invalid_kind", "reason_fragment"),
+    [
+        ("malformed_amount", "malformed declared amount"),
+        ("partial_component", "partial_composition"),
+        ("printed_wt_refusal", "mass-percent composition"),
+        ("malformed_amount_with_wt_refusal", "malformed declared amount"),
+        ("valid_mole_with_wt_refusal", "mass-percent composition"),
+        ("unsupported_map", "unsupported component"),
+    ],
+)
+def test_initial_charge_proxy_classifies_invalid_inputs_across_all_containers(
+    tmp_path: Path, path: str, invalid_kind: str, reason_fragment: str
+) -> None:
+    invalid, refused, result = _score_initial_charge_composition_path(
+        tmp_path / "invalid", path=path, invalid_kind=invalid_kind
+    )
+    composition_states = [invalid.identity.composition]
+    point_composition = (invalid.point_conditions or {}).get("composition")
+    if isinstance(point_composition, Located):
+        composition_states.append(point_composition.state)
+    identity_composition = invalid.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown, (
+        path,
+        invalid_kind,
+        identity_composition,
+    )
+    assert reason_fragment in (identity_composition.reason or ""), (
+        path,
+        invalid_kind,
+        identity_composition,
+    )
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_unknown, (path, invalid_kind, point_composition)
+    assert reason_fragment in (point_composition.state.reason or ""), (
+        path,
+        invalid_kind,
+        point_composition.state.reason,
+    )
+    assert all(
+        state is None or not state.is_value for state in composition_states
+    ), (path, invalid_kind, composition_states)
+    experiment = result.experiments[invalid.experiment_id]
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, invalid, experiment=experiment)
+        assert prediction.value is None, (path, invalid_kind, engine, prediction)
+        assert prediction.refusal_reason is not None, (path, invalid_kind, engine)
+    assert refused
+    assert all(row.status is ResidualStatus.REFUSED for row in refused)
+    assert all(row.numeric is None for row in refused)
+    if path == "yield_series":
+        # The declared method gets past METHOD_UNKNOWN; this fixture intentionally
+        # leaves Langmuir geometry unstated, so that is the first scoring refusal.
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
+            for row in refused
+        )
+    else:
+        assert all(
+            row.refusal is not None
+            and row.refusal.reason is RefusalReason.INVALID_SOURCE
+            for row in refused
+        )
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["scalar", "points", "rows", "series", "tests"],
+    ids=["scalar", "points", "rows", "series", "tests"],
+)
+@pytest.mark.parametrize(
+    ("invalid_kind", "reason_fragment"),
+    [
+        ("malformed_amount", "malformed declared amount"),
+        ("partial_component", "partial_composition"),
+        ("printed_wt_refusal", "mass-percent composition"),
+        ("malformed_amount_with_wt_refusal", "malformed declared amount"),
+        ("valid_mole_with_wt_refusal", "mass-percent composition"),
+        ("unsupported_map", "unsupported component"),
+    ],
+)
+def test_invalid_run_composition_refuses_vapour_prediction(
+    tmp_path: Path, path: str, invalid_kind: str, reason_fragment: str
+) -> None:
+    """Vapour reads identity first. An invalid run map must not predict."""
+
+    invalid, refused, result = _score_initial_charge_composition_path(
+        tmp_path / "vapour",
+        path=path,
+        invalid_kind=invalid_kind,
+        consumer="vapour",
+    )
+    identity_composition = invalid.identity.composition
+    assert identity_composition is not None and identity_composition.is_unknown
+    assert reason_fragment in (identity_composition.reason or "")
+    point_composition = (invalid.point_conditions or {}).get("composition")
+    assert isinstance(point_composition, Located)
+    assert point_composition.state.is_unknown
+    assert reason_fragment in (point_composition.state.reason or "")
+    experiment = result.experiments[invalid.experiment_id]
+    for engine in (Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL):
+        prediction = predict_with_engine(engine, invalid, experiment=experiment)
+        assert prediction.value is None
+        assert prediction.refusal_reason is RefusalReason.INVALID_SOURCE
+        assert prediction.refusal_detail["reason"] == point_composition.state.reason
+        assert prediction.refusal_detail["consumer"] == "vapour"
+    assert refused
+    assert all(row.refusal is not None for row in refused)
+    assert all(row.status is ResidualStatus.REFUSED and row.numeric is None for row in refused)
+
+
+def _migrate_flat_run_columns(
+    tmp_path: Path,
+    point_columns: dict,
+    *,
+    depletion: tuple[str, ...] = (),
+):
+    from simulator.battery.input_provenance import PRINTED_STARTING_BULK
+
+    values = {
+        "quantity": "p_partial",
+        "method_class": "measured_direct",
+        "admission_status": "admitted",
+        "composition_role": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "composition_wt_pct": {"SiO2": 40, "MgO": 60},
+        "points": [
+            {
+                "T_K": 1773.15,
+                "P": 1.0e-4,
+                **point_columns,
+            }
+        ],
+    }
+    if depletion:
+        values["caption_depletion_columns"] = {
+            "columns": list(depletion),
+            "locator": {
+                "page": 51,
+                "pdf_page": 57,
+                "note": "caption depletion, not the run composition",
+            },
+            "quote": "start-to-end depletion",
+        }
+    extract = _scalar_extract(
+        quantity="p_partial",
+        units="Pa",
+        values=values,
+        obs_type="p_partial",
+    )
+    row = extract["species"]["Na"]["observations"][0]
+    row.update({"experiment": "sample", "T_K": 1773.15})
+    extract["species"] = {"MgO": {"observations": [row]}}
+    extract["experiments"] = [
+        {
+            "experiment_id": "sample",
+            "sample": {
+                "printed_composition": {
+                    "state": {
+                        "tag": "value",
+                        "value": {"SiO2": 40, "MgO": 60},
+                    },
+                    "locator": {"table": "1", "page": 1},
+                }
+            },
+        }
+    ]
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+    return observation, result, PRINTED_STARTING_BULK
+
+
+def test_parent_flat_columns_are_a_declared_run_composition(tmp_path: Path) -> None:
+    malformed, malformed_result, _provenance = _migrate_flat_run_columns(
+        tmp_path / "malformed",
+        {"SiO2_wt_pct": "17.0-16.7", "MgO_wt_pct": 50},
+    )
+    malformed_identity = malformed.identity.composition
+    assert malformed_identity is not None and malformed_identity.is_unknown
+    assert "malformed printed component amount" in (malformed_identity.reason or "")
+    malformed_point = malformed.point_conditions["composition"]
+    assert malformed_point.state.is_unknown
+    assert "malformed printed component amount" in (malformed_point.state.reason or "")
+    experiment = malformed_result.experiments[malformed.experiment_id]
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, malformed, experiment=experiment
+    )
+    assert prediction.value is None
+
+    valid, _valid_result, _provenance = _migrate_flat_run_columns(
+        tmp_path / "valid",
+        {"SiO2_wt_pct": 50, "MgO_wt_pct": 50},
+    )
+    charge_only, _charge_result, provenance = _migrate_flat_run_columns(
+        tmp_path / "charge",
+        {},
+    )
+    valid_identity = valid.identity.composition
+    charge_identity = charge_only.identity.composition
+    assert valid_identity is not None and valid_identity.is_value
+    assert isinstance(valid_identity.value, Composition)
+    assert valid_identity.value.proxy_flag is None
+    assert valid_identity.value.input_provenance is None
+    assert charge_identity is not None and charge_identity.is_value
+    assert isinstance(charge_identity.value, Composition)
+    assert charge_identity.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert charge_identity.value.input_provenance == provenance
+    assert valid_identity.value.components != charge_identity.value.components
+
+
+def test_caption_depletion_columns_keep_the_initial_charge_proxy(
+    tmp_path: Path,
+) -> None:
+    observation, _result, provenance = _migrate_flat_run_columns(
+        tmp_path,
+        {"SiO2_wt_pct": "17.0-16.7", "MgO_wt_pct": "15.6-13.3"},
+        depletion=("SiO2_wt_pct", "MgO_wt_pct"),
+    )
+    identity_composition = observation.identity.composition
+    assert identity_composition is not None and identity_composition.is_value
+    assert isinstance(identity_composition.value, Composition)
+    assert identity_composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert identity_composition.value.input_provenance == provenance
+    point_composition = observation.point_conditions["composition"]
+    assert point_composition.state.is_value
+    assert point_composition.state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    assert point_composition.state.value.input_provenance == provenance
+
+
+@pytest.mark.parametrize(
+    "path",
+    ["scalar", "points", "rows", "series", "yield_series", "tests"],
+    ids=["scalar", "points", "rows", "series", "yield-series", "tests"],
+)
+def test_initial_charge_proxy_is_used_only_when_composition_is_not_printed(
+    tmp_path: Path, path: str
+) -> None:
+    unprinted, scored, _result = _score_initial_charge_composition_path(
+        tmp_path / "unprinted", path=path, invalid_kind=None
+    )
+    composition_states = [unprinted.identity.composition]
+    point_composition = (unprinted.point_conditions or {}).get("composition")
+    if isinstance(point_composition, Located):
+        composition_states.append(point_composition.state)
+    assert any(
+        state is not None
+        and state.is_value
+        and isinstance(state.value, Composition)
+        and state.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+        for state in composition_states
+    ), (path, unprinted)
+    assert scored, path
+    assert all(
+        row.refusal is None
+        or row.refusal.reason is not RefusalReason.INVALID_SOURCE
+        for row in scored
+    ), (path, scored)
+
+
+@pytest.mark.parametrize(
+    ("charge_source", "invalid_kind"),
+    [
+        ("initial", "malformed_amount"),
+        ("initial", "partial_component"),
+        ("initial", "printed_wt_refusal"),
+        ("initial", "malformed_amount_with_wt_refusal"),
+        ("initial", "valid_mole_with_wt_refusal"),
+        ("initial", "unsupported_map"),
+        ("printed", "malformed_amount"),
+        ("invalid", "malformed_amount"),
+        ("invalid", "unsupported_map"),
+        ("absent", "malformed_amount"),
+        ("not_printed", None),
+    ],
+    ids=[
+        "initial-malformed-amount",
+        "initial-partial-component",
+        "initial-printed-wt-refusal",
+        "initial-malformed-plus-wt-refusal",
+        "initial-valid-mole-plus-wt-refusal",
+        "initial-unsupported-map",
+        "printed-charge",
+        "invalid-charge",
+        "invalid-charge-with-invalid-run-echo",
+        "absent-charge",
+        "not-printed-proxy",
+    ],
+)
+def test_migrated_point_run_composition_does_not_replace_kems_charge(
+    tmp_path: Path, charge_source: str, invalid_kind: str | None
+) -> None:
+    from simulator.battery.consumer_inputs import collect_consumer_inputs
+    from simulator.battery.generators import kems_case
+    from simulator.battery.waypoints import GapReason, ReadinessStatus
+    from tests.battery.test_bench_generators import complete_kems
+
+    migrated, _refused, migrated_result = _score_initial_charge_composition_path(
+        tmp_path / "migrated",
+        path="points",
+        invalid_kind=invalid_kind,
+        consumer="vapour",
+        starting_wt_pct={"MgO": 100},
+    )
+    migrated_point_composition = (migrated.point_conditions or {}).get("composition")
+    assert isinstance(migrated_point_composition, Located)
+    if invalid_kind is None:
+        assert migrated.identity.composition is not None
+        assert migrated.identity.composition.is_value
+        assert migrated.identity.composition.value.proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
+    else:
+        assert migrated_point_composition.state.is_unknown
+
+    base_experiment, bench, kems_observation = complete_kems()
+    migrated_experiment = migrated_result.experiments[migrated.experiment_id]
+    sample = replace(
+        migrated_experiment.sample,
+        mass_kg=base_experiment.sample.mass_kg,
+        initial_composition=None,
+        printed_composition=None,
+    )
+    if charge_source == "initial":
+        sample = replace(
+            sample,
+            initial_composition=F.located(
+                Composition(
+                    "formula",
+                    (("MgO", Decimal("1")),),
+                    AmountBasis.MOL_INVENTORY,
+                )
+            ),
+        )
+    elif charge_source in {"printed", "not_printed"}:
+        sample = replace(
+            sample,
+            printed_composition=F.located({"MgO": Decimal("100")}),
+        )
+    elif charge_source == "invalid":
+        sample = replace(
+            sample,
+            printed_composition=F.located(
+                {"MgO": Decimal("97"), "Unobtainium2O": Decimal("3")}
+            ),
+        )
+    experiment = replace(base_experiment, sample=sample)
+    observation = replace(
+        migrated,
+        observation_id=kems_observation.observation_id,
+        experiment_id=experiment.experiment_id,
+        point_conditions={
+            **(migrated.point_conditions or {}),
+            **(kems_observation.point_conditions or {}),
+        },
+    )
+    identity_before = observation.identity.composition
+    conditions_before = observation.point_conditions
+
+    generated = kems_case(
+        collect_consumer_inputs(experiment, bench, observation)
+    )
+
+    if charge_source in {"initial", "printed", "not_printed"}:
+        assert generated.readiness.status is ReadinessStatus.READY
+        assert generated.payload is not None
+        assert generated.payload["oxide"]["formula"] == "MgO"
+    elif charge_source == "invalid":
+        assert generated.payload is None
+        assert generated.readiness.status is ReadinessStatus.GAP
+        assert any(
+            gap.reason is GapReason.UNSUPPORTED_PRINT_FORM
+            and any("Unobtainium2O" in path for path in gap.missing)
+            for gap in generated.readiness.gaps
+        )
+    else:
+        assert generated.payload is None
+        assert generated.readiness.status is ReadinessStatus.GAP
+        assert any(
+            gap.waypoint == "charge_moles_by_species"
+            and gap.reason is GapReason.MISSING_EVIDENCE
+            for gap in generated.readiness.gaps
+        )
+    if charge_source == "not_printed":
+        assert observation.identity.composition == identity_before
+        assert observation.point_conditions == conditions_before
+
+
+@pytest.mark.parametrize(
+    "quantity",
+    [
+        Quantity.DELTA_FG,
+        Quantity.ACTIVITY_COEFFICIENT_TEMPERATURE_FIT,
+    ],
+    ids=["tabulated-delta-fG", "rows-as-printed-fit"],
+)
+def test_initial_charge_proxy_leaves_not_applicable_composition_untouched(
+    quantity: Quantity,
+) -> None:
+    not_applicable = State.not_applicable("quantity profile does not use composition")
+    identity = fill_identity(quantity, None, composition=not_applicable)
+    point_conditions = {
+        "composition": Located(not_applicable),
+    }
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            point_conditions,
+            (),
+            role=INITIAL_CHARGE_ONLY_PROXY_FLAG,
+            quantity=quantity,
+            quantity_as_printed=None,
+            locator=None,
+            origin="not-applicable-composition",
+            composition_refusal_reasons=("mass-percent composition refused",),
+            malformed_composition_reason="malformed declared amount: invalid cell",
+        )
+    )
+    assert updated_identity == identity
+    assert updated_conditions == point_conditions
+    assert notices == []
+    assert updated_identity.composition is not None
+    assert updated_identity.composition.is_not_applicable
+    updated_point_composition = updated_conditions["composition"]
+    assert updated_point_composition.state.is_not_applicable
+
+
+def test_malformed_amount_does_not_replace_explicit_point_composition() -> None:
+    reason = "malformed declared amount: invalid cell"
+    composition = Composition(
+        basis="printed_oxides",
+        components=(("SiO2", Decimal("0.5")), ("MgO", Decimal("0.5"))),
+        amount_basis=AmountBasis.MOLE_FRACTION,
+    )
+    composition_state = State.of(composition)
+    identity = fill_identity(
+        Quantity.ACTIVITY, None, composition=composition_state
+    )
+    point_conditions = {"composition": Located(composition_state)}
+
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            point_conditions,
+            (),
+            role=None,
+            quantity=Quantity.ACTIVITY,
+            quantity_as_printed="activity",
+            locator=None,
+            origin="explicit-point-composition",
+            malformed_composition_reason=reason,
+            declared_composition_state=State.unknown(reason),
+        )
+    )
+
+    assert updated_identity.composition == composition_state
+    assert updated_conditions == point_conditions
+    assert notices == []
+
+
+def test_malformed_amount_does_not_replace_resolved_named_material_mixture() -> None:
+    reason = "malformed declared amount: invalid cell"
+    binding = _named_material_mixture_binding(
+        {
+            "basis": "printed_reactant_mass_percent",
+            "amount_basis": "mass_percent",
+            "components": [["Mg", "26"], ["JSC-1A", "74"]],
+            "named_material_records": {"JSC-1A": "jsc1a"},
+        },
+        records={
+            "jsc1a": (
+                {"SiO2": Decimal("50"), "MgO": Decimal("50")},
+                None,
+            )
+        },
+        source_id="fixture-source",
+    )
+    assert binding is not None
+    assert binding.located.state.is_value
+    mixture_state = binding.located.state
+    identity = fill_identity(Quantity.ACTIVITY, None, composition=mixture_state)
+    point_conditions = {"composition": binding.located}
+
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            point_conditions,
+            (),
+            role=None,
+            quantity=Quantity.ACTIVITY,
+            quantity_as_printed="activity",
+            locator=None,
+            origin="named-material-mixture",
+            malformed_composition_reason=reason,
+            declared_composition_state=State.unknown(reason),
+        )
+    )
+
+    assert updated_identity.composition == mixture_state
+    assert updated_conditions == point_conditions
+    assert notices == []
+
+
+def test_malformed_inherited_identity_composition_is_refused_without_parameter() -> None:
+    reason = "malformed declared amount: inherited input"
+    identity = fill_identity(
+        Quantity.ACTIVITY, None, composition=State.unknown(reason)
+    )
+
+    updated_identity, updated_conditions, notices = (
+        _initial_charge_only_composition_proxy(
+            identity,
+            None,
+            (),
+            role=None,
+            quantity=Quantity.ACTIVITY,
+            quantity_as_printed="activity",
+            locator=None,
+            origin="inherited-malformed-composition",
+            malformed_composition_reason=None,
+        )
+    )
+
+    assert updated_identity.composition is not None
+    assert updated_identity.composition.is_unknown
+    assert updated_identity.composition.reason == reason
+    assert updated_conditions is not None
+    assert updated_conditions["composition"].state.reason == reason
+    assert notices == []
 
 
 @pytest.mark.parametrize("printed_marker", ["<0.01", "tr."])
@@ -19443,7 +20248,7 @@ def test_bare_log_accepts_printed_air_atmosphere() -> None:
     assert decision.state.is_value
     assert decision.state.value == Decimal("20892.96130854039483122233736")
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "expected log10(fO2/bar)=-0.6789" in decision.notice_reason
     assert "matched 1 bar total-pressure anchor" in decision.notice_reason
     assert "bar-vs-atm unit ambiguity (0.0057 dex)" in decision.notice_reason
 
@@ -19465,8 +20270,52 @@ def test_bare_log_air_at_one_bar_uses_the_bar_frame() -> None:
         Decimal("-0.68"), Decimal("100000")
     )
     assert decision.notice_kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
-    assert "expected log10(fO2/bar)=-0.6788" in decision.notice_reason
+    assert "expected log10(fO2/bar)=-0.6789" in decision.notice_reason
     assert "matched bar frame" in decision.notice_reason
+
+
+def test_raw_oxygen_pressure_inequality_is_retained_through_migration(
+    tmp_path: Path,
+) -> None:
+    extract = _scalar_extract(
+        quantity="partial_pressure",
+        units="atm",
+        obs_type="partial_pressure",
+        values={
+            "quantity": "partial_pressure",
+            "method_class": "measured_direct",
+            "admission_status": "admitted",
+            "series": [
+                {
+                    "T_K": 1200,
+                    "pressure_atm": "1e-6",
+                    "oxygen_partial_pressure": {
+                        "value": "< 1e-12",
+                        "units": "atm",
+                        "locator": {"page": 2, "table": "I"},
+                    },
+                }
+            ],
+        },
+    )
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(
+        row
+        for row in result.observations.values()
+        if quantity_token(row.identity) is Quantity.P_PARTIAL
+    )
+
+    condition = observation.point_conditions["fO2_log"]
+    assert condition.state.is_value
+    value = condition.state.value
+    assert value.kind is ValueKind.BOUND
+    assert value.bound_operator == "<"
+    pressure_pa, _trail = convert_pressure_to_pa(Decimal("1e-12"), "atm")
+    assert pressure_pa is not None
+    expected = (pressure_pa / Decimal("100000")).log10()
+    assert value.bound_value == expected
+    assert condition.inference.output_unit == "log10(fO2/bar)"
+    assert "units=atm" in condition.inference.inputs
 
 
 def test_bare_log_accepts_printed_pure_oxygen_at_one_atmosphere() -> None:
@@ -20144,6 +20993,13 @@ def test_residue_cells_keep_run_identity_and_printed_conditions(
         expected_fO2, expected_starting = expected_sossi_conditions[run_key]
         assert conditions["fO2_log"].state.value == expected_fO2
         assert conditions["starting_component_ppm"].state.value == expected_starting
+        starting_locator = conditions["starting_component_ppm"].locator
+        assert starting_locator is not None
+        assert starting_locator.page == 53
+        assert starting_locator.table == "1"
+        assert starting_locator.source_path == (
+            "raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"
+        )
         expected_pressure = sossi.experiments[obs.experiment_id].pressure_environment.total_pressure_Pa
         assert conditions["total_pressure_Pa"].state == expected_pressure.state
         identity = obs.identity

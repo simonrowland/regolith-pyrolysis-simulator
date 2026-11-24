@@ -62,3 +62,84 @@ experiments:
     pdf_page_index: 42
     table: '5'
     section: 4.3 Mineralogy
+context:
+- observation_id: nasa_tm_2024_figure24_evolved_species
+  type: figure
+  locator:
+    page: 93
+    published_page: 83
+    pdf_page_index: 92
+    figure: '24'
+    section: 6.2.2.B.(ii) High Temperatures
+  phase: CSM-LHT-1G_simulant
+  standard_state: selected mass spectra traces as plotted
+  regime: vacuum_mass_spectrometry
+  units: m/z and temperature as plotted; curves not digitised
+  values:
+    quantity: evolved_species_traces
+    method_class: figure_only
+    evidence_class: figure_only
+    generator: Petkov and Voecks (2023), attributed by the guide.
+    status: figure_only_not_digitised
+    species:
+    - H2
+    - H2O
+    - CO2
+    - SO2
+    - SO3
+    - HCl
+    - HF
+  uncertainty:
+    note: No printed numeric trace values or uncertainty table.
+  context_id: nasa-tm-2024-simulant-guide::context::nasa_tm_2024_figure24_evolved_species
+  work_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320
+  source_id: nasa-tm-2024-simulant-guide
+  species: lunar_regolith_simulants
+- observation_id: nasa_tm_2024_high_temperature_vacuum_guidance
+  type: source_summary
+  locator:
+    page: 93
+    published_page: 83
+    pdf_page_index: 92
+    section: 6.2.2.B.(ii) High Temperatures
+    figure: '24'
+  phase: CSM-LHT-1G_simulant
+  standard_state: cited vacuum-sintering evolved-gas observations and guide summary
+  regime: high_temperature_vacuum_simulant_processing
+  units: torr, wt.%, degrees C, and m/z as printed
+  values:
+    quantity: evolved_gas_and_thermal_processing_context
+    method_class: quoted_literature
+    evidence_class: quoted_attributed
+    generator: Petkov and Voecks (2023) mass spectrometry; guide reports the cited result and does not provide the primary
+      apparatus record.
+    attribution: 'Figure 24 caption: Petkov and Voecks (2023).'
+    gas_species_reported:
+    - H2
+    - H2O
+    - CO2
+    - SO2
+    - SO3
+    - HCl
+    - HF
+    mass_to_charge_labels:
+      H2: 2
+      H2O: 18
+      CO2: 44
+      SO2:
+      - 48
+      - 64
+      SO3: 80
+      HF: 20
+      HCl:
+      - 36
+      - 38
+    physi_adsorbed_water_evolves_below_pressure_torr: 20
+    thermal_processing_mass_loss_wt_pct: 0.5-1
+    figure_24: figure_only_temperature_traces_not_digitised
+  uncertainty:
+    note: Figure traces and source-specific uncertainties are not printed as numeric tables in this guide.
+  context_id: nasa-tm-2024-simulant-guide::context::nasa_tm_2024_high_temperature_vacuum_guidance
+  work_id: 9c738eae201a991b7167499e0f417d7596a83d0bee48cf2747f52498db850320
+  source_id: nasa-tm-2024-simulant-guide
+  species: lunar_regolith_simulants

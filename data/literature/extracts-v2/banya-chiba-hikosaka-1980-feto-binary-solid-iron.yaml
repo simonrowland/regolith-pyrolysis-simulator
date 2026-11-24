@@ -9,7 +9,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -42,7 +42,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -52,7 +52,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -91,7 +91,14 @@ observations:
     point: '0.756'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -498,7 +505,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -531,7 +538,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -541,7 +548,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -580,7 +587,14 @@ observations:
     point: '0.705'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -987,7 +1001,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -1020,7 +1034,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -1030,7 +1044,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1069,7 +1083,14 @@ observations:
     point: '0.711'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -1476,7 +1497,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -1509,7 +1530,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -1519,7 +1540,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -1558,7 +1579,14 @@ observations:
     point: '0.651'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -1965,7 +1993,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -1998,7 +2026,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -2008,7 +2036,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2047,7 +2075,14 @@ observations:
     point: '0.655'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -2454,7 +2489,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -2487,7 +2522,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -2497,7 +2532,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -2536,7 +2571,14 @@ observations:
     point: '0.607'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -2943,7 +2985,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -2976,7 +3018,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -2986,7 +3028,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3025,7 +3067,14 @@ observations:
     point: '0.579'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -3432,7 +3481,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -3465,7 +3514,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -3475,7 +3524,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -3514,7 +3563,14 @@ observations:
     point: '0.563'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -3921,7 +3977,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -3954,7 +4010,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -3964,7 +4020,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4003,7 +4059,14 @@ observations:
     point: '0.515'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -4410,7 +4473,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -4443,7 +4506,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -4453,7 +4516,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4492,7 +4555,14 @@ observations:
     point: '0.468'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -4899,7 +4969,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -4932,7 +5002,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -4942,7 +5012,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -4981,7 +5051,14 @@ observations:
     point: '0.985'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -5388,7 +5465,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -5421,7 +5498,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -5431,7 +5508,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5470,7 +5547,14 @@ observations:
     point: '0.961'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -5877,7 +5961,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -5910,7 +5994,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -5920,7 +6004,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -5959,7 +6043,14 @@ observations:
     point: '0.907'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -6366,7 +6457,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -6399,7 +6490,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -6409,7 +6500,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6448,7 +6539,14 @@ observations:
     point: '0.924'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -6855,7 +6953,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -6888,7 +6986,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -6898,7 +6996,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -6937,7 +7035,14 @@ observations:
     point: '0.859'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -7344,7 +7449,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -7377,7 +7482,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -7387,7 +7492,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7426,7 +7531,14 @@ observations:
     point: '0.869'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -7833,7 +7945,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -7866,7 +7978,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -7876,7 +7988,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -7915,7 +8027,14 @@ observations:
     point: '0.805'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -8322,7 +8441,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -8355,7 +8474,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -8365,7 +8484,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8404,7 +8523,14 @@ observations:
     point: '0.809'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -8811,7 +8937,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -8844,7 +8970,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -8854,7 +8980,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -8893,7 +9019,14 @@ observations:
     point: '0.767'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -9300,7 +9433,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -9333,7 +9466,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -9343,7 +9476,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -9382,7 +9515,14 @@ observations:
     point: '0.759'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -9789,7 +9929,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -9822,7 +9962,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -9832,7 +9972,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -9871,7 +10011,14 @@ observations:
     point: '0.764'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -10278,7 +10425,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -10311,7 +10458,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -10321,7 +10468,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -10360,7 +10507,14 @@ observations:
     point: '0.698'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -10767,7 +10921,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -10800,7 +10954,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -10810,7 +10964,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -10849,7 +11003,14 @@ observations:
     point: '0.65'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -11256,7 +11417,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -11289,7 +11450,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -11299,7 +11460,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -11338,7 +11499,14 @@ observations:
     point: '0.592'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -11745,7 +11913,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -11778,7 +11946,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -11788,7 +11956,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -11827,7 +11995,14 @@ observations:
     point: '0.536'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -12234,7 +12409,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -12267,7 +12442,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -12277,7 +12452,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -12316,7 +12491,14 @@ observations:
     point: '0.442'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -12723,7 +12905,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -12756,7 +12938,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -12766,7 +12948,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -12805,7 +12987,14 @@ observations:
     point: '1.001'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -13212,7 +13401,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -13245,7 +13434,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -13255,7 +13444,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -13294,7 +13483,14 @@ observations:
     point: '0.976'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -13701,7 +13897,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -13734,7 +13930,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -13744,7 +13940,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -13783,7 +13979,14 @@ observations:
     point: '0.957'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -14190,7 +14393,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -14223,7 +14426,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -14233,7 +14436,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -14272,7 +14475,14 @@ observations:
     point: '0.899'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -14679,7 +14889,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -14712,7 +14922,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -14722,7 +14932,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -14761,7 +14971,14 @@ observations:
     point: '0.819'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -15168,7 +15385,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -15201,7 +15418,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -15211,7 +15428,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -15250,7 +15467,14 @@ observations:
     point: '0.556'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -15657,7 +15881,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -15690,7 +15914,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -15700,7 +15924,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -15739,7 +15963,14 @@ observations:
     point: '0.515'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -16146,7 +16377,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -16179,7 +16410,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -16189,7 +16420,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -16228,7 +16459,14 @@ observations:
     point: '0.503'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -16635,7 +16873,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -16668,7 +16906,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -16678,7 +16916,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -16717,7 +16955,14 @@ observations:
     point: '0.485'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -17124,7 +17369,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -17157,7 +17402,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -17167,7 +17412,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -17206,7 +17451,14 @@ observations:
     point: '0.475'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -17613,7 +17865,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -17646,7 +17898,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -17656,7 +17908,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -17695,7 +17947,14 @@ observations:
     point: '0.459'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -18102,7 +18361,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -18135,7 +18394,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -18145,7 +18404,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -18184,7 +18443,14 @@ observations:
     point: '0.46'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -18591,7 +18857,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -18624,7 +18890,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -18634,7 +18900,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -18673,7 +18939,14 @@ observations:
     point: '0.444'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -19080,7 +19353,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -19113,7 +19386,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -19123,7 +19396,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -19162,7 +19435,14 @@ observations:
     point: '0.992'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -19569,7 +19849,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -19602,7 +19882,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -19612,7 +19892,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -19651,7 +19931,14 @@ observations:
     point: '0.906'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -20058,7 +20345,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -20091,7 +20378,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -20101,7 +20388,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -20140,7 +20427,14 @@ observations:
     point: '0.858'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -20547,7 +20841,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -20580,7 +20874,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -20590,7 +20884,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -20629,7 +20923,14 @@ observations:
     point: '0.799'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -21036,7 +21337,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -21069,7 +21370,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -21079,7 +21380,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -21118,7 +21419,14 @@ observations:
     point: '0.768'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -21525,7 +21833,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -21558,7 +21866,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -21568,7 +21876,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -21607,7 +21915,14 @@ observations:
     point: '0.741'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -22014,7 +22329,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -22047,7 +22362,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -22057,7 +22372,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -22096,7 +22411,14 @@ observations:
     point: '0.642'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -22503,7 +22825,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -22536,7 +22858,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -22546,7 +22868,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -22585,7 +22907,14 @@ observations:
     point: '0.601'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -22992,7 +23321,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -23025,7 +23354,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -23035,7 +23364,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -23074,7 +23403,14 @@ observations:
     point: '0.524'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -23481,7 +23817,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -23514,7 +23850,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -23524,7 +23860,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -23563,7 +23899,14 @@ observations:
     point: '0.491'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -23970,7 +24313,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -24003,7 +24346,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -24013,7 +24356,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -24052,7 +24395,14 @@ observations:
     point: '0.462'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -24459,7 +24809,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -24492,7 +24842,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -24502,7 +24852,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -24541,7 +24891,14 @@ observations:
     point: '0.448'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -24948,7 +25305,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -24981,7 +25338,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -24991,7 +25348,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -25030,7 +25387,14 @@ observations:
     point: '0.98'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -25437,7 +25801,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -25470,7 +25834,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -25480,7 +25844,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -25519,7 +25883,14 @@ observations:
     point: '0.838'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -25926,7 +26297,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -25959,7 +26330,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -25969,7 +26340,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -26008,7 +26379,14 @@ observations:
     point: '0.797'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -26415,7 +26793,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -26448,7 +26826,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -26458,7 +26836,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -26497,7 +26875,14 @@ observations:
     point: '0.777'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -26904,7 +27289,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -26937,7 +27322,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -26947,7 +27332,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -26986,7 +27371,14 @@ observations:
     point: '0.753'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -27393,7 +27785,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -27426,7 +27818,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -27436,7 +27828,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -27475,7 +27867,14 @@ observations:
     point: '0.647'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -27882,7 +28281,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -27915,7 +28314,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -27925,7 +28324,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -27964,7 +28363,14 @@ observations:
     point: '0.612'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -28371,7 +28777,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -28404,7 +28810,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -28414,7 +28820,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -28453,7 +28859,14 @@ observations:
     point: '0.964'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -28860,7 +29273,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -28893,7 +29306,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -28903,7 +29316,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -28942,7 +29355,14 @@ observations:
     point: '0.975'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -29349,7 +29769,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -29382,7 +29802,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -29392,7 +29812,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -29431,7 +29851,14 @@ observations:
     point: '0.973'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -29838,7 +30265,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -29871,7 +30298,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -29881,7 +30308,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -29920,7 +30347,14 @@ observations:
     point: '0.919'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -30327,7 +30761,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -30360,7 +30794,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -30370,7 +30804,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -30409,7 +30843,14 @@ observations:
     point: '0.897'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -30816,7 +31257,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -30849,7 +31290,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -30859,7 +31300,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -30898,7 +31339,14 @@ observations:
     point: '0.867'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -31305,7 +31753,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -31338,7 +31786,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -31348,7 +31796,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -31387,7 +31835,14 @@ observations:
     point: '0.98'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -31794,7 +32249,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -31827,7 +32282,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -31837,7 +32292,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -31876,7 +32331,14 @@ observations:
     point: '0.992'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -32283,7 +32745,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -32316,7 +32778,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -32326,7 +32788,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -32365,7 +32827,14 @@ observations:
     point: '0.949'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -32772,7 +33241,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -32805,7 +33274,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -32815,7 +33284,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -32854,7 +33323,14 @@ observations:
     point: '0.926'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value
@@ -33261,7 +33737,7 @@ observations:
       tag: value
       value: activity
     species:
-      formula: Fe_tO
+      formula: FeO
       phase:
         tag: value
         value: l
@@ -33294,7 +33770,7 @@ observations:
       value:
         convention: raoultian_pure_endmember
         endmember:
-          formula: Fe_tO
+          formula: Fe(1-x)O
           phase:
             tag: value
             value: l
@@ -33304,7 +33780,7 @@ observations:
           charge:
             tag: value
             value: 0
-        component_basis: Fe_tO
+        component_basis: Fe(1-x)O
     reservoir:
       tag: not_applicable
       reason: profile activity does not use reservoir
@@ -33343,7 +33819,14 @@ observations:
     point: '0.896'
     approximate: false
   uncertainty:
-    kind: none
+    kind: derived
+    derivation:
+      relation: total_iron_basis
+      inputs:
+      - point_conditions.composition
+      parameters: []
+      output_unit: dex
+      references: []
   evidence:
     class:
       tag: value

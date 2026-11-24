@@ -36,10 +36,6 @@ def _environment_setting(name: str) -> str | None:
     return os.environ.get(name)
 
 
-def _engine_cache_path() -> str | None:
-    return _environment_setting("REGOLITH_ENGINE_CACHE")
-
-
 def _studio_host() -> str | None:
     return _environment_setting("REGOLITH_STUDIO_HOST")
 

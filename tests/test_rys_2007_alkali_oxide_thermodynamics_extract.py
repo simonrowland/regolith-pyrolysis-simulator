@@ -6,6 +6,10 @@ from collections import Counter
 
 from simulator.battery.enums import CellMaterial, MethodToken, Phase, Quantity
 from simulator.battery.migrate import Migrator
+from tests.literature_extract_test_helpers import (
+    assert_all_physical_locators,
+    iter_locators,
+)
 from simulator.yaml_cache import YAML12SafeLoader, yaml_mapping_source_issues
 import yaml
 
@@ -138,29 +142,14 @@ def test_rys_extract_values_migrate_and_conditions_reach_each_row() -> None:
         point["locator"]["table"] == "9" for point in table9_activity_points
     )
 
-    locators = []
-
-    def collect_locators(value: object) -> None:
-        if isinstance(value, dict):
-            if "page" in value and "pdf_page_index" in value:
-                locators.append(value)
-            for item in value.values():
-                collect_locators(item)
-        elif isinstance(value, list):
-            for item in value:
-                collect_locators(item)
-
-    collect_locators(document)
+    locators = list(iter_locators(document))
     # Typing Tables 7 and 9 adds 162 locators and 75 observations; the KEMS
     # apparatus and experiment registry add three locators.
     # The merged document keeps the two Table 9 NaAlSi_6 points and Na Table
     # 10a row 8, each with a row locator and a condition locator.
     assert len(locators) == 2235
-    assert all(
-        locator["page"] == locator["pdf_page_index"] + 1
-        and "published_page" in locator
-        for locator in locators
-    )
+    assert_all_physical_locators(document)
+    assert all("published_page" in locator for locator in locators)
 
     appendix_rows = Counter()
     for species in document["species"].values():

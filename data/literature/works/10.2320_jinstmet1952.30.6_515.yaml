@@ -1953,35 +1953,6 @@ experiments:
         paragraph: 市販アルミナるつぼ (CP-2)
         line_range: '27'
         source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-    geometry:
-      exposed_area_m2:
-        state:
-          tag: value
-          value:
-            kind: point
-            point: '0.0011341149'
-            approximate: false
-        locator:
-          paragraph: commercial alumina crucible CP-2 ID 38 mm
-          source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-        inference:
-          relation: extract_inference
-          inputs:
-          - inferred=true
-          - A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
-          - extract_value=0.0011341149 m2
-          - extract_field=sample_surface_area
-          - unit_conversion=identity:m2
-          parameters:
-          - - original
-            - state:
-                tag: value
-                value: '0.0011341149'
-              locator:
-                paragraph: commercial alumina crucible CP-2 ID 38 mm
-                source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
-          output_unit: m2
-          references: []
 benches:
 - id: 10.2320/jinstmet1952.30.6_515::bench::vif-ii-vacuum-induction
   work_id: 10.2320/jinstmet1952.30.6_515
@@ -2124,3 +2095,51 @@ benches:
         page: 516
         section: II. Experimental method
     unit: mm
+context:
+- observation_id: homma_1966_crucible_area_numeric_b1
+  type: apparatus
+  locator:
+    source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+    page: 1
+    published_page: 515
+    pdf_page_index: 0
+    paragraph: alumina crucible CP-2 ID 38 mm
+  T_range_K:
+  - '1873.15'
+  - '1873.15'
+  phase: liquid_Fe_alloy_steel_melt
+  regime: vacuum_induction_free_evaporation_steel_melt
+  units: as published
+  values:
+    quantity: crucible_cross_section_as_proxy_free_surface
+    method_class: measured_direct
+    system_class: molten_metal
+    semantics: competing_observation_do_not_average
+    note: Numeric A from stated crucible ID 38 mm. Free surface ≈ crucible cross-section assumption; not independently measured
+      melt free surface. Olette α rows remain non-HKL. Molten-metal system — NOT silicate-melt α evidence.
+    crucible_inner_diameter_mm: '38'
+    sample_surface_area_m2: '0.0011341149'
+  equipment:
+    sample_surface_area:
+      value: '0.0011341149'
+      units: m2
+      inferred: true
+      inference: A = pi*(d/2)^2 with d=38 mm ID => 0.0011341149 m2
+      locator:
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        page: 1
+        published_page: 515
+        pdf_page_index: 0
+        paragraph: commercial alumina crucible CP-2 ID 38 mm
+    cell_material:
+      value: commercial alumina crucible CP-2 (ID 38 mm, OD 49 mm, height 120 mm)
+      locator:
+        source_path: text/kems-001-homma-1966/mineru/spool/out/kems-001-homma-1966/vlm/kems-001-homma-1966.md
+        page: 1
+        published_page: 515
+        pdf_page_index: 0
+        paragraph: crucible CP-2
+  context_id: kems-001-homma-1966::context::homma_1966_crucible_area_numeric_b1
+  work_id: 10.2320/jinstmet1952.30.6_515
+  source_id: kems-001-homma-1966
+  species: Mn

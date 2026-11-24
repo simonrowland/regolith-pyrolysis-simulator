@@ -883,6 +883,30 @@ def beskok_karniadakis_civan_conductance_m3_s(
     )
 
 
+def series_effective_speed_m3_s(
+    pump_speed_m3_s: float,
+    line_conductance_m3_s: float,
+) -> float:
+    """Combine a pump and a line that carry one throughput.
+
+    1/S_eff = 1/S_pump + 1/C_line. Both arguments are m^3/s and must be
+    finite and positive. Callers that treat a missing conductance as
+    unknown keep that branch themselves; this function does not turn a
+    missing line into an infinite conductance.
+    """
+    pump_speed_m3_s = _require_positive(
+        pump_speed_m3_s,
+        name="pump_speed_m3_s",
+        category="invalid_pump_speed",
+    )
+    line_conductance_m3_s = _require_positive(
+        line_conductance_m3_s,
+        name="line_conductance_m3_s",
+        category="invalid_conductance",
+    )
+    return 1.0 / (1.0 / pump_speed_m3_s + 1.0 / line_conductance_m3_s)
+
+
 def _minimum_pressure_pa_for_knudsen(
     temperature_K: float,
     collision_diameter_m: float,

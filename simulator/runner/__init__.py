@@ -579,7 +579,8 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         raise PresetRunnerError(
             "malformed_preset: "
             f"pair.{requested_leg}.duration_h={duration_h!r} cannot map "
-            "losslessly to runner integer --hours",
+            "losslessly to the 1-hour simulator timestep; "
+            "runner --hours requires a whole number of hours",
             provenance=provenance,
         )
 

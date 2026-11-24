@@ -108,13 +108,13 @@ def test_ordering_pair_counts_are_categorical_not_measurements(observation, stat
 def extract_comparator(monkeypatch):
     from simulator.diagnostic_helpers import extract_reproduction as e
     from simulator.diagnostic_helpers.reproduction_compare import compare_values
-    obs = e.AdoptedObservation(species_id="Fe", source_id="fixture", observation_id="measured_alpha",
-        obs_type="alpha", review_status="reviewed", phase="solid", regime="vacuum", standard_state=None,
-        T_range_K=[1500, 1600], units="alpha", uncertainty={"kind": "absolute", "value": 0.1},
-        locator="Table 1", values={}, equipment={}, disagreement_dex=None, is_priority_winner=True,
-        geometry_assumption="no geometry needed")
 
-    def install(status, extrapolated=False):
+    def install(status, extrapolated=False, source_id="fixture"):
+        obs = e.AdoptedObservation(species_id="Fe", source_id=source_id, observation_id="measured_alpha",
+            obs_type="alpha", review_status="reviewed", phase="solid", regime="vacuum", standard_state=None,
+            T_range_K=[1500, 1600], units="alpha", uncertainty={"kind": "absolute", "value": 0.1},
+            locator="Table 1", values={}, equipment={}, disagreement_dex=None, is_priority_winner=True,
+            geometry_assumption="no geometry needed")
         records = [compare_values(case_id=obs.case_id, source_id=obs.source_id,
             observable_id=f"measured_alpha:T={t}", species="Fe", coordinate={"temperature_K": t},
             expected_value=0.1, expected_uncertainty=obs.uncertainty, actual_value=0.2,
@@ -126,6 +126,45 @@ def extract_comparator(monkeypatch):
         monkeypatch.setattr(e, "_engine_alpha", lambda *a: (0.2, None, {"alpha_s_extrapolated": extrapolated}))
         return obs
     return install
+
+
+@pytest.mark.parametrize(("source_id", "expected_kind", "has_fit"), [
+    ("kems-005-fedkin-2006", "derived measurement", True),
+    ("kems-008-schaefer-fegley-2004", "literature correlation", False),
+    ("kems-041-sossi-fegley-2018", "literature correlation", False),
+])
+def test_calibration_source_kind_uses_source_declaration(
+    extract_comparator, source_id, expected_kind, has_fit
+):
+    from scripts.calibration_battery import extract_rows
+
+    obs = extract_comparator("match", source_id=source_id)
+    if has_fit:
+        obs.values["fit"] = True
+
+    rows = extract_rows()
+
+    assert rows and {row["measurement_kind"] for row in rows} == {expected_kind}
+
+
+@pytest.mark.parametrize(("source_id", "expected_kind"), [
+    ("kems-008-schaefer-fegley-2004", "literature correlation"),
+    ("kems-041-sossi-fegley-2018", "literature correlation"),
+])
+def test_calibration_correlation_classification_depends_on_declaration(
+    extract_comparator, monkeypatch, source_id, expected_kind
+):
+    from scripts.calibration_battery import extract_rows
+    from simulator.battery.source_declarations import SOURCE_DECLARATIONS
+
+    extract_comparator("match", source_id=source_id)
+    rows = extract_rows()
+    assert rows and {row["measurement_kind"] for row in rows} == {expected_kind}
+
+    monkeypatch.setitem(SOURCE_DECLARATIONS, source_id, {})
+    mutated_rows = extract_rows()
+    assert mutated_rows
+    assert {row["measurement_kind"] for row in mutated_rows} == {"direct experiment"}
 
 
 @pytest.mark.parametrize("markers", [

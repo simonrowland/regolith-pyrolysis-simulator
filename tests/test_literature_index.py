@@ -87,6 +87,21 @@ def test_robie_hemingway_compilation_is_citable_with_published_doi() -> None:
     assert source["report_number"] == "USGS Bulletin 2131"
 
 
+def test_aithala_index_keeps_article_primary_and_supplementary_locators() -> None:
+    index = yaml.safe_load(COMMITTED_YAML.read_text(encoding="utf-8"))
+    source = next(
+        row for row in index["sources"]
+        if row["source_id"] == "aithala-2026-magmatic-iron-redox-to-2100c"
+    )
+    assert source["corpus"]["raw"]["path"] == (
+        "raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+        "aithala-2026-magmatic-iron-redox-to-2100c.pdf"
+    )
+    assert source["corpus"]["raw"]["sha256"] == (
+        "4a3a85dcb94b935de7b3f30af872d2bb7b56d4b0e5c177179f33b4a876694261"
+    )
+
+
 def test_robie_hemingway_compilation_work_retains_index_doi() -> None:
     from simulator.battery.migrate import Migrator
 
@@ -481,7 +496,36 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     # Pin the generated index for the approved combined-offer merge stack.
     # The named comparison runs first so an added or dropped extract is
     # reported by filename before this aggregate pin can fail on a bare count.
-    assert counts["sources"] == 852
+    indexed_source_rows = {source["source_id"]: source for source in index["sources"]}
+    t1880_source_ids = {
+        "barin-1989",
+        "ivtan-nio-thermo",
+        "ivtan-zno-thermo",
+        "robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics",
+    }
+    assert t1880_source_ids <= indexed_source_rows.keys()
+    assert indexed_source_rows[
+        "robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics"
+    ]["doi"] == "10.2138/am-1995-5-615"
+    indexed_sidecar_gaps = {
+        gap["source_id"]: gap for gap in index["gaps"]["sidecars_missing_fields"]
+    }
+    assert t1880_source_ids <= indexed_sidecar_gaps.keys()
+    expected_sidecar_gaps = {
+        "barin-1989": ["doi", "license_or_oa_basis", "sha256", "retrieved_date"],
+        "ivtan-nio-thermo": ["doi", "license_or_oa_basis", "sha256", "retrieved_date"],
+        "ivtan-zno-thermo": ["doi", "license_or_oa_basis", "sha256", "retrieved_date"],
+        "robie-huebner-hemingway-1995-braunite-rhodonite-thermodynamics": [
+            "license_or_oa_basis",
+            "sha256",
+            "retrieved_date",
+        ],
+    }
+    assert {
+        source_id: indexed_sidecar_gaps[source_id]["missing_fields"]
+        for source_id in t1880_source_ids
+    } == expected_sidecar_gaps
+    assert counts["sources"] == 861
     # PDF status of every source with extracts, compared by source id against
     # a checked-in manifest so a changed status is named, and the
     # extracts_without_pdf count is pinned to that independent expectation
@@ -510,8 +554,8 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
     assert status["counts"]["sources"] == 2338
     assert status["counts"]["by_stage"] == {
         "located": 206,
-        "inbox": 1250,
-        "in_progress": 192,
+        "inbox": 1244,
+        "in_progress": 198,
         "ingested_partial": 183,
         "ingested_complete": 149,
         "unknown": 358,

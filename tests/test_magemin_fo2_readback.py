@@ -304,7 +304,14 @@ def test_corrective_resolve_shares_budget_and_requires_fresh_output(
         ))
 
     monkeypatch.setattr(magemin_module.subprocess, 'run', run)
-    monkeypatch.setattr(magemin_module.time, 'monotonic', lambda: clock[0])
+    # Patch a module-local clock namespace, never the shared ``time`` module
+    # (tests/test_time_patch_isolation.py): other threads read time.monotonic.
+    local_time = SimpleNamespace(
+        **{name: getattr(magemin_module.time, name)
+           for name in dir(magemin_module.time) if not name.startswith('_')}
+    )
+    local_time.monotonic = lambda: clock[0]
+    monkeypatch.setattr(magemin_module, 'time', local_time)
     raw = backend._call_magemin_subprocess(
         bulk_projection=backend._build_db_bulk_projection(_BASALT),
         temperature_C=1449.85, pressure_kbar=0.001, fO2_log=-9.0,

@@ -1,9 +1,11 @@
 # Deliberate analytical-model corpus release tag.
 # Bump only when the operator decides cached-real rows are no longer reusable.
+# 2026-11-19 C2A staged-pressure runtime results changed; expire optimizer rows.
 # 2026-07-31 VR-3 compatibility-only bump: retire optimizer keys containing
 # code/data/provider fingerprints. This changes identity shape, not physics.
 # Prior corpus rows are intentionally non-interoperable so old and new key
 # shapes cannot collide after fingerprints become provenance-only.
-corpus_version: "analytical-corpus-2026-07-31-vapour-rail-key-v2"
+corpus_version: "analytical-corpus-2026-11-19-c2a-staged-pressure-v1"
 interoperable_versions:
+  - "analytical-corpus-2026-11-19-c2a-staged-pressure-v1"
   - "analytical-corpus-2026-07-31-vapour-rail-key-v2"
