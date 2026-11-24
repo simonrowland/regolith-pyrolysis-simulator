@@ -248,9 +248,15 @@ def test_missing_declared_engine_falls_to_analytical_floor(
     assert sim.record.liquid_fraction_provider == 'magemin'
     refusal = snapshot.liquid_fraction_gate['redox']['gate_provider_refusal']
     _assert_analytical_floor_flag(refusal)
-    assert build_per_hour_summary(sim, snapshot)['oxygen_reservoir'][
-        'liquid_fraction_gate'
-    ]['redox']['gate_provider_refusal'] == refusal
+    # The hour summary copies diagnostics through a JSON boundary, so
+    # tuple fields such as phases_present become lists. The flag is the
+    # contract, not that copy's container types.
+    summary_refusal = build_per_hour_summary(sim, snapshot)[
+        'oxygen_reservoir'
+    ]['liquid_fraction_gate']['redox']['gate_provider_refusal']
+    _assert_analytical_floor_flag(summary_refusal)
+    assert summary_refusal['reason'] == refusal['reason']
+    assert summary_refusal['qualification'] == refusal['qualification']
 
 
 def test_daemonic_missing_binary_falls_to_analytical_floor(
@@ -1073,7 +1079,15 @@ def test_declared_gate_holds_or_uses_first_call_floor_and_retries_next_hour(
 
 
 class _DeadWorkerPool:
-    """Pool whose first result is the UI-QA worker death."""
+    """Pool whose first result is the UI-QA worker death.
+
+    ``workers`` is empty so database resolution uses the backend config.
+    A missing attribute is an AttributeError, which is a programming
+    error and does not reach the worker-death path.
+    """
+
+    def __init__(self):
+        self.workers = ()
 
     def submit(self, _payload, timeout_s=None):
         return self
@@ -1127,9 +1141,11 @@ def test_engine_worker_died_on_default_lunar_continues_on_analytical_floor(
     assert refusal['reason'] == 'EngineWorkerDied'
     assert 'EngineWorkerDied' in str(refusal)
     summary = build_per_hour_summary(sim, snapshot)
-    assert summary['oxygen_reservoir']['liquid_fraction_gate']['redox'][
-        'gate_provider_refusal'
-    ] == refusal
+    summary_refusal = summary['oxygen_reservoir']['liquid_fraction_gate'][
+        'redox'
+    ]['gate_provider_refusal']
+    _assert_analytical_floor_flag(summary_refusal)
+    assert summary_refusal['reason'] == refusal['reason']
 
 
 def test_all_liquid_fraction_rungs_unavailable_is_typed_refusal(

@@ -799,6 +799,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
+    floor_refusals: dict[str, dict] = {}
     current_scenario = [None]
     equilibrium_count = [0]
     original_record = PyrolysisSimulator._freeze_gate_curve_record
@@ -867,6 +868,23 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert notice['authority'] == 'extrapolated'
             assert notice['reason'].startswith('composition_projected_over_threshold:')
             assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
+        if (
+            curve.get('source') == _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
+            and current_scenario[0] != 'ci_carbonaceous_chondrite_C2B_12h'
+        ):
+            refusal = curve.get('gate_provider_refusal') or {}
+            diagnostic = refusal.get('provider_diagnostic') or {}
+            floor_refusals[current_scenario[0]] = {
+                'reason': refusal.get('reason'),
+                'outcome': refusal.get('outcome'),
+                'status': refusal.get('status'),
+                'fallback_authority': refusal.get('fallback_authority'),
+                'backend_status_reason': diagnostic.get('backend_status_reason'),
+                'backend_failure_exception': diagnostic.get(
+                    'backend_failure_exception'
+                ),
+                'exception_class': diagnostic.get('exception_class'),
+            }
         rebuild_counts[current_scenario[0]] = int(
             getattr(sim, '_freeze_gate_cache_rebuild_count', 0)
         )
@@ -1018,7 +1036,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         for curves in logical_gate_reads.values()
         for curve in curves
     )
-    assert observed == expected
+    assert observed == expected, floor_refusals
 
 
 def test_native_fe_no_commit_split_suppresses_vapor_route(

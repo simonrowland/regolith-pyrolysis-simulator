@@ -3928,11 +3928,26 @@ class EvaporationMixin:
                 )
                 # Holds and first-call floors are tick-local, never solved memos.
                 published = _gate_curve_live_publication(record, curve)
-                self._freeze_gate_held_curve_record = {
-                    'hour': int(self.melt.hour),
-                    'provider': self._liquid_fraction_provider,
-                    'record': copy.deepcopy(published),
-                }
+                # A swallowed startup error left no backend. Holding that floor
+                # would skip the next construction attempt.
+                registry = getattr(self, '_chem_registry', None)
+                provider = (
+                    registry.fallback_for(ChemistryIntent.GATE_LIQUID_FRACTION)
+                    if registry is not None else None
+                )
+                startup_pending = (
+                    provider is not None
+                    and getattr(provider, '_backend', None) is None
+                    and getattr(
+                        provider, '_backend_initialization_error', None,
+                    ) is not None
+                )
+                if not startup_pending:
+                    self._freeze_gate_held_curve_record = {
+                        'hour': int(self.melt.hour),
+                        'provider': self._liquid_fraction_provider,
+                        'record': copy.deepcopy(published),
+                    }
                 return published
 
             # Invalid projected bounds are not a liquidus. The Kress floor
