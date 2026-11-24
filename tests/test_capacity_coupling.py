@@ -780,7 +780,6 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     assert original_equilibrium_activities == sim._last_high_t_melt_activity["selected_parent_activities"]
     assert original_equilibrium_activities != original_activities
     baseline_catalog_pa: dict[str, float] = {}
-    activity_exponents: dict[str, float] = {}
     source_pressure_provenance = sim._last_vapor_pressure_diagnostic[
         "vapor_pressure_numerator_provenance"
     ]
@@ -795,25 +794,23 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         assert activity.value == pytest.approx(
             original_activities[species_id], rel=0.0, abs=0.0
         )
-        evaluator = sim.vapour_rail_catalog.species[species_id].evaluator
-        assert evaluator is not None
-        activity_exponents[species_id] = evaluator.activity_exponent
         pressure_provenance = source_pressure_provenance[species_id]
         source_activity_factor = float(pressure_provenance["activity_factor"])
-        expected_activity_factor = (
-            float(activity.value) ** evaluator.activity_exponent
+        source_pressure_pa = float(pressure_provenance["P_eq_Pa"])
+        source_standard_pressure_pa = float(
+            pressure_provenance["P_reference_Antoine_Pa"]
         )
-        assert source_activity_factor == pytest.approx(
-            expected_activity_factor, rel=1.0e-12, abs=0.0
+        # activity_factor is the full normalized multiplier (including the
+        # temperature and oxygen-fugacity terms), not the oxide activity:
+        # P_eq = activity_factor * P_standard. Separately, at fixed T and
+        # intrinsic fO2, P_eq(a) / P_eq(a=1) = a; the activity-one mutation
+        # below checks that route directly against the typed activity value.
+        assert source_pressure_pa == pytest.approx(
+            source_activity_factor * source_standard_pressure_pa,
+            rel=1.0e-12,
+            abs=0.0,
         )
-        # Remove the equilibrium source's activity factor, then apply the
-        # typed activity carried by this catalog channel. The remaining factor
-        # retains the source reference pressure and its oxygen-fugacity term.
-        expected_seam_pa = (
-            float(pressure_provenance["P_eq_Pa"])
-            / source_activity_factor
-            * expected_activity_factor
-        )
+        expected_seam_pa = source_pressure_pa
         seam_pa = effective_source.pressure_pa(species_id)
         assert seam_pa is not None and seam_pa > 0.0
         probe_band_decades[species_id] = abs(
@@ -901,13 +898,17 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert isinstance(a1_answer.pressure, PressureValue)
             assert a1_answer.source_reaction_activity is not None
             assert a1_answer.source_reaction_activity.value == pytest.approx(1.0)
-            if batch.channel(species_id).extra.get("out_of_range", False):
-                exponent = activity_exponents[species_id]
-                assert exponent > 0.0
-                expected_scale = (1.0 / original_activities[species_id]) ** exponent
-                assert (
-                    float(a1_answer.pressure.pa) / baseline_catalog_pa[species_id]
-                ) == pytest.approx(expected_scale, rel=1.0e-12, abs=0.0)
+            routed_activity = batch.channel(species_id).source_reaction_activity
+            assert routed_activity is not None and routed_activity.value is not None
+            # The catalog pressure is P_eq at the routed activity; the
+            # activity-one reversion supplies P_eq(a=1), so their ratio must
+            # recover the typed activity at fixed temperature and intrinsic fO2.
+            assert (
+                baseline_catalog_pa[species_id]
+                / float(a1_answer.pressure.pa)
+            ) == pytest.approx(
+                float(routed_activity.value), rel=1.0e-12, abs=0.0
+            )
             seam_pa = effective_source.pressure_pa(species_id)
             assert seam_pa is not None and seam_pa > 0.0
             assert not within_probe_band(
