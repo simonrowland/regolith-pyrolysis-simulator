@@ -1,6 +1,5 @@
 """Guard the disclosure cache inventory against production cache-site drift."""
 
-import json
 from pathlib import Path
 
 import pytest
@@ -19,26 +18,6 @@ def test_cache_inventory_matches_the_production_scan() -> None:
     scanned = scan_cache_sites(_REPO_ROOT)
     unregistered = sorted(set(scanned) - set(CACHE_SITES))
     stale = sorted(set(CACHE_SITES) - set(scanned))
-    line_changes = {
-        site_id: {
-            "old_line": CACHE_SITES[site_id]["line"],
-            "new_line": scanned[site_id]["line"],
-        }
-        for site_id in sorted(set(scanned) & set(CACHE_SITES))
-        if CACHE_SITES[site_id]["line"] != scanned[site_id]["line"]
-    }
-    print(
-        "CACHE_SITE_SCAN_DIFF="
-        + json.dumps(
-            {
-                "unregistered": unregistered,
-                "stale": stale,
-                "line_changes": line_changes,
-            },
-            sort_keys=True,
-        ),
-        flush=True,
-    )
     assert not unregistered and not stale, {
         "unregistered": unregistered,
         "stale": stale,
