@@ -214,13 +214,10 @@ def classify_target_provenance(
             if (
                 cell is not None
                 and own_print is not None
+                and own_print.unit is not None
+                and cell.unit is None
                 and cell.value is not None
                 and cell.value == own_print.value
-                and (
-                    cell.unit is None
-                    or own_print.unit is None
-                    or cell.unit == own_print.unit
-                )
             ):
                 continue
             match = _match_target_cell(targets, cell)
