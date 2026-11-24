@@ -325,20 +325,17 @@ def _live_engine_probe(
             import openimcc
 
             module_file = Path(openimcc.__file__).resolve()
-            source_hash = subprocess.run(
-                [
-                    "sh",
-                    "-c",
-                    "rg --files . -g '*.py' | sort | xargs shasum | shasum",
-                ],
-                cwd=module_file.parent,
-                capture_output=True,
-                check=True,
-                text=True,
-            ).stdout.strip()
+            source_files = sorted(module_file.parent.rglob("*.py"))
+            source_hash_input = b"".join(
+                hashlib.sha256(path.read_bytes()).hexdigest().encode()
+                + b"  ./"
+                + path.relative_to(module_file.parent).as_posix().encode()
+                + b"\n"
+                for path in source_files
+            )
             openimcc_import = {
                 "module_file": str(module_file),
-                "source_hash": source_hash,
+                "source_hash": hashlib.sha256(source_hash_input).hexdigest(),
             }
         return {
             "pid": os.getpid(),
