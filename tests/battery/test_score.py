@@ -4208,6 +4208,9 @@ def test_species_formula_parser_honors_braced_and_mixed_decimal_subscripts() -> 
     assert parse_species_formula("$MgAl_{1.5}H_2O.2H_2O$") == (
         ("Al", 1.5), ("H", 6.0), ("Mg", 1.0), ("O", 3.0)
     )
+    assert parse_species_formula(r"$MgAl_{1.5}H_2O\cdot CO_2$") == (
+        ("Al", 1.5), ("C", 1.0), ("H", 2.0), ("Mg", 1.0), ("O", 3.0)
+    )
 
 
 def test_species_formula_parser_classifies_each_dot() -> None:
@@ -4250,6 +4253,7 @@ def test_species_formula_parser_rejects_conflicting_phase_suffixes() -> None:
 
 def test_species_formula_parser_does_not_treat_d2o_as_an_adduct() -> None:
     assert parse_species_formula("CaSO4.2D2O") is None
+    assert parse_species_formula("CaSO4·2D2O") is None
     assert parse_species_formula("AsD_3") == (("As", 1.0), ("D", 3.0))
     assert parse_species_formula("D2O(l)", species=Species("D2O", Phase.L)) == (
         ("D", 2.0), ("O", 1.0)
@@ -4261,14 +4265,14 @@ def test_decimal_precedence_mutation_recreates_production_parser_failure(
 ) -> None:
     from simulator.accounting import formulas as formula_owner
 
-    is_adduct = formula_owner._is_ascii_adduct
+    split_adducts = formula_owner._ascii_adduct_parts
 
-    def adduct_first(formula: str) -> bool:
+    def adduct_first(formula: str) -> list[str] | None:
         if formula == "MgAl1.5SiO3":
-            return True
-        return is_adduct(formula)
+            return ["MgAl1", "5SiO3"]
+        return split_adducts(formula)
 
-    monkeypatch.setattr(formula_owner, "_is_ascii_adduct", adduct_first)
+    monkeypatch.setattr(formula_owner, "_ascii_adduct_parts", adduct_first)
     with pytest.raises(AssertionError):
         test_species_formula_parser_preserves_normalized_decimal_stoichiometry()
 

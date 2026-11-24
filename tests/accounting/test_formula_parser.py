@@ -6,6 +6,7 @@ from simulator.accounting.exceptions import UnknownSpeciesError
 from simulator.accounting.formulas import (
     _ASCII_ADDUCT_UNITS,
     _is_ascii_adduct,
+    atoms_parse_formula_else_janaf,
     parse_formula,
 )
 
@@ -102,6 +103,20 @@ def test_d2o_is_outside_the_adduct_vocabulary() -> None:
     except UnknownSpeciesError:
         return
     raise AssertionError("CaSO4.2D2O parsed without a deuterium mass")
+
+
+def test_formula_accounting_entrypoint_owns_delimited_decimals_and_d2o_refusal() -> None:
+    assert atoms_parse_formula_else_janaf(r"$MgAl_{1.5}H_2O\cdot CO_2$") == (
+        ("Al", 1.5),
+        ("C", 1.0),
+        ("H", 2.0),
+        ("Mg", 1.0),
+        ("O", 3.0),
+    )
+    assert atoms_parse_formula_else_janaf("CaSO4.2D2O") is None
+    assert atoms_parse_formula_else_janaf("CaSO4·2D2O") is None
+    assert atoms_parse_formula_else_janaf("AsD3") == (("As", 1.0), ("D", 3.0))
+    assert atoms_parse_formula_else_janaf("D2O(l)") == (("D", 2.0), ("O", 1.0))
 
 
 def test_all_or_nothing_dot_split_refuses_mixed_decimal_adduct(monkeypatch) -> None:

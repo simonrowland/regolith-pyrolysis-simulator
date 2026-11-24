@@ -18,7 +18,10 @@ GENERATORS = (
 # formula arithmetic. Studio 2 request e26f96f4 printed the new digest.
 # Previous pin: c5db0e9edf343d80920afdb401775daabcda010137d7a566ae34d0563e53f6fa.
 EXPECTED_PARSER_OUTPUT_SHA256 = {
-    "b1259": "45e7170e8fdc1513b0077f7a554ab653bb7cac51b4db15f8eaeb86bbe09d1dc7",
+    # Corrected image-verified 500 K cell on physical PDF page 226, folio 220:
+    # the printed elements-frame value is -786.941 kcal/GFW.
+    # Previous pin: 45e7170e8fdc1513b0077f7a554ab653bb7cac51b4db15f8eaeb86bbe09d1dc7.
+    "b1259": "2991016249ee2b0e71f0c8375aa824c9a38beeb9d033102ca4334d79ca840131",
     "b1452": "ecafdbb8a65db93da5ffd1a61a9c0211b6c5ff4c4f2a34e6ed89e5ad8077d9ec",
     "b1544": "c446507f621c4018bd470d558bf79fcb5a0a736283dc093932bc7a67d6af1b9b",
 }
