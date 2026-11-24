@@ -738,19 +738,29 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
         effective_pressure_source=effective_source,
     )
     assert batch is not None
+    assert sim._last_vapor_pressure_diagnostic["phase_basis"] == "liquid"
 
     verifier_probe_pa = {
-        # MC-5 Ca (2026-08-07): catalog Pref retargeted TE Pref_GR -> JANAF
-        # Pref_GF (live move +2.465 dex at this probe's 1873.15 K). The PIN
-        # moves +3.096 dex (4.6e-9 -> 5.740e-6 Pa) because the assertion is
-        # band-based (within_probe_band ~1.43 dex), so the old pin sat below
-        # the old live value. SIGN CHECK: pressure UP, matching more high-T
-        # Ca volatilisation. See docs-private/research/2026-08-07-mc5-ca-fix/report.md.
+        # Three-way Studio probe at 1873.15 K: source-reaction fO2 is
+        # 1e-9 bar and P_standard is 1e5 Pa in both parents. b274 keeps
+        # vapour on the builtin path below 1950 K, whose `melt_oxide_activity`
+        # table-gamma CaO activity is 1.386915e-3; it gives activity_factor
+        # 5.740329e-11 and P_eq=5.740329e-6 Pa. The car carries d-207
+        # (source commit db7c534cdd, adapted in dcf8f3c945): this all-liquid
+        # charge uses OpenIMCC from its 1700 K domain floor, giving activity
+        # 9.337961e-5, activity_factor 3.864906e-12, and P_eq=3.864906e-7 Pa.
+        # At fixed fO2 the gas-fugacity reaction is linear in CaO activity,
+        # so the 14.853x pressure change is the change from b274's table
+        # activity to the car's OpenIMCC activity. The direct OpenIMCC call's
+        # CaO value also moves 8.771606e-5 -> 9.337961e-5 (+6.5%) from D066
+        # v1 to v4 (OpenIMCC ce673d05); this pack update is distinct from the
+        # routing change. Pure-Ca Psat is 2.205e5 Pa and there is no cap notice,
+        # so the saturation ceiling does not bind. Pin the car/merged value.
         # b-136 / t-559 posture rework 2026-08-08: Zhang CaTiO3 α remains
         # WITHDRAWN; channel stays live on Hertz-Knudsen ideal α=1.0 as an
         # explicit status-bearing upper bound (missing kinetic α ≠ missing
         # pressure). Ca pressure probe retained. docs-private/research/2026-08-08-rp3-b136/report.md.
-        "Ca": 5.740329129667688e-6,
+        "Ca": 3.8649058209492974e-7,
         # b-147 Mg (2026-08-07): TE gas_rail demoted; Pref_GF path. Live catalog
         # probe at 1873.15 K moves 7.3e-3 -> 0.09398 Pa (+1.110 dex). Pref_GF-GR
         # at this T is only +0.565 dex; the extra pin motion is band-based
@@ -1213,7 +1223,12 @@ def test_default_off_c0_pipe_cap_preserves_hot_fe_redox_split_head_result(monkey
         for species, rate in snapshot.evap_flux.species_kg_hr.items()
         if float(rate) > 0.0
     }
-    assert abs(released_kg_hr - capacity_kg_hr) <= _NONTRIVIAL_FLUX_KG_HR
+    # Species summation and the independently computed cap differ by about
+    # 5.5e-9 relative here; scale the equality tolerance with the bound while
+    # retaining the absolute floor for small fluxes.
+    assert abs(released_kg_hr - capacity_kg_hr) <= max(
+        _NONTRIVIAL_FLUX_KG_HR, 1e-8 * capacity_kg_hr
+    )
     assert demand_kg_hr - capacity_kg_hr > _NONTRIVIAL_FLUX_KG_HR
 
     def _committed_vapor_kg(species: str) -> float:

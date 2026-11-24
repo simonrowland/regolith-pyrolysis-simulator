@@ -195,7 +195,8 @@ def test_exact_log10_min_is_a_floor_even_when_not_clamped() -> None:
 
 def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
     _withhold_metal_saturation_floor(monkeypatch)
-    provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+    vapor_pressure_data = _yaml("vapor_pressures.yaml")
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     result = provider.dispatch(_request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0))
     diagnostic = result.diagnostic
 
@@ -227,7 +228,25 @@ def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
         assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in sources[species]
         assert _is_noncertifying_vapor_extrapolation(species, sources[species])
 
-    assert pressures["Si"] >= CATALOG_PHYSICAL_PRESSURE_CEILING_PA
+    from engines.builtin import ellingham_graph
+
+    si_pure_saturation_pa = ellingham_graph.metal_saturation_pressure_Pa(
+        "Si", _T_K, vapor_pressure_data=vapor_pressure_data
+    )
+    # The floor-inversion flag and successful result remain. At 1700 K,
+    # pure-Si Psat is about 0.068309497634 Pa; the uncapped pO2^-1 value at
+    # 1e-30 bar is about 7.13e9 Pa, so the metal ceiling binds before the
+    # broad catalog ceiling.
+    assert pressures["Si"] == pytest.approx(
+        min(CATALOG_PHYSICAL_PRESSURE_CEILING_PA, si_pure_saturation_pa)
+    )
+    si_cap = next(
+        row
+        for row in diagnostic["elemental_metal_saturation_caps"]
+        if row["species"] == "Si"
+    )
+    assert si_cap["uncapped_pressure_Pa"] > si_cap["capped_pressure_Pa"]
+    assert si_cap["capped_pressure_Pa"] == pytest.approx(si_pure_saturation_pa)
     assert any(
         MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in str(item)
         for item in result.warnings
@@ -253,7 +272,7 @@ def test_provider_flags_exact_minus_30_without_clamp_warning(monkeypatch) -> Non
 
 
 def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
-    """Hand mass-action: n_Si=-1 → 21 dex; n_Mg_eff=-0.5 → 10.5 dex; n_Na=-0.25 → 5.25 dex."""
+    """Pure-Si saturation caps the Si ratio; Mg and Na retain mass action."""
 
     _withhold_metal_saturation_floor(monkeypatch)
     provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
@@ -264,9 +283,20 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
         _request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0)
     ).diagnostic["vapor_pressures_Pa"]
 
-    # Premise: p ∝ pO2^n. Algebra: P_floor/P_ref = (1e-30/1e-9)^n.
-    # Unit: bar/bar. Sanity: n=-1 → 1e21; n=-0.5 → 1e10.5; n=-0.25 → 1e5.25.
-    assert at_floor["Si"] / at_ref["Si"] == pytest.approx(1e21, rel=1e-9)
+    # Without the ceiling, n_Si=-1 gives 21 dex. At 1700 K the production
+    # pure-Si saturation resolver caps P_Si at about 0.068309497634 Pa,
+    # below the uncapped ~7.13e9 Pa floor value. The ratio is therefore
+    # about 9.5794495e9, or P_sat,Si(1700 K) / P_Si(1e-9 bar).
+    from engines.builtin import ellingham_graph
+
+    si_pure_saturation_pa = ellingham_graph.metal_saturation_pressure_Pa(
+        "Si", _T_K, vapor_pressure_data=_yaml("vapor_pressures.yaml")
+    )
+    assert at_floor["Si"] == pytest.approx(si_pure_saturation_pa)
+    assert at_floor["Si"] / at_ref["Si"] == pytest.approx(
+        9.579449513963434e9, rel=1e-9
+    )
+    # Mg and Na remain below their pure-component ceilings at this probe.
     assert at_floor["Mg"] / at_ref["Mg"] == pytest.approx(10 ** 10.5, rel=1e-9)
     assert at_floor["Na"] / at_ref["Na"] == pytest.approx(10 ** 5.25, rel=1e-6)
 

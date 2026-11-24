@@ -3490,7 +3490,20 @@ def test_internal_source_reaction_metal_pressure_never_exceeds_pure_saturation(
         pressure = result.vapor_pressures_Pa[species]
         assert type(pressure) is float
 
-        if species == "Mg":
+        if species == "Cr":
+            # b274's 53b1d191dc melt-fO2 floor raises Cr2O3's source fO2.
+            # The car's 0.10679639619 Pa Cr ceiling receipt therefore moves
+            # to 0.01903152521 Pa, below pure-metal saturation; no cap notice
+            # is emitted because the ceiling does not bind.
+            assert pressure == pytest.approx(0.019031525208526055, rel=1e-12)
+            assert pressure < pure_metal_saturation_Pa
+            assert not any(
+                row["species"] == "Cr"
+                for row in result.diagnostics.get(
+                    "elemental_metal_saturation_caps", ()
+                )
+            )
+        elif species == "Mg":
             # JANAF Mg(g)/MgO at 1423.15 K gives ΔG≈−877.16 kJ/mol O2,
             # K≈6.394e−33 bar and a_M≈7.996e−3 at pO2=1e−28 bar.
             # Its 799.6039375676731 Pa pressure is below the pure-metal cap.

@@ -64,11 +64,22 @@ _RESIDUAL_SHA256_BEFORE_STANDARD_STEP = {
 # sha 3b1518942a5ca7524b6e4be8e2c98fd375db44c5835bd830a4acff0a54e32ce0
 # dex -0.013180332034779389
 # The offer frame is a_D * f from the Darken & Gurry factor.
-# The byte pin includes the active OpenIMCC redox-pack identity and FeO
-# standard-normalization provenance as well as the residual value. The
-# candidate v4 FeO standard shifts the green value; see the integration test.
+# Three-way pin comparison: car 4018b707..., b274 700e6d2b..., merged
+# a5830affe765585c7d55dcf72aaa0e388550c33e2e22df7cf287c6ac93cbc1f0.
+# b274 changes the first notice from the car's d-056 admission_defaulted
+# wording to its DP-106 method_unstated policy notice. The merged notices
+# combine both parents' FeO provenance: the merge-only iron-saturated FeO
+# calibration notice at [8] comes from b274's Fe-saturation path applied to
+# the car's notice set (it appears at car notices[7]). The hematite
+# notice for the FeO1.5(l) 1500-1735 K supercooled branch appears at index 9
+# in both parents and index 10 in the merge because of that shifted notice
+# sequence. That warning is physically appropriate for the stated branch;
+# it describes the metastable interval below the hematite decomposition
+# marker, not the Distin measurement at 1880 K.
+# The digest covers that merged notice set, the active OpenIMCC redox-pack
+# identity, and FeO standard-normalization provenance as well as the residual.
 _DISTIN_1880_RESIDUAL_SHA256 = (
-    "4018b7071882dfaca4eca46512ad7357f48e461bc4c4ed1feacedf2c3a420097"
+    "a5830affe765585c7d55dcf72aaa0e388550c33e2e22df7cf287c6ac93cbc1f0"
 )
 # Green (OpenIMCC 66ec4a3) pinned this residual at -0.10057837869175247 dex.
 # The 9c327c2 repin (series commit 5c670398e0) moved it by -0.0047345491326921
