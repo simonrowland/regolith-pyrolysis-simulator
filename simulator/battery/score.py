@@ -44,6 +44,7 @@ from typing import (
 
 import yaml
 
+from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.default_policy import load_policy_table
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
@@ -1174,75 +1175,17 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
     return species is not None and phase_token(species) is phase
 
 
-def _normalize_ascii_adduct_dots(text: str) -> str:
-    normalized: list[str] = []
-    segment_start = 0
-    index = 0
-    while index < len(text):
-        if text[index] == "·":
-            normalized.append(text[index])
-            segment_start = index + 1
-            index += 1
-            continue
-        if text[index] == ".":
-            prefix = text[segment_start:index]
-            suffix = text[index + 1 :]
-            multiplier = re.match(
-                r"(?:\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", suffix
-            )
-            multiplier_tail = (
-                suffix[multiplier.end() :]
-                if multiplier is not None
-                else ""
-            )
-            # Fe0.95O must keep its decimal when the tail is a single element;
-            # treating 95O as an adduct corrupts the existing composition.
-            decimal_subscript = (
-                multiplier is not None
-                and re.search(r"[A-Z][a-z]?\d+$", prefix) is not None
-                and re.match(r"[A-Z][a-z]?\d*(?=\.|$)", multiplier_tail)
-                is not None
-            )
-            # The dot in a leading hydrate multiplier such as 6.5H2O is decimal.
-            decimal_multiplier = prefix.isdigit() and suffix[:1].isdigit()
-            starts_with_water = suffix.startswith(("H2O", "H₂O"))
-            if (
-                (multiplier is not None or starts_with_water)
-                and not decimal_subscript
-                and not decimal_multiplier
-            ):
-                normalized.append("·")
-                segment_start = index + 1
-                index += 1
-                continue
-        normalized.append(text[index])
-        index += 1
-    return "".join(normalized)
-
-
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
-    """Parse explicit stoichiometry; None → unmatched, never string equality.
+    """Parse explicit stoichiometry; None means unmatched, never string equality.
 
-    The fast-path ``formula_composition`` result is returned unchanged. Its
-    source-derived extension accepts element symbols with numeric counts,
-    nested ``()[]{}`` groups, hydrate/adduct segments (including fractional or
-    decimal multipliers), TeX math wrappers / ``\\text{}``, and TeX or Unicode
-    subscripts. Newly normalized terminal phase or polymorph labels require a
-    matching existing species axis, as in ``$AsCl_3(g)$`` and ``$Fe(α)$``. A
-    terminal bracket phase label that the accounting parser would strip, as in
-    ``Fe2O3[s]``, uses that same axis before the fallback. The d-420 iron-oxide
-    conventions are normalized without assigning a numerical vacancy value;
-    other names, variable compositions, and unverified charge or phase labels
-    remain unmatched.
+    Phase, polymorph, and charge annotations must match the typed species axis
+    before the accounting owner parses atom counts and hydrate/adduct segments.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(_normalize_ascii_adduct_dots(formula))
-    if established is not None:
-        return established
 
     text = formula.strip()
     if text.startswith("$") and text.endswith("$"):
@@ -1337,65 +1280,10 @@ def parse_species_formula(
     if text in {"Fe(1-x)O", "Fe_tO"}:
         return (("Fe", 1.0), ("O", 1.0))
 
-    # ASCII periods separate formula-unit adducts when another formula follows
-    # (for example 3Al2O3.2SiO2). A terminal period plus digits is instead a
-    # leading-zero decimal subscript, as in Fe.9470. Decimal hydrate multipliers
-    # remain one number for the segment parser.
-    text = _normalize_ascii_adduct_dots(text)
+    # The accounting parser owns decimal-subscript versus adduct splitting.
+    # Keep only this source spelling normalization, which it does not accept.
     text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
-
-    if "·" in text:
-        hydrated: defaultdict[str, float] = defaultdict(float)
-        try:
-            from simulator.accounting.formulas import parse_formula
-
-            # Parse each middle-dot segment separately so hydrate multipliers
-            # such as 1/2 and 6.5 do not collide with period splitting.
-            for segment in text.split("·"):
-                multiplier_match = re.match(
-                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
-                )
-                multiplier = 1.0
-                body = segment
-                if multiplier_match is not None:
-                    number = multiplier_match.group(1)
-                    if "/" in number:
-                        numerator, denominator = number.split("/", 1)
-                        if int(denominator) == 0:
-                            return None
-                        multiplier = int(numerator) / int(denominator)
-                    else:
-                        multiplier = float(number)
-                    body = segment[multiplier_match.end() :]
-                if not body:
-                    return None
-                composition = formula_composition(body)
-                if composition is None:
-                    parsed_body = parse_formula(body, species=body).elements
-                    composition = tuple(
-                        sorted(
-                            (str(symbol), float(count))
-                            for symbol, count in parsed_body.items()
-                        )
-                    )
-                for symbol, count in composition:
-                    hydrated[symbol] += multiplier * count
-        except ValueError:
-            return None
-        return tuple(sorted(hydrated.items()))
-
-    parsed = formula_composition(text)
-    if parsed is not None:
-        return parsed
-    if "." in text:
-        return None
-    try:
-        from simulator.accounting.formulas import parse_formula
-
-        elements = parse_formula(text, species=text).elements
-    except ValueError:
-        return None
-    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
+    return atoms_parse_formula_else_janaf(text)
 
 
 def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:
@@ -9573,7 +9461,6 @@ def _oxide_element_inventory(
     """
 
     from simulator.accounting.exceptions import UnparseableCompositionComponent
-    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
     from simulator.accounting.oxide_mass import oxide_molar_mass_g_mol
 
     inventory: dict[str, float] = {}
@@ -22231,7 +22118,7 @@ def _battery_hero_nbo_t(
                 return None
             formula, raw_amount = component
             amount = as_decimal(raw_amount)
-            parsed = formula_composition(str(formula))
+            parsed = atoms_parse_formula_else_janaf(str(formula))
             if (
                 parsed is None
                 or not amount.is_finite()
