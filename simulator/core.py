@@ -67,6 +67,7 @@ from simulator.backend_names import (
     C0_FORECAST_ENGINE_NAMES,
     canonical_backend_name,
 )
+from simulator.float_tolerance import sum_roundoff_slack
 from simulator.process_timestep import (
     ONE_HOUR,
     exponential_approach_fraction,
@@ -3199,35 +3200,45 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         target_oxides: Tuple[str, ...],
     ) -> Dict[str, float]:
         target_set = {str(species) for species in target_oxides}
-        debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+        debit_terms = self._transition_account_o2_equiv_terms(
             transition,
             side='debits',
             account='process.cleaned_melt',
             species_filter=target_set,
         )
-        credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+        credit_terms = self._transition_account_o2_equiv_terms(
             transition,
             side='credits',
             account='process.cleaned_melt',
             species_filter=target_set,
         )
+        debit_o2_equiv_mol = sum(debit_terms, 0.0)
+        credit_o2_equiv_mol = sum(credit_terms, 0.0)
         o2_equiv_mol = -(debit_o2_equiv_mol - credit_o2_equiv_mol)
-        if abs(o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+        roundoff_terms = (*debit_terms, *credit_terms)
+        # Each term is one lot/species O2-equivalent contribution. N is the
+        # debit plus credit contribution count; k=N/2+1 and M sums their
+        # magnitudes before cancellation, matching the two side reductions.
+        slack = sum_roundoff_slack(
+            roundoff_terms,
+            noop=OXYGEN_RESERVOIR_NOOP_MOL,
+        )
+        if abs(o2_equiv_mol) <= slack:
             return {}
         return {str(label): o2_equiv_mol}
 
-    def _transition_account_o2_equiv_mol(
+    def _transition_account_o2_equiv_terms(
         self,
         transition: LedgerTransition,
         *,
         side: str,
         account: str,
         species_filter: set[str] | None = None,
-    ) -> float:
+    ) -> tuple[float, ...]:
         if side not in {'debits', 'credits'}:
             raise ValueError(f"transition side must be 'debits' or 'credits', got {side!r}")
         lots = transition.debits if side == 'debits' else transition.credits
-        o2_equiv_mol = 0.0
+        terms: list[float] = []
         for lot in lots:
             if lot.account != account:
                 continue
@@ -3243,8 +3254,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 if oxygen_atoms <= 0.0:
                     continue
                 species_mol = float(kg) / formula.molar_mass_kg_per_mol()
-                o2_equiv_mol += 0.5 * oxygen_atoms * species_mol
-        return o2_equiv_mol
+                term = 0.5 * oxygen_atoms * species_mol
+                terms.append(term)
+        # The explicit per-lot contributions let inventory guards scale their
+        # slack before opposite-sign sides cancel. Callers that need the old
+        # total sum this tuple in its original iteration order.
+        return tuple(terms)
 
     def _transition_species_mol(
         self,
@@ -3254,19 +3269,37 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         account: str | None,
         species: str,
     ) -> float:
+        return sum(
+            self._transition_species_mol_terms(
+                transition,
+                side=side,
+                account=account,
+                species=species,
+            ),
+            0.0,
+        )
+
+    def _transition_species_mol_terms(
+        self,
+        transition: LedgerTransition,
+        *,
+        side: str,
+        account: str | None,
+        species: str,
+    ) -> tuple[float, ...]:
         if side not in {'debits', 'credits'}:
             raise ValueError(f"transition side must be 'debits' or 'credits', got {side!r}")
         lots = transition.debits if side == 'debits' else transition.credits
         formula = resolve_species_formula(species, self.species_formula_registry)
-        mol = 0.0
+        terms: list[float] = []
         for lot in lots:
             if account is not None and lot.account != account:
                 continue
             kg = float(lot.species_kg.get(species, 0.0) or 0.0)
             if kg <= 0.0:
                 continue
-            mol += kg / formula.molar_mass_kg_per_mol()
-        return mol
+            terms.append(kg / formula.molar_mass_kg_per_mol())
+        return tuple(terms)
 
     def _mre_anode_o2_redox_source_terms_from_transition(
         self,
@@ -3315,19 +3348,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self.species_formula_registry,
         )
         vapor_oxygen_atoms = float(vapor_formula.elements.get('O', 0.0) or 0.0)
-        overhead_o2_credit_mol = self._transition_species_mol(
+        overhead_o2_credit_terms = self._transition_species_mol_terms(
             transition,
             side='credits',
             account='process.overhead_gas',
             species=OXYGEN_SPECIES,
         )
-        overhead_o2_debit_mol = self._transition_species_mol(
+        overhead_o2_debit_terms = self._transition_species_mol_terms(
             transition,
             side='debits',
             account='process.overhead_gas',
             species=OXYGEN_SPECIES,
         )
-        buffer_o2_debit_mol = self._transition_species_mol(
+        buffer_o2_debit_terms = self._transition_species_mol_terms(
             transition,
             side='debits',
             account=FO2_BUFFER_ACCOUNT,
@@ -3348,12 +3381,27 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # On this base, evaporation credits the buffer and does not debit
         # it, so the buffer term is idle until an oxidative vapour posts
         # one. The headspace overdraw refusal is a different owner.
+        overhead_o2_credit_mol = sum(overhead_o2_credit_terms, 0.0)
+        overhead_o2_debit_mol = sum(overhead_o2_debit_terms, 0.0)
+        buffer_o2_debit_mol = sum(buffer_o2_debit_terms, 0.0)
         net_posted_o2_mol = (
             overhead_o2_credit_mol
             - overhead_o2_debit_mol
             + buffer_o2_debit_mol
         )
-        if abs(net_posted_o2_mol) > OXYGEN_RESERVOIR_NOOP_MOL:
+        roundoff_terms = (
+            *overhead_o2_credit_terms,
+            *overhead_o2_debit_terms,
+            *buffer_o2_debit_terms,
+        )
+        # Terms are each O2-mol posting from the overhead credit, overhead
+        # debit, and fO2-buffer debit lists. N is their combined count;
+        # k=N/2+1, with M retaining the magnitudes of cancelling postings.
+        slack = sum_roundoff_slack(
+            roundoff_terms,
+            noop=OXYGEN_RESERVOIR_NOOP_MOL,
+        )
+        if abs(net_posted_o2_mol) > slack:
             return {
                 'redox_source:evaporative_oxygen_loss': -net_posted_o2_mol,
             }
@@ -3366,21 +3414,31 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # couple, so the fO2 source is positive and derives from the actual
         # cleaned-melt debit.  If a future provider debits a reduced metal
         # species directly, this term naturally falls to zero.
-        cleaned_melt_debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+        cleaned_melt_debit_terms = self._transition_account_o2_equiv_terms(
             transition,
             side='debits',
             account='process.cleaned_melt',
         )
-        cleaned_melt_credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
+        cleaned_melt_credit_terms = self._transition_account_o2_equiv_terms(
             transition,
             side='credits',
             account='process.cleaned_melt',
         )
+        cleaned_melt_debit_o2_equiv_mol = sum(cleaned_melt_debit_terms, 0.0)
+        cleaned_melt_credit_o2_equiv_mol = sum(cleaned_melt_credit_terms, 0.0)
         metal_loss_o2_equiv_mol = (
             cleaned_melt_debit_o2_equiv_mol
             - cleaned_melt_credit_o2_equiv_mol
         )
-        if abs(metal_loss_o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
+        roundoff_terms = (*cleaned_melt_debit_terms, *cleaned_melt_credit_terms)
+        # Each term is one cleaned-melt lot/species O2-equivalent. N is the
+        # debit plus credit contribution count; k=N/2+1 and M counts both
+        # sides before their net metal-loss cancellation.
+        slack = sum_roundoff_slack(
+            roundoff_terms,
+            noop=OXYGEN_RESERVOIR_NOOP_MOL,
+        )
+        if abs(metal_loss_o2_equiv_mol) <= slack:
             return {}
         return {'redox_source:evaporative_metal_loss': metal_loss_o2_equiv_mol}
 
@@ -6193,10 +6251,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         frozen = getattr(self, '_ferric_exhausted_bookable_o2_mol', None)
         if frozen is None:
             return False
-        return (
-            self._bookable_ferric_o2_mol()
-            > float(frozen) + OXYGEN_RESERVOIR_NOOP_MOL
+        bookable = self._bookable_ferric_o2_mol()
+        # The current and frozen ferric-O2 readings give N=2, k=2; both
+        # are mol O2 and eps is dimensionless.
+        slack = sum_roundoff_slack(
+            (bookable, -float(frozen)),
+            noop=OXYGEN_RESERVOIR_NOOP_MOL,
         )
+        return bookable > float(frozen) + slack
 
     def _authoritative_melt_feo_activity(
         self,
@@ -6500,6 +6562,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self,
         *,
         signed_o2_equiv_mol: float,
+        signed_o2_equiv_terms: Sequence[float] | None = None,
         base_fO2_log: float,
         capacity_mol_per_ln: float,
         apply_pressure_ceiling: bool,
@@ -6576,7 +6639,20 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         if signed < 0.0:
             demand_o2_mol = -signed
             bookable_o2_mol = self._bookable_ferric_o2_mol()
-            if demand_o2_mol > bookable_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL:
+            source_terms = (
+                tuple(signed_o2_equiv_terms)
+                if signed_o2_equiv_terms is not None
+                else (signed_o2_equiv_mol,)
+            )
+            roundoff_terms = (*source_terms, bookable_o2_mol)
+            # Source terms are the demand-side sum; current bookable ferric
+            # O2 is one inventory reading. N=len(source terms)+1, k=N/2+1,
+            # so cancelling source contributions remain in M.
+            slack = sum_roundoff_slack(
+                roundoff_terms,
+                noop=OXYGEN_RESERVOIR_NOOP_MOL,
+            )
+            if demand_o2_mol > bookable_o2_mol + slack:
                 ferric_exhausted = True
                 self._ferric_tangent_exhausted = True
                 # Freeze this step's bookable O2, not the hour-open Fe2O3.
@@ -6829,7 +6905,15 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             # 1.790e-4 mol and minute 43 reads the melt-activity floor,
             # not -1.886.
             demand_o2_mol = -net_o2_equiv_mol
-            if demand_o2_mol > bookable_o2_mol + OXYGEN_RESERVOIR_NOOP_MOL:
+            roundoff_terms = (*terms.values(), bookable_o2_mol)
+            # Demand sums the signed source terms; inventory is one bookable
+            # O2 reading. N=len(terms)+1, k=N/2+1; M includes cancelling
+            # source contributions instead of only their net result.
+            slack = sum_roundoff_slack(
+                roundoff_terms,
+                noop=OXYGEN_RESERVOIR_NOOP_MOL,
+            )
+            if demand_o2_mol > bookable_o2_mol + slack:
                 self._ferric_tangent_exhausted = True
                 self._ferric_exhausted_bookable_o2_mol = bookable_o2_mol
                 self._note_ferric_tangent_reason('ferric_inventory_handover')
@@ -6879,6 +6963,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             applied_delta_ln, candidate_fO2_log, ferric_exhausted = (
                 self._melt_redox_tangent_fO2_step(
                     signed_o2_equiv_mol=net_o2_equiv_mol,
+                    signed_o2_equiv_terms=tuple(terms.values()),
                     base_fO2_log=base_fO2_log,
                     capacity_mol_per_ln=C_m,
                     apply_pressure_ceiling=True,
@@ -7337,6 +7422,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 applied_delta_ln, candidate_fO2_log, _ = (
                     self._melt_redox_tangent_fO2_step(
                         signed_o2_equiv_mol=absorbed_mol,
+                        signed_o2_equiv_terms=(absorbed_mol,),
                         base_fO2_log=current_fO2_log,
                         capacity_mol_per_ln=C_m,
                         apply_pressure_ceiling=False,
@@ -8137,6 +8223,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         applied_delta_ln, candidate_fO2_log, ferric_exhausted = (
             self._melt_redox_tangent_fO2_step(
                 signed_o2_equiv_mol=-dn_ledger_to_headspace,
+                signed_o2_equiv_terms=(-dn_ledger_to_headspace,),
                 base_fO2_log=base_fO2_log,
                 capacity_mol_per_ln=C_m,
                 apply_pressure_ceiling=False,
