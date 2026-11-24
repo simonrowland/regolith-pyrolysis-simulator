@@ -274,7 +274,8 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
             assert "No PtO2 powder" in buffer_text
         assert observation.identity.fO2_Pa.is_unknown
         assert {notice.kind.value for notice in observation.notices} == {
-            "phase_inferred"
+            "phase_inferred",
+            "method_unstated",
         }
 
         if row["sigma"]:

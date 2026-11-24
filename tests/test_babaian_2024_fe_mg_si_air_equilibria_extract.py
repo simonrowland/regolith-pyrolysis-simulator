@@ -210,21 +210,22 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
         if row["table"] == "2":
-            # This paper's own runs: the air-pressure gap is the only notice.
+            # The paper's own runs have a phase inference and an unstated-method default.
             assert {notice.kind for notice in other_notices} == {
-                NoticeKind.PHASE_INFERRED
+                NoticeKind.PHASE_INFERRED,
+                NoticeKind.METHOD_UNSTATED,
             }
         else:
             # Values the paper quotes from its references may carry admission_status
             # quoted_attributed; the legacy-token mapping admits those with one notice naming
-            # the old token. An unstated experimental method is separately flagged.
+            # the old token. Table 3 also defaults its unprinted phase and method.
             expected_other_notice_kinds = (
                 {NoticeKind.ADMISSION_FROM_LEGACY_TOKEN}
                 if row["method_class"] == "quoted_attributed"
                 else set()
             )
-            method = migrator.result.experiments[observation.experiment_id].method
-            if method.is_value and method.value is MethodToken.UNSPECIFIED:
+            expected_other_notice_kinds.add(NoticeKind.PHASE_INFERRED)
+            if row["table"] == "3":
                 expected_other_notice_kinds.add(NoticeKind.METHOD_UNSTATED)
             assert {
                 notice.kind for notice in other_notices

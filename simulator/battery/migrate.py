@@ -10748,13 +10748,6 @@ def _phase_inference_from_evidence(
     return None
 
 
-def _is_unstated_method_reason(reason: str | None) -> bool:
-    return reason in {
-        "source does not state method",
-        "experiment method not published",
-    }
-
-
 def _phase_needs_default(phase: State[Phase]) -> bool:
     if phase.is_value:
         return phase.value is Phase.UNSPECIFIED
@@ -13695,9 +13688,22 @@ def map_method(regime: object) -> State[MethodToken]:
     return State.of(token)
 
 
+def _method_text_value(candidate: object) -> str | None:
+    if isinstance(candidate, str):
+        return candidate if candidate.strip() else None
+    if isinstance(candidate, Mapping):
+        state = candidate.get("state")
+        if isinstance(state, Mapping) and state.get("tag") == "value":
+            value = state.get("value")
+            if isinstance(value, str) and value.strip():
+                return value
+    return None
+
+
 _METHOD_TEXT_EVIDENCE = (
     ("electron microprobe analysis", MethodToken.ELECTRON_MICROPROBE),
     ("electron microprobe", MethodToken.ELECTRON_MICROPROBE),
+    ("electron probe microanalysis", MethodToken.ELECTRON_MICROPROBE),
     ("knudsen-cell", MethodToken.KNUDSEN_EFFUSION),
     ("knudsen cell", MethodToken.KNUDSEN_EFFUSION),
     ("knudsen effusion", MethodToken.KNUDSEN_EFFUSION),
@@ -13717,9 +13723,10 @@ def _method_inference_from_evidence(
     """Infer a closed method only when one explicit source phrase identifies it."""
 
     for candidate in candidates:
-        if not isinstance(candidate, str) or not candidate.strip():
+        candidate_text = _method_text_value(candidate)
+        if candidate_text is None:
             continue
-        text = " ".join(candidate.casefold().split())
+        text = " ".join(candidate_text.casefold().split())
         # A source-text acronym is evidence; the closed-looking regime token
         # ``kems_effusion`` alone remains insufficient.
         matches = [
@@ -25003,6 +25010,7 @@ class Migrator:
         self._inferred_method_evidence_by_experiment: dict[
             str, tuple[MethodToken, str, str]
         ] = {}
+        self._unstated_method_original_reason_by_experiment: dict[str, str] = {}
         self._author_derivations: dict[str, Derivation] = {}
         # Parents actually replaced by emitted children. Retarget uses this
         # exact map, never a prefix search.
@@ -25833,21 +25841,42 @@ class Migrator:
         observation_id: str,
         experiment_id: str,
         method: State[MethodToken],
-        method_raw: object,
+        method_raw_candidates: tuple[object, ...],
+        method_evidence_candidates: tuple[object, ...],
         evidence_candidates: tuple[object, ...],
         quantity: Quantity | None,
-        work_id: str,
-        locator: Locator,
-        source_key: str,
-        queue_if_unresolved: bool,
     ) -> tuple[State[MethodToken], Notice | None]:
         experiment = self.result.experiments.get(experiment_id)
         experiment_method = None if experiment is None else experiment.method
+        method_raw = next(
+            (
+                text
+                for candidate in method_raw_candidates
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
+        method_source_text = next(
+            (
+                text
+                for candidate in (
+                    *method_raw_candidates,
+                    *method_evidence_candidates,
+                    *evidence_candidates,
+                    experiment_method.reason
+                    if experiment_method is not None
+                    and experiment_method.is_unknown
+                    else None,
+                )
+                if (text := _method_text_value(candidate)) is not None
+            ),
+            None,
+        )
 
         if (
             experiment_method is not None
             and method.is_unknown
-            and method_raw in (None, "")
+            and method_raw is None
             and experiment_method.is_value
             and experiment_method.value is not MethodToken.UNSPECIFIED
         ):
@@ -25858,17 +25887,38 @@ class Migrator:
             method.is_value and method.value is MethodToken.UNSPECIFIED
         )
         if method.is_unknown:
-            method_evidence = _method_inference_from_evidence(
-                method_raw,
-                *evidence_candidates,
-                experiment_method.reason
-                if experiment_method is not None and experiment_method.is_unknown
-                else None,
-            )
+            method_token = map_method(method_raw) if method_raw is not None else None
+            if method_token is not None and method_token.is_value:
+                if method_token.value is MethodToken.UNSPECIFIED:
+                    method = State.unknown(
+                        f"source method text: {method_raw}"
+                    )
+                    method_was_unspecified = True
+                else:
+                    method = method_token
+                method_evidence = None
+            else:
+                inference_candidates = (
+                    (method_raw,)
+                    if method_raw is not None
+                    else (
+                        *method_evidence_candidates,
+                        *evidence_candidates,
+                        experiment_method.reason
+                        if experiment_method is not None
+                        and experiment_method.is_unknown
+                        else None,
+                    )
+                )
+                method_evidence = _method_inference_from_evidence(
+                    *inference_candidates
+                )
             if method_evidence is not None:
                 method_token, evidence = method_evidence
                 original_reason = (
-                    method.reason or "source does not state method"
+                    f"source method text: {method_source_text}"
+                    if method_source_text is not None
+                    else method.reason or "source does not state method"
                 )
                 self._inferred_method_evidence_by_experiment[experiment_id] = (
                     method_token,
@@ -25876,19 +25926,31 @@ class Migrator:
                     original_reason,
                 )
                 method = State.of(method_token)
-            elif _is_unstated_method_reason(method.reason):
-                method_was_unspecified = True
-            elif queue_if_unresolved:
-                self.result.add_queue(
-                    work_id,
-                    locator,
-                    ["method"],
-                    method.reason or "unknown method",
-                    source=source_key,
-                    observation_id=observation_id,
+            elif method_source_text is not None and method.is_unknown:
+                method = State.unknown(
+                    f"source method text is not mapped: {method_source_text}"
                 )
+                method_was_unspecified = True
+            elif method.is_unknown:
+                # Method absence never prevents an engine call. Preserve the
+                # state's reason in the DP-106 notice instead of queueing it.
+                method_was_unspecified = True
         if method_was_unspecified:
-            original_reason = method.reason or "source does not state method"
+            original_reason = (
+                method.reason
+                or (
+                    self._unstated_method_original_reason_by_experiment.get(
+                        experiment_id
+                    )
+                    if method_raw is None and method_source_text is None
+                    else None
+                )
+                or "source does not state method"
+            )
+            if method.is_unknown:
+                self._unstated_method_original_reason_by_experiment.setdefault(
+                    experiment_id, original_reason
+                )
             policy_resolution = resolve_default_policy("DP-106")
             method = State.of(MethodToken(str(policy_resolution.value)))
             method_notice = Notice(
@@ -26011,14 +26073,10 @@ class Migrator:
                 observation_id=observation.observation_id,
                 experiment_id=observation.experiment_id,
                 method=experiment.method,
-                method_raw=None,
+                method_raw_candidates=(),
+                method_evidence_candidates=(),
                 evidence_candidates=(),
                 quantity=quantity if isinstance(quantity, Quantity) else None,
-                work_id=experiment.work_id
-                or observation.experiment_id.split("::", 1)[0],
-                locator=observation.locator,
-                source_key=source_key,
-                queue_if_unresolved=False,
             )
             if method_notice is not None:
                 observation_notices.append(method_notice)
@@ -28657,19 +28715,66 @@ class Migrator:
         experiment_id = declared_experiment_id or self._experiment_id(
             work.work_id, locator, source_id, distinguisher=distinguisher
         )
+        experiment_before_method_resolution = self.result.experiments.get(
+            experiment_id
+        )
         rail_raw = obs.get("rail") or values.get("rail")
         if rail_raw:
             canonicalize_rail(str(rail_raw))
-        method_raw = obs.get("regime")
-        if "regime" not in obs:
-            method_raw = values.get("method")
-        method = map_method(method_raw)
+        derivation_method_candidates = tuple(
+            derivation.get("method")
+            for derivation in (obs.get("derivation"), values.get("derivation"))
+            if isinstance(derivation, Mapping)
+        )
+        standard_state_raw = obs.get("standard_state")
+        if not isinstance(standard_state_raw, Mapping):
+            standard_state_raw = values.get("standard_state")
+        standard_state_state = (
+            standard_state_raw.get("state")
+            if isinstance(standard_state_raw, Mapping)
+            else None
+        )
+        standard_state_value = (
+            standard_state_state.get("value")
+            if isinstance(standard_state_state, Mapping)
+            and standard_state_state.get("tag") == "value"
+            else None
+        )
+        iron_saturation_composition = (
+            standard_state_value.get("iron_saturation_composition")
+            if isinstance(standard_state_value, Mapping)
+            else None
+        )
+        standard_state_method = (
+            iron_saturation_composition.get("method")
+            if isinstance(iron_saturation_composition, Mapping)
+            else None
+        )
+        method_raw_candidates = (
+            obs.get("regime"),
+            obs.get("method"),
+            obs.get("method_as_printed"),
+            obs.get("method_text"),
+            obs.get("analytical_method"),
+            obs.get("method_detail_as_printed"),
+            values.get("method"),
+            values.get("method_as_printed"),
+            values.get("method_text"),
+            values.get("analytical_method"),
+            values.get("method_detail_as_printed"),
+        )
+        method_evidence_candidates = (
+            *derivation_method_candidates,
+            standard_state_method,
+        )
+        method = State.unknown("source does not state method")
         quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
-        method, _ = self._resolve_method_for_observation(
+        method, method_notice = self._resolve_method_for_observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
             method=method,
-            method_raw=method_raw,
+            method_raw_candidates=method_raw_candidates,
+            method_evidence_candidates=method_evidence_candidates,
             evidence_candidates=(
                 obs.get("method_as_printed"),
                 values.get("method_as_printed"),
@@ -28679,14 +28784,36 @@ class Migrator:
                 values.get("note"),
             ),
             quantity=quantity_for_notice,
-            work_id=work.work_id,
-            locator=locator,
-            source_key=source_key,
-            queue_if_unresolved=True,
         )
+        if (
+            declared_experiment_id is None
+            and experiment_before_method_resolution is not None
+            and experiment_before_method_resolution.method.is_value
+            and method.is_value
+            and experiment_before_method_resolution.method.value is not method.value
+        ):
+            # Synthetic IDs can group measurements from one work; keep a
+            # conflicting row's typed method from standing in for both rows.
+            self.result.experiments[experiment_id] = (
+                experiment_before_method_resolution
+            )
+            method_distinguisher = f"method:{method.value.value}"
+            distinguisher = (
+                f"{distinguisher}::{method_distinguisher}"
+                if distinguisher
+                else method_distinguisher
+            )
+            experiment_id = self._experiment_id(
+                work.work_id,
+                locator,
+                source_id,
+                distinguisher=distinguisher,
+            )
         experiment = self.result.experiments.get(experiment_id)
-        migration_axis_notices = (
-            () if phase_flag_notice is None else (phase_flag_notice,)
+        migration_axis_notices = tuple(
+            notice
+            for notice in (phase_flag_notice, method_notice)
+            if notice is not None
         )
         effective_method = (
             method

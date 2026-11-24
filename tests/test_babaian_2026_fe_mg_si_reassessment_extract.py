@@ -7,7 +7,15 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, PhaseRole, Quantity, UncertaintyKind, ValueKind
+from simulator.battery.enums import (
+    MethodToken,
+    NoticeKind,
+    Phase,
+    PhaseRole,
+    Quantity,
+    UncertaintyKind,
+    ValueKind,
+)
 from simulator.battery.identity import celsius_to_kelvin
 from tests.battery.factories import migrate_one_extract
 from tests.battery.literature_extract_grids import (
@@ -164,6 +172,11 @@ def test_every_typed_component_migrates_with_its_formula_conditions_and_point() 
         for species in document["species"].values()
         for row in (species.get("context") or [])
     }
+    source_observations = {
+        row["observation_id"]: row
+        for species in document["species"].values()
+        for row in (species.get("observations") or [])
+    }
     for row in zero_rows:
         item = context[row["observation_id"]]
         assert item["type"] == "context_only"
@@ -212,10 +225,27 @@ def test_every_typed_component_migrates_with_its_formula_conditions_and_point() 
             assert observation.uncertainty.verbatim["units"] == "mol.%"
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
-        assert {notice.kind.value for notice in observation.notices} == {
-            "phase_inferred",
-            "method_unstated",
-        }
+        source_method = source_observations[row["observation_id"]]["values"].get(
+            "analytical_method"
+        )
+        method_inferred = (
+            source_method
+            == "electron probe microanalysis (EPMA), corrected phase composition"
+        )
+        expected_method_notice = (
+            NoticeKind.METHOD_INFERRED
+            if method_inferred
+            else NoticeKind.METHOD_UNSTATED
+        )
+        assert {notice.kind for notice in observation.notices} == {
+            NoticeKind.PHASE_INFERRED,
+            expected_method_notice,
+        }, row["observation_id"]
+        if method_inferred:
+            assert (
+                migrator.result.experiments[observation.experiment_id].method.value
+                is MethodToken.ELECTRON_MICROPROBE
+            )
 
         experiment_id = expected_experiments.setdefault(row["experiment"], observation.experiment_id)
         assert observation.experiment_id == experiment_id

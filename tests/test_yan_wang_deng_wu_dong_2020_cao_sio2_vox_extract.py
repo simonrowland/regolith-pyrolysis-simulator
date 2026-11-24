@@ -7,7 +7,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import MethodToken, PhaseRole, Quantity, ValueKind
-from simulator.battery.migrate import REPO_ROOT
+from simulator.battery.migrate import REPO_ROOT, _phase_needs_default, map_phase
 from tests.battery.factories import migrate_one_extract
 
 
@@ -349,14 +349,25 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
         quantity = values["quantity"]
         assert observation.value.kind is ValueKind.POINT, raw["observation_id"]
         method = experiment_methods[raw["experiment"]]
-        expected_notice_kinds = (
-            {"method_unstated"} if method.get("tag") != "value" else set()
-        )
-        if raw["observation_id"] == "yan_2020_table2_prose_delta_fg_v2o3":
+        method_is_declared = (
+            isinstance(method, str) and bool(method.strip())
+        ) or (isinstance(method, dict) and method.get("tag") == "value")
+        expected_notice_kinds = set() if method_is_declared else {"method_unstated"}
+        phase_raw = raw.get("phase") or values.get("phase")
+        phase_state, _unmapped_phase = map_phase(phase_raw)
+        if _phase_needs_default(phase_state):
             expected_notice_kinds.add("phase_inferred")
-        assert {
+        actual_notice_kinds = {
             notice.kind.value for notice in observation.notices
-        } == expected_notice_kinds, raw["observation_id"]
+        }
+        assert actual_notice_kinds == expected_notice_kinds, (
+            raw["observation_id"],
+            sorted(expected_notice_kinds),
+            [
+                (notice.kind.value, notice.reason)
+                for notice in observation.notices
+            ],
+        )
         raw_conditions = values.get("point_conditions", raw.get("point_conditions", {}))
         if quantity == "equilibrium_phase_composition":
             expected_value = Decimal(str(values["component_amount"]))

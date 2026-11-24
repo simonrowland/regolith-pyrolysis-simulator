@@ -5,6 +5,7 @@ import json
 import re
 from collections.abc import Mapping
 from collections import Counter
+from dataclasses import replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -13,6 +14,7 @@ import yaml
 
 from simulator.battery.enums import (
     EvidenceClass,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
@@ -22,6 +24,7 @@ from simulator.battery.enums import (
 from simulator.battery.identity import quantity_token
 from simulator.battery.migrate import (
     EXTRACTS_DIR,
+    Migrator,
     REPO_ROOT,
     _YAML_LOADER,
     _standard_state_from_extract_text,
@@ -38,6 +41,7 @@ from simulator.battery.compilation_tier import _iter_compilation_series_cells
 from simulator.battery.score import point_magnitude, rail_for_quantity
 from simulator.battery.validity import underdetermined_apparatus
 from tests.battery.test_migrate import (
+    FIXTURE_EXTRACT,
     _copy_compilation_record,
     _copy_extract,
     _extract_observation,
@@ -403,7 +407,7 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
     )
     assert all(
         {notice.kind for notice in observation.notices}
-        == {NoticeKind.METHOD_UNSTATED}
+        == {NoticeKind.PHASE_INFERRED}
         for observation in buckets["superseded"]
     )
     assert len(measured) == 383
@@ -449,7 +453,7 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         if "s1214_r" in observation.observation_id
     )
     assert all(o.value.kind is ValueKind.POINT and o.value.point is not None for o in measured)
-    assert sum(bool(o.notices) for o in measured) == 221
+    assert sum(bool(o.notices) for o in measured) == 383
     factor = Decimal("0.226")
     tolerance = Decimal("1e-12")
     for obs in buckets["admitted"]:
@@ -1037,7 +1041,8 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
     assert point_magnitude(silver_ion[0].value) == Decimal("77.1")
     assert silver_ion[0].identity.species.phase.value is Phase.UNSPECIFIED
     assert {notice.kind for notice in silver_ion[0].notices} == {
-        NoticeKind.PHASE_INFERRED
+        NoticeKind.PHASE_INFERRED,
+        NoticeKind.ADMISSION_DEFAULTED,
     }
 
     silver = _delta_fg_observations(result, source, "reference-p005-01")
@@ -1046,8 +1051,13 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
         (Decimal("298.15"), Decimal("0.0"))
     ]
     phase = silver[0].identity.species.phase
-    assert phase.is_unknown
-    assert "REFERENCE STATE" in (phase.reason or "")
+    assert phase.is_value and phase.value is Phase.UNSPECIFIED
+    phase_notice = next(
+        notice
+        for notice in silver[0].notices
+        if notice.kind is NoticeKind.PHASE_INFERRED
+    )
+    assert "REFERENCE STATE" in phase_notice.reason
     assert phase.value is not Phase.CR
 
     calcium = _delta_fg_observations(result, source, "high-temperature-p078")
@@ -1360,7 +1370,6 @@ def absence_audit(paths=STORE_PATHS):
                                 for path, value in leaves
                                 if value not in (None, "")
                                 and not path.endswith((".tag", ".reason"))
-                                and not path.startswith("derivation.method.")
                                 and re.search(
                                     r"(?:^|\.)"
                                     + re.escape(match[1])
@@ -1525,7 +1534,7 @@ def test_g1_absence_audit_catches_same_row_species_phase_mutation(
                     }
                 }
             },
-            False,
+            True,
         ),
         (
             {"method": {"state": {"tag": "value", "value": "Knudsen effusion"}}},
@@ -1533,11 +1542,11 @@ def test_g1_absence_audit_catches_same_row_species_phase_mutation(
         ),
     ],
     ids=(
-        "derivation-method-is-not-experimental-method",
+        "printed-derivation-method-is-method-evidence",
         "experimental-method-is-evidence",
     ),
 )
-def test_g1_method_absence_audit_distinguishes_experimental_method(
+def test_g1_method_absence_audit_distinguishes_printed_method_evidence(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
     source_method: dict,
@@ -1583,6 +1592,361 @@ def test_g1_method_absence_audit_distinguishes_experimental_method(
 
     _judged, bad = absence_audit([store_path])
     assert bool(bad) is expected_bad
+
+
+def test_observation_method_text_resolves_or_defaults_with_its_source_text(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.records import State
+
+    cases = (
+        (
+            "zhang-2021-acsesc-si.yaml",
+            "zhang-2021-acsesc-si",
+            "zhang_2021_table1_bas1200c0h1_residue_composition",
+            MethodToken.ELECTRON_MICROPROBE,
+            NoticeKind.METHOD_INFERRED,
+            "electron probe microanalysis (EPMA)",
+        ),
+        (
+            "zhang-2021-acsesc-si.yaml",
+            "zhang-2021-acsesc-si",
+            "zhang_si_table_s1_bas1400c0m1_mass_loss",
+            MethodToken.LANGMUIR_FREE_EVAPORATION,
+            None,
+            "free_evaporation",
+        ),
+        (
+            "tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems.yaml",
+            "tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems",
+            "tyurnina_2008_measured_ion_current_ratios_unreported",
+            MethodToken.UNSPECIFIED,
+            NoticeKind.METHOD_UNSTATED,
+            "High-temperature mass-spectral analysis of vapor over the melts",
+        ),
+        (
+            "tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems.yaml",
+            "tyurnina-lopatin-stolyarova-2008-ba-borosilicate-kems",
+            "tyurnina_2008_bao_activity_table1_comp_01",
+            MethodToken.KNUDSEN_EFFUSION,
+            None,
+            "Knudsen effusion with high-temperature mass-spectral analysis of the vapor",
+        ),
+        (
+            "borisov-2018-compilation.yaml",
+            "borisov-2018-compilation",
+            "borisov_2018_table2_row_10",
+            MethodToken.UNSPECIFIED,
+            NoticeKind.METHOD_UNSTATED,
+            "wet chemistry, as compiled",
+        ),
+        (
+            "banya-hino-takezoe-1985-na-fe-silicate-redox.yaml",
+            "banya-hino-takezoe-1985-na-fe-silicate-redox",
+            "banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound",
+            MethodToken.UNSPECIFIED,
+            NoticeKind.METHOD_UNSTATED,
+            "Regular-solution relations from Eqs. (24), (26), and (33)",
+        ),
+    )
+
+    for index, (
+        filename,
+        source_id,
+        local_id,
+        expected,
+        notice_kind,
+        raw_text,
+    ) in enumerate(cases):
+        result = _migrate_real_extract(tmp_path / str(index), filename)
+        prefix = f"{source_id}::{local_id}"
+        rows = [
+            observation
+            for observation_id, observation in result.observations.items()
+            if observation_id == prefix or observation_id.startswith(prefix + "::")
+        ]
+        assert rows, f"no migrated observations for {prefix}"
+        assert all(
+            result.experiments[row.experiment_id].method == State.of(expected)
+            for row in rows
+        )
+        if notice_kind is None:
+            assert not any(
+                notice.kind in {NoticeKind.METHOD_UNSTATED, NoticeKind.METHOD_INFERRED}
+                for row in rows
+                for notice in row.notices
+            )
+        else:
+            assert all(
+                any(
+                    notice.kind is notice_kind and raw_text in notice.reason
+                    for notice in row.notices
+                )
+                for row in rows
+            )
+
+
+def test_standard_state_method_text_reaches_the_method_resolver(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = Migrator._resolve_method_for_observation
+    source_text = "derived_from_source_analyses"
+
+    def legacy_standard_state_consumer(self, *args, **kwargs):
+        kwargs["method_evidence_candidates"] = tuple(
+            candidate
+            for candidate in kwargs["method_evidence_candidates"]
+            if candidate != source_text
+        )
+        return original(self, *args, **kwargs)
+
+    result = _migrate_real_extract(
+        tmp_path / "current", "distin-1971-ferrous-silicate-melts.yaml"
+    )
+    observation = result.observations[
+        "distin-1971-ferrous-silicate-melts::distin1971_t1_1785_6_1"
+    ]
+    assert any(
+        notice.kind is NoticeKind.METHOD_UNSTATED
+        and source_text in notice.reason
+        for notice in observation.notices
+    )
+
+    monkeypatch.setattr(
+        Migrator, "_resolve_method_for_observation", legacy_standard_state_consumer
+    )
+    legacy = _migrate_real_extract(
+        tmp_path / "legacy", "distin-1971-ferrous-silicate-melts.yaml"
+    )
+    legacy_observation = legacy.observations[
+        "distin-1971-ferrous-silicate-melts::distin1971_t1_1785_6_1"
+    ]
+    with pytest.raises(AssertionError):
+        assert any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            and source_text in notice.reason
+            for notice in legacy_observation.notices
+        )
+
+
+def test_observation_method_regression_probe_rejects_legacy_consumer(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.records import State
+
+    original = Migrator._resolve_method_for_observation
+
+    def legacy_consumer(self, *args, **kwargs):
+        kwargs["method_raw_candidates"] = ()
+        kwargs["method_evidence_candidates"] = ()
+        kwargs["evidence_candidates"] = ()
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_resolve_method_for_observation", legacy_consumer)
+    result = _migrate_real_extract(
+        tmp_path / "mutated", "zhang-2021-acsesc-si.yaml"
+    )
+    observation = result.observations[
+        "zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h1_residue_composition"
+    ]
+    with pytest.raises(AssertionError):
+        assert result.experiments[observation.experiment_id].method == State.of(
+            MethodToken.ELECTRON_MICROPROBE
+        )
+
+
+def test_method_specific_experiment_id_probe_rejects_shared_conflict(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = Migrator._experiment_id
+
+    def legacy_shared_experiment(self, work_id, locator, fallback, distinguisher=None):
+        if distinguisher is not None:
+            if distinguisher.startswith("method:"):
+                distinguisher = None
+            elif "::method:" in distinguisher:
+                distinguisher = distinguisher.split("::method:", 1)[0]
+        return original(self, work_id, locator, fallback, distinguisher)
+
+    monkeypatch.setattr(Migrator, "_experiment_id", legacy_shared_experiment)
+    result = _migrate_real_extract(tmp_path, "zhang-2021-acsesc-si.yaml")
+    mass_loss = result.observations[
+        "zhang-2021-acsesc-si::zhang_si_table_s1_bas1400c0m1_mass_loss"
+    ]
+    microprobe = result.observations[
+        "zhang-2021-acsesc-si::zhang_2021_table1_bas1200c0h1_residue_composition"
+    ]
+    with pytest.raises(AssertionError):
+        assert mass_loss.experiment_id != microprobe.experiment_id
+
+
+def test_observation_method_notice_regression_probe_rejects_dropped_notice(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = Migrator._resolve_method_for_observation
+
+    def legacy_consumer(self, *args, **kwargs):
+        method, _notice = original(self, *args, **kwargs)
+        return method, None
+
+    monkeypatch.setattr(Migrator, "_resolve_method_for_observation", legacy_consumer)
+    result = _migrate_real_extract(
+        tmp_path, "adamkovicova-1980-casio3-heat-of-fusion.yaml"
+    )
+    rows = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id.startswith(
+            "adamkovicova-1980-casio3-heat-of-fusion::"
+            "adamkovicova_1980_heat_of_fusion_at_1817K"
+        )
+    ]
+    assert rows
+    with pytest.raises(AssertionError):
+        assert all(
+            any(
+                notice.kind is NoticeKind.METHOD_UNSTATED
+                and "Difference between Hrel for CaSiO3 melt" in notice.reason
+                for notice in observation.notices
+            )
+            for observation in rows
+        )
+
+
+def test_unknown_method_default_regression_probe_rejects_legacy_unknown_state(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from simulator.battery.records import State
+
+    original = Migrator._resolve_method_for_observation
+
+    def legacy_unknown_method(self, *args, **kwargs):
+        method, notice = original(self, *args, **kwargs)
+        if notice is not None and notice.kind is NoticeKind.METHOD_UNSTATED:
+            self.result.experiments[kwargs["experiment_id"]] = replace(
+                self.result.experiments[kwargs["experiment_id"]],
+                method=State.unknown("unknown method"),
+            )
+            return State.unknown("unknown method"), None
+        return method, notice
+
+    monkeypatch.setattr(
+        Migrator, "_resolve_method_for_observation", legacy_unknown_method
+    )
+    result = _migrate_real_extract(
+        tmp_path, "kirschen-1998-silicate-miscibility-thesis.yaml"
+    )
+    observation = result.observations[
+        "kirschen-1998-silicate-miscibility-thesis::"
+        "kirschen_1998_ii_1_stc_3_1_phase2_sio2"
+    ]
+    with pytest.raises(AssertionError):
+        assert any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            for notice in observation.notices
+        )
+
+
+def test_derivation_method_consumer_regression_probe_rejects_legacy_candidate_path(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    original = Migrator._resolve_method_for_observation
+
+    def legacy_consumer(self, *args, **kwargs):
+        kwargs["method_raw_candidates"] = ()
+        kwargs["method_evidence_candidates"] = ()
+        kwargs["evidence_candidates"] = ()
+        return original(self, *args, **kwargs)
+
+    monkeypatch.setattr(Migrator, "_resolve_method_for_observation", legacy_consumer)
+    result = _migrate_real_extract(
+        tmp_path, "banya-hino-takezoe-1985-na-fe-silicate-redox.yaml"
+    )
+    observation = result.observations[
+        "banya-hino-takezoe-1985-na-fe-silicate-redox::"
+        "banya_hino_takezoe_1985_fig11_na2o_activity_upper_bound"
+    ]
+    with pytest.raises(AssertionError):
+        assert any(
+            notice.kind is NoticeKind.METHOD_UNSTATED
+            and "Regular-solution relations from Eqs. (24), (26), and (33)"
+            in notice.reason
+            for notice in observation.notices
+        )
+
+
+def test_inferred_method_from_evidence_keeps_its_source_text(
+    tmp_path: Path,
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row.pop("regime")
+    source_text = "Measured by solution calorimetry."
+    row["note"] = source_text
+
+    result = _migrate_real_extract(
+        tmp_path,
+        "zhang-2021-acsesc-si.yaml",
+        extract_doc=extract,
+    )
+    observations = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id == "fixture-source::na_psat"
+        or observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert observations
+    for observation in observations:
+        assert result.experiments[observation.experiment_id].method == State.of(
+            MethodToken.SOLUTION_CALORIMETRY
+        )
+        assert any(
+            notice.kind is NoticeKind.METHOD_INFERRED
+            and f"original_reason=source method text: {source_text}" in notice.reason
+            for notice in observation.notices
+        )
+
+
+def test_method_text_reason_probe_rejects_legacy_evidence_loss(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    extract = yaml.safe_load(yaml.safe_dump(FIXTURE_EXTRACT))
+    row = extract["species"]["Na"]["observations"][0]
+    row.pop("regime")
+    source_text = "Measured by solution calorimetry."
+    row["note"] = source_text
+    original = Migrator._resolve_method_for_observation
+
+    def legacy_reason(self, *args, **kwargs):
+        method, notice = original(self, *args, **kwargs)
+        if notice is not None and notice.kind is NoticeKind.METHOD_INFERRED:
+            reason = notice.reason.replace(
+                f"original_reason=source method text: {source_text}",
+                "original_reason=source does not state method",
+            )
+            return method, replace(notice, reason=reason)
+        return method, notice
+
+    monkeypatch.setattr(Migrator, "_resolve_method_for_observation", legacy_reason)
+    result = _migrate_real_extract(
+        tmp_path,
+        "zhang-2021-acsesc-si.yaml",
+        extract_doc=extract,
+    )
+    observations = [
+        observation
+        for observation_id, observation in result.observations.items()
+        if observation_id == "fixture-source::na_psat"
+        or observation_id.startswith("fixture-source::na_psat::")
+    ]
+    assert observations
+    with pytest.raises(AssertionError):
+        assert any(
+            notice.kind is NoticeKind.METHOD_INFERRED
+            and f"original_reason=source method text: {source_text}" in notice.reason
+            for observation in observations
+            for notice in observation.notices
+        )
 
 
 def test_g1_current_stolyarova_source_migrates_without_context_observation(

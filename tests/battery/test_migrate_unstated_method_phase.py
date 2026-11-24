@@ -14,7 +14,7 @@ from simulator.battery.migrate import (
     phase_for_sample_form,
 )
 from simulator.battery.score import flagged_strata
-from simulator.battery.records import NoticePolicy
+from simulator.battery.records import NoticePolicy, State
 from tests.battery.test_migrate import (
     FIXTURE_EXTRACT,
     _migrate_real_extract,
@@ -232,7 +232,7 @@ def test_pending_cacl2_method_stays_unspecified_when_citation_names_two_methods(
     )
 
 
-def test_conflicting_method_phrases_remain_queued(tmp_path: Path) -> None:
+def test_conflicting_method_phrases_default_with_source_text(tmp_path: Path) -> None:
     extract = _scalar_fixture_extract()
     raw = extract["species"]["Na"]["observations"][0]
     raw["regime"] = "electron microprobe analysis and calorimetry"
@@ -242,14 +242,23 @@ def test_conflicting_method_phrases_remain_queued(tmp_path: Path) -> None:
     observation = _only_observation(result)
     experiment = result.experiments[observation.experiment_id]
 
-    assert experiment.method.is_unknown
+    assert experiment.method == State.of(MethodToken.UNSPECIFIED)
+    method_notice = next(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.METHOD_UNSTATED
+    )
+    assert (
+        "source method text is not mapped: electron microprobe analysis and calorimetry"
+        in method_notice.reason
+    )
     method_entries = [
         entry
         for entry in result.queue
         if entry.observation_id == observation.observation_id
         and "method" in entry.axes
     ]
-    assert len(method_entries) == 1
+    assert method_entries == []
 
 
 def test_partial_pressure_without_phase_is_inferred_as_gas_and_flagged(

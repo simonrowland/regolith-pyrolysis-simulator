@@ -614,7 +614,10 @@ def test_undersaturated_zero_is_scored(tmp_path, monkeypatch) -> None:
         and item.identity.species.formula == "Na2SO4"
         and item.value.point == Decimal("0.38") / Decimal(360000)
     )
-    assert {notice.kind for notice in row.notices} == {NoticeKind.METHOD_UNSTATED}
+    assert {notice.kind for notice in row.notices} == {
+        NoticeKind.METHOD_UNSTATED,
+        _NOTICE,
+    }
     fraction = Decimal("0.01")
     pressure = Decimal("100000")
     identity = replace(
@@ -678,6 +681,7 @@ def test_undersaturated_zero_is_scored(tmp_path, monkeypatch) -> None:
     assert "not_flagged_stratum" in residual.exclusions
     assert {notice.kind for notice in residual.notices} == {
         NoticeKind.METHOD_UNSTATED,
+        _NOTICE,
         NoticeKind.UNDERSATURATED_WALL_NET_EVAPORATION,
     }
     notices = [
