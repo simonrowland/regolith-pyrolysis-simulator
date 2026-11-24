@@ -97,6 +97,17 @@ def test_all_zero_metal_mass_percent_keeps_basis_refusal(
     )
 
 
+def _install_predict_phase_row(monkeypatch: pytest.MonkeyPatch, source: str) -> None:
+    code = compile(source, score_module.__file__, "exec")
+    for name in score_module._predict_phase_row.__qualname__.split("."):
+        code = next(
+            item
+            for item in code.co_consts
+            if isinstance(item, CodeType) and item.co_name == name
+        )
+    monkeypatch.setattr(score_module._predict_phase_row, "__code__", code)
+
+
 def test_alloy_gate_ahead_of_mass_percent_fails_the_taniguchi_pin(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -110,24 +121,38 @@ def test_alloy_gate_ahead_of_mass_percent_fails_the_taniguchi_pin(
         "    if (\n"
         "        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION\n"
         "        and composition.amount_basis is AmountBasis.MASS_PERCENT\n"
+        "        and not _equilibrium_mass_percent_map_is_usable(composition)\n"
         "    ):\n"
-        "        # Basis mismatch is decided before alloy capability. A wt% payload\n"
-        "        # that parses, including Taniguchi Fe 0.974, still cannot be moles.\n"
+        "        # Fraction-shaped wt% fails migrate's closure (Taniguchi Fe 0.974).\n"
+        "        # Basis mismatch precedes alloy capability only for that input.\n"
         "        return mass_percent_basis_refusal()\n"
     )
     if source.count(block) != 1:
-        raise AssertionError("mass-percent precedence block was not unique")
-    code = compile(source.replace(block, "", 1), score_module.__file__, "exec")
-    for name in score_module._predict_phase_row.__qualname__.split("."):
-        code = next(
-            item
-            for item in code.co_consts
-            if isinstance(item, CodeType) and item.co_name == name
-        )
-    monkeypatch.setattr(score_module._predict_phase_row, "__code__", code)
+        raise AssertionError("fraction-shaped mass-percent block was not unique")
+    _install_predict_phase_row(monkeypatch, source.replace(block, "", 1))
     with pytest.raises(AssertionError) as caught:
         test_sum_near_one_mass_percent_bulk_stays_refused(monkeypatch)
     assert "phase assemblage must not be called" not in str(caught.value)
+
+
+def test_blanket_mass_percent_return_fails_the_henao_census(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Restoring the blanket mass-percent return hides usable Henao alloy maps."""
+
+    from tests.test_henao_2001_ni_cr_mn_co_cu_slag_distribution_extract import (
+        test_henao_tables_migrate_as_typed_compositions_with_conditions as henao,
+    )
+
+    source = Path(score_module.__file__).read_text()
+    conjunct = (
+        "        and not _equilibrium_mass_percent_map_is_usable(composition)\n"
+    )
+    if source.count(conjunct) != 1:
+        raise AssertionError("usable-map conjunct was not unique")
+    _install_predict_phase_row(monkeypatch, source.replace(conjunct, "", 1))
+    with pytest.raises(AssertionError, match="usable alloy map must reach"):
+        henao(monkeypatch)
 
 
 def test_malformed_metal_mutation_anchor_fails_the_conversion_assertion(

@@ -179,6 +179,7 @@ from simulator.battery.migrate import (
     load_yaml,
     _convert_compilation_amount,
     _log_fO2_to_pa,
+    _mass_percent_composition_located,
     PARTICULATE_CARRYOVER_OUT_OF_MODEL_SCOPE,
     convert_areal_mass_to_kg_per_m2,
     convert_pressure_to_pa,
@@ -12512,6 +12513,23 @@ def _element_amount_in_phase(
     )
 
 
+def _equilibrium_mass_percent_map_is_usable(composition: Composition) -> bool:
+    """Whether migrate's mass-percent closure accepts this printed map.
+
+    The closure owner separates a fraction-shaped payload (a sum near 1,
+    Taniguchi Fe 0.974) from a usable wt% map. No second bound lives here.
+    """
+
+    components = dict(composition.components)
+    located = _mass_percent_composition_located(
+        components,
+        basis=composition.basis,
+        locator=None,
+        declared_component_map=components,
+    )
+    return located.state.is_value
+
+
 def _predict_phase_row(
     engine: Engine,
     observation: Observation,
@@ -12693,8 +12711,9 @@ def _predict_phase_row(
         and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         and composition.amount_basis is AmountBasis.MASS_PERCENT
     ):
-        # Validate printed mass components without treating their weights as
-        # mole amounts. The basis refusal below remains the typed outcome.
+        # Malformed or all-zero metal names are not a closure question.
+        # Refuse them without calling composition_wt_pct. Usable versus
+        # fraction-shaped is the closure owner's decision below.
         valid_mass_percent_components = (
             sum((amount for _name, amount in composition.components), Decimal(0)) > 0
             and all(
@@ -12711,9 +12730,10 @@ def _predict_phase_row(
     if (
         quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         and composition.amount_basis is AmountBasis.MASS_PERCENT
+        and not _equilibrium_mass_percent_map_is_usable(composition)
     ):
-        # Basis mismatch is decided before alloy capability. A wt% payload
-        # that parses, including Taniguchi Fe 0.974, still cannot be moles.
+        # Fraction-shaped wt% fails migrate's closure (Taniguchi Fe 0.974).
+        # Basis mismatch precedes alloy capability only for that input.
         return mass_percent_basis_refusal()
     if role is PhaseRole.METAL:
         from simulator.melt_backend.base import battery_adapter_class
@@ -12729,6 +12749,12 @@ def _predict_phase_row(
                     "detail": "adapter does not declare metal-alloy phase support",
                 },
             )
+    if (
+        quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        # A usable wt% map is still not a mole inventory.
+        return mass_percent_basis_refusal()
     wt = composition_wt_pct(composition_state.value)
     if not wt:
         return refused(
