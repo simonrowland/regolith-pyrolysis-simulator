@@ -82,6 +82,9 @@ def test_deterministic_refusal_allowlist_is_explicit():
     assert "internal_analytical_oxygen_balance_unavailable" not in (
         CACHEABLE_REFUSAL_CODES
     )
+    # The 7cf trace-limit check is a cheap pre-solve input refusal; storing it
+    # would add a cache round trip without avoiding any engine work.
+    assert "imcc_trace_limit_exceeded" not in CACHEABLE_REFUSAL_CODES
     assert OutOfDomainReason.SPECIATION_NO_FINITE_VALUES in (
         STABLE_OUT_OF_DOMAIN_REASONS
     )
@@ -1606,6 +1609,27 @@ def test_worker_timeout_exception_is_counted_and_not_stored(tmp_path, monkeypatc
         ).fetchone()[0] == 0
 
 
+def test_openimcc_p2o5_trace_admission_carries_model_notice():
+    # Under 7cf this sub-1 mol% P2O5 input is admitted only as a flagged trace.
+    pytest.importorskip("openimcc")
+    from simulator.melt_backend import openimcc_bridge
+
+    result = openimcc_bridge._evaluate_uncached(
+        composition_mol={"SiO2": 1.0, "P2O5": 0.01},
+        temperature_K=1600.0,
+    )
+
+    assert any(
+        notice.startswith("trace_components_outside_melt_model {P2O5:")
+        for notice in result.notices
+    )
+    assert any(
+        flag.startswith("trace_major_activity_bound:")
+        and "row=refused" in flag
+        for flag in result.flags
+    )
+
+
 @pytest.mark.parametrize(
     ("composition_mol", "code", "exception_name"),
     [
@@ -1614,14 +1638,6 @@ def test_worker_timeout_exception_is_counted_and_not_stored(tmp_path, monkeypatc
             "imcc_ferric_input_unsupported",
             "ImccFerricInputUnsupportedError",
         ),
-        (
-            # Use 0.01 mol P2O5: Studio showed 0.005 mol did not raise the
-            # extension refusal, while 0.1 mol exceeded the 1 mol% trace limit.
-            # 0.01 mol remains below that limit (0.01 / 1.01 mol total).
-            {"SiO2": 1.0, "P2O5": 0.01},
-            "imcc_sp_extension_required",
-            "ImccSPComponentRequiresExtensionError",
-        ),
     ],
 )
 def test_openimcc_presolver_refusal_hits_after_disk_round_trip(
@@ -1629,14 +1645,10 @@ def test_openimcc_presolver_refusal_hits_after_disk_round_trip(
 ):
     pytest.importorskip("openimcc")
     from openimcc.kernel import ImccFerricInputUnsupportedError
-    from openimcc.model import ImccSPComponentRequiresExtensionError
     from simulator.melt_backend import openimcc_bridge
 
     expected = {
         "ImccFerricInputUnsupportedError": ImccFerricInputUnsupportedError,
-        "ImccSPComponentRequiresExtensionError": (
-            ImccSPComponentRequiresExtensionError
-        ),
     }[exception_name]
     _enable_disk_cache(tmp_path, monkeypatch)
     calls = []
@@ -1666,6 +1678,48 @@ def test_openimcc_presolver_refusal_hits_after_disk_round_trip(
     counts = _assert_returned_miss_accounting("openimcc")
     assert counts["hits"] == counts["misses"] == counts["stores"] == 1
     assert counts.get(f"not_stored:refusal:{code}", 0) == 0
+
+
+def test_openimcc_p2o5_trace_limit_refusal_is_not_cached(tmp_path, monkeypatch):
+    # This over-limit input is rejected before solving, so persistence has no
+    # engine work to save and must not create a cache row.
+    pytest.importorskip("openimcc")
+    from openimcc.model import ImccTraceLimitExceededError
+    from simulator.melt_backend import openimcc_bridge
+
+    path = tmp_path / "cache.sqlite"
+    _enable_disk_cache(tmp_path, monkeypatch)
+    calls = []
+    original = openimcc_bridge._evaluate_uncached
+
+    def wrapped(**adapter_kwargs):
+        calls.append(1)
+        return original(**adapter_kwargs)
+
+    monkeypatch.setattr(openimcc_bridge, "_evaluate_uncached", wrapped)
+
+    def run():
+        return openimcc_bridge.evaluate(
+            composition_mol={"SiO2": 1.0, "P2O5": 0.1},
+            temperature_K=1600.0,
+        )
+
+    with pytest.raises(ImccTraceLimitExceededError) as first:
+        run()
+    engine_cache._MEMORY_CACHE.clear()
+    with pytest.raises(ImccTraceLimitExceededError) as second:
+        run()
+
+    assert first.value.code == second.value.code == "imcc_trace_limit_exceeded"
+    assert str(first.value) == str(second.value)
+    assert len(calls) == 2
+    counts = _assert_returned_miss_accounting("openimcc")
+    assert counts["misses"] == 2
+    assert counts["stores"] == 0
+    with sqlite3.connect(path) as connection:
+        assert connection.execute(
+            "SELECT count(*) FROM engine_outputs"
+        ).fetchone()[0] == 0
 
 
 def test_openimcc_invalid_fo2_refusal_hits_after_disk_round_trip(
