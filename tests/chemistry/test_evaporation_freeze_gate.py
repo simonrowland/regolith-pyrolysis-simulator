@@ -800,6 +800,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
     floor_refusals: dict[str, dict] = {}
+    ci_recorded_hours: list[int] = []
     current_scenario = [None]
     equilibrium_count = [0]
     original_record = PyrolysisSimulator._freeze_gate_curve_record
@@ -864,6 +865,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             return record
         curve = record['curve']
         if current_scenario[0] == 'ci_carbonaceous_chondrite_C2B_12h':
+            ci_recorded_hours.append(int(sim.melt.hour))
             notice = curve['composition_projected_notice']
             assert notice['authority'] == 'extrapolated'
             assert notice['reason'].startswith('composition_projected_over_threshold:')
@@ -1023,6 +1025,8 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
             assert len(artifact['timesteps']) == scenario['hours']
             assert rebuild_counts.get(name, 0) == 1
             assert equilibrium_count[0] > equilibrations_before
+            # A repeated same-hour hold must not enter the recorder twice.
+            assert ci_recorded_hours == list(range(scenario['hours']))
 
     observed_read_counts = {
         site_hour: len(curves)
