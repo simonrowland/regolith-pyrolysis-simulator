@@ -896,8 +896,10 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
     for start, end in rejected:
         segment = name[cursor:start]
         segment_tokens = tokens_outside_spans(segment)
+        # A token is glued to a rejected span only when one has already ended.
+        # The opening segment has no previous span, so its first character is not a boundary.
         if (
-            cursor < len(name)
+            cursor > 0
             and not is_separator(name[cursor])
             and segment_tokens
         ):

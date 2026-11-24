@@ -499,11 +499,21 @@ def test_rejected_span_keeps_separate_formula_tokens(name: str) -> None:
     assert formula == "Ag"
 
 
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
+        ("Ag $Kg_{3}$", "Ag"),
+        ("Fe2SiO4 $Kg_{3}$ OTHER", "Fe2SiO4"),
+        ("Ag($Kg_{3}$)", "Ag"),
+    ],
+)
+def test_leading_formula_separated_from_rejected_span(name: str, expected: str) -> None:
+    formula, _charge = generator._formula_from_name(name)
+    assert formula == expected
+
+
 def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatch) -> None:
     source = getsource(generator._formula_from_name).replace(
-        "cursor < len(name)",
-        "cursor > 0",
-    ).replace(
         "not is_separator(name[cursor])",
         "not is_separator(name[cursor - 1])",
     ).replace(
@@ -513,6 +523,7 @@ def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatc
         "not is_separator(tail[0])",
         "not tail[0].isspace()",
     )
+    assert "cursor > 0" in source
     assert source != getsource(generator._formula_from_name)
     namespace = vars(generator).copy()
     exec(source, namespace)
@@ -520,6 +531,10 @@ def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatc
     monkeypatch.setattr(generator, "_formula_from_name", old_formula_from_name)
     with pytest.raises(AssertionError):
         assert generator._formula_from_name("TEST Ag($Kg_{3}$)")[0] == "Ag"
+    with pytest.raises(AssertionError):
+        assert generator._formula_from_name("Ag($Kg_{3}$)")[0] == "Ag"
+    with pytest.raises(AssertionError):
+        assert generator._formula_from_name("TEST $Kg_{3}$ Ag $Kg_{3}$ OTHER")[0] == "Ag"
 
 
 def test_generator_preserves_explicit_decimal_subscript_for_accounting(monkeypatch) -> None:
