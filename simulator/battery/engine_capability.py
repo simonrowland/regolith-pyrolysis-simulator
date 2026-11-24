@@ -26,11 +26,13 @@ from simulator.battery.enums import (
     FORMATION_QUANTITIES,
     FUSION_QUANTITIES,
     PHASE_ROW_QUANTITIES,
+    PRINTED_CAPACITY_QUANTITIES,
     PURE_STANDARD_THERMO,
     EQUILIBRIUM_FIT_QUANTITIES,
     Engine,
     Quantity,
     ResidualStatus,
+    effective_phase_basis,
 )
 from simulator.battery.validate import _VAPOUR_EQUILIBRIUM
 
@@ -65,7 +67,7 @@ _SHARED_ATTEMPT = frozenset(
         Quantity.TRANSITION_TEMPERATURE,
     }
 )
-_CELL_BASE = _ACTIVITY | PHASE_ROW_QUANTITIES | _SHARED_ATTEMPT
+_CELL_BASE = _ACTIVITY | _SHARED_ATTEMPT
 
 # NASA's predict path returns before the cell dispatch unless the quantity
 # is Fe3+/Fe2+ or in the thermo set plus saturation pressure.
@@ -104,9 +106,15 @@ _RESIDUE_QUANTITIES = frozenset(
 )
 ENGINE_QUANTITIES: dict[Engine, frozenset[Quantity]] = {
     Engine.VAPOROCK: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
-    Engine.ALPHAMELTS: _cell_quantities(vapour=True, thermo=frozenset()),
-    Engine.THERMOENGINE: _cell_quantities(vapour=True, thermo=PURE_PHASE_QUANTITIES),
-    Engine.MAGEMIN: _cell_quantities(vapour=False, thermo=PURE_PHASE_QUANTITIES),
+    Engine.ALPHAMELTS: _cell_quantities(
+        vapour=True, thermo=frozenset()
+    ) | PHASE_ROW_QUANTITIES,
+    Engine.THERMOENGINE: _cell_quantities(
+        vapour=True, thermo=PURE_PHASE_QUANTITIES
+    ) | PHASE_ROW_QUANTITIES,
+    Engine.MAGEMIN: _cell_quantities(
+        vapour=False, thermo=PURE_PHASE_QUANTITIES
+    ) | PHASE_ROW_QUANTITIES,
     Engine.OPENIMCC: _cell_quantities(vapour=True, thermo=frozenset()),
     Engine.INTERNAL_ANALYTICAL: _cell_quantities(
         vapour=True, thermo=ELLINGHAM_QUANTITIES | FUSION_QUANTITIES
@@ -126,6 +134,56 @@ def engine_covers_quantity(engine: Engine, quantity: Quantity) -> bool:
     return quantity in engine_quantities(engine)
 
 
+def engine_covers_scoring_route(engine: Engine, quantity: Quantity) -> bool:
+    """Whether the production scorer dispatches this quantity to the engine."""
+
+    if quantity not in PHASE_ROW_QUANTITIES:
+        return engine_covers_quantity(engine, quantity)
+    from simulator.battery.score import (
+        _adapter_models_dissolved_solute,
+        _capacity_solute,
+    )
+
+    solute = _capacity_solute(quantity)
+    if solute is not None:
+        return _adapter_models_dissolved_solute(engine, solute)
+    return engine_covers_quantity(engine, quantity)
+
+
+def phase_route_entered(quantity: Quantity, phase_basis: str | None) -> bool:
+    """Whether predict_with_engine enters the phase-row predictor.
+
+    Equilibrium phase composition enters only for a closed basis. Capacity
+    and distribution rows enter, then the adapter may refuse the solute.
+    A free-text equilibrium ratio shares the quantity and does not enter.
+    """
+
+    if (
+        quantity in PRINTED_CAPACITY_QUANTITIES
+        or quantity is Quantity.DISTRIBUTION_RATIO
+    ):
+        return True
+    if quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION:
+        return effective_phase_basis(phase_basis) is not None
+    return False
+
+
+def observation_route_covered(
+    engine: Engine, quantity: Quantity, phase_basis: str | None
+) -> bool:
+    """Census and emission coverage for one observation's phase route.
+
+    Quantity membership stays on ``engine_covers_scoring_route``. A phase
+    quantity whose basis does not enter the predictor is not callable.
+    """
+
+    if quantity in PHASE_ROW_QUANTITIES and not phase_route_entered(
+        quantity, phase_basis
+    ):
+        return False
+    return engine_covers_scoring_route(engine, quantity)
+
+
 def engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
     """Thermochemistry slice of the declared set. Empty when undeclared."""
 
@@ -133,7 +191,10 @@ def engine_thermo_quantities(engine: Engine) -> frozenset[Quantity]:
 
 
 def any_declared_engine_covers(quantity: Quantity) -> bool:
-    return any(quantity in quantities for quantities in ENGINE_QUANTITIES.values())
+    return any(
+        engine_covers_scoring_route(engine, quantity)
+        for engine in ENGINE_QUANTITIES
+    )
 
 
 def _coverage_text(scored: int, callable_observations: int) -> str:
@@ -165,6 +226,7 @@ def capability_summary(
         ScoreContext,
         _has_duplicate_observation_link,
         _refusal_diagnostic_references,
+        _subtype_text,
         comparison_candidates,
         diagnostic_references,
         quantity_token,
@@ -181,6 +243,7 @@ def capability_summary(
     counts: dict[tuple[str, str, str], int] = defaultdict(int)
     uncovered: dict[tuple[str, str], int] = defaultdict(int)
     callable_ids: set[str] = set()
+    omitted_emission_pairs = 0
     n_quantity_unknown = 0
     engine_list = tuple(engines)
     candidates = comparison_candidates(context)
@@ -200,12 +263,28 @@ def capability_summary(
         )
         rail = rail_for_quantity(quantity, species_formula=formula)
         rail_token = NO_HEADLINE_RAIL if rail is None else rail.value
-        if any(engine_covers_quantity(engine, quantity) for engine in engine_list):
+        phase_basis = (
+            _subtype_text(identity) if isinstance(identity, Identity) else None
+        )
+        if any(
+            observation_route_covered(engine, quantity, phase_basis)
+            for engine in engine_list
+        ):
             callable_ids.add(observation.observation_id)
         if not any_declared_engine_covers(quantity):
             uncovered[(quantity.value, rail_token)] += 1
+        experiment = context.experiments.get(observation.experiment_id)
         for engine in engine_list:
             counts[(engine.value, quantity.value, rail_token)] += 1
+            # The same skip as score_run's emission gate. Quantity-level
+            # ``covered`` stays on the matrix row; this count is the pairs
+            # that gate does not emit.
+            if not observation_route_covered(
+                engine, quantity, phase_basis
+            ) and not _residue_adapter_binds(
+                observation, engine, experiment, quantity
+            ):
+                omitted_emission_pairs += 1
     seen = {observation.observation_id for observation in candidates}
     outside: list[object] = []
     for observation in diagnostic_references(context):
@@ -236,15 +315,20 @@ def capability_summary(
             production_scoring=True,
         )
         experiment = context.experiments.get(observation.experiment_id)
+        phase_basis = (
+            _subtype_text(identity) if isinstance(identity, Identity) else None
+        )
         for engine in offered:
-            if engine_covers_quantity(engine, quantity):
+            if observation_route_covered(engine, quantity, phase_basis):
                 continue
             if _residue_adapter_binds(observation, engine, experiment, quantity):
                 continue
             n_outside_census_not_emitted += 1
     rows = [
         {
-            "covered": engine_covers_quantity(Engine(engine), Quantity(quantity)),
+            "covered": engine_covers_scoring_route(
+                Engine(engine), Quantity(quantity)
+            ),
             "engine": engine,
             "n_observations": n,
             "quantity": quantity,
@@ -254,9 +338,7 @@ def capability_summary(
     ]
     scored = callable_ids.intersection(scored_observation_ids)
     cross_product_total = sum(row["n_observations"] for row in rows)
-    uncovered_pair_total = sum(
-        row["n_observations"] for row in rows if not row["covered"]
-    )
+    uncovered_pair_total = omitted_emission_pairs
     return {
         "capability_matrix": {
             "cross_product_total": cross_product_total,

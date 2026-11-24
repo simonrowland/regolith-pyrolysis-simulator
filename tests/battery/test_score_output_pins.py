@@ -995,8 +995,9 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 
 Coverage is observations with a numeric residual from at least one
 scoring engine, divided by callable comparison candidates. Callable
-means the quantity is in at least one scoring engine's declared
-capability set. A quantity no declared engine predicts is a
+means the observation's quantity and phase basis pass
+observation_route_covered for at least one scoring engine.
+A quantity no declared engine predicts is a
 capability-matrix cell, not a refusal, and is outside this ratio.
 The candidate population is the live candidate census, not the
 residual ledger.
@@ -1820,8 +1821,9 @@ Co-equal descriptive headline (A) over every priced residual, certified and flag
 
 Coverage is observations with a numeric residual from at least one
 scoring engine, divided by callable comparison candidates. Callable
-means the quantity is in at least one scoring engine's declared
-capability set. A quantity no declared engine predicts is a
+means the observation's quantity and phase basis pass
+observation_route_covered for at least one scoring engine.
+A quantity no declared engine predicts is a
 capability-matrix cell, not a refusal, and is outside this ratio.
 The candidate population is the live candidate census, not the
 residual ledger.

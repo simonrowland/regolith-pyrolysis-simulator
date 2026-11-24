@@ -57,8 +57,46 @@ def pressure_has_only_unit_conversion(point: Located) -> bool:
     ):
         return False
     value = point.state.value
-    value = value.point if isinstance(value, Value) else value
-    return value == original.state.value * factor.state.value
+    factor_value = factor.state.value
+    original_value = original.state.value
+    if not isinstance(factor_value, Decimal):
+        return False
+    if not isinstance(value, Value):
+        return (
+            isinstance(value, Decimal)
+            and isinstance(original_value, Decimal)
+            and value == original_value * factor_value
+        )
+    if value.kind is ValueKind.POINT:
+        return (
+            isinstance(original_value, Decimal)
+            and value.point == original_value * factor_value
+        )
+    if value.kind is not ValueKind.BOUND or value.bound_value is None:
+        return False
+    from simulator.battery.records import BoundDirection, _bound_operator_semantics
+
+    if isinstance(original_value, Value):
+        if original_value.kind is ValueKind.POINT:
+            original_magnitude = original_value.point
+            original_operator = None
+        elif original_value.kind is ValueKind.BOUND:
+            original_magnitude = original_value.bound_value
+            original_operator = original_value.bound_operator
+        else:
+            return False
+    else:
+        original_magnitude = original_value
+        original_operator = None
+    if (
+        not isinstance(original_magnitude, Decimal)
+        or value.bound_value != original_magnitude * factor_value
+    ):
+        return False
+    if original_operator is None:
+        semantics = _bound_operator_semantics(value.bound_operator)
+        return semantics is not None and semantics[0] is BoundDirection.UPPER
+    return value.bound_operator == original_operator
 
 
 def printed_source_pressure(row: Observation) -> Decimal | None:

@@ -16,16 +16,215 @@ evidence inputs.
 from __future__ import annotations
 
 import re
-from decimal import Decimal
+from dataclasses import replace
+from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping, Sequence
 
 from simulator.battery.decimal_tokens import decimal_token as _dec_str
-from simulator.battery.enums import ValueKind
-from simulator.battery.records import Located, Value
+from simulator.battery.default_policy import resolve as resolve_default_policy
+from simulator.battery.enums import (
+    AmbientPressureEvidenceClass,
+    NoticeKind,
+    Quantity,
+    ValueKind,
+)
+from simulator.battery.identity import Identity
+from simulator.battery.records import (
+    AmbientPressureEvidence,
+    Located,
+    Notice,
+    NoticePolicy,
+    Observation,
+    Value,
+    nominal_pressure_pa,
+)
+from simulator.chemistry.fo2_buffers import evaluate_buffer
 from simulator.physical_constants import BAR_PA_DECIMAL
+from simulator.state_types import State
 
 # 1 bar = 1e5 Pa exactly. An atmosphere frame passes 101325 Pa instead.
 BAR_PA = BAR_PA_DECIMAL
+
+_BUFFER_CALIBRATION_TARGET_QUANTITIES = {
+    "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "jugo-2010-sulfur-xanes": Quantity.VALENCE_RATIO,
+    "gaillard-2003-hydrous-silicic-melt-activity": Quantity.ACTIVITY,
+    "borisov-veksler-2021-k-fe-supplement":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "zagrtdenov-2020-chromite-magnesiochromite-solubility":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "neuman-2026-levitation-k-isotopes": Quantity.MASS_LOSS_FRACTION,
+    "lu-2026-mercury-sulfur-liquidus":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    "jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation":
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+}
+
+_BUFFER_OFFSET_PATTERN = re.compile(
+    r"(?:^|\s)buffer=([^\s;]+).*?(?:^|\s)offset=([^\s;]+)"
+)
+
+
+def _printed_buffer_offset(reason: str) -> tuple[str, Decimal] | None:
+    match = _BUFFER_OFFSET_PATTERN.search(reason)
+    if match is None:
+        return None
+    buffer, raw_offset = match.groups()
+    try:
+        offset = Decimal(raw_offset.replace("−", "-"))
+    except (InvalidOperation, ValueError):
+        return None
+    if not offset.is_finite():
+        return None
+    return buffer, offset
+
+
+def _dp002_applicability(
+    evidence: AmbientPressureEvidence | None,
+    *,
+    atmosphere_condition: Located[Any] | None = None,
+) -> str | None:
+    if evidence is None:
+        return (
+            'experiment "in air"'
+            if _air_composition_quote(
+                None, atmosphere_condition=atmosphere_condition
+            )
+            is not None
+            else None
+        )
+    if evidence.evidence_class is AmbientPressureEvidenceClass.GAS_MIXING:
+        return "gas-mixing furnace"
+    if evidence.evidence_class is AmbientPressureEvidenceClass.GAS_FLOW:
+        quote = " ".join(evidence.quote.casefold().replace("-", " ").split())
+        if "wire loop" in quote and "equilibr" in quote:
+            return "wire-loop equilibration"
+    if _air_composition_quote(
+        evidence, atmosphere_condition=atmosphere_condition
+    ) is not None:
+        return 'experiment "in air"'
+    return None
+
+
+# Negated or excluded air is not a run atmosphere. The categorical token is
+# matched before this, so a located value "air" is not sent through prose.
+# A claim is one clause: the sample, the equilibration event, and the
+# atmosphere have to belong to that same clause. Preparation under argon
+# does not veto a later air equilibration, and a reference gas equilibrated
+# in air is not the sample. "argon sample" does not count.
+_CLAIM_BOUNDARY = re.compile(r"\b(?:while|whereas|but)\b|[.;!?]+")
+_AIR_SUBJECT = re.compile(
+    r"\b(?:samples|sample|melts|melt|glasses|glass|charges|charge)\b"
+)
+_OTHER_ATMOSPHERE_SUBJECT = re.compile(r"\breference\s+gas\b")
+_AIR_EQUILIBRATION = re.compile(
+    r"\bequilibrat\w*(?:\s+\w+){0,6}\s+"
+    r"(?:in|under|atmosphere)\s+(?:ambient\s+)?air\b(?!\s+free\b)"
+)
+_AIR_SENSOR_OR_ROOM = re.compile(r"\b(?:sensor|room)\b")
+
+
+_AIR_NEGATION = re.compile(
+    r"(?:"
+    r"\b(?:not|never|without|no|n't)\b(?:\s+\w+){0,6}\s+equilibrat"
+    r"|"
+    r"\bair\b(?:\s+\w+){0,8}\s+(?:excluded|displaced|replaced|removed|absent)\b"
+    r"|"
+    r"\b(?:excluded|displaced|replaced|removed|without|not|no)\b"
+    r"(?:\s+\w+){0,8}\s+air\b"
+    r")"
+)
+
+
+def _air_composition_quote(
+    evidence: AmbientPressureEvidence | None,
+    *,
+    atmosphere_condition: Located[Any] | None = None,
+) -> str | None:
+    """Return printed evidence that explicitly names an air atmosphere."""
+
+    if (
+        isinstance(atmosphere_condition, Located)
+        and atmosphere_condition.inference is None
+        and atmosphere_condition.state.is_value
+    ):
+        value = atmosphere_condition.state.value
+        if isinstance(value, Value):
+            value = (
+                value.categorical
+                if value.kind is ValueKind.CATEGORICAL
+                else None
+            )
+        if not isinstance(value, str):
+            return None
+        quote = value
+    elif evidence is not None:
+        quote = evidence.quote
+    else:
+        return None
+    source_quote = quote
+    normalized_quote = " ".join(quote.casefold().replace("-", " ").split())
+    atmosphere = _atmosphere_kind(normalized_quote)
+    if atmosphere is not None and atmosphere[0] == "air":
+        return source_quote
+    if _AIR_NEGATION.search(normalized_quote):
+        return None
+    # Air has to be the sample atmosphere during equilibration. "Held in air
+    # before the run" is not that stage. Sensor and room air reject only the
+    # clause that contains them. "air-free" normalizes to "air free".
+    # The last subject before the equilibration decides the claim.
+    clauses = [
+        part.strip()
+        for part in _CLAIM_BOUNDARY.split(normalized_quote)
+        if part.strip()
+    ]
+    for clause in clauses:
+        if _AIR_SENSOR_OR_ROOM.search(clause) is not None:
+            continue
+        equilibration = _AIR_EQUILIBRATION.search(clause)
+        if equilibration is None:
+            continue
+        prefix = clause[: equilibration.start()]
+        subjects = (
+            *((match.start(), "sample") for match in _AIR_SUBJECT.finditer(prefix)),
+            *(
+                (match.start(), "other")
+                for match in _OTHER_ATMOSPHERE_SUBJECT.finditer(prefix)
+            ),
+        )
+        if not subjects or max(subjects)[1] != "sample":
+            continue
+        return source_quote
+    return None
+
+
+def _dp002_pressure_default(
+    evidence: AmbientPressureEvidence | None,
+    quantity: Quantity,
+    *,
+    atmosphere_condition: Located[Any] | None = None,
+) -> tuple[Decimal | None, Notice | None]:
+    applicability = _dp002_applicability(
+        evidence, atmosphere_condition=atmosphere_condition
+    )
+    if applicability is None:
+        return None, None
+    policy = resolve_default_policy("DP-002")
+    pressure_pa = policy.value
+    if not isinstance(pressure_pa, Decimal):
+        return None, None
+    return pressure_pa, Notice(
+        kind=policy.flag,
+        affected_quantities=(quantity,),
+        reason=(
+            f"DP-002 applies to registered condition {applicability}; "
+            "chamber pressure is unreported"
+        ),
+        origin="score:DP-002",
+        policy=NoticePolicy(**policy.payload["policy"]),
+    )
+
 
 def log10_fo2_to_pa(
     log10_fO2: Decimal, reference_pressure_pa: Decimal = BAR_PA
@@ -39,6 +238,148 @@ def log10_fo2_to_pa(
     """
 
     return reference_pressure_pa * (Decimal(10) ** log10_fO2)
+
+
+def _dp112_receipts(observation: Observation) -> tuple[Notice, ...]:
+    """Score-time notices that record a DP-112 buffer evaluation."""
+
+    return tuple(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        and notice.policy is not None
+        and notice.policy.id == "DP-112"
+    )
+
+
+def _resolve_score_time_buffer_identity(
+    observation: Observation,
+    *,
+    pressure_pa: Decimal | None = None,
+    pressure_source: str | None = None,
+    ambient_pressure_evidence: AmbientPressureEvidence | None = None,
+) -> Observation:
+    """Resolve the eight numeric-source buffer markers for score-time use."""
+
+    if not isinstance(observation.identity, Identity):
+        return observation
+    expected_quantity = _BUFFER_CALIBRATION_TARGET_QUANTITIES.get(
+        observation.source_id or ""
+    )
+    quantity = observation.identity.quantity
+    if (
+        expected_quantity is None
+        or not quantity.is_value
+        or quantity.value is not expected_quantity
+    ):
+        return observation
+
+    if _dp112_receipts(observation):
+        return observation
+    marker = next(
+        (
+            notice
+            for notice in observation.notices
+            if notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ),
+        None,
+    )
+    if marker is None:
+        return observation
+
+    printed_buffer = _printed_buffer_offset(marker.reason)
+    temperature_state = observation.identity.temperature_K
+    if (
+        printed_buffer is None
+        or temperature_state is None
+        or not temperature_state.is_value
+    ):
+        return observation
+    buffer, offset = printed_buffer
+    temperature = temperature_state.value
+    if (
+        not isinstance(temperature, Decimal)
+        or not temperature.is_finite()
+        or temperature <= 0
+    ):
+        return observation
+
+    pressure_state = observation.identity.total_pressure_Pa
+    pressure_route = pressure_source or "pressure_boundary"
+    pressure_notice = None
+    if pressure_state is not None and pressure_state.is_value:
+        resolved_pressure_pa = nominal_pressure_pa(pressure_state)
+        if resolved_pressure_pa is not None:
+            pressure_route = "identity.total_pressure_Pa"
+            if not resolved_pressure_pa.is_finite() or resolved_pressure_pa < 0:
+                return observation
+            pressure_pa = resolved_pressure_pa
+    if pressure_pa is not None:
+        if not pressure_pa.is_finite() or pressure_pa < 0:
+            return observation
+    else:
+        pressure_pa, pressure_notice = _dp002_pressure_default(
+            ambient_pressure_evidence,
+            expected_quantity,
+            atmosphere_condition=(observation.point_conditions or {}).get(
+                "atmosphere"
+            ),
+        )
+        if pressure_pa is not None:
+            pressure_route = "method_policy:DP-002"
+        else:
+            pressure_notice = Notice(
+                kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+                affected_quantities=(expected_quantity,),
+                reason=(
+                    "DP-112 total pressure is unreported and no applicable pressure "
+                    "policy resolves it; evaluate_buffer pressure term omitted at its "
+                    "one-bar reference"
+                ),
+                origin="score:DP-112",
+            )
+    pressure_bar = None if pressure_pa is None else pressure_pa / BAR_PA
+    try:
+        evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
+    except (KeyError, ValueError):
+        return observation
+    log10_fO2_bar = evaluation.log10_fO2_bar + offset
+    resolved_pa = log10_fo2_to_pa(log10_fO2_bar)
+    band = (
+        "unsized"
+        if evaluation.band_dex is None
+        else format(evaluation.band_dex, "f")
+    )
+    pressure_text = (
+        "not supplied (term omitted at one-bar reference)"
+        if pressure_bar is None
+        else format(pressure_bar, "f")
+    )
+    resolved_policy = resolve_default_policy("DP-112", formula_result=resolved_pa)
+    notice = Notice(
+        kind=resolved_policy.flag,
+        affected_quantities=(expected_quantity,),
+        reason=(
+            f"DP-112 buffer={buffer} offset={offset} calibration="
+            f"{evaluation.calibration_id} T_K={temperature} P_bar={pressure_text} "
+            f"pressure_route={pressure_route} "
+            f"log10_fO2_bar={log10_fO2_bar} band_dex={band}"
+        ),
+        origin="score:DP-112",
+        band=band,
+        policy=NoticePolicy(**resolved_policy.payload["policy"]),
+    )
+    identity = replace(observation.identity, fO2_Pa=State.of(resolved_pa))
+    return replace(
+        observation,
+        identity=identity,
+        notices=(
+            *observation.notices,
+            *((pressure_notice,) if pressure_notice is not None else ()),
+            notice,
+        ),
+    )
 
 
 _ATM_BAR = Decimal("1.01325")

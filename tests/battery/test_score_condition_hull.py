@@ -248,6 +248,10 @@ def test_pin_measured_headline_table_unchanged_by_hull() -> None:
 # No fixture row enters that stratum. Chain Ban-ya Fe_tO (t-1802 Eq. 23 /
 # d-432) does not move it: cf2a0c7fe and f96f7cace hash the same payload.
 # PIN_SUMMARY_SHA256 before d-443: 30345d844ade8f69a341c7b7f99ca2400ca340244cf4c39a9ff96aef9f625588
+# Capability rollout: summary_payload merges capability_matrix and coverage
+# into the headline JSON. The hull fixture is prebuilt residuals, not a
+# rescore, so the oxygen-frame edits do not move those rows. Studio digest
+# d3122d81… is that merge. Previous pin 41816516… lacked the two keys.
 PIN_MELT_STATS = ("0.3162277660168379331998893544", "0.10", "0.20")
 PIN_VAPOUR_STATS = (2, "0.1118033988749894848204586834", "-0.05")
 PIN_RECORD_KEYS = [
@@ -256,7 +260,7 @@ PIN_RECORD_KEYS = [
     "n_inside_band", "n_no_band", "n_score_eligible", "rail", "rms_dex",
     "sources", "tier",
 ]
-PIN_SUMMARY_SHA256 = "41816516c6f9167c34736bfef368925e4754b4867ade0ab218fb73027e350b6f"
+PIN_SUMMARY_SHA256 = "d3122d819223388edb73ef0932ee144d1afe71565f68e711232c48189b7a55ec"
 PIN_HEADLINE_LINES = (
     "| melt_activity | internal-analytical | — | 4 | 1 | 3 | 3 | 2 | "
     "0.3162277660168379331998893544 | 0.10 | 0.20 | 0.3 | "

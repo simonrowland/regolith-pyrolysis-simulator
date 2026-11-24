@@ -237,6 +237,9 @@ class RefusalReason(StrEnum):
     ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION = (
         "engine_does_not_report_phase_composition"
     )
+    ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY = (
+        "engine_does_not_model_liquid_immiscibility"
+    )
     ENGINE_DOES_NOT_MODEL_SULFUR = "engine_does_not_model_sulfur"
     ENGINE_DOES_NOT_MODEL_CHLORIDE = "engine_does_not_model_chloride"
     # t-1625. The charge kept elemental metals. This engine's accepted

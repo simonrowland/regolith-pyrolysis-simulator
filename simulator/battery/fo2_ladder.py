@@ -56,23 +56,23 @@ from simulator.battery.records import (
     Notice,
     Observation,
     Value,
+    as_decimal,
     nominal_pressure_pa,
 )
 from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
+    EXPERIMENT_RUN_OXYGEN_ROUTES,
+    TYPED_RUN_OXYGEN_ROUTES,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
     oxygen_condition,
+    route_source_pressure_pa,
 )
 from simulator.oxygen_buffers import log10_fo2_c_co_bar
-from simulator.physical_constants import PA_PER_BAR
+from simulator.physical_constants import BAR_PA_DECIMAL, PA_PER_BAR
 
-_TIER1_DIRECT_ROUTES = frozenset({
-    "oxygen_partial_pressure_to_log_fO2",
-    "oxygen_sweep_partial_pressure",
-    "oxygen_sweep_component_partial_pressure",
-})
+_TIER1_DIRECT_ROUTES = TYPED_RUN_OXYGEN_ROUTES | EXPERIMENT_RUN_OXYGEN_ROUTES
 _TIER3_ATMOSPHERE_ROUTES = (
     "observation_gas_composition",
     "observation_gas_couple_equilibrium",
@@ -101,6 +101,11 @@ class ResolvedFo2:
     cell_material: str | None = None
     # Physics-95 rung is separate from the existing generic ``tier`` taxonomy.
     physics_rung: int | None = None
+    # Exact pascals from the oxygen owner. None when the route is a log by
+    # definition and no located pressure was read. Callers command
+    # ``pressure_pa`` and do not rebuild it from ``log10_fO2_bar``.
+    pressure_pa: Decimal | None = None
+    notices: tuple[Notice, ...] = ()
 
 
 _PHYSICS_RUNG_LABELS = {
@@ -142,6 +147,64 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
     )
+
+
+def dp010_command_notice(
+    quantity: Quantity,
+    intrinsic: ResolvedFo2,
+    *,
+    identity: Identity | None,
+    printed_log: str | None = None,
+    atmospheric_quote: str | None = None,
+) -> tuple[Notice, Decimal, Decimal]:
+    """The phase and vapour paths share one DP-010 receipt.
+
+    The notice carries the registry policy, the commanded default, and the
+    missing-evidence clause. The returned pascal value is that command once;
+    callers keep it instead of rebuilding it from a float log.
+    """
+
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+    from simulator.battery.records import NoticePolicy
+
+    command = float(intrinsic.log10_fO2_bar)
+    policy = resolve_default_policy("DP-010", formula_result=command)
+    ladder_notice = fo2_tier_notice(quantity, intrinsic)
+    frame_evidence = scale_unknown_evidence_clause(identity, printed_log)
+    if frame_evidence is not None:
+        missing_evidence = frame_evidence
+    else:
+        missing_evidence = (
+            "original_missing_evidence=no printed fO2, applicable buffer, or "
+            "air-composition evidence; "
+        )
+    quote = (
+        f"pressure_evidence_quote={atmospheric_quote!r}; "
+        if atmospheric_quote is not None
+        else ""
+    )
+    # Registry formatting normalises -9.0 to -9. The commanded default keeps
+    # the value the engine is given.
+    policy_meta = replace(
+        NoticePolicy(**policy.payload["policy"]),
+        value=str(command),
+    )
+    notice = replace(
+        ladder_notice,
+        kind=policy.flag,
+        reason=(
+            "DP-010 physics_rung=4: "
+            + missing_evidence
+            + f"commanded_default_log10_bar={str(command)}; "
+            + quote
+            + ladder_notice.reason
+        ),
+        origin="score:DP-010",
+        policy=policy_meta,
+    )
+    log = Decimal(str(command))
+    return notice, log, log10_fo2_to_pa(log)
 
 
 def fo2_refusal_notice(quantity: Quantity) -> Notice:
@@ -219,6 +282,7 @@ def resolve_row_fo2(
     oxygen: WaypointResult | None = None,
     source_oxygen_bar: float | None = None,
     quantity: Quantity | None = None,
+    include_ferric_inverse: bool = True,
 ) -> ResolvedFo2 | None:
     """Resolve one fO2 for this row. None when every tier fails.
 
@@ -226,8 +290,13 @@ def resolve_row_fo2(
     row has no positive point temperature. The identity temperature is used
     only when the caller does not pass one.
 
-    ``quantity`` selects the effusion closure. Activity callers omit it, so
-    a melt-activity row never takes the vapour closure.
+    ``quantity`` selects the effusion closure and the air / DP-010 receipts.
+    Activity callers that omit it keep the historical tier-4 number with no
+    DP-010 notice. A melt-activity row never takes the vapour closure.
+
+    ``include_ferric_inverse`` is false for phase and redox. Named failure:
+    scoring a ferric ratio or a phase composition must not command fO2 from
+    that same ratio. Activity and vapour keep the Kress inverse.
     """
 
     identity = _identity(observation)
@@ -239,10 +308,19 @@ def resolve_row_fo2(
         temperature = None
     routes = _oxygen_routes(experiment, bench, observation, oxygen)
     knudsen_vapour = _vapour_quantity(quantity) and _is_knudsen(experiment)
+    physics_rung = 1 if knudsen_vapour else None
     rys_row_oxygen_unverified = (
         _rys_oxygen_measurement_status(observation, quantity)
         not in {None, "measured_independent"}
     )
+    # A DP-112 receipt already stored the absolute pressure. It precedes a
+    # buffer waypoint and any log reconstructed from one.
+    if _receipted_buffer(observation) and not rys_row_oxygen_unverified:
+        admitted = absolute_frame_admission(
+            observation, identity, physics_rung=physics_rung
+        )
+        if admitted is not None:
+            return resolved_from_admitted(admitted)
     for route in routes:
         if (
             rys_row_oxygen_unverified
@@ -253,65 +331,79 @@ def resolve_row_fo2(
         ):
             continue
         if _is_tier1(route, observation):
-            log = _log_point(route.value)
-            if log is not None:
-                return ResolvedFo2(
-                    log, 1, route.route, False,
-                    physics_rung=1 if knudsen_vapour else None,
-                )
-    printed = (
-        None
-        if rys_row_oxygen_unverified
-        else _printed_identity_bar(observation, identity)
-    )
-    if printed is not None:
-        bar, log = printed
-        return ResolvedFo2(
-            log, 1, "identity_fO2_Pa", False, po2_bar=bar,
-            physics_rung=1 if knudsen_vapour else None,
+            admitted = admit_waypoint_oxygen(
+                route,
+                experiment,
+                observation,
+                bench=bench,
+                tier=1,
+                physics_rung=physics_rung,
+            )
+            if admitted is not None:
+                return resolved_from_admitted(admitted)
+    if not rys_row_oxygen_unverified and (
+        observation is not None
+        and identity is not None
+        and has_printed_fo2(observation, identity)
+    ):
+        admitted = absolute_frame_admission(
+            observation, identity, physics_rung=physics_rung
         )
+        if admitted is not None:
+            return resolved_from_admitted(admitted)
     weights = _weight_percent(composition, composition_moles, composition_wt, identity)
     # On a Knudsen vapour row, an unprinted ferric ratio or melt redox estimate
     # does not replace the cell's explicit oxygen control or effusion balance.
-    if not knudsen_vapour:
+    # Phase and redox pass include_ferric_inverse=False: their target is the
+    # ferric split, so the inverse would command oxygen from the quantity
+    # being scored.
+    if include_ferric_inverse and not knudsen_vapour:
         tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
         if tier2 is not None:
-            return tier2
+            return _with_exact_pascals(tier2)
     for route in routes:
         if route.route in _TIER3_ATMOSPHERE_ROUTES:
-            log = _log_point(route.value)
-            if log is not None:
-                return ResolvedFo2(
-                    log, 3, route.route, False,
-                    physics_rung=1 if knudsen_vapour else None,
-                )
+            if route.route == "buffer_relation" and (
+                uncalibrated_buffer_awaits_receipt(observation)
+                or _receipted_buffer(observation)
+            ):
+                continue
+            admitted = admit_waypoint_oxygen(
+                route,
+                experiment,
+                observation,
+                bench=bench,
+                tier=3,
+                physics_rung=physics_rung,
+            )
+            if admitted is not None:
+                return resolved_from_admitted(admitted)
+    unresolved = admit_unresolved_buffer(
+        observation, experiment, tier=3, physics_rung=physics_rung
+    )
+    if unresolved is not None:
+        return resolved_from_admitted(unresolved[1])
     atmosphere = _gas_ratio_fo2(experiment, temperature)
     if atmosphere is not None:
+        sealed = _with_exact_pascals(atmosphere)
         if knudsen_vapour:
-            return ResolvedFo2(
-                atmosphere.log10_fO2_bar,
-                atmosphere.tier,
-                atmosphere.route,
-                atmosphere.borrowed,
-                po2_bar=atmosphere.po2_bar,
-                closure=atmosphere.closure,
-                cell_material=atmosphere.cell_material,
-                physics_rung=1,
-            )
-        return atmosphere
+            return replace(sealed, physics_rung=1)
+        return sealed
     if knudsen_vapour and source_oxygen_bar is not None:
         try:
             bar = float(source_oxygen_bar)
         except (TypeError, ValueError, ArithmeticError):
             bar = math.nan
         if math.isfinite(bar) and bar > 0.0:
-            return ResolvedFo2(
-                math.log10(bar),
-                3,
-                "source_linked_oxygen_condition",
-                False,
-                po2_bar=bar,
-                physics_rung=2,
+            return _with_exact_pascals(
+                ResolvedFo2(
+                    math.log10(bar),
+                    3,
+                    "source_linked_oxygen_condition",
+                    False,
+                    po2_bar=bar,
+                    physics_rung=2,
+                )
             )
     if (
         observation is not None
@@ -337,12 +429,14 @@ def resolve_row_fo2(
                 # Rego reports graphite under a CO-only cover, so the stated
                 # CO pressure is the row's total pressure. Its observed pNa is
                 # the target and does not enter this source condition.
-                return ResolvedFo2(
-                    log10_fo2_c_co_bar(temperature, p_co_bar),
-                    3,
-                    "rego_c_co_two_species_approximation",
-                    False,
-                    physics_rung=1,
+                return _with_exact_pascals(
+                    ResolvedFo2(
+                        log10_fo2_c_co_bar(temperature, p_co_bar),
+                        3,
+                        "rego_c_co_two_species_approximation",
+                        False,
+                        physics_rung=1,
+                    )
                 )
     if knudsen_vapour and (temperature is None or not weights):
         return None
@@ -363,12 +457,27 @@ def resolve_row_fo2(
         return None
     for route in routes:
         if route.route == _VACUUM_ROUTE:
-            log = _log_point(route.value)
-            if log is not None:
-                return ResolvedFo2(log, 3, route.route, False)
+            admitted = admit_waypoint_oxygen(
+                route, experiment, observation, bench=bench, tier=3
+            )
+            if admitted is not None:
+                return resolved_from_admitted(admitted)
     if _knudsen_blocks_intrinsic(experiment, observation, quantity):
         return None
-    return _tier4(weights, temperature)
+    if quantity is not None:
+        air = _air_oxygen_decision(
+            experiment, observation, identity, quantity
+        )
+        if air is not None:
+            return air
+    return _borrowed_oxygen_decision(
+        weights,
+        temperature,
+        quantity=quantity,
+        identity=identity,
+        observation=observation,
+        experiment=experiment,
+    )
 
 
 def _metal_saturation_declared(experiment: Experiment | None) -> bool:
@@ -504,9 +613,382 @@ def _oxygen_routes(
     return oxygen.routes
 
 
+def absolute_oxygen_frame(identity: Identity | None) -> bool:
+    """True when the row's oxygen pressure is already an absolute value.
+
+    Migration writes that value only after it has bound a frame: an explicit
+    bar or atm unit, a printed atmosphere match, or the 1-bar convention.
+    A located log with no inference is not a frame. The scale-unknown
+    sentence is not a value, so it is not absolute.
+    """
+
+    if identity is None:
+        return False
+    state = identity.fO2_Pa
+    if state is None or not state.is_value or state.value is None:
+        return False
+    try:
+        pa = float(state.value)
+    except (TypeError, ValueError):
+        return False
+    return math.isfinite(pa) and pa > 0.0
+
+
+def scale_unknown_oxygen(identity: Identity | None) -> bool:
+    """True when the stored pressure says the log's scale was not printed."""
+
+    if identity is None or identity.fO2_Pa is None or not identity.fO2_Pa.is_unknown:
+        return False
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    return identity.fO2_Pa.reason == _BARE_LOG_SCALE_UNKNOWN
+
+
+def scale_unknown_evidence_clause(
+    identity: Identity | None, printed_fO2_log: str | None
+) -> str | None:
+    """Flag text for a log whose absolute-versus-buffer frame was not printed.
+
+    The clause quotes the stored reason and the printed log, including a
+    real zero, and names DP-010 as the command that replaces it. Callers
+    that already hold a different registered default keep their own sentence.
+    """
+
+    if not scale_unknown_oxygen(identity):
+        return None
+    from simulator.battery.migrate import _BARE_LOG_SCALE_UNKNOWN
+
+    printed = "absent" if printed_fO2_log is None else printed_fO2_log
+    return (
+        f"original_missing_evidence={_BARE_LOG_SCALE_UNKNOWN}; "
+        f"printed_fO2_log={printed}; "
+        "reference_frame_default=DP-010; "
+    )
+
+
+def oxygen_frame_receipts(observation: Observation | None) -> tuple[Notice, ...]:
+    """Notices that record the frame a grounded log was admitted under."""
+
+    if observation is None:
+        return ()
+    from simulator.battery.migrate import _BARE_LOG_BAR_NOTICE
+
+    return tuple(
+        notice
+        for notice in observation.notices
+        if isinstance(notice.reason, str)
+        and (
+            notice.reason == _BARE_LOG_BAR_NOTICE
+            or notice.kind is NoticeKind.FO2_FRAME_FROM_PRINTED_ATMOSPHERE
+        )
+    )
+
+
+@dataclass(frozen=True)
+class AdmittedOxygen:
+    """One oxygen pressure admitted with the frame that resolved it.
+
+    ``pressure_pa`` is the stored absolute pressure. ``log10_bar`` is that
+    pressure over 1 bar. Callers command ``command_bar()`` and keep
+    ``pressure_pa``; they do not rebuild pascals from the printed log.
+    """
+
+    pressure_pa: Decimal
+    log10_bar: Decimal
+    tier: int
+    route: str
+    borrowed: bool
+    notices: tuple[Notice, ...] = ()
+    physics_rung: int | None = None
+
+    def command_bar(self) -> float:
+        return float(self.pressure_pa / BAR_PA_DECIMAL)
+
+
+def decimal_log10_bar(pressure_pa: Decimal) -> Decimal:
+    """log10(pressure_pa / 1 bar). 100000 Pa is exactly zero."""
+
+    return pressure_pa.log10() - BAR_PA_DECIMAL.log10()
+
+
+def stored_absolute_pressure_pa(identity: Identity | None) -> Decimal | None:
+    """The identity's finite positive fO2 in pascals, or None."""
+
+    if identity is None or identity.fO2_Pa is None or not identity.fO2_Pa.is_value:
+        return None
+    value = identity.fO2_Pa.value
+    if not isinstance(value, Decimal):
+        return None
+    if not value.is_finite() or value <= 0:
+        return None
+    return value
+
+
+def _admission_notices(observation: Observation | None) -> tuple[Notice, ...]:
+    """DP-112 receipts, their pressure warnings, and frame receipts, once each.
+
+    ``pressure_provenance_unknown`` from the DP-112 resolver has no policy id.
+    Dropping it leaves the oxygen command without the omitted-pressure warning.
+    A derived-condition notice of the same kind is not a resolver warning.
+    """
+
+    if observation is None:
+        return ()
+    from simulator.battery.oxygen_identity import _dp112_receipts
+
+    pressure_warnings = tuple(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.origin == "score:DP-112"
+    )
+    notices: list[Notice] = []
+    for notice in (
+        *_dp112_receipts(observation),
+        *pressure_warnings,
+        *oxygen_frame_receipts(observation),
+    ):
+        if notice not in notices:
+            notices.append(notice)
+    return tuple(notices)
+
+
+def absolute_frame_admission(
+    observation: Observation | None,
+    identity: Identity | None,
+    *,
+    route: str = "identity_fO2_Pa",
+    tier: int = 1,
+    physics_rung: int | None = None,
+) -> AdmittedOxygen | None:
+    """Admit the stored absolute pressure when the frame is already resolved.
+
+    A monkeypatched frame check with no stored pressure returns None.
+    Callers do not reconstruct a bar command from the printed log.
+    """
+
+    if not absolute_oxygen_frame(identity):
+        return None
+    pressure_pa = stored_absolute_pressure_pa(identity)
+    if pressure_pa is None:
+        return None
+    return AdmittedOxygen(
+        pressure_pa=pressure_pa,
+        log10_bar=decimal_log10_bar(pressure_pa),
+        tier=tier,
+        route=route,
+        borrowed=False,
+        notices=_admission_notices(observation),
+        physics_rung=physics_rung,
+    )
+
+
+_LOG_DEFINED_OXYGEN_ROUTES = frozenset({
+    "observation_gas_couple_equilibrium",
+    "graphite_c_co_buffer",
+    "buffer_relation",
+})
+_PA_BACKED_OXYGEN_ROUTES = (
+    TYPED_RUN_OXYGEN_ROUTES
+    | EXPERIMENT_RUN_OXYGEN_ROUTES
+    | frozenset({
+        "observation_fO2_Pa_to_log_fO2",
+        "vacuum_total_pressure_upper_bound",
+        "observation_gas_composition",
+    })
+)
+
+
+def resolved_from_admitted(admitted: AdmittedOxygen) -> ResolvedFo2:
+    """The ladder's float command plus the owner's exact pascals and notices."""
+
+    return ResolvedFo2(
+        float(admitted.log10_bar),
+        admitted.tier,
+        admitted.route,
+        admitted.borrowed,
+        po2_bar=admitted.command_bar(),
+        physics_rung=admitted.physics_rung,
+        pressure_pa=admitted.pressure_pa,
+        notices=admitted.notices,
+    )
+
+
+def _admit_log_defined(
+    route: Waypoint,
+    *,
+    tier: int,
+    observation: Observation | None,
+    physics_rung: int | None,
+) -> AdmittedOxygen | None:
+    """One conversion of an evaluated log. The log is the quantity."""
+
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    if not isinstance(route.value, Value) or route.value.kind is not ValueKind.POINT:
+        return None
+    point = route.value.point
+    if not isinstance(point, Decimal) or not point.is_finite():
+        return None
+    pressure_pa = log10_fo2_to_pa(point)
+    if not pressure_pa.is_finite() or pressure_pa <= 0:
+        return None
+    return AdmittedOxygen(
+        pressure_pa=pressure_pa,
+        log10_bar=point,
+        tier=tier,
+        route=route.route,
+        borrowed=False,
+        notices=_admission_notices(observation),
+        physics_rung=physics_rung,
+    )
+
+
+def admit_waypoint_oxygen(
+    route: Waypoint,
+    experiment: Experiment | None,
+    observation: Observation | None,
+    *,
+    bench: object | None = None,
+    tier: int,
+    physics_rung: int | None = None,
+) -> AdmittedOxygen | None:
+    """One typed admission for a score-time oxygen waypoint.
+
+    A route that started as pascals keeps those pascals. A route whose
+    quantity is an evaluated log converts once. A missing located pressure
+    is not recovered by inverting the waypoint log.
+    """
+
+    if route.route == "observation_fO2_log":
+        return absolute_frame_admission(
+            observation,
+            _identity(observation),
+            route=route.route,
+            tier=tier,
+            physics_rung=physics_rung,
+        )
+    if route.route in _PA_BACKED_OXYGEN_ROUTES:
+        if experiment is None:
+            return None
+        pressure_pa = route_source_pressure_pa(
+            experiment, bench, observation, route.route
+        )
+        if pressure_pa is None:
+            # An ideal-mixture interval has no single point. Keep its log.
+            if route.route == "observation_gas_composition":
+                return _admit_log_defined(
+                    route,
+                    tier=tier,
+                    observation=observation,
+                    physics_rung=physics_rung,
+                )
+            return None
+        return AdmittedOxygen(
+            pressure_pa=pressure_pa,
+            log10_bar=decimal_log10_bar(pressure_pa),
+            tier=tier,
+            route=route.route,
+            borrowed=False,
+            notices=_admission_notices(observation),
+            physics_rung=physics_rung,
+        )
+    if route.route in _LOG_DEFINED_OXYGEN_ROUTES:
+        return _admit_log_defined(
+            route,
+            tier=tier,
+            observation=observation,
+            physics_rung=physics_rung,
+        )
+    return None
+
+
+def admit_unresolved_buffer(
+    observation: Observation | None,
+    experiment: Experiment | None,
+    *,
+    tier: int = 3,
+    physics_rung: int | None = None,
+) -> tuple[Observation, AdmittedOxygen] | None:
+    """Resolve a calibration marker that DP-112 has not yet receipted.
+
+    The pressure is the resolver's stored pascals. Notices are only the
+    ones the resolver added. A marker the resolver cannot evaluate returns
+    None so later named routes still run.
+    """
+
+    if observation is None or not uncalibrated_buffer_awaits_receipt(observation):
+        return None
+    from simulator.battery.oxygen_identity import _resolve_score_time_buffer_identity
+
+    resolved = _resolve_score_time_buffer_identity(
+        observation,
+        ambient_pressure_evidence=(
+            None if experiment is None else experiment.ambient_pressure_evidence
+        ),
+    )
+    pressure_pa = stored_absolute_pressure_pa(
+        resolved.identity if isinstance(resolved.identity, Identity) else None
+    )
+    new_notices = tuple(
+        notice
+        for notice in resolved.notices
+        if notice not in observation.notices
+    )
+    if pressure_pa is None or not any(
+        notice.policy is not None and notice.policy.id == "DP-112"
+        for notice in new_notices
+    ):
+        return None
+    return resolved, AdmittedOxygen(
+        pressure_pa=pressure_pa,
+        log10_bar=decimal_log10_bar(pressure_pa),
+        tier=tier,
+        route="score:DP-112",
+        borrowed=False,
+        notices=new_notices,
+        physics_rung=physics_rung,
+    )
+
+
+def _receipted_buffer(observation: Observation | None) -> bool:
+    """True when DP-112 has already receipted this row's buffer."""
+
+    if observation is None:
+        return False
+    from simulator.battery.oxygen_identity import _dp112_receipts
+
+    return bool(_dp112_receipts(observation))
+
+
+def uncalibrated_buffer_awaits_receipt(observation: Observation | None) -> bool:
+    """True when a buffer marker is present and DP-112 has not receipted it.
+
+    A typed buffer name is not the calibration. The marker has to be seen
+    by the DP-112 resolver before any buffer command is admitted.
+    """
+
+    if observation is None:
+        return False
+    marker = False
+    for notice in observation.notices:
+        if (
+            notice.kind
+            is not NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        ):
+            continue
+        if notice.policy is not None and notice.policy.id == "DP-112":
+            return False
+        marker = True
+    return marker
+
+
 def _is_tier1(route: Waypoint, observation: Observation | None) -> bool:
     if route.route == "observation_fO2_log":
-        return route.authority is WaypointAuthority.PRINTED
+        return (
+            route.authority is WaypointAuthority.PRINTED
+            and absolute_oxygen_frame(_identity(observation))
+        )
     if route.route == "observation_fO2_Pa_to_log_fO2":
         if observation is None or derived_fo2_condition(observation):
             return False
@@ -532,6 +1014,38 @@ def _log_point(value: object) -> float | None:
     if not math.isfinite(number):
         return None
     return number
+
+
+def admitted_score_oxygen(
+    oxygen: WaypointResult, observation: Observation | None
+) -> Waypoint | None:
+    """First score-time oxygen route in the waypoint owner's order.
+
+    Tier 1 is a grounded printed log, a provenance-valid observation
+    pressure, or a registered run route. An unknown frame is not tier 1.
+    Tier 3 is a gas mixture or a buffer whose calibration is not waiting
+    on a DP-112 receipt. An uncalibrated buffer marker is not admitted
+    here: the DP-112 resolver has to see it first.
+    """
+
+    for route in oxygen.routes:
+        if _is_tier1(route, observation) and _log_point(route.value) is not None:
+            return route
+    for route in oxygen.routes:
+        if (
+            route.route in _TIER3_ATMOSPHERE_ROUTES
+            and route.authority is WaypointAuthority.DERIVED
+            and _log_point(route.value) is not None
+            and not (
+                route.route == "buffer_relation"
+                and (
+                    uncalibrated_buffer_awaits_receipt(observation)
+                    or _receipted_buffer(observation)
+                )
+            )
+        ):
+            return route
+    return None
 
 
 def _printed_identity_bar(
@@ -962,3 +1476,179 @@ def _tier4(
     if not math.isfinite(log):
         return None
     return ResolvedFo2(log, 4, "intrinsic_melt_fO2", True)
+
+
+def _with_exact_pascals(resolved: ResolvedFo2) -> ResolvedFo2:
+    """Attach the owner's pascals once. Closures and sealed routes stay as they are.
+
+    A route that already names a bar keeps that bar as the pascal source.
+    A log-defined route converts once through ``log10_fo2_to_pa``. Callers
+    command ``pressure_pa`` and do not exponentiate the float log again.
+    """
+
+    if resolved.closure or resolved.pressure_pa is not None:
+        return resolved
+    if not math.isfinite(resolved.log10_fO2_bar):
+        return resolved
+    from simulator.battery.oxygen_identity import log10_fo2_to_pa
+
+    if (
+        resolved.po2_bar is not None
+        and math.isfinite(resolved.po2_bar)
+        and resolved.po2_bar > 0.0
+    ):
+        pressure_pa = Decimal(str(resolved.po2_bar)) * BAR_PA_DECIMAL
+    else:
+        pressure_pa = log10_fo2_to_pa(Decimal(str(resolved.log10_fO2_bar)))
+    if not pressure_pa.is_finite() or pressure_pa <= 0:
+        return resolved
+    return replace(resolved, pressure_pa=pressure_pa)
+
+
+def printed_total_pressure_pa(
+    identity: Identity | None, observation: Observation | None
+) -> Decimal | None:
+    """Located total pressure in pascals, from the identity or the row."""
+
+    if identity is not None and identity.total_pressure_Pa is not None:
+        state = identity.total_pressure_Pa
+        if state.is_value and state.value is not None:
+            pa = nominal_pressure_pa(state)
+            if pa is not None and pa.is_finite() and pa > 0:
+                return pa
+    if observation is None:
+        return None
+    located = (observation.point_conditions or {}).get("total_pressure_Pa")
+    if located is None or located.inference is not None or not located.state.is_value:
+        return None
+    pa = nominal_pressure_pa(located)
+    if pa is None or not pa.is_finite() or pa <= 0:
+        return None
+    return pa
+
+
+def _printed_log_text(observation: Observation | None) -> str | None:
+    if observation is None:
+        return None
+    located = (observation.point_conditions or {}).get("fO2_log")
+    if located is None or not located.state.is_value:
+        return None
+    raw = located.state.value
+    if isinstance(raw, Value):
+        if raw.kind is not ValueKind.POINT or raw.point is None:
+            return None
+        raw = raw.point
+    if isinstance(raw, Decimal) and raw.is_finite():
+        return format(raw, "f")
+    return None
+
+
+def _air_oxygen_decision(
+    experiment: Experiment | None,
+    observation: Observation | None,
+    identity: Identity | None,
+    quantity: Quantity,
+) -> ResolvedFo2 | None:
+    """DP-003 when the sample was equilibrated in air and no earlier route fired.
+
+    The notice text is the phase path's receipt. Total pressure is the printed
+    value, or DP-002 when that registered default applies. The oxygen pascal
+    is the policy result, not a second evaluation of the mole fraction.
+    """
+
+    if observation is None:
+        return None
+    from simulator.battery.default_policy import resolve as resolve_default_policy
+    from simulator.battery.oxygen_identity import (
+        _air_composition_quote,
+        _dp002_pressure_default,
+    )
+    from simulator.battery.records import NoticePolicy
+
+    atmospheric = None if experiment is None else experiment.ambient_pressure_evidence
+    atmosphere_condition = (observation.point_conditions or {}).get("atmosphere")
+    air_quote = _air_composition_quote(
+        atmospheric, atmosphere_condition=atmosphere_condition
+    )
+    if air_quote is None:
+        return None
+    pressure_pa = printed_total_pressure_pa(identity, observation)
+    pressure_notices: tuple[Notice, ...] = ()
+    if pressure_pa is None:
+        pressure_pa, pressure_notice = _dp002_pressure_default(
+            atmospheric,
+            quantity,
+            atmosphere_condition=atmosphere_condition,
+        )
+        if pressure_notice is not None:
+            pressure_notices = (pressure_notice,)
+    if pressure_pa is None:
+        return None
+    # The phase receipt prints the bar round trip, and DP-003 consumes that
+    # same total. Keep both so the notice text and the oxygen pascal stay
+    # the values the phase path already produced.
+    total_pressure_pa = (pressure_pa / BAR_PA_DECIMAL) * BAR_PA_DECIMAL
+    policy = resolve_default_policy("DP-003", P_total=total_pressure_pa)
+    oxygen_pa = as_decimal(policy.value)
+    if not oxygen_pa.is_finite() or oxygen_pa <= 0:
+        return None
+    oxygen_notice = Notice(
+        kind=policy.flag,
+        affected_quantities=(quantity,),
+        reason=(
+            "DP-003 physics_rung=3: source says the experiment was "
+            f"in air; quote={air_quote!r}; "
+            f"P_total={total_pressure_pa} Pa"
+        ),
+        origin="score:DP-003",
+        policy=NoticePolicy(**policy.payload["policy"]),
+    )
+    return ResolvedFo2(
+        float(decimal_log10_bar(oxygen_pa)),
+        3,
+        "score:DP-003",
+        False,
+        po2_bar=float(oxygen_pa / BAR_PA_DECIMAL),
+        physics_rung=3,
+        pressure_pa=oxygen_pa,
+        notices=(*pressure_notices, oxygen_notice),
+    )
+
+
+def _borrowed_oxygen_decision(
+    weights: dict[str, float] | None,
+    temperature_K: float | None,
+    *,
+    quantity: Quantity | None,
+    identity: Identity | None,
+    observation: Observation | None,
+    experiment: Experiment | None,
+) -> ResolvedFo2 | None:
+    """Tier 4. DP-010 is attached only when the caller names a quantity.
+
+    Callers that omit quantity compare the bare intrinsic log. Naming a
+    quantity is what makes the commanded default a scored receipt.
+    """
+
+    intrinsic = _tier4(weights, temperature_K)
+    if intrinsic is None:
+        return None
+    sealed = _with_exact_pascals(intrinsic)
+    if quantity is None or sealed.pressure_pa is None:
+        return sealed
+    quote = None
+    if experiment is not None and experiment.ambient_pressure_evidence is not None:
+        quote = experiment.ambient_pressure_evidence.quote
+    notice, _command_log, command_pa = dp010_command_notice(
+        quantity,
+        sealed,
+        identity=identity,
+        printed_log=_printed_log_text(observation),
+        atmospheric_quote=quote,
+    )
+    return replace(
+        sealed,
+        pressure_pa=command_pa,
+        po2_bar=float(command_pa / BAR_PA_DECIMAL),
+        notices=(notice,),
+    )

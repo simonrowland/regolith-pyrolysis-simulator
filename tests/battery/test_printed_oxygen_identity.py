@@ -12,13 +12,27 @@ absolute log still wins. A row with no printed oxygen stays unknown.
 from __future__ import annotations
 
 from collections import Counter
+from dataclasses import replace
 from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
+import re
 
 import pytest
 
-from simulator.battery.enums import Authority, NoticeKind, Quantity, ValueKind
-from simulator.battery.identity import IdentityEqualKind, identity_equal
+from simulator.battery.default_policy import resolve as resolve_default_policy
+from simulator.battery.enums import (
+    AmountBasis,
+    AmbientPressureEvidenceClass,
+    Authority,
+    Engine,
+    FO2Channel,
+    NoticeKind,
+    PhaseRole,
+    Quantity,
+    ResidualStatus,
+    ValueKind,
+)
+from simulator.battery.identity import IdentityEqualKind, identity_equal, quantity_token
 from simulator.battery.migrate import (
     Migrator,
     _BARE_LOG_BAR_NOTICE,
@@ -26,13 +40,53 @@ from simulator.battery.migrate import (
     _BOUNDED_FO2_REASON,
     _band_text,
     _log_fO2_to_pa,
+    load_migrated_store,
 )
-from simulator.battery.records import Located, Value
+from simulator.battery.records import (
+    AmbientPressureEvidence,
+    Composition,
+    Derivation,
+    FO2Control,
+    Located,
+    Locator,
+    Value,
+    nominal_pressure_pa,
+)
+from simulator.battery.oxygen_identity import (
+    _air_composition_quote,
+    _dp002_applicability,
+    _printed_buffer_offset,
+    _resolve_score_time_buffer_identity,
+)
+from simulator.battery.score import (
+    _headline_payload_admits,
+    compile_residual,
+    flagged_strata,
+    load_score_context,
+    rail_for_quantity,
+)
 from simulator.chemistry.fo2_buffers import evaluate_buffer
+from simulator.state_types import State
 from tests.battery.test_migrate import _scalar_extract, _write_min_tree
 
 ROOT = Path(__file__).resolve().parents[2]
 _UNMAPPED = "no fO2_Pa mapped from source"
+_BUFFER_IDENTITY_PIN_COUNTS = {
+    "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas": 28,
+    "jugo-2010-sulfur-xanes": 7,
+    "gaillard-2003-hydrous-silicic-melt-activity": 96,
+    "borisov-veksler-2021-k-fe-supplement": 6672,
+    "zagrtdenov-2020-chromite-magnesiochromite-solubility": 132,
+    "neuman-2026-levitation-k-isotopes": 6,
+    "lu-2026-mercury-sulfur-liquidus": 61,
+    "jugo-luth-richards-2005-basaltic-sulfur-sulfate-saturation": 117,
+}
+_BUFFER_MARKER_ONLY_COUNTS = {
+    "hanson-jones-1998-am-cr-partitioning-olivine-liquid": 276,
+    "neuman-2026-levitation-k-isotopes": 1457,
+    "zhang-2024-alkali-evaporation-ti-thesis": 111,
+    "leuthold-2023-basalt-partition-fo2": 2,
+}
 
 # 10^-9.56 bar × 1e5 Pa/bar, computed as Decimal arithmetic.
 # The brief rounds this to 2.754e-5 Pa.
@@ -1317,3 +1371,1725 @@ def test_activity_without_printed_oxygen_stays_unknown(tmp_path: Path) -> None:
     )
     assert all("fO2_log" not in (observation.point_conditions or {}) for observation in rows)
     assert all("fO2_Pa" not in (observation.point_conditions or {}) for observation in rows)
+
+
+def test_every_numeric_canonical_buffer_identity_matches_the_owner() -> None:
+    _, _, observations = load_migrated_store(
+        ROOT, sources=tuple(_BUFFER_IDENTITY_PIN_COUNTS)
+    )
+    counts: Counter[str] = Counter()
+    mismatches = []
+    for observation in observations.values():
+        marker = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind
+                is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            ),
+            None,
+        )
+        identity = observation.identity
+        oxygen = getattr(identity, "fO2_Pa", None)
+        if (
+            observation.source_id not in _BUFFER_IDENTITY_PIN_COUNTS
+            or marker is None
+            or oxygen is None
+            or not oxygen.is_value
+            or not isinstance(oxygen.value, Decimal)
+        ):
+            continue
+        counts[observation.source_id] += 1
+        match = re.search(
+            r"(?:^|\s)buffer=([^\s]+).*?(?:^|\s)offset=([^\s]+)",
+            marker.reason,
+        )
+        if match is None:
+            mismatches.append(
+                (observation.source_id, observation.observation_id, "missing buffer/offset")
+            )
+            continue
+        buffer, raw_offset = match.groups()
+        temperature_state = identity.temperature_K
+        pressure_state = identity.total_pressure_Pa
+        pressure_pa = (
+            nominal_pressure_pa(pressure_state)
+            if pressure_state is not None and pressure_state.is_value
+            else None
+        )
+        temperature = (
+            temperature_state.value
+            if temperature_state is not None and temperature_state.is_value
+            else None
+        )
+        if temperature is None or (
+            pressure_pa is None
+            and pressure_state is not None
+            and pressure_state.is_value
+        ):
+            mismatches.append(
+                (observation.source_id, observation.observation_id, "invalid T/P")
+            )
+            continue
+        pressure_bar = (
+            None if pressure_pa is None else pressure_pa / Decimal("100000")
+        )
+        evaluation = evaluate_buffer(
+            buffer,
+            temperature,
+            pressure_bar=pressure_bar,
+        )
+        output = _log_fO2_to_pa(
+            evaluation.log10_fO2_bar + Decimal(raw_offset.replace("−", "-"))
+        )
+        if output != oxygen.value:
+            mismatches.append(
+                (
+                    observation.source_id,
+                    observation.observation_id,
+                    str(temperature),
+                    buffer,
+                    raw_offset,
+                    str(output),
+                    str(oxygen.value),
+                )
+            )
+
+    assert dict(counts) == _BUFFER_IDENTITY_PIN_COUNTS
+    assert not mismatches, mismatches
+
+
+def test_every_marked_numeric_identity_resolves_with_dp112() -> None:
+    _, _, observations = load_migrated_store(
+        ROOT, sources=tuple(_BUFFER_IDENTITY_PIN_COUNTS)
+    )
+    counts: Counter[str] = Counter()
+    samples = {}
+    for observation in observations.values():
+        resolved = _resolve_score_time_buffer_identity(observation)
+        if resolved is observation:
+            continue
+        source_id = observation.source_id
+        assert source_id in _BUFFER_IDENTITY_PIN_COUNTS
+        counts[source_id] += 1
+        samples.setdefault(source_id, (observation, resolved))
+
+        stored = observation.identity.fO2_Pa
+        actual = resolved.identity.fO2_Pa
+        assert stored is not None and stored.is_value
+        assert actual is not None and actual.is_value
+        assert actual.value == stored.value
+        notice = next(
+            notice
+            for notice in resolved.notices
+            if notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        )
+        assert notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        assert notice.policy is not None
+        assert notice.policy.id == "DP-112"
+        assert notice.policy.version == 1
+        assert notice.policy.status == "proposed"
+        expected_policy = resolve_default_policy("DP-112", formula_result=actual.value)
+        assert notice.policy.value == expected_policy.payload["policy"]["value"]
+        assert notice.policy.units == (
+            "printed offset and log10(fO2/bar) in dex; P in bar; output in Pa"
+        )
+        strata = flagged_strata(resolved.notices)
+        assert NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED.value in strata
+        assert "proposed-policy" in strata
+        assert notice.band is not None
+
+        quantity = observation.identity.quantity.value
+        species_formula = (
+            observation.identity.species.formula
+            if observation.identity.species is not None
+            else ""
+        )
+        rail = rail_for_quantity(quantity, species_formula=species_formula)
+        assert rail is not None
+        payload = {
+            "rail": rail.value,
+            "notices": [
+                {
+                    "kind": notice.kind.value,
+                    "reason": notice.reason,
+                    "policy": {
+                        "id": notice.policy.id,
+                        "version": notice.policy.version,
+                        "status": notice.policy.status,
+                        "value": notice.policy.value,
+                        "units": notice.policy.units,
+                    },
+                }
+            ],
+        }
+        assert not _headline_payload_admits(payload, tier="measured")
+
+    assert dict(counts) == _BUFFER_IDENTITY_PIN_COUNTS
+    assert set(samples) == set(_BUFFER_IDENTITY_PIN_COUNTS)
+    for observation, resolved in samples.values():
+        marker = next(
+            notice
+            for notice in observation.notices
+            if notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        )
+        printed_buffer = _printed_buffer_offset(marker.reason)
+        assert printed_buffer is not None
+        buffer, _offset = printed_buffer
+        identity = observation.identity
+        temperature = identity.temperature_K.value
+        pressure_pa = (
+            nominal_pressure_pa(identity.total_pressure_Pa)
+            if identity.total_pressure_Pa is not None
+            and identity.total_pressure_Pa.is_value
+            else None
+        )
+        pressure_bar = (
+            None if pressure_pa is None else pressure_pa / Decimal("100000")
+        )
+        evaluation = evaluate_buffer(buffer, temperature, pressure_bar=pressure_bar)
+        expected_band = (
+            "unsized"
+            if evaluation.band_dex is None
+            else format(evaluation.band_dex, "f")
+        )
+        resolved_notice = next(
+            notice
+            for notice in resolved.notices
+            if notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        )
+        assert resolved_notice.band == expected_band
+
+
+def test_dp112_mutation_ignores_stored_numeric_identity() -> None:
+    source_id = "mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas"
+    _, _, observations = load_migrated_store(ROOT, sources=(source_id,))
+    observation = next(
+        item
+        for item in observations.values()
+        if item.source_id == source_id
+        and any(
+            notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in item.notices
+        )
+    )
+    expected = _resolve_score_time_buffer_identity(observation).identity.fO2_Pa
+    assert expected is not None and expected.is_value
+
+    mutated_identity = replace(
+        observation.identity,
+        fO2_Pa=State.of(Decimal("123.456")),
+    )
+    mutated_observation = replace(observation, identity=mutated_identity)
+    mutated = _resolve_score_time_buffer_identity(mutated_observation)
+    assert mutated.identity.fO2_Pa == expected
+    assert mutated.identity.fO2_Pa.value != Decimal("123.456")
+
+
+def test_marker_rows_keep_buffer_labels_without_numeric_identity_fo2() -> None:
+    _, _, observations = load_migrated_store(
+        ROOT, sources=tuple(_BUFFER_MARKER_ONLY_COUNTS)
+    )
+    unchanged_counts: Counter[str] = Counter()
+    neuman_targets = 0
+    for observation in observations.values():
+        marker = next(
+            (
+                notice
+                for notice in observation.notices
+                if notice.kind
+                is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            ),
+            None,
+        )
+        if marker is None:
+            continue
+        resolved = _resolve_score_time_buffer_identity(observation)
+        if resolved is observation:
+            unchanged_counts[observation.source_id] += 1
+            assert (
+                NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED.value
+                not in flagged_strata(observation.notices)
+            )
+            continue
+        assert observation.source_id == "neuman-2026-levitation-k-isotopes"
+        assert observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-112"
+            for notice in resolved.notices
+        )
+        neuman_targets += 1
+
+    assert dict(unchanged_counts) == _BUFFER_MARKER_ONLY_COUNTS
+    assert neuman_targets == _BUFFER_IDENTITY_PIN_COUNTS[
+        "neuman-2026-levitation-k-isotopes"
+    ]
+
+
+def test_load_score_context_applies_dp112_before_scoring() -> None:
+    context = load_score_context(
+        ROOT,
+        sources=("mavrogenes-oneill-1999-sulfide-solubility-mafic-magmas",),
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-112"
+        for observation in context.observations.values()
+        for notice in observation.notices
+    )
+
+
+def test_neuman_dp112_numeric_output_pin() -> None:
+    context = load_score_context(
+        ROOT,
+        sources=("neuman-2026-levitation-k-isotopes",),
+    )
+    values = sorted(
+        str(observation.identity.fO2_Pa.value)
+        for observation in context.observations.values()
+        if observation.source_id == "neuman-2026-levitation-k-isotopes"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and any(
+            notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in observation.notices
+        )
+        and observation.identity.fO2_Pa is not None
+        and observation.identity.fO2_Pa.is_value
+    )
+
+    assert values == sorted(
+        [
+            "26.58486771855459565668361043",
+            "0.002658486771855459565668361043",
+            "0.002658486771855459565668361043",
+            "26.58486771855459565668361043",
+            "26.58486771855459565668361043",
+            "0.002658486771855459565668361043",
+        ]
+    )
+
+
+def test_neuman_pressure_policy_requires_registered_applicability() -> None:
+    context = load_score_context(
+        ROOT,
+        sources=("neuman-2026-levitation-k-isotopes",),
+    )
+    targets = [
+        observation
+        for observation in context.observations.values()
+        if observation.source_id == "neuman-2026-levitation-k-isotopes"
+        and observation.identity.quantity.is_value
+        and observation.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and any(
+            notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in observation.notices
+        )
+    ]
+    assert len(targets) == 6
+    for observation in targets:
+        experiment = context.experiments[observation.experiment_id]
+        assert experiment.pressure_environment.total_pressure_Pa.state.is_unknown
+        assert experiment.ambient_pressure_evidence is None
+        assert not any(
+            notice.origin == "score:DP-002" for notice in observation.notices
+        )
+        pressure_notice = next(
+            notice
+            for notice in observation.notices
+            if notice.origin == "score:DP-112"
+            and notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        )
+        assert "no applicable pressure policy resolves it" in pressure_notice.reason
+        dp112 = next(
+            notice
+            for notice in observation.notices
+            if notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+        )
+        assert "P_bar=not supplied (term omitted at one-bar reference)" in dp112.reason
+
+
+def test_dp002_applicability_uses_registered_pressure_evidence() -> None:
+    locator = Locator(page=2, section="Methods")
+    cases = (
+        (
+            AmbientPressureEvidenceClass.GAS_MIXING,
+            "Experiments were conducted in a gas-mixing furnace.",
+            "gas-mixing furnace",
+        ),
+        (
+            AmbientPressureEvidenceClass.GAS_FLOW,
+            "Samples were equilibrated on a wire-loop.",
+            "wire-loop equilibration",
+        ),
+        (
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            "Samples were equilibrated in air.",
+            'experiment "in air"',
+        ),
+    )
+    for evidence_class, quote, expected in cases:
+        evidence = AmbientPressureEvidence(evidence_class, quote, locator)
+        assert _dp002_applicability(evidence) == expected
+
+    flowing_levitation_gas = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.GAS_FLOW,
+        "Levitation used flowing Ar with CO and CO2 mixtures.",
+        locator,
+    )
+    assert _dp002_applicability(flowing_levitation_gas) is None
+
+    atmospheric_argon = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        "The run was at atmospheric pressure under flowing argon.",
+        locator,
+    )
+    assert _air_composition_quote(atmospheric_argon) is None
+    assert _dp002_applicability(atmospheric_argon) is None
+    printed_air = Located(State.of("Air"), locator=locator)
+    printed_air_token = Located(State.of("air"), locator=locator)
+    printed_argon = Located(State.of("Ar"), locator=locator)
+    assert _air_composition_quote(
+        None, atmosphere_condition=printed_air
+    ) == "Air"
+    # Borisov–Behrens–Holtz stores the located atmosphere value `air`.
+    assert _air_composition_quote(
+        None, atmosphere_condition=printed_air_token
+    ) == "air"
+    for negated in (
+        "The sample was not equilibrated in air.",
+        "Air was excluded during equilibration.",
+    ):
+        negated_evidence = AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            negated,
+            locator,
+        )
+        assert _air_composition_quote(negated_evidence) is None, negated
+        assert _dp002_applicability(negated_evidence) is None
+    assert _dp002_applicability(
+        None, atmosphere_condition=printed_air
+    ) == 'experiment "in air"'
+    assert _air_composition_quote(
+        None, atmosphere_condition=printed_argon
+    ) is None
+    assert _dp002_applicability(
+        None, atmosphere_condition=printed_argon
+    ) is None
+    assert _air_composition_quote(
+        atmospheric_argon, atmosphere_condition=printed_air
+    ) == "Air"
+    atmospheric_air = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        "The sample was equilibrated in air.",
+        locator,
+    )
+    assert _air_composition_quote(
+        atmospheric_air, atmosphere_condition=printed_argon
+    ) is None
+    prepared_then_air = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        "The sample was held under argon before the run. The sample was equilibrated in air.",
+        locator,
+    )
+    assert _air_composition_quote(prepared_then_air) == prepared_then_air.quote
+    assert _dp002_applicability(prepared_then_air) == 'experiment "in air"'
+    for false_air in (
+        "The sample was equilibrated in air-free argon.",
+        "The furnace sensor measured air outside the chamber during equilibration.",
+        "The furnace sensor recorded air during equilibration.",
+        "An argon sample was inside; air flowed in the room during equilibration.",
+        "Before the run, the sample was held in air. Equilibration was under argon.",
+        "The reference gas equilibrated in air. The sample equilibrated under argon.",
+        "The reference gas was equilibrated in air while the sample was equilibrated under nitrogen.",
+    ):
+        false_evidence = AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            false_air,
+            locator,
+        )
+        assert _air_composition_quote(false_evidence) is None, false_air
+        assert _dp002_applicability(false_evidence) is None
+
+
+def test_registered_method_pressure_precedes_the_unbound_default() -> None:
+    from simulator.battery.score import PA_PER_BAR_DEC, _condensed_pressure_for_score
+    from tests.battery import factories as F
+
+    identity = replace(
+        F.activity_identity(),
+        total_pressure_Pa=State.unknown("unprinted total pressure"),
+    )
+
+    def without_run_pressure(experiment):
+        return replace(
+            experiment,
+            pressure_environment=replace(
+                experiment.pressure_environment,
+                total_pressure_Pa=Located(
+                    State.unknown("unprinted total pressure"),
+                    locator=experiment.locator,
+                ),
+            ),
+        )
+
+    def resolve(experiment, point_conditions=None):
+        observation = F.observation(
+            "pressure-row",
+            experiment.experiment_id,
+            identity,
+            Decimal("1"),
+        )
+        if point_conditions is not None:
+            observation = replace(observation, point_conditions=point_conditions)
+        return _condensed_pressure_for_score(
+            identity,
+            observation,
+            experiment,
+            None,
+            Quantity.ACTIVITY,
+        )
+
+    gas = replace(
+        without_run_pressure(F.tabulation_experiment(experiment_id="gas-mix")),
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.GAS_MIXING,
+            "Experiments were conducted in a gas-mixing furnace.",
+            Locator(page=1),
+        ),
+    )
+    wire = replace(
+        without_run_pressure(F.tabulation_experiment(experiment_id="wire-loop")),
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.GAS_FLOW,
+            "Samples were equilibrated on a wire-loop.",
+            Locator(page=1),
+        ),
+    )
+    air = without_run_pressure(F.tabulation_experiment(experiment_id="in-air"))
+    unbound = without_run_pressure(F.tabulation_experiment(experiment_id="unbound"))
+    knudsen = F.kems_experiment(total_P=Decimal("1e-6"))
+
+    for experiment, marker in (
+        (gas, "gas-mixing furnace"),
+        (wire, "wire-loop equilibration"),
+    ):
+        resolved, pressure_bar, notices = resolve(experiment)
+        assert resolved.total_pressure_Pa == State.of(Decimal("101325"))
+        assert pressure_bar == Decimal("101325") / PA_PER_BAR_DEC
+        assert any(
+            notice.policy is not None and notice.policy.id == "DP-002" and marker in notice.reason
+            for notice in notices
+        ), f"DP-002 {marker}"
+        assert not any(
+            notice.policy is not None and notice.policy.id == "DP-001"
+            for notice in notices
+        )
+
+    air_identity, air_bar, air_notices = resolve(
+        air,
+        {"atmosphere": Located(State.of("air"), locator=Locator(note="located air"))},
+    )
+    assert air_identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert air_bar == Decimal("101325") / PA_PER_BAR_DEC
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-002"
+        and 'experiment "in air"' in notice.reason
+        for notice in air_notices
+    ), "DP-002"
+
+    unbound_identity, unbound_bar, unbound_notices = resolve(unbound)
+    assert unbound_identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert unbound_bar == Decimal("101325") / PA_PER_BAR_DEC
+    assert any(
+        notice.policy is not None
+        and notice.policy.id == "DP-001"
+        and notice.kind is NoticeKind.ASSUMED_PRESSURE
+        for notice in unbound_notices
+    )
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-002"
+        for notice in unbound_notices
+    )
+
+    chamber_identity, _chamber_bar, chamber_notices = resolve(knudsen)
+    assert chamber_identity.total_pressure_Pa == State.of(Decimal("101325"))
+    assert chamber_identity.total_pressure_Pa != State.of(Decimal("1e-6"))
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-001"
+        for notice in chamber_notices
+    )
+
+
+def test_neuman_printed_run_pressure_resolves_without_a_bench(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+
+    source_id = "neuman-2026-levitation-k-isotopes"
+    works, experiments, observations = load_migrated_store(
+        ROOT, sources=(source_id,)
+    )
+    target = next(
+        row
+        for row in observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.MASS_LOSS_FRACTION
+        and any(
+            notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    experiment = experiments[target.experiment_id]
+    assert experiment.bench_id is None
+    pressure_environment = replace(
+        experiment.pressure_environment,
+        total_pressure_Pa=Located(
+            State.of(Value.point_of(Decimal("33300"))),
+            locator=experiment.pressure_environment.total_pressure_Pa.locator,
+        ),
+    )
+    injected_experiments = dict(experiments)
+    injected_experiments[experiment.experiment_id] = replace(
+        experiment, pressure_environment=pressure_environment
+    )
+    monkeypatch.setattr(
+        score_module,
+        "load_migrated_store",
+        lambda _root, sources=None: (works, injected_experiments, observations),
+    )
+    monkeypatch.setattr(score_module, "load_migrated_benches", lambda _root: {})
+
+    context = score_module.load_score_context(ROOT, sources=(source_id,))
+    resolved = context.observations[target.observation_id]
+    buffer_notice = next(
+        notice
+        for notice in resolved.notices
+        if notice.origin == "score:DP-112"
+        and notice.kind
+        is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+
+    assert "P_bar=0.333" in buffer_notice.reason
+    assert "pressure_route=printed_run_pressure" in buffer_notice.reason
+    assert not any(notice.origin == "score:DP-002" for notice in resolved.notices)
+
+
+def test_nonqualifying_dp112_markers_keep_the_row_level_path() -> None:
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    _, _, observations = load_migrated_store(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and any(
+            notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    marker = next(
+        notice
+        for notice in observation.notices
+        if notice.kind is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+    no_offset = replace(
+        observation,
+        notices=tuple(
+            replace(notice, reason="DP-112 buffer=IW") if notice is marker else notice
+            for notice in observation.notices
+        ),
+    )
+    unusable_temperature = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            temperature_K=State.unknown("temperature is not a numeric point"),
+        ),
+    )
+    assert _resolve_score_time_buffer_identity(no_offset) is no_offset
+    assert _resolve_score_time_buffer_identity(unusable_temperature) is unusable_temperature
+
+    pressure_unknown = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            total_pressure_Pa=State.unknown("pressure was not reported"),
+        ),
+    )
+    omitted_pressure = _resolve_score_time_buffer_identity(pressure_unknown)
+    pressure_notice = next(
+        notice
+        for notice in omitted_pressure.notices
+        if notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        and notice.origin == "score:DP-112"
+    )
+    dp112_notice = next(
+        notice
+        for notice in omitted_pressure.notices
+        if notice.origin == "score:DP-112"
+        and notice.kind
+        is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    )
+    assert "evaluate_buffer pressure term omitted at its one-bar reference" in (
+        pressure_notice.reason
+    )
+    assert "not supplied (term omitted at one-bar reference)" in dp112_notice.reason
+    printed_buffer = _printed_buffer_offset(marker.reason)
+    assert printed_buffer is not None
+    buffer, offset = printed_buffer
+    evaluation = evaluate_buffer(
+        buffer,
+        pressure_unknown.identity.temperature_K.value,
+        pressure_bar=None,
+    )
+    assert omitted_pressure.identity.fO2_Pa == State.of(
+        _log_fO2_to_pa(evaluation.log10_fO2_bar + offset)
+    )
+
+
+def test_rejected_dp112_policy_raises_for_a_real_gaillard_row(monkeypatch) -> None:
+    from simulator.battery.default_policy import load_policy_table
+
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    _, _, observations = load_migrated_store(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and any(
+            notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    monkeypatch.setitem(load_policy_table()["DP-112"], "status", "rejected")
+    with pytest.raises(ValueError, match="default policy DP-112 is rejected"):
+        _resolve_score_time_buffer_identity(observation)
+
+
+def test_dp112_stored_mutation_flows_through_activity_request_and_residual() -> None:
+    from simulator.battery import score as score_mod
+    from simulator.battery.generators.bench import activity_request_for_engine
+    from simulator.battery.enums import ExecutionState
+    from simulator.battery.records import Execution
+
+    source_id = "gaillard-2003-hydrous-silicic-melt-activity"
+    context = load_score_context(ROOT, sources=(source_id,))
+    observation = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.ACTIVITY
+        and row.value.kind is ValueKind.POINT
+        and any(
+            notice.origin == "score:DP-112"
+            and notice.kind
+            is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+            for notice in row.notices
+        )
+    )
+    experiment = context.experiments[observation.experiment_id]
+    baseline_request = activity_request_for_engine(
+        experiment, observation, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert baseline_request is not None and baseline_request.payload is not None
+    assert baseline_request.readiness.status.value == "ready"
+
+    unresolved = replace(
+        observation,
+        identity=replace(observation.identity, fO2_Pa=State.of(Decimal("123.456"))),
+        notices=tuple(
+            notice for notice in observation.notices if notice.origin != "score:DP-112"
+        ),
+    )
+    resolved = _resolve_score_time_buffer_identity(
+        unresolved,
+        ambient_pressure_evidence=experiment.ambient_pressure_evidence,
+    )
+    mutated_request = activity_request_for_engine(
+        experiment, resolved, Engine.INTERNAL_ANALYTICAL.value
+    )
+    assert mutated_request is not None and mutated_request.payload is not None
+    assert mutated_request.payload == baseline_request.payload
+    assert resolved.identity.fO2_Pa != State.of(Decimal("123.456"))
+
+    mutated_observations = dict(context.observations)
+    mutated_observations[resolved.observation_id] = resolved
+    mutated_context = replace(context, observations=mutated_observations)
+    prediction = score_mod.EnginePrediction(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        channel=Engine.INTERNAL_ANALYTICAL.value,
+        execution=Execution(
+            state=ExecutionState.PRODUCED,
+            call_evidence="test:buffer-resolved-activity",
+        ),
+        value=Decimal("0.5"),
+        unit="dimensionless",
+        authority=Authority.BRIDGE,
+        notices=resolved.notices,
+        identity=resolved.identity,
+    )
+    residual, _candidate = compile_residual(
+        resolved,
+        Engine.INTERNAL_ANALYTICAL,
+        context=mutated_context,
+        prediction=prediction,
+    )
+    refusal = residual.refusal
+    assert residual.status is not ResidualStatus.REFUSED, (
+        f"status={residual.status} execution={residual.execution.state} "
+        f"reason={None if refusal is None else refusal.reason} "
+        f"detail={None if refusal is None else refusal.detail}"
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-112"
+        for notice in residual.notices
+    )
+    assert residual.numeric is not None
+    assert "proposed-policy" in flagged_strata(residual.notices)
+
+
+def test_borisov_veksler_two_liquid_target_gets_the_real_capability_refusal(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path,
+) -> None:
+    from simulator.battery.enums import ExecutionState, RefusalReason
+    from simulator.melt_backend import base as melt_base
+    from simulator.battery.score import (
+        _liquid_pair_target,
+        _printed_fo2_log10_bar,
+        predict_with_engine,
+    )
+
+    import simulator.battery.score as score
+
+    source_id = "borisov-veksler-2021-k-fe-supplement"
+    context = load_score_context(ROOT, sources=(source_id,))
+    rows = tuple(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id
+    )
+    lfe_oxide_rows = tuple(
+        row
+        for row in rows
+        if _liquid_pair_target(row) == ("Lfe", "Lsi")
+        and row.identity.species is not None
+        and row.identity.species.formula == "Al2O3"
+    )
+    lsi_oxide_rows = tuple(
+        row
+        for row in rows
+        if _liquid_pair_target(row) == ("Lsi", "Lfe")
+        and row.identity.species is not None
+        and row.identity.species.formula == "SiO2"
+    )
+    assert lfe_oxide_rows, "expected a real Borisov–Veksler Lfe Al2O3 row"
+    assert lsi_oxide_rows, "expected a real Borisov–Veksler Lsi SiO2 row"
+    lfe = next(iter(lfe_oxide_rows))
+    lsi = next(iter(lsi_oxide_rows))
+    non_pair_target = replace(
+        lfe,
+        identity=replace(lfe.identity, phase_role=State.of(PhaseRole.METAL)),
+    )
+    assert _liquid_pair_target(non_pair_target) is None
+    recorded: dict[str, float] = {}
+    # BV's persisted excluded-data rows do not carry a starting composition.
+    # Supply a test-only engine input so this case reaches the post-engine
+    # capability decision; the mocked engine below supplies the single liquid.
+    test_bulk = Composition(
+        "test-only engine composition",
+        (
+            ("FeO", Decimal("0.50")),
+            ("Al2O3", Decimal("0.25")),
+            ("SiO2", Decimal("0.25")),
+        ),
+        AmountBasis.MOLE_FRACTION,
+    )
+
+    def eligible_target(observation):
+        return replace(
+            observation,
+            identity=replace(observation.identity, composition=State.of(test_bulk)),
+        )
+
+    def predict_single_liquid(observation):
+        observation = eligible_target(observation)
+        formula = observation.identity.species.formula
+        result = melt_base.EquilibriumResult(
+            status="ok",
+            phases_present=["liquid"],
+            liquid_fraction=1.0,
+            phase_compositions={"melt": {formula: 50.0}},
+            liquid_composition_wt_pct={formula: 50.0},
+        )
+
+        def equilibrate(*_args, **kwargs):
+            recorded["fO2_log"] = kwargs["fO2_log"]
+            return result
+
+        monkeypatch.setattr(score, "_equilibrate_phase_assemblage", equilibrate)
+        prediction = predict_with_engine(
+            Engine.ALPHAMELTS,
+            observation,
+            experiment=context.experiments[observation.experiment_id],
+        )
+        return prediction, observation
+
+    lfe_prediction, lfe_with_bulk = predict_single_liquid(lfe)
+    assert (
+        lfe_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert lfe_prediction.execution.state is ExecutionState.ATTEMPTED_UNAVAILABLE
+    assert lfe_prediction.refusal_detail["target_phase"] == "Lfe"
+    assert lfe_prediction.refusal_detail["conjugate_phase"] == "Lsi"
+
+    lsi_prediction, _lsi_with_bulk = predict_single_liquid(lsi)
+    assert (
+        lsi_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert lsi_prediction.refusal_detail["target_phase"] == "Lsi"
+    assert lsi_prediction.refusal_detail["conjugate_phase"] == "Lfe"
+
+    for target, target_phase, conjugate_phase in (
+        (lfe, "Lfe", "Lsi"),
+        (lsi, "Lsi", "Lfe"),
+    ):
+        glass_target = replace(
+            target,
+            identity=replace(
+                target.identity, phase_role=State.of(PhaseRole.GLASS)
+            ),
+        )
+        glass_prediction, _glass_with_bulk = predict_single_liquid(glass_target)
+        assert (
+            glass_prediction.refusal_reason
+            is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+        )
+        assert glass_prediction.refusal_detail["target_phase"] == target_phase
+        assert glass_prediction.refusal_detail["conjugate_phase"] == conjugate_phase
+
+    from simulator.battery.validate import validate_residual
+
+    residual_context = replace(
+        context,
+        observations={
+            **context.observations,
+            lfe_with_bulk.observation_id: lfe_with_bulk,
+        },
+    )
+    residual, residual_candidate = compile_residual(
+        lfe_with_bulk,
+        Engine.ALPHAMELTS,
+        context=residual_context,
+        prediction=lfe_prediction,
+    )
+    assert residual.execution.call_evidence == "phase_assemblage"
+    assert validate_residual(
+        residual,
+        residual_context.observations,
+        residual_context.experiments,
+        residual_context.works,
+    ) == []
+    assert residual.refusal is not None
+    assert residual.refusal.reason is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    assert residual.refusal.detail["target_phase"] == "Lfe"
+    assert residual.refusal.detail["conjugate_phase"] == "Lsi"
+    assert score._static_refusal_summary_key(residual) is None
+    stream = score._ResidualJsonlStream(
+        tmp_path / "pair-gap.jsonl",
+        root=ROOT,
+        store_stamp=score.derive_store_stamp(ROOT),
+        sort_on_finalize=False,
+        compact_static_refusals=True,
+    )
+    try:
+        stream.append(residual, residual_candidate)
+        stream.flush()
+        compacted_lines = stream.partial_path.read_text(encoding="utf-8").splitlines()
+    finally:
+        stream.close()
+    assert stream.count == 1
+    assert stream.static_refusals == []
+    serialized_residual = compacted_lines[1]
+    assert "engine_does_not_model_liquid_immiscibility" in serialized_residual
+    assert '"target_phase":"Lfe"' in serialized_residual
+    assert '"conjugate_phase":"Lsi"' in serialized_residual
+
+    # Mutating the source predicate to False must turn the exact same one-liquid
+    # result into a prediction; the capability-gap assertion above catches it.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(score, "_liquid_pair_target", lambda _observation: None)
+        mutated, _mutated_with_bulk = predict_single_liquid(lfe)
+    assert mutated.refusal_reason is None
+    assert mutated.value is not None
+
+    printed_fo2_rows = tuple(
+        row
+        for row in rows
+        if row.identity.species is not None
+        and row.identity.species.formula in {"SiO2", "Al2O3", "CaO"}
+        and _printed_fo2_log10_bar(row.identity) is not None
+        and not any(
+            notice.policy is not None and notice.policy.id == "DP-112"
+            for notice in row.notices
+        )
+    )
+    assert printed_fo2_rows, "expected printed-fO2 BV controls"
+    printed = next(iter(printed_fo2_rows))
+    expected_log = _printed_fo2_log10_bar(printed.identity)
+    printed_prediction, _printed_with_bulk = predict_single_liquid(printed)
+    assert recorded["fO2_log"] == expected_log
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in printed_prediction.notices
+    )
+
+    def without_target_label(observation):
+        provenance = {
+            key: value
+            for key, value in (observation.provenance or {}).items()
+            if key != "liquid_label_as_published"
+        }
+        locator = observation.locator
+        if locator is not None and isinstance(locator.note, str):
+            locator = replace(
+                locator,
+                note=re.sub(
+                    r"\bphase\s+[A-Za-z0-9-]+\b",
+                    "assemblage",
+                    locator.note,
+                    flags=re.IGNORECASE,
+                ),
+            )
+        return replace(observation, provenance=provenance, locator=locator)
+
+    unlabelled = without_target_label(lfe)
+    assert _liquid_pair_target(unlabelled) is None, "unlabelled"
+    shared_locator = Locator(note="assemblage contains phase Lfe and phase Lsi")
+    single_locator = Locator(note="measured phase Lfe")
+    conjunction_locator = Locator(note="assemblage contains phase Lfe and Lsi")
+    coexisting_locator = Locator(note="unlabelled glass coexisting with phase Lfe")
+    assert (
+        _liquid_pair_target(replace(unlabelled, locator=shared_locator)) is None
+    ), "phase Lfe and phase Lsi"
+    assert _liquid_pair_target(replace(unlabelled, locator=conjunction_locator)) is None
+    assert _liquid_pair_target(replace(unlabelled, locator=coexisting_locator)) is None
+    assert _liquid_pair_target(replace(unlabelled, locator=single_locator)) == (
+        "Lfe",
+        "Lsi",
+    )
+    unlabelled_prediction, _unlabelled_with_bulk = predict_single_liquid(unlabelled)
+    assert (
+        unlabelled_prediction.refusal_reason
+        is not RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert unlabelled_prediction.value is not None
+
+    from simulator.battery.composition import element_wt_percent_of_oxide_phase
+    from simulator.battery.enums import ELEMENT_WT_PERCENT_BASIS, Phase
+    from simulator.battery.records import Species
+
+    silicon = element_wt_percent_of_oxide_phase({"SiO2": Decimal("100")}, "Si")
+    oxygen = element_wt_percent_of_oxide_phase({"SiO2": Decimal("100")}, "O")
+    assert silicon is not None and oxygen is not None
+    elemental = replace(
+        lfe,
+        identity=replace(
+            lfe.identity,
+            subtype=State.of(ELEMENT_WT_PERCENT_BASIS),
+            species=Species("Si", Phase.L),
+        ),
+        point_conditions={
+            **(lfe.point_conditions or {}),
+            ELEMENT_WT_PERCENT_BASIS: Located(
+                State.of(
+                    Composition(
+                        "element_wt_percent",
+                        (("Si", silicon), ("O", oxygen)),
+                        AmountBasis.MASS_PERCENT,
+                    )
+                ),
+                locator=Locator(note="test-only exact silica element map"),
+            ),
+        },
+    )
+    assert _liquid_pair_target(elemental) == ("Lfe", "Lsi")
+    elemental_prediction, _elemental_with_bulk = predict_single_liquid(elemental)
+    assert (
+        elemental_prediction.refusal_reason
+        is RefusalReason.ENGINE_DOES_NOT_MODEL_LIQUID_IMMISCIBILITY
+    )
+    assert elemental_prediction.refusal_detail["target_phase"] == "Lfe"
+    assert elemental_prediction.refusal_detail["conjugate_phase"] == "Lsi"
+
+
+def test_xu_lvp1_phase_row_uses_dp010_and_detects_missing_fo2_mutation(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import base as melt_base
+    from simulator.battery.score import predict_with_engine
+
+    import simulator.battery.score as score
+
+    source_id = "xu-2026-excess-oxygen-magma"
+    context = load_score_context(ROOT, sources=(source_id,))
+    experiment_id = "10.1093/nsr/nwag539::experiment::xu_2026_lvp_1"
+    candidates = tuple(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.observation_id
+        == "xu-2026-excess-oxygen-magma::xu_2026_table1_lvp_1_si"
+        and row.experiment_id == experiment_id
+        and row.identity.species is not None
+        and row.identity.species.formula == "Si"
+        and row.value.point == Decimal("23.4")
+        and score._phase_role_value(row.identity, "phase_role") is PhaseRole.GLASS
+    )
+    assert candidates, "expected the real Xu LVP-1 Si 23.4 wt% glass phase row"
+    observation = next(iter(candidates))
+    assert len(candidates) == 1
+    assert score._liquid_pair_target(observation) is None
+    recorded: dict[str, float] = {}
+
+    def one_liquid(*_args, **kwargs):
+        recorded["fO2_log"] = kwargs["fO2_log"]
+        return melt_base.EquilibriumResult(
+            status="ok",
+            phases_present=["liquid"],
+            liquid_fraction=1.0,
+            phase_compositions={"liquid": {"SiO2": 50.0}},
+            liquid_composition_wt_pct={"SiO2": 50.0},
+        )
+
+    monkeypatch.setattr(score, "_equilibrate_phase_assemblage", one_liquid)
+    prediction = predict_with_engine(
+        Engine.ALPHAMELTS,
+        observation,
+        experiment=context.experiments[observation.experiment_id],
+    )
+    # This real single-liquid glass row reaches the engine boundary. The
+    # stored formula remains elemental Si; no oxide matcher is asserted here.
+    assert recorded
+    assert recorded["fO2_log"] is not None
+    dp010 = next(
+        notice
+        for notice in prediction.notices
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    )
+    assert "physics_rung=4" in dp010.reason
+    assert "original_missing_evidence=" in dp010.reason
+    assert recorded["fO2_log"] == float(dp010.policy.value)
+
+    # A located printed pressure wins over DP-010. The resolver must retain
+    # its exact bar command after the identity state is made unknown.
+    located_observation = replace(
+        observation,
+        identity=replace(
+            observation.identity,
+            fO2_Pa=State.unknown("test-only missing identity oxygen"),
+        ),
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "fO2_Pa": Located(
+                State.of(Decimal("1E-7")),
+                locator=Locator(note="test-only located printed fO2"),
+            ),
+        },
+    )
+    located_resolved, located_log, located_notice = score._resolve_row_fo2(
+        located_observation.identity,
+        located_observation,
+        context.experiments[observation.experiment_id],
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert located_resolved.fO2_Pa == State.of(Decimal("1E-7"))
+    assert located_log == Decimal("-12")
+    assert located_notice == ()
+
+    located_experiment = replace(
+        context.experiments[observation.experiment_id],
+        conditions={
+            **context.experiments[observation.experiment_id].conditions,
+            "fO2_Pa": Located(
+                State.of(Decimal("1E-7")),
+                locator=Locator(note="test-only located experiment fO2"),
+            ),
+        },
+    )
+    experiment_identity = replace(
+        observation.identity,
+        fO2_Pa=State.unknown("test-only missing identity oxygen"),
+    )
+    _experiment_resolved, experiment_log, _experiment_notices = (
+        score._resolve_row_fo2(
+            experiment_identity,
+            observation,
+            located_experiment,
+            {"SiO2": 100.0},
+            Decimal("1673.15"),
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        )
+    )
+    assert experiment_log == Decimal("-12")
+
+    partial_experiment = replace(
+        context.experiments[observation.experiment_id],
+        conditions={
+            **context.experiments[observation.experiment_id].conditions,
+            "oxygen_partial_pressure_Pa": Located(
+                State.of(Decimal("1E-7")),
+                locator=Locator(note="test-only located experiment pO2"),
+            ),
+        },
+    )
+    _partial_resolved, partial_log, partial_notices = score._resolve_row_fo2(
+        experiment_identity,
+        observation,
+        partial_experiment,
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert partial_log == Decimal("-12")
+    assert partial_notices == ()
+
+    typed_control_experiment = replace(
+        located_experiment,
+        conditions={
+            **located_experiment.conditions,
+            "fO2_Pa": Located(
+                State.of(Decimal("1E-3")), locator=Locator(note="generic copy")
+            ),
+        },
+        fO2_control=FO2Control(
+            channel=State.of(FO2Channel.COMMANDED),
+            oxygen_partial_pressure_Pa=Located(
+                State.of(Value.point_of("1E-7")),
+                locator=Locator(note="typed run command"),
+            ),
+        ),
+    )
+    _typed_identity, typed_log, typed_notices = score._resolve_row_fo2(
+        experiment_identity,
+        observation,
+        typed_control_experiment,
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert typed_log == Decimal("-12")
+    assert typed_notices == ()
+
+    derived_oxygen = Located(
+        State.of(Decimal("1E-7")),
+        locator=Locator(note="derived point condition"),
+        inference=Derivation("derived test oxygen", (), (), "Pa"),
+    )
+    derived_observation = replace(
+        observation,
+        identity=replace(observation.identity, fO2_Pa=derived_oxygen.state),
+        point_conditions={**(observation.point_conditions or {}), "fO2_Pa": derived_oxygen},
+    )
+    _derived_identity, derived_log, derived_notices = score._resolve_row_fo2(
+        derived_observation.identity,
+        derived_observation,
+        context.experiments[observation.experiment_id],
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert derived_log == Decimal("-9")
+    assert any(item.policy is not None and item.policy.id == "DP-010" for item in derived_notices)
+
+    derived_run = replace(
+        context.experiments[observation.experiment_id],
+        conditions={
+            **context.experiments[observation.experiment_id].conditions,
+            "fO2_Pa": Located(
+                State.of(Decimal("1E-7")),
+                locator=Locator(note="derived condition"),
+                inference=Derivation("derived test oxygen", (), (), "Pa"),
+            ),
+        },
+    )
+    _derived_run_identity, derived_run_log, derived_run_notices = (
+        score._resolve_row_fo2(
+            experiment_identity,
+            observation,
+            derived_run,
+            {"SiO2": 100.0},
+            Decimal("1673.15"),
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        )
+    )
+    assert derived_run_log == Decimal("-9")
+    assert any(
+        item.policy is not None and item.policy.id == "DP-010"
+        for item in derived_run_notices
+    )
+
+    monkeypatch.setattr(score, "_equilibrate_phase_assemblage", one_liquid)
+    predict_with_engine(
+        Engine.ALPHAMELTS,
+        located_observation,
+        experiment=context.experiments[observation.experiment_id],
+    )
+    assert recorded["fO2_log"] == -12.0
+
+    air_evidence = AmbientPressureEvidence(
+        AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+        "The sample was equilibrated in air.",
+        Locator(note="test-only in-air evidence"),
+    )
+    air_identity = replace(
+        observation.identity,
+        fO2_Pa=State.unknown("test-only unprinted fO2"),
+    )
+    air_observation = replace(observation, identity=air_identity)
+    air_experiment = replace(
+        context.experiments[observation.experiment_id],
+        ambient_pressure_evidence=air_evidence,
+    )
+    _air_identity, air_log, air_notices = score._resolve_row_fo2(
+        air_identity,
+        air_observation,
+        air_experiment,
+        {},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert air_log is not None
+    air_notice = next(item for item in air_notices if item.policy is not None)
+    assert air_notice.policy.id == "DP-003"
+    assert "physics_rung=3" in air_notice.reason
+    assert "quote='The sample was equilibrated in air.'" in air_notice.reason
+
+    argon_evidence = replace(
+        air_evidence,
+        quote="The run was at atmospheric pressure under flowing argon.",
+    )
+    argon_experiment = replace(
+        air_experiment, ambient_pressure_evidence=argon_evidence
+    )
+    _argon_identity, argon_log, argon_notices = score._resolve_row_fo2(
+        air_identity,
+        air_observation,
+        argon_experiment,
+        {"SiO2": 100.0},
+        Decimal("1673.15"),
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+    )
+    assert argon_log is not None
+    argon_notice = next(item for item in argon_notices if item.policy is not None)
+    assert argon_notice.policy.id == "DP-010"
+    assert "atmospheric pressure under flowing argon" in argon_notice.reason
+    assert "original_missing_evidence=" in argon_notice.reason
+
+    for counterexample in (
+        "Air was displaced with flowing argon before equilibration.",
+        "The furnace was equilibrated under argon, then quenched in air.",
+        "The sample was not equilibrated in air.",
+        "Air was excluded during equilibration.",
+    ):
+        counterexample_experiment = replace(
+            air_experiment,
+            ambient_pressure_evidence=replace(air_evidence, quote=counterexample),
+        )
+        _identity, _log, notices = score._resolve_row_fo2(
+            air_identity,
+            air_observation,
+            counterexample_experiment,
+            {"SiO2": 100.0},
+            Decimal("1673.15"),
+            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        )
+        assert any(item.policy is not None and item.policy.id == "DP-010" for item in notices)
+        assert not any(item.policy is not None and item.policy.id == "DP-003" for item in notices)
+
+    # Mutation restoring the previous hard refusal is rejected by the same
+    # engine-boundary prediction assertion above.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score,
+            "_resolve_row_fo2",
+            lambda identity, *_args: (identity, None, ()),
+        )
+        recorded.clear()
+        refused = predict_with_engine(
+            Engine.ALPHAMELTS,
+            observation,
+            experiment=context.experiments[observation.experiment_id],
+        )
+    assert refused.value is None
+
+
+def test_redox_path_uses_the_shared_oxygen_rungs_for_a_real_row(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.enums import ExecutionState, RefusalReason
+    from simulator.battery.score import (
+        _fe_redox_material,
+        _fe_redox_kress_basis,
+        _resolve_row_fo2,
+        predict_with_engine,
+    )
+
+    import simulator.battery.score as score
+    import simulator.fe_redox as fe_redox
+
+    source_id = "volovetskii-2012-iron-redox"
+    context = load_score_context(
+        ROOT,
+        sources=(
+            source_id,
+            "leister-ehrt-2000-polyvalent-redox",
+            "borisov-behrens-holtz-2013-ti-p-fe-redox",
+        ),
+    )
+    leister_air_rows = tuple(
+        row
+        for row in context.observations.values()
+        if row.source_id == "leister-ehrt-2000-polyvalent-redox"
+        and quantity_token(row.identity) is Quantity.FE3_FE2_RATIO
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_unknown
+        and _air_composition_quote(
+            None, atmosphere_condition=(row.point_conditions or {}).get("atmosphere")
+        ) is not None
+    )
+    assert leister_air_rows, "expected real located Leister–Ehrt air rows"
+    leister_air = leister_air_rows[0]
+    leister_experiment = context.experiments[leister_air.experiment_id]
+    leister_material = _fe_redox_material(
+        leister_air, leister_air.identity, leister_experiment
+    )
+    assert getattr(leister_material, "composition_wt", None) is not None
+    _air_resolved, _air_log, leister_air_notices = _resolve_row_fo2(
+        leister_air.identity,
+        leister_air,
+        leister_experiment,
+        leister_material.composition_wt,
+        leister_material.temperature,
+        Quantity.FE3_FE2_RATIO,
+    )
+    leister_policy_ids = {
+        item.policy.id for item in leister_air_notices if item.policy is not None
+    }
+    assert leister_policy_ids == {"DP-002", "DP-003"}
+    assert any("quote='Air'" in item.reason for item in leister_air_notices)
+
+    bbh_source = "borisov-behrens-holtz-2013-ti-p-fe-redox"
+    bbh_air_rows = tuple(
+        row
+        for row in context.observations.values()
+        if row.source_id == bbh_source
+        and quantity_token(row.identity) is Quantity.VALENCE_RATIO
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_unknown
+        and _air_composition_quote(
+            None,
+            atmosphere_condition=(row.point_conditions or {}).get("atmosphere"),
+        ) is not None
+    )
+    assert bbh_air_rows, "expected persisted Borisov–Behrens–Holtz Air redox rows"
+    bbh_candidates = tuple(
+        row
+        for row in bbh_air_rows
+        if getattr(
+            _fe_redox_material(
+                row, row.identity, context.experiments.get(row.experiment_id)
+            ),
+            "composition_wt",
+            None,
+        ) is not None
+        and hasattr(
+            _fe_redox_kress_basis(
+                _fe_redox_material(
+                    row, row.identity, context.experiments.get(row.experiment_id)
+                ).composition_wt
+            ),
+            "mol_fractions",
+        )
+    )
+    assert bbh_candidates, "expected an Air redox row ready for internal Kress"
+    bbh_air = next(iter(bbh_candidates))
+    bbh_experiment = context.experiments[bbh_air.experiment_id]
+    bbh_material = _fe_redox_material(
+        bbh_air, bbh_air.identity, bbh_experiment
+    )
+    bbh_resolved, bbh_log, bbh_notices = _resolve_row_fo2(
+        bbh_air.identity,
+        bbh_air,
+        bbh_experiment,
+        bbh_material.composition_wt,
+        bbh_material.temperature,
+        Quantity.VALENCE_RATIO,
+    )
+    assert bbh_log is not None
+    assert any(
+        item.policy is not None and item.policy.id == "DP-003"
+        for item in bbh_notices
+    )
+    assert any("quote='air'" in item.reason for item in bbh_notices)
+
+    candidates = tuple(
+        row
+        for row in context.observations.values()
+        if row.source_id == source_id
+        and row.observation_id
+        == "volovetskii-2012-iron-redox::volo12_i2_granite_table1::T=1498.15:h=c13a26b4a50c"
+        and quantity_token(row.identity) is Quantity.FE3_FE2_RATIO
+        and row.identity.fO2_Pa is not None
+        and row.identity.fO2_Pa.is_unknown
+        and getattr(
+            _fe_redox_material(
+                row, row.identity, context.experiments.get(row.experiment_id)
+            ),
+            "composition_wt",
+            None,
+        ) is not None
+    )
+    assert candidates, "expected a real Volovetskii redox row with no fO2"
+    assert len(candidates) == 1
+    observation = next(iter(candidates))
+    experiment = context.experiments[observation.experiment_id]
+    material = _fe_redox_material(observation, observation.identity, experiment)
+    _resolved, log, notices = _resolve_row_fo2(
+        observation.identity,
+        observation,
+        experiment,
+        material.composition_wt,
+        material.temperature,
+        Quantity.FE3_FE2_RATIO,
+    )
+    assert log is not None and any(
+        item.policy is not None and item.policy.id == "DP-010"
+        for item in notices
+    )
+
+    monkeypatch.setattr(
+        fe_redox, "kress91_split", lambda **_kwargs: {"ratio": 1.0}
+    )
+    bbh_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        bbh_air,
+        experiment=bbh_experiment,
+    )
+    assert bbh_prediction.refusal_reason is None
+    assert bbh_prediction.execution.state is ExecutionState.PRODUCED
+    assert any(
+        item.policy is not None and item.policy.id == "DP-003"
+        for item in bbh_prediction.notices
+    )
+    assert bbh_prediction.identity.fO2_Pa == bbh_resolved.fO2_Pa
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=experiment,
+    )
+    assert prediction.refusal_reason is None
+    assert any(
+        item.policy is not None and item.policy.id == "DP-010"
+        for item in prediction.notices
+    )
+    assert prediction.identity.fO2_Pa == _resolved.fO2_Pa
+
+    air_experiment = replace(
+        experiment,
+        ambient_pressure_evidence=AmbientPressureEvidence(
+            AmbientPressureEvidenceClass.ATMOSPHERIC_PRESSURE_STATEMENT,
+            "The sample was equilibrated in air.",
+            Locator(note="test-only redox in-air evidence"),
+        ),
+    )
+    air_prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL,
+        observation,
+        experiment=air_experiment,
+    )
+    assert any(
+        item.policy is not None and item.policy.id == "DP-003"
+        for item in air_prediction.notices
+    )
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            score,
+            "_resolve_row_fo2",
+            lambda identity, *_args: (identity, None, ()),
+        )
+        refused = predict_with_engine(
+            Engine.INTERNAL_ANALYTICAL,
+            observation,
+            experiment=experiment,
+        )
+    assert refused.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert refused.refusal_detail["input"] == "printed_fO2"
+    assert refused.execution.state is ExecutionState.NOT_PROBED
+
+
+def test_unknown_frame_and_uncalibrated_buffer_are_not_clean_commands() -> None:
+    """A printed log of zero is not 1 bar, and a buffer marker is not a command.
+
+    The same owner decides both entry points. A grounded log of zero still
+    commands zero. An inferred run pressure with a conversion label but no
+    conversion arithmetic is not a run-oxygen route.
+    """
+
+    from simulator.battery.fo2_ladder import (
+        admitted_score_oxygen,
+        resolve_row_fo2,
+    )
+    from simulator.battery.records import Notice
+    from simulator.battery.score import _resolve_row_fo2
+    from simulator.battery.waypoints import (
+        _printed_run_oxygen_pa,
+        oxygen_condition,
+    )
+    from tests.battery import factories as F
+
+    temperature = Decimal("1400")
+    identity = replace(
+        F.activity_identity(T_K=temperature),
+        fO2_Pa=State.unknown(_BARE_LOG_SCALE_UNKNOWN),
+    )
+    marker = Notice(
+        kind=NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason="buffer=IW offset=0 calibration not printed",
+        origin="test",
+    )
+    observation = F.observation(
+        "frame-row",
+        "frame-exp",
+        identity,
+        Decimal("1"),
+        notices=(marker,),
+    )
+    observation = replace(
+        observation,
+        point_conditions={
+            **(observation.point_conditions or {}),
+            "fO2_log": Located(
+                State.of(Decimal("0")),
+                locator=Locator(note="printed log with no frame"),
+            ),
+        },
+    )
+    bad_pressure = Located(
+        State.of(Decimal("100000")),
+        locator=Locator(note="inferred run pressure"),
+        inference=Derivation(
+            "bar_to_Pa",
+            ("original_unit=bar",),
+            (),
+            "Pa",
+        ),
+    )
+    experiment = replace(
+        F.tabulation_experiment(
+            experiment_id="frame-exp",
+            T_K=temperature,
+            fO2_control=FO2Control(
+                channel=State.of(FO2Channel.BUFFER),
+                buffer=Located(State.of("IW"), locator=Locator(note="typed buffer")),
+            ),
+        ),
+        conditions={
+            **F.tabulation_experiment(T_K=temperature).conditions,
+            "fO2_Pa": bad_pressure,
+        },
+    )
+    weights = {"SiO2": 50.0, "FeO": 10.0, "MgO": 40.0}
+    oxygen = oxygen_condition(experiment, None, observation)
+    assert any(route.route == "buffer_relation" for route in oxygen.routes)
+    admitted = admitted_score_oxygen(oxygen, observation)
+    assert admitted is None or admitted.route != "buffer_relation", "buffer_relation"
+    assert _printed_run_oxygen_pa(experiment, "fO2_Pa") is None, "original_unit"
+    ladder = resolve_row_fo2(
+        experiment,
+        None,
+        observation,
+        composition_wt=weights,
+        temperature_K=float(temperature),
+        oxygen=oxygen,
+        quantity=Quantity.ACTIVITY,
+    )
+    assert ladder is None or ladder.route != "observation_fO2_log", "printed_fO2_log"
+
+    def admitted_command(run):
+        return _resolve_row_fo2(
+            identity,
+            observation,
+            run,
+            weights,
+            temperature,
+            Quantity.ACTIVITY,
+            None,
+        )
+
+    _with_identity, with_log, with_notices = admitted_command(experiment)
+    _without_identity, without_log, without_notices = admitted_command(None)
+    assert with_log == without_log
+    assert with_log != Decimal("0")
+    for notices in (with_notices, without_notices):
+        assert any(
+            item.policy is not None
+            and item.policy.id == "DP-010"
+            and _BARE_LOG_SCALE_UNKNOWN in item.reason
+            and "printed_fO2_log=0" in item.reason
+            for item in notices
+        ), "printed_fO2_log"
+
+    grounded = replace(identity, fO2_Pa=State.of(Decimal("100000")))
+    grounded_row = replace(observation, identity=grounded, notices=())
+    _ground_identity, ground_log, ground_notices = _resolve_row_fo2(
+        grounded,
+        grounded_row,
+        None,
+        weights,
+        temperature,
+        Quantity.ACTIVITY,
+    )
+    assert ground_log == Decimal("0")
+    assert ground_notices == ()
+    convention = Notice(
+        kind=NoticeKind.INPUT_OMITTED,
+        affected_quantities=(Quantity.ACTIVITY,),
+        reason=_BARE_LOG_BAR_NOTICE,
+        origin="test",
+    )
+    convention_row = replace(grounded_row, notices=(convention,))
+    _convention_identity, convention_log, convention_notices = _resolve_row_fo2(
+        grounded,
+        convention_row,
+        None,
+        weights,
+        temperature,
+        Quantity.ACTIVITY,
+    )
+    assert convention_log == Decimal("0")
+    assert convention in convention_notices

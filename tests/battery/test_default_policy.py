@@ -55,6 +55,7 @@ EXPECTED_POLICY_FLAGS = {
     "composition_from_analysed_phase",
     "method_unstated",
     "method_inferred",
+    "buffer_calibration_not_printed_canonical_used",
 }
 
 
@@ -79,6 +80,7 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
         "DP-101",
         "DP-106",
         "DP-107",
+        "DP-112",
     }
 
     required = {
@@ -126,6 +128,11 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
                 "simulator.battery.migrate._method_inference_from_evidence"
             )
             assert entry["flag"] == "method_inferred"
+        elif policy_id == "DP-112":
+            assert entry["status"] == "proposed"
+            assert entry["proposed_by"] == "w1123canon"
+            assert entry["canonized_by"] is None
+            assert entry["canonized_at"] is None
         else:
             assert entry["status"] == "canonical"
             assert entry["canonized_by"] in {"owner", "controller"}
@@ -293,6 +300,28 @@ def test_contextual_formula_does_not_return_its_text_as_a_value() -> None:
         resolve("DP-010")
 
 
+def test_dp112_resolves_the_buffer_owner_formula_result() -> None:
+    assert load_policy_table()["DP-112"]["formula_owner"] == (
+        "simulator.chemistry.fo2_buffers.evaluate_buffer"
+    )
+    result = Decimal("27.5")
+    resolved = resolve("DP-112", formula_result=result)
+    assert resolved.value == result
+    assert resolved.flag is NoticeKind.BUFFER_CALIBRATION_NOT_PRINTED_CANONICAL_USED
+    assert resolved.payload["policy_status"] == "proposed"
+    assert resolved.payload["policy"]["value"] == format(result.normalize(), "f")
+    with pytest.raises(ValueError, match="DP-112 requires the owning formula result"):
+        resolve("DP-112")
+
+
+def test_dp010_resolves_the_intrinsic_fo2_ladder_result() -> None:
+    result = Decimal("-8.25")
+    resolved = resolve("DP-010", formula_result=result)
+    assert resolved.value == result
+    assert resolved.flag is NoticeKind.ASSUMED_FO2
+    assert resolved.payload["policy"]["value"] == "-8.25"
+
+
 def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
     assert load_policy_table()["DP-004"]["formula_owner"] == (
         "simulator.battery.score._sum_gas_partial_pressures_pa"
@@ -312,6 +341,7 @@ def test_formula_results_cannot_be_overridden_by_a_value_context() -> None:
             "DP-017",
             {"value": "fixture composition", "flag": "composition_from_run_siblings"},
         ),
+        ("DP-112", {"value": Decimal("1")}),
     )
     for policy_id, context in cases:
         with pytest.raises(ValueError, match="owning formula result"):
