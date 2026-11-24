@@ -1883,18 +1883,32 @@ def test_aithala_redox_rows_score_when_printed_composition_is_joined():
         benches=result.benches,
     )
     residuals, _ = score_store(context, engines=SCORE_ENGINE_SET, rail=Rail.REDOX)
-    covered = tuple(
+    callable_engines = tuple(
         engine
         for engine in SCORE_ENGINE_SET
         if engine_covers_quantity(engine, Quantity.FE3_FE2_RATIO)
     )
-    assert Engine.CATALOG_EVALUATOR not in covered
-    assert Engine.NASA_CEA_9 in covered
-    assert len(residuals) == len(redox_rows) * len(covered)
+    assert Engine.CATALOG_EVALUATOR not in callable_engines
+    assert Engine.NASA_CEA_9 in callable_engines
+    assert len(residuals) == len(redox_rows) * len(callable_engines)
+    assert len(residuals) == 16 * len(callable_engines)
     assert not any(
         residual.key.rsplit("::", 1)[-1] == Engine.CATALOG_EVALUATOR.value
         for residual in residuals
     )
+    assert {
+        residual.key.rsplit("::", 1)[-1] for residual in residuals
+    } == {engine.value for engine in callable_engines}
+    catalog_prediction = predict_with_engine(
+        Engine.CATALOG_EVALUATOR,
+        redox_rows[0],
+        experiment=context.experiments[redox_rows[0].experiment_id],
+    )
+    # Catalog evaluator has no redox adapter, so score_store emits no row for
+    # it; a direct request still receives the engine's typed refusal.
+    assert catalog_prediction.value is None
+    assert catalog_prediction.refusal_reason is not None
+    assert catalog_prediction.refusal_reason is RefusalReason.UNSUPPORTED
     for residual in residuals:
         observation_id = residual.key.split(":T=", 1)[0]
         engine = residual.key.rsplit("::", 1)[-1]
