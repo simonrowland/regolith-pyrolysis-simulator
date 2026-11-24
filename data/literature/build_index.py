@@ -458,10 +458,27 @@ def load_work_metadata(root: Path) -> dict[str, dict]:
         work = doc.get("work") or {}
         if not isinstance(work, dict):
             continue
-        source_files = work.get("source_files")
-        if not isinstance(source_files, dict) or source_files.get("files") != []:
+        if doc.get("experiments") or doc.get("context"):
             continue
-        for source_id in work.get("source_ids") or []:
+        source_files = work.get("source_files")
+        assets = source_files.get("files") if isinstance(source_files, dict) else None
+        source_ids = work.get("source_ids") or []
+        citation_only = (
+            isinstance(assets, list)
+            and (
+                not assets
+                or all(
+                    isinstance(asset, dict)
+                    and asset.get("role") == "pdftotext"
+                    and asset.get("path") == "unknown"
+                    and asset.get("asset_id") in {f"unknown:{source_id}" for source_id in source_ids}
+                    for asset in assets
+                )
+            )
+        )
+        if not citation_only:
+            continue
+        for source_id in source_ids:
             if not isinstance(source_id, str) or not source_id:
                 continue
             metadata = works.setdefault(source_id, {"citation": None, "doi": None})
@@ -956,13 +973,13 @@ def build_index(root: Path, *, private_roots: list[Path] | None = None, hunt_jso
         pdf = pdfs.get(pdf_stem) if pdf_stem else None
         src = dict(((extract or {}).get("doc") or {}).get("source") or {})
         metadata = work_metadata.get(source_id) or {}
-        for key in ("citation", "doi"):
-            if not src.get(key):
-                src[key] = metadata.get(key)
         if pdf and pdf.get("sidecar"):
             for key in ("citation", "doi"):
                 if not src.get(key):
                     src[key] = pdf["sidecar"].get(key)
+        for key in ("citation", "doi"):
+            if not src.get(key):
+                src[key] = metadata.get(key)
         citation, doi, report = src.get("citation"), doi_of(src), report_number(src)
         pdf_path, sidecar_info, sidecar_path = (pdf["path"] if pdf else None), (pdf or {}).get("sidecar"), (pdf or {}).get("sidecar_path")
         copies, names = [], [source_id, *aliases]

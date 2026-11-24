@@ -1,7 +1,7 @@
 schema_version: battery_work.v2.1
 work:
   work_id: 4d1d8f72f3e42cc261534e3c1dceb0e11db3736d6f92c829d91b5b59b926c0bb
-  citation: Ganits et al. (1979), SrO–Al2O3 fusion markers; cited via Ye et al. (2007), Table 4. Full bibliographic details unknown.
+  citation: Ganits, F., Chemekova, T. Yu. & Udalov, Yu. P. (1979), "The System SrO-Al2O3", Zh. Neorg. Khim. 24(2), 471–475 (in Russian).
   source_ids:
   - ganits-1979
   source_files:
@@ -9,6 +9,12 @@ work:
     corpus_commit:
       tag: unknown
       reason: No source files are held for this metadata-only registration.
-    files: []
+    files:
+    - asset_id: unknown:ganits-1979
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
 experiments: []
 context: []

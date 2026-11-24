@@ -1,15 +1,21 @@
 schema_version: battery_work.v2.1
 work:
-  work_id: 10.1016/S0021-9614(05)80042-4
+  work_id: 10.1016/s0021-9614(05)80042-4
   citation: Huntelaar et al. (1992), J. Chem. Thermodyn. 24(2), 139–143.
   source_ids:
   - huntelaar-1992-j-chem-thermodyn
-  doi: 10.1016/S0021-9614(05)80042-4
+  doi: 10.1016/s0021-9614(05)80042-4
   source_files:
     corpus_repo: regolith-corpus
     corpus_commit:
       tag: unknown
       reason: No source files are held for this metadata-only registration.
-    files: []
+    files:
+    - asset_id: unknown:huntelaar-1992-j-chem-thermodyn
+      role: pdftotext
+      path: unknown
+      sha256:
+        tag: unknown
+        reason: INDEX does not give an unmatched-layer asset
 experiments: []
 context: []

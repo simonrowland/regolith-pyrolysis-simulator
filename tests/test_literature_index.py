@@ -205,6 +205,39 @@ def test_builder_temp_corpus_row_truth(tmp_path: Path) -> None:
     assert index["scan"]["hunt_json"] is None
 
 
+def test_builder_keeps_extract_and_sidecar_metadata_ahead_of_work_fallback(monkeypatch, tmp_path):
+    extracts = {
+        "extract-paper": {"doc": {"source": {
+            "citation": "Citation from extract", "doi": "10.9999/extract"
+        }}, "files": []},
+        "sidecar-paper": {"doc": {"source": {}}, "files": []},
+    }
+    pdfs = {
+        source_id: {"path": None, "sidecar_path": None, "sidecar": {
+            "citation": f"Citation from sidecar: {source_id}",
+            "doi": f"10.9999/{source_id}-sidecar",
+            "local_paths": [], "missing_fields": [],
+        }}
+        for source_id in extracts
+    }
+    monkeypatch.setattr(builder, "load_extracts", lambda root: extracts)
+    monkeypatch.setattr(builder, "load_pdfs", lambda root: pdfs)
+    monkeypatch.setattr(builder, "load_work_metadata", lambda root: {
+        source_id: {"citation": f"Citation from work: {source_id}", "doi": f"10.9999/{source_id}-work"}
+        for source_id in extracts
+    })
+    monkeypatch.setattr(builder, "load_consumers", lambda root: ([], []))
+    monkeypatch.setattr(builder, "git_tracked_set", lambda root: ("not-git", None))
+    monkeypatch.setattr(builder, "walk_private_roots", lambda root, paths: ([], [], {}))
+    monkeypatch.setattr(builder, "build_alias_map", lambda *args: ({}, []))
+
+    rows = {row["source_id"]: row for row in builder.build_index(tmp_path)["sources"]}
+    assert rows["extract-paper"]["citation"] == "Citation from extract"
+    assert rows["extract-paper"]["doi"] == "10.9999/extract"
+    assert rows["sidecar-paper"]["citation"] == "Citation from sidecar: sidecar-paper"
+    assert rows["sidecar-paper"]["doi"] == "10.9999/sidecar-paper-sidecar"
+
+
 def test_doi_bearing_sidecars_reach_index():
     index = yaml.safe_load(COMMITTED_YAML.read_text())
     # Detect DOI-bearing sidecars with a parser-independent regex on the raw
