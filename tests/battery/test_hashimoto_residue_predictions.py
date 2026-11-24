@@ -317,12 +317,14 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         engine="openimcc",
     )
     predictions = copy.deepcopy(cohort)
-    # 8b8665343 removed provenance.code_revision and both integration CPU-time
-    # fields; this digest strips those timing fields. The b265 merge 5d993f1192
-    # added alpha_authority_status and authority_reason to proxy alpha rows,
-    # changing provenance while leaving primary numeric outputs unchanged.
+    # Timing fields remain stripped. The b265 merge 5d993f1192 added
+    # alpha_authority_status and authority_reason to proxy alpha rows.
+    # 4dfc7fcea3 applies d-466 o_bar_Fe = 1 + q/2: OpenIMCC holds activities
+    # fixed and lacks trial-pO2 Fe speciation, so the residue oxygen balance
+    # uses Kress91 and flags residue_fe_speciation_kress91_fallback.
+    # Provenance also records engine_flags and an empty pressure_law_diagnostics.
     assert _hashimoto_prediction_tuple_digest(predictions) == (
-        "39dbae46857781ccb897002b186aac7241fa99672b9a6583a7b327590073c17e"
+        "217c511f9da28db3e3f1c15e3d22f56890378d875b1e9a78ec509b5ca73d5950"
     )
     primary = next(
         row for row in predictions if row.alpha_arm == _HASHIMOTO_PRIMARY_ALPHA_ARM
@@ -334,11 +336,11 @@ def test_hashimoto_openimcc_primary_numeric_output_is_pinned() -> None:
         oxide: value.hex()
         for oxide, value in primary.primary_oxide_wt_pct.items()
     } == {
-        "SiO2": "0x1.5f0cdac992197p+5",
-        "Al2O3": "0x1.1b3cb0566fbffp+2",
-        "FeO": "0x1.10ec3b5604051p+4",
-        "MgO": "0x1.f179bb173dc7fp+4",
-        "CaO": "0x1.c5893f4ff0809p+1",
+        "SiO2": "0x1.5eb6f58ae9550p+5",
+        "Al2O3": "0x1.1ab5f666caf13p+2",
+        "FeO": "0x1.1289d5e1f41e4p+4",
+        "MgO": "0x1.f0c490d5dacf2p+4",
+        "CaO": "0x1.c4b184c55d62bp+1",
     }
 
 
