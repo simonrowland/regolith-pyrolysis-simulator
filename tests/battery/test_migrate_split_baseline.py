@@ -8,7 +8,10 @@ compares the writer's complete output map against the checked-in derived store.
 
 from __future__ import annotations
 
+import base64
 import json
+import re
+import zlib
 from pathlib import Path
 from unittest.mock import patch
 
@@ -223,33 +226,92 @@ def _compact_difference_paths(differences: list[str], prefix: str) -> str:
             continue
         suffix = field[closing + 1:]
         indexed.setdefault(suffix, []).append(index)
-    compact.extend(
-        f"experiments[{','.join(map(str, sorted(indices)))}]{suffix}"
-        for suffix, indices in sorted(indexed.items())
-    )
+    for suffix, indices in sorted(indexed.items()):
+        ordered = sorted(set(indices))
+        ranges = []
+        start = previous = ordered[0]
+        for index in ordered[1:]:
+            if index == previous + 1:
+                previous = index
+                continue
+            ranges.append(str(start) if start == previous else f"{start}-{previous}")
+            start = previous = index
+        ranges.append(str(start) if start == previous else f"{start}-{previous}")
+        compact.append(f"experiments[{','.join(ranges)}]{suffix}")
     return ", ".join(compact)
+
+
+def _compact_observation_ids(observation_ids: list[str]) -> list[dict[str, object]]:
+    remaining = set(observation_ids)
+    compact = []
+    while remaining:
+        templates: dict[str, list[tuple[int, str]]] = {}
+        for observation_id in sorted(remaining):
+            for match in re.finditer(r"\d+", observation_id):
+                template = (
+                    observation_id[:match.start()]
+                    + "{n}"
+                    + observation_id[match.end():]
+                )
+                templates.setdefault(template, []).append((int(match.group()), observation_id))
+        candidates = {
+            template: members
+            for template, members in templates.items()
+            if len({observation_id for _, observation_id in members}) > 1
+        }
+        if not candidates:
+            break
+        template, members = max(
+            candidates.items(),
+            key=lambda item: len({observation_id for _, observation_id in item[1]}),
+        )
+        numbers = sorted({number for number, _ in members})
+        ranges = []
+        start = previous = numbers[0]
+        for number in numbers[1:]:
+            if number == previous + 1:
+                previous = number
+                continue
+            ranges.append(str(start) if start == previous else f"{start}-{previous}")
+            start = previous = number
+        ranges.append(str(start) if start == previous else f"{start}-{previous}")
+        compact.append({"template": template, "numbers": ranges})
+        remaining.difference_update(observation_id for _, observation_id in members)
+    if remaining:
+        compact.append({"ids": sorted(remaining)})
+    return compact
 
 
 def _store_difference_details(
     stored: dict[str, bytes], regenerated: dict[str, bytes], paths: list[str]
 ) -> str:
-    details = [f"changed_store_paths={len(paths)}"]
+    details = {
+        "changed_store_paths": len(paths),
+        "observations": {},
+        "work": [],
+        "other": [],
+    }
     for path in paths:
         stored_bytes = stored.get(path)
         regenerated_bytes = regenerated.get(path)
         if stored_bytes is None or regenerated_bytes is None:
             present_bytes = stored_bytes if stored_bytes is not None else regenerated_bytes
-            details.append(
+            details["other"].append(
                 f"{path}: {'missing from store' if stored_bytes is None else 'unexpected in store'}"
             )
             if present_bytes is not None:
                 for observation_id, row in sorted(_observation_rows(present_bytes).items()):
-                    details.append(
-                        f"{path}::{observation_id}: {json.dumps(row, sort_keys=True)}"
+                    field = "row missing from store" if stored_bytes is None else "unexpected row"
+                    details["observations"].setdefault(path, {}).setdefault(field, []).append(
+                        observation_id
                     )
+                details["observations"][path] = {
+                    field: _compact_observation_ids(observation_ids)
+                    for field, observation_ids in sorted(details["observations"][path].items())
+                }
             continue
         if path.endswith(".md"):
-            details.append(
+            details["other"].append(
                 f"{path}: bytes differ ({len(stored_bytes)} stored, "
                 f"{len(regenerated_bytes)} regenerated)"
             )
@@ -268,14 +330,13 @@ def _store_difference_details(
                 if source_ids
                 else f"work_id={work_id}"
             )
-            details.append(
-                f"work {source_label}: "
-                + (
-                    _compact_difference_paths(differences, "work")
-                    if differences
-                    else "bytes differ without a YAML field difference"
-                )
-            )
+            details["work"].append({
+                "path": path,
+                "source": source_label,
+                "fields": _compact_difference_paths(differences, "work")
+                if differences
+                else "bytes differ without a YAML field difference",
+            })
             continue
         stored_rows = _observation_rows(stored_bytes)
         regenerated_rows = _observation_rows(regenerated_bytes)
@@ -285,26 +346,30 @@ def _store_difference_details(
             if stored_rows.get(observation_id) != regenerated_rows.get(observation_id)
         ]
         if changed_rows:
+            source_fields = details["observations"].setdefault(path, {})
             for observation_id in changed_rows:
                 differences = _field_differences(
                     "observation",
                     stored_rows.get(observation_id),
                     regenerated_rows.get(observation_id),
                 )
-                details.append(
-                    f"{path}::{observation_id}: "
-                    + (
-                        _compact_difference_paths(differences, "observation")
-                        if differences
-                        else "bytes differ without a YAML field difference"
-                    )
-                )
+                source_id = Path(path).stem
+                short_id = observation_id.removeprefix(f"{source_id}::")
+                fields = differences or ["bytes differ without a YAML field difference"]
+                for field in fields:
+                    source_fields.setdefault(field, []).append(short_id)
+            details["observations"][path] = {
+                field: _compact_observation_ids(observation_ids)
+                for field, observation_ids in sorted(source_fields.items())
+            }
         else:
-            details.append(
+            details["other"].append(
                 f"{path}: bytes differ ({len(stored_bytes)} stored, "
                 f"{len(regenerated_bytes)} regenerated); no observation-row difference"
             )
-    return "\n".join(details)
+    raw = json.dumps(details, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    payload = base64.b64encode(zlib.compress(raw, level=9)).decode("ascii")
+    return f"store_delta_zlib_base64={payload}"
 
 
 def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) -> None:
