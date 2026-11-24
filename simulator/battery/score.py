@@ -21801,23 +21801,13 @@ def _paired_engine_rail_comparisons(
     for row in residuals:
         rail = str(row.get("rail") or "")
         reference = str(row.get("reference") or "")
-        numeric = row.get("numeric")
-        if (
-            not rail
-            or not reference
-            or not isinstance(numeric, Mapping)
-            or numeric.get("operation") != MetricOperation.DEX.value
-            or numeric.get("value") is None
-        ):
+        if not rail or not reference:
+            continue
+        value = _battery_hero_dex_metric_value(row)
+        if value is None:
             continue
         engine = _engine_from_payload(row)
         if engine == "unknown":
-            continue
-        try:
-            value = as_decimal(numeric["value"])
-        except (KeyError, TypeError, ValueError, ArithmeticError):
-            continue
-        if not value.is_finite():
             continue
         values[(rail, reference)][engine].append(value)
 
@@ -21910,13 +21900,20 @@ class _BatteryHeroExactAccumulator:
         self.total += value
         self.squares += value * value
 
+    def rms(self) -> Decimal | None:
+        if self.count == 0:
+            return None
+        return (self.squares / Decimal(self.count)).sqrt()
+
 
 def _battery_hero_add_flagged_absolute(
     facts: dict[
         tuple[str, str, str],
-        tuple[list[Decimal], _BatteryHeroExactAccumulator, Counter[str]],
+        tuple[_BatteryHeroExactAccumulator, Counter[str]],
     ],
     row: Mapping[str, object],
+    *,
+    engine: str,
 ) -> None:
     if (
         row.get("status") == "refused"
@@ -21932,17 +21929,36 @@ def _battery_hero_add_flagged_absolute(
         return
     if not value.is_finite():
         return
+    observation = row.get("candidate_observation")
+    identity = (
+        observation.get("identity")
+        if isinstance(observation, Mapping)
+        else None
+    )
+    subtype_state = (
+        identity.get("subtype")
+        if isinstance(identity, Mapping)
+        else None
+    )
+    subtype = (
+        str(subtype_state.get("value"))
+        if isinstance(subtype_state, Mapping)
+        and subtype_state.get("tag") == "value"
+        else None
+    )
+    unit = str(numeric.get("unit") or "")
+    if unit == "subtype_defined":
+        unit = _battery_hero_subtype_scale(subtype) or unit
     key = (
         str(row.get("rail") or ""),
-        _engine_from_payload(row),
-        str(numeric.get("unit") or ""),
+        engine,
+        unit,
     )
     entry = facts.get(key)
     if entry is None:
-        entry = ([], _BatteryHeroExactAccumulator(), Counter())
+        entry = (_BatteryHeroExactAccumulator(), Counter())
         facts[key] = entry
-    values, accumulator, flag_counts = entry
-    values.append(value)
+    accumulator, flag_counts = entry
     accumulator.add(value)
     flag_counts.update(set(_battery_hero_flagged_notice_kinds(row)))
 
@@ -21950,15 +21966,15 @@ def _battery_hero_add_flagged_absolute(
 def _battery_hero_flagged_absolute_records(
     facts: Mapping[
         tuple[str, str, str],
-        tuple[Sequence[Decimal], _BatteryHeroExactAccumulator, Mapping[str, int]],
+        tuple[_BatteryHeroExactAccumulator, Mapping[str, int]],
     ],
 ) -> dict[tuple[str, str], tuple[Mapping[str, object], ...]]:
     records: dict[tuple[str, str], list[Mapping[str, object]]] = defaultdict(list)
-    for (rail, engine, unit), (values, accumulator, flag_counts) in sorted(
+    for (rail, engine, unit), (accumulator, flag_counts) in sorted(
         facts.items()
     ):
-        rms = _rms(values)
-        if rms is None or accumulator.count == 0:
+        rms = accumulator.rms()
+        if rms is None:
             continue
         records[(rail, engine)].append(
             {
@@ -22003,11 +22019,11 @@ def _battery_hero_metric_values_stats(
     )
     medians = [Decimal(str(row[0])) for row in median_rows]
     median = medians[0] if count % 2 else (medians[0] + medians[1]) / Decimal(2)
+    rms = accumulator.rms()
+    assert rms is not None
     return {
         "n": count,
-        "rms_dex": _battery_hero_metric_decimal_text(
-            (accumulator.squares / Decimal(count)).sqrt()
-        ),
+        "rms_dex": _battery_hero_metric_decimal_text(rms),
         "sd_dex": _battery_hero_metric_decimal_text(
             (accumulator.deviations / Decimal(count)).sqrt()
         ),

@@ -906,7 +906,7 @@ def read_scores(
     source_disagreement_reasons: set[str] = set()
     flagged_absolute_facts: dict[
         tuple[str, str, str],
-        tuple[list[Decimal], _BatteryHeroExactAccumulator, Counter[str]],
+        tuple[_BatteryHeroExactAccumulator, Counter[str]],
     ] = {}
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
@@ -1039,7 +1039,9 @@ def read_scores(
                 selected_rail = rail in selected
                 if rail not in retained_rails:
                     continue
-                _battery_hero_add_flagged_absolute(flagged_absolute_facts, row)
+                _battery_hero_add_flagged_absolute(
+                    flagged_absolute_facts, row, engine=engine
+                )
                 metric_tier = _residual_metric_tier(row)
                 if metric_tier != "dex":
                     if selected_rail:

@@ -26,6 +26,7 @@ from simulator.battery.enums import (
     SourceRelation,
 )
 from simulator.battery.score_metrics import populate_numeric
+from simulator.battery.migrate import to_plain
 from scripts.battery_hero_plot import (
     HERO_MINOR_FACETS,
     HERO_RAILS,
@@ -2100,7 +2101,7 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
         encoding="utf-8",
     )
 
-    data = read_scores(path)
+    data = read_scores(path, _collection_mode=True)
 
     metric = data.hero_all_numeric_metrics[("residue_composition", "openimcc")]
     assert data.hero_all_numeric_metrics[("vapour", "openimcc")]["rms_dex"] == "0.5"
@@ -2145,6 +2146,93 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
     assert metric["flagged_absolute_metrics"][0]["n"] == 1
 
 
+def test_collection_resolves_residue_unit_from_production_payload(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    row = _record(
+        engine="openimcc", experiment="oxide", formula="FeO",
+        temperature_K=1200, residual=None, rail="residue_composition",
+    )
+    row["candidate_observation"]["identity"]["subtype"] = {
+        "tag": "value", "value": "oxide_wt_percent",
+    }
+    numeric, refusal, detail = populate_numeric(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        candidate=Decimal("4"),
+        reference=Decimal("7"),
+        source_relation=SourceRelation.INDEPENDENT,
+        operation_override=MetricOperation.ABSOLUTE,
+    )
+    assert refusal is None, detail
+    assert numeric is not None
+    row["numeric"] = to_plain(numeric)
+    row["notices"] = [{
+        "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+        "reason": "outside certified band",
+    }]
+    path = tmp_path / "production-residue-unit.jsonl"
+    path.write_text(
+        "".join(json.dumps(item) + "\n" for item in (
+            {"kind": "battery_store_stamp", "revision": "unit"}, row,
+        )),
+        encoding="utf-8",
+    )
+
+    data = read_scores(path, _collection_mode=True)
+    metric = data.hero_all_numeric_metrics[("residue_composition", "openimcc")]
+    absolute = metric["flagged_absolute_metrics"][0]
+    assert absolute["n"] == 1 and absolute["rms"] == "3"
+    assert absolute["unit"] == "mass_percent"
+    summary_metric = hero_plot._hero_summary_payload(data)["residue_composition"][
+        "all_numeric_metrics_by_engine"
+    ]["openimcc"]["flagged_absolute_metrics"][0]
+    assert summary_metric == absolute
+
+    rendered_text: list[str] = []
+    original_text = hero_plot.Axes.text
+
+    def capture_text(axis: object, x: object, y: object, text: object, *args: object, **kwargs: object) -> object:
+        rendered_text.append(str(text))
+        return original_text(axis, x, y, text, *args, **kwargs)
+
+    monkeypatch.setattr(hero_plot.Axes, "text", capture_text)
+    hero_plot._draw_scorecard_png(
+        tmp_path / "production-residue-unit.png", data, [], [],
+        (("residue_composition", "Residue composition"),),
+    )
+    assert any("RMS 3 mass_percent (n=1" in text for text in rendered_text)
+
+
+def test_collection_keeps_observation_only_engine_for_flagged_absolute(
+    tmp_path: Path,
+) -> None:
+    row = _record(
+        engine="openimcc", experiment="observation-engine", formula="FeO",
+        temperature_K=1200, residual=None, rail="residue_composition",
+    )
+    del row["candidate_request"]
+    row["numeric"] = {
+        "operation": "absolute", "unit": "wt_percent", "value": "-3",
+    }
+    row["notices"] = [{
+        "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+        "reason": "outside certified band",
+    }]
+    path = tmp_path / "observation-engine.jsonl"
+    path.write_text(
+        "".join(json.dumps(item) + "\n" for item in (
+            {"kind": "battery_store_stamp", "revision": "engine"}, row,
+        )),
+        encoding="utf-8",
+    )
+
+    data = read_scores(path, _collection_mode=True)
+
+    assert data.engines == ("openimcc",)
+    metric = data.hero_all_numeric_metrics[("residue_composition", "openimcc")]
+    assert metric["flagged_absolute_metrics"][0]["n"] == 1
+
+
 def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2168,13 +2256,18 @@ def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
         encoding="utf-8",
     )
 
+    rendered_text: list[str] = []
+    original_text = hero_plot.Axes.text
+
+    def capture_text(axis: object, x: object, y: object, text: object, *args: object, **kwargs: object) -> object:
+        rendered_text.append(str(text))
+        return original_text(axis, x, y, text, *args, **kwargs)
+
+    monkeypatch.setattr(hero_plot.Axes, "text", capture_text)
+
     def collection_pin() -> None:
+        rendered_text.clear()
         data = read_scores(path, _collection_mode=True)
-        metric = data.hero_all_numeric_metrics.get(("residue_composition", "openimcc"), {})
-        assert metric.get("flagged_absolute_metrics"), "flagged_absolute_metrics missing"
-        assert hero_plot._hero_summary_payload(data)["residue_composition"][
-            "all_numeric_metrics_by_engine"
-        ]["openimcc"]["flagged_absolute_metrics"]
         hero_plot._draw_scorecard_png(
             tmp_path / "mutated-collection-scorecard.png",
             data,
@@ -2182,7 +2275,11 @@ def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
             [],
             (("residue_composition", "Residue composition"),),
         )
+        assert "Flagged absolute (native units)" in rendered_text and any(
+            "RMS 2 wt_percent (n=1" in text for text in rendered_text
+        ), "native RMS missing from rendered collection scorecard"
 
+    collection_pin()
     # Restore the old dex-only scorer gate; the shipped collection pin must fail.
     with monkeypatch.context() as mutation:
         mutation.setattr(
@@ -2193,7 +2290,7 @@ def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
             and row["numeric"].get("operation") == "dex"
             else None,
         )
-        with pytest.raises(AssertionError, match="flagged_absolute_metrics"):
+        with pytest.raises(AssertionError, match="native RMS missing"):
             collection_pin()
     collection_pin()
 
@@ -2367,6 +2464,38 @@ def test_openimcc_vaporock_pair_metrics_split_by_species_and_temperature() -> No
     assert sio["views"]["temperature_ge_1700"]["n_shared"] == 1
     assert na["n_shared"] == 2
     assert na["views"]["all"]["outside_rms_dex"] is None
+
+
+def test_paired_engine_comparisons_use_the_shared_dex_reader(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    rows = [
+        {
+            "rail": "vapour",
+            "reference": "shared-row",
+            "candidate_request": {"engine": engine},
+            "numeric": {"operation": "dex", "value": value},
+        }
+        for engine, value in (("openimcc", "1"), ("magemin", "2"))
+    ]
+
+    def comparisons() -> list[dict[str, object]]:
+        record = battery_score._paired_engine_rail_comparisons(
+            rows,
+            primary_engines=("openimcc",),
+            comparison_engines=("magemin",),
+            rails=("vapour",),
+        )[0]
+        return record["comparisons"]
+
+    assert comparisons()[0]["n_shared"] == 1
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            battery_score,
+            "_battery_hero_dex_metric_value",
+            lambda _row: None,
+        )
+        assert comparisons() == []
 
 
 def test_vapour_metrics_split_source_disagreement_rows_and_shared_pairs() -> None:
