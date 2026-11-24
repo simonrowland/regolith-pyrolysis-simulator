@@ -780,6 +780,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     assert original_equilibrium_activities == sim._last_high_t_melt_activity["selected_parent_activities"]
     assert original_equilibrium_activities != original_activities
     baseline_catalog_pa: dict[str, float] = {}
+    source_activity_pressure_exponents: dict[str, float] = {}
     source_pressure_provenance = sim._last_vapor_pressure_diagnostic[
         "vapor_pressure_numerator_provenance"
     ]
@@ -795,21 +796,62 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             original_activities[species_id], rel=0.0, abs=0.0
         )
         pressure_provenance = source_pressure_provenance[species_id]
+        pressure_rail = pressure_provenance.get("pressure_rail")
         source_activity_factor = float(pressure_provenance["activity_factor"])
         source_pressure_pa = float(pressure_provenance["P_eq_Pa"])
-        source_standard_pressure_pa = float(
-            pressure_provenance["P_reference_Antoine_Pa"]
-        )
-        # activity_factor is the full normalized multiplier (including the
-        # temperature and oxygen-fugacity terms), not the oxide activity:
-        # P_eq = activity_factor * P_standard. Separately, at fixed T and
-        # intrinsic fO2, P_eq(a) / P_eq(a=1) = a; the activity-one mutation
-        # below checks that route directly against the typed activity value.
-        assert source_pressure_pa == pytest.approx(
-            source_activity_factor * source_standard_pressure_pa,
-            rel=1.0e-12,
-            abs=0.0,
-        )
+        if pressure_rail == "gas_fugacity":
+            required_fields = (
+                "P_standard_Pa",
+                "melt_oxide_activity",
+                "equivalent_parent_oxide_activity",
+            )
+            if any(pressure_provenance.get(key) is None for key in required_fields):
+                pytest.fail(
+                    f"incomplete gas_fugacity provenance for {species_id}: "
+                    f"keys={sorted(pressure_provenance)}"
+                )
+            source_standard_pressure_pa = float(
+                pressure_provenance["P_standard_Pa"]
+            )
+            # This rail's activity_factor is the full normalized multiplier,
+            # including temperature and oxygen-fugacity terms. The separate
+            # melt activity fields identify the routed oxide activity.
+            assert source_pressure_pa == (
+                source_activity_factor * source_standard_pressure_pa
+            )
+            source_oxide_activity = float(
+                pressure_provenance["melt_oxide_activity"]
+            )
+            equivalent_parent_activity = float(
+                pressure_provenance["equivalent_parent_oxide_activity"]
+            )
+            assert source_oxide_activity == activity.value
+            assert equivalent_parent_activity == activity.value
+            source_activity_pressure_exponents[species_id] = 1.0
+        elif pressure_rail == "liquid_oxide_standard_reaction":
+            required_fields = (
+                "melt_oxide_activity",
+                "oxide_activity_exponent",
+            )
+            if any(pressure_provenance.get(key) is None for key in required_fields):
+                pytest.fail(
+                    "incomplete liquid_oxide_standard_reaction provenance "
+                    f"for {species_id}: keys={sorted(pressure_provenance)}"
+                )
+            source_oxide_activity = float(
+                pressure_provenance["melt_oxide_activity"]
+            )
+            source_activity_pressure_exponents[species_id] = float(
+                pressure_provenance["oxide_activity_exponent"]
+            )
+            assert source_activity_factor == source_oxide_activity
+            assert source_oxide_activity == activity.value
+        else:
+            pytest.fail(
+                f"unexpected pressure_rail={pressure_rail!r} for {species_id}; "
+                f"provenance keys={sorted(pressure_provenance)}"
+            )
+        assert source_activity_pressure_exponents[species_id] > 0.0
         expected_seam_pa = source_pressure_pa
         seam_pa = effective_source.pressure_pa(species_id)
         assert seam_pa is not None and seam_pa > 0.0
@@ -900,14 +942,18 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert a1_answer.source_reaction_activity.value == pytest.approx(1.0)
             routed_activity = batch.channel(species_id).source_reaction_activity
             assert routed_activity is not None and routed_activity.value is not None
-            # The catalog pressure is P_eq at the routed activity; the
-            # activity-one reversion supplies P_eq(a=1), so their ratio must
-            # recover the typed activity at fixed temperature and intrinsic fO2.
+            # At fixed temperature and intrinsic fO2, the oxygen term is
+            # constant. The activity-one reversion therefore makes the
+            # catalog-pressure ratio equal a**n, where n is the source rail's
+            # published oxide_activity_exponent (one on gas_fugacity).
             assert (
                 baseline_catalog_pa[species_id]
                 / float(a1_answer.pressure.pa)
             ) == pytest.approx(
-                float(routed_activity.value), rel=1.0e-12, abs=0.0
+                float(routed_activity.value)
+                ** source_activity_pressure_exponents[species_id],
+                rel=1.0e-12,
+                abs=0.0,
             )
             seam_pa = effective_source.pressure_pa(species_id)
             assert seam_pa is not None and seam_pa > 0.0
