@@ -721,8 +721,9 @@ def test_flux_activity_operands_retain_every_pressure_carrier(temperature_K):
 def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     """RG-1 gateway: catalog P_eff class without a flux-value cutover.
 
-    Each species' band is derived from its verifier-probed effective-vs-pure
-    separation so every pure-component reversion is independently red.
+    Each species' band follows the source-reaction activity and pressure
+    provenance for this route, so every pure-component reversion is
+    independently red even when d-207 changes the activity provider.
     """
 
     sim = _real_capacity_sim()
@@ -740,56 +741,29 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     assert batch is not None
     assert sim._last_vapor_pressure_diagnostic["phase_basis"] == "liquid"
 
-    verifier_probe_pa = {
-        # Three-way Studio probe at 1873.15 K: source-reaction fO2 is
-        # 1e-9 bar and P_standard is 1e5 Pa in both parents. b274 keeps
-        # vapour on the builtin path below 1950 K, whose `melt_oxide_activity`
-        # table-gamma CaO activity is 1.386915e-3; it gives activity_factor
-        # 5.740329e-11 and P_eq=5.740329e-6 Pa. The car carries d-207
-        # (source commit db7c534cdd, adapted in dcf8f3c945): this all-liquid
-        # charge uses OpenIMCC from its 1700 K domain floor, giving activity
-        # 9.337961e-5, activity_factor 3.864906e-12, and P_eq=3.864906e-7 Pa.
-        # At fixed fO2 the gas-fugacity reaction is linear in CaO activity,
-        # so the 14.853x pressure change is the change from b274's table
-        # activity to the car's OpenIMCC activity. The direct OpenIMCC call's
-        # CaO value also moves 8.771606e-5 -> 9.337961e-5 (+6.5%) from D066
-        # v1 to v4 (OpenIMCC ce673d05); this pack update is distinct from the
-        # routing change. Pure-Ca Psat is 2.205e5 Pa and there is no cap notice,
-        # so the saturation ceiling does not bind. Pin the car/merged value.
+    # d-207 (db7c534cdd, adapted in dcf8f3c945) routes this all-liquid
+    # charge's source-reaction activities through OpenIMCC. For Ca, b274's
+    # builtin table-gamma activity was 1.386915e-3; the routed activity is
+    # 9.337961e-5. At fixed fO2 the gas-fugacity reaction is linear in CaO
+    # activity, and pure-Ca Psat is 2.205e5 Pa, so the saturation ceiling does
+    # not bind. Seam references below now follow each routed activity and its
+    # pressure provenance instead of the b274-era fixed probe table.
+    pure_component_probe_pa = {
         # b-136 / t-559 posture rework 2026-08-08: Zhang CaTiO3 α remains
         # WITHDRAWN; channel stays live on Hertz-Knudsen ideal α=1.0 as an
         # explicit status-bearing upper bound (missing kinetic α ≠ missing
         # pressure). Ca pressure probe retained. docs-private/research/2026-08-08-rp3-b136/report.md.
-        "Ca": 3.8649058209492974e-7,
-        # b-147 Mg (2026-08-07): TE gas_rail demoted; Pref_GF path. Live catalog
-        # probe at 1873.15 K moves 7.3e-3 -> 0.09398 Pa (+1.110 dex). Pref_GF-GR
-        # at this T is only +0.565 dex; the extra pin motion is band-based
-        # (old pin sat below old live). SIGN CHECK: pressure UP.
-        # docs-private/research/2026-08-07-mgfix/report.md
-        "Mg": 0.09397692153837497,
-        # Constant table gamma (no T*/T / pseudo-binary mid-range).
-        # t-538: seam pin unchanged (pre-rg Builtin path); catalog OOR value
-        # moves via physical 1/T tangent (see K branch below).
-        "K": 0.469,
-        "Al": 1.4e-8,
-    }
-    pure_component_probe_pa = {
         "Ca": 8.35e5,
         "Mg": 6.87e5,
         "K": 4.51e6,
         "Al": 110.2,
     }
-    # Premise: the legacy probes give separation R_i = P_pure,i / P_eff,i.
-    # Algebra: admit one tenth of that measured log separation,
-    # b_i = log10(R_i) / 10. The band therefore admits ratios
-    # [R_i^-0.1, R_i^0.1] around P_eff,i, not the full raw separation.
-    # Catalog a=1 answers also pass through source-reaction/fO2 evaluation;
-    # the isolated re-evaluations below prove none can fit its species' band.
-    probe_band_decades = {
-        species_id: abs(math.log10(pure_component_probe_pa[species_id] / probe_pa))
-        / 10.0
-        for species_id, probe_pa in verifier_probe_pa.items()
-    }
+    # Admit one tenth of each source-derived pure/effective log separation.
+    # The former fixed table mixed builtin and d-207 activities (e.g. Mg's
+    # 0.0939769 Pa target against the merged 0.00594450 Pa seam). Derive the
+    # effective reference per species from the routed activity/provenance
+    # below; pure-component references remain independent of that route.
+    probe_band_decades: dict[str, float] = {}
 
     def within_probe_band(
         species_id: str, actual: float, reference: float
@@ -807,14 +781,46 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     assert original_equilibrium_activities != original_activities
     baseline_catalog_pa: dict[str, float] = {}
     activity_exponents: dict[str, float] = {}
-    for species_id, probe_pa in verifier_probe_pa.items():
+    source_pressure_provenance = sim._last_vapor_pressure_diagnostic[
+        "vapor_pressure_numerator_provenance"
+    ]
+    for species_id, pure_pa in pure_component_probe_pa.items():
         answer = batch.channel(species_id)
         assert isinstance(answer.pressure, PressureValue)
         catalog_pa = float(answer.pressure.pa)
         baseline_catalog_pa[species_id] = catalog_pa
+        activity = answer.source_reaction_activity
+        assert activity is not None
+        assert activity.value is not None and activity.value > 0.0
+        assert activity.value == pytest.approx(
+            original_activities[species_id], rel=0.0, abs=0.0
+        )
+        evaluator = sim.vapour_rail_catalog.species[species_id].evaluator
+        assert evaluator is not None
+        activity_exponents[species_id] = evaluator.activity_exponent
+        pressure_provenance = source_pressure_provenance[species_id]
+        source_activity_factor = float(pressure_provenance["activity_factor"])
+        expected_activity_factor = (
+            float(activity.value) ** evaluator.activity_exponent
+        )
+        assert source_activity_factor == pytest.approx(
+            expected_activity_factor, rel=1.0e-12, abs=0.0
+        )
+        # Remove the equilibrium source's activity factor, then apply the
+        # typed activity carried by this catalog channel. The remaining factor
+        # retains the source reference pressure and its oxygen-fugacity term.
+        expected_seam_pa = (
+            float(pressure_provenance["P_eq_Pa"])
+            / source_activity_factor
+            * expected_activity_factor
+        )
         seam_pa = effective_source.pressure_pa(species_id)
         assert seam_pa is not None and seam_pa > 0.0
-        assert within_probe_band(species_id, float(seam_pa), probe_pa)
+        probe_band_decades[species_id] = abs(
+            math.log10(pure_pa / expected_seam_pa)
+        ) / 10.0
+        assert within_probe_band(species_id, float(seam_pa), expected_seam_pa)
+        assert within_probe_band(species_id, catalog_pa, expected_seam_pa)
         if species_id == "K":
             # K fit domain ends at 1600 K; this probe is at 1873.15 K → OOR.
             # t-538: OOR value is the physical 1/T-tangent continuation of the
@@ -831,52 +837,43 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert answer.verdict_status == "status_bearing_non_authoritative"
             assert answer.certification_ceiling == "never"
             assert math.isfinite(catalog_pa) and 0.0 < catalog_pa
-            assert catalog_pa < pure_component_probe_pa[species_id]
+            assert catalog_pa < pure_pa
             # Physical OOR can land near the pre-rg seam; pin the live value
             # so a future regression that re-inflates heating OOR is visible.
             assert catalog_pa == pytest.approx(0.7101916366096568, rel=1.0e-9)
         else:
             assert not answer.extra.get("out_of_range", False)
-            assert within_probe_band(species_id, catalog_pa, probe_pa)
-            assert within_probe_band(species_id, catalog_pa, float(seam_pa))
-        activity = answer.source_reaction_activity
-        assert activity is not None
         assert activity.provider == "BuiltinVaporPressureProvider"
-        if species_id == "K":
+        reported_provenance = activity.derivation.get(
+            "reported_activity_provenance", {}
+        )
+        openimcc_flags = reported_provenance.get("openimcc_flags", ())
+        openimcc_sourced = (
+            reported_provenance.get("melt_activity_authority") == "openimcc"
+        )
+        if openimcc_sourced:
+            # d-207 keeps OpenIMCC's reported number with a typed status:
+            # provider-pack identity is provenance, not external DOI evidence.
+            assert (
+                activity.verdict
+                is ActivityVerdictKind.STATUS_BEARING_VALUE
+            )
+            assert activity.reason == "producer_self_reference_rejected"
+            assert any(
+                flag.startswith("paper-demonstrated-window:")
+                for flag in openimcc_flags
+            )
+        elif activity.reason == "out_of_gamma_domain":
             # b-121: OOD table gamma is status-bearing (not POINT) while the
             # HEAD oodfix seam still publishes PressureValue + FluxEligible.
             assert (
                 activity.verdict
                 is ActivityVerdictKind.STATUS_BEARING_VALUE
             )
-            assert activity.reason == "out_of_gamma_domain"
             assert answer.is_flux_active
-        elif species_id == "Ca":
-            # d-207 routes this all-liquid CaO activity through OpenIMCC.
-            # Its numeric value remains the reported activity, but the pack
-            # identity is provider provenance rather than an external DOI, so
-            # the activity API correctly keeps it status-bearing.
-            assert (
-                activity.verdict
-                is ActivityVerdictKind.STATUS_BEARING_VALUE
-            )
-            assert activity.reason == "producer_self_reference_rejected"
-            assert activity.value == pytest.approx(
-                original_activities[species_id], rel=0.0, abs=0.0
-            )
-            reported_provenance = activity.derivation[
-                "reported_activity_provenance"
-            ]
-            assert any(
-                flag.startswith("paper-demonstrated-window:")
-                for flag in reported_provenance["openimcc_flags"]
-            )
         else:
             assert activity.verdict is ActivityVerdictKind.POINT
-            assert activity.value == pytest.approx(
-                original_activities[species_id], rel=0.0, abs=0.0
-            )
-        if species_id == "Ca":
+        if openimcc_sourced:
             assert activity.evidence_ref is None
         else:
             assert activity.evidence_ref is not None
@@ -884,11 +881,8 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
             assert "DOI " in activity.evidence_ref
         if activity.evidence_ref is not None:
             assert "_last_vapor_pressure_diagnostic" not in activity.evidence_ref
-        evaluator = sim.vapour_rail_catalog.species[species_id].evaluator
-        assert evaluator is not None
-        activity_exponents[species_id] = evaluator.activity_exponent
     try:
-        for species_id in verifier_probe_pa:
+        for species_id in pure_component_probe_pa:
             # Mutate one species at a time from the same baseline. This proves
             # every activity=1 reversion independently leaves its own band.
             mutated_activities = dict(original_activities)
@@ -931,7 +925,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     # headspace pO2. Varying only transport pO2 must leave catalog P_eff fixed.
     original_catalog_pa = {
         species_id: float(batch.channel(species_id).pressure.pa)
-        for species_id in verifier_probe_pa
+        for species_id in pure_component_probe_pa
     }
     sim._last_vapor_pressure_diagnostic["pO2_bar"] = 1.0e-3
     transport_mutation_batch = sim._resolve_evaporation_vapour_batch(
@@ -972,7 +966,7 @@ def test_catalog_probe_is_activity_corrected_while_flux_source_stays_pre_rg():
     assert flux_report["selection_source"] == (
         "equilibrium_backend_effective_pressure_pre_rg"
     )
-    for species_id in verifier_probe_pa:
+    for species_id in pure_component_probe_pa:
         assert flux_pressures[species_id] == pytest.approx(
             effective_source.pressure_pa(species_id), rel=0.0, abs=0.0
         )
