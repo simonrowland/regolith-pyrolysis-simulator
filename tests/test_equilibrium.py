@@ -941,7 +941,7 @@ def test_native_fe_saturation_carries_contributing_holzheid_authority():
         "high_uncertainty": False,
     }
     combined_host = SimpleNamespace(
-        _compute_native_fe_saturation_extent=lambda **_kwargs: {
+        _compute_native_fe_saturation_extent=lambda *_args, **_kwargs: {
             "native_fe_state": native_state,
             "native_fe_frac": 0.1,
         },

@@ -1707,6 +1707,59 @@ def test_equilibrium_replay_restores_requested_fo2_not_printed_echo(
     assert sim.melt.melt_fO2_log == requested_fO2_log
 
 
+def test_pt1_equilibrium_restoration_keeps_scoped_fe_pressure_notice(
+    tmp_path: Path,
+) -> None:
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _provider_notice_flags_from_result,
+    )
+
+    db_path = tmp_path / "pt1-fe-pressure-notice.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    capture_sim, result = _pt0_equilibrium_capture_context(capture)
+    notice = {
+        "kind": "out_of_certified_band",
+        "authority_level": "extrapolated",
+        "reason": "Holzheid Fe pressure extension",
+    }
+    diagnostic = {
+        "vapor_pressure_numerator_provenance": {
+            "Fe": {
+                "affected_species": ["Fe"],
+                "affected_quantities": ["p_partial"],
+                "notice": notice,
+            }
+        }
+    }
+    capture_sim._last_vapor_pressures_source = {
+        "Fe": "builtin_authoritative"
+    }
+    capture_sim._last_vapor_pressure_diagnostic = diagnostic
+    capture.capture_equilibrium(capture_sim, result)
+    assert capture.last_cache_state == "live_fill"
+
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim, _replay_result = _pt0_equilibrium_capture_context(replay)
+    replay._authorize_cached_real_replay = lambda *_args, **_kwargs: None
+    replay.replay_equilibrium(replay_sim)
+
+    assert replay_sim._last_vapor_pressures_source == {
+        "Fe": "builtin_authoritative"
+    }
+    restored_notices = _provider_notice_flags_from_result(
+        {
+            "diagnostics": {
+                "vapor_pressure_diagnostic": replay_sim._last_vapor_pressure_diagnostic
+            }
+        }
+    )
+    assert len(restored_notices) == 1
+    assert restored_notices[0]["authority"] == "extrapolated"
+    assert restored_notices[0]["reason"] == notice["reason"]
+    assert restored_notices[0]["affected_species"] == ["Fe"]
+    assert restored_notices[0]["affected_quantities"] == ["p_partial"]
+
+
 def test_unset_alphamelts_fo2_fields_do_not_change_other_cache_payloads():
     result = EquilibriumResult(
         temperature_C=1600.0,

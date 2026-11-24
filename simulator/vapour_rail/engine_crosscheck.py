@@ -320,13 +320,29 @@ def _run_rail_cell(
         pressures = {}
     notices_by_species: dict[str, list[dict[str, Any]]] = {}
     provenance = diagnostic.get("vapor_pressure_numerator_provenance")
+    # binary_pot_battery imports divergence_label from this module; defer this
+    # shared-reader import until both modules have finished initialization.
+    from simulator.diagnostic_helpers.binary_pot_battery import (
+        _provider_notice_flags_from_result,
+        _scope_matches,
+    )
+
+    provider_notices = _provider_notice_flags_from_result(
+        {"diagnostics": {"vapor_pressure_diagnostic": diagnostic}}
+    )
     if isinstance(provenance, Mapping):
-        for species, record in provenance.items():
-            if species not in pressures or not isinstance(record, Mapping):
+        for species in provenance:
+            if species not in pressures:
                 continue
-            notice = record.get("notice")
-            if isinstance(notice, Mapping) and notice.get("kind"):
-                notices_by_species[str(species)] = [dict(notice)]
+            scoped_notices = [
+                dict(notice)
+                for notice in provider_notices
+                if _scope_matches(
+                    notice.get("affected_species"), str(species), species=True
+                )
+            ]
+            if scoped_notices:
+                notices_by_species[str(species)] = scoped_notices
     return {
         "status": status,
         "reason": reason,

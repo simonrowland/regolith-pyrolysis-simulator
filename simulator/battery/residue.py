@@ -466,12 +466,16 @@ class ResiduePressureResult:
 
 
 def _retain_residue_pressure_notices(
-    result: Mapping[str, float] | ResiduePressureResult,
+    result: Mapping[str, float] | ResiduePressureResult | ResidueInventoryResult,
     notices: list[Mapping[str, object]],
 ) -> None:
-    if not isinstance(result, ResiduePressureResult):
+    if isinstance(result, ResiduePressureResult):
+        incoming = result.notices
+    elif isinstance(result, ResidueInventoryResult):
+        incoming = result.pressure_notices
+    else:
         return
-    for notice in result.notices:
+    for notice in incoming:
         row = dict(notice)
         if row not in notices:
             notices.append(row)
@@ -2734,7 +2738,9 @@ def _self_similar_area_m2(
 def _hashimoto_integrate_geometry(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
-    pressure_model: Callable[[Mapping[str, float], float], Mapping[str, float]],
+    pressure_model: Callable[
+        [Mapping[str, float], float], Mapping[str, float] | ResiduePressureResult
+    ],
     *,
     temperature_K: float,
     duration_s: float,
@@ -2820,15 +2826,14 @@ def _hashimoto_integrate_geometry(
         step = integrate_residue_inventory(
             inventory,
             active_channels,
-            lambda inventory_at, logp: _residue_pressure_values(
-                pressure_model(inventory_at, logp), pressure_notices
-            ),
+            pressure_model,
             temperature_K=temperature_K,
             duration_s=duration,
             area_evolution_m2=(area_m2,),
             **({"background_pressure_Pa": background_pressure_Pa}
                if background_pressure_Pa else {}),
         )
+        _retain_residue_pressure_notices(step, pressure_notices)
         if on_step is not None:
             on_step(inventory, active_channels, area_m2, duration)
         inventory = dict(step.residue_mol)

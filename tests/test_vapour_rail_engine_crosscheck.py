@@ -310,6 +310,66 @@ def test_builtin_fe_notice_reaches_its_matched_report_observation(tmp_path):
     assert "notices_by_species" not in fe_row["vaporock"]
 
 
+def test_rail_cell_uses_shared_provider_notice_reader_and_indexes_by_species(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.diagnostic_helpers import binary_pot_battery
+
+    notice = {
+        "kind": "out_of_certified_band",
+        "authority_level": "extrapolated",
+        "reason": "injected Fe pressure extension",
+    }
+    diagnostic = {
+        "vapor_pressures_Pa": {"Fe": 3.0, "SiO": 4.0},
+        "vapor_pressure_numerator_provenance": {
+            "Fe": {
+                "affected_species": ["Fe"],
+                "affected_quantities": ["p_partial"],
+                "notice": notice,
+            },
+            "SiO": {
+                "affected_species": ["SiO"],
+                "affected_quantities": ["p_partial"],
+            },
+        },
+    }
+    calls: list[object] = []
+    read_provider_notices = binary_pot_battery._provider_notice_flags_from_result
+
+    def observe_reader(result: object) -> list[dict[str, object]]:
+        calls.append(result)
+        return read_provider_notices(result)
+
+    monkeypatch.setattr(
+        binary_pot_battery,
+        "_provider_notice_flags_from_result",
+        observe_reader,
+    )
+
+    class Provider:
+        def dispatch(self, _request: object) -> SimpleNamespace:
+            return SimpleNamespace(status="ok", diagnostic=diagnostic)
+
+    cell = _run_rail_cell(
+        Provider(),
+        composition_mol=COMPOSITION.composition_mol,
+        temperature_K=1800.0,
+        fo2_log10_bar=-8.0,
+        pressure_bar=DEFAULT_PRESSURE_BAR,
+    )
+
+    assert len(calls) == 1
+    assert calls[0] == {
+        "diagnostics": {"vapor_pressure_diagnostic": diagnostic}
+    }
+    fe_notice = cell["notices_by_species"]["Fe"][0]
+    assert fe_notice["authority"] == "extrapolated"
+    assert fe_notice["affected_species"] == ["Fe"]
+    assert fe_notice["affected_quantities"] == ["p_partial"]
+    assert cell["notices_by_species"] == {"Fe": [fe_notice]}
+
+
 def test_crosscheck_serializes_extrapolated_h2_envelope_with_existing_status():
     report = run_engine_crosscheck(
         composition=COMPOSITION,

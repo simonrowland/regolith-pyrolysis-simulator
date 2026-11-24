@@ -827,12 +827,14 @@ def test_default_alphamelts_projection_matches_resolved_opener_settings(
         close_battery_engine_handle(handle)
 
 
+@pytest.mark.parametrize("isolated", (False, True))
 def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    isolated: bool,
 ) -> None:
     from simulator import engine_cache
-    from simulator.battery.enums import Quantity
+    from simulator.battery.enums import Authority, Quantity
     from simulator.battery.score import cell_notices
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -870,7 +872,7 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
             pot,
             temperature_K=1878.15,
             po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
-            isolated=False,
+            isolated=isolated,
         )
         engine_cache._MEMORY_CACHE.clear()
         warm = equilibrate_cell(
@@ -878,7 +880,7 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
             pot,
             temperature_K=1878.15,
             po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
-            isolated=False,
+            isolated=isolated,
         )
     finally:
         close_battery_engine_handle(handle)
@@ -893,7 +895,9 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
             cell,
             species="Fe",
         )
-        assert sum(notice.reason == reason for notice in fe_notices) == 1
+        matching_notices = [notice for notice in fe_notices if notice.reason == reason]
+        assert len(matching_notices) == 1
+        assert matching_notices[0].authority is Authority.EXTRAPOLATED
         assert not any(
             notice.reason == reason
             for notice in cell_notices(
@@ -3053,7 +3057,7 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_without_cache(
     second = pressure({"Na2O": 1.0}, -8.0)
     pressure._on_accepted_evaluation(-8.0)
 
-    assert first == second == {"Na": 5.0}
+    assert first.pressures_Pa == second.pressures_Pa == {"Na": 5.0}
     assert floor_diagnostics["Na"]["detail"] == {
         "reason": "recorded floor inversion"
     }

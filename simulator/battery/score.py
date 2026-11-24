@@ -12520,8 +12520,6 @@ def _predict_phase_row(
 def _residue_engine_pressure_notices(
     raw_notices: object,
     dependent_quantity: Quantity,
-    *,
-    species_formula: str | None = None,
 ) -> tuple[Notice, ...]:
     from types import SimpleNamespace
 
@@ -12529,12 +12527,6 @@ def _residue_engine_pressure_notices(
 
     if not isinstance(raw_notices, (list, tuple)):
         return ()
-    dependent_elements = set(
-        parse_formula_elements(species_formula) or ()
-    ) if species_formula else set()
-    scoped_species = dependent_elements | (
-        {species_formula} if species_formula is not None else set()
-    )
     built: list[Notice] = []
     for row in raw_notices:
         if not isinstance(row, Mapping):
@@ -12542,28 +12534,10 @@ def _residue_engine_pressure_notices(
         if not _scope_matches(row.get("affected_quantities"), "p_partial"):
             continue
         affected_species = row.get("affected_species")
-        if species_formula is not None and (
-            affected_species is not None
-            and not any(
-                _scope_matches(affected_species, selected, species=True)
-                for selected in scoped_species
-            )
-        ):
-            continue
-        matching_species = next(
-            (
-                selected
-                for selected in sorted(scoped_species)
-                if affected_species is None
-                or _scope_matches(affected_species, selected, species=True)
-            ),
-            None,
-        )
         typed_notices = cell_notices(
             Quantity.P_PARTIAL,
             Engine.INTERNAL_ANALYTICAL,
             SimpleNamespace(notices=(row,), authority=None),
-            species=matching_species,
         )
         if not typed_notices:
             continue
@@ -16886,7 +16860,6 @@ def _hashimoto_residue_prediction(
             _residue_engine_pressure_notices(
                 primary_provenance.get("engine_pressure_notices"),
                 reported_quantity,
-                species_formula=formula,
             )
         )
         surface_floor = primary_provenance.get("surface_pO2_balance_floor")
@@ -17145,7 +17118,6 @@ def _knudsen_residue_prediction(
                 *_residue_engine_pressure_notices(
                     result.get("pressure_notices"),
                     reported_quantity,
-                    species_formula=reference.identity.species.formula,
                 ),
             ), identity=reference.identity,
             refusal_detail=provenance,
