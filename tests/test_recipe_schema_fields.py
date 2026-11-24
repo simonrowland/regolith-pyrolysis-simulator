@@ -16,6 +16,18 @@ RECIPE_DIR = ROOT / "data" / "recipes"
 EXAMPLE_RECIPE = RECIPE_DIR / "robinot_2026_benchtop_example.yaml"
 ROBINOT_PRESET = ROOT / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
 OPTIONAL_FIELDS = {"lab_schedule", "process_dt_s", "source_tags"}
+GREEN_STARTER_FIXTURE = (
+    Path(__file__).parent
+    / "fixtures"
+    / "recipe_schema"
+    / "green_canonical_lunar_full_yield.yaml"
+)
+GREEN_WINNER_FIXTURE = (
+    Path(__file__).parent
+    / "fixtures"
+    / "recipe_schema"
+    / "green_prechange_winner.recipe.yaml"
+)
 
 
 def _robinot_preset() -> dict:
@@ -34,6 +46,26 @@ def test_legacy_recipe_database_starters_keep_their_setpoints_shape() -> None:
         assert loaded == RecipeSchema().to_setpoints_patch(
             RecipePatch.from_nested(original)
         )
+
+
+@pytest.mark.parametrize(
+    "fixture_path",
+    [GREEN_STARTER_FIXTURE, GREEN_WINNER_FIXTURE],
+    ids=["starter", "prechange-winner"],
+)
+def test_green_recipe_fixtures_keep_load_save_parity(
+    fixture_path: Path,
+    tmp_path: Path,
+) -> None:
+    original_bytes = fixture_path.read_bytes()
+    loaded = load_recipe_patch(fixture_path)
+    original = yaml.safe_load(original_bytes)
+    assert loaded == RecipeSchema().to_setpoints_patch(
+        RecipePatch.from_nested(original)
+    )
+    saved_path = tmp_path / fixture_path.name
+    write_recipe_patch(saved_path, loaded)
+    assert load_recipe_patch(saved_path) == loaded
 
 
 def test_lab_schedule_and_source_tags_round_trip_without_losing_knots(
