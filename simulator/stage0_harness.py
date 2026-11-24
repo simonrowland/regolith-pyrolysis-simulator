@@ -108,6 +108,18 @@ def _empty_by_group() -> dict[str, list[dict[str, Any]]]:
     return {group: [] for group in FOULANT_GROUPS}
 
 
+def _diagnostic_number(
+    diagnostic: Mapping[str, Any],
+    field: str,
+    missing_fields: list[str],
+) -> float | None:
+    value = diagnostic.get(field)
+    if value is None:
+        missing_fields.append(field)
+        return None
+    return float(value)
+
+
 def _resolve_group(
     carrier: str,
     reaction_family: str,
@@ -149,9 +161,14 @@ def _carbon_kg(carbon_mol: float) -> float:
 def _carbon_carrier_equivalent_kg(
     split_mol: float,
     declared_c_mol: float | None,
-    feed_kg: float,
+    feed_kg: float | None,
 ) -> float | None:
-    if declared_c_mol is None or declared_c_mol <= 0.0 or feed_kg <= 0.0:
+    if (
+        declared_c_mol is None
+        or declared_c_mol <= 0.0
+        or feed_kg is None
+        or feed_kg <= 0.0
+    ):
         return None
     return feed_kg * float(split_mol) / declared_c_mol
 
@@ -160,7 +177,7 @@ def _carbon_partition_interval_event(
     *,
     carrier: str,
     diagnostic: Mapping[str, Any],
-    feed_kg: float,
+    feed_kg: float | None,
     declared_c_mol: float | None,
 ) -> dict[str, Any] | None:
     raw_not_speciated = diagnostic.get("not_speciated", ()) or ()
@@ -170,7 +187,7 @@ def _carbon_partition_interval_event(
         not_speciated = tuple(str(item) for item in raw_not_speciated)
     if "f_refractory_organic_C" not in not_speciated:
         return None
-    if feed_kg <= 0.0 or declared_c_mol is None:
+    if feed_kg is None or feed_kg <= 0.0 or declared_c_mol is None:
         return None
 
     with _DEFAULT_CARBON_PARTITION.open(encoding="utf-8") as handle:
@@ -230,33 +247,46 @@ def _diagnostic_events(
     events: list[dict[str, Any]] = []
 
     if family == REACTION_FAMILY_VOLATILIZATION:
-        feed_kg = float(diagnostic.get("feed_kg", 0.0) or 0.0)
+        missing_fields: list[str] = []
+        feed_kg = _diagnostic_number(diagnostic, "feed_kg", missing_fields)
         group = _resolve_group(carrier, family, registry)
         for split in diagnostic.get("phase_splits", ()) or ():
+            split_missing: list[str] = []
             phase_id = split.get("phase")
             phase_label = (
                 "phase_1_oxidizing"
                 if int(phase_id or 0) == 1
                 else "phase_2_vacuum"
             )
-            escaped = float(split.get("escaped_frac", 0.0) or 0.0)
-            events.append({
+            escaped = _diagnostic_number(split, "escaped_frac", split_missing)
+            temperature = _diagnostic_number(split, "T_C", split_missing)
+            event = {
                 "carrier": carrier,
                 "reaction_family": family,
                 "group": group,
                 "disposition": "escaped",
                 "phase": phase_label,
-                "T_C": float(split.get("T_C", 0.0) or 0.0),
+                "T_C": temperature,
                 "escaped_frac": escaped,
-                "escaped_kg": feed_kg * escaped,
+                "escaped_kg": (
+                    feed_kg * escaped
+                    if feed_kg is not None and escaped is not None
+                    else None
+                ),
                 "source": "diagnostic",
-            })
+            }
+            missing = [*missing_fields, *split_missing]
+            if missing:
+                event["missing_fields"] = missing
+            events.append(event)
         return events
 
     if family == REACTION_FAMILY_SULFATE_DECOMP:
         group = _resolve_group(carrier, family, registry)
-        feed_kg = float(diagnostic.get("feed_kg", 0.0) or 0.0)
-        extent = float(diagnostic.get("extent", 0.0) or 0.0)
+        missing_fields = []
+        feed_kg = _diagnostic_number(diagnostic, "feed_kg", missing_fields)
+        extent = _diagnostic_number(diagnostic, "extent", missing_fields)
+        temperature = _diagnostic_number(diagnostic, "T_C", missing_fields)
         phase_id = diagnostic.get("phase")
         phase_label = (
             "phase_1_oxidizing"
@@ -269,28 +299,40 @@ def _diagnostic_events(
             "group": group,
             "disposition": "decomposed",
             "phase": phase_label,
-            "T_C": float(diagnostic.get("T_C", 0.0) or 0.0),
+            "T_C": temperature,
             "extent": extent,
-            "decomposed_kg": feed_kg * extent,
+            "decomposed_kg": (
+                feed_kg * extent
+                if feed_kg is not None and extent is not None
+                else None
+            ),
             "source": "diagnostic",
+            **({"missing_fields": missing_fields} if missing_fields else {}),
         })
         return events
 
     if family == REACTION_FAMILY_PARTITION_CARBON:
-        feed_kg = float(diagnostic.get("feed_kg", 0.0) or 0.0)
+        missing_fields: list[str] = []
+        feed_kg = _diagnostic_number(diagnostic, "feed_kg", missing_fields)
         declared_c_mol = _positive_float(diagnostic.get("declared_c_mol"))
-        interval_event = _carbon_partition_interval_event(
-            carrier=carrier,
-            diagnostic=diagnostic,
-            feed_kg=feed_kg,
-            declared_c_mol=declared_c_mol,
+        interval_event = (
+            _carbon_partition_interval_event(
+                carrier=carrier,
+                diagnostic=diagnostic,
+                feed_kg=feed_kg,
+                declared_c_mol=declared_c_mol,
+            )
+            if feed_kg is not None
+            else None
         )
         if interval_event is not None:
             events.append(interval_event)
         labile_mol = _positive_float(diagnostic.get("labile_mol"))
         refractory_mol = _positive_float(diagnostic.get("refractory_mol"))
         if labile_mol is not None:
-            labile_extent = float(diagnostic.get("labile_extent", 0.0) or 0.0)
+            labile_extent = _diagnostic_number(
+                diagnostic, "labile_extent", missing_fields
+            )
             labile_c_kg = _carbon_kg(labile_mol)
             carrier_equivalent = _carbon_carrier_equivalent_kg(
                 labile_mol,
@@ -306,13 +348,22 @@ def _diagnostic_events(
                 "declared_c_mol": declared_c_mol,
                 "labile_mol": labile_mol,
                 "labile_C_kg": labile_c_kg,
-                "burned_C_kg": labile_c_kg * labile_extent,
-                "burned_kg": labile_c_kg * labile_extent,
+                "burned_C_kg": (
+                    labile_c_kg * labile_extent
+                    if labile_extent is not None
+                    else None
+                ),
+                "burned_kg": (
+                    labile_c_kg * labile_extent
+                    if labile_extent is not None
+                    else None
+                ),
                 "labile_carrier_equivalent_kg": carrier_equivalent,
                 "mass_basis": "declared_C",
                 "phase": "phase_1_oxidizing",
                 "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
                 "source": "diagnostic",
+                **({"missing_fields": list(missing_fields)} if missing_fields else {}),
             })
         if refractory_mol is not None:
             residual_mol = _positive_float(diagnostic.get("refractory_residual_mol"))
@@ -340,6 +391,7 @@ def _diagnostic_events(
                 "phase": "phase_1_oxidizing",
                 "T_C": STAGE0_FOULANT_PHASE1_TEMP_C,
                 "source": "diagnostic",
+                **({"missing_fields": list(missing_fields)} if missing_fields else {}),
             })
         carbonate_mol = _positive_float(diagnostic.get("carbonate_mol"))
         if carbonate_mol is not None:
@@ -354,6 +406,7 @@ def _diagnostic_events(
                 "carbonate_C_kg": _carbon_kg(carbonate_mol),
                 "mass_basis": "declared_C",
                 "source": "diagnostic",
+                **({"missing_fields": list(missing_fields)} if missing_fields else {}),
             })
         return events
 
@@ -363,8 +416,11 @@ def _diagnostic_events(
         REACTION_FAMILY_INERT_TO_RUMP,
     }:
         group = _resolve_group(carrier, family, registry)
-        feed_kg = float(diagnostic.get("feed_kg", 0.0) or 0.0)
-        extent = float(diagnostic.get("extent", diagnostic.get("rump_frac", 0.0)) or 0.0)
+        missing_fields = []
+        feed_kg = _diagnostic_number(diagnostic, "feed_kg", missing_fields)
+        extent_key = "extent" if diagnostic.get("extent") is not None else "rump_frac"
+        extent = _diagnostic_number(diagnostic, extent_key, missing_fields)
+        temperature = _diagnostic_number(diagnostic, "T_C", missing_fields)
         disposition = (
             "rump"
             if family == REACTION_FAMILY_INERT_TO_RUMP
@@ -376,9 +432,14 @@ def _diagnostic_events(
             "group": group,
             "disposition": disposition,
             "extent": extent,
-            "amount_kg": feed_kg * extent,
-            "T_C": float(diagnostic.get("T_C", 0.0) or 0.0),
+            "amount_kg": (
+                feed_kg * extent
+                if feed_kg is not None and extent is not None
+                else None
+            ),
+            "T_C": temperature,
             "source": "diagnostic",
+            **({"missing_fields": missing_fields} if missing_fields else {}),
         })
         return events
 

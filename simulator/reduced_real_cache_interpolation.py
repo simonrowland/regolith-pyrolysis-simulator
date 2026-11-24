@@ -198,6 +198,10 @@ def interpolation_validity_gate(
 
     disagreement = _neighbor_disagreement(neighbors)
     result["neighbor_disagreement"] = disagreement
+    if disagreement.get("status") == "insufficient_data":
+        result["accepted"] = False
+        result["refusal_reason"] = "insufficient_vapor_pressure_data"
+        return result
     if disagreement["relative_error_max"] > INTERPOLATION_HELD_OUT_DISAGREEMENT_THRESHOLD:
         result["accepted"] = False
         result["refusal_reason"] = "held_out_disagreement_exceeded"
@@ -457,15 +461,35 @@ def estimate_interpolation_error(
     interpolated = interpolated_payload.get("equilibrium_result", {})
     if not isinstance(interpolated, Mapping):
         interpolated = {}
+    missing = list(disagreement.get("missing_vapor_pressures", ()))
+    missing.extend(
+        _missing_vapor_pressure_entries(neighbors, _vapor_species_union(neighbors))
+    )
+    interpolated_vapor_pressures = interpolated.get("vapor_pressures_Pa", {})
+    if not isinstance(interpolated_vapor_pressures, Mapping):
+        interpolated_vapor_pressures = {}
+    for species in _vapor_species_union(neighbors):
+        if (
+            species not in interpolated_vapor_pressures
+            or interpolated_vapor_pressures[species] is None
+        ):
+            missing.append(f"interpolated:{species}")
+    if missing:
+        return {
+            "term": INTERPOLATION_ERROR_TERM,
+            "status": "insufficient_data",
+            "missing_vapor_pressures": sorted(set(missing)),
+            "neighbor_disagreement": disagreement,
+            "held_out_relative_error_max": None,
+            "held_out_relative_error_by_species": {},
+        }
     held_out_terms: dict[str, float] = {}
     for species in _vapor_species_union(neighbors):
         values = [
-            float(_nested_payload_value(neighbor, ("equilibrium_result", "vapor_pressures_Pa", species)) or 0.0)
+            float(_nested_payload_value(neighbor, ("equilibrium_result", "vapor_pressures_Pa", species)))
             for neighbor in neighbors
         ]
-        exact_value = float(
-            interpolated.get("vapor_pressures_Pa", {}).get(species, 0.0) or 0.0
-        )
+        exact_value = float(interpolated_vapor_pressures[species])
         scale = max(abs(value) for value in values + [exact_value, 1.0e-30])
         held_out_terms[species] = max(
             abs(value - exact_value) / scale for value in values
@@ -609,20 +633,26 @@ def _query_liquid_fraction_proxy(
     return weighted / total_weight
 
 
-def _neighbor_disagreement(neighbors: Sequence[Mapping[str, Any]]) -> dict[str, float]:
+def _neighbor_disagreement(neighbors: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     species = _vapor_species_union(neighbors)
+    missing = (
+        _missing_vapor_pressure_entries(neighbors, species)
+        if species
+        else ["no_vapor_pressure_entries"]
+    )
+    if missing:
+        return {
+            "status": "insufficient_data",
+            "missing_vapor_pressures": missing,
+            "relative_error_max": None,
+            "relative_error_mean": None,
+        }
     relative_errors: list[float] = []
     for species_name in species:
-        values = [
-            float(
-                _nested_payload_value(
-                    neighbor,
-                    ("equilibrium_result", "vapor_pressures_Pa", species_name),
-                )
-                or 0.0
-            )
-            for neighbor in neighbors
-        ]
+        values = [float(_nested_payload_value(
+            neighbor,
+            ("equilibrium_result", "vapor_pressures_Pa", species_name),
+        )) for neighbor in neighbors]
         if not values:
             continue
         scale = max(max(abs(value) for value in values), 1.0e-30)
@@ -638,6 +668,26 @@ def _neighbor_disagreement(neighbors: Sequence[Mapping[str, Any]]) -> dict[str, 
             else 0.0
         ),
     }
+
+
+def _missing_vapor_pressure_entries(
+    neighbors: Sequence[Mapping[str, Any]],
+    species: Sequence[str],
+) -> list[str]:
+    missing = []
+    for index, neighbor in enumerate(neighbors):
+        vapor = _nested_payload_value(
+            neighbor,
+            ("equilibrium_result", "vapor_pressures_Pa"),
+        )
+        for species_name in species:
+            if (
+                not isinstance(vapor, Mapping)
+                or species_name not in vapor
+                or vapor[species_name] is None
+            ):
+                missing.append(f"neighbor[{index}]:{species_name}")
+    return missing
 
 
 def _vapor_species_union(neighbors: Sequence[Mapping[str, Any]]) -> list[str]:

@@ -871,3 +871,157 @@ def test_near_phase_boundary_query_is_refused_not_interpolated(tmp_path: Path) -
 
     assert payload is None
     assert store.replay_sequence == []
+
+
+def test_interpolation_error_with_present_vapor_pressures_is_bit_identical() -> None:
+    low = _candidate(
+        _interpolation_key("low", feo_fraction=0.2, temperature_K=1499.0),
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+    high = _candidate(
+        _interpolation_key("high", feo_fraction=0.2, temperature_K=1501.0),
+        _interpolation_payload(liquid_fraction=0.9, sio_pa=9.0),
+    )
+    interpolated = _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)
+
+    assert rci.estimate_interpolation_error([low, high], interpolated) == {
+        "term": rci.INTERPOLATION_ERROR_TERM,
+        "neighbor_disagreement": {
+            "relative_error_max": 1.0 / 9.0,
+            "relative_error_mean": 0.11111111111111109,
+        },
+        "held_out_relative_error_max": 1.0 / 9.0,
+        "held_out_relative_error_by_species": {
+            "O2": 0.11111111111111108,
+            "SiO": 1.0 / 9.0,
+        },
+    }
+
+
+def test_missing_neighbor_vapor_pressure_makes_error_estimate_insufficient(
+    monkeypatch,
+) -> None:
+    low = _candidate(
+        _interpolation_key("low", feo_fraction=0.2, temperature_K=1499.0),
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+    high_payload = _interpolation_payload(liquid_fraction=0.9, sio_pa=9.0)
+    del high_payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"]
+    high = _candidate(
+        _interpolation_key("high", feo_fraction=0.2, temperature_K=1501.0),
+        high_payload,
+    )
+    interpolated = _interpolation_payload(liquid_fraction=0.8, sio_pa=8.0)
+
+    estimate = rci.estimate_interpolation_error([low, high], interpolated)
+    assert estimate["status"] == "insufficient_data"
+    assert estimate["held_out_relative_error_max"] is None
+    assert estimate["missing_vapor_pressures"] == ["neighbor[1]:SiO"]
+    assert estimate["neighbor_disagreement"]["relative_error_max"] is None
+
+    query = _interpolation_key("query", feo_fraction=0.2, temperature_K=1500.0)
+    monkeypatch.setattr(rci, "_physics_bucket_consumes_pO2_bar", lambda _key: False)
+    gate = rci.interpolation_validity_gate(query, [low, high])
+    assert gate["accepted"] is False
+    assert gate["refusal_reason"] == "insufficient_vapor_pressure_data"
+
+
+def test_missing_interpolated_vapor_pressure_makes_error_estimate_insufficient() -> None:
+    low = _candidate(
+        _interpolation_key("low", feo_fraction=0.2, temperature_K=1499.0),
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+    high = _candidate(
+        _interpolation_key("high", feo_fraction=0.2, temperature_K=1501.0),
+        _interpolation_payload(liquid_fraction=0.9, sio_pa=9.0),
+    )
+    interpolated_result = _interpolation_payload(
+        liquid_fraction=0.8,
+        sio_pa=8.0,
+    )["equilibrium_result"]
+    del interpolated_result["vapor_pressures_Pa"]["SiO"]
+
+    estimate = rci.estimate_interpolation_error(
+        [low, high], {"equilibrium_result": interpolated_result}
+    )
+    assert estimate["status"] == "insufficient_data"
+    assert estimate["held_out_relative_error_max"] is None
+    assert estimate["missing_vapor_pressures"] == ["interpolated:SiO"]
+
+    interpolated_result["vapor_pressures_Pa"]["SiO"] = None
+    estimate = rci.estimate_interpolation_error(
+        [low, high], {"equilibrium_result": interpolated_result}
+    )
+    assert estimate["status"] == "insufficient_data"
+    assert estimate["held_out_relative_error_max"] is None
+
+
+def test_empty_vapor_pressure_entries_make_error_estimate_insufficient() -> None:
+    low_payload = _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0)
+    high_payload = _interpolation_payload(liquid_fraction=0.9, sio_pa=9.0)
+    low_payload["equilibrium_result"]["vapor_pressures_Pa"] = {}
+    high_payload["equilibrium_result"]["vapor_pressures_Pa"] = {}
+    low = _candidate(
+        _interpolation_key("low", feo_fraction=0.2, temperature_K=1499.0),
+        low_payload,
+    )
+    high = _candidate(
+        _interpolation_key("high", feo_fraction=0.2, temperature_K=1501.0),
+        high_payload,
+    )
+
+    estimate = rci.estimate_interpolation_error(
+        [low, high], {"equilibrium_result": {"vapor_pressures_Pa": {}}}
+    )
+    assert estimate["status"] == "insufficient_data"
+    assert estimate["missing_vapor_pressures"] == ["no_vapor_pressure_entries"]
+    assert estimate["held_out_relative_error_max"] is None
+
+
+def test_missing_neighbor_vapor_pressure_mutation_would_accept_fake_zero(monkeypatch) -> None:
+    query = _interpolation_key("query", feo_fraction=0.2, temperature_K=1500.0)
+    low = _candidate(
+        _interpolation_key("low", feo_fraction=0.2, temperature_K=1499.0),
+        _interpolation_payload(liquid_fraction=0.7, sio_pa=7.0),
+    )
+    high_payload = _interpolation_payload(liquid_fraction=0.9, sio_pa=9.0)
+    del high_payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"]
+    high = _candidate(
+        _interpolation_key("high", feo_fraction=0.2, temperature_K=1501.0),
+        high_payload,
+    )
+    monkeypatch.setattr(rci, "_physics_bucket_consumes_pO2_bar", lambda _key: False)
+    monkeypatch.setattr(
+        rci,
+        "_neighbor_disagreement",
+        lambda _neighbors: {
+            "relative_error_max": 0.0,
+            "relative_error_mean": 0.0,
+        },
+    )
+    original_nested_value = rci._nested_payload_value
+
+    def old_missing_to_zero(neighbor, path):
+        value = original_nested_value(neighbor, path)
+        if value is None and len(path) == 3 and path[:2] == (
+            "equilibrium_result",
+            "vapor_pressures_Pa",
+        ):
+            return 0.0
+        return value
+
+    monkeypatch.setattr(rci, "_missing_vapor_pressure_entries", lambda *_args: [])
+    monkeypatch.setattr(rci, "_nested_payload_value", old_missing_to_zero)
+
+    estimate = rci.estimate_interpolation_error(
+        [low, high],
+        {"equilibrium_result": _interpolation_payload(
+            liquid_fraction=0.8, sio_pa=8.0
+        )["equilibrium_result"]},
+    )
+    with pytest.raises(AssertionError):
+        assert estimate.get("status") == "insufficient_data"
+
+    gate = rci.interpolation_validity_gate(query, [low, high])
+    with pytest.raises(AssertionError):
+        assert gate["refusal_reason"] == "insufficient_vapor_pressure_data"

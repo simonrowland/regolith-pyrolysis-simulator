@@ -7,6 +7,7 @@ from pathlib import Path
 import pytest
 import yaml
 
+import simulator.stage0_harness as stage0_harness
 from simulator.backends import BackendSelectionPolicy, CachedRealBackend, CachedRealConfig
 from simulator.corpus_version import current_corpus_version, interoperable_corpus_versions
 from simulator.core import PyrolysisSimulator
@@ -15,11 +16,13 @@ from simulator.session import SimSession, SimSessionConfig
 from simulator.stage0_harness import (
     FOULANT_GROUPS,
     Stage0HarnessError,
+    _diagnostic_events,
     _capture_cleaned_melt_kg,
     default_max_stage0_hours,
     run_stage0_harness,
     run_stage0_harness_from_config,
 )
+from engines.builtin.foulant_disposition import load_foulant_registry
 from simulator.state import CampaignPhase
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
@@ -67,6 +70,119 @@ def test_default_max_stage0_hours_derives_from_setpoints():
         + 8.0
     )
     assert default_max_stage0_hours(setpoints) == pytest.approx(expected)
+
+
+def test_diagnostic_event_with_present_inputs_is_bit_identical():
+    registry = load_foulant_registry(DATA_DIR / "foulant_thermo.yaml")
+    assert _diagnostic_events(
+        {
+            "reaction_family": "carbonate_decomposition",
+            "carrier": "CaCO3",
+            "feed_kg": 2.0,
+            "extent": 0.25,
+            "T_C": 650.0,
+        },
+        registry,
+    ) == [{
+        "carrier": "CaCO3",
+        "reaction_family": "carbonate_decomposition",
+        "group": "other_mineral_contaminant",
+        "disposition": "decomposed",
+        "extent": 0.25,
+        "amount_kg": 0.5,
+        "T_C": 650.0,
+        "source": "diagnostic",
+    }]
+
+
+def test_missing_stage0_inputs_remain_unknown_and_do_not_form_amounts():
+    registry = load_foulant_registry(DATA_DIR / "foulant_thermo.yaml")
+    event = _diagnostic_events(
+        {
+            "reaction_family": "inert_to_rump",
+            "carrier": "CaF2",
+            "rump_frac": 1.0,
+        },
+        registry,
+    )[0]
+
+    assert event["T_C"] is None
+    assert event["amount_kg"] is None
+    assert event["missing_fields"] == ["feed_kg", "T_C"]
+
+
+def test_missing_extent_and_escape_fraction_do_not_form_amounts():
+    registry = load_foulant_registry(DATA_DIR / "foulant_thermo.yaml")
+    sulfate_event = _diagnostic_events(
+        {
+            "reaction_family": "sulfate_decomp",
+            "carrier": "CaSO4",
+            "feed_kg": 1.0,
+            "T_C": 500.0,
+        },
+        registry,
+    )[0]
+    volatile_event = _diagnostic_events(
+        {
+            "reaction_family": "volatilization",
+            "carrier": "NaF",
+            "feed_kg": 1.0,
+            "phase_splits": [{"phase": 1, "T_C": 500.0}],
+        },
+        registry,
+    )[0]
+
+    assert sulfate_event["extent"] is None
+    assert sulfate_event["decomposed_kg"] is None
+    assert sulfate_event["missing_fields"] == ["extent"]
+    assert volatile_event["escaped_frac"] is None
+    assert volatile_event["escaped_kg"] is None
+    assert volatile_event["missing_fields"] == ["escaped_frac"]
+
+
+def test_inert_rump_producer_omits_temperature_without_inventing_zero():
+    session = SimSession().start(_session_config("lunar_mare_low_ti"))
+    session.simulator._emit_stage0_foulant_diagnostics(
+        {},
+        {"terminal_slag": {"CaF2": 1.0}},
+        {},
+        feedstock_key=None,
+    )
+    diagnostic = session.simulator._stage0_foulant_diagnostics[-1]
+
+    assert diagnostic is not None
+    assert diagnostic["feed_kg"] == 1.0
+    assert diagnostic["rump_frac"] == 1.0
+    assert "T_C" not in diagnostic
+    event = _diagnostic_events(diagnostic, load_foulant_registry(
+        DATA_DIR / "foulant_thermo.yaml"
+    ))[0]
+    assert event["T_C"] is None
+    assert event["missing_fields"] == ["T_C"]
+
+
+def test_stage0_zero_coercion_mutation_breaks_missing_input_contract(monkeypatch):
+    original = stage0_harness._diagnostic_number
+
+    def old_zero_coercion(diagnostic, field, missing_fields):
+        if diagnostic.get(field) is None:
+            return 0.0
+        return original(diagnostic, field, missing_fields)
+
+    monkeypatch.setattr(stage0_harness, "_diagnostic_number", old_zero_coercion)
+    registry = load_foulant_registry(DATA_DIR / "foulant_thermo.yaml")
+    event = _diagnostic_events(
+        {
+            "reaction_family": "inert_to_rump",
+            "carrier": "CaF2",
+            "feed_kg": 1.0,
+            "rump_frac": 1.0,
+        },
+        registry,
+    )[0]
+
+    with pytest.raises(AssertionError):
+        assert event["T_C"] is None
 
 
 def test_real_feedstock_stops_at_c0b_path_ab_pause(monkeypatch):
