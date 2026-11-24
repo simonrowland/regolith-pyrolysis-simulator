@@ -53,6 +53,7 @@ from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     KRESS_FE2O3_WT_PCT_FIELD,
     KRESS_FEO_WT_PCT_FIELD,
+    OxygenControlRoute,
 )
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.oxygen_balance import _cell_oxygen_class
@@ -85,14 +86,17 @@ _TIER1_DIRECT_ROUTES = frozenset({
     "oxygen_sweep_partial_pressure",
     "oxygen_sweep_component_partial_pressure",
 })
-_TIER3_ATMOSPHERE_ROUTES = (
-    "observation_gas_composition",
-    "observation_gas_composition_method_implied_pressure",
-    "observation_gas_couple_equilibrium",
+_BUFFER_ROUTES = frozenset({
     "graphite_c_co_buffer",
     "buffer_relation",
     "container_graphite_c_co_buffer",
     "container_buffer_relation",
+})
+_TIER3_ATMOSPHERE_ROUTES = (
+    "observation_gas_composition",
+    "observation_gas_composition_method_implied_pressure",
+    "observation_gas_couple_equilibrium",
+    *_BUFFER_ROUTES,
 )
 _VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
@@ -1020,25 +1024,53 @@ def _gas_ratio_fo2(
     return ResolvedFo2(log, 3, "experiment_gas_ratio", False)
 
 
-def imposed_oxygen_pressure_pa(
+def _scalar_oxygen_pressure_pa(experiment: Experiment | None) -> Decimal | None:
+    control = None if experiment is None else experiment.fO2_control
+    pressure = control.oxygen_partial_pressure_Pa if control is not None else None
+    if pressure is None or not pressure.state.is_value:
+        return None
+    point = pressure.state.value.point
+    if point is None or not point.is_finite() or point <= 0:
+        return None
+    return point
+
+
+def _buffer_oxygen_pressure_pa(
     experiment: Experiment, bench: object | None, observation: Observation,
 ) -> Decimal | None:
-    """Evaluate the named apparatus control without using the measured target."""
-    control = experiment.fO2_control
-    pressure = control.oxygen_partial_pressure_Pa if control is not None else None
-    if pressure is not None and pressure.state.is_value:
-        point = pressure.state.value.point
-        if point is not None and point.is_finite() and point > 0:
-            return point
     result = _oxygen_result(experiment, bench, observation, None)
-    if result is not None:
-        for route in result.routes:
-            if route.route in _TIER3_ATMOSPHERE_ROUTES and isinstance(route.value, Value):
-                if (point := route.value.point) is not None and point.is_finite():
-                    return log10_fo2_to_pa(point)
-    temperature = _temperature_K(_identity(observation), None)
-    gas = _gas_ratio_fo2(experiment, temperature)
-    return None if gas is None else log10_fo2_to_pa(Decimal(str(gas.log10_fO2_bar)))
+    if result is None:
+        return None
+    for item in result.routes:
+        if item.route in _BUFFER_ROUTES and isinstance(item.value, Value):
+            point = item.value.point
+            if point is not None and point.is_finite():
+                return log10_fo2_to_pa(point)
+    return None
+
+
+def imposed_oxygen_pressure_pa(
+    experiment: Experiment,
+    bench: object | None,
+    observation: Observation,
+    *,
+    route: OxygenControlRoute,
+) -> Decimal | None:
+    """Evaluate only the selected control.
+
+    A named buffer or gas control never returns a scalar pressure that
+    belongs to a different control on the same run.
+    """
+
+    if route is OxygenControlRoute.SCALAR_PRESSURE:
+        return _scalar_oxygen_pressure_pa(experiment)
+    if route is OxygenControlRoute.NAMED_BUFFER:
+        return _buffer_oxygen_pressure_pa(experiment, bench, observation)
+    if route is OxygenControlRoute.GAS_CONTROL:
+        temperature = _temperature_K(_identity(observation), None)
+        gas = _gas_ratio_fo2(experiment, temperature)
+        return None if gas is None else log10_fo2_to_pa(Decimal(str(gas.log10_fO2_bar)))
+    return None
 
 
 def _is_knudsen(experiment: Experiment | None) -> bool:

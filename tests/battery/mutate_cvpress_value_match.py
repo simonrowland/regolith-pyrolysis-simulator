@@ -8,6 +8,7 @@ This script does not start an engine and does not call pytest.
 
 from __future__ import annotations
 
+import math
 import sys
 from dataclasses import replace
 from decimal import Decimal
@@ -184,6 +185,214 @@ def mutation_unfiltered_command() -> int:
     return 0
 
 
+def _is_pa(bar, pa: str) -> bool:
+    if bar is None:
+        return False
+    expected = float(Decimal(pa) / Decimal(100000))
+    return math.isclose(bar, expected, rel_tol=1e-6, abs_tol=1e-12)
+
+
+def _request_bar(row, run):
+    """One request-builder call. It does not equilibrate a melt engine."""
+
+    import simulator.battery.score as score
+
+    decision = score._oxygen_input_request(
+        engine=score.Engine.INTERNAL_ANALYTICAL,
+        channel="mutation",
+        sources=(),
+        identity=row.identity,
+        requested=None,
+        quantity=Quantity.FUGACITY,
+        composition_value=None,
+        input_notices=[],
+        observation=row,
+        experiment=run,
+    )
+    return getattr(decision, "po2_bar", None)
+
+
+def _admit(row, run):
+    from simulator.battery.migrate import condition_identity_axis, redox_identity_sources
+    from simulator.battery.redox_fields import oxygen_request_inputs
+
+    return oxygen_request_inputs(
+        row,
+        run,
+        quantity=Quantity.FUGACITY,
+        is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
+        identity_sources=redox_identity_sources(row, run),
+    )
+
+
+def _buffer_and_scalar():
+    from simulator.battery.records import Derivation
+
+    run = F.tabulation_experiment()
+    buffer_at = Locator(page=3, table="2", record="run 1", note="column=buffer")
+    scalar_at = Locator(page=3, table="2", record="run 1", note="column=pO2")
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.COMMANDED),
+        buffer=Located(State.of("QFM"), buffer_at),
+        oxygen_partial_pressure_Pa=Located(
+            State.of(Value.point_of(Decimal("10"))), scalar_at,
+        ),
+    ))
+    identity = replace(
+        F.psat_identity("O2"), quantity=State.of(Quantity.FUGACITY), reservoir=None,
+    )
+    row = replace(
+        F.observation("buffer", run.experiment_id, identity, Decimal("12")),
+        locator=buffer_at,
+        derivation=Derivation(
+            "declared setpoint", ("experiment.fO2_control.buffer",), (), "1",
+        ),
+    )
+    return row, run
+
+
+def _detached_echo():
+    location = Locator(page=4, table="3", record="row 1", note="column=fO2")
+    identity = replace(
+        F.psat_identity("O2"),
+        quantity=State.of(Quantity.FUGACITY),
+        reservoir=None,
+        total_pressure_Pa=None,
+        fO2_Pa=State.of(Decimal("12")),
+    )
+    return replace(
+        F.observation("detached", "none", identity, Decimal("12")),
+        locator=location,
+        point_conditions={"fO2_Pa": Located(State.of(Decimal("12")), location)},
+    )
+
+
+def mutation_selected_route() -> int:
+    """A buffer declaration must not become the sibling scalar."""
+
+    import simulator.battery.redox_fields as fields
+    from simulator.battery.migrate import condition_identity_axis, redox_identity_sources
+
+    row, run = _buffer_and_scalar()
+    before = fields.selected_oxygen_control(
+        row, run, quantity=Quantity.FUGACITY,
+        is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
+        identity_sources=redox_identity_sources(row, run),
+    )
+    if before.route is not fields.OxygenControlRoute.NAMED_BUFFER:
+        return _fail("selected-route-baseline")
+    original = fields._select_imposed
+
+    def scalar_first(candidates):
+        scalars = [
+            candidate for candidate in candidates
+            if fields._oxygen_route(candidate.field) is fields.OxygenControlRoute.SCALAR_PRESSURE
+        ]
+        return scalars[0] if scalars else original(candidates)
+
+    fields._select_imposed = scalar_first
+    try:
+        after = fields.selected_oxygen_control(
+            row, run, quantity=Quantity.FUGACITY,
+            is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
+            identity_sources=redox_identity_sources(row, run),
+        )
+    finally:
+        fields._select_imposed = original
+    point = None if after.value is None else after.value.state.value.point
+    if after.route is not fields.OxygenControlRoute.SCALAR_PRESSURE or point != Decimal("10"):
+        return _fail("selected-route")
+    return 0
+
+
+def mutation_request_filter() -> int:
+    """A passthrough request filter must let the target command through."""
+
+    import simulator.battery.score as score
+    from simulator.battery.redox_fields import SelectedOxygenControl
+
+    bare, run, _control = _row("10", None)
+    _view, filtered, _selected = _admit(bare, run)
+    if filtered is None or filtered.fO2_control.oxygen_partial_pressure_Pa is not None:
+        return _fail("request-filter-baseline")
+    if _is_pa(_request_bar(bare, run), "10"):
+        return _fail("request-filter-baseline")
+
+    def passthrough(observation, experiment=None, **_kwargs):
+        return observation, experiment, SelectedOxygenControl(None, None, None, None, ())
+
+    original = score.oxygen_request_inputs
+    score.oxygen_request_inputs = passthrough
+    try:
+        commanded = _is_pa(_request_bar(bare, run), "10")
+    finally:
+        score.oxygen_request_inputs = original
+    if not commanded:
+        return _fail("request-filter")
+    return 0
+
+
+def mutation_evaluator_route() -> int:
+    """A scalar-first evaluator must return the sibling 10 Pa."""
+
+    import simulator.battery.fo2_ladder as ladder
+
+    row, run = _buffer_and_scalar()
+    before = ladder.imposed_oxygen_pressure_pa(
+        run, None, row, route=ladder.OxygenControlRoute.NAMED_BUFFER,
+    )
+    if before == Decimal("10"):
+        return _fail("evaluator-route-baseline")
+    original = ladder.imposed_oxygen_pressure_pa
+
+    def scalar_first(experiment, bench, observation, *, route):
+        point = ladder._scalar_oxygen_pressure_pa(experiment)
+        if point is not None:
+            return point
+        return original(experiment, bench, observation, route=route)
+
+    ladder.imposed_oxygen_pressure_pa = scalar_first
+    try:
+        after = ladder.imposed_oxygen_pressure_pa(
+            run, None, row, route=ladder.OxygenControlRoute.NAMED_BUFFER,
+        )
+    finally:
+        ladder.imposed_oxygen_pressure_pa = original
+    if after != Decimal("10"):
+        return _fail("evaluator-route")
+    return 0
+
+
+def mutation_detached_self_echo() -> int:
+    """Without the echo filter the scored cell commands 0.00012 bar."""
+
+    import simulator.battery.score as score
+    from simulator.battery.redox_fields import SelectedOxygenControl
+
+    row = _detached_echo()
+    viewed, _run, selected = _admit(row, None)
+    fo2 = viewed.identity.fO2_Pa
+    if fo2 is not None and fo2.is_value:
+        return _fail("detached-self-echo-baseline")
+    if "identity.fO2_Pa" not in dict(selected.excluded):
+        return _fail("detached-self-echo-baseline")
+    if _is_pa(_request_bar(row, None), "12"):
+        return _fail("detached-self-echo-baseline")
+
+    def passthrough(observation, experiment=None, **_kwargs):
+        return observation, experiment, SelectedOxygenControl(None, None, None, None, ())
+
+    original = score.oxygen_request_inputs
+    score.oxygen_request_inputs = passthrough
+    try:
+        commanded = _is_pa(_request_bar(row, None), "12")
+    finally:
+        score.oxygen_request_inputs = original
+    if not commanded:
+        return _fail("detached-self-echo")
+    return 0
+
+
 def main() -> int:
     baseline()
     # The helper is the production predicate. A missing name is a failed load.
@@ -191,8 +400,16 @@ def main() -> int:
     status = mutation_value_match()
     status |= mutation_typed_declaration()
     status |= mutation_unfiltered_command()
+    status |= mutation_selected_route()
+    status |= mutation_request_filter()
+    status |= mutation_evaluator_route()
+    status |= mutation_detached_self_echo()
     if status == 0:
-        print("three mutations detected: value-match, typed-declaration, unfiltered-command")
+        print(
+            "seven mutations detected: value-match, typed-declaration, "
+            "unfiltered-command, selected-route, request-filter, "
+            "evaluator-route, detached-self-echo"
+        )
     return status
 
 

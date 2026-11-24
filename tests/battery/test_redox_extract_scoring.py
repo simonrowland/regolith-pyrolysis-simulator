@@ -39,6 +39,7 @@ from simulator.battery.migrate import (
     _experiment_from_plain,
     _point_condition_from_plain,
     _with_target_print,
+    condition_identity_axis,
     condition_identity_value,
     convert_pressure_to_pa,
     experiment_from_plain,
@@ -53,9 +54,11 @@ from simulator.battery.migrate import (
     to_plain,
     write_outputs,
 )
-from simulator.battery.fo2_ladder import resolve_row_fo2
+from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa, resolve_row_fo2
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.battery.redox_fields import (
+    OxygenControlRoute,
+    SelectedOxygenControl,
     _printed_cell, _target_cells, located_printed_cell, same_printed_cell,
 )
 from simulator.battery.printed_cells import PrintedCell
@@ -2572,6 +2575,16 @@ def test_retained_and_ingested_temperature_use_the_same_precedence(payload, fiel
     assert retained == State.of(Decimal(expected))
 
 
+def _selected_oxygen(row, experiment, quantity=Quantity.FUGACITY):
+    return provenance.selected_oxygen_control(
+        row,
+        experiment,
+        quantity=quantity,
+        is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
+        identity_sources=redox_identity_sources(row, experiment),
+    )
+
+
 @pytest.mark.parametrize("column", ("O2 setpoint", None), ids=("explicit", "omitted"))
 def test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline(column):
     experiment = F.tabulation_experiment()
@@ -2605,8 +2618,16 @@ def test_imposed_oxygen_target_predicts_but_is_outside_accuracy_headline(column)
 
     view, filtered, _ = score_module._redox_input_view(row, Quantity.FUGACITY, experiment)
     resolved = resolve_row_fo2(filtered, None, view, quantity=Quantity.FUGACITY)
+    admitted, request_run, selected = score_module._oxygen_admission(
+        row, experiment, Quantity.FUGACITY,
+    )
+    request = resolve_row_fo2(request_run, None, admitted, quantity=Quantity.FUGACITY)
+    assert not selected.imposed
     assert filtered.fO2_control.oxygen_partial_pressure_Pa is None
-    assert resolved is not None and resolved.po2_bar is not None
+    assert request_run.fO2_control.oxygen_partial_pressure_Pa is None
+    assert resolved is not None and request is not None
+    assert request.po2_bar == resolved.po2_bar
+    assert resolved.po2_bar is not None
     assert resolved.route == "dp010_ambient_air_unprinted_atmosphere"
     assert prediction.value == Decimal(str(resolved.po2_bar)) * score_module.PA_PER_BAR_DEC
     assert prediction.execution.call_evidence != "experiment.fO2_control"
@@ -2895,7 +2916,7 @@ def test_target_derived_commanded_oxygen_cannot_use_setpoint_exemption(reference
                        Derivation("copied pressure", (reference,), (), "Pa"))
     run = replace(run, fO2_control=FO2Control(State.of(FO2Channel.COMMANDED), oxygen_partial_pressure_Pa=pressure))
 
-    assert not provenance.imposed_oxygen_target(row, run, resolve_identity_sources=redox_identity_sources)
+    assert not _selected_oxygen(row, run).imposed
     _, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
     assert filtered.fO2_control.oxygen_partial_pressure_Pa is None
     assert any(n.reason == "experiment.fO2_control.oxygen_partial_pressure_Pa: derived_from_target" for n in notices)
@@ -2925,15 +2946,13 @@ def test_printed_target_does_not_withdraw_a_typed_setpoint():
         ),
         provenance={"printed_target": {"value": "10", "unit": "Pa"}},
     )
-    assert provenance.imposed_oxygen_target(row, run, resolve_identity_sources=redox_identity_sources)
+    assert _selected_oxygen(row, run).imposed
     prediction = predict_with_engine(Engine.INTERNAL_ANALYTICAL, row, experiment=run, isolated=False)
     assert prediction.value == Decimal("10")
     assert "target_is_imposed_control" in score_module.flagged_strata(prediction.notices)
 
     undeclared = replace(row, derivation=None)
-    assert not provenance.imposed_oxygen_target(
-        undeclared, run, resolve_identity_sources=redox_identity_sources,
-    )
+    assert not _selected_oxygen(undeclared, run).imposed
 
 
 def test_correction_original_operand_is_not_a_setpoint():
@@ -2954,7 +2973,7 @@ def test_correction_original_operand_is_not_a_setpoint():
         locator=assay,
         derivation=Derivation("measurement correction", (), (("original", original),), "Pa"),
     )
-    assert not provenance.imposed_oxygen_target(row, run, resolve_identity_sources=redox_identity_sources)
+    assert not _selected_oxygen(row, run).imposed
     _, filtered, notices = score_module._redox_input_view(row, Quantity.FUGACITY, run)
     assert filtered.fO2_control.oxygen_partial_pressure_Pa is None
     assert any(notice.reason.endswith(": same") for notice in notices)
@@ -2963,6 +2982,151 @@ def test_correction_original_operand_is_not_a_setpoint():
     assert prediction.execution.call_evidence != "experiment.fO2_control"
     assert NoticeKind.TARGET_IS_IMPOSED_CONTROL not in {notice.kind for notice in prediction.notices}
     assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
+
+
+def _oxygen_free(observation, experiment):
+    """The same row with every oxygen command removed, for the resolver pin."""
+
+    identity = replace(
+        observation.identity,
+        fO2_Pa=None,
+    )
+    conditions = {
+        field: condition
+        for field, condition in (observation.point_conditions or {}).items()
+        if condition_identity_axis(field) != "fO2_Pa"
+    }
+    bare = replace(
+        observation,
+        identity=identity,
+        point_conditions=conditions or (
+            {} if observation.point_conditions is not None else None
+        ),
+    )
+    if experiment is not None and experiment.fO2_control is not None:
+        experiment = replace(experiment, fO2_control=None)
+    return bare, experiment
+
+
+def _assert_default_not_measured(observation, experiment, measured_pa: Decimal):
+    admitted, filtered, selected = score_module._oxygen_admission(
+        observation, experiment, Quantity.FUGACITY,
+    )
+    resolved = resolve_row_fo2(filtered, None, admitted, quantity=Quantity.FUGACITY)
+    bare, bare_run = _oxygen_free(observation, experiment)
+    expected = resolve_row_fo2(bare_run, None, bare, quantity=Quantity.FUGACITY)
+    assert not selected.imposed
+    assert selected.notices
+    assert any(notice.reason.endswith(": same") for notice in selected.notices)
+    assert resolved is not None and expected is not None
+    assert resolved.route == expected.route == "dp010_ambient_air_unprinted_atmosphere"
+    assert resolved.po2_bar == expected.po2_bar
+    measured_bar = float(measured_pa / Decimal(100000))
+    assert resolved.po2_bar != pytest.approx(measured_bar)
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, observation, experiment=experiment, isolated=False,
+    )
+    assert prediction.value == Decimal(str(resolved.po2_bar)) * score_module.PA_PER_BAR_DEC
+    assert prediction.value != measured_pa
+    assert any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
+    assert any(
+        notice.kind is NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY
+        for notice in prediction.notices
+    )
+    return selected
+
+
+def test_buffer_declaration_does_not_return_a_sibling_scalar():
+    run = F.tabulation_experiment()
+    buffer_at = Locator(page=3, table="2", record="run 1", note="column=buffer")
+    scalar_at = Locator(page=3, table="2", record="run 1", note="column=pO2")
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.COMMANDED),
+        buffer=Located(State.of("QFM"), buffer_at),
+        oxygen_partial_pressure_Pa=Located(State.of(Value.point_of(Decimal("10"))), scalar_at),
+    ))
+    identity = replace(
+        F.psat_identity("O2"), quantity=State.of(Quantity.FUGACITY),
+        reservoir=None, total_pressure_Pa=None,
+    )
+    row = replace(
+        F.observation("buffer-setpoint", run.experiment_id, identity, Decimal("12")),
+        locator=buffer_at,
+        derivation=Derivation(
+            "declared setpoint", ("experiment.fO2_control.buffer",), (), "1",
+        ),
+    )
+
+    selected = _selected_oxygen(row, run)
+    assert selected.route is OxygenControlRoute.NAMED_BUFFER
+    assert selected.field == "experiment.fO2_control.buffer"
+    assert imposed_oxygen_pressure_pa(run, None, row, route=OxygenControlRoute.SCALAR_PRESSURE) == Decimal("10")
+    assert imposed_oxygen_pressure_pa(run, None, row, route=selected.route) is None
+    admitted, filtered, _ = score_module._oxygen_admission(row, run, Quantity.FUGACITY)
+    assert filtered.fO2_control.buffer is not None
+    assert filtered.fO2_control.oxygen_partial_pressure_Pa is None
+    assert admitted.identity.fO2_Pa is None or not admitted.identity.fO2_Pa.is_value
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=run, isolated=False,
+    )
+    assert prediction.value is None
+    assert prediction.value != Decimal("10")
+    assert prediction.refusal_reason is RefusalReason.UNSUPPORTED
+    assert prediction.refusal_detail["reason"] == "quantity_not_predicted"
+    assert not any(notice.policy and notice.policy.id == "DP-010" for notice in prediction.notices)
+    assert any(
+        notice.kind is NoticeKind.TARGET_IS_IMPOSED_CONTROL
+        and "route=named_buffer" in notice.reason
+        for notice in prediction.notices
+    )
+
+
+def test_detached_own_cell_uses_the_stated_default():
+    location = Locator(page=4, table="3", record="row 1", note="column=fO2")
+    identity = replace(
+        F.psat_identity("O2"),
+        quantity=State.of(Quantity.FUGACITY),
+        reservoir=None,
+        total_pressure_Pa=None,
+        fO2_Pa=State.of(Decimal("12")),
+    )
+    row = replace(
+        F.observation("detached-oxygen", "no-experiment", identity, Decimal("12")),
+        locator=location,
+        point_conditions={"fO2_Pa": Located(State.of(Decimal("12")), location)},
+    )
+
+    selected = _assert_default_not_measured(row, None, Decimal("12"))
+    assert any(notice.reason == "fO2_Pa: same" for notice in selected.notices)
+    assert "identity.fO2_Pa" in dict(selected.excluded)
+
+
+def test_attached_same_cell_identity_does_not_echo_the_measured_pressure():
+    run = F.tabulation_experiment()
+    location = Locator(page=3, table="2", record="run 1", note="column=oxygen")
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.COMMANDED),
+        oxygen_partial_pressure_Pa=Located(State.of(Value.point_of(Decimal("12"))), location),
+    ))
+    identity = replace(
+        F.psat_identity("O2"),
+        quantity=State.of(Quantity.FUGACITY),
+        reservoir=None,
+        total_pressure_Pa=None,
+        fO2_Pa=State.of(Decimal("12")),
+    )
+    row = replace(
+        F.observation("attached-echo", run.experiment_id, identity, Decimal("12")),
+        locator=location,
+        point_conditions={"fO2_Pa": Located(State.of(Decimal("12")), location)},
+    )
+
+    selected = _assert_default_not_measured(row, run, Decimal("12"))
+    assert any(
+        notice.reason == "experiment.fO2_control.oxygen_partial_pressure_Pa: same"
+        for notice in selected.notices
+    )
+    assert "identity.fO2_Pa" in dict(selected.excluded)
 
 
 def test_excluded_oxygen_command_does_not_reach_partial_pressure_cell(
@@ -3021,7 +3185,10 @@ def test_excluded_oxygen_command_does_not_reach_partial_pressure_cell(
     prediction = predict_with_engine(
         Engine.ALPHAMELTS, row, experiment=run, bench=bench, isolated=False,
     )
-    assert seen["experiment"].fO2_control.oxygen_partial_pressure_Pa is None
+    # The wrapper no longer strips the command. The request builder does,
+    # so the experiment handed to the builder still carries 10 Pa.
+    supplied = seen["experiment"].fO2_control.oxygen_partial_pressure_Pa
+    assert supplied is not None and supplied.state.value.point == Decimal("10")
     decision = seen["decision"]
     assert not isinstance(decision, score_module.EnginePrediction)
     command_bar = float(Decimal(10) / Decimal(100000))
@@ -3077,7 +3244,7 @@ def test_redox_target_provenance_census(source, capsys, monkeypatch):
         if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO, Quantity.FUGACITY, Quantity.P_PARTIAL}:
             run = migrator.result.experiments.get(row.experiment_id)
             score_module._redox_input_view(row, quantity, run)
-            provenance.imposed_oxygen_target(row, run, resolve_identity_sources=redox_identity_sources)
+            _selected_oxygen(row, run, quantity)
     assert counts[provenance.TargetRelation.INDEPENDENT_RUN_CONTROL]
     with capsys.disabled():
         print(source, {relation.value: len(counts[relation]) for relation in provenance.TargetRelation})
@@ -3148,7 +3315,10 @@ def test_provenance_regressions_detect_bypassing_each_consumer(consumer, monkeyp
         return result
 
     if consumer == "scorer":
-        monkeypatch.setattr(score_module, "imposed_oxygen_target", lambda *_, **__: False)
+        monkeypatch.setattr(
+            score_module, "selected_oxygen_control",
+            lambda *_args, **_kwargs: SelectedOxygenControl(None, None, None, None, ()),
+        )
     elif consumer == "default-headline":
         admit = score_module._headline_payload_admits
 
@@ -3163,8 +3333,10 @@ def test_provenance_regressions_detect_bypassing_each_consumer(consumer, monkeyp
         monkeypatch.setattr(provenance, "classify_target_provenance", restore_value_match)
     elif consumer == "unfiltered-command":
         monkeypatch.setattr(
-            score_module, "_redox_input_view",
-            lambda observation, quantity, experiment: (observation, experiment, ()),
+            score_module, "oxygen_request_inputs",
+            lambda observation, experiment=None, **_kwargs: (
+                observation, experiment, SelectedOxygenControl(None, None, None, None, ()),
+            ),
         )
     else:
         monkeypatch.setattr(provenance, "classify_target_provenance", skip_relation)

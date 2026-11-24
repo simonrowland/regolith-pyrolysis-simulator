@@ -208,7 +208,8 @@ from simulator.battery.migrate import (
 from simulator.battery.redox_fields import (
     FERRIC_FRACTION_FIELDS,
     independent_redox_conditions,
-    imposed_oxygen_target,
+    oxygen_request_inputs,
+    selected_oxygen_control,
 )
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -10182,6 +10183,13 @@ def _predict_redox(
         if isinstance(kress_basis, _FeRedoxRefusal):
             return refused(kress_basis.reason, kress_basis.detail)
 
+    observation, experiment, oxygen_selected = _oxygen_admission(
+        observation, experiment, quantity,
+    )
+    identity = observation.identity
+    material_notices.extend(
+        notice for notice in oxygen_selected.notices if notice not in material_notices
+    )
     fo2_log = _printed_fe_redox_fo2_log(observation, identity)
     resolved_po2_bar = None
     if fo2_log is None:
@@ -10918,6 +10926,18 @@ def _prediction_identity_with_fo2(
     )
 
 
+def _oxygen_admission(observation, experiment, quantity):
+    """The one oxygen filter, applied where the engine request is built."""
+
+    return oxygen_request_inputs(
+        observation,
+        experiment,
+        quantity=quantity,
+        is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
+        identity_sources=redox_identity_sources(observation, experiment),
+    )
+
+
 def _oxygen_input_request(
     *,
     engine: Engine,
@@ -10997,6 +11017,44 @@ def _oxygen_input_request(
         fo2_tier_notice,
         resolve_row_fo2,
     )
+
+    observation, experiment, selected = _oxygen_admission(observation, experiment, quantity)
+    if isinstance(observation.identity, Identity):
+        identity = observation.identity
+    input_notices.extend(selected.notices)
+    if selected.imposed and selected.route is not None:
+        # The selected control is the only oxygen this request may carry.
+        # An unevaluated buffer or gas control is not replaced by a sibling
+        # scalar or by the ambient default.
+        from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
+
+        input_notices.append(Notice(
+            kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
+            affected_quantities=(quantity,),
+            reason=(
+                "scored oxygen is the run setpoint; "
+                f"route={selected.route.value}"
+            ),
+            origin=observation.observation_id,
+        ))
+        value = imposed_oxygen_pressure_pa(
+            experiment, bench, observation, route=selected.route,
+        )
+        if value is None:
+            return _input_refusal(
+                engine=engine,
+                channel=channel,
+                sources=sources,
+                identity=identity,
+                requested=requested,
+                reason=RefusalReason.UNSUPPORTED,
+                detail=_quantity_not_predicted_detail(quantity),
+                notices=tuple(input_notices),
+            )
+        return Po2Request(
+            mode=PO2_COMMANDED,
+            po2_bar=float(value) / PA_PER_BAR,
+        )
 
     if _has_printed_fo2(observation, identity):
         fo2_state = identity.fO2_Pa
@@ -14854,57 +14912,21 @@ def _predict_catalog_evaluator(observation: Observation) -> EnginePrediction:
     )
 
 
-def _excluded_oxygen_command(notices: tuple[Notice, ...]) -> bool:
-    prefix = "experiment.fO2_control"
-    for notice in notices:
-        for item in notice.dropped or ():
-            if item == prefix or item.startswith(prefix + "."):
-                return True
-    return False
-
-
-def _without_unsourced_scored_oxygen(
-    observation: Observation, experiment: Experiment | None,
-) -> Observation:
-    """Drop an identity fO2 that is the scored number and has no source.
-
-    The input filter already clears an axis whose recorded source was
-    excluded. An unsourced copy of the scored oxygen would otherwise come
-    back as a tier-1 identity echo.
-    """
-
-    identity = observation.identity
-    if not isinstance(identity, Identity):
-        return observation
-    fo2 = identity.fO2_Pa
-    scored = getattr(observation.value, "point", None)
-    if (
-        fo2 is None
-        or not fo2.is_value
-        or fo2.value is None
-        or scored is None
-        or fo2.value != scored
-        or redox_identity_sources(observation, experiment).get("fO2_Pa")
-    ):
-        return observation
-    return replace(observation, identity=replace(identity, fO2_Pa=None))
-
-
 def _lost_exemption_oxygen_prediction(
     prediction: EnginePrediction,
     observation: Observation,
     experiment: Experiment | None,
     bench: Bench | None,
     quantity: Quantity | None,
-    exclusion_notices: tuple[Notice, ...],
 ) -> EnginePrediction:
-    """Predict a fugacity row whose oxygen command was excluded.
+    """Predict a fugacity row whose oxygen command the request filter excluded.
 
     d-460: losing the setpoint exemption is a stated default with its notice,
-    not a refusal. Partial pressure stays on the ordinary cell path.
+    not a refusal. The same filter the request builder uses decides that.
+    Partial pressure stays on the ordinary cell path.
     """
 
-    if quantity is not Quantity.FUGACITY or not _excluded_oxygen_command(exclusion_notices):
+    if quantity is not Quantity.FUGACITY:
         return prediction
     if prediction.refusal_reason is not RefusalReason.UNSUPPORTED:
         return prediction
@@ -14919,8 +14941,12 @@ def _lost_exemption_oxygen_prediction(
         return prediction
     from simulator.battery.fo2_ladder import fo2_tier_notice, resolve_row_fo2
 
-    fo2_observation = _without_unsourced_scored_oxygen(observation, experiment)
-    resolved = resolve_row_fo2(experiment, bench, fo2_observation, quantity=quantity)
+    fo2_observation, filtered, selected = _oxygen_admission(
+        observation, experiment, quantity,
+    )
+    if selected.imposed or not selected.notices:
+        return prediction
+    resolved = resolve_row_fo2(filtered, bench, fo2_observation, quantity=quantity)
     if resolved is None or resolved.closure:
         return prediction
     bar = resolved.po2_bar
@@ -14936,28 +14962,10 @@ def _lost_exemption_oxygen_prediction(
         execution=Execution(state=ExecutionState.PRODUCED, call_evidence=resolved.route),
         value=value,
         unit="Pa",
-        notices=(fo2_tier_notice(quantity, resolved),),
+        notices=(fo2_tier_notice(quantity, resolved), *selected.notices),
         coefficient_sources=prediction.coefficient_sources,
         identity=identity_out,
     )
-
-
-def _with_exclusion_notices(
-    prediction: EnginePrediction, exclusion_notices: tuple[Notice, ...],
-) -> EnginePrediction:
-    if not exclusion_notices:
-        return prediction
-    present = {
-        (notice.kind, notice.reason, notice.dropped, notice.origin)
-        for notice in prediction.notices
-    }
-    fresh = tuple(
-        notice for notice in exclusion_notices
-        if (notice.kind, notice.reason, notice.dropped, notice.origin) not in present
-    )
-    if not fresh:
-        return prediction
-    return replace(prediction, notices=(*fresh, *prediction.notices))
 
 
 def _predict_with_engine(
@@ -14972,18 +14980,17 @@ def _predict_with_engine(
     phase_siblings: Mapping[str, Decimal] | None = None,
     phase_sibling_refusal: str | None = None,
 ) -> EnginePrediction:
-    """Filter every non-catalog row once, then predict from those inputs."""
+    """Predict one non-catalog row from the supplied inputs.
+
+    Oxygen commands are filtered in the request builder. Target-dependent
+    temperature, composition and ferric inputs stay in ``_predict_redox``.
+    """
 
     _require_score_engine(engine)
     if engine is Engine.CATALOG_EVALUATOR:
         return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    exclusion_notices: tuple[Notice, ...] = ()
-    if quantity is not None and experiment is not None:
-        observation, experiment, exclusion_notices = _redox_input_view(
-            observation, quantity, experiment,
-        )
     prediction = _predict_engine_from_supplied_inputs(
         engine,
         observation,
@@ -14995,10 +15002,9 @@ def _predict_with_engine(
         phase_siblings=phase_siblings,
         phase_sibling_refusal=phase_sibling_refusal,
     )
-    prediction = _lost_exemption_oxygen_prediction(
-        prediction, observation, experiment, bench, quantity, exclusion_notices,
+    return _lost_exemption_oxygen_prediction(
+        prediction, observation, experiment, bench, quantity,
     )
-    return _with_exclusion_notices(prediction, exclusion_notices)
 
 
 def _predict_engine_from_supplied_inputs(
@@ -15015,8 +15021,8 @@ def _predict_engine_from_supplied_inputs(
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells.
 
-    The caller supplies the filtered experiment. Exclusion notices are
-    attached by that caller. This body only adds the imposed-control flag.
+    An imposed oxygen setpoint returns that control's own route. Every
+    other oxygen input is filtered where the engine request is built.
     """
 
     _require_score_engine(engine)
@@ -15024,26 +15030,53 @@ def _predict_engine_from_supplied_inputs(
         return _predict_catalog_evaluator(observation)
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
-    if quantity is not None and experiment is not None and imposed_oxygen_target(
-        observation, experiment, resolve_identity_sources=redox_identity_sources,
-    ):
-        from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
+    if quantity is not None and experiment is not None:
+        selected = selected_oxygen_control(
+            observation,
+            experiment,
+            quantity=quantity,
+            is_oxygen_field=lambda name: condition_identity_axis(name) == "fO2_Pa",
+            identity_sources=redox_identity_sources(observation, experiment),
+        )
+        if selected.imposed and selected.route is not None:
+            from simulator.battery.fo2_ladder import imposed_oxygen_pressure_pa
 
-        value = imposed_oxygen_pressure_pa(experiment, bench, observation)
-        if value is not None:
+            value = imposed_oxygen_pressure_pa(
+                experiment, bench, observation, route=selected.route,
+            )
+            notice = Notice(
+                kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
+                affected_quantities=(quantity,),
+                reason=(
+                    "scored oxygen is the run setpoint; "
+                    f"route={selected.route.value}"
+                ),
+                origin=observation.observation_id,
+            )
+            if value is not None:
+                return EnginePrediction(
+                    engine=engine,
+                    channel=ENGINE_CHANNELS[engine],
+                    execution=Execution(
+                        state=ExecutionState.PRODUCED,
+                        call_evidence=selected.field,
+                    ),
+                    value=value,
+                    unit="Pa",
+                    authority=Authority.DERIVED_FROM_APPARATUS,
+                    notices=(notice, *selected.notices),
+                    identity=identity,
+                )
+            # The selected route did not evaluate. Another control's number
+            # is not a substitute.
             return EnginePrediction(
                 engine=engine,
                 channel=ENGINE_CHANNELS[engine],
-                execution=Execution(state=ExecutionState.PRODUCED, call_evidence="experiment.fO2_control"),
-                value=value,
-                unit="Pa",
+                execution=Execution(state=ExecutionState.NOT_PROBED),
                 authority=Authority.DERIVED_FROM_APPARATUS,
-                notices=(Notice(
-                    kind=NoticeKind.TARGET_IS_IMPOSED_CONTROL,
-                    affected_quantities=(quantity,),
-                    reason="scored oxygen is the run setpoint",
-                    origin=observation.observation_id,
-                ),),
+                notices=(notice, *selected.notices),
+                refusal_reason=RefusalReason.UNSUPPORTED,
+                refusal_detail=_quantity_not_predicted_detail(quantity),
                 identity=identity,
             )
     if engine is Engine.NASA_CEA_9 and quantity is not None:
