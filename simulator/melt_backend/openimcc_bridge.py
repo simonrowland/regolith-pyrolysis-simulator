@@ -1037,6 +1037,42 @@ def _load_pack(pack_name: str) -> Any:
         return package.load_datapack(path)
 
 
+@lru_cache(maxsize=1)
+def _load_gas_pack(selection: str) -> Any:
+    """Resolve the gas-pack selector once, keeping table I/O off the solve path."""
+
+    if selection != DEFAULT_GAS_PACK_SELECTION:
+        raise ValueError(f"unknown OpenIMCC gas pack selection {selection!r}")
+    package = _require_openimcc()
+    loader = getattr(package, "load_gas_datapack", None)
+    if not callable(loader):
+        raise OpenImccUnavailableError("OpenIMCC gas datapack loader unavailable")
+    return loader()
+
+
+def _assert_gas_pack_selection(gas_pack: Any, selection: str) -> None:
+    """Require the supplied pack to match the selected pack without reading tables."""
+
+    selected = _load_gas_pack(selection)
+    if gas_pack is selected:
+        return
+    gas_pins = (
+        getattr(gas_pack, "gas_table_digest", None),
+        getattr(gas_pack, "condensate_table_digest", None),
+    )
+    selected_pins = (
+        getattr(selected, "gas_table_digest", None),
+        getattr(selected, "condensate_table_digest", None),
+    )
+    if (
+        not all(isinstance(pin, str) and pin for pin in gas_pins)
+        or gas_pins != selected_pins
+    ):
+        raise ValueError(
+            f"gas pack does not match selected OpenIMCC pack {selection!r}"
+        )
+
+
 def _temperature_domain_K() -> tuple[float, float]:
     try:
         _require_openimcc()
@@ -1418,6 +1454,7 @@ def evaluate_gas(
     from openimcc import evaluate_gas as openimcc_evaluate_gas
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
+    _assert_gas_pack_selection(gas_pack, gas_pack_selection)
     record_engine_open("openimcc")
 
     request = {

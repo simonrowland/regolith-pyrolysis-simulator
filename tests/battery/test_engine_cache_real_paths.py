@@ -2553,11 +2553,12 @@ def test_openimcc_cache_settings_use_selected_opener_pack() -> None:
     )
 
 
-def test_openimcc_gas_cache_key_tracks_pack_selection_only(
+def test_openimcc_gas_pack_selection_guard_uses_pack_pins_without_table_reads(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
     from simulator.melt_backend.openimcc_bridge import evaluate_gas
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "gas-cache.sqlite"))
@@ -2580,21 +2581,43 @@ def test_openimcc_gas_cache_key_tracks_pack_selection_only(
         "openimcc",
         SimpleNamespace(evaluate_gas=fake_evaluate_gas),
     )
+    selected_core = SimpleNamespace(
+        gas_table_digest="gas-core",
+        condensate_table_digest="condensate-core",
+    )
+    duplicate_core = SimpleNamespace(
+        gas_table_digest="gas-core",
+        condensate_table_digest="condensate-core",
+    )
+    selected_ext = SimpleNamespace(
+        gas_table_digest="gas-ext",
+        condensate_table_digest="condensate-ext",
+    )
+    wrong_core = SimpleNamespace(
+        gas_table_digest="gas-edited",
+        condensate_table_digest="condensate-core",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_load_gas_pack",
+        lambda selection: {
+            "published-core": selected_core,
+            "published-ext": selected_ext,
+        }[selection],
+    )
     common = ({"SiO2": 0.5}, 1700.0, 1.0e-6)
-    oxide_path = Path("condensate.csv")
-    first_pack = SimpleNamespace(gas_path=Path("gas-a.csv"), oxide_path=oxide_path)
-    second_pack = SimpleNamespace(gas_path=Path("gas-b.csv"), oxide_path=oxide_path)
-
-    first = evaluate_gas(*common, first_pack, gas_pack_selection="published-core")
-    same_selection = evaluate_gas(
-        *common, second_pack, gas_pack_selection="published-core"
+    first = evaluate_gas(*common, selected_core, gas_pack_selection="published-core")
+    same_pin = evaluate_gas(
+        *common, duplicate_core, gas_pack_selection="published-core"
     )
+    with pytest.raises(ValueError, match="does not match selected"):
+        evaluate_gas(*common, wrong_core, gas_pack_selection="published-core")
     other_selection = evaluate_gas(
-        *common, second_pack, gas_pack_selection="published-ext"
+        *common, selected_ext, gas_pack_selection="published-ext"
     )
 
-    assert first == same_selection
-    assert first["CO(g)"] != other_selection["CO(g)"]
+    assert first == same_pin
+    assert first == other_selection
     assert calls == 2
     assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
         "hits": 1,
