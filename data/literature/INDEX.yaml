@@ -7131,9 +7131,9 @@ sources:
   citation: J. C. Chan, C. B. Alcock and K. T. Jacob (1973), Electrochemical measurement of the oxygen
     potential of the system iron-alumina-hercynite in the temperature range 750 to 1600 C, Canadian Metallurgical
     Quarterly 12, 439-443.
-  doi: null
+  doi: 10.1179/cmq.1973.12.4.439
   report_number: null
-  identifier: null
+  identifier: 10.1179/cmq.1973.12.4.439
   pdf_status: ABSENT
   pdf_path: null
   pdf_last_seen: []
@@ -12562,8 +12562,8 @@ sources:
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
 - source_id: glushko-1978-1982-thermodynamic-properties
   aliases: []
-  citation: V. P. Glushko et al. (eds.) (1978-1982), Thermodynamic Properties of Individual Substances,
-    4 volumes, High Temperature Institute, Moscow.
+  citation: V. P. Glushko (ed.-in-chief) (1978-1982), Thermodynamic Properties of Individual Substances,
+    4 volumes, Nauka, Moscow.
   doi: null
   report_number: null
   identifier: null
@@ -35338,9 +35338,9 @@ sources:
   citation: 'P. Richet and Y. Bottinga (1984), Anorthite, andesine, wollastonite, diopside, cordierite
     and pyrope: thermodynamics of melting, glass transitions, and properties of the amorphous phases,
     Earth Planet. Sci. Lett. 67, 415-432.'
-  doi: null
+  doi: 10.1016/0012-821x(84)90179-1
   report_number: null
-  identifier: null
+  identifier: 10.1016/0012-821x(84)90179-1
   pdf_status: ABSENT
   pdf_path: null
   pdf_last_seen: []
@@ -37065,6 +37065,61 @@ sources:
       last_stage: decoded
       date: '2026-09-06'
     commit: 3ab26d3e0674afd45eabcf1ccce6fb6c2ae9c11d
+- source_id: schairer-bowen-1955-kas-system
+  aliases: []
+  citation: J. F. Schairer and N. L. Bowen (1955), The system K2O-Al2O3-SiO2, American Journal of Science
+    253, 681-746.
+  doi: 10.2475/ajs.253.12.681
+  report_number: null
+  identifier: 10.2475/ajs.253.12.681
+  pdf_status: ABSENT
+  pdf_path: null
+  pdf_last_seen: []
+  pdf_sha256: null
+  pdf_tracked: null
+  sidecar_path: null
+  sidecar_missing_fields:
+  - citation
+  - doi
+  - license_or_oa_basis
+  - sha256
+  - retrieved_date
+  - retrieval_url
+  access_status: unknown
+  extracts: []
+  battery_datasets: []
+  hunt_ids: []
+  copies: []
+  measurement_sets: []
+  corpus_status: available
+  corpus:
+    raw:
+      path: raw/schairer-bowen-1955-kas-system/schairer-bowen-1955-kas-system.pdf
+      present: false
+      sha256: null
+      matches_simulator: null
+    sidecar:
+      path: raw/schairer-bowen-1955-kas-system/sidecar.yaml
+      present: false
+    text:
+      path: text/schairer-bowen-1955-kas-system
+      exists: false
+      file_count: 0
+    tables:
+      path: tables/schairer-bowen-1955-kas-system
+      exists: false
+      file_count: 0
+    extract:
+      path: extracts/schairer-bowen-1955-kas-system.yaml
+      present: false
+      matches_simulator: null
+    ledger:
+      path: ledger/schairer-bowen-1955-kas-system.yaml
+      present: false
+      error: null
+      last_stage: null
+      date: null
+    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: schairer-bowen-1956-nas-phase-equilibria
   aliases: []
   citation: Schairer, J.F. & Bowen, N.L. (1956). The system Na2O–Al2O3–SiO2. American Journal of Science
@@ -37123,61 +37178,6 @@ sources:
       last_stage: extracted
       date: '2026-10-05'
     commit: 0cd75bda4277fecfc2e65cbee7008ef8d5686a46
-- source_id: schairer-bowen-1985-kas-system
-  aliases: []
-  citation: J. F. Schairer and N. L. Bowen (1985), The system K2O-Al2O3-SiO2, American Journal of Science
-    253, 681-746.
-  doi: null
-  report_number: null
-  identifier: null
-  pdf_status: ABSENT
-  pdf_path: null
-  pdf_last_seen: []
-  pdf_sha256: null
-  pdf_tracked: null
-  sidecar_path: null
-  sidecar_missing_fields:
-  - citation
-  - doi
-  - license_or_oa_basis
-  - sha256
-  - retrieved_date
-  - retrieval_url
-  access_status: unknown
-  extracts: []
-  battery_datasets: []
-  hunt_ids: []
-  copies: []
-  measurement_sets: []
-  corpus_status: available
-  corpus:
-    raw:
-      path: raw/schairer-bowen-1985-kas-system/schairer-bowen-1985-kas-system.pdf
-      present: false
-      sha256: null
-      matches_simulator: null
-    sidecar:
-      path: raw/schairer-bowen-1985-kas-system/sidecar.yaml
-      present: false
-    text:
-      path: text/schairer-bowen-1985-kas-system
-      exists: false
-      file_count: 0
-    tables:
-      path: tables/schairer-bowen-1985-kas-system
-      exists: false
-      file_count: 0
-    extract:
-      path: extracts/schairer-bowen-1985-kas-system.yaml
-      present: false
-      matches_simulator: null
-    ledger:
-      path: ledger/schairer-bowen-1985-kas-system.yaml
-      present: false
-      error: null
-      last_stage: null
-      date: null
-    commit: af693af9d0dcd86177db6e0ff94a70ec548330c2
 - source_id: schreiber-1977-plsc8-redox-ti-zr-hf-cr-eu
   aliases: []
   citation: 'Schreiber, H. D. (1977). Redox states of Ti, Zr, Hf, Cr, and Eu in basaltic magmas: An experimental

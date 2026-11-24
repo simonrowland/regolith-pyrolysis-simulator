@@ -1140,26 +1140,27 @@ def test_source_files_do_not_register_absent_layers():
 def test_registered_citation_only_works_load_and_feed_index_metadata(tmp_path: Path) -> None:
     import shutil
 
+    from simulator.battery import migrate
     from simulator.battery.migrate import load_migrated_store
 
     source_work_ids = {
         "bell-roseboom-1969-jadeite-albite-melting": "f71f1546815d059a2957da7b9fb0bf4c2b21e5d9f3bc4561c8edde06b92949c0",
         "blander-pelton-1983-anl-fe-83-19": "78648bc6f6f54256098f7a3b7759de3541ca2c88acfee01bf08d7d9dc6dc4964",
-        "chan-alcock-jacob-1973-oxygen-potential": "35d87c99e00483561404d150145a7c4c532fcafcb4d2746d2cdecaffebe692e7",
-        "glushko-1978-1982-thermodynamic-properties": "53e0bc9698d817992da4ff5ed16858c82341df6d4f43f4b4e09198b7974e0dc8",
+        "chan-alcock-jacob-1973-oxygen-potential": "10.1179/cmq.1973.12.4.439",
+        "glushko-1978-1982-thermodynamic-properties": "b81da04104c1d52d2d9ed013ac28045c05bb0dd3f65c6ec66657bc50288bf74c",
         "pankratz-kelley-1964-ri6555": "3d82819f9f3147a4a45a6cc246d02b855fdcd99b02d90acb43f757e12694e966",
         "proks-eliasova-kosa-1977-heat-fusion-akermanite": "9580e89efeab1ab64dce87d028bb8e06de14be5cfea560f7dcafb95f75a9c14f",
         "rein-chipman-1965-trans-aime": "c0c411028f74688fa14e4daa552004540acc370ce6385682af9edaa2c8106e4e",
-        "richet-bottinga-1984-epsl": "230a4d99bf4c08cc9a2045be0795a28989cec2f928602f128221c3780d1ed1f6",
-        "schairer-bowen-1985-kas-system": "2c67dbc8d0ca961c1ab86228819d7b799fdb837630660ea1fd39d57d931ce7f4",
+        "richet-bottinga-1984-epsl": "10.1016/0012-821x(84)90179-1",
+        "schairer-bowen-1955-kas-system": "10.2475/ajs.253.12.681",
         "stout-piwinskii-1982-silicate-melts": "2bbf78ec242637310d3d76fd589b6293a41edebd4ba5e98d4f688037fc325e39",
     }
     works_dir = tmp_path / "data/literature/works"
     works_dir.mkdir(parents=True)
     for work_id in source_work_ids.values():
         shutil.copyfile(
-            REPO_ROOT / "data/literature/works" / f"{work_id}.yaml",
-            works_dir / f"{work_id}.yaml",
+            REPO_ROOT / "data/literature/works" / migrate.work_filename(work_id),
+            works_dir / migrate.work_filename(work_id),
         )
 
     loaded, experiments, observations = load_migrated_store(tmp_path)
@@ -1167,13 +1168,39 @@ def test_registered_citation_only_works_load_and_feed_index_metadata(tmp_path: P
     assert experiments == {}
     assert observations == {}
     for source_id, work_id in source_work_ids.items():
-        assets = loaded[work_id].source_files.files
+        work = loaded[work_id]
+        assets = work.source_files.files
         assert len(assets) == 1
         assert assets[0].asset_id == f"unknown:{source_id}"
         assert assets[0].path == "unknown"
+        assert migrate.work_id_for(
+            citation=work.citation, doi=work.doi, source_id=source_id, aliases={},
+        )[0] == work_id
 
     indexed = builder.load_work_metadata(REPO_ROOT)
     assert set(source_work_ids) <= indexed.keys()
+    for source_id, doi in {
+        "chan-alcock-jacob-1973-oxygen-potential": "10.1179/cmq.1973.12.4.439",
+        "richet-bottinga-1984-epsl": "10.1016/0012-821x(84)90179-1",
+        "schairer-bowen-1955-kas-system": "10.2475/ajs.253.12.681",
+    }.items():
+        assert indexed[source_id]["doi"] == doi
+        assert migrate.work_id_for(
+            citation=loaded[doi].citation,
+            doi=indexed[source_id]["doi"], source_id=source_id, aliases={},
+        ) == (doi, doi)
+
+
+def test_publisher_doi_identity_pin_fails_if_hash_fallback_returns(monkeypatch, tmp_path: Path) -> None:
+    from simulator.battery import migrate
+
+    monkeypatch.setattr(
+        migrate,
+        "work_id_for",
+        lambda *, citation, doi, source_id, aliases: (migrate.citation_hash(citation), None),
+    )
+    with pytest.raises(AssertionError):
+        test_registered_citation_only_works_load_and_feed_index_metadata(tmp_path)
 
 
 def _require_nist_janaf_source_files(corpus_root: Path, table_ids: set[str]) -> None:
