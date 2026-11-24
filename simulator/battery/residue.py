@@ -1711,7 +1711,7 @@ def integrate_knudsen_residue_inventory(
         while xi < stop:
             event_indices = [
                 i for i, k in enumerate(parents)
-                if state[i] > 0.0
+                if state[i] > parent_cutoffs.get(k, 0.0)
                 and any(k in term.parent_moles_per_product for term in terms)
             ]
             if state[oxygen_index] > 0.0:
@@ -3750,8 +3750,12 @@ def predict_mass_loss_fraction(
                 )
                 endpoint_channels = tuple(
                     channel for channel in channels
-                    if channel.parent_oxide is None
-                    or float(final_inventory.get(channel.parent_oxide, 0.0)) > 0.0
+                    if all(
+                        float(final_inventory.get(parent, 0.0)) > 0.0
+                        for parent in template_by_species[
+                            channel.species
+                        ].parent_moles_per_product
+                    )
                 )
                 endpoint_bounds, endpoint_corners = _mass_loss_corner_bounds(
                     final_inventory, endpoint_channels, pressure_model,

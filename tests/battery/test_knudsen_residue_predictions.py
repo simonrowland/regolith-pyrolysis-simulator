@@ -1005,6 +1005,63 @@ def test_knudsen_extent_fires_secondary_parent_exhaustion_event(monkeypatch):
     assert result.residue_mol["Al2O3"] > 0.0
 
 
+def test_knudsen_cutoff_parent_does_not_stall_secondary_exhaustion(monkeypatch):
+    from scipy import integrate as scipy_integrate
+
+    from simulator import core
+    from simulator.battery.residue import _formula_terms
+
+    cutoff_kg = 4e-12
+    monkeypatch.setattr(core, "LEDGER_LOADER_SPECIES_CUTOFF_KG", cutoff_kg)
+    cutoff_ca_oxide_mol = cutoff_kg / _formula_terms("CaO")[1]
+    real_solve_ivp = scipy_integrate.solve_ivp
+    solves = []
+
+    def record_solve_ivp(*args, **kwargs):
+        events = kwargs["events"]
+        initial_event_values = tuple(
+            float(event(args[1][0], args[2])) for event in events
+        )
+        # An exactly-cutoff primary must not be scheduled at zero. The
+        # secondary SiO2 parent has a zero cutoff and remains eventable.
+        assert all(value > 0.0 for value in initial_event_values)
+        solution = real_solve_ivp(*args, **kwargs)
+        assert solution.t[-1] > solution.t[0]
+        solves.append((initial_event_values, solution.t_events))
+        return solution
+
+    monkeypatch.setattr(scipy_integrate, "solve_ivp", record_solve_ivp)
+    result = integrate_knudsen_residue_inventory(
+        {"CaO": cutoff_ca_oxide_mol, "Al2O3": 1.0, "SiO2": 0.01},
+        (
+            ResidueChannel("Ca", "Ca", "CaO", 1.0, "trace cutoff parent"),
+            ResidueChannel(
+                "AlSiO", "AlSiO", "Al2O3", 1.0, "mixed-parent event",
+                parent_oxide_stoich={"Al2O3": 0.5, "SiO2": 1.0},
+            ),
+            ResidueChannel("O2", "O2", None, 1.0, "oxygen extent"),
+        ),
+        lambda _inventory, _logp, _temperature: {
+            "Ca": 0.0, "AlSiO": 1.0e6, "O2": 1.0,
+        },
+        temperature_path=((0.02, 2000.0),),
+        measured_mass_loss_fraction=0.02,
+        near_saturated=True,
+        source_fO2_log_by_interval=(-10.0,),
+        analytical_loader_cutoff=True,
+    )
+
+    # The inventory order is CaO, Al2O3, SiO2, then oxygen. CaO is exactly
+    # at its positive loader cutoff and gets no event; SiO2 is the second
+    # scheduled parent event (zero cutoff) and is exhausted normally.
+    assert solves
+    assert any(len(t_events) > 1 and t_events[1] for _, t_events in solves)
+    assert result.trace_tail_kg["CaO"] == pytest.approx(cutoff_kg)
+    assert result.residue_mol["CaO"] == cutoff_ca_oxide_mol
+    assert result.residue_mol["SiO2"] == 0.0
+    assert result.residue_mol["Al2O3"] > 0.0
+
+
 @pytest.mark.parametrize("pressures,reason", (
     ({"O2": 0.0}, "channel_missing"),
     ({"FeO": float("nan"), "O2": 0.0}, "residue_pressure_invalid"),

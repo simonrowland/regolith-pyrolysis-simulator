@@ -765,20 +765,34 @@ def test_drop_chemistry_version_commits_hot_before_cold(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
     monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    stale_version = 1
+    current_version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    assert stale_version != current_version
 
     def store() -> None:
-        engine_cache.cached_engine_call(
-            "openimcc",
-            {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
-            lambda: engine_cache.EngineCacheValue(
-                hot={"answer": 1}, cold={"enthalpy": 2.0}
-            ),
+        monkeypatch.setitem(
+            engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", stale_version
         )
+        try:
+            engine_cache.cached_engine_call(
+                "openimcc",
+                {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
+                lambda: engine_cache.EngineCacheValue(
+                    hot={"answer": 1}, cold={"enthalpy": 2.0}
+                ),
+            )
+        finally:
+            monkeypatch.setitem(
+                engine_cache.ENGINE_CHEMISTRY_VERSION,
+                "openimcc",
+                current_version,
+            )
 
     cold_path = path.with_name(path.name + ".cold")
     store()
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"] == current_version
     assert cold_path.is_file()
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    assert engine_cache.drop_chemistry_version("openimcc", stale_version) == 1
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
         assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
@@ -786,6 +800,7 @@ def test_drop_chemistry_version_commits_hot_before_cold(
         assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 0
 
     store()
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"] == current_version
 
     def boom(connection, _pairs) -> None:
         hot_left = connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0]
@@ -796,7 +811,7 @@ def test_drop_chemistry_version_commits_hot_before_cold(
     original = engine_cache._drop_attached_cold
     monkeypatch.setattr(engine_cache, "_drop_attached_cold", boom)
     with pytest.raises(sqlite3.OperationalError, match="injected between hot and cold"):
-        engine_cache.drop_chemistry_version("openimcc", 1)
+        engine_cache.drop_chemistry_version("openimcc", stale_version)
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
         assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
@@ -815,7 +830,7 @@ def test_drop_chemistry_version_commits_hot_before_cold(
         assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 1
 
     monkeypatch.setattr(engine_cache, "_drop_attached_cold", original)
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    assert engine_cache.drop_chemistry_version("openimcc", stale_version) == 1
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
         assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0

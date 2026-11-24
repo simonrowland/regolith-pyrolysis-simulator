@@ -21,6 +21,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
@@ -63,20 +64,20 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
     """Authoritative ``FE_REDOX_RESPECIATION`` provider."""
 
     name = "builtin-fe-redox-respeciation"
-    def capability_profile(self) -> CapabilityProfile:
-        from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
+    DECLARED_ACCOUNTS = frozenset({
+        CLEANED_MELT_ACCOUNT,
+        OXYGEN_ACCOUNT,
+        OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
+    })
 
+    def capability_profile(self) -> CapabilityProfile:
         return CapabilityProfile(
             provider_id=self.name,
             intents=frozenset({ChemistryIntent.FE_REDOX_RESPECIATION}),
             is_authoritative_for=frozenset({
                 ChemistryIntent.FE_REDOX_RESPECIATION,
             }),
-            declared_accounts=frozenset({
-                CLEANED_MELT_ACCOUNT,
-                OXYGEN_ACCOUNT,
-                OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
-            }),
+            declared_accounts=self.DECLARED_ACCOUNTS,
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
@@ -87,10 +88,6 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         """
 
         from simulator.accounting.formulas import resolve_species_formula
-        from simulator.account_ids import (
-            OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT as FO2_BUFFER_ACCOUNT,
-        )
-
         wrong_intent = reject_wrong_intent(
             request,
             ChemistryIntent.FE_REDOX_RESPECIATION,
@@ -117,7 +114,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         if not math.isfinite(internal_o2_capacity_mol):
             raise ValueError("internal_o2_capacity_mol must be finite")
         o2_account = (
-            FO2_BUFFER_ACCOUNT
+            OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
             if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES
             else OXYGEN_ACCOUNT
         )
