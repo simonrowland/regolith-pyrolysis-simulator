@@ -47,6 +47,10 @@ from simulator.lab_geometry import (
     require_lab_pipe_diameter,
     require_lab_pipe_length,
 )
+from simulator.crucible_geometry import (
+    MELT_DENSITY_KG_M3 as CRUCIBLE_MELT_DENSITY_KG_M3,
+    size_crucible_geometry,
+)
 from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET,
@@ -161,7 +165,9 @@ class EquipmentDesigner:
     """
 
     # Melt physical properties
-    MELT_DENSITY_KG_M3 = 2700.0     # Basaltic melt ~2500-2900
+    # Kept as a class-level compatibility override; the sizing owner defines
+    # the default value.
+    MELT_DENSITY_KG_M3 = CRUCIBLE_MELT_DENSITY_KG_M3
     MELT_CP_J_KG_K = 1200.0          # Heat capacity of silicate melt
     # provenance: melt emissivity — REF-047 coefficient_note; engineering default for hot silicates.
     MELT_EMISSIVITY = 0.85            # Radiative emissivity
@@ -305,33 +311,16 @@ class EquipmentDesigner:
         return design
 
     def size_crucible(self, mass_kg: float) -> CrucibleSpec:
-        """
-        Size the crucible for the batch.
-
-        Derivation [EQ-1]: V_melt = mass_kg / MELT_DENSITY_KG_M3 and
-        V_total = 1.20 * V_melt for 20% freeboard. For a cylinder with
-        h = 1.5 * d, V_total = π * d² * h / 4 = 1.5π * d³ / 4, so
-        d = (4 * V_total / (1.5π))**(1/3). The melt face area returned is
-        A = π * d² / 4.
-
-        Unit check: V_total is m³, d is m, and A is m². Since density and
-        geometry are fixed here, A ∝ mass_kg**(2/3): a 1000-fold smaller
-        batch has 100-fold smaller face area.
-        """
-        V_melt = mass_kg / self.MELT_DENSITY_KG_M3
-        V_total = V_melt * 1.20  # 20% freeboard
-
-        # Cylinder: V = π/4 × d² × h, with h = 1.5d
-        # → V = π/4 × d² × 1.5d = 1.5π/4 × d³
-        d = (V_total * 4.0 / (1.5 * math.pi)) ** (1.0/3.0)
-        h = 1.5 * d
-
+        """Return the established equipment spec from shared EQ-1 geometry."""
+        geometry = size_crucible_geometry(
+            mass_kg, self.MELT_DENSITY_KG_M3
+        )
         return CrucibleSpec(
-            volume_m3=V_total,
-            diameter_m=d,
-            height_m=h,
-            melt_surface_area_m2=math.pi * (d/2)**2,
-            freeboard_pct=20.0,
+            volume_m3=geometry.volume_m3,
+            diameter_m=geometry.diameter_m,
+            height_m=geometry.height_m,
+            melt_surface_area_m2=geometry.melt_surface_area_m2,
+            freeboard_pct=geometry.freeboard_pct,
         )
 
     @staticmethod

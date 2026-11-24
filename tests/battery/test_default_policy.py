@@ -3,6 +3,8 @@ from __future__ import annotations
 import ast
 from dataclasses import replace
 from decimal import Decimal
+import hashlib
+import json
 from pathlib import Path
 
 import pytest
@@ -16,6 +18,12 @@ from simulator.battery.enums import (
     Phase,
     Quantity,
     ResidualStatus,
+)
+from simulator.policy.enums import (
+    DEFAULT_POLICY_NOTICE_KINDS as OWNER_DEFAULT_POLICY_NOTICE_KINDS,
+    MethodToken as OwnerMethodToken,
+    NoticeKind as OwnerNoticeKind,
+    Phase as OwnerPhase,
 )
 from simulator.battery.migrate import to_plain
 from simulator.battery.records import Notice, NoticePolicy, union_notices
@@ -48,6 +56,19 @@ EXPECTED_POLICY_FLAGS = {
     "method_unstated",
     "method_inferred",
 }
+
+
+def test_battery_policy_tokens_reexport_single_owner_definitions() -> None:
+    assert NoticeKind is OwnerNoticeKind
+    assert Phase is OwnerPhase
+    assert MethodToken is OwnerMethodToken
+    assert DEFAULT_POLICY_NOTICE_KINDS is OWNER_DEFAULT_POLICY_NOTICE_KINDS
+
+
+def _policy_json_bytes(policy: object) -> bytes:
+    return json.dumps(policy, sort_keys=True, separators=(",", ":")).encode(
+        "utf-8"
+    )
 
 
 def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
@@ -204,7 +225,19 @@ def test_dp007_uses_sample_sized_crucible_area_and_requires_mass() -> None:
         sample_mass_kg
     ).melt_surface_area_m2
     resolved = resolve("DP-007", sample_mass_kg=sample_mass_kg)
+    policy_bytes = _policy_json_bytes(resolved.payload["policy"])
+    runner_sample_policy = resolve(
+        "DP-007", sample_mass_kg=0.01
+    ).payload["policy"]
 
+    assert (
+        hashlib.sha256(policy_bytes).hexdigest()
+        == "b538cb732135d3441ff6fe826811ef25c398f61e9dbbc2755e9849be4ab4ea96"
+    )
+    assert (
+        hashlib.sha256(_policy_json_bytes(runner_sample_policy)).hexdigest()
+        == "053e7537cc22fe756da0429942b746f28e2de91a0905b14b83e61b89992b2a12"
+    )
     assert resolved.value == Decimal(str(expected_area_m2))
     assert resolved.units == "m²"
     assert resolved.value < Decimal("0.2") / Decimal("1000")
@@ -336,7 +369,7 @@ def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
 
 
 def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monkeypatch) -> None:
-    import simulator.battery.default_policy as policy_module
+    import simulator.policy.default_policy as policy_module
 
     policy_path = tmp_path / "default_policy.yaml"
     policy_path.write_text("schema_version: 1\npolicies: []\n", encoding="utf-8")
@@ -508,7 +541,7 @@ def test_method_inferred_payload_without_policy_is_rejected_by_headline_census()
 def test_proposals_require_allocated_ids_and_refuse_duplicate_ids(
     tmp_path, monkeypatch
 ) -> None:
-    import simulator.battery.default_policy as policy_module
+    import simulator.policy.default_policy as policy_module
 
     policy_path = tmp_path / "default_policy.yaml"
     policy_path.write_text(

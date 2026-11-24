@@ -493,10 +493,26 @@ def test_dp007_area_notice_is_attached_to_run_metadata() -> None:
     sample_mass_kg = preset["lab_geometry"]["sample"]["mass_g"] / 1000.0
     expected = resolve("DP-007", sample_mass_kg=sample_mass_kg)
     run = _gram_lab_run(preset, campaign="C0")
-    output = run._run_session(run._start_session())
+    session = run._start_session()
+    output = run._run_session(session)
 
     notices = output["run_metadata"]["runtime_notices"]
     assert len(notices) == 1
+    audit = session.simulator._dp007_area_default
+    assert audit is not None
+    audit_policy_bytes = json.dumps(
+        audit["resolved"].payload["policy"],
+        sort_keys=True,
+        separators=(",", ":"),
+    ).encode("utf-8")
+    notice_policy_bytes = json.dumps(
+        notices[0]["policy"], sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    assert audit_policy_bytes == notice_policy_bytes
+    assert (
+        hashlib.sha256(audit_policy_bytes).hexdigest()
+        == "053e7537cc22fe756da0429942b746f28e2de91a0905b14b83e61b89992b2a12"
+    )
     assert notices[0]["kind"] == "knob_defaulted"
     assert notices[0]["reason"] == "exposed_melt_area_not_printed"
     assert notices[0]["policy"] == {
