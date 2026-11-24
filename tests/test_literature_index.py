@@ -606,7 +606,7 @@ def test_repo_hybrid_index_count_pins_match_green_plus_stack_deltas() -> None:
         source_id: indexed_sidecar_gaps[source_id]["missing_fields"]
         for source_id in t1880_source_ids
     } == expected_sidecar_gaps
-    assert counts["sources"] == 861
+    assert counts["sources"] == 869
     # PDF status of every source with extracts, compared by source id against
     # a checked-in manifest so a changed status is named, and the
     # extracts_without_pdf count is pinned to that independent expectation
