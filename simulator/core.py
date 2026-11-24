@@ -14673,6 +14673,16 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         try:
             ledger = snapshot_atom_ledger(self.atom_ledger)
             memo = {id(self): context, id(self.atom_ledger): ledger}
+            gate_curve_memo = getattr(
+                self,
+                '_freeze_gate_liquid_fraction_curve_memo',
+                None,
+            )
+            if isinstance(gate_curve_memo, dict):
+                # The keyed memo holds provider-solved curves and stable
+                # out-of-domain floors with their refusal notices. The shared
+                # cacheability rule excludes transient outcomes and holds.
+                memo[id(gate_curve_memo)] = gate_curve_memo
             if self.backend is not None:
                 memo[id(self.backend)] = forecast_backend
             if live_store is not None:
