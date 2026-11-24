@@ -16055,11 +16055,16 @@ def test_pankratz_1987_crystal_columns_reach_separate_series(tmp_path: Path) -> 
             or observation.observation_id.startswith(f"{record_prefix}:")
         ]
         assert observations
-        assert all(
-            observation.identity.species.phase.is_value
-            and observation.identity.species.phase.value is Phase.UNSPECIFIED
-            for observation in observations
-        )
+        for observation in observations:
+            phase = observation.identity.species.phase
+            assert phase.is_unknown
+            assert phase.reason == (
+                "phase string 'c' is not in the closed automatic map"
+            )
+            assert not any(
+                notice.kind is NoticeKind.PHASE_INFERRED
+                for notice in observation.notices
+            )
 
 
 def test_g5_compilation_conversion_trail_mutation_proof(
