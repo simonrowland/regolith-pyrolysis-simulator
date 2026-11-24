@@ -468,6 +468,21 @@ def test_integer_hour_preset_keeps_hourly_metadata(tmp_path: Path):
     assert "step_count" not in spec.provenance
 
 
+def test_hourly_duration_boundary_keeps_the_existing_acceptance_window(
+    tmp_path: Path,
+):
+    path = _write_lab_preset(
+        tmp_path,
+        duration_h=1.0 + 5.0e-10,
+        process_dt_s=None,
+    )
+    spec = _load_vacuum_preset_run_spec(path, "faithful")
+
+    assert spec.hours == 1
+    assert spec.process_dt_s == 3600.0
+    assert spec.step_count is None
+
+
 def test_quarter_hour_preset_runs_and_samples_inside_the_window(tmp_path: Path):
     """A 0.25 h program at 900 s is one step, sampled at the printed end.
 
