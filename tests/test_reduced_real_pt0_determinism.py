@@ -3370,6 +3370,7 @@ def test_pt0_physics_ladder_route_refuses_dependency_vector_mismatch(
     decoded_payload = rrd._decode_payload_for_admission(
         "equilibrium_post_record",
         source_entry["payload"],
+        payload_codec_version=source_entry["payload_codec_version"],
         keys=(source_entry["key"], query_key),
     )
 
@@ -5137,11 +5138,15 @@ def test_empty_gate_curve_path_misses_and_is_replaceable(
     assert replay._lookup("freeze_gate_curve", key) == current_payload
 
 
-def test_gate_codec_admission_uses_the_row_version() -> None:
-    store = PT0DeterminismStore("capture")
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_gate_codec_admission_uses_the_row_version(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "gate-codec-current.sqlite" if persistent else None
+    store = PT0DeterminismStore("capture", db_path=db_path)
     key = _freeze_gate_key()
     payload = {
-        "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
         "curve": {
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
@@ -5154,21 +5159,63 @@ def test_gate_codec_admission_uses_the_row_version() -> None:
         },
     }
     store._store("freeze_gate_curve", key, payload, law_disclosures=[])
+    key_hash = _key_hash(key)
+    stored_entry = store._entries[key_hash]
+    assert "payload_codec_version" not in stored_entry["payload"]
+    assert stored_entry["payload_codec_version"] == rrd.PT0_GATE_CURVE_CODEC_VERSION
+    if persistent:
+        assert store.persistent_store is not None
+        persisted_entry = store.persistent_store.get(
+            artifact="freeze_gate_curve",
+            key=key,
+            key_bytes=canonical_json_bytes(key),
+            key_hash=key_hash,
+        )
+        assert persisted_entry is not None
+        assert persisted_entry["payload_codec_version"] == (
+            rrd.PT0_GATE_CURVE_CODEC_VERSION
+        )
 
-    decoded = store._lookup_first_available(
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else store
+
+    decoded = replay._lookup_first_available(
         "freeze_gate_curve",
         (key,),
         return_decoded=True,
     )
 
     assert decoded["path"] == ((1200.0, 0.0), (1300.0, 1.0))
+    assert replay.hits == 1
 
 
-def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version() -> None:
-    store = PT0DeterminismStore("capture")
+def _set_pt1_payload_codec_version(
+    db_path: Path,
+    key_hash: str,
+    version: int | None,
+) -> None:
+    with sqlite3.connect(db_path) as conn:
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET payload_codec_version = ? WHERE key_hash = ?",
+            (version, key_hash),
+        )
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "row_version",
+    (None, rrd.PT0_GATE_CURVE_CODEC_VERSION - 1),
+    ids=("missing", "old"),
+)
+def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version(
+    tmp_path: Path,
+    persistent: bool,
+    row_version: int | None,
+) -> None:
+    db_path = tmp_path / "gate-codec-stale.sqlite" if persistent else None
+    store = PT0DeterminismStore("capture", db_path=db_path)
     key = _freeze_gate_key()
     current_payload = {
-        "payload_codec_version": rrd.PT0_GATE_CURVE_CODEC_VERSION,
         "curve": {
             "source": "gate_liquid_fraction",
             "solidus_T_C": 1200.0,
@@ -5180,16 +5227,79 @@ def test_gate_codec_admission_rejects_and_replaces_a_stale_row_version() -> None
             "is_liquidus_floor": False,
         },
     }
-    stale_payload = copy.deepcopy(current_payload)
-    stale_payload["payload_codec_version"] -= 1
-    store._store("freeze_gate_curve", key, stale_payload, law_disclosures=[])
+    store._store("freeze_gate_curve", key, current_payload, law_disclosures=[])
+    key_hash = _key_hash(key)
+    store._entries[key_hash]["payload_codec_version"] = row_version
+    if persistent:
+        assert db_path is not None
+        _set_pt1_payload_codec_version(db_path, key_hash, row_version)
 
     with pytest.raises(PT0CacheMiss):
         store._lookup("freeze_gate_curve", key)
     assert store.hits == 0
 
     store._store("freeze_gate_curve", key, current_payload, law_disclosures=[])
-    assert store._lookup("freeze_gate_curve", key) == current_payload
+    entry = store._entries[key_hash]
+    assert entry["payload_codec_version"] == rrd.PT0_GATE_CURVE_CODEC_VERSION
+    assert entry["payload"] == current_payload
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else store
+    assert replay._lookup("freeze_gate_curve", key) == current_payload
+    assert replay.hits == 1
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "row_version",
+    (None, rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION - 1),
+    ids=("missing", "old"),
+)
+def test_equilibrium_codec_row_version_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    row_version: int | None,
+) -> None:
+    db_path = tmp_path / "equilibrium-codec-stale.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    key = capture._equilibrium_key(sim)
+    key_hash = _key_hash(key)
+    entry = capture._entries[key_hash]
+    current_payload = copy.deepcopy(entry["payload"])
+    assert "payload_codec_version" not in current_payload
+    assert entry["payload_codec_version"] == (
+        rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
+    )
+    entry["payload_codec_version"] = row_version
+    if persistent:
+        assert db_path is not None
+        _set_pt1_payload_codec_version(db_path, key_hash, row_version)
+
+    with pytest.raises(PT0CacheMiss):
+        capture._lookup("equilibrium_post_record", key, sim=sim)
+    assert capture.hits == 0
+
+    capture.capture_equilibrium(sim, result)
+    entry = capture._entries[key_hash]
+    assert entry["payload_codec_version"] == (
+        rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
+    )
+    assert entry["payload"] == current_payload
+    if persistent:
+        assert capture.persistent_store is not None
+        persisted_entry = capture.persistent_store.get(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=canonical_json_bytes(key),
+            key_hash=key_hash,
+        )
+        assert persisted_entry is not None
+        assert persisted_entry["payload_codec_version"] == (
+            rrd.PT1_EQUILIBRIUM_PAYLOAD_CODEC_VERSION
+        )
+    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
+    assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
+    assert replay.hits == 1
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
