@@ -1,6 +1,7 @@
 """Pause command acknowledgement stays responsive during a simulation step."""
 
 import threading
+from concurrent.futures import ThreadPoolExecutor
 from types import SimpleNamespace
 
 import app as app_module
@@ -68,7 +69,7 @@ def test_pause_ack_does_not_wait_for_in_flight_step_lock(active_run):
         )
         assert not failures
         assert state["paused"] is True
-        assert state["pause_ack_pending"] is True
+        assert state["pause_ack_pending"] == 1
         assert client.get_received() == []
         run_lock.release()
         lock_released = True
@@ -81,7 +82,7 @@ def test_pause_ack_does_not_wait_for_in_flight_step_lock(active_run):
 
 def test_missing_pause_ack_mutation_fails_handshake_contract(active_run, monkeypatch):
     client, sid, state, _run_lock = active_run
-    state["pause_ack_pending"] = True
+    state["pause_ack_pending"] = 1
     monkeypatch.setattr(
         web_events,
         "_emit_pending_pause_ack",
@@ -182,10 +183,7 @@ def _restore_deferred_pause_handler(monkeypatch, socketio, sid, state):
                 return
             current["session"].pause()
             current["paused"] = True
-            generation = int(current.get("pause_ack_generation", 0)) + 1
-            current["pause_ack_generation"] = generation
-            current["pause_ack_pending"] = True
-            current["pause_ack_pending_generation"] = generation
+            current["pause_ack_pending"] = 1
 
     monkeypatch.setitem(
         socketio.server.handlers["/"], "pause_simulation", old_pause_handler
@@ -231,66 +229,122 @@ def test_old_deferred_sleep_ack_mutation_fails(live_worker, monkeypatch):
     assert len(steps) == 1
 
 
-def _pause_then_resume_before_worker_check(client, task, monkeypatch):
+def _pause_then_resume_before_worker_check(live_worker, monkeypatch):
+    client, _sid, state, _socketio, task, steps = live_worker
     original_emit = web_events._emit_if_current
+    pending_after_resume = []
 
-    def emit_then_commands(socketio, sid, run_id, event, payload):
+    def tick_with_pause(**_kwargs):
+        # The worker still holds the step lock when the socket thread runs Pause.
+        _request_pause_within_bound(client)
+        return {}
+
+    def emit_then_resume(socketio, sid, run_id, event, payload):
         emitted = original_emit(socketio, sid, run_id, event, payload)
         if event == "per_hour_summary":
-            client.emit("pause_simulation")
+            assert state["pause_ack_pending"] == 1
+            assert _status_events(client) == []
             client.emit("resume_simulation", {"payload_version": 4})
+            pending_after_resume.append(state.get("pause_ack_pending", 0))
         return emitted
 
-    monkeypatch.setattr(web_events, "_emit_if_current", emit_then_commands)
+    monkeypatch.setattr(web_events, "_tick_payload", tick_with_pause)
+    monkeypatch.setattr(web_events, "_emit_if_current", emit_then_resume)
     task()
+
+    assert len(steps) == 1
+    assert _status_events(client) == ["resumed"]
+    assert pending_after_resume == [0], "Resume left the queued Pause acknowledgement"
 
 
 def test_resume_clears_pending_ack_before_worker_check(live_worker, monkeypatch):
-    client, _sid, state, _socketio, task, _steps = live_worker
-    _pause_then_resume_before_worker_check(client, task, monkeypatch)
-
-    statuses = _status_events(client)
-    assert statuses[-1] == "resumed"
-    assert "paused" not in statuses[statuses.index("resumed") + 1 :]
-    assert state["pause_ack_pending"] is False
+    _pause_then_resume_before_worker_check(live_worker, monkeypatch)
 
 
 def test_old_resume_pending_flag_mutation_fails(live_worker, monkeypatch):
-    client, _sid, state, _socketio, task, _steps = live_worker
-    original_emit = web_events._emit_if_current
+    original_take = web_events._take_pending_pause_acks
 
-    def old_pending_ack(socketio, sid, run_id):
-        with web_events._simulations_guard:
-            current = web_events._simulations.get(sid)
-            if current is None or current.get("run_id") != run_id:
-                return False
-            if not current.get("running") or not current.pop(
-                "pause_ack_pending", False
-            ):
-                return False
-            socketio.emit(
-                "simulation_status",
-                {"status": "paused", "run_id": run_id},
-                room=sid,
-            )
-            return True
+    def take_except_on_resume(state):
+        if state["paused"]:
+            return original_take(state)
+        return 0  # Omit the drain in the real Resume handler.
 
-    monkeypatch.setattr(web_events, "_emit_pending_pause_ack", old_pending_ack)
+    monkeypatch.setattr(web_events, "_take_pending_pause_acks", take_except_on_resume)
+    with pytest.raises(AssertionError, match="Resume left the queued Pause"):
+        _pause_then_resume_before_worker_check(live_worker, monkeypatch)
 
-    def resume_without_invalidating(socketio, sid, run_id, event, payload):
-        emitted = original_emit(socketio, sid, run_id, event, payload)
-        if event == "per_hour_summary":
-            client.emit("pause_simulation")
-            client.emit("resume_simulation", {"payload_version": 4})
-            state["paused"] = False  # old resume left the queued acknowledgement intact
-            state["pause_ack_pending"] = True
-        return emitted
 
-    monkeypatch.setattr(web_events, "_emit_if_current", resume_without_invalidating)
-    with pytest.raises(AssertionError, match="stale paused acknowledgement"):
-        task()
-        statuses = _status_events(client)
-        assert not (
-            "resumed" in statuses
-            and "paused" in statuses[statuses.index("resumed") + 1 :]
-        ), "stale paused acknowledgement"
+def _pause_during_parked_resume(live_worker, monkeypatch):
+    client, _sid, state, _socketio, task, steps = live_worker
+    decision = {"choice": "test"}
+    monkeypatch.setattr(web_events, "drive_session", lambda *_: iter(()))
+    monkeypatch.setattr(web_events, "_decision_payload", lambda _: decision)
+    state["session"].pending_decision = lambda: decision
+    task()
+
+    assert steps == []
+    assert state["running"] and state["decision_waiting"] and state["loop_exited"]
+    client.get_received()
+
+    in_resume = threading.Event()
+    finish_resume = threading.Event()
+
+    def pending_decision():
+        in_resume.set()
+        assert finish_resume.wait(timeout=5)
+        return decision
+
+    state["session"].pending_decision = pending_decision
+    with ThreadPoolExecutor(max_workers=1) as pool:
+        resume = pool.submit(client.emit, "resume_simulation", {"payload_version": 4})
+        try:
+            assert in_resume.wait(timeout=2)
+            _request_pause_within_bound(client)
+            during_resume = _status_events(client)
+        finally:
+            finish_resume.set()
+            resume.result(timeout=2)
+
+    assert _status_events(client) == ["awaiting_decision"]
+    assert during_resume == ["paused"], "Parked worker did not acknowledge Pause once"
+    assert not state.get("pause_ack_pending")
+
+
+def test_parked_worker_acknowledges_pause_during_declined_resume(
+    live_worker, monkeypatch
+):
+    _pause_during_parked_resume(live_worker, monkeypatch)
+
+
+def test_old_parked_ack_mutation_fails(live_worker, monkeypatch):
+    _client, _sid, state, _socketio, _task, _steps = live_worker
+    original_emit = web_events._emit_pending_pause_ack
+
+    def ignore_worker_exit(socketio, sid, run_id, *, command_lock=None):
+        if command_lock is None:
+            return original_emit(socketio, sid, run_id)
+        with monkeypatch.context() as mutation:
+            mutation.setitem(state, "decision_waiting", False)
+            mutation.setitem(state, "loop_exited", False)
+            return original_emit(socketio, sid, run_id, command_lock=command_lock)
+
+    monkeypatch.setattr(web_events, "_emit_pending_pause_ack", ignore_worker_exit)
+    with pytest.raises(AssertionError, match="Parked worker did not acknowledge Pause"):
+        _pause_during_parked_resume(live_worker, monkeypatch)
+
+
+def test_each_pause_queued_during_a_step_is_acknowledged_once(live_worker, monkeypatch):
+    client, _sid, state, _socketio, task, steps = live_worker
+
+    def tick_with_pauses(**_kwargs):
+        _request_pause_within_bound(client)
+        _request_pause_within_bound(client)
+        assert _status_events(client) == []
+        return {}
+
+    monkeypatch.setattr(web_events, "_tick_payload", tick_with_pauses)
+    task()
+
+    assert len(steps) == 1
+    assert _status_events(client) == ["paused", "paused"]
+    assert not state.get("pause_ack_pending")

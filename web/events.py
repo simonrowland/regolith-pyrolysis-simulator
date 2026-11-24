@@ -683,32 +683,58 @@ def _emit_if_current(socketio, sid: str, run_id: str, event: str, payload) -> bo
         return True
 
 
-def _emit_pending_pause_ack(socketio, sid: str, run_id: str) -> bool:
-    """Acknowledge a pause once its current simulation step has settled."""
+def _take_pending_pause_acks(state: dict) -> int:
+    """Drain acknowledgements while holding the simulations guard."""
+    return state.pop('pause_ack_pending', 0)
+
+
+def _emit_pending_pause_ack(
+    socketio, sid: str, run_id: str, *, command_lock=None,
+) -> bool:
+    """Queue a Pause from the command handler or drain it at a worker boundary."""
     with _simulations_guard:
         state = _simulations.get(sid)
-        pause_generation = (
-            state.get('pause_ack_generation') if state is not None else None
-        )
         if (
             state is None
             or state.get('run_id') != run_id
             or not state.get('running')
-            or not state.get('paused')
-            or state.get('pause_ack_pending_generation') != pause_generation
-            or not state.pop('pause_ack_pending', False)
         ):
             return False
-        state.pop('pause_ack_pending_generation', None)
-        socketio.emit(
-            'simulation_status',
-            _browser_socket_payload(
+
+        # Transition                         Pending acknowledgement
+        # Pause with step lock busy          Queue for the worker boundary.
+        # Pause between steps                Queue and emit now.
+        # Pause at a decision / after exit   Queue and emit now, even with a busy lock.
+        # Worker reaches a safe point       Drain once while the run is paused.
+        # Successful Resume                  Drain without emitting, then emit resumed.
+        # Declined Resume                    Leave the pause state alone.
+        # Stopped or replaced run           Reject or discard its acknowledgement.
+        if command_lock is not None:
+            if not state['paused']:
+                _take_pending_pause_acks(state)
+            state['session'].pause()
+            state['paused'] = True
+            state['pause_ack_pending'] = state.get('pause_ack_pending', 0) + 1
+            if not (state.get('decision_waiting') or state.get('loop_exited')):
+                # Never wait for the run lock while holding the guard. The
+                # worker must take the guard to check paused before admission.
+                if not command_lock.acquire(blocking=False):
+                    return False
+                command_lock.release()
+
+        if not state['paused']:
+            return False
+        pending = _take_pending_pause_acks(state)
+        for _ in range(pending):
+            socketio.emit(
                 'simulation_status',
-                {'status': 'paused', 'run_id': run_id},
-            ),
-            room=sid,
-        )
-        return True
+                _browser_socket_payload(
+                    'simulation_status',
+                    {'status': 'paused', 'run_id': run_id},
+                ),
+                room=sid,
+            )
+        return bool(pending)
 
 
 _PER_HOUR_DETAIL_FIELDS = (
@@ -4193,21 +4219,7 @@ def register_events(socketio):
                 reject_control_without_active_run(sid, 'pause_simulation')
                 return
             run_id = state['run_id']
-            state['session'].pause()
-            state['paused'] = True
-            pause_generation = int(state.get('pause_ack_generation', 0)) + 1
-            state['pause_ack_generation'] = pause_generation
-            state['pause_ack_pending'] = True
-            state['pause_ack_pending_generation'] = pause_generation
-
-        # If the worker is between steps, hold the step lock through the
-        # acknowledgement so it cannot start another step first. An in-flight
-        # step owns the lock and acknowledges at its post-step boundary.
-        if run_lock.acquire(blocking=False):
-            try:
-                _emit_pending_pause_ack(socketio, sid, run_id)
-            finally:
-                run_lock.release()
+        _emit_pending_pause_ack(socketio, sid, run_id, command_lock=run_lock)
 
     @socketio.on('resume_simulation')
     def handle_resume(data=None):
@@ -4252,11 +4264,7 @@ def register_events(socketio):
                     return
                 state['session'].resume()
                 state['paused'] = False
-                state['pause_ack_generation'] = int(
-                    state.get('pause_ack_generation', 0)
-                ) + 1
-                state['pause_ack_pending'] = False
-                state.pop('pause_ack_pending_generation', None)
+                _take_pending_pause_acks(state)
                 socketio.emit(
                     'simulation_status',
                     _browser_socket_payload(
