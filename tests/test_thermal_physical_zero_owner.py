@@ -18,7 +18,7 @@ from engines.builtin.evaporation_flux import (
     BuiltinEvaporationFluxProvider,
     _solid_host_bakeout_result,
 )
-from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
@@ -68,11 +68,11 @@ def test_species_rates_follow_the_vapor_owner_limit(monkeypatch):
 
 
 def test_internal_analytical_cold_gate_follows_the_vapor_limit(monkeypatch):
-    import engines.builtin.vapor_pressure as vapor_pressure
+    import simulator.equilibrium as equilibrium
     from simulator.equilibrium import EquilibriumMixin
 
     monkeypatch.setattr(
-        vapor_pressure,
+        equilibrium,
         "BUILTIN_VAPOR_BELOW_400K_LIMIT_K",
         500.0,
     )
@@ -127,9 +127,9 @@ def _evaporation_host(*, temperature_C: float, pressures: dict[str, float]):
 
 
 def test_empty_pressure_cold_gate_follows_the_vapor_limit(monkeypatch):
-    import engines.builtin.vapor_pressure as vapor_pressure
+    import engines.vapor_limits as vapor_limits
 
-    monkeypatch.setattr(vapor_pressure, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 500.0)
+    monkeypatch.setattr(vapor_limits, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 500.0)
     host = _evaporation_host(temperature_C=150.0, pressures={})
     equilibrium = SimpleNamespace(
         liquid_fraction=1.0,
@@ -145,9 +145,9 @@ def test_empty_pressure_cold_gate_follows_the_vapor_limit(monkeypatch):
 
 
 def test_catalog_pressure_gate_follows_the_vapor_limit(monkeypatch):
-    import engines.builtin.vapor_pressure as vapor_pressure
+    import engines.vapor_limits as vapor_limits
 
-    monkeypatch.setattr(vapor_pressure, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 200.0)
+    monkeypatch.setattr(vapor_limits, "BUILTIN_VAPOR_BELOW_400K_LIMIT_K", 200.0)
     host = _evaporation_host(temperature_C=25.0, pressures={"SiO": 10.0})
     equilibrium = SimpleNamespace(liquid_fraction=1.0, status="ok", diagnostics={})
     try:
@@ -220,10 +220,10 @@ def test_solid_host_bakeout_gate_follows_the_vapor_limit(monkeypatch):
 
 
 def test_kernel_refresh_gate_follows_the_vapor_limit(monkeypatch):
-    import engines.builtin.vapor_pressure as vapor_pressure
+    import engines.vapor_limits as vapor_limits
 
     monkeypatch.setattr(
-        vapor_pressure,
+        vapor_limits,
         "BUILTIN_VAPOR_BELOW_400K_LIMIT_K",
         300.0,
     )
@@ -241,10 +241,10 @@ def test_kernel_refresh_gate_follows_the_vapor_limit(monkeypatch):
 
 
 def test_capacity_shadow_gate_follows_the_vapor_limit(monkeypatch):
-    import engines.builtin.vapor_pressure as vapor_pressure
+    import engines.vapor_limits as vapor_limits
 
     monkeypatch.setattr(
-        vapor_pressure,
+        vapor_limits,
         "BUILTIN_VAPOR_BELOW_400K_LIMIT_K",
         200.0,
     )

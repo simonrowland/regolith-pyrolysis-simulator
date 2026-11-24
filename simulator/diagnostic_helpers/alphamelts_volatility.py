@@ -29,8 +29,8 @@ from engines.alphamelts.domain import (
     AlphaMELTSDomainGate,
     canonical_melt_oxide_activity_name,
 )
+from engines.vapor_limits import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from engines.builtin.vapor_pressure import (
-    BUILTIN_VAPOR_BELOW_400K_LIMIT_K,
     COEFF_BLOCK_ANTOINE,
     FIT_TARGET_STANDARD_REACTION,
     VaporPressureComputationError,
