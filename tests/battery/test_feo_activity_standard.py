@@ -765,13 +765,13 @@ def test_distin_closed_redox_residual_pins_candidate_value_and_band_metadata(
     # The serialized line includes the shifted residual above and the
     # feo_standard_normalisation provenance, including its extrapolated
     # authority, certified band, and pack range flags.
-    # Pin-port comparison: the 38,482-value probe found no numeric changes;
-    # this serialized-line digest moved only because the default redox pack
-    # digest changed from b927cf95 to 4beed388. OpenIMCC bisect found no
-    # numeric changes across four text/identity commits, including c75456f's
-    # v5-to-v6 default redox-pack reissue (digest
-    # 6e99778d67e8e4ac5ea34d58c72eab0e56e538968ffe6f9cb4b69c4208af83c6
-    # -> 4018b7071882dfaca4eca46512ad7357f48e461bc4c4ed1feacedf2c3a420097).
+    # Three-way pin comparison: car 4018b707..., b274 700e6d2b..., merge
+    # a5830affe765585c7d55dcf72aaa0e388550c33e2e22df7cf287c6ac93cbc1f0.
+    # b274 moves notices[0] from the car's admission_defaulted to DP-106's
+    # method_unstated and adds its Fe-saturated FeO calibration notice at [8].
+    # The FeO1.5(l) 1500-1735 K hematite-decomposition notice shifts to [10];
+    # this correctly flags that supercooled metastable interval, not the
+    # Distin measurement at 1880 K.
     serialized = dumps_residual_line(residual, candidate).encode("utf-8")
     assert '"assumed_band_details"' in serialized.decode("utf-8")
     # d-443 adds only this metadata to the serialized line. Keep the existing

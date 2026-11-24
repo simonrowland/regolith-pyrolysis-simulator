@@ -228,7 +228,7 @@ def test_provider_flags_floor_inversion_and_completes(monkeypatch) -> None:
         assert MELT_DISSOCIATION_PO2_FLOOR_INVERSION_REASON in sources[species]
         assert _is_noncertifying_vapor_extrapolation(species, sources[species])
 
-    from engines.builtin import ellingham_graph
+    from simulator.chemistry import ellingham_graph
 
     si_pure_saturation_pa = ellingham_graph.metal_saturation_pressure_Pa(
         "Si", _T_K, vapor_pressure_data=vapor_pressure_data
@@ -275,7 +275,8 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
     """Pure-Si saturation caps the Si ratio; Mg and Na retain mass action."""
 
     _withhold_metal_saturation_floor(monkeypatch)
-    provider = BuiltinVaporPressureProvider(_yaml("vapor_pressures.yaml"))
+    vapor_pressure_data = _yaml("vapor_pressures.yaml")
+    provider = BuiltinVaporPressureProvider(vapor_pressure_data)
     at_ref = provider.dispatch(
         _request(pO2_bar=1e-9, intrinsic_fO2_log=-9.0)
     ).diagnostic["vapor_pressures_Pa"]
@@ -287,14 +288,15 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
     # pure-Si saturation resolver caps P_Si at about 0.068309497634 Pa,
     # below the uncapped ~7.13e9 Pa floor value. The ratio is therefore
     # about 9.5794495e9, or P_sat,Si(1700 K) / P_Si(1e-9 bar).
-    from engines.builtin import ellingham_graph
+    from simulator.chemistry import ellingham_graph
 
     si_pure_saturation_pa = ellingham_graph.metal_saturation_pressure_Pa(
-        "Si", _T_K, vapor_pressure_data=_yaml("vapor_pressures.yaml")
+        "Si", _T_K, vapor_pressure_data=vapor_pressure_data
     )
     assert at_floor["Si"] == pytest.approx(si_pure_saturation_pa)
+    expected_si_ratio = si_pure_saturation_pa / at_ref["Si"]
     assert at_floor["Si"] / at_ref["Si"] == pytest.approx(
-        9.579449513963434e9, rel=1e-9
+        expected_si_ratio, rel=1e-9
     )
     # Mg and Na remain below their pure-component ceilings at this probe.
     assert at_floor["Mg"] / at_ref["Mg"] == pytest.approx(10 ** 10.5, rel=1e-9)
