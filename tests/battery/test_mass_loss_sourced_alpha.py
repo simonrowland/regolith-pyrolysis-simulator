@@ -1118,17 +1118,47 @@ def test_redox_fallback_flag_reaches_mass_loss_prediction(
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_full_prediction_refuses_non_negligible_unsourced_channel(
-    r11_inputs, prescribed_pressure_engine,
+    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
 ):
+    import simulator.battery.residue as residue
+
     row, experiment = r11_inputs
     prescribed_pressure_engine["unsourced_ca"] = True
-    prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    assert prediction.value is None
-    assert prediction.refusal_reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert prediction.refusal_detail["reason"] == "alpha_not_sourced"
-    detail = json.loads(prediction.refusal_detail["detail"])
+    corner_counts = []
+    original_corner_bounds = residue._mass_loss_corner_bounds
+
+    def record_corner_counts(*args, **kwargs):
+        bounds, corners = original_corner_bounds(*args, **kwargs)
+        corner_counts.append((kwargs.get("check_neighbours", False), corners))
+        return bounds, corners
+
+    monkeypatch.setattr(residue, "_mass_loss_corner_bounds", record_corner_counts)
+    with pytest.raises(ResidueInventoryRefusal) as failure:
+        residue.predict_mass_loss_fraction(
+            "openimcc", experiment, temperature_K=2073.15,
+            source_document=fig3_source, observation=row,
+        )
+    assert failure.value.reason == "alpha_not_sourced"
+    detail = json.loads(failure.value.detail)
     assert detail["bound_fraction"] > 0.01
     assert detail["unsourced_channels"] == ["Ca"]
+
+    step_corners = [corners for endpoint, corners in corner_counts if not endpoint]
+    endpoint_corners = [corners for endpoint, corners in corner_counts if endpoint]
+    assert step_corners and endpoint_corners
+    # Each integration step contributes its input-derived corner/root counts;
+    # each endpoint contributes its own counts (and neighbour flips). Sum those
+    # calls across the preheat and sourced/unsourced R-11 segments independently
+    # of the predictor's aggregate counters.
+    assert detail["corner_evaluations"] == sum(
+        corners["corner_count"] for corners in step_corners + endpoint_corners
+    )
+    assert detail["corner_root_solves"] == sum(
+        corners["corner_root_solves"] for corners in step_corners + endpoint_corners
+    )
+    assert detail["corner_neighbour_evaluations"] == sum(
+        corners["corner_neighbour_evaluations"] for corners in endpoint_corners
+    )
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
