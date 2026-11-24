@@ -3720,7 +3720,7 @@ def _sample_from_plain(
     printed_from_initial = printed_located is None and initial is not None
     if printed_from_initial:
         printed_located = _mass_percent_printed_from_plain(initial)
-    composition_role = composition_roles.resolve_composition_role(payload).role
+    composition_role = composition_roles.read_composition_role_field(payload)[0]
     owner_initial = None
     if (
         not (initial_located is not None and initial_located.state.is_value)
@@ -8526,7 +8526,9 @@ def _composition_located_from_values(
     """
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
-    resolution = composition_roles.resolve_composition_role(values)
+    # No usable assay: an unrecognized token stays a refusal here. Defaulting
+    # belongs to the one resolver call that has the assay.
+    resolution = composition_roles.resolve_point_composition(values)
     role = resolution.role
     if resolution.original_reason is not None and role_refusal is not None:
         role_refusal.append(resolution.original_reason)
@@ -9689,11 +9691,6 @@ def _initial_charge_only_composition_proxy(
                     ):
                         composition = identity.composition.value
             if composition is not None:
-                composition = replace(
-                    composition,
-                    proxy_flag=INITIAL_CHARGE_ONLY_PROXY_FLAG,
-                    input_provenance=PRINTED_STARTING_BULK,
-                )
                 selected = Located(
                     State.of(composition), locator=composition_locator
                 )
@@ -9765,18 +9762,27 @@ def _initial_charge_only_composition_proxy(
                 conditions,
                 list(notices),
             )
+    composition_quantity = quantity in {
+        Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    } or (
+        isinstance(quantity_as_printed, str)
+        and "composition" in quantity_as_printed.casefold()
+    )
     if (
-        outside_initial_charge_proxy_scope
-        or quantity
-        in {
-            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
-        }
-        or (
-            isinstance(quantity_as_printed, str)
-            and "composition" in quantity_as_printed.casefold()
-        )
+        resolution.role == DATUM_STATE
+        and not composition_quantity
+        and selected is not None
+        and selected.state.is_value
+        and isinstance(selected.state.value, Composition)
     ):
+        conditions["composition"] = selected
+        return (
+            replace(identity, composition=selected.state),
+            conditions,
+            [*notices, *resolution.notices],
+        )
+    if outside_initial_charge_proxy_scope or composition_quantity:
         return identity, point_conditions, list(notices)
     if any(
         state is not None and state.is_not_applicable
@@ -19660,7 +19666,7 @@ def _printed_map_is_typed_initial(
         return False
     if _is_printed_initial_charge(printed, values, declared_map=declared_map):
         return True
-    role = composition_roles.resolve_composition_role(equipment, values).role
+    role = composition_roles.read_composition_role_field(equipment, values)[0]
     if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
         return True
     target = _printed_fingerprint(printed.state.value)
@@ -20169,7 +20175,7 @@ def sample_from_equipment(
 
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
-    role = composition_roles.resolve_composition_role(equipment, values).role
+    role = composition_roles.read_composition_role_field(equipment, values)[0]
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
@@ -26722,9 +26728,9 @@ class Migrator:
         composition_axis_required = identity_profile_uses_composition
         identity_profile_known = q_token is not None
         declared_printed_map = _named_printed_composition_map(values)
-        role_resolution = composition_roles.resolve_composition_role(values)
-        composition_role = role_resolution.role
-        composition_role_error = role_resolution.original_reason
+        composition_role, composition_role_error = (
+            composition_roles.read_composition_role_field(values)
+        )
         declares_composition_datum = _has_explicit_composition_field(values) or (
             q_token is None
             and any(
@@ -27077,11 +27083,9 @@ class Migrator:
             and composition_role_error is None
             and not _declared_wt_composition_point_map(values, obs.get("units"))
         ):
-            role_resolution = composition_roles.resolve_composition_role(
-                obs.get("equipment")
+            composition_role, composition_role_error = (
+                composition_roles.read_composition_role_field(obs.get("equipment"))
             )
-            composition_role = role_resolution.role
-            composition_role_error = role_resolution.original_reason
         composition_located = (
             _composition_located_from_values(
                 values,
@@ -30483,11 +30487,9 @@ class Migrator:
         point_catalogue: Located[Composition] | None = None
         malformed_composition_amount: str | None = None
         row_bound_redox_composition = False
-        point_role_resolution = composition_roles.resolve_composition_role(
-            raw_item, parent_values
+        point_composition_role, point_composition_role_refusal = (
+            composition_roles.read_composition_role_field(raw_item, parent_values)
         )
-        point_composition_role = point_role_resolution.role
-        point_composition_role_refusal = point_role_resolution.original_reason
         if isinstance(raw_item, Mapping):
             q_for_species = (
                 quantity.value

@@ -65,7 +65,12 @@ from simulator.physical_constants import (
 )
 from simulator.battery import composition_roles
 from simulator.battery import migrate as battery_migrate
-from simulator.battery.composition_roles import COMPOSITION_ROLE_FIELD, RoleResolution, RoleStatus
+from simulator.battery.composition_roles import (
+    COMPOSITION_ROLE_FIELD,
+    AssayCandidate,
+    RoleResolution,
+    RoleStatus,
+)
 from simulator.battery.enums import Quantity
 from simulator.state_types import State
 from simulator.diagnostic_helpers.qualitative_skip import qualitative_payload_skip_reason
@@ -3170,7 +3175,7 @@ def _evaluate_psat(
             "standard_state_kind": standard_state_kind,
             "melt_recipe_source": melt_recipe_source,
         }
-        typed_input_reason = _record_composition_role(runtime, role, include_declared=True)
+        typed_input_reason = _record_composition_role(runtime, role)
         point_melt_only_assumption: str | None = None
         if role.initial_charge_only and typed_input_reason is not None:
             pairing = obs.values.get("fO2_pairing")
@@ -3904,21 +3909,101 @@ def _evaluate_alpha(
     return evaluation
 
 
+def _located_composition_is_value(point: Mapping[str, Any]) -> bool:
+    """True only for a value-tagged located composition.
+
+    An unknown or other non-value tag is not an assay. Bischof's mixed-basis
+    points carry that tag and keep the parent recipe.
+    """
+
+    conditions = point.get("point_conditions")
+    if not isinstance(conditions, Mapping):
+        return False
+    composition = conditions.get("composition")
+    state = composition.get("state") if isinstance(composition, Mapping) else None
+    return isinstance(state, Mapping) and state.get("tag") == "value"
+
+
+def _point_claims_printed_assay(point: Mapping[str, Any]) -> bool:
+    """True when the point itself printed an assay, a gap, or a value composition."""
+
+    if point.get("composition_source_gap"):
+        return True
+    for key in (
+        "composition_mol",
+        "melt_composition_mol",
+        "composition_wt_pct",
+        "melt_composition_wt_pct",
+        "sample_oxide_composition_wt_pct",
+        "sample_Na2O_wt_pct",
+        "sample_K2O_wt_pct",
+        "composition_source_observation_id",
+    ):
+        if point.get(key):
+            return True
+    if _located_composition_is_value(point):
+        return True
+    source = point.get("source_point")
+    if isinstance(source, Mapping) and source is not point:
+        return _point_claims_printed_assay(source)
+    return False
+
+
+def _assay_candidate(
+    recipe: dict[str, float] | None,
+    source: str,
+    error: str | None,
+    *,
+    origin: str,
+    terminal: bool = False,
+) -> AssayCandidate:
+    state = (
+        State.of(recipe)
+        if recipe is not None
+        else State.unknown(error or "missing_condition:melt_composition")
+    )
+    return AssayCandidate(state, source=origin, label=source, terminal=terminal)
+
+
 def _resolve_melt_recipe(
     obs: AdoptedObservation,
     *,
     point: Mapping[str, Any] | None = None,
 ) -> tuple[RoleResolution[dict[str, float]], str]:
-    recipe, source, error = (
-        _melt_recipe_mol(obs, point=point) if point is not None else _melt_recipe_mol(obs)
+    parent_values = getattr(obs, "values", None)
+    if point is None:
+        recipe, source, error = _melt_recipe_mol(obs)
+        candidates = (
+            _assay_candidate(recipe, source, error, origin="parent"),
+        )
+    else:
+        # Point-local decode must not inherit the parent. The resolver chooses.
+        point_recipe, point_source, point_error = _melt_recipe_mol(
+            obs, point=point, parent_fallback=False
+        )
+        parent_recipe, parent_source, parent_error = _melt_recipe_mol(obs)
+        candidates = (
+            _assay_candidate(
+                point_recipe,
+                point_source,
+                point_error,
+                origin="point",
+                # A printed gap or a failed point assay stops the search.
+                # A point that printed no assay leaves the parent available.
+                terminal=point_recipe is None
+                and (
+                    point_source != "none"
+                    or _point_claims_printed_assay(point)
+                ),
+            ),
+            _assay_candidate(
+                parent_recipe, parent_source, parent_error, origin="parent"
+            ),
+        )
+    role = composition_roles.resolve_point_composition(
+        point, parent_values, candidates
     )
-    composition = (
-        State.of(recipe) if recipe is not None
-        else State.unknown(error or "missing_condition:melt_composition")
-    )
-    role = composition_roles.resolve_composition_role(
-        point, obs.values, composition=composition
-    )
+    source = role.source_label or "none"
     if role.initial_charge_only and source.startswith((
         "extract composition_wt_pct",
         "extract sample_oxide_composition_wt_pct",
@@ -3932,14 +4017,8 @@ def _resolve_melt_recipe(
 def _record_composition_role(
     runtime: dict[str, Any],
     role: RoleResolution[dict[str, float]],
-    *,
-    include_declared: bool = False,
 ) -> str | None:
-    if (
-        not role.flags
-        or not role.callable
-        or (not include_declared and role.status is not RoleStatus.DEFAULTED)
-    ):
+    if not role.flags or not role.callable:
         return None
     flag = role.flags[0]
     runtime["input_assumption"] = (
@@ -3955,6 +4034,7 @@ def _melt_recipe_mol(
     obs: AdoptedObservation,
     *,
     point: Mapping[str, Any] | None = None,
+    parent_fallback: bool = True,
 ) -> tuple[dict[str, float] | None, str, str | None]:
     """Resolve an extract recipe to oxide moles, refusing declared composition gaps."""
 
@@ -3969,20 +4049,7 @@ def _melt_recipe_mol(
             "sample_oxide_composition_wt_pct",
         )
         point_conditions = point.get("point_conditions")
-        located_composition = (
-            point_conditions.get("composition")
-            if isinstance(point_conditions, Mapping)
-            else None
-        )
-        located_state = (
-            located_composition.get("state")
-            if isinstance(located_composition, Mapping)
-            else None
-        )
-        point_has_located_composition = (
-            isinstance(located_state, Mapping)
-            and located_state.get("tag") == "value"
-        )
+        point_has_located_composition = _located_composition_is_value(point)
         point_has_named_recipe = any(
             isinstance(point.get(key), Mapping) and bool(point.get(key))
             for key in point_recipe_keys
@@ -4014,6 +4081,24 @@ def _melt_recipe_mol(
                 return None, source, errors[0] if errors else "missing_condition:melt_composition"
             composition = battery_migrate.wt_pct_to_mole_fraction(flat)
             return {oxide: float(amount) for oxide, amount in composition.components}, source, None
+        # Alkali overlays and a source-observation id are applied to the parent
+        # recipe below. Stopping here would drop that printed adjustment.
+        carries_parent_adjustment = any(
+            point.get(key) is not None
+            for key in (
+                "sample_Na2O_wt_pct",
+                "sample_K2O_wt_pct",
+                "composition_source_observation_id",
+            )
+        )
+        if (
+            not parent_fallback
+            and not point_has_located_composition
+            and not point_has_named_recipe
+            and not point.get("composition_source_gap")
+            and not carries_parent_adjustment
+        ):
+            return None, "none", "missing_condition:melt_composition"
         if point_has_located_composition or point_has_named_recipe or point.get("composition_source_gap"):
             # A point's own suite or explicit gap takes precedence over the parent recipe.
             for key in (

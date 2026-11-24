@@ -10,6 +10,10 @@ from pathlib import Path
 import pytest
 
 from simulator.battery import migrate as battery_migrate
+from simulator.battery.records import (
+    INITIAL_CHARGE_ONLY_PROXY_FLAG,
+    INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+)
 from simulator.diagnostic_helpers.extract_reproduction import (
     AdoptedObservation,
     _literature_pressure_points,
@@ -157,8 +161,8 @@ def test_digitized_12022_entry_point_emits_flagged_record_for_every_point(
     assert evaluation.skip_reason is not None
     assert evaluation.skip_reason.startswith("typed-refusal:")
     assert evaluation.skip_reason in evaluation.skip_reasons
-    assert battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG in evaluation.skip_reason
-    assert battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE in evaluation.skip_reason
+    assert INITIAL_CHARGE_ONLY_PROXY_FLAG in evaluation.skip_reason
+    assert INITIAL_CHARGE_ONLY_PROXY_NOTICE in evaluation.skip_reason
     assert "pO2_bar" in evaluation.skip_reason
     assert "contextual" in evaluation.skip_reason.lower()
     assert len(engine_calls) == 6
@@ -171,8 +175,8 @@ def test_digitized_12022_entry_point_emits_flagged_record_for_every_point(
         record.status != "unsupported-observable" for record in evaluation.records
     )
     expected_assumption = {
-        "flag": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_FLAG,
-        "reason": battery_migrate.INITIAL_CHARGE_ONLY_PROXY_NOTICE,
+        "flag": INITIAL_CHARGE_ONLY_PROXY_FLAG,
+        "reason": INITIAL_CHARGE_ONLY_PROXY_NOTICE,
     }
     assert len(comparisons) == 6
     assert all(assumed_input for assumed_input, _runtime in comparisons)

@@ -1519,7 +1519,8 @@ def test_numeric_activity_executes_melt_activity_model(
     comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
     assert calls == []
     assert not comparable
-    assert {r.status for r in evaluation.records} == {"assumed-input"}
+    assert {record.status for record in evaluation.records} == {"out-of-domain"}
+    assert all(record.actual_value is None for record in evaluation.records)
     assert (
         "typed-refusal:missing_condition:melt_composition"
         in evaluation.skip_reasons

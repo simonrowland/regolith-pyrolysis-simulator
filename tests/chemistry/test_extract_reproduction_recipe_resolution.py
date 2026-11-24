@@ -332,6 +332,12 @@ def _rate_observation() -> AdoptedObservation:
                     "composition_role": "unreported",
                 },
                 {
+                    "T_K": 1550.0,
+                    "rate_mol_m2_s": 1.0e-6,
+                    "composition_wt_pct": {"SiO2": 50, "MgO": 50},
+                    "composition_role": "initial_charge_only",
+                },
+                {
                     "T_K": 1600.0,
                     "rate_mol_m2_s": 1.0e-6,
                 },
@@ -348,14 +354,19 @@ def test_rate_point_keeps_its_role_and_assay(monkeypatch) -> None:
     obs = _rate_observation()
     parsed, skip, _drops = _literature_rate_points(obs)
     assert skip is None
-    assert parsed is not None and len(parsed) == 2
+    assert parsed is not None and len(parsed) == 3
     assert parsed[0]["composition_role"] == "unreported"
     assert parsed[0]["source_point"]["composition_wt_pct"] == {"SiO2": 60, "MgO": 40}
-    assert "composition_role" not in parsed[1]
+    assert parsed[1]["composition_role"] == "initial_charge_only"
+    assert "composition_role" not in parsed[2]
     point_recipe, _source, point_error = _melt_recipe_mol(obs, point=parsed[0])
+    declared_recipe, _declared_source, declared_error = _melt_recipe_mol(
+        obs, point=parsed[1]
+    )
     parent_recipe, _parent_source, parent_error = _melt_recipe_mol(obs)
-    assert point_error is None and parent_error is None
+    assert point_error is None and declared_error is None and parent_error is None
     assert point_recipe != parent_recipe
+    assert declared_recipe != parent_recipe
     calls = []
 
     def melt_stub(*_args, **kwargs):
@@ -371,15 +382,20 @@ def test_rate_point_keeps_its_role_and_assay(monkeypatch) -> None:
     )
     monkeypatch.setattr(extract_reproduction, "langmuir_molar_flux", lambda *_a, **_k: 1.0e-6)
     result = _evaluate_rate(obs, ObservationEvaluation(observation=obs), {}, 1.0e-8)
-    assert calls == [point_recipe, parent_recipe]
-    assert [record.status for record in result.records] == ["assumed-input", "match"]
+    assert calls == [point_recipe, declared_recipe, parent_recipe]
+    assert [record.status for record in result.records] == [
+        "assumed-input",
+        "assumed-input",
+        "match",
+    ]
+    assert result.records[1].status != "match"
     assert composition_roles.is_role_default_reason(result.skip_reason)
 
 
 def test_restoring_flat_decode_before_the_gap_breaks_the_pressure_pin(monkeypatch) -> None:
     real = extract_reproduction._melt_recipe_mol
 
-    def restored(obs, *, point=None):
+    def restored(obs, *, point=None, parent_fallback=True):
         if isinstance(point, Mapping) and point.get("composition_source_gap"):
             stripped = {
                 key: value
@@ -393,8 +409,8 @@ def test_restoring_flat_decode_before_the_gap_breaks_the_pressure_pin(monkeypatc
                     for key, value in source.items()
                     if key != "composition_source_gap"
                 }
-            return real(obs, point=stripped)
-        return real(obs, point=point)
+            return real(obs, point=stripped, parent_fallback=parent_fallback)
+        return real(obs, point=point, parent_fallback=parent_fallback)
 
     monkeypatch.setattr(extract_reproduction, "_melt_recipe_mol", restored)
     with pytest.raises(AssertionError):
@@ -412,16 +428,29 @@ def test_reusing_the_parent_rate_recipe_breaks_the_point_pin(monkeypatch) -> Non
         test_rate_point_keeps_its_role_and_assay(monkeypatch)
 
 
+def test_dropping_declared_role_flags_breaks_the_rate_pin(monkeypatch) -> None:
+    real = extract_reproduction._record_composition_role
+
+    def drop_declared(runtime, role):
+        if role.status is not composition_roles.RoleStatus.DEFAULTED:
+            return None
+        return real(runtime, role)
+
+    monkeypatch.setattr(extract_reproduction, "_record_composition_role", drop_declared)
+    with pytest.raises(AssertionError):
+        test_rate_point_keeps_its_role_and_assay(monkeypatch)
+
+
 @pytest.mark.parametrize("consumer", ["migration", "pressure", "scoring"])
 def test_bypassing_role_resolution_breaks_the_consumer_pin(
     monkeypatch, tmp_path, consumer
 ) -> None:
-    resolve = composition_roles.resolve_composition_role
+    resolve = composition_roles.resolve_point_composition
 
-    def bypass(row, parent=None, **kwargs):
+    def bypass(row, parent=None, candidates=(), **kwargs):
         observation = isinstance(row, composition_roles.Observation)
         if consumer == "scoring" and observation:
-            return replace(resolve(row, parent, **kwargs), notices=())
+            return replace(resolve(row, parent, candidates, **kwargs), notices=())
         if not observation and consumer != "scoring":
             if isinstance(row, Mapping):
                 row = {
@@ -435,9 +464,9 @@ def test_bypassing_role_resolution_breaks_the_consumer_pin(
                     for key, value in parent.items()
                     if key != composition_roles.COMPOSITION_ROLE_FIELD
                 }
-        return resolve(row, parent, **kwargs)
+        return resolve(row, parent, candidates, **kwargs)
 
-    monkeypatch.setattr(composition_roles, "resolve_composition_role", bypass)
+    monkeypatch.setattr(composition_roles, "resolve_point_composition", bypass)
     with pytest.raises(AssertionError):
         if consumer == "migration":
             test_flat_run_unknown_role_is_flagged_at_scorer_boundary(tmp_path)
