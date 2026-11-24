@@ -9,6 +9,14 @@ import yaml
 import simulator.field_preregistration as field_preregistration
 from simulator.diagnostic_helpers.reproduction_compare import content_digest
 
+FROZEN_EXAMPLE = (
+    Path(__file__).resolve().parents[1]
+    / "data"
+    / "field-preregistration"
+    / "robinot-2026-example"
+    / "v1"
+)
+
 
 def _freeze(tmp_path: Path, *, version: int = 1, predecessor_digest: str | None = None):
     return field_preregistration._freeze_field_run(
@@ -99,3 +107,25 @@ def test_immutability_test_detects_overwrite_guard_mutation(
 
     with pytest.raises(AssertionError, match="allowed v1 overwrite"):
         assert_rewrite_refused()
+
+
+def test_robinot_example_bundle_is_frozen_without_invented_predictions() -> None:
+    setup = yaml.safe_load((FROZEN_EXAMPLE / "setup.yaml").read_text(encoding="utf-8"))
+    resolved = yaml.safe_load(
+        (FROZEN_EXAMPLE / "resolved.yaml").read_text(encoding="utf-8")
+    )
+    bundle = json.loads((FROZEN_EXAMPLE / "bundle.json").read_text(encoding="utf-8"))
+    digest = (FROZEN_EXAMPLE / "bundle.sha256").read_text(encoding="utf-8").strip()
+
+    assert setup["recipe"]["lab_schedule"]["id"] == "robinot_2026_schedule"
+    assert resolved["lab_geometry"]["sample"]["mass_g"] == 3.38
+    assert resolved["lab_geometry"]["pump"]["pumping_speed_m3_s"] is None
+    assert bundle["provider_runtime_identity"]["status"] == "not_executed"
+    assert bundle["predicted_series"] == {
+        "o2_cumulative_kg": None,
+        "o2_window_kg": None,
+        "wall_deposits_committed_kg": None,
+        "melt_inventory_snapshots": None,
+    }
+    assert bundle["flags"][1]["kind"] == "prediction_not_run"
+    assert digest == content_digest(bundle)

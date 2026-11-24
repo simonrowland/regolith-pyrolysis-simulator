@@ -1,0 +1,454 @@
+recipe:
+  process_dt_s: 60
+  source_tags:
+    feedstock.total_Fe:
+      source_class: literature_sidecar
+      source_ref: "REF-031 Engelschi\xF8n et al. 2020 EAC-1A XRF"
+      citation_id: engelschion_2020
+      locator: major-oxide table; total Fe reported as FeO
+    run.assumed_FeO:
+      source_class: assumption_with_sensitivity_marker
+      registry_default_id: example:assumed-feo-basis
+      flag:
+        kind: assumed_input
+        reason: separate redox FeO basis is not a measured field in this example
+  lab_schedule:
+    id: robinot_2026_schedule
+    duration_h: 1.0
+    duration_qualifier: approximate
+    duration_source_class: literature_sidecar
+    duration_source_ref: robinot_2026_methods
+    duration_citation_id: robinot_2026
+    interpolation: piecewise_linear
+    interpolation_source_class: assumption_with_sensitivity_marker
+    interpolation_citation_id: robinot_2026
+    interpolation_extraction_note: Findings anchor reports about 1 h heating and a
+      peak near 1800 C, not a paper-reported T(t) profile; piecewise-linear interpolation
+      is a sensitivity-marked schedule-shape assumption.
+    furnace_ceiling_C: 1800
+    furnace_ceiling_qualifier: approximate_peak
+    furnace_ceiling_source_class: literature_sidecar
+    furnace_ceiling_source_ref: robinot_2026_methods
+    furnace_ceiling_citation_id: robinot_2026
+    experiment_windows:
+      heating:
+        start_h: 0.0
+        end_h: 1.0
+      measured:
+        start_h: 0.0
+        end_h: 1.0
+      cooldown:
+        reported: true
+        deposit_sampling: cooldown_or_post_run
+    window_semantics:
+      preheat_h: 0.0
+      measured_window_start_h: 0.0
+      measured_window_end_h: 1.0
+      cooldown_h: 0.0
+      deposit_sample_basis: after_cooldown
+    melt_temperature_C:
+    - t_h: 0.0
+      value: 25
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: initial_temperature_not_reported_room_temperature_assumption
+    - t_h: 1.0
+      value: 1800
+      unit: C
+      qualifier: approximate_peak
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+    chamber_pressure_mbar:
+    - t_h: 0.0
+      value: 13.0
+      unit: mbar
+      qualifier: approximate
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+    - t_h: 1.0
+      value: 13.0
+      unit: mbar
+      qualifier: approximate
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+    gas_boundary:
+      background_gas:
+        species: Ar
+        mole_fraction: 1.0
+        source_class: literature_sidecar
+        source_ref: robinot_2026_methods
+        citation_id: robinot_2026
+        digest: 'Robinot carrier-gas anchor: argon sweep at about 13 mbar.'
+      imposed_flow:
+        value: 0.3
+        unit: NL_min
+        source_class: literature_sidecar
+        source_ref: robinot_2026_methods
+        citation_id: robinot_2026
+        digest: 'Robinot imposed-flow anchor: 0.3 NL/min Ar.'
+      pressure_control:
+        mode: flow_through_with_pump
+        pressure_driver: imposed
+        source_class: assumption_with_sensitivity_marker
+        pump_throughput_source: assumption_with_sensitivity_marker
+        source_ref: robinot_2026_methods
+        citation_id: robinot_2026
+        extraction_note: pressure_control_mode_not_reported_flow_through_runtime_assumption.
+          pressure_driver is imposed because the pump speed and the conductance path
+          are not printed.
+        digest: The reported achieved chamber pressure drives runtime because pressure_driver
+          is imposed. Flow-through control topology is assumed only to express the
+          boundary. No pump speed is inferred or used to generate pressure. The apparatus
+          is not fully specified.
+    surface_temperature_C:
+      holder:
+      - t_h: 0.0
+        value: 25
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: holder_temperature_not_reported
+      - t_h: 1.0
+        value: 1500
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: holder_temperature_not_reported
+      window:
+      - t_h: 0.0
+        value: 25
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: window_temperature_not_reported
+      - t_h: 1.0
+        value: 80
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: window_temperature_not_reported
+      condenser:
+      - t_h: 0.0
+        value: 25
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: condenser_temperature_not_reported
+      - t_h: 1.0
+        value: 25
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: condenser_temperature_not_reported
+      filter:
+      - t_h: 0.0
+        value: 25
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: filter_temperature_not_reported
+      - t_h: 1.0
+        value: 80
+        unit: C
+        source_class: assumption_with_sensitivity_marker
+        citation_id: robinot_2026
+        extraction_note: filter_temperature_not_reported
+lab_geometry:
+  id: robinot_2026_geometry
+  scale: gram_lab
+  equipment_sizing: lab_fixed_geometry
+  geometry_status: populated_with_assumption_geometry
+  sample:
+    mass_g: 3.38
+    mass_qualifier: reported
+    mass_source_class: literature_sidecar
+    mass_source_ref: robinot_2026_methods
+    mass_citation_id: robinot_2026
+    mass_digest: Robinot anchor reports an EAC-1 pellet mass of 3.38 g.
+    crucible_material: null
+    crucible_material_reason: not_printed
+    pellet_diameter_mm: 13
+    pellet_height_mm: 10
+    focal_spot_diameter_mm: 20
+    focal_spot_diameter_qualifier: approximate
+    focal_spot_source_class: literature_sidecar
+    focal_spot_citation_id: robinot_2026
+    focal_spot_digest: Section 3.1 prints a focal spot roughly 2 cm across. Eq. (6)
+      is the power concentrated at that spot.
+    radiating_face_set: hot_upper
+    radiating_face_set_source_class: literature_sidecar
+    radiating_face_set_citation_id: robinot_2026
+    radiating_face_set_digest: Fig. 3 shows the lower half still solid, so the booked
+      surface is the top face plus the hot upper side. The full side is the bound
+      reported beside it.
+    pressed_at_tons: 2.5
+    pellet_source_class: literature_sidecar
+    pellet_citation_id: robinot_2026
+    pellet_digest: Section 3.2 prints a pellet 13 mm in diameter and 10 mm in height,
+      pressed at 2.5 tons. Those dimensions are not an exposed-area measurement.
+    exposed_melt_area_m2: 0.00013273228961416876
+    exposed_melt_area_basis: assumed_pellet_top_face_from_reported_diameter
+    exposed_melt_area_source_class: assumption_with_sensitivity_marker
+    exposed_melt_area_source_ref: robinot_2026_methods
+    exposed_melt_area_citation_id: robinot_2026
+    exposed_melt_area_digest: The top face from the reported 13 mm pellet diameter
+      is an explicit deck assumption, not a measured liquid footprint.
+    exposed_melt_area_notice:
+      kind: deck_declared_assumption
+      field: exposed_melt_area_m2
+      basis: assumed_pellet_top_face_from_reported_diameter
+      ruling_ref: t-1892_2026-11-22
+      derivation: pi*(D/2)^2 from the reported D=13 mm
+      reason: liquid_footprint_not_printed
+      source: Robinot section 3.2 reports the 13 mm pellet diameter; its top face
+        is assumed as the evaporating area.
+    crucible_opening_area_m2: null
+    crucible_opening_area_reason: not_printed
+    named_missing_fields:
+    - crucible_material
+    - crucible_opening_area_m2
+  chamber:
+    volume_m3: null
+    volume_reason: not_printed
+    wall_area_m2: null
+    wall_temperature_profile: window
+    named_missing_fields:
+    - chamber_volume_m3
+    - chamber_wall_area_m2
+  surfaces:
+  - id: holder
+    role: sample_holder
+    area_m2: 0.000314
+    equivalent_diameter_m: 0.02
+    view_factor_from_melt: 0.35
+    line_of_sight_to_melt: true
+    temperature_profile: holder
+    source_class: assumption_with_sensitivity_marker
+    sensitivity_marker: robinot_holder_area_view_factor_sweep
+    source_ref: robinot_2026_apparatus
+    citation_id: robinot_2026
+    extraction_note: Robinot Sec. 2.2 states the sample was on a water-cooled steel
+      holder and reports a roughly 2 cm focal spot; holder capture area/view factor
+      are not stated, so the active holder area is assumed from that spot and must
+      remain in sensitivity sweeps.
+  - id: window
+    role: transparent_wall
+    area_m2: 0.01
+    equivalent_diameter_m: 0.113
+    view_factor_from_melt: 0.25
+    line_of_sight_to_melt: true
+    temperature_profile: window
+    source_class: assumption_with_sensitivity_marker
+    sensitivity_marker: robinot_window_area_view_factor_sweep
+    source_ref: robinot_2026_apparatus
+    citation_id: robinot_2026
+    extraction_note: Robinot Sec. 4.1 reports visible opacification of the reactor
+      glass and Fig. 4c includes recovered material locations; transparent wall area/view
+      factor are not stated, so a 0.01 m2 exposed glass surface is an assumption with
+      sensitivity coverage.
+  - id: condenser
+    role: collector
+    area_m2: 0.005
+    equivalent_diameter_m: 0.08
+    view_factor_from_melt: 0.3
+    line_of_sight_to_melt: true
+    temperature_profile: condenser
+    source_class: assumption_with_sensitivity_marker
+    sensitivity_marker: robinot_condenser_area_view_factor_sweep
+    source_ref: robinot_2026_apparatus
+    citation_id: robinot_2026
+    extraction_note: Robinot Sec. 2.2 states a refrigerated copper condenser was positioned
+      above the reactor; collector area/view factor are not stated, so an 80 mm equivalent
+      collector is an assumption with sensitivity coverage.
+  - id: filter
+    role: downstream_filter
+    area_m2: 0.002
+    equivalent_diameter_m: 0.05
+    view_factor_from_melt: 0.05
+    line_of_sight_to_melt: false
+    temperature_profile: filter
+    source_class: assumption_with_sensitivity_marker
+    sensitivity_marker: robinot_filter_area_view_factor_sweep
+    source_ref: robinot_2026_apparatus
+    citation_id: robinot_2026
+    extraction_note: Robinot Sec. 2.2 states a PORAL grade 03 316L porous filter sat
+      between reactor and pump; filter area/view factor are not stated, so a 50 mm
+      equivalent downstream filter is an assumption with sensitivity coverage.
+  pump:
+    model: Edwards NDX15
+    model_source_class: literature_sidecar
+    model_citation_id: robinot_2026
+    model_digest: Section 3.1 names a scroll pump (Edwards NDX15) with a vacuum limit
+      of 7e-3 mbar. It does not print a pumping speed.
+    vacuum_limit_mbar: 0.007
+    vacuum_limit_source_class: literature_sidecar
+    vacuum_limit_citation_id: robinot_2026
+    pumping_speed_m3_s: null
+    pumping_speed_reason: not_printed
+    ultimate_pressure_pa: null
+    ultimate_pressure_reason: The paper prints a vacuum limit, not a throughput ultimate.
+      vacuum_limit_mbar records the printed limit and is not a speed model.
+    port_area_m2: null
+    port_area_reason: not_printed
+    conductance_path: null
+    conductance_path_reason: not_printed
+    balance_temperature_K: null
+    balance_temperature_reason: Chamber gas temperature is not printed. pressure_driver
+      is imposed, so the balance temperature is not a runtime input.
+    named_missing_fields:
+    - pumping_speed_m3_s
+    - ultimate_pressure_pa
+    - port_area_m2
+    - conductance_path
+    - balance_temperature_K
+lab_schedule:
+  id: robinot_2026_schedule
+  duration_h: 1.0
+  duration_qualifier: approximate
+  duration_source_class: literature_sidecar
+  duration_source_ref: robinot_2026_methods
+  duration_citation_id: robinot_2026
+  interpolation: piecewise_linear
+  interpolation_source_class: assumption_with_sensitivity_marker
+  interpolation_citation_id: robinot_2026
+  interpolation_extraction_note: Findings anchor reports about 1 h heating and a peak
+    near 1800 C, not a paper-reported T(t) profile; piecewise-linear interpolation
+    is a sensitivity-marked schedule-shape assumption.
+  furnace_ceiling_C: 1800
+  furnace_ceiling_qualifier: approximate_peak
+  furnace_ceiling_source_class: literature_sidecar
+  furnace_ceiling_source_ref: robinot_2026_methods
+  furnace_ceiling_citation_id: robinot_2026
+  experiment_windows:
+    heating:
+      start_h: 0.0
+      end_h: 1.0
+    measured:
+      start_h: 0.0
+      end_h: 1.0
+    cooldown:
+      reported: true
+      deposit_sampling: cooldown_or_post_run
+  window_semantics:
+    preheat_h: 0.0
+    measured_window_start_h: 0.0
+    measured_window_end_h: 1.0
+    cooldown_h: 0.0
+    deposit_sample_basis: after_cooldown
+  melt_temperature_C:
+  - t_h: 0.0
+    value: 25
+    unit: C
+    source_class: assumption_with_sensitivity_marker
+    citation_id: robinot_2026
+    extraction_note: initial_temperature_not_reported_room_temperature_assumption
+  - t_h: 1.0
+    value: 1800
+    unit: C
+    qualifier: approximate_peak
+    source_class: literature_sidecar
+    source_ref: robinot_2026_methods
+    citation_id: robinot_2026
+  chamber_pressure_mbar:
+  - t_h: 0.0
+    value: 13.0
+    unit: mbar
+    qualifier: approximate
+    source_class: literature_sidecar
+    source_ref: robinot_2026_methods
+    citation_id: robinot_2026
+  - t_h: 1.0
+    value: 13.0
+    unit: mbar
+    qualifier: approximate
+    source_class: literature_sidecar
+    source_ref: robinot_2026_methods
+    citation_id: robinot_2026
+  gas_boundary:
+    background_gas:
+      species: Ar
+      mole_fraction: 1.0
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+      digest: 'Robinot carrier-gas anchor: argon sweep at about 13 mbar.'
+    imposed_flow:
+      value: 0.3
+      unit: NL_min
+      source_class: literature_sidecar
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+      digest: 'Robinot imposed-flow anchor: 0.3 NL/min Ar.'
+    pressure_control:
+      mode: flow_through_with_pump
+      pressure_driver: imposed
+      source_class: assumption_with_sensitivity_marker
+      pump_throughput_source: assumption_with_sensitivity_marker
+      source_ref: robinot_2026_methods
+      citation_id: robinot_2026
+      extraction_note: pressure_control_mode_not_reported_flow_through_runtime_assumption.
+        pressure_driver is imposed because the pump speed and the conductance path
+        are not printed.
+      digest: The reported achieved chamber pressure drives runtime because pressure_driver
+        is imposed. Flow-through control topology is assumed only to express the boundary.
+        No pump speed is inferred or used to generate pressure. The apparatus is not
+        fully specified.
+  surface_temperature_C:
+    holder:
+    - t_h: 0.0
+      value: 25
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: holder_temperature_not_reported
+    - t_h: 1.0
+      value: 1500
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: holder_temperature_not_reported
+    window:
+    - t_h: 0.0
+      value: 25
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: window_temperature_not_reported
+    - t_h: 1.0
+      value: 80
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: window_temperature_not_reported
+    condenser:
+    - t_h: 0.0
+      value: 25
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: condenser_temperature_not_reported
+    - t_h: 1.0
+      value: 25
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: condenser_temperature_not_reported
+    filter:
+    - t_h: 0.0
+      value: 25
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: filter_temperature_not_reported
+    - t_h: 1.0
+      value: 80
+      unit: C
+      source_class: assumption_with_sensitivity_marker
+      citation_id: robinot_2026
+      extraction_note: filter_temperature_not_reported
+process_dt_s: 60
+duration_h: 0.9833333333333333
