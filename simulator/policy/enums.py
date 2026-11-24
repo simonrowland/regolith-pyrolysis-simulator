@@ -8,6 +8,8 @@ from enum import StrEnum
 class NoticeKind(StrEnum):
     FLOOR_INVERSION = "floor_inversion"
     FALLBACK = "fallback"
+    SOSSI_GAS_BOUNDARY_UNVERIFIED = "sossi_gas_boundary_unverified"
+    SCCM_REFERENCE_STATE_UNREPORTED = "sccm_reference_state_unreported"
     OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"

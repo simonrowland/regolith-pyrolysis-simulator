@@ -5260,11 +5260,9 @@ def _sossi_initial_inventory(
         for oxide, value in wt_pct.items()
     }
     for element, parent in _SOSSI_TRACE_PARENTS.items():
-        ppm = float(starting_trace_ppm.get(element, math.nan))
-        if not math.isfinite(ppm) or ppm <= 0.0:
-            raise ResidueInventoryRefusal(
-                "starting_component_ppm_missing", f"missing positive {element} starting ppm"
-            )
+        ppm = _sossi_positive_starting_ppm(starting_trace_ppm.get(element))
+        if ppm is None:
+            continue
         _atoms, element_molar_mass = _formula_terms(element)
         element_mass_kg = ppm * 1.0e-6 * mass_kg
         inventory[parent] = inventory.get(parent, 0.0) + (
@@ -5273,6 +5271,26 @@ def _sossi_initial_inventory(
     return inventory, mass_kg, math.fsum(
         amount * _formula_terms(oxide)[1] for oxide, amount in inventory.items()
     )
+
+
+def _sossi_positive_starting_ppm(raw: object) -> float | None:
+    """Return a finite positive starting ppm, using the cohort's validity rule."""
+    try:
+        ppm = float(raw)
+    except (TypeError, ValueError, OverflowError):
+        return None
+    return ppm if math.isfinite(ppm) and ppm > 0.0 else None
+
+
+def _sossi_element_refusal(
+    reason: str, element: str, experiment_id: str, detail: str
+) -> dict[str, str]:
+    return {
+        "reason": reason,
+        "species": element,
+        "row": experiment_id,
+        "detail": detail,
+    }
 
 
 def _sossi_geometry_areas(sample_mass_kg: float) -> dict[str, float]:
@@ -5482,7 +5500,7 @@ def _predict_sossi_residue_cohort(
     experiments: Sequence[Mapping[str, Any]],
     runtime_catalog: Mapping[str, Any],
     *,
-    starting_trace_ppm_by_experiment: Mapping[str, Mapping[str, float]],
+    starting_trace_ppm_by_experiment: Mapping[str, Mapping[str, object]],
     buffered_fO2_log_by_experiment: Mapping[str, float],
     engine: str,
     selected_experiment_ids: frozenset[str] | None = None,
@@ -5543,6 +5561,28 @@ def _predict_sossi_residue_cohort(
         gas_channels = []
 
     prediction_rows: list[_SossiResiduePrediction] = []
+
+    def append_refused_run(
+        experiment_id: str,
+        missing_elements: Sequence[str],
+        element_refusals: Mapping[str, Mapping[str, str]],
+    ) -> None:
+        prediction_rows.append(
+            _SossiResiduePrediction(
+                experiment_id=experiment_id,
+                primary_element_ppm={},
+                geometry_element_ppm={},
+                sensitivity_band_ppm={},
+                channel_missing_elements=tuple(missing_elements),
+                provenance={
+                    "source_id": _SOSSI_SOURCE_ID,
+                    "experiment_id": experiment_id,
+                    "engine": engine,
+                    "element_refusals": dict(element_refusals),
+                },
+            )
+        )
+
     for experiment in experiments:
         experiment_id = str(experiment.get("experiment_id") or "")
         if not experiment_id:
@@ -5552,23 +5592,68 @@ def _predict_sossi_residue_cohort(
             and experiment_id not in selected_experiment_ids
         ):
             continue
-        schedule = experiment.get("thermal_schedule", {})
-        setpoints = schedule.get("setpoints_and_holds", ())
-        if not setpoints or not isinstance(setpoints[0], Mapping):
-            raise ResidueInventoryRefusal("sossi_temperature_missing")
-        temperature_K = _hashimoto_point_value(
-            setpoints[0].get("temperature_K", {})
-        )
-        duration_s = _hashimoto_point_value(
-            schedule.get("total_duration_s", {})
-        )
-        sample = experiment.get("sample") or {}
-        total_pressure_Pa = _hashimoto_point_value(
-            experiment.get("pressure_environment", {}).get("total_pressure_Pa", {})
-        )
-        inventory, sample_mass_kg, initial_melt_mass_kg = _sossi_initial_inventory(
-            experiment, starting_trace_ppm_by_experiment.get(experiment_id, {})
-        )
+        try:
+            schedule = experiment.get("thermal_schedule")
+            if not isinstance(schedule, Mapping):
+                raise ResidueInventoryRefusal("sossi_temperature_missing")
+            setpoints = schedule.get("setpoints_and_holds", ())
+            if not setpoints or not isinstance(setpoints[0], Mapping):
+                raise ResidueInventoryRefusal("sossi_temperature_missing")
+            temperature_K = _hashimoto_point_value(
+                setpoints[0].get("temperature_K", {})
+            )
+            duration_s = _hashimoto_point_value(
+                schedule.get("total_duration_s", {})
+            )
+            sample = experiment.get("sample") or {}
+            pressure_environment = experiment.get("pressure_environment")
+            if not isinstance(pressure_environment, Mapping):
+                raise ResidueInventoryRefusal("sossi_pressure_missing")
+            total_pressure_Pa = _hashimoto_point_value(
+                pressure_environment.get("total_pressure_Pa", {})
+            )
+            inventory, sample_mass_kg, initial_melt_mass_kg = (
+                _sossi_initial_inventory(
+                    experiment,
+                    starting_trace_ppm_by_experiment.get(experiment_id, {}),
+                )
+            )
+        except ResidueInventoryRefusal as exc:
+            prediction_rows.append(
+                _SossiResiduePrediction(
+                    experiment_id=experiment_id,
+                    primary_element_ppm={},
+                    geometry_element_ppm={},
+                    sensitivity_band_ppm={},
+                    channel_missing_elements=(),
+                    provenance={
+                        "source_id": _SOSSI_SOURCE_ID,
+                        "experiment_id": experiment_id,
+                        "engine": engine,
+                        "run_refusal": {
+                            "reason": exc.reason,
+                            "detail": exc.detail,
+                        },
+                    },
+                )
+            )
+            continue
+        trace_inputs = starting_trace_ppm_by_experiment.get(experiment_id, {})
+        element_refusals: dict[str, dict[str, str]] = {}
+        for element in _SOSSI_TRACE_PARENTS:
+            if _sossi_positive_starting_ppm(trace_inputs.get(element)) is None:
+                element_refusals[element] = _sossi_element_refusal(
+                    "starting_component_ppm_missing",
+                    element,
+                    experiment_id,
+                    (
+                        f"missing positive starting_component_ppm for {element} "
+                        f"in {experiment_id}"
+                    ),
+                )
+        if len(element_refusals) == len(_SOSSI_TRACE_PARENTS):
+            append_refused_run(experiment_id, (), element_refusals)
+            continue
         try:
             buffered_logp = float(buffered_fO2_log_by_experiment[experiment_id])
         except (KeyError, TypeError, ValueError, OverflowError) as exc:
@@ -5579,6 +5664,8 @@ def _predict_sossi_residue_cohort(
         selected_channels: list[tuple[str, str, float, str]] = []
         missing_elements: list[str] = []
         for element, parent in _SOSSI_TRACE_PARENTS.items():
+            if element in element_refusals:
+                continue
             available = [
                 item for item in gas_channels if item[1] == parent
             ] if engine == "openimcc" else [
@@ -5618,10 +5705,21 @@ def _predict_sossi_residue_cohort(
                 added += 1
             if added == 0:
                 missing_elements.append(element)
-        if len(missing_elements) == len(_SOSSI_TRACE_PARENTS):
-            raise ResidueInventoryRefusal(
-                "channel_missing", ",".join(missing_elements)
-            )
+        if len(set(missing_elements) | set(element_refusals)) == len(
+            _SOSSI_TRACE_PARENTS
+        ):
+            for element in missing_elements:
+                element_refusals.setdefault(
+                    element,
+                    _sossi_element_refusal(
+                        "channel_missing",
+                        element,
+                        experiment_id,
+                        f"no supported evaporation channel for {element} in {experiment_id}",
+                    ),
+                )
+            append_refused_run(experiment_id, missing_elements, element_refusals)
+            continue
         # A missing channel is a refusal for that element, never a retained
         # trace prediction. Remove its unsupported oxide from this engine's
         # starting inventory before evaluating the supported channel.
@@ -5646,7 +5744,7 @@ def _predict_sossi_residue_cohort(
             }
             mno_channel_active = any(
                 parent == "MnO"
-                for _species, parent, _reaction_parent, _reaction_o2 in gas_channels
+                for _species, parent, _alpha, _source in selected_channels
             )
 
             def pressure_model(
@@ -5807,21 +5905,29 @@ def _predict_sossi_residue_cohort(
             channel for channel in channels if channel.species in pressure_species
         )
         for element, parent in _SOSSI_TRACE_PARENTS.items():
+            if element in element_refusals:
+                continue
             if not any(channel.parent_oxide == parent for channel in channels):
                 if element not in missing_elements:
                     missing_elements.append(element)
                 inventory.pop(parent, None)
-        if not channels:
-            raise ResidueInventoryRefusal(
-                "channel_missing", ",".join(missing_elements)
-            )
+                element_refusals.setdefault(
+                    element,
+                    _sossi_element_refusal(
+                        "channel_missing",
+                        element,
+                        experiment_id,
+                        f"no supported evaporation channel for {element} in {experiment_id}",
+                    ),
+                )
         supported_elements = tuple(
-            element for element in _SOSSI_TRACE_PARENTS if element not in missing_elements
+            element
+            for element in _SOSSI_TRACE_PARENTS
+            if element not in element_refusals and element not in missing_elements
         )
         if not supported_elements:
-            raise ResidueInventoryRefusal(
-                "channel_missing", ",".join(missing_elements)
-            )
+            append_refused_run(experiment_id, missing_elements, element_refusals)
+            continue
         initial_melt_mass_kg = math.fsum(
             amount * _formula_terms(oxide)[1]
             for oxide, amount in inventory.items()
@@ -5978,8 +6084,9 @@ def _predict_sossi_residue_cohort(
                         "shrinking sphere, and equal-volume disk are declared sensitivity assumptions"
                     ),
                     "starting_trace_ppm": dict(
-                        starting_trace_ppm_by_experiment.get(experiment_id, {})
+                        trace_inputs
                     ),
+                    "element_refusals": element_refusals,
                     "starting_trace_basis": "element ppm on the printed approximately 25 mg chemical basis",
                     "geometry_policy_id": _SOSSI_PRIMARY_GEOMETRY,
                     "geometry_areas_m2": areas,
