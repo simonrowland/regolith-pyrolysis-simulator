@@ -201,6 +201,12 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
+from simulator.battery.uncertainty_conventions import (
+    NORMAL_95_TICKET_MULTIPLIER,
+    UncertaintyConventionConflict,
+    printed_uncertainty_convention,
+    standard_uncertainty_width,
+)
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -487,7 +493,6 @@ REVIEW_BLOCKS_USE: frozenset[str] = frozenset({"rejected", "withdrawn", "retired
 # endpoint of the central 95% interval. MAD(N(0,1)) = Φ⁻¹(.75), so the
 # consistency scale is 1/Φ⁻¹(.75) = 1.482602218505602.
 DECISION_BAND_PERCENTILE = 95
-NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
 MAD_NORMAL_SCALE = Decimal("1.482602218505602")
 DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
@@ -1075,6 +1080,8 @@ class _PrintedBandResolution:
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
     standard_uncertainty_dex: Decimal | None = None
+    standard_uncertainty: Decimal | None = None
+    standard_uncertainty_unit: str | None = None
     two_sigma_band: DecisionBand | None = None
 
 
@@ -7030,7 +7037,7 @@ def _textual_printed_confidence_level(
         text = " ".join(
             str(value)
             for key, value in raw.items()
-            if key not in {"confidence_level", "locator", "parent", "k"}
+            if key not in {"confidence_level", "kind", "locator", "parent", "k"}
             and isinstance(value, str)
         )
     elif isinstance(raw, str):
@@ -7065,9 +7072,12 @@ def _stated_printed_confidence_level(
 ) -> str | None:
     raw = uncertainty.verbatim
     if isinstance(raw, Mapping):
-        confidence_level = raw.get("confidence_level", "not_stated")
-        if confidence_level != "not_stated":
-            return str(confidence_level)
+        try:
+            convention = printed_uncertainty_convention(raw)
+        except UncertaintyConventionConflict:
+            return None
+        if convention is not None:
+            return convention[0]
     return _textual_printed_confidence_level(uncertainty)
 
 
@@ -7235,6 +7245,7 @@ def _printed_uncertainty_band(
     method: MethodToken | None = None,
     band_basis: str = "row_printed",
     confidence_level_override: str | None = None,
+    native_width: bool = False,
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
@@ -7303,6 +7314,7 @@ def _printed_uncertainty_band(
                 method=method,
                 band_basis="row_printed",
                 confidence_level_override=confidence_level_override,
+                native_width=native_width,
             )
             if printed.refusal is not None:
                 return printed
@@ -7355,6 +7367,18 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution()
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
         return _PrintedBandResolution()
+    raw_declaration = uncertainty.verbatim
+    convention = None
+    if not native_width and isinstance(raw_declaration, Mapping):
+        try:
+            convention = printed_uncertainty_convention(raw_declaration)
+        except UncertaintyConventionConflict as exc:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "uncertainty_convention_conflict",
+                    "detail": str(exc),
+                }
+            )
     if _is_source_wide_kems_pressure_envelope(
         quantity, method, source_observation
     ):
@@ -7366,14 +7390,29 @@ def _printed_uncertainty_band(
             )
         )
     raw_text = _uncertainty_original(uncertainty)
-    stated_confidence_level = _stated_printed_confidence_level(uncertainty)
+    stated_confidence_level = (
+        convention[0]
+        if convention is not None
+        else None
+        if native_width
+        else _textual_printed_confidence_level(uncertainty)
+    )
     confidence_level = stated_confidence_level or "not_stated"
     if confidence_level == "not_stated" and confidence_level_override is not None:
         confidence_level = confidence_level_override
-    log10_activity_sigma = (
+    if native_width:
+        confidence_level = "not_stated"
+    log10_activity_width = (
         band_basis == "row_printed"
         and quantity is Quantity.ACTIVITY
         and _is_log10_activity_standard_deviation(raw_text)
+    )
+    log10_activity_sigma = (
+        log10_activity_width
+        and not native_width
+        and convention is None
+        and stated_confidence_level is None
+        and confidence_level_override is None
     )
     if log10_activity_sigma:
         confidence_level = "one_sigma"
@@ -7422,7 +7461,7 @@ def _printed_uncertainty_band(
         )
     source_unit = (
         "dex"
-        if log10_activity_sigma
+        if log10_activity_width
         else _uncertainty_unit(
             quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
         )
@@ -7444,7 +7483,7 @@ def _printed_uncertainty_band(
     if confidence_level == "not_stated":
         if shape == "range" or kind == "printed_range":
             kind = "printed_range"
-        elif _has_printed_plus_minus(uncertainty):
+        elif not native_width and _has_printed_plus_minus(uncertainty):
             confidence_level = "one_sigma"
             kind = "printed_1sigma"
         else:
@@ -7460,6 +7499,14 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
+    if native_width:
+        effective_convention = None
+    else:
+        effective_convention = convention or printed_uncertainty_convention(
+            raw_declaration, fallback_token=confidence_level
+        )
+    confidence_token, k_print = effective_convention or (None, None)
+    k_ticket = NORMAL_95_TICKET_MULTIPLIER if k_print is not None else Decimal(1)
     if converted is None:
         return _PrintedBandResolution(
             refusal={
@@ -7473,98 +7520,176 @@ def _printed_uncertainty_band(
     fraction_derivation = None
     if quantity is Quantity.FE3_FE2_RATIO and source_observation is not None:
         fraction_derivation = source_observation.derivation
-    if fraction_derivation is not None:
-        relation = fraction_derivation.relation or ""
-        fraction_parameters = [
+    relation = (
+        fraction_derivation.relation or ""
+        if fraction_derivation is not None
+        else ""
+    )
+    fraction_parameters = (
+        [
             parameter
             for name, parameter in fraction_derivation.parameters
             if name.removeprefix("original_") in FERRIC_FRACTION_FIELDS
         ]
-        if FERRIC_FRACTION_RELATION in relation or fraction_parameters:
-            if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_provenance_unmapped",
-                        "quantity": quantity.value,
-                        "relation": relation,
-                    }
-                )
-            fraction_state = getattr(fraction_parameters[0], "state", None)
-            fraction_r = (
-                fraction_state.value
-                if isinstance(fraction_state, State) and fraction_state.is_value
-                else None
+        if fraction_derivation is not None
+        else []
+    )
+    has_ferric_fraction = fraction_derivation is not None and (
+        FERRIC_FRACTION_RELATION in relation
+        or bool(fraction_parameters)
+    )
+    if has_ferric_fraction:
+        if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_provenance_unmapped",
+                    "quantity": quantity.value,
+                    "relation": relation,
+                }
             )
-            if not isinstance(fraction_r, Decimal):
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_input_unmapped",
-                        "quantity": quantity.value,
-                        "relation": relation,
-                    }
-                )
-            if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_unit_unmapped",
-                        "quantity": quantity.value,
-                        "source_unit": source_unit,
-                        "converted_unit": converted_unit,
-                    }
-                )
-            if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_value_mismatch",
-                        "quantity": quantity.value,
-                        "fraction": str(fraction_r),
-                        "reference": str(reference),
-                    }
-                )
-            if operation is not MetricOperation.DEX:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_metric_unmapped",
-                        "quantity": quantity.value,
-                        "operation": operation.value,
-                    }
-                )
-            confidence_width_scale = (
-                Decimal(2)
-                if confidence_level == "two_sigma"
-                else NORMAL_95_TICKET_MULTIPLIER
-                if confidence_level == "ci95"
-                else Decimal(1)
+        fraction_state = getattr(fraction_parameters[0], "state", None)
+        fraction_r = (
+            fraction_state.value
+            if isinstance(fraction_state, State) and fraction_state.is_value
+            else None
+        )
+        if not isinstance(fraction_r, Decimal):
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_input_unmapped",
+                    "quantity": quantity.value,
+                    "relation": relation,
+                }
             )
-            sigma_r = converted / confidence_width_scale
-            # FE3/Fe2 residuals use log10 distance, so propagate directly to
-            # dex at the reduction owner before the scorer applies its band policy.
-            sigma_log10_r, refusal_reason = (
-                _fe3_fe2_log10_uncertainty_from_ferric_fraction(
-                    fraction_r, sigma_r
-                )
+        if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_unit_unmapped",
+                    "quantity": quantity.value,
+                    "source_unit": source_unit,
+                    "converted_unit": converted_unit,
+                }
             )
-            if sigma_log10_r is None:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": refusal_reason
-                        or "ferric_fraction_uncertainty_propagation_unavailable",
-                        "quantity": quantity.value,
-                        "fraction": str(fraction_r),
-                        "sigma_r": str(sigma_r),
-                        "distance_to_r_one": str(Decimal(1) - fraction_r),
-                    }
-                )
-            converted = sigma_log10_r * confidence_width_scale
-            converted_unit = "dex"
+        if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_value_mismatch",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "reference": str(reference),
+                }
+            )
+        if operation is not MetricOperation.DEX:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_metric_unmapped",
+                    "quantity": quantity.value,
+                    "operation": operation.value,
+                }
+            )
+        standard_width = (
+            standard_uncertainty_width(converted, k_print)
+            if k_print is not None
+            else converted
+        )
+        sigma_r = standard_width
+        # FE3/Fe2 residuals use log10 distance, so propagate directly to
+        # dex at the reduction owner before the scorer applies its band policy.
+        sigma_log10_r, refusal_reason = (
+            _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                fraction_r,
+                sigma_r,
+                printed_half_width=converted,
+            )
+        )
+        if sigma_log10_r is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": refusal_reason
+                    or "ferric_fraction_uncertainty_propagation_unavailable",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "sigma_r": str(sigma_r),
+                    "distance_to_r_one": str(Decimal(1) - fraction_r),
+                }
+            )
+        standard_width = sigma_log10_r
+        two_sigma_r_width = standard_uncertainty_width(converted, Decimal(2))
+        two_sigma_standard_width, refusal_reason = (
+            _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                fraction_r,
+                two_sigma_r_width,
+                printed_half_width=converted,
+            )
+        )
+        if two_sigma_standard_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": refusal_reason
+                    or "ferric_fraction_uncertainty_propagation_unavailable",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "sigma_r": str(two_sigma_r_width),
+                    "distance_to_r_one": str(Decimal(1) - fraction_r),
+                }
+            )
+        converted_unit = "dex"
+    else:
+        printed_interval_metric_width = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            converted,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if printed_interval_metric_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_outside_metric_domain",
+                    "quantity": quantity.value,
+                    "original": raw_text,
+                }
+            )
+        standard_width = (
+            standard_uncertainty_width(converted, k_print)
+            if k_print is not None
+            else converted
+        )
 
-    ticket = _metric_uncertainty_width(
+    metric_standard_width = _metric_uncertainty_width(
         operation,
         quantity,
         reference,
-        converted,
+        standard_width,
         converted_unit or QUANTITY_UNITS[quantity],
     )
+    if (
+        not has_ferric_fraction
+        and metric_standard_width is None
+        and k_print is not None
+    ):
+        # The original printed interval passed the domain gate above, but
+        # dividing its linear-unit width by k can put the standard interval
+        # outside the transform's domain. Keep the admitted original interval
+        # and scale its metric width only for this otherwise-unrepresentable
+        # standard interval.
+        metric_standard_width = standard_uncertainty_width(
+            printed_interval_metric_width, k_print
+        )
+    ticket = metric_standard_width
+    exact_ticket_input = (
+        k_print == k_ticket
+        and fraction_derivation is None
+        and (
+            operation in {MetricOperation.ABSOLUTE, MetricOperation.RELATIVE}
+            or (operation is MetricOperation.DEX and converted_unit == "dex")
+        )
+    )
+    if exact_ticket_input:
+        ticket = printed_interval_metric_width
+    else:
+        if ticket is not None:
+            ticket *= k_ticket
     if ticket is None or ticket < 0 or not ticket.is_finite():
         return _PrintedBandResolution(
             refusal={
@@ -7572,9 +7697,7 @@ def _printed_uncertainty_band(
                 "quantity": quantity.value,
                 "original": raw_text,
             }
-    )
-    if confidence_level == "one_sigma" and kind == "printed_1sigma":
-        ticket *= NORMAL_95_TICKET_MULTIPLIER
+        )
     unit = (
         "dimensionless"
         if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
@@ -7599,15 +7722,36 @@ def _printed_uncertainty_band(
         ),
     )
     standard_uncertainty_dex = None
-    if operation is MetricOperation.DEX:
-        if confidence_level in {"one_sigma", "ci95"}:
-            standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
-        elif confidence_level == "two_sigma":
-            standard_uncertainty_dex = ticket / Decimal(2)
+    standard_uncertainty = None
+    standard_uncertainty_unit = None
+    if k_print is not None and confidence_token != "range_half_width":
+        standard_uncertainty = standard_width
+        standard_uncertainty_unit = converted_unit
+    if operation is MetricOperation.DEX and k_print is not None:
+        standard_uncertainty_dex = metric_standard_width
     two_sigma_band = None
     if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
+        if not has_ferric_fraction:
+            two_sigma_standard_width = standard_uncertainty_width(
+                converted, Decimal(2)
+            )
+        two_sigma_metric_width = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            two_sigma_standard_width,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if two_sigma_metric_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_outside_metric_domain",
+                    "quantity": quantity.value,
+                    "original": raw_text,
+                }
+            )
         two_sigma_band = DecisionBand(
-            ticket / NORMAL_95_TICKET_MULTIPLIER,
+            two_sigma_metric_width * NORMAL_95_TICKET_MULTIPLIER,
             unit,
             f"printed_2sigma_reading: source-printed uncertainty; original={raw_text}",
             band_basis=band_basis,
@@ -7616,6 +7760,8 @@ def _printed_uncertainty_band(
         DecisionBand(ticket, unit, rule, band_basis=band_basis),
         notice=notice,
         standard_uncertainty_dex=standard_uncertainty_dex,
+        standard_uncertainty=standard_uncertainty,
+        standard_uncertainty_unit=standard_uncertainty_unit,
         two_sigma_band=two_sigma_band,
     )
 
@@ -19407,8 +19553,8 @@ def _compile_residual_with_lineage(
                 )
                 two_sigma_band = printed.two_sigma_band
                 if two_sigma_band is not None:
-                    two_sigma_measurement_dex = (
-                        printed.standard_uncertainty_dex / Decimal(2)
+                    two_sigma_measurement_dex = standard_uncertainty_width(
+                        two_sigma_band.value, NORMAL_95_TICKET_MULTIPLIER
                     )
                     two_sigma_total_dex = (
                         _combine_independent_standard_uncertainties(

@@ -22,17 +22,41 @@ notes:
   is the requested Wang et al. (2001) source.
 - Table 1 reports bulk residue analyses after quench. The complete normalized oxide composition of each residue
   is not reconstructed from separately reported major oxides, rare-earth totals, and elemental ppm.
-- Table 2's total-melt mass-loss percentages are typed once under each printed sample ID SC1–SC16. SC1 uses the
-  Table 2 run-summary value 57.29 wt%; Table 1's 57.35 wt% disagreement is cited in that observation's locator.
+- >
+  Table 2's initial and final weights are retained with cell locators, and each migrated mass-loss fraction is
+  computed as (initial − final)/initial. Its printed percent remains separately stored: 15 rows round to the
+  Table 2 percentage at 0.01 percentage-point precision; SC1's printed masses give 57.35027223230490018148820327 wt%
+  while Table 2 prints 57.29 wt%. Table 1 reports 57.35 wt%; the source does not reconcile Table 2's discrepancy.
+- >
+  Locator audit: Table 2's 16 rows and five numeric columns were checked against the born-digital text and page render.
+  The proof string `SC1 1800 60 165.3 70.5 57.29` occurs on physical PDF page 6 (PDF index 5, published page 484).
 - Table 3 evaporation flux J and volatility J/C are author-calculated from residue compositions and a melt-density
   parameterization. They are not stored as measured total-mass evaporation rates.
 - The fitted and comparison alpha values in Table 5 are isotope fractionation factors, not Hertz–Knudsen evaporation
   coefficients; no compatible quantity token exists.
 - Table 1 reports ΣLn2O3 as the total of all rare-earth oxides. The aggregate does not have a single species formula;
   the individual La–Lu ppm values are typed.
-- Table 1 prints 1σ standard errors for individual components. Nonzero cell errors are retained as standard_errors
-  in each row; printed zero errors are omitted. The current residue-series migration does not carry these component-specific
-  errors onto migrated observations.
+- >
+  The electron-microprobe oxide grid has 16 bead rows × 6 oxide cells = 96 cells. Each row retains the six oxide
+  values and its printed nonzero widths in `standard_errors`. Eight printed zero widths are listed in the
+  observation-level `uncertainty.zero_width_cells` metadata, outside the row payload used by stable IDs. The footnote
+  identifies all 96 widths as one-sigma standard errors from replicate analyses.
+- >
+  The ion-microprobe oxide grid has 16 bead rows × 7 oxide cells = 112 cells. Its 112 printed widths are retained
+  as 94 nonzero `standard_errors` and 18 zero widths in `uncertainty.zero_width_cells`. The shared Table 1 footnote
+  identifies these as one-sigma standard errors from replicate analyses.
+- >
+  Locator audit: sample columns SC12, SC11, SC5, SC13, SC8, SC4, SC14, and SC1 use physical PDF page 4
+  (index 3, published page 482); SC7, SC2, SC16, SC6, SC3, SC15, SC10, and SC9 use page 5 (index 4, published
+  page 483). Page 4 proof: `44.9 ⫾ 0.0`; page 5 proofs: `43.0 ⫾ 0.0` and `0.001 ⫾ 0.000`. The confidence
+  statement `Uncertainties are ⫾1␴ standard errors calculated from replicate analyses` is on page 5.
+- >
+  Engine-readiness audit: the target is `residue_component_composition` on
+  `simulator/battery/enums.py::Rail.RESIDUE_COMPOSITION`; the 16 Table 2 mass-loss fractions are per-sample extent
+  anchors, not a second score target. The electron-probe values, their 1σ widths, sample temperatures, matched
+  extents, weighed starting composition, method, and printed chamber-pressure point are present for 96/96 target
+  cells. The extent comparator does not require a per-bead exposed-area value (not reported in section 2.2, page 3).
+  Scoring is deferred to Car 3, outside this change; this car scores 0/96 cells.
 fidelity_samples:
 - path: species.SiO2.observations[wang_2001_table1_electron_microprobe_residue_compositions].values.series[15].FeO_wt_pct
   value: '0.003'
@@ -74,6 +98,40 @@ species:
       phase: cr
       regime: langmuir_free_evaporation
       units: wt%
+      uncertainty:
+        confidence_level: one_sigma
+        note: 'Table 1 footnote states uncertainties are ±1σ standard errors calculated from replicate analyses.'
+        locator:
+          page: 5
+          published_page: 483
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 footnote on replicate-analysis standard errors.
+        zero_width_cells:
+        - sample: SC4
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC14
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC1
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC7
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC2
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC16
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC4
+          formula: FeO
+          sigma: '0.0'
+        - sample: SC9
+          formula: MgO
+          sigma: '0.000'
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
@@ -1214,6 +1272,70 @@ species:
       phase: cr
       regime: langmuir_free_evaporation
       units: wt%
+      uncertainty:
+        confidence_level: one_sigma
+        note: '“Uncertainties are ±1σ standard errors calculated from replicate analyses.”'
+        locator:
+          page: 5
+          published_page: 483
+          pdf_page_index: 4
+          table: '1'
+          note: Table 1 footnote on replicate-analysis standard errors.
+        zero_width_cells:
+        - sample: SC12
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC11
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC5
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC13
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC8
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC4
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC14
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC1
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC7
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC2
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC16
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC6
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC3
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC15
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC10
+          formula: SiO2
+          sigma: '0.0'
+        - sample: SC4
+          formula: FeO
+          sigma: '0.0'
+        - sample: SC4
+          formula: WO3
+          sigma: '0.000'
+        - sample: SC6
+          formula: Al2O3
+          sigma: '0.0'
       values:
         quantity: residue_composition_vs_time
         method_class: measured_direct
@@ -2364,7 +2486,7 @@ species:
         row: SC1
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2419,17 +2541,68 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '60'
-          mass_loss_wt_pct: '57.29'
-          initial_mass_mg_as_printed: '165.3'
-          final_mass_mg_as_printed: '70.5'
+          mass_loss_fraction: '0.5735027223230490018148820327'
+          mass_loss_wt_pct_as_printed:
+            value: '57.29'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC1
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '165.3'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC1
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '70.5'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC1
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '165.3'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC1
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '70.5'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC1
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
             pdf_page_index: 5
             table: '2'
             row: SC1
-            note: 'row=SC1; Table 1 prints 57.35; values disagree; the source does not reconcile them. Cross-reference
-              locator: physical PDF page 4, published page 482, Table 1, row SC1.'
+            note: 'Table 2 prints 57.29 wt%; mass ratio from the printed masses is 57.35027223230490018148820327 wt%; Table 1 reports 57.35 wt%; the source does not reconcile the Table 2 discrepancy. Cross-reference locator: physical PDF page 4, published page 482, Table 1, row SC1.'
     - observation_id: wang_2001_table2_sc2_mass_loss
       type: rate_series
       locator:
@@ -2440,7 +2613,7 @@ species:
         row: SC2
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2480,9 +2653,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '180'
-          mass_loss_wt_pct: '69.17'
-          initial_mass_mg_as_printed: '161.2'
-          final_mass_mg_as_printed: '49.7'
+          mass_loss_fraction: '0.6916873449131513647642679901'
+          mass_loss_wt_pct_as_printed:
+            value: '69.17'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC2
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '161.2'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC2
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '49.7'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC2
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '161.2'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC2
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '49.7'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC2
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2500,7 +2725,7 @@ species:
         row: SC3
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2540,9 +2765,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '300'
-          mass_loss_wt_pct: '86.34'
-          initial_mass_mg_as_printed: '161.0'
-          final_mass_mg_as_printed: '22.0'
+          mass_loss_fraction: '0.8633540372670807453416149068'
+          mass_loss_wt_pct_as_printed:
+            value: '86.34'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC3
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '161.0'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC3
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '22.0'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC3
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '161.0'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC3
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '22.0'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC3
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2560,7 +2837,7 @@ species:
         row: SC4
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2600,9 +2877,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '15'
-          mass_loss_wt_pct: '36.68'
-          initial_mass_mg_as_printed: '160.3'
-          final_mass_mg_as_printed: '101.5'
+          mass_loss_fraction: '0.3668122270742358078602620087'
+          mass_loss_wt_pct_as_printed:
+            value: '36.68'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC4
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '160.3'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC4
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '101.5'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC4
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '160.3'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC4
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '101.5'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC4
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2620,7 +2949,7 @@ species:
         row: SC5
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2660,9 +2989,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '0'
-          mass_loss_wt_pct: '7.58'
-          initial_mass_mg_as_printed: '166.3'
-          final_mass_mg_as_printed: '153.7'
+          mass_loss_fraction: '0.07576668671076368009621166566'
+          mass_loss_wt_pct_as_printed:
+            value: '7.58'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC5
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '166.3'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC5
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '153.7'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC5
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '166.3'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC5
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '153.7'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC5
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2680,7 +3061,7 @@ species:
         row: SC6
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2720,9 +3101,61 @@ species:
             FeO: '36.7'
           T_C: '2000'
           time_min: '15'
-          mass_loss_wt_pct: '82.91'
-          initial_mass_mg_as_printed: '161.5'
-          final_mass_mg_as_printed: '27.6'
+          mass_loss_fraction: '0.8291021671826625386996904025'
+          mass_loss_wt_pct_as_printed:
+            value: '82.91'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC6
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '161.5'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC6
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '27.6'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC6
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '161.5'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC6
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '27.6'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC6
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2740,7 +3173,7 @@ species:
         row: SC7
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2780,9 +3213,61 @@ species:
             FeO: '36.7'
           T_C: '2000'
           time_min: '5'
-          mass_loss_wt_pct: '60.38'
-          initial_mass_mg_as_printed: '170.1'
-          final_mass_mg_as_printed: '67.4'
+          mass_loss_fraction: '0.6037624926513815402704291593'
+          mass_loss_wt_pct_as_printed:
+            value: '60.38'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC7
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '170.1'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC7
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '67.4'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC7
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '170.1'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC7
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '67.4'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC7
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2800,7 +3285,7 @@ species:
         row: SC8
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2840,9 +3325,61 @@ species:
             FeO: '36.7'
           T_C: '2000'
           time_min: '0'
-          mass_loss_wt_pct: '32.15'
-          initial_mass_mg_as_printed: '166.1'
-          final_mass_mg_as_printed: '112.7'
+          mass_loss_fraction: '0.3214930764599638771824202288'
+          mass_loss_wt_pct_as_printed:
+            value: '32.15'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC8
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '166.1'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC8
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '112.7'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC8
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '166.1'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC8
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '112.7'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC8
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2860,7 +3397,7 @@ species:
         row: SC9
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2900,9 +3437,61 @@ species:
             FeO: '36.7'
           T_C: '2000'
           time_min: '25'
-          mass_loss_wt_pct: '95.36'
-          initial_mass_mg_as_printed: '165.8'
-          final_mass_mg_as_printed: '7.7'
+          mass_loss_fraction: '0.9535585042219541616405307600'
+          mass_loss_wt_pct_as_printed:
+            value: '95.36'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC9
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '165.8'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC9
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '7.7'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC9
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '165.8'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC9
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '7.7'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC9
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2920,7 +3509,7 @@ species:
         row: SC10
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -2960,9 +3549,61 @@ species:
             FeO: '36.7'
           T_C: '2000'
           time_min: '20'
-          mass_loss_wt_pct: '89.61'
-          initial_mass_mg_as_printed: '169.4'
-          final_mass_mg_as_printed: '17.6'
+          mass_loss_fraction: '0.8961038961038961038961038961'
+          mass_loss_wt_pct_as_printed:
+            value: '89.61'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC10
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '169.4'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC10
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '17.6'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC10
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '169.4'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC10
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '17.6'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC10
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -2980,7 +3621,7 @@ species:
         row: SC11
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -3020,9 +3661,61 @@ species:
             FeO: '36.7'
           T_C: '1500'
           time_min: '0'
-          mass_loss_wt_pct: '3.43'
-          initial_mass_mg_as_printed: '139.8'
-          final_mass_mg_as_printed: '135.0'
+          mass_loss_fraction: '0.03433476394849785407725321888'
+          mass_loss_wt_pct_as_printed:
+            value: '3.43'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC11
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '139.8'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC11
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '135.0'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC11
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '139.8'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC11
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '135.0'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC11
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -3040,7 +3733,7 @@ species:
         row: SC12
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -3080,9 +3773,61 @@ species:
             FeO: '36.7'
           T_C: '1400'
           time_min: '0'
-          mass_loss_wt_pct: '0.38'
-          initial_mass_mg_as_printed: '182.7'
-          final_mass_mg_as_printed: '182.0'
+          mass_loss_fraction: '0.003831417624521072796934865900'
+          mass_loss_wt_pct_as_printed:
+            value: '0.38'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC12
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '182.7'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC12
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '182.0'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC12
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '182.7'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC12
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '182.0'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC12
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -3100,7 +3845,7 @@ species:
         row: SC13
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -3140,9 +3885,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '7'
-          mass_loss_wt_pct: '21.80'
-          initial_mass_mg_as_printed: '182.6'
-          final_mass_mg_as_printed: '142.8'
+          mass_loss_fraction: '0.2179627601314348302300109529'
+          mass_loss_wt_pct_as_printed:
+            value: '21.80'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC13
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '182.6'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC13
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '142.8'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC13
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '182.6'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC13
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '142.8'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC13
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -3160,7 +3957,7 @@ species:
         row: SC14
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -3200,9 +3997,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '40'
-          mass_loss_wt_pct: '52.54'
-          initial_mass_mg_as_printed: '173.2'
-          final_mass_mg_as_printed: '82.2'
+          mass_loss_fraction: '0.5254041570438799076212471132'
+          mass_loss_wt_pct_as_printed:
+            value: '52.54'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC14
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '173.2'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC14
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '82.2'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC14
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '173.2'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC14
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '82.2'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC14
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -3220,7 +4069,7 @@ species:
         row: SC15
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -3260,9 +4109,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '220'
-          mass_loss_wt_pct: '88.59'
-          initial_mass_mg_as_printed: '176.1'
-          final_mass_mg_as_printed: '20.1'
+          mass_loss_fraction: '0.8858603066439522998296422487'
+          mass_loss_wt_pct_as_printed:
+            value: '88.59'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC15
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '176.1'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC15
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '20.1'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC15
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '176.1'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC15
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '20.1'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC15
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484
@@ -3280,7 +4181,7 @@ species:
         row: SC16
       phase: l
       regime: langmuir_free_evaporation
-      units: wt%
+      units: fraction
       point_conditions:
         temperature_K:
           state:
@@ -3320,9 +4221,61 @@ species:
             FeO: '36.7'
           T_C: '1800'
           time_min: '120'
-          mass_loss_wt_pct: '72.06'
-          initial_mass_mg_as_printed: '179.7'
-          final_mass_mg_as_printed: '50.2'
+          mass_loss_fraction: '0.7206455203116304952698942682'
+          mass_loss_wt_pct_as_printed:
+            value: '72.06'
+            units: wt%
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC16
+              column: '% evaporated'
+          initial_mass_mg_as_printed:
+            value: '179.7'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC16
+              column: 'Initial wt. (mg)'
+          final_mass_mg_as_printed:
+            value: '50.2'
+            units: mg
+            locator:
+              page: 6
+              published_page: 484
+              pdf_page_index: 5
+              table: '2'
+              row: SC16
+              column: 'Final wt. (mg)'
+          derivation:
+            relation: (initial_mass_mg_as_printed - final_mass_mg_as_printed) / initial_mass_mg_as_printed
+            output_unit: fraction
+            inputs:
+              initial_mass_mg_as_printed:
+                value: '179.7'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC16
+                  column: 'Initial wt. (mg)'
+              final_mass_mg_as_printed:
+                value: '50.2'
+                units: mg
+                locator:
+                  page: 6
+                  published_page: 484
+                  pdf_page_index: 5
+                  table: '2'
+                  row: SC16
+                  column: 'Final wt. (mg)'
           locator:
             page: 6
             published_page: 484

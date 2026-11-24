@@ -1807,6 +1807,7 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     expected_sigma_log10_ratio = Decimal("0.02") / (
         Decimal(10).ln() * Decimal("0.72") * Decimal("0.28")
     )
+    assert abs(printed.standard_uncertainty_dex - expected_sigma_log10_ratio) < Decimal("1e-20")
     assert abs(
         printed.band.value
         - expected_sigma_log10_ratio * score_mod.NORMAL_95_TICKET_MULTIPLIER
@@ -1846,9 +1847,7 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     )
     assert near_one_band.band is None
     assert near_one_band.refusal is not None
-    assert near_one_band.refusal["reason"] == (
-        "ferric_fraction_uncertainty_linearization_invalid"
-    )
+    assert near_one_band.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
 
     from simulator.battery.score_metrics import populate_numeric
 
@@ -1865,6 +1864,457 @@ def test_redox_uncertainty_mapping_selects_exact_observation_field() -> None:
     assert numeric is not None
     assert numeric.value.is_finite()
     assert numeric.decision_band is None
+
+
+@pytest.mark.parametrize(
+    ("declaration", "override", "expected_sigma", "expected_ticket"),
+    (
+        (
+            {"value": "0.1", "units": "dex", "confidence_level": "one_sigma"},
+            None,
+            Decimal("0.1"),
+            Decimal("0.1") * score_mod.NORMAL_95_TICKET_MULTIPLIER,
+        ),
+        (
+            {"value": "0.1", "units": "dex", "confidence_level": "not_stated"},
+            "two_sigma",
+            Decimal("0.05"),
+            Decimal("0.05") * score_mod.NORMAL_95_TICKET_MULTIPLIER,
+        ),
+        (
+            {"value": "0.1", "units": "dex", "confidence_level": "not_stated"},
+            "ci95",
+            Decimal("0.1") / score_mod.NORMAL_95_TICKET_MULTIPLIER,
+            Decimal("0.1"),
+        ),
+        (
+            {"value": "0.3", "units": "dex", "k": 3},
+            None,
+            Decimal("0.1"),
+            Decimal("0.1") * score_mod.NORMAL_95_TICKET_MULTIPLIER,
+        ),
+    ),
+)
+def test_dex_printed_width_keeps_print_and_ticket_factors_separate(
+    declaration: dict[str, object],
+    override: str | None,
+    expected_sigma: Decimal,
+    expected_ticket: Decimal,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species("FeO", Phase.L),
+    )
+    observation = replace(
+        F.observation(
+            "dex-width-factor-separation",
+            "dex-width-factor-separation-experiment",
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="dex-width-factor-separation-source",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim=declaration,
+        ),
+    )
+    printed = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        observation.uncertainty,
+        Decimal("0.5"),
+        source_observation=observation,
+        confidence_level_override=override,
+    )
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.standard_uncertainty_dex == expected_sigma
+    assert printed.band.value == expected_ticket
+
+
+def test_structured_confidence_controls_rule_when_activity_note_names_sd() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species("FeO", Phase.L),
+    )
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={
+            "value": "0.1",
+            "units": "dex",
+            "confidence_level": "two_sigma",
+            "note": "standard deviation of log10(a)",
+        },
+    )
+    observation = replace(
+        F.observation(
+            "structured-confidence-prose-precedence",
+            "structured-confidence-prose-precedence-experiment",
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="structured-confidence-prose-precedence-source",
+        ),
+        uncertainty=uncertainty,
+    )
+    printed = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty,
+        Decimal("0.5"),
+        source_observation=observation,
+    )
+    assert printed.refusal is None
+    assert printed.band is not None
+    assert printed.standard_uncertainty_dex == Decimal("0.05")
+    assert printed.band.value == (
+        Decimal("0.05") * score_mod.NORMAL_95_TICKET_MULTIPLIER
+    )
+    assert printed.band.rule.startswith("printed_2sigma:")
+    assert printed.notice is None
+
+
+def test_dex_print_ticket_factor_swap_mutation_changes_the_pins(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    identity = Identity(
+        quantity=Quantity.ACTIVITY,
+        species=Species("FeO", Phase.L),
+    )
+    observation = replace(
+        F.observation(
+            "dex-factor-swap-mutation",
+            "dex-factor-swap-mutation-experiment",
+            identity,
+            Decimal("0.5"),
+            evidence=EvidenceClass.MEASURED_DIRECT,
+            source_id="dex-factor-swap-mutation-source",
+        ),
+        uncertainty=Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={
+                "value": "0.1",
+                "units": "dex",
+                "confidence_level": "one_sigma",
+            },
+        ),
+    )
+    monkeypatch.setattr(
+        score_mod,
+        "printed_uncertainty_convention",
+        lambda _declaration, **_kwargs: (
+            "one_sigma",
+            Decimal("1.959963984540054"),
+        ),
+    )
+    monkeypatch.setattr(score_mod, "NORMAL_95_TICKET_MULTIPLIER", Decimal(1))
+    mutated = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        observation.uncertainty,
+        Decimal("0.5"),
+        source_observation=observation,
+    )
+    assert mutated.band is not None
+    assert mutated.standard_uncertainty_dex != Decimal("0.1")
+    assert mutated.band.value != Decimal("0.1") * Decimal("1.959963984540054")
+
+
+def test_norris_standard_deviation_metadata_preserves_all_printed_bands() -> None:
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+    _, _, observations = load_migrated_store(
+        REPO_ROOT, sources=("norris-2016-trace-volatility-thesis",)
+    )
+    affected = [
+        observation
+        for observation in observations.values()
+        if isinstance(observation.uncertainty.verbatim, dict)
+        and observation.uncertainty.verbatim.get("kind") == "standard_deviation"
+    ]
+    assert len(affected) == 64
+    banded = 0
+    for observation in affected:
+        reference = point_magnitude(observation.value)
+        assert reference is not None
+        printed = _printed_uncertainty_band(
+            Quantity.ELEMENT_RETENTION_RATIO,
+            observation.uncertainty,
+            reference,
+            source_observation=observation,
+        )
+        assert printed.refusal is None
+        assert printed.band is not None
+        assert printed.notice is not None
+        assert printed.notice.reason == "confidence_level_not_stated"
+        banded += 1
+        if observation.observation_id.endswith("_zn_logfo2_neg13"):
+            assert printed.band.value == Decimal("0.4804748967272502428014170047")
+    assert banded == 64
+
+
+def test_bonnand_gorojovsky_printed_domain_ids_match_green() -> None:
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+    source_ids = (
+        "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite",
+        "gorojovsky-wood-2026-sulfur-crustal",
+    )
+    _, _, observations = load_migrated_store(REPO_ROOT, sources=source_ids)
+    band_counts: dict[str, int] = {}
+    outside_domain_ids: list[str] = []
+    for observation in observations.values():
+        quantity = quantity_token(observation.identity)
+        reference = point_magnitude(observation.value)
+        if quantity is None or reference is None:
+            continue
+        resolution = _printed_uncertainty_band(
+            quantity,
+            observation.uncertainty,
+            reference,
+            source_observation=observation,
+        )
+        if (
+            resolution.refusal is not None
+            and resolution.refusal.get("reason") == "unparseable_printed_uncertainty"
+        ):
+            continue
+        if resolution.band is not None:
+            band_counts[observation.source_id] = (
+                band_counts.get(observation.source_id, 0) + 1
+            )
+        if (
+            resolution.refusal is not None
+            and resolution.refusal.get("reason")
+            == "printed_uncertainty_outside_metric_domain"
+        ):
+            outside_domain_ids.append(observation.observation_id)
+    restored_ids = (
+        "bonnand-bruand-matzen-et-al-2020-redox-chromium-isotope-magnesiochromite::bonnand_2020_A3a_cr2o3",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r011-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r020-cao",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r022-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r032-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r036-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t3-r003-cao",
+        "gorojovsky-wood-2026-sulfur-crustal::t3-r037-k2o",
+    )
+    preexisting_refusal_ids = (
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r002-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r003-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r004-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r007-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r008-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r010-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r013-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r015-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r019-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r020-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r026-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r030-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r031-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r038-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r043-mgo",
+        "gorojovsky-wood-2026-sulfur-crustal::t2-r044-mgo",
+    )
+    # Both partitions were called against green using this same migrated store.
+    assert set(outside_domain_ids) == set(restored_ids) | set(preexisting_refusal_ids)
+    assert set(restored_ids).isdisjoint(preexisting_refusal_ids)
+    assert band_counts == {
+        source_ids[0]: 83,
+        source_ids[1]: 908,
+    }
+
+
+@pytest.mark.nightly
+@pytest.mark.timeout(300)
+def test_full_store_printed_width_band_census_matches_green() -> None:
+    from simulator.battery.identity import quantity_token
+    from simulator.battery.migrate import REPO_ROOT, load_migrated_store
+    from simulator.battery.score import _printed_uncertainty_band, point_magnitude
+
+    _, _, observations = load_migrated_store(REPO_ROOT)
+    width_count = 0
+    band_count = 0
+    conflicts: list[str] = []
+    for observation in observations.values():
+        if observation.uncertainty.kind is UncertaintyKind.NONE:
+            continue
+        quantity = quantity_token(observation.identity)
+        reference = point_magnitude(observation.value)
+        if quantity is None or reference is None:
+            continue
+        resolution = _printed_uncertainty_band(
+            quantity,
+            observation.uncertainty,
+            reference,
+            source_observation=observation,
+        )
+        if resolution.band is not None:
+            width_count += 1
+            band_count += 1
+        elif resolution.refusal is not None:
+            if resolution.refusal.get("reason") == "unparseable_printed_uncertainty":
+                continue
+            width_count += 1
+            if resolution.refusal.get("reason") == "uncertainty_convention_conflict":
+                conflicts.append(observation.observation_id)
+
+    # Round 10 restores the two in-domain Sossi XANES intervals; no printed
+    # widths or convention conflicts are added or removed.
+    assert (width_count, band_count, conflicts) == (21202, 13527, [])
+
+
+def test_ferric_fraction_printed_interval_domain_precedes_k_normalization() -> None:
+    from simulator.battery.score import _printed_uncertainty_band, populate_numeric
+
+    identity = Identity(
+        quantity=Quantity.FE3_FE2_RATIO,
+        species=Species("Fe", Phase.CR),
+    )
+
+    def resolve(width: str, k: str = "3", r: str = "0.1"):
+        observation = F.observation(
+            f"ferric-fraction-domain-{width}",
+            "ferric-fraction-domain-experiment",
+            identity,
+            Decimal(r) / (Decimal(1) - Decimal(r)),
+            evidence=EvidenceClass.MEASURED_REDUCED,
+            derivation=Derivation(
+                relation=score_mod.FERRIC_FRACTION_RELATION,
+                inputs=("ferric-fraction-domain-source",),
+                parameters=(
+                    ("original_Fe3_over_FeT", F.located(Decimal(r))),
+                ),
+                output_unit="dimensionless",
+            ),
+        )
+        uncertainty = Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"Fe3_over_FeT": width, "units": "fraction", "k": k},
+        )
+        return observation, _printed_uncertainty_band(
+            Quantity.FE3_FE2_RATIO,
+            uncertainty,
+            observation.value.point,
+            source_observation=observation,
+        )
+
+    outside_observation, outside = resolve("0.12")
+    assert outside.band is None
+    assert outside.refusal is not None
+    assert outside.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+    numeric, reason, _detail = populate_numeric(
+        quantity=Quantity.FE3_FE2_RATIO,
+        candidate=Decimal("0.2"),
+        reference=outside_observation.value.point,
+        source_relation=SourceRelation.UNKNOWN,
+        printed_refusal=outside.refusal,
+        operation_override=MetricOperation.DEX,
+        band_operation=MetricOperation.DEX,
+    )
+    assert reason is None
+    assert numeric is not None
+    assert numeric.decision_band is None
+
+    _inside_observation, inside = resolve("0.09")
+    assert inside.refusal is None
+    assert inside.band is not None
+
+    _k1_observation, k1_inside = resolve("0.09", "1")
+    assert k1_inside.refusal is None
+    assert k1_inside.band is not None
+
+    _endpoint_observation, endpoint = resolve("0.10", "1")
+    assert endpoint.band is None
+    assert endpoint.refusal is not None
+    assert endpoint.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+
+    _upper_endpoint_observation, upper_endpoint = resolve("0.10", "1", "0.9")
+    assert upper_endpoint.band is None
+    assert upper_endpoint.refusal is not None
+    assert upper_endpoint.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+
+
+def test_dex_printed_interval_domain_uses_original_coverage_width() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    # The original pressure interval [0.4, 1.6] Pa is in-domain. k=0.5
+    # widens the implied standard uncertainty, but does not change whether
+    # the printed interval itself can be represented in log space.
+    uncertainty = Uncertainty(
+        kind=UncertaintyKind.PRINTED,
+        verbatim={"value": "0.6", "unit": "Pa", "k": "0.5"},
+    )
+    half_factor = _printed_uncertainty_band(
+        Quantity.P_PARTIAL, uncertainty, Decimal("1")
+    )
+    assert half_factor.refusal is None
+    assert half_factor.band is not None
+    assert half_factor.band.value == Decimal(
+        "1.559896170009500952197931536"
+    )
+
+    one_sigma = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        replace(uncertainty, verbatim={"value": "0.6", "unit": "Pa", "k": "1"}),
+        Decimal("1"),
+    )
+    assert one_sigma.refusal is None
+    assert one_sigma.band is not None
+    assert one_sigma.band.value == Decimal(
+        "0.7799480850047504760989657678"
+    )
+
+    crossing = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        replace(uncertainty, verbatim={"value": "1", "unit": "Pa", "k": "0.5"}),
+        Decimal("1"),
+    )
+    assert crossing.band is None
+    assert crossing.refusal is not None
+    assert crossing.refusal["reason"] == "printed_uncertainty_outside_metric_domain"
+
+
+def test_dex_linear_width_normalizes_coverage_before_log_transform() -> None:
+    from simulator.battery.score import _printed_uncertainty_band
+
+    printed = _printed_uncertainty_band(
+        Quantity.P_PARTIAL,
+        Uncertainty(
+            kind=UncertaintyKind.PRINTED,
+            verbatim={"value": "1000", "unit": "Pa", "k": "2"},
+        ),
+        Decimal("100000"),
+    )
+
+    # Round 10 transforms the normalized ±500 Pa interval, then applies Z95.
+    # This numeric k=2 declaration must retain those exact standard-width and
+    # ticket values; transforming ±1000 Pa first produces a wider band.
+    assert printed.refusal is None
+    assert printed.standard_uncertainty_dex == Decimal(
+        "0.002176919254274545113717110304"
+    )
+    assert printed.band is not None
+    assert printed.band.value == Decimal(
+        "0.004266683335629900421816705747"
+    )
+    from simulator.battery.score_metrics import match_status
+
+    boundary_residual = ResidualNumeric(
+        operation=MetricOperation.DEX,
+        unit="dimensionless",
+        value=Decimal("0.004272"),
+        decision_band=printed.band,
+    )
+    assert match_status(boundary_residual) is ResidualStatus.MISMATCH
 
 
 def test_delta_fh_printed_uncertainty_uses_absolute_width() -> None:
@@ -2198,7 +2648,16 @@ def test_source_method_uncertainty_supplies_a_source_method_band(
             "two_sigma",
             "The standard deviation of log10(a) is 0.10.",
             "0.2",
-            "0.20",
+            str(Decimal("0.10") * Decimal("1.959963984540054")),
+            "printed_2sigma",
+        ),
+        (
+            "log10_dex",
+            "0.10",
+            "ci95",
+            "The reported width is a 95% confidence interval.",
+            "0.2",
+            "0.10",
             "printed_2sigma",
         ),
         (
@@ -2224,7 +2683,7 @@ def test_source_method_activity_band_uses_explicit_basis_and_meaning(
     # Independently, a 10% relative width spans log10(0.9) to log10(1.1);
     # the larger magnitude is log10(10/9), then the 95% one-sigma multiplier
     # gives 0.08968303352185472833542869883. This is the metric's conservative
-    # dex width and does not use the production uncertainty converter.
+    # dex width before its normal-95 ticket conversion.
     experiment = F.kems_experiment()
     identity = F.activity_identity(endmember_phase=Phase.L)
     reference = F.observation(
