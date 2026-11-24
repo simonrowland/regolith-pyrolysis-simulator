@@ -125,6 +125,12 @@ GATE_CURVE_IDENTITY_NOTICE_KEYS = tuple(
     key for key in GATE_CURVE_NOTICE_KEYS
     if key not in GATE_CURVE_ENVIRONMENT_KEYS
 )
+ENVIRONMENT_GATE_HOLD_MESSAGE = (
+    "environment: gate_provider_refusal records a load timeout "
+    "(disposition=environment); the held-last-good curve is not a golden "
+    "mismatch"
+)
+_MISSING = object()
 _T_K_QUANTUM = 0.01
 _FO2_LOG_QUANTUM = 0.001
 _PRESSURE_BAR_QUANTUM = 0.00001
@@ -161,6 +167,48 @@ _SOURCE_MODULE_PATTERNS = (
     # is ever cached.
     "engines/vaporock/*.py",
 )
+
+
+def find_environment_gate_refusal(value: Any) -> Mapping[str, Any] | None:
+    """Return an environment-classified gate refusal in a run document."""
+    seen: set[int] = set()
+
+    def walk(node: Any) -> Mapping[str, Any] | None:
+        if node is None or isinstance(node, (str, bytes, int, float, bool)):
+            return None
+        marker = id(node)
+        if marker in seen:
+            return None
+        seen.add(marker)
+        if isinstance(node, Mapping):
+            refusal = node.get("gate_provider_refusal")
+            if isinstance(refusal, Mapping) and (
+                refusal.get("disposition") == "environment"
+                or refusal.get("backend_failure_disposition") == "environment"
+            ):
+                return refusal
+            for item in node.values():
+                found = walk(item)
+                if found is not None:
+                    return found
+            return None
+        if isinstance(node, (list, tuple)):
+            for item in node:
+                found = walk(item)
+                if found is not None:
+                    return found
+            return None
+        for name in ("record", "snapshots", "liquid_fraction_gate"):
+            child = getattr(node, name, _MISSING)
+            if child is not _MISSING:
+                found = walk(child)
+                if found is not None:
+                    return found
+        return None
+
+    return walk(value)
+
+
 _ALPHAMELTS_AUTHORIZED_NAME = "alphamelts"
 _ALPHAMELTS_BACKEND_NAME = "AlphaMELTSBackend"
 _ALPHAMELTS_BACKEND_CLASS = (

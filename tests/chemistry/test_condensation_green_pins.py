@@ -9,8 +9,10 @@ from types import SimpleNamespace
 import pytest
 
 from simulator.reduced_real_determinism import (
+    ENVIRONMENT_GATE_HOLD_MESSAGE,
     ENVIRONMENT_RETRIES_KEY,
     failed_provider_attempt_is_environment,
+    find_environment_gate_refusal,
     gate_curve_provider_diagnostic_reasons,
     gate_curve_provider_timeout_reason,
 )
@@ -267,21 +269,6 @@ def _without_environment_attempts(value):
     return value
 
 
-_MISSING = object()
-
-_ENVIRONMENT_HOLD_MESSAGE = (
-    "environment: gate_provider_refusal records a load timeout "
-    "(disposition=environment); the held-last-good curve is not a golden mismatch"
-)
-
-
-def _refusal_is_environment_hold(refusal: Mapping) -> bool:
-    return (
-        refusal.get("disposition") == "environment"
-        or refusal.get("backend_failure_disposition") == "environment"
-    )
-
-
 def _refuse_environment_gate_hold(value) -> None:
     """A held curve is an environment failure, not a golden mismatch.
 
@@ -289,32 +276,8 @@ def _refuse_environment_gate_hold(value) -> None:
     out-of-domain refusal has no environment disposition. Both compare.
     """
 
-    seen: set[int] = set()
-
-    def walk(node) -> None:
-        if node is None or isinstance(node, (str, bytes, int, float, bool)):
-            return
-        marker = id(node)
-        if marker in seen:
-            return
-        seen.add(marker)
-        if isinstance(node, Mapping):
-            refusal = node.get("gate_provider_refusal")
-            if isinstance(refusal, Mapping) and _refusal_is_environment_hold(refusal):
-                raise AssertionError(_ENVIRONMENT_HOLD_MESSAGE)
-            for item in node.values():
-                walk(item)
-            return
-        if isinstance(node, (list, tuple)):
-            for item in node:
-                walk(item)
-            return
-        for name in ("record", "snapshots", "liquid_fraction_gate"):
-            child = getattr(node, name, _MISSING)
-            if child is not _MISSING:
-                walk(child)
-
-    walk(value)
+    if find_environment_gate_refusal(value) is not None:
+        raise AssertionError(ENVIRONMENT_GATE_HOLD_MESSAGE)
 
 
 def deterministic_gate_payload(value):
