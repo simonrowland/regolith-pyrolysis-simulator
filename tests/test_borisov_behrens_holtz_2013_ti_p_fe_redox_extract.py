@@ -471,7 +471,7 @@ def test_mutating_method_resolver_to_drop_method_notice_fails(
         "_resolve_method_for_observation",
         discard_method_notice,
     )
-    with pytest.raises(AssertionError, match="printed analytical method"):
+    with pytest.raises(AssertionError, match="should have one METHOD_UNSTATED notice"):
         _assert_unstated_method_rows(_migrate(), _document())
 
 
