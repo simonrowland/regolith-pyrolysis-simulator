@@ -18,6 +18,7 @@ from typing import Mapping
 import pytest
 
 import scripts.battery_hero_plot as hero_plot
+import simulator.battery.score as battery_score
 from simulator.battery.enums import NoticeKind
 from scripts.battery_hero_plot import (
     HERO_MINOR_FACETS,
@@ -2036,7 +2037,7 @@ def test_hero_scorecard_cells_show_n_for_each_metric_and_exposure_bucket() -> No
 
 
 def test_flagged_absolute_residual_has_separate_native_unit_tier(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     path = tmp_path / "flagged-absolute.jsonl"
     dex = _record(
@@ -2045,7 +2046,7 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
     )
     absolute = _record(
         engine="openimcc", experiment="absolute", formula="SiO2",
-        temperature_K=1200, residual=None,
+        temperature_K=1200, residual=None, rail="residue_composition",
     )
     absolute["numeric"] = {
         "operation": "absolute", "unit": "wt_percent", "value": "-3",
@@ -2056,11 +2057,15 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
     }]
     refused = _record(
         engine="openimcc", experiment="refused", formula="SiO2",
-        temperature_K=1200, residual=None, status="refused",
+        temperature_K=1200, residual=None, rail="residue_composition", status="refused",
     )
     refused["numeric"] = {
         "operation": "absolute", "unit": "wt_percent", "value": "0",
     }
+    refused["notices"] = [{
+        "kind": NoticeKind.OUT_OF_CERTIFIED_BAND.value,
+        "reason": "refused absolute metric is flagged",
+    }]
     path.write_text(
         "".join(json.dumps(row) + "\n" for row in (
             {"kind": "battery_store_stamp", "revision": "flagged-absolute"},
@@ -2073,8 +2078,14 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
 
     data = read_scores(path)
 
-    metric = data.hero_all_numeric_metrics[("vapour", "openimcc")]
-    assert metric["rms_dex"] == "0.5"
+    metric = data.hero_all_numeric_metrics[("residue_composition", "openimcc")]
+    assert data.hero_all_numeric_metrics[("vapour", "openimcc")]["rms_dex"] == "0.5"
+    assert metric.get("rms_dex") is None
+    views = metric.get("views", {})
+    views = views if isinstance(views, Mapping) else {}
+    all_view = views.get("all", {})
+    all_view = all_view if isinstance(all_view, Mapping) else {}
+    assert int(all_view.get("n") or 0) == 0
     assert metric["flagged_absolute_metrics"] == [{
         "tier": "flagged_absolute",
         "operation": "absolute",
@@ -2083,14 +2094,31 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
         "rms": "3",
         "flag_kinds": {NoticeKind.OUT_OF_CERTIFIED_BAND.value: 1},
     }]
-    all_cell = hero_plot._hero_scorecard_rows(data, "vapour")[0][1]
-    assert "flagged absolute RMS 3 wt_percent (n=1" in all_cell
-    assert NoticeKind.OUT_OF_CERTIFIED_BAND.value in all_cell
-    summary_metric = hero_plot._hero_summary_payload(data)["vapour"][
+    rendered_text: list[str] = []
+    original_text = hero_plot.Axes.text
+
+    def capture_text(axis: object, x: object, y: object, text: object, *args: object, **kwargs: object) -> object:
+        rendered_text.append(str(text))
+        return original_text(axis, x, y, text, *args, **kwargs)
+
+    monkeypatch.setattr(hero_plot.Axes, "text", capture_text)
+    hero_plot._draw_scorecard_png(
+        tmp_path / "collection-scorecard.png",
+        data,
+        [],
+        [],
+        (("residue_composition", "Residue composition"),),
+    )
+    assert "Flagged absolute (native units)" in rendered_text
+    assert any("RMS 3 wt_percent (n=1" in text for text in rendered_text)
+    assert any(NoticeKind.OUT_OF_CERTIFIED_BAND.value in text for text in rendered_text)
+    assert not any(text.startswith("not scored:") for text in rendered_text)
+    summary_metric = hero_plot._hero_summary_payload(data)["residue_composition"][
         "all_numeric_metrics_by_engine"
     ]["openimcc"]["flagged_absolute_metrics"][0]
     assert summary_metric == metric["flagged_absolute_metrics"][0]
     assert data.summaries["openimcc"].refusals["unsupported_species"] == 1
+    assert metric["flagged_absolute_metrics"][0]["n"] == 1
 
 
 def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
@@ -2099,7 +2127,7 @@ def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
     path = tmp_path / "dex-only-mutant.jsonl"
     absolute = _record(
         engine="openimcc", experiment="absolute", formula="SiO2",
-        temperature_K=1200, residual=None,
+        temperature_K=1200, residual=None, rail="residue_composition",
     )
     absolute["numeric"] = {
         "operation": "absolute", "unit": "wt_percent", "value": "2",
@@ -2116,19 +2144,34 @@ def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
         encoding="utf-8",
     )
 
-    # Mutation: restore the old operation == dex gate. The feature pin below
-    # must then fail because the flagged absolute row disappears.
-    monkeypatch.setattr(
-        hero_plot,
-        "_residual_metric_tier",
-        lambda row: "dex"
-        if isinstance(row.get("numeric"), Mapping)
-        and row["numeric"].get("operation") == "dex"
-        else None,
-    )
-    with pytest.raises(AssertionError, match="flagged_absolute_metrics"):
-        metric = read_scores(path).hero_all_numeric_metrics[("vapour", "openimcc")]
+    def collection_pin() -> None:
+        data = read_scores(path, _collection_mode=True)
+        metric = data.hero_all_numeric_metrics.get(("residue_composition", "openimcc"), {})
         assert metric.get("flagged_absolute_metrics"), "flagged_absolute_metrics missing"
+        assert hero_plot._hero_summary_payload(data)["residue_composition"][
+            "all_numeric_metrics_by_engine"
+        ]["openimcc"]["flagged_absolute_metrics"]
+        hero_plot._draw_scorecard_png(
+            tmp_path / "mutated-collection-scorecard.png",
+            data,
+            [],
+            [],
+            (("residue_composition", "Residue composition"),),
+        )
+
+    # Restore the old dex-only scorer gate; the shipped collection pin must fail.
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            battery_score,
+            "residual_metric_tier",
+            lambda row: "dex"
+            if isinstance(row.get("numeric"), Mapping)
+            and row["numeric"].get("operation") == "dex"
+            else None,
+        )
+        with pytest.raises(AssertionError, match="flagged_absolute_metrics"):
+            collection_pin()
+    collection_pin()
 
 
 def _hero_metric_row(

@@ -112,9 +112,13 @@ from simulator.battery.score import (  # noqa: E402
     _battery_hero_deck_store_observations,
     _battery_hero_facet,
     _battery_hero_create_metric_rows,
+    _battery_hero_add_flagged_absolute,
+    _BatteryHeroExactAccumulator,
+    _battery_hero_dex_metric_value,
+    _battery_hero_flagged_absolute_records,
+    _battery_hero_flagged_notice_kinds,
     _battery_hero_fingerprint_band,
     _battery_hero_minor_foulant_facets,
-    _flagged_payload_strata,
     residual_metric_tier as _residual_metric_tier,
     _battery_hero_sio2_mole_fraction,
     _battery_hero_create_fingerprint_values,
@@ -621,16 +625,9 @@ def _hero_metric_rows_database(
     for row in residuals:
         rail = str(row.get("rail") or "")
         engine = _engine_name(row)
-        numeric = row.get("numeric")
-        if (
-            not rail
-            or not engine
-            or not isinstance(numeric, Mapping)
-            or _residual_metric_tier(row) != "dex"
-            or numeric.get("value") is None
-        ):
+        if not rail or not engine:
             continue
-        value = _hero_decimal(numeric["value"])
+        value = _battery_hero_dex_metric_value(row)
         if value is None:
             continue
         temperature = _hero_metric_temperature(row)
@@ -664,44 +661,6 @@ def _hero_metric_rows_database(
             pending,
         )
     return database
-
-
-def _hero_flag_kinds(row: Mapping[str, object]) -> tuple[str, ...]:
-    notices = row.get("notices")
-    if not isinstance(notices, Sequence) or isinstance(notices, (str, bytes)):
-        return ()
-    return tuple(
-        sorted(
-            {
-                str(notice["kind"])
-                for notice in notices
-                if (
-                    isinstance(notice, Mapping)
-                    and notice.get("kind")
-                    and _flagged_payload_strata({"notices": [notice]})
-                )
-            }
-        )
-    )
-
-
-def _hero_flagged_absolute_records(
-    facts: Mapping[tuple[str, str, str], tuple[int, Decimal, Mapping[str, int]]],
-) -> dict[tuple[str, str], tuple[Mapping[str, object], ...]]:
-    records: dict[tuple[str, str], list[Mapping[str, object]]] = defaultdict(list)
-    for (rail, engine, unit), (count, squares, flag_counts) in sorted(facts.items()):
-        rms = (squares / Decimal(count)).sqrt()
-        records[(rail, engine)].append(
-            {
-                "tier": "flagged_absolute",
-                "operation": "absolute",
-                "unit": unit,
-                "n": count,
-                "rms": str(rms),
-                "flag_kinds": dict(sorted(flag_counts.items())),
-            }
-        )
-    return {key: tuple(value) for key, value in records.items()}
 
 
 def _hero_metric_records(
@@ -812,24 +771,11 @@ def _record_hero_diagnostic(
         refusal_counts[reason] += 1
         return
 
-    numeric = row.get("numeric")
-    if (
-        not isinstance(numeric, Mapping)
-        or _residual_metric_tier(row) != "dex"
-        or numeric.get("value") is None
-    ):
+    if _battery_hero_dex_metric_value(row) is None:
         return
     notice_counts = bucket["open_predict_and_flag_notice_counts_by_kind"]
     assert isinstance(notice_counts, Counter)
-    notices = row.get("notices")
-    if isinstance(notices, Sequence) and not isinstance(notices, (str, bytes)):
-        for notice in notices:
-            if (
-                isinstance(notice, Mapping)
-                and notice.get("kind")
-                and _flagged_payload_strata({"notices": [notice]})
-            ):
-                notice_counts[str(notice["kind"])] += 1
+    notice_counts.update(_battery_hero_flagged_notice_kinds(row))
 
 
 def _refusal_reason(row: Mapping[str, Any]) -> str:
@@ -959,7 +905,8 @@ def read_scores(
     rails_seen: set[str] = set()
     source_disagreement_reasons: set[str] = set()
     flagged_absolute_facts: dict[
-        tuple[str, str, str], tuple[int, Decimal, Counter[str]]
+        tuple[str, str, str],
+        tuple[list[Decimal], _BatteryHeroExactAccumulator, Counter[str]],
     ] = {}
     hero_refusals: Counter[tuple[str, str, str, str, str]] = Counter()
     hero_refusal_totals: Counter[tuple[str, str, str]] = Counter()
@@ -1092,21 +1039,8 @@ def read_scores(
                 selected_rail = rail in selected
                 if rail not in retained_rails:
                     continue
+                _battery_hero_add_flagged_absolute(flagged_absolute_facts, row)
                 metric_tier = _residual_metric_tier(row)
-                if metric_tier == "flagged_absolute":
-                    unit = str(numeric.get("unit") or "")
-                    value = _hero_decimal(numeric.get("value"))
-                    if value is not None:
-                        key = (rail, engine, unit)
-                        count, squares, flags = flagged_absolute_facts.get(
-                            key, (0, Decimal(0), Counter())
-                        )
-                        flags.update(_hero_flag_kinds(row))
-                        flagged_absolute_facts[key] = (
-                            count + 1,
-                            squares + value * value,
-                            flags,
-                        )
                 if metric_tier != "dex":
                     if selected_rail:
                         summary.non_dex_rows += 1
@@ -1377,7 +1311,7 @@ def read_scores(
                 else None
             ),
         )
-        hero_flagged_absolute_metrics = _hero_flagged_absolute_records(
+        hero_flagged_absolute_metrics = _battery_hero_flagged_absolute_records(
             flagged_absolute_facts
         )
         for key, strata in hero_flagged_absolute_metrics.items():
@@ -3278,7 +3212,7 @@ def _hero_summary_payload(
         "exposed_n" in metric.get("views", {}).get("all", {})
         for metric in data.hero_all_numeric_metrics.values()
     )
-    for rail in HERO_RAILS:
+    for rail in (*HERO_RAILS, Rail.RESIDUE_COMPOSITION.value):
         rows_by_engine: Counter[str] = Counter()
         for (series_rail, facet, engine, _composition), points in data.hero_series.items():
             if series_rail == rail and not (
@@ -3296,9 +3230,9 @@ def _hero_summary_payload(
         openimcc_vaporock = next(
             (
                 comparison
-                for comparison in data.hero_comparisons[
-                    (rail, "openimcc")
-                ].get("comparisons", ())
+                for comparison in data.hero_comparisons.get(
+                    (rail, "openimcc"), {}
+                ).get("comparisons", ())
                 if isinstance(comparison, Mapping)
                 and comparison.get("engine") == "vaporock"
             ),
@@ -3451,13 +3385,13 @@ def _collection_row_database(
             if rail not in COLLECTION_SCORE_RAILS:
                 continue
             status = residual_status_token(row.get("status"))
-            numeric = row.get("numeric")
-            if status is ResidualStatus.REFUSED or not isinstance(numeric, Mapping):
+            if status is ResidualStatus.REFUSED:
                 continue
-            if _residual_metric_tier(row) != "dex":
+            dex_value = _battery_hero_dex_metric_value(row)
+            if dex_value is None:
                 continue
             d139_uncalibrated_kems = _is_d139_uncalibrated_kems_row(row)
-            residual = _finite_float(numeric.get("value"))
+            residual = _finite_float(dex_value)
             identity = _row_identity(row)
             temperature_raw = _state_value(identity.get("temperature_K"))
             temperature = _finite_float(temperature_raw)
@@ -4125,6 +4059,7 @@ def _draw_scorecard_png(
 ) -> None:
     colors = _hero_engine_colors(data.engines)
     all_rows_by_rail: dict[str, list[tuple[str, int, float]]] = {}
+    flagged_absolute_by_rail: dict[str, list[str]] = {}
     no_data_lines: list[str] = []
     pair_rows_by_rail: dict[str, list[Mapping[str, str]]] = {}
     all_plot_values: list[float] = []
@@ -4132,18 +4067,39 @@ def _draw_scorecard_png(
 
     for rail, _label in observables:
         summary_rows: list[tuple[str, int, float]] = []
+        flagged_rows: list[str] = []
+        flagged_engines: set[str] = set()
         not_scored: list[str] = []
         for engine in _ordered_hero_engines(data.engines):
             view = _view_metric(_collection_metric(data, rail, engine), "all")
+            metric = data.hero_all_numeric_metrics.get((rail, engine), {})
+            strata = metric.get("flagged_absolute_metrics", ())
+            if isinstance(strata, Sequence) and not isinstance(
+                strata, (str, bytes)
+            ):
+                for absolute in strata:
+                    if not isinstance(absolute, Mapping):
+                        continue
+                    flags = absolute.get("flag_kinds")
+                    flags = flags if isinstance(flags, Mapping) else {}
+                    flag_text = ", ".join(
+                        f"{kind}={count}" for kind, count in sorted(flags.items())
+                    ) or "flag kind unavailable"
+                    flagged_rows.append(
+                        f"{engine}: RMS {absolute.get('rms')} {absolute.get('unit')} "
+                        f"(n={_compact_count(absolute.get('n'))}; {flag_text})"
+                    )
+                    flagged_engines.add(engine)
             n = int(view.get("n") or 0)
             rms = _finite_float(view.get("rms_dex"))
             if n and rms is not None:
                 summary_rows.append((engine, n, rms))
                 all_plot_values.append(rms)
-            else:
+            elif engine not in flagged_engines:
                 not_scored.append(engine)
         all_rows_by_rail[rail] = summary_rows
-        if not summary_rows:
+        flagged_absolute_by_rail[rail] = flagged_rows
+        if not summary_rows and not flagged_rows:
             _dominant, refusal_mix = _scorecard_coverage_notes(
                 coverage_rows, rail
             )
@@ -4181,12 +4137,13 @@ def _draw_scorecard_png(
     active_observables = tuple(
         (rail, label)
         for rail, label in observables
-        if all_rows_by_rail[rail]
+        if all_rows_by_rail[rail] or flagged_absolute_by_rail[rail]
     )
     maximum_rows = max(
         (
             len(pair_rows_by_rail.get(rail, ()))
             + len(all_rows_by_rail[rail])
+            + len(flagged_absolute_by_rail[rail])
             + 2
             for rail, _label in active_observables
         ),
@@ -4372,6 +4329,33 @@ def _draw_scorecard_png(
             )
 
         footer_y = summary_start_y + len(summary_rows) + 0.15
+        absolute_rows = flagged_absolute_by_rail.get(rail, [])
+        if absolute_rows:
+            absolute_heading_y = footer_y + 0.35
+            axis.text(
+                0.02,
+                absolute_heading_y,
+                "Flagged absolute (native units)",
+                transform=axis.get_yaxis_transform(),
+                ha="left",
+                va="center",
+                color="#334155",
+                fontsize=5.4,
+                fontweight="bold",
+                clip_on=False,
+            )
+            for index, text in enumerate(absolute_rows):
+                axis.text(
+                    0.02,
+                    absolute_heading_y + 0.55 + index * 0.65,
+                    text,
+                    transform=axis.get_yaxis_transform(),
+                    ha="left",
+                    va="center",
+                    color="#334155",
+                    fontsize=4.7,
+                    clip_on=False,
+                )
         not_scored = not_scored_by_rail.get(rail)
         if not_scored:
             axis.text(
@@ -4385,7 +4369,12 @@ def _draw_scorecard_png(
                 fontsize=4.2,
                 clip_on=False,
             )
-        last_y = footer_y + (0.35 if not_scored else -0.25)
+        absolute_extra = (
+            1.2 + max(0, len(absolute_rows) - 1) * 0.65
+            if absolute_rows
+            else 0
+        )
+        last_y = footer_y + absolute_extra + (0.35 if not_scored else -0.25)
         axis.set_title(label, loc="left", fontsize=7.5)
         axis.set_yticks([])
         axis.set_ylim(last_y + 0.5, -0.85)

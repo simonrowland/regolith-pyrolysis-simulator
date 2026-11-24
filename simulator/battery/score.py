@@ -21909,6 +21909,68 @@ class _BatteryHeroExactAccumulator:
         self.squares += value * value
 
 
+def _battery_hero_add_flagged_absolute(
+    facts: dict[
+        tuple[str, str, str],
+        tuple[list[Decimal], _BatteryHeroExactAccumulator, Counter[str]],
+    ],
+    row: Mapping[str, object],
+) -> None:
+    if (
+        row.get("status") == "refused"
+        or residual_metric_tier(row) != "flagged_absolute"
+    ):
+        return
+    numeric = row.get("numeric")
+    if not isinstance(numeric, Mapping):
+        return
+    try:
+        value = as_decimal(numeric.get("value"))
+    except (TypeError, ValueError, ArithmeticError):
+        return
+    if not value.is_finite():
+        return
+    key = (
+        str(row.get("rail") or ""),
+        _engine_from_payload(row),
+        str(numeric.get("unit") or ""),
+    )
+    entry = facts.get(key)
+    if entry is None:
+        entry = ([], _BatteryHeroExactAccumulator(), Counter())
+        facts[key] = entry
+    values, accumulator, flag_counts = entry
+    values.append(value)
+    accumulator.add(value)
+    flag_counts.update(set(_battery_hero_flagged_notice_kinds(row)))
+
+
+def _battery_hero_flagged_absolute_records(
+    facts: Mapping[
+        tuple[str, str, str],
+        tuple[Sequence[Decimal], _BatteryHeroExactAccumulator, Mapping[str, int]],
+    ],
+) -> dict[tuple[str, str], tuple[Mapping[str, object], ...]]:
+    records: dict[tuple[str, str], list[Mapping[str, object]]] = defaultdict(list)
+    for (rail, engine, unit), (values, accumulator, flag_counts) in sorted(
+        facts.items()
+    ):
+        rms = _rms(values)
+        if rms is None or accumulator.count == 0:
+            continue
+        records[(rail, engine)].append(
+            {
+                "tier": "flagged_absolute",
+                "operation": "absolute",
+                "unit": unit,
+                "n": accumulator.count,
+                "rms": str(rms),
+                "flag_kinds": dict(sorted(flag_counts.items())),
+            }
+        )
+    return {key: tuple(value) for key, value in records.items()}
+
+
 def _battery_hero_metric_values_stats(
     database: sqlite3.Connection,
     table: str,
@@ -22830,21 +22892,11 @@ def _battery_hero_deck_records(
         engine = _engine_from_payload(row)
         if engine != "unknown":
             engines.add(engine)
-        numeric = row.get("numeric")
         candidate = row.get("candidate_observation")
         identity = candidate.get("identity") if isinstance(candidate, Mapping) else None
         identity = identity if isinstance(identity, Mapping) else {}
-        if (
-            not isinstance(numeric, Mapping)
-            or numeric.get("operation") != MetricOperation.DEX.value
-            or numeric.get("value") is None
-        ):
-            continue
-        try:
-            residual_dex = as_decimal(numeric["value"])
-        except (TypeError, ValueError, ArithmeticError):
-            continue
-        if not residual_dex.is_finite():
+        residual_dex = _battery_hero_dex_metric_value(row)
+        if residual_dex is None:
             continue
 
         species = identity.get("species")
@@ -25066,6 +25118,38 @@ def residual_metric_tier(row: Mapping[str, object]) -> str | None:
     ):
         return "flagged_absolute"
     return None
+
+
+def _battery_hero_dex_metric_value(
+    row: Mapping[str, object],
+) -> Decimal | None:
+    if residual_metric_tier(row) != "dex":
+        return None
+    numeric = row.get("numeric")
+    if not isinstance(numeric, Mapping):
+        return None
+    try:
+        value = as_decimal(numeric.get("value"))
+    except (TypeError, ValueError, ArithmeticError):
+        return None
+    return value if value.is_finite() else None
+
+
+def _battery_hero_flagged_notice_kinds(
+    row: Mapping[str, object],
+) -> tuple[str, ...]:
+    notices = row.get("notices")
+    if not isinstance(notices, Sequence) or isinstance(notices, (str, bytes)):
+        return ()
+    return tuple(
+        str(notice["kind"])
+        for notice in notices
+        if (
+            isinstance(notice, Mapping)
+            and notice.get("kind")
+            and _flagged_payload_strata({"notices": [notice]})
+        )
+    )
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:
