@@ -92,10 +92,13 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
 
     monkeypatch.setattr(engine_local_config, "_WARNING_REPEAT_COUNTS", {})
     backend = AlphaMELTSBackend()
-    reaction_pressure_data = (
+    saturation_pressure_data = (
         ellingham_graph._load_default_vapor_pressure_data()
         if species == "Si"
         else vapor_pressure_data
+    )
+    helper_pressure_data = (
+        saturation_pressure_data if route == "helper" else vapor_pressure_data
     )
     answers = {}
     receipts = {}
@@ -110,7 +113,7 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
                     species,
                     1873.15,
                     oxygen,
-                    vapor_pressure_data=reaction_pressure_data,
+                    vapor_pressure_data=helper_pressure_data,
                 )
             else:
                 pressure = backend._activities_times_antoine(
@@ -130,13 +133,13 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
-    # L's legacy projection omits Si's saturation row; use the full catalog
-    # for this elemental pressure so the expected ceiling matches both routes.
+    # The Si elemental rail also cannot exceed its pure-component saturation
+    # pressure: the source reaction's implied metal activity is at most unity.
     saturation_Pa = (
         ellingham_graph.metal_saturation_pressure_Pa(
-            species, 1873.15, vapor_pressure_data=reaction_pressure_data,
+            species, 1873.15, vapor_pressure_data=saturation_pressure_data,
         )
-        if species in reaction_pressure_data["metals"]
+        if species in saturation_pressure_data.get("metals", {})
         else math.inf
     )
     assert answers[1000.0] < saturation_Pa

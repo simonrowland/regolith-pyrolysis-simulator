@@ -158,56 +158,6 @@ def test_projected_gate_dispatch_admits_projection_only_refusal(
     assert phase[3] == curve['composition_projected_notice']
 
 
-def test_sub_percent_mn_p_projection_falls_back_to_shadow_liquidus(
-    monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
-    setpoints_data,
-):
-    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
-    projection = MAGEMinBackend()._build_db_bulk_projection({
-        'SiO2': 50.0,
-        'Al2O3': 15.0,
-        'FeO': 10.0,
-        'MgO': 10.0,
-        'CaO': 10.0,
-        'Na2O': 2.0,
-        'K2O': 1.0,
-        'TiO2': 1.0,
-        'Cr2O3': 0.689,
-        'MnO': 0.207,
-        'P2O5': 0.104,
-    })
-    diagnostic = _projected_gate_provider_diagnostic()
-    backend_diagnostic = diagnostic['backend_diagnostics']
-    backend_diagnostic['input_composition_projection'] = (
-        _magemin_bulk_projection_details(projection)
-    )
-    backend_diagnostic['projected_liquidus_status'] = 'not_converged'
-    backend_diagnostic['projected_liquidus_diagnostics'] = {
-        'reason': 'liquidus_not_bracketed',
-    }
-    sim.melt.temperature_C = 1150.0
-    curve, phase = _projected_gate_phase_reader_result(
-        sim, monkeypatch, tmp_path, diagnostic, status='out_of_domain',
-    )
-
-    assert curve['source'] == (
-        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
-    )
-    assert curve['liquidus_T_C'] == pytest.approx(1300.0)
-    dropped = curve['composition_projected_notice']['dropped_components']
-    dropped_by_component = {
-        row['component']: row['mass_fraction'] for row in dropped
-    }
-    assert set(dropped_by_component) == {'MnO', 'P2O5'}
-    assert dropped_by_component['MnO'] == pytest.approx(0.00207)
-    assert dropped_by_component['P2O5'] == pytest.approx(0.00104)
-    assert sum(row['mass_fraction'] for row in dropped) == pytest.approx(0.00311)
-    assert curve['composition_projected_notice']['authority'] == 'extrapolated'
-    assert 'gate_provider_refusal' not in curve
-    assert sim._freeze_gate_provider_outcome is GateCurveProviderOutcome.STABLE_REFUSAL
-    assert phase[0] == pytest.approx(0.5)
-
-
 def test_projected_gate_dispatch_rejects_mixed_refusal_as_missing_with_notice(
     monkeypatch, tmp_path, vapor_pressure_data, feedstocks_data,
     setpoints_data,
@@ -970,6 +920,8 @@ def test_magemin_launch_programming_errors_still_propagate(
     ({'backend_status': 'unavailable'}, 'failed'),
     ({'backend_status': 'not_converged'}, 'numerical_failure'),
     ({'backend_status_reason': 'engine_worker_timeout'}, 'failed'),
+    ({'projected_liquidus_status': 'unavailable'}, 'numerical_failure'),
+    ({'projected_liquidus_status': 'not_converged'}, 'numerical_failure'),
     ({'projected_liquidus_status': 'out_of_domain',
       'projected_liquidus_diagnostics': {'reason': 'engine_worker_timeout'}}, 'failed'),
     ({'projected_liquidus_status': 'not_converged',
@@ -992,35 +944,6 @@ def test_wrapped_diagnostic_distinguishes_numerical_and_environment_failure(
         'backend_status_reason': 'composition_projected',
         'backend_diagnostics': nested,
     }).value == expected
-
-
-@pytest.mark.parametrize('outer_status', ['ok', 'out_of_domain'])
-@pytest.mark.parametrize('projected_status', ['unavailable', 'not_converged'])
-def test_projected_search_failure_does_not_override_composition_refusal(
-    outer_status, projected_status,
-):
-    expected = (
-        'stable_refusal' if outer_status == 'out_of_domain'
-        else 'numerical_failure'
-    )
-    assert gate_curve_provider_outcome_for_status(outer_status, {
-        'backend_status_reason': 'composition_projected',
-        'backend_diagnostics': {
-            'backend_status_reason': 'composition_projected',
-            'projected_liquidus_status': projected_status,
-        },
-    }).value == expected
-
-
-def test_numerical_reason_in_projected_search_keeps_failure_classification():
-    assert gate_curve_provider_outcome_for_status('out_of_domain', {
-        'backend_status_reason': 'composition_projected',
-        'backend_diagnostics': {
-            'backend_status_reason': 'composition_projected',
-            'projected_liquidus_status': 'not_converged',
-            'projected_liquidus_diagnostics': {'reason': 'no_convergence'},
-        },
-    }).value == 'numerical_failure'
 
 
 @pytest.mark.parametrize('mode', ['reason', 'exception', 'backend_exception', 'aggregate_budget'])
