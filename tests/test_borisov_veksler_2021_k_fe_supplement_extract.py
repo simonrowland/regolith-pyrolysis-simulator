@@ -73,6 +73,26 @@ def test_locatorless_printed_kbar_migrates_to_identity_with_unit_trail(migrated_
     assert "kbar_to_Pa" in observation.derivation.relation
 
 
+def test_absent_primary_keeps_quoted_run_composition_missing(migrated_extract) -> None:
+    document, result = migrated_extract
+    raw = next(
+        item
+        for item in document["species"]["SiO2"]["observations"]
+        if item["values"].get("attribution_as_published")
+        == "Veksler et al., 2006."
+        and item["values"].get("source_row_as_published") == 4
+    )
+    observation = result.observations[
+        f"{SOURCE_ID}::{raw['observation_id']}"
+    ]
+    experiment = result.experiments[observation.experiment_id]
+
+    assert experiment.quoted_from is None
+    assert experiment.sample.initial_composition is None
+    assert experiment.sample.initial_composition_inherited_from is None
+    assert observation.identity.composition.is_unknown
+
+
 @pytest.mark.skipif(not SOURCE_XLSX.is_file(), reason="regolith-corpus workbook is absent")
 def test_every_workbook_component_migrates_as_its_printed_point_or_refusal(migrated_extract) -> None:
     document, result = migrated_extract
