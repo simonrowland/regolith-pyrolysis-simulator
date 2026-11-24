@@ -2545,6 +2545,8 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
+    if NoticeKind.QUENCH_OXIDISING.value in kinds:
+        strata.append(NoticeKind.QUENCH_OXIDISING.value)
     return tuple(strata)
 
 

@@ -9,6 +9,7 @@ import pytest
 import yaml
 
 from simulator.battery.engine_capability import engine_covers_quantity
+import simulator.battery.score as score_mod
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -23,6 +24,7 @@ from simulator.battery.enums import (
     QuenchState,
     Quantity,
     Rail,
+    ResidualStatus,
     RefusalReason,
     ValenceDenominatorKind,
     ValenceValueForm,
@@ -2244,7 +2246,7 @@ def test_paired_quench_diagnostics_requires_matching_source_id():
     ) == ()
 
 
-def test_oxidising_cr_glass_carries_lower_bound_notice_without_gating_score():
+def test_oxidising_cr_glass_carries_lower_bound_notice_outside_certified_tier():
     result = _migrate_sossi_cr()
     template = _valence_template(result)
     identity = replace(
@@ -2271,10 +2273,33 @@ def test_oxidising_cr_glass_carries_lower_bound_notice_without_gating_score():
 
     residual = next(row for row in residuals if row.reference == glass.observation_id)
     assert residual.numeric is not None
+    assert residual.status is not ResidualStatus.REFUSED
     notice = next(
         notice
         for notice in residual.notices
         if notice.kind is NoticeKind.QUENCH_OXIDISING
     )
     assert "lower bound" in notice.reason
-    assert "quench_oxidising" not in flagged_strata(residual.notices)
+    assert "quench_oxidising" in flagged_strata(residual.notices)
+    assert not score_mod._headline_payload_admits(
+        residual_to_plain(residual), tier="measured"
+    )
+
+
+def test_oxidising_quench_headline_guard_detects_classifier_mutation(monkeypatch):
+    notice = {
+        "kind": NoticeKind.QUENCH_OXIDISING.value,
+        "reason": "oxidising quench makes Cr2+/SumCr a lower bound",
+    }
+    row = {"notices": (notice,), "rail": Rail.REDOX.value, "exclusions": ()}
+    classifier = score_mod._classify_flagged_notice_facts
+    monkeypatch.setattr(
+        score_mod,
+        "_classify_flagged_notice_facts",
+        lambda notices: classifier(
+            tuple(item for item in notices if item[0] != NoticeKind.QUENCH_OXIDISING.value)
+        ),
+    )
+
+    with pytest.raises(AssertionError):
+        assert not score_mod._headline_payload_admits(row, tier="measured")
