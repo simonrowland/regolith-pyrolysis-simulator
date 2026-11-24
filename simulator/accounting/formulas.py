@@ -11,6 +11,10 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
+from simulator.chemistry.formula_text import (
+    _strip_formula_markup,
+    fold_subscript_digits,
+)
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -275,17 +279,28 @@ def atoms_parse_formula_else_janaf(
     A successful ``parse_formula`` wins. A hydrate stays waters
     (``CuSO4.5H2O`` and ``CuSO4·5H2O`` are five waters, not decimal
     oxygen). A printed decimal subscript stays one species and is not
-    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). ``AccountingError``
-    falls back to JANAF ``formula_composition``. None means both failed.
-    Other exceptions propagate.
+    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). D2O adducts outside
+    the closed vocabulary are refused, while standalone JANAF deuterium
+    formulas keep their counts. ``AccountingError`` falls back to JANAF
+    ``formula_composition``. None means both failed. Other exceptions
+    propagate.
     """
 
+    cleaned = _clean_formula_text(formula)
+    if _has_empty_middle_dot_segment(cleaned):
+        return None
+    # D2O remains available as an ordinary JANAF component, but it is not in
+    # accounting's closed adduct vocabulary. Refuse the hydrate spelling
+    # before a JANAF fallback can reinterpret the separator or multiplier.
+    if re.search(r"[.·]\d*D2O(?:$|[^a-z])", cleaned):
+        return None
+
     try:
-        parsed = parse_formula(formula)
+        parsed = parse_formula(cleaned)
     except AccountingError:
         from simulator.reference_data.janaf import formula_composition
 
-        return formula_composition(formula)
+        return formula_composition(cleaned.replace(_DECIMAL_DOT_SENTINEL, "."))
     return tuple(
         sorted(
             (str(element), float(count))
@@ -597,12 +612,39 @@ def _declared_molar_mass(value: Mapping[str, Any]) -> float | None:
 
 
 def _clean_formula_text(formula: str) -> str:
+    """Normalize notation while leaving dot classification to the splitter."""
+
     text = re.sub(r"\s+", "", str(formula).strip())
+    if text.startswith("$") and text.endswith("$"):
+        text = text[1:-1]
+    text = _strip_formula_markup(text)
+    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+
+    def _expand_subscript(match: re.Match[str]) -> str:
+        braced = match.group(1)
+        if braced is not None:
+            return braced.replace(".", _DECIMAL_DOT_SENTINEL)
+        return match.group(2) or ""
+
+    text = re.sub(
+        r"_\{(\d+(?:\.\d+)?)\}|_(\d+(?:\.\d+)?)",
+        _expand_subscript,
+        text,
+    )
+    text = fold_subscript_digits(text)
     previous = None
     while text and previous != text:
         previous = text
         text = _PHASE_SUFFIX_RE.sub("", text)
     return text
+
+
+def _has_empty_middle_dot_segment(formula: str) -> bool:
+    """Reject empty adduct segments before a fallback can drop them."""
+
+    return "·" in formula and any(
+        not segment for segment in formula.split("·")
+    )
 
 
 def _adduct_boundary(text: str, dot: int) -> int | None:
@@ -693,6 +735,9 @@ def _split_formula_segments(formula: str) -> list[str]:
     ``FeO1.5``, and ``SiO1.5C0.5`` stay one species.
     """
 
+    if _has_empty_middle_dot_segment(formula):
+        raise UnknownSpeciesError("formula has an empty middle-dot segment")
+
     pieces: list[str] = []
     for part in formula.split("·"):
         pieces.extend(_split_ascii_adducts(part))
@@ -703,13 +748,21 @@ def _split_formula_segments(formula: str) -> list[str]:
 
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:
-    match = _NUMBER_RE.match(segment)
+    match = re.match(r"(\d+/\d+|\d+(?:\.\d+)?)", segment)
     if match is None:
         return 1.0, segment
     body = segment[match.end() :]
     if not body:
         raise UnknownSpeciesError(f"formula segment {segment!r} has no body")
-    return float(match.group(0)), body
+    number = match.group(0)
+    if "/" in number:
+        numerator, denominator = number.split("/", 1)
+        if int(denominator) == 0:
+            raise UnknownSpeciesError(
+                f"formula segment {segment!r} has a zero denominator"
+            )
+        return int(numerator) / int(denominator), body
+    return float(number), body
 
 
 def _close_enough(left: float, right: float, absolute: float, relative: float) -> bool:

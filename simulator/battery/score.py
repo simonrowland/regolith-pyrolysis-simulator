@@ -44,7 +44,7 @@ from typing import (
 
 import yaml
 
-from simulator.chemistry.formula_text import fold_subscript_digits
+from simulator.chemistry.formula_text import _strip_formula_markup
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
 from simulator.supervised_process_pool import (
@@ -1159,18 +1159,6 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
     return species is not None and phase_token(species) is phase
 
 
-def _accounting_formula_composition(
-    formula: str,
-) -> tuple[tuple[str, float], ...] | None:
-    from simulator.accounting.formulas import parse_formula
-
-    try:
-        elements = parse_formula(formula, species=formula).elements
-    except ValueError:
-        return None
-    return tuple(sorted((str(symbol), float(count)) for symbol, count in elements.items()))
-
-
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
@@ -1195,26 +1183,9 @@ def parse_species_formula(
         text = text[1:-1].strip()
     if "$" in text:
         return None
-    text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
-    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
-    # A dot inside ``_{1.5}`` is a coefficient. Expanding the braces before
-    # classification turns ``$MgAl_{1.5}H_2O$`` into five waters.
-    from simulator.accounting.formulas import _DECIMAL_DOT_SENTINEL
-
-    braced_decimal_dot = _DECIMAL_DOT_SENTINEL
-
-    def _expand_subscript(match: re.Match[str]) -> str:
-        braced = match.group(1)
-        if braced is not None:
-            return braced.replace(".", braced_decimal_dot)
-        return match.group(2) or ""
-
-    text = re.sub(
-        r"_\{(\d+(?:\.\d+)?)\}|_(\d+(?:\.\d+)?)",
-        _expand_subscript,
-        text,
-    )
-    text = fold_subscript_digits(text)
+    # Remove command wrappers so terminal phase labels remain visible to the
+    # scorer's axis checks. Formula notation and every dot stay with accounting.
+    text = _strip_formula_markup(text)
     phase_labels: dict[str, Phase] = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1304,63 +1275,9 @@ def parse_species_formula(
     ):
         return None
 
-    # A D2O adduct is outside the accounting vocabulary. JANAF accepts D as
-    # an ordinary element, so stop this unsupported hydrate before its decimal
-    # fallback can reinterpret the separator as oxygen stoichiometry.
-    if re.search(r"\.\d*D2O(?:$|[^a-z])", text):
-        return None
+    from simulator.accounting.formulas import atoms_parse_formula_else_janaf
 
-    # Validate suffix axes before the JANAF parser can strip a terminal phase
-    # label and return a composition without seeing the required species axis.
-    # Accounting assigns separator dots before restoring this explicit decimal.
-    if "." in text and "·" not in text:
-        from simulator.accounting.formulas import _is_ascii_adduct
-
-        if _is_ascii_adduct(text):
-            return _accounting_formula_composition(text)
-    text = text.replace(braced_decimal_dot, ".")
-
-    established = formula_composition(text)
-    if established is not None:
-        return established
-
-    if "·" in text:
-        hydrated: defaultdict[str, float] = defaultdict(float)
-        try:
-            from simulator.accounting.formulas import atoms_parse_formula_else_janaf
-
-            # Parse each middle-dot segment separately so hydrate multipliers
-            # such as 1/2 and 6.5 do not collide with period splitting.
-            for segment in text.split("·"):
-                multiplier_match = re.match(
-                    r"^(\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", segment
-                )
-                multiplier = 1.0
-                body = segment
-                if multiplier_match is not None:
-                    number = multiplier_match.group(1)
-                    if "/" in number:
-                        numerator, denominator = number.split("/", 1)
-                        if int(denominator) == 0:
-                            return None
-                        multiplier = int(numerator) / int(denominator)
-                    else:
-                        multiplier = float(number)
-                    body = segment[multiplier_match.end() :]
-                if not body:
-                    return None
-                composition = atoms_parse_formula_else_janaf(body)
-                if composition is None:
-                    return None
-                for symbol, count in composition:
-                    hydrated[symbol] += multiplier * count
-        except ValueError:
-            return None
-        return tuple(sorted(hydrated.items()))
-
-    if "." in text:
-        return None
-    return _accounting_formula_composition(text)
+    return atoms_parse_formula_else_janaf(text)
 
 
 def _is_raw_element_label(formula: str, *, species: Species | None = None) -> bool:

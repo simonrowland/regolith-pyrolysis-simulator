@@ -791,7 +791,7 @@ def _latex_to_formula(chunk: str) -> tuple[str, int | None]:
         elif raw.endswith("-"):
             charge = -1
         chunk = chunk[: superscript.start()] + chunk[superscript.end() :]
-    chunk = chunk.replace(r"\cdot", ".").replace(r"\mathrm", "")
+    chunk = chunk.replace(r"\cdot", "·").replace(r"\mathrm", "")
     chunk = _LATEX_SUB_RE.sub(lambda match: match.group(1) or match.group(2), chunk)
     chunk = chunk.replace("{", "").replace("}", "").replace("\\", "")
     chunk = chunk.replace(" ", "")
@@ -831,7 +831,7 @@ def _is_closed_formula_token(text: str) -> bool:
 
 
 def _plain_formula_and_charge(text: str) -> tuple[str | None, int | None]:
-    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = re.sub(r"\s+", "", text)
     if not compact:
         return None, None
     ion = _ION_TOKEN_RE.fullmatch(compact)
@@ -884,7 +884,7 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
 
 
 def _parseable_formula(text: str) -> str | None:
-    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = re.sub(r"\s+", "", text)
     if not compact or compact.startswith("$"):
         return None
     for candidate in (compact, compact.replace("0", "O")):

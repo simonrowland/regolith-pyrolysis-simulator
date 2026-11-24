@@ -749,7 +749,7 @@ def _row_temperature_tokens(tokens: Sequence[RawToken]) -> dict[int, RawToken]:
 
 
 def _parseable_formula(text: str) -> str | None:
-    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = re.sub(r"\s+", "", text)
     if not compact:
         return None
     for candidate in (compact, compact.replace("0", "O")):
@@ -764,7 +764,7 @@ def _parseable_formula(text: str) -> str | None:
 def _formula_and_charge_from_published(
     text: str,
 ) -> tuple[str | None, int | None]:
-    compact = re.sub(r"\s+", "", text).replace("·", ".")
+    compact = re.sub(r"\s+", "", text)
     compact = compact.translate(_SUBSCRIPT_TRANSLATION)
     charge: int | None = None
     quote_tail = re.search(r"[\"']+$", compact)
@@ -901,7 +901,7 @@ def _allotrope_from_weight(name: str, fw: Decimal) -> str | None:
 def _ocr_formula_variants(text: str) -> tuple[str, ...]:
     """Closed OCR repairs of a printed formula. Mass-check is the gate."""
 
-    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = re.sub(r"\s+", "", text)
     compact = compact.translate(_SUBSCRIPT_TRANSLATION)
     if not compact:
         return ()
