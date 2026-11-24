@@ -11,7 +11,6 @@ from __future__ import annotations
 import base64
 import json
 import lzma
-import os
 import re
 from pathlib import Path
 from unittest.mock import patch
@@ -580,6 +579,23 @@ def _format_store_delta_report(
             )))
         unique_paths = set(observations) | {str(item["path"]) for item in work + other}
         output.append(f"TOTAL changed_store_paths={len(unique_paths)}")
+        out_of_scope_sources = set()
+        for record in observations.values():
+            assert isinstance(record, dict)
+            for row in record.get("rows", []):
+                for change in row.get("changes", []):
+                    if not _field_is_fold22_scope(
+                        str(change["field"]), change, str(row["source_id"])
+                    ):
+                        out_of_scope_sources.add(str(row["source_id"]))
+        for record in work:
+            assert isinstance(record, dict)
+            for change in record.get("changes", []):
+                if not _field_is_fold22_scope(
+                    str(change["field"]), change, str((record.get("source_ids") or [""])[0])
+                ):
+                    out_of_scope_sources.update(map(str, record.get("source_ids", [])))
+        output.append("OUT_OF_SCOPE_SOURCE_IDS=" + ",".join(sorted(out_of_scope_sources)))
         return "\n".join(output)
 
     decoded: list[str] = []
@@ -2783,7 +2799,9 @@ def test_representative_migration_rows_match_literal_baseline(tmp_path: Path) ->
     assert not differences, "\n".join(differences)
 
 
-def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:
+def _assert_complete_store_regeneration_matches_checked_in_bytes(
+    report_mode: str | None = None, source_filter: tuple[str, ...] = ()
+) -> None:
     result = migrate(REPO_ROOT, write=False)
     stored = _store_output_file_bytes(REPO_ROOT)
     regenerated: dict[str, bytes] = {}
@@ -2817,13 +2835,11 @@ def _assert_complete_store_regeneration_matches_checked_in_bytes() -> None:
     for label, count in headline.items():
         assert f"{label}: {count}" in report
 
-    report_mode = os.environ.get("REGOLITH_STORE_DELTA_REPORT")
     if report_mode:
-        source_filter = set(filter(None, os.environ.get("REGOLITH_STORE_DELTA_SOURCES", "").split(",")))
         payload = _store_difference_payload(stored, regenerated, byte_differences)
-        print(_format_store_delta_report(payload, report_mode, source_filter))
+        print(_format_store_delta_report(payload, report_mode, set(source_filter)))
         assert len(byte_differences) == 376
-        return
+        raise AssertionError("intentional store delta report follows")
     assert byte_differences == [], _store_difference_details(
         stored, regenerated, byte_differences
     )
