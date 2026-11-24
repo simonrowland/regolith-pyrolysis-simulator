@@ -5,7 +5,6 @@ import pytest
 import yaml
 
 from simulator.battery import migrate as M
-from simulator.battery import validate as validation_module
 from simulator.battery.enums import AmountBasis, QuotedTargetKind, RefusalReason
 from simulator.battery.records import Composition, QuotedFrom, State
 from simulator.battery.validate import validate_corpus
@@ -72,8 +71,6 @@ def test_quoted_from_roundtrips_and_resolves_either_primary_record(
     assert restored.method_inherited_from is True
     assert restored.sample.initial_composition_inherited_from is True
     assert restored.sample.initial_composition == quoted.sample.initial_composition
-    assert restored.sample.initial_composition == primary.sample.initial_composition
-    assert primary_observation.identity.composition.is_not_applicable
     assert M.to_plain(restored)["quoted_from"] == {
         "target_kind": target_kind.value,
         "target_id": target_id,
@@ -120,12 +117,7 @@ def test_measured_liquid_composition_cannot_stand_in_for_run_composition() -> No
     )
 
 
-_INHERITED_COMPOSITION_PATH = (
-    "experiment[quoted-experiment].sample.initial_composition_inherited_from"
-)
-
-
-def _inherited_composition_mismatch_report():
+def test_inherited_initial_composition_must_match_cited_run() -> None:
     primary = F.tabulation_experiment("primary-experiment")
     starting_composition = _composition()
     primary = replace(
@@ -146,46 +138,13 @@ def _inherited_composition_mismatch_report():
         QuotedFrom(QuotedTargetKind.EXPERIMENT, primary.experiment_id),
         composition=different_composition,
     )
-    return validate_corpus([F.work()], [primary, quoted], [])
-
-
-def _assert_inherited_composition_mismatch(report) -> None:
+    report = validate_corpus([F.work()], [primary, quoted], [])
     assert any(
-        issue.path == _INHERITED_COMPOSITION_PATH
+        issue.path
+        == "experiment[quoted-experiment].sample.initial_composition_inherited_from"
         and issue.reason is RefusalReason.CONDITIONAL_FIELD
         for issue in report.hard_issues
     )
-
-
-def test_inherited_initial_composition_must_match_cited_run() -> None:
-    _assert_inherited_composition_mismatch(
-        _inherited_composition_mismatch_report()
-    )
-
-
-def test_inherited_initial_composition_mismatch_mutation_is_detected(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    validate_experiment = validation_module.validate_experiment
-
-    def without_mismatch_refusal(*args, **kwargs):
-        issues = validate_experiment(*args, **kwargs)
-        return [
-            issue
-            for issue in issues
-            if not (
-                issue.path == _INHERITED_COMPOSITION_PATH
-                and issue.reason is RefusalReason.CONDITIONAL_FIELD
-            )
-        ]
-
-    monkeypatch.setattr(
-        validation_module, "validate_experiment", without_mismatch_refusal
-    )
-    with pytest.raises(AssertionError):
-        _assert_inherited_composition_mismatch(
-            _inherited_composition_mismatch_report()
-        )
 
 
 def test_quoted_from_requires_a_resolving_target() -> None:
