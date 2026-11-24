@@ -283,7 +283,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'class:simulator/optimize/results_store.py:ResultStore': {
         "path": 'simulator/optimize/results_store.py',
-        "line": 189,
+        "line": 205,
         "kind": 'class',
         "name": 'ResultStore',
         "carries_disclosure": True,
@@ -299,7 +299,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'fn:simulator/optimize/study.py:_scored_result_from_journal_payload': {
         "path": 'simulator/optimize/study.py',
-        "line": 2273,
+        "line": 2268,
         "kind": 'fn',
         "name": '_scored_result_from_journal_payload',
         "carries_disclosure": True,
@@ -859,7 +859,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/residue.py:pressure_cache': {
         "path": 'simulator/battery/residue.py',
-        "line": 5520,
+        "line": 5522,
         "kind": 'store',
         "name": 'pressure_cache',
         "carries_disclosure": True,
@@ -931,7 +931,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 8836,
+        "line": 8834,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,
@@ -1059,7 +1059,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/optimize/study.py:prefix_replay_cache': {
         "path": 'simulator/optimize/study.py',
-        "line": 723,
+        "line": 718,
         "kind": 'store',
         "name": 'prefix_replay_cache',
         "carries_disclosure": False,
