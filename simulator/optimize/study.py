@@ -5597,6 +5597,10 @@ def _write_artifacts(
                 ),
                 **dict(winner_patch),
             }
+            if winner.eval_spec.lab_schedule:
+                winner_document["lab_schedule"] = _jsonable_value(
+                    winner.eval_spec.lab_schedule
+                )
             winner_path.write_text(
                 yaml.safe_dump(winner_document, sort_keys=False),
                 encoding="utf-8",

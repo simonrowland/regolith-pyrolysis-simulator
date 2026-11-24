@@ -77,6 +77,8 @@ from simulator.optimize.recipe import (
     conditional_context_metadata,
 )
 from simulator.optimize.results_store import ResultStore
+from simulator import runner as runner_module
+from simulator.recipe_io import load_recipe_patch
 from simulator.optimize.save_bundle import ALLOWED_MEMBERS, export_study_bundle
 from simulator.optimize.strategy import (
     Candidate,
@@ -441,6 +443,7 @@ def _write_save_format_artifacts(
     *,
     warm_start_from: Path | None = None,
     cost_parameters: Mapping[str, Any] | None = None,
+    lab_schedule: Mapping[str, Any] | None = None,
 ) -> Path:
     out = tmp_path / "run"
     out.mkdir()
@@ -464,6 +467,11 @@ def _write_save_format_artifacts(
 
     monkeypatch.setattr(study, "optimizer_tier_label", fake_honesty)
     record = _save_format_record(cost_parameters)
+    if lab_schedule is not None:
+        record = replace(
+            record,
+            eval_spec=replace(record.eval_spec, lab_schedule=lab_schedule),
+        )
     config = study.StudyConfig(
         profile=PROFILE,
         feedstock=FEEDSTOCK,
@@ -529,6 +537,81 @@ def test_winner_recipe_records_evaluated_cost_parameters(
     assert winner["cost_parameters"]["parameters"]["electricity_cost_per_kWh"][
         "value"
     ] == pytest.approx(0.42)
+
+
+def test_robinot_schedule_round_trips_winner_recipe_io_and_preset_runner(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    preset_path = (
+        Path(__file__).resolve().parents[1]
+        / "data"
+        / "presets"
+        / "vacuum_pyrolysis"
+        / "robinot_2026.yaml"
+    )
+    preset = yaml.safe_load(preset_path.read_text(encoding="utf-8"))
+    source_schedule = preset["lab_schedule"]
+    out = _write_save_format_artifacts(
+        tmp_path,
+        monkeypatch,
+        lab_schedule=source_schedule,
+    )
+
+    winner_recipe = out / "winner.recipe.yaml"
+    winner_document = yaml.safe_load(winner_recipe.read_text(encoding="utf-8"))
+    source_tags = {
+        "run.assumed_FeO": {
+            "source_class": "assumption_with_sensitivity_marker",
+            "registry_default_id": "example:assumed-feo-basis",
+            "flag": {"kind": "assumed_input", "reason": "example only"},
+        }
+    }
+    winner_document["source_tags"] = source_tags
+    winner_recipe.write_text(
+        yaml.safe_dump(winner_document, sort_keys=False),
+        encoding="utf-8",
+    )
+    loaded_recipe = load_recipe_patch(winner_recipe)
+    preset_spec = runner_module._load_preset_run_spec(
+        preset_path,
+        "faithful",
+        recipe_fields=loaded_recipe,
+    )
+    expected_knots = yaml.safe_dump(
+        source_schedule["melt_temperature_C"],
+        sort_keys=False,
+    ).encode("utf-8")
+
+    assert winner_document["lab_schedule"]["melt_temperature_C"] == (
+        source_schedule["melt_temperature_C"]
+    )
+    assert yaml.safe_dump(
+        loaded_recipe["lab_schedule"]["melt_temperature_C"],
+        sort_keys=False,
+    ).encode("utf-8") == expected_knots
+    assert yaml.safe_dump(
+        preset_spec.lab_schedule["melt_temperature_C"],
+        sort_keys=False,
+    ).encode("utf-8") == expected_knots
+    assert preset_spec.process_dt_s == 60.0
+    assert preset_spec.step_count == 59
+    assert preset_spec.document["source_tags"] == source_tags
+    assert preset_spec.provenance["recipe_source_tags"] == source_tags
+
+    legacy_root = tmp_path / "legacy"
+    legacy_root.mkdir()
+    legacy_out = _write_save_format_artifacts(legacy_root, monkeypatch)
+    legacy_winner_path = legacy_out / "winner.recipe.yaml"
+    legacy_winner = yaml.safe_load(
+        legacy_winner_path.read_text(encoding="utf-8")
+    )
+    assert not {"lab_schedule", "process_dt_s", "source_tags"}.intersection(
+        legacy_winner
+    )
+    assert load_recipe_patch(legacy_winner_path) == RecipeSchema().to_setpoints_patch(
+        RecipePatch.from_nested(legacy_winner)
+    )
 
 
 def test_write_artifacts_emits_study_summary_schema(

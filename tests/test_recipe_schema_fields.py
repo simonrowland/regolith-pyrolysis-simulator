@@ -1,0 +1,135 @@
+from __future__ import annotations
+
+import copy
+from pathlib import Path
+
+import pytest
+import yaml
+
+from simulator.lab_geometry import parse_lab_geometry
+from simulator.recipe import RecipePatch, RecipeSchema, RecipeValidationError
+from simulator.recipe_io import load_recipe_patch, write_recipe_patch
+
+
+ROOT = Path(__file__).resolve().parents[1]
+RECIPE_DIR = ROOT / "data" / "recipes"
+EXAMPLE_RECIPE = RECIPE_DIR / "robinot_2026_benchtop_example.yaml"
+ROBINOT_PRESET = ROOT / "data" / "presets" / "vacuum_pyrolysis" / "robinot_2026.yaml"
+OPTIONAL_FIELDS = {"lab_schedule", "process_dt_s", "source_tags"}
+
+
+def _robinot_preset() -> dict:
+    return yaml.safe_load(ROBINOT_PRESET.read_text(encoding="utf-8"))
+
+
+def test_legacy_recipe_database_starters_keep_their_setpoints_shape() -> None:
+    assert RecipeSchema().recipe_schema_version == "recipe-schema-v2"
+    for path in sorted(RECIPE_DIR.glob("*.yaml")):
+        if path == EXAMPLE_RECIPE:
+            continue
+        original = yaml.safe_load(path.read_text(encoding="utf-8"))
+        loaded = load_recipe_patch(path)
+
+        assert not OPTIONAL_FIELDS.intersection(loaded)
+        assert loaded == RecipeSchema().to_setpoints_patch(
+            RecipePatch.from_nested(original)
+        )
+
+
+def test_lab_schedule_and_source_tags_round_trip_without_losing_knots(
+    tmp_path: Path,
+) -> None:
+    preset = _robinot_preset()
+    schedule = copy.deepcopy(preset["lab_schedule"])
+    source_tags = {
+        "feedstock.total_Fe": {
+            "source_class": "literature_sidecar",
+            "citation_id": "engelschion_2020",
+            "locator": "EAC-1A XRF major-oxide table; total Fe reported as FeO",
+        },
+        "run.assumed_FeO": {
+            "source_class": "assumption_with_sensitivity_marker",
+            "registry_default_id": "test_default_feo_basis",
+            "flag": {"kind": "assumed_input", "reason": "redox split not measured"},
+        },
+    }
+    recipe_path = tmp_path / "robinot_example.recipe.yaml"
+    write_recipe_patch(
+        recipe_path,
+        {
+            "lab_schedule": schedule,
+            "process_dt_s": preset["process_dt_s"],
+            "source_tags": source_tags,
+        },
+    )
+    loaded = load_recipe_patch(recipe_path)
+
+    original_knots = yaml.safe_dump(
+        schedule["melt_temperature_C"],
+        sort_keys=False,
+    ).encode("utf-8")
+    loaded_knots = yaml.safe_dump(
+        loaded["lab_schedule"]["melt_temperature_C"],
+        sort_keys=False,
+    ).encode("utf-8")
+    assert loaded_knots == original_knots
+    assert loaded["process_dt_s"] == 60.0
+    assert loaded["source_tags"] == source_tags
+    assert loaded["source_tags"]["run.assumed_FeO"] != loaded["source_tags"][
+        "feedstock.total_Fe"
+    ]
+
+
+@pytest.mark.parametrize("dt_s", [0, -1, float("inf"), float("nan"), True])
+def test_process_dt_s_requires_a_positive_finite_number(dt_s: object) -> None:
+    with pytest.raises(RecipeValidationError):
+        RecipePatch.from_nested({"process_dt_s": dt_s})
+
+
+def test_process_dt_s_uses_the_landed_timestep_owner_for_duration_ratio() -> None:
+    schedule = _robinot_preset()["lab_schedule"]
+    minute_step = RecipePatch.from_nested(
+        {"lab_schedule": schedule, "process_dt_s": 60}
+    )
+    assert minute_step.process_dt_s == 60.0
+
+    with pytest.raises(RecipeValidationError, match="timestep_does_not_divide_duration"):
+        RecipePatch.from_nested(
+            {"lab_schedule": schedule, "process_dt_s": 700}
+        )
+
+
+def test_robinot_geometry_keeps_gram_mass_units() -> None:
+    preset = _robinot_preset()
+    geometry = parse_lab_geometry(
+        preset["lab_geometry"],
+        allow_temperature_profiles=True,
+    )
+    assert geometry is not None
+    assert geometry.sample_mass_g == pytest.approx(3.38)
+
+
+def test_legacy_ramp_recipe_has_no_lab_schedule_override() -> None:
+    recipe = load_recipe_patch(RECIPE_DIR / "canonical_lunar_full_yield.yaml")
+    assert "lab_schedule" not in recipe
+    assert "process_dt_s" not in recipe
+
+
+def test_robinot_example_recipe_uses_preset_geometry_and_distinct_fe_tags() -> None:
+    recipe = load_recipe_patch(EXAMPLE_RECIPE)
+    preset = _robinot_preset()
+    geometry = parse_lab_geometry(
+        preset["lab_geometry"],
+        allow_temperature_profiles=True,
+    )
+
+    assert geometry is not None
+    assert geometry.sample_mass_g == pytest.approx(3.38)
+    assert recipe["process_dt_s"] == 60.0
+    assert recipe["lab_schedule"]["id"] == preset["lab_schedule"]["id"]
+    assert recipe["source_tags"]["feedstock.total_Fe"]["source_class"] == (
+        "literature_sidecar"
+    )
+    assert recipe["source_tags"]["run.assumed_FeO"]["source_class"] == (
+        "assumption_with_sensitivity_marker"
+    )

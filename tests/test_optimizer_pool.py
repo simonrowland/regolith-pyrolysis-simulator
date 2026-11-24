@@ -76,6 +76,16 @@ def test_eval_timeout_rejects_nonfinite_values(value: str) -> None:
         resolve_eval_timeout_seconds(value)
 
 
+def test_pool_patch_normalization_preserves_recipe_run_fields() -> None:
+    tags = {"run.assumed_FeO": {"registry_default_id": "example-default"}}
+    patch = RecipePatch({}, process_dt_s=60, source_tags=tags)
+
+    normalized = pool_module._normalize_patch(patch)
+
+    assert normalized.process_dt_s == 60.0
+    assert normalized.source_tags == tags
+
+
 @pytest.mark.parametrize("value", [True, False])
 def test_eval_timeout_rejects_bool_before_numeric_conversion(value: bool) -> None:
     with pytest.raises(ValueError, match="must not be bool"):

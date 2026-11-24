@@ -23,6 +23,7 @@ from simulator.optimize.recipe import (
     C5_GUARD,
     ConditionalExecutionContext,
     KeyPath,
+    _PREVIOUS_RECIPE_SCHEMA_VERSIONS,
     RecipePatch,
     RecipeSchema,
     c5_sampler_context,
@@ -217,6 +218,8 @@ class DoeSpec:
         if (
             expected_recipe_schema_version is not None
             and expected_recipe_schema_version != active_schema.recipe_schema_version
+            and expected_recipe_schema_version
+            not in _PREVIOUS_RECIPE_SCHEMA_VERSIONS
         ):
             raise ValueError("DOE spec recipe_schema_version does not match the active schema")
         expected_allowlist_version = payload.get("allowlist_version")

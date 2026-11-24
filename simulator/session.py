@@ -25,6 +25,7 @@ from simulator.backends import (
 )
 from simulator.core import CampaignPhase, PyrolysisSimulator
 from simulator.process_timestep import (
+    PROCESS_HOUR_S,
     ProcessTimestepRefusal,
     resolve_process_timestep,
 )
@@ -213,7 +214,7 @@ class SimSessionConfig:
     # is_complete() instead of stopping at ``hours``. ``hours`` stays the
     # authored budget for the cache key and for runs that leave this false.
     until_campaign_complete: bool = False
-    process_dt_s: float = 3600.0
+    process_dt_s: float = float(PROCESS_HOUR_S)
 
     def __post_init__(self) -> None:
         # Fold legacy analytical aliases onto the canonical

@@ -155,7 +155,11 @@ from simulator.thermal_budget import (
     furnace_power_driver_payload,
     measured_furnace_power_trace,
 )
-from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
+from simulator.recipe import (
+    C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES,
+    RecipePatch,
+    RecipeSchema,
+)
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, load_recipe_patch
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -328,7 +332,7 @@ class PresetRunSpec:
     lab_geometry: Mapping[str, Any]
     provenance: dict[str, Any]
     document: Mapping[str, Any]
-    process_dt_s: float = 3600.0
+    process_dt_s: float = float(PROCESS_HOUR_S)
     step_count: int | None = None
 
 
@@ -349,6 +353,7 @@ def _load_preset_run_spec(
     leg: str | None,
     *,
     observations_override: str | None = None,
+    recipe_fields: Mapping[str, Any] | None = None,
 ) -> PresetRunSpec | MREPresetRunSpec:
     try:
         raw_bytes = path.read_bytes()
@@ -384,7 +389,11 @@ def _load_preset_run_spec(
                 "preset_kind": preset_kind,
             },
         )
-    return _load_vacuum_preset_run_spec(path, str(leg or "faithful"))
+    return _load_vacuum_preset_run_spec(
+        path,
+        str(leg or "faithful"),
+        recipe_fields=recipe_fields,
+    )
 
 
 def _load_mre_preset_run_spec(
@@ -446,7 +455,12 @@ def _load_mre_preset_run_spec(
     )
 
 
-def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
+def _load_vacuum_preset_run_spec(
+    path: Path,
+    leg: str,
+    *,
+    recipe_fields: Mapping[str, Any] | None = None,
+) -> PresetRunSpec:
     requested_leg = str(leg or "faithful").strip()
     base_provenance = {
         "path": str(path),
@@ -500,8 +514,19 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         f"pair.{requested_leg}",
         provenance,
     )
+    raw_recipe_schedule = (
+        recipe_fields.get("lab_schedule")
+        if isinstance(recipe_fields, Mapping)
+        else None
+    )
     schedule = copy.deepcopy(
-        _preset_mapping(preset.get("lab_schedule"), "lab_schedule", provenance)
+        _preset_mapping(
+            raw_recipe_schedule
+            if raw_recipe_schedule is not None
+            else preset.get("lab_schedule"),
+            "lab_schedule",
+            provenance,
+        )
     )
     geometry = copy.deepcopy(
         _preset_mapping(preset.get("lab_geometry"), "lab_geometry", provenance)
@@ -513,8 +538,16 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         provenance,
     )
     schedule_id = _preset_text(
-        leg_block.get("schedule_id"),
-        f"pair.{requested_leg}.schedule_id",
+        (
+            schedule.get("id")
+            if raw_recipe_schedule is not None
+            else leg_block.get("schedule_id")
+        ),
+        (
+            "recipe.lab_schedule.id"
+            if raw_recipe_schedule is not None
+            else f"pair.{requested_leg}.schedule_id"
+        ),
         provenance,
     )
     geometry_id = _preset_text(
@@ -522,7 +555,10 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         f"pair.{requested_leg}.geometry_id",
         provenance,
     )
-    if str(schedule.get("id") or "") != schedule_id:
+    if (
+        raw_recipe_schedule is None
+        and str(schedule.get("id") or "") != schedule_id
+    ):
         raise PresetRunnerError(
             "malformed_preset: "
             f"pair.{requested_leg}.schedule_id={schedule_id!r} "
@@ -580,7 +616,12 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         f"pair.{requested_leg}.duration_h",
         provenance,
     )
-    process_dt_s = _preset_process_dt_s(leg_block, preset, provenance)
+    process_dt_s = _preset_process_dt_s(
+        leg_block,
+        preset,
+        provenance,
+        recipe_fields=recipe_fields,
+    )
     try:
         timestep = resolve_process_timestep(process_dt_s)
     except ProcessTimestepRefusal as exc:
@@ -588,9 +629,10 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             f"malformed_preset: {exc.reason}: process_dt_s={process_dt_s!r}",
             provenance=provenance,
         ) from exc
-    if timestep.is_one_hour:
-        hours = int(duration_h)
-        if not math.isclose(duration_h, float(hours), rel_tol=0.0, abs_tol=1e-9):
+    try:
+        hours = duration_step_count(duration_h, timestep)
+    except ProcessTimestepRefusal as exc:
+        if timestep.is_one_hour:
             raise PresetRunnerError(
                 "malformed_preset: "
                 "timestep_does_not_divide_duration: "
@@ -599,19 +641,17 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
                 "runner --hours requires a whole number of hours "
                 f"(process_dt_s={timestep.dt_s!r})",
                 provenance=provenance,
-            )
-        spec_dt_s = 3600.0
+            ) from exc
+        raise PresetRunnerError(
+            "malformed_preset: "
+            f"{exc.reason}: duration_h={duration_h!r} "
+            f"process_dt_s={timestep.dt_s!r}",
+            provenance=provenance,
+        ) from exc
+    if timestep.is_one_hour:
+        spec_dt_s = float(PROCESS_HOUR_S)
         spec_step_count = None
     else:
-        try:
-            hours = duration_step_count(duration_h, timestep)
-        except ProcessTimestepRefusal as exc:
-            raise PresetRunnerError(
-                "malformed_preset: "
-                f"{exc.reason}: duration_h={duration_h!r} "
-                f"process_dt_s={timestep.dt_s!r}",
-                provenance=provenance,
-            ) from exc
         provenance["process_dt_s"] = timestep.dt_s
         provenance["step_count"] = hours
         spec_dt_s = timestep.dt_s
@@ -646,6 +686,10 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             "geometry_id": geometry_id,
         }
     )
+    if isinstance(recipe_fields, Mapping) and recipe_fields.get("source_tags"):
+        provenance["recipe_source_tags"] = copy.deepcopy(
+            recipe_fields["source_tags"]
+        )
     provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
     try:
         power_trace = measured_furnace_power_trace(preset)
@@ -685,6 +729,18 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),
             radiating_face_set=radiating_face_set,
         )
+    projected_document = copy.deepcopy(dict(preset))
+    if raw_recipe_schedule is not None:
+        projected_document["lab_schedule"] = copy.deepcopy(dict(raw_recipe_schedule))
+    if (
+        isinstance(recipe_fields, Mapping)
+        and "process_dt_s" in recipe_fields
+    ):
+        projected_document["process_dt_s"] = process_dt_s
+    if isinstance(recipe_fields, Mapping) and recipe_fields.get("source_tags"):
+        projected_document["source_tags"] = copy.deepcopy(
+            recipe_fields["source_tags"]
+        )
     return PresetRunSpec(
         feedstock_id=feedstock_id,
         hours=hours,
@@ -692,7 +748,7 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         lab_schedule=schedule,
         lab_geometry=geometry,
         provenance=provenance,
-        document=copy.deepcopy(dict(preset)),
+        document=projected_document,
         process_dt_s=spec_dt_s,
         step_count=spec_step_count,
     )
@@ -802,10 +858,14 @@ def _preset_process_dt_s(
     leg_block: Mapping[str, Any],
     preset: Mapping[str, Any],
     provenance: Mapping[str, Any],
+    *,
+    recipe_fields: Mapping[str, Any] | None = None,
 ) -> float:
     """Seconds per process step. Absent means one hour."""
 
-    if "process_dt_s" in leg_block:
+    if isinstance(recipe_fields, Mapping) and "process_dt_s" in recipe_fields:
+        raw = recipe_fields.get("process_dt_s")
+    elif "process_dt_s" in leg_block:
         raw = leg_block.get("process_dt_s")
     elif "process_dt_s" in preset:
         raw = preset.get("process_dt_s")
@@ -1147,7 +1207,7 @@ class PyrolysisRun:
     # authored hour budget. Not an EvalSpec field: the cache key stays
     # engine VERSION plus the request, and this branch bumps VERSION.
     until_campaign_complete: bool = False
-    process_dt_s: float = 3600.0
+    process_dt_s: float = float(PROCESS_HOUR_S)
     strict_result_contract: bool = field(init=False, default=True)
     _target_inventory_by_hour: list[dict[str, Any]] = field(
         default_factory=list, init=False, repr=False
@@ -6546,11 +6606,28 @@ def main(argv: Optional[list[str]] = None) -> int:
 
         setpoints_patch: Mapping[str, Any] = {}
         lab_schedule: Mapping[str, Any] | None = None
+        recipe_fields: Mapping[str, Any] = {}
+        recipe_setpoints: Mapping[str, Any] = {}
+        recipe_model: RecipePatch | None = None
+        if args.recipe:
+            try:
+                recipe_payload = load_recipe_patch(Path(args.recipe))
+                recipe_model = RecipePatch.from_nested(recipe_payload)
+                recipe_setpoints = RecipeSchema().to_setpoints_patch(recipe_model)
+                recipe_fields = recipe_model.to_nested()
+            except (RecipeIOError, ValueError) as exc:
+                raise RunnerError(str(exc)) from exc
+            if recipe_model.lab_schedule is not None and not args.preset:
+                raise RunnerError(
+                    "a recipe lab_schedule requires --preset to provide its "
+                    "lab_geometry overrides"
+                )
         if args.preset:
             preset = _load_preset_run_spec(
                 Path(args.preset),
                 args.leg,
                 observations_override=args.observations,
+                recipe_fields=recipe_fields,
             )
             loaded_preset = preset
             _assert_cli_matches_preset(
@@ -6585,11 +6662,14 @@ def main(argv: Optional[list[str]] = None) -> int:
         elif not feedstock_id:
             raise RunnerError("--feedstock is required unless --preset is supplied")
         if args.recipe:
-            try:
-                recipe_patch = load_recipe_patch(Path(args.recipe))
-            except RecipeIOError as exc:
-                raise RunnerError(str(exc)) from exc
-            setpoints_patch = _deep_merge_setpoints(setpoints_patch, recipe_patch)
+            setpoints_patch = _deep_merge_setpoints(
+                setpoints_patch,
+                recipe_setpoints,
+            )
+            if recipe_model is not None and recipe_model.source_tags and not args.preset:
+                metadata_overrides["recipe_source_tags"] = copy.deepcopy(
+                    dict(recipe_model.source_tags)
+                )
 
         if isinstance(loaded_preset, MREPresetRunSpec):
             if campaign.upper() in {"C5", "MRE_BASELINE"} or args.track == "mre_baseline":
@@ -6656,7 +6736,12 @@ def main(argv: Optional[list[str]] = None) -> int:
                 process_dt_s=(
                     loaded_preset.process_dt_s
                     if isinstance(loaded_preset, PresetRunSpec)
-                    else float(PROCESS_HOUR_S)
+                    else (
+                        recipe_model.process_dt_s
+                        if recipe_model is not None
+                        and recipe_model.process_dt_s is not None
+                        else float(PROCESS_HOUR_S)
+                    )
                 ),
             )
             result = run.run()

@@ -21,14 +21,27 @@ from simulator.chemistry.kernel.config import (
 )
 from simulator.furnace_materials import FURNACE_MAX_T_BOUNDS_C
 from simulator.canonical import canonical_json_dumps
+from simulator.lab_schedule import (
+    LabScheduleValidationError,
+    lab_schedule_digests,
+    normalize_lab_schedule,
+)
+from simulator.process_timestep import (
+    PROCESS_HOUR_S,
+    ProcessTimestepRefusal,
+    duration_step_count,
+    resolve_process_timestep,
+)
 
 KeyPath = tuple[str, ...]
 
-recipe_schema_version = "recipe-schema-v1"
+recipe_schema_version = "recipe-schema-v2"
+_PREVIOUS_RECIPE_SCHEMA_VERSIONS = frozenset({"recipe-schema-v1"})
 allowlist_version = "allowlist-v12"
 O2_BUBBLER_NEUTRAL_ALLOWLIST_VERSION = "allowlist-v12"
 O2_BUBBLER_DEFAULT_ETA_ABSORB = 0.75
-_RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"})
+_RECIPE_OPTIONAL_FIELDS = frozenset({"lab_schedule", "process_dt_s", "source_tags"})
+_RECIPE_ENVELOPE_KEYS = frozenset({"metadata", "cost_parameters"}) | _RECIPE_OPTIONAL_FIELDS
 
 # Hot-wall search bounds. The per-species no-fouling temperatures live in the
 # dew-point check (CLAUDE.md §4 / docs/concepts.md), not in this floor. The
@@ -1615,7 +1628,15 @@ class RecipeSchema:
         context = conditional_execution_context(
             self, states=states, effective_pins=effective_pins
         )
-        return ResolvedConditionalPatch(RecipePatch(values).validated(self), context)
+        return ResolvedConditionalPatch(
+            RecipePatch(
+                values,
+                lab_schedule=validated.lab_schedule,
+                process_dt_s=validated.process_dt_s,
+                source_tags=validated.source_tags,
+            ).validated(self),
+            context,
+        )
 
 
 def _nested_default(
@@ -2297,6 +2318,9 @@ def _already_fixed_pin_reason(path: KeyPath) -> str:
 @dataclass(frozen=True)
 class RecipePatch:
     values: Mapping[KeyPath, Any]
+    lab_schedule: Mapping[str, Any] | None = None
+    process_dt_s: float | None = None
+    source_tags: Mapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:
         raw = {
@@ -2321,8 +2345,58 @@ class RecipePatch:
             source_by_path[canonical_path] = path
         object.__setattr__(self, "values", MappingProxyType(normalized))
 
-    def __reduce__(self) -> tuple[Any, tuple[dict[KeyPath, Any]]]:
-        return (type(self), (dict(self.values),))
+        schedule = self.lab_schedule
+        if schedule is not None:
+            if not isinstance(schedule, Mapping):
+                raise RecipeValidationError("lab_schedule must be a mapping")
+            schedule = copy.deepcopy(dict(schedule))
+            try:
+                normalized_schedule = normalize_lab_schedule(schedule)
+            except LabScheduleValidationError as exc:
+                raise RecipeValidationError(str(exc)) from exc
+            try:
+                duration_step_count(
+                    normalized_schedule["duration_h"],
+                    self._process_timestep(),
+                )
+            except ProcessTimestepRefusal as exc:
+                raise RecipeValidationError(str(exc)) from exc
+        object.__setattr__(self, "lab_schedule", schedule)
+
+        if self.process_dt_s is not None:
+            object.__setattr__(self, "process_dt_s", self._process_timestep().dt_s)
+
+        if not isinstance(self.source_tags, Mapping):
+            raise RecipeValidationError("source_tags must be a mapping")
+        source_tags: dict[str, Any] = {}
+        for field_path, tag in self.source_tags.items():
+            if not isinstance(field_path, str) or not field_path.strip():
+                raise RecipeValidationError("source_tags keys must be non-empty strings")
+            if not isinstance(tag, Mapping):
+                raise RecipeValidationError(
+                    f"source_tags[{field_path!r}] must be a mapping"
+                )
+            source_tags[field_path] = copy.deepcopy(dict(tag))
+        object.__setattr__(self, "source_tags", source_tags)
+
+    def _process_timestep(self):
+        try:
+            return resolve_process_timestep(
+                PROCESS_HOUR_S if self.process_dt_s is None else self.process_dt_s
+            )
+        except ProcessTimestepRefusal as exc:
+            raise RecipeValidationError(str(exc)) from exc
+
+    def __reduce__(self) -> tuple[Any, tuple[Any, ...]]:
+        return (
+            type(self),
+            (
+                dict(self.values),
+                self.lab_schedule,
+                self.process_dt_s,
+                self.source_tags,
+            ),
+        )
 
     @classmethod
     def from_nested(cls, nested: Mapping[str, Any]) -> "RecipePatch":
@@ -2330,6 +2404,10 @@ class RecipePatch:
             raise RecipeValidationError("recipe patch must be a nested mapping")
         if not nested:
             return cls({})
+
+        lab_schedule = nested.get("lab_schedule")
+        process_dt_s = nested.get("process_dt_s")
+        source_tags = nested.get("source_tags", {})
 
         flat: dict[KeyPath, Any] = {}
 
@@ -2358,7 +2436,12 @@ class RecipePatch:
             flat[prefix] = _normalize_value(node)
 
         walk((), nested)
-        return cls(flat)
+        return cls(
+            flat,
+            lab_schedule=lab_schedule,
+            process_dt_s=process_dt_s,
+            source_tags=source_tags,
+        )
 
     def to_nested(self) -> dict[str, Any]:
         """Render values only; UNVALIDATED. Use RecipeSchema.to_setpoints_patch()."""
@@ -2378,6 +2461,12 @@ class RecipePatch:
                     f"duplicate recipe path: {_format_path(path)}"
                 )
             cursor[leaf] = _normalize_value(value)
+        if self.lab_schedule is not None:
+            nested["lab_schedule"] = copy.deepcopy(dict(self.lab_schedule))
+        if self.process_dt_s is not None:
+            nested["process_dt_s"] = self.process_dt_s
+        if self.source_tags:
+            nested["source_tags"] = copy.deepcopy(dict(self.source_tags))
         return nested
 
     def validated(self, schema: RecipeSchema | None = None) -> "RecipePatch":
@@ -2388,7 +2477,12 @@ class RecipePatch:
         _validate_pressure_default_pairs(active_schema, self.values)
         _validate_c2a_staged_depletion_knob_conflict(self.values)
         _validate_temperature_dual_control(self.values)
-        return RecipePatch(dict(self.values))
+        return RecipePatch(
+            dict(self.values),
+            lab_schedule=self.lab_schedule,
+            process_dt_s=self.process_dt_s,
+            source_tags=self.source_tags,
+        )
 
     def recipe_id(
         self,
@@ -2431,7 +2525,20 @@ class RecipePatch:
             {"path": list(path), "value": _normalize_value(value)}
             for path, value in sorted(values.items())
         ]
-        return canonical_json_dumps(entries)
+        has_non_hourly_step = (
+            self.process_dt_s is not None
+            and self.process_dt_s != float(PROCESS_HOUR_S)
+        )
+        if self.lab_schedule is None and not has_non_hourly_step:
+            return canonical_json_dumps(entries)
+        payload: dict[str, Any] = {"setpoints": entries}
+        if self.lab_schedule is not None:
+            payload["lab_schedule_digests"] = lab_schedule_digests(
+                self.lab_schedule
+            )
+        if has_non_hourly_step:
+            payload["process_dt_s"] = self.process_dt_s
+        return canonical_json_dumps(payload)
 
 
 def _identity_float(value: Any) -> float | None:

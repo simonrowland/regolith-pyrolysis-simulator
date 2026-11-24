@@ -73,8 +73,8 @@ def resolve_process_timestep(dt_s: object) -> ProcessTimestep:
 def duration_step_count(duration_h: object, timestep: ProcessTimestep) -> int:
     """How many steps of ``timestep`` fit in ``duration_h``.
 
-    The ratio must be an integer within an absolute tolerance of 1e-8, so a
-    binary 0.1 hour still divides 60 s and 3600/7 still refuses.
+    The hourly path keeps its pre-existing 1e-9 tolerance. Shorter steps use
+    1e-8 so a binary 0.1 hour still divides 60 s and 3600/7 still refuses.
     """
 
     if isinstance(duration_h, bool) or not isinstance(duration_h, (int, float)):
@@ -92,7 +92,7 @@ def duration_step_count(duration_h: object, timestep: ProcessTimestep) -> int:
         ratio,
         nearest,
         rel_tol=0.0,
-        abs_tol=1.0e-8,
+        abs_tol=1.0e-9 if timestep.is_one_hour else 1.0e-8,
     ):
         raise ProcessTimestepRefusal(
             "timestep_does_not_divide_duration",

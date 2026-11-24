@@ -442,6 +442,16 @@ def test_doe_spec_from_dict_rejects_allowlist_version_mismatch() -> None:
         DoeSpec.from_dict(payload, schema=new_schema)
 
 
+def test_doe_spec_reader_accepts_the_previous_recipe_schema_version() -> None:
+    schema = RecipeSchema()
+    payload = DoeSpec(schema=schema, n_samples=8, seed=321).to_dict()
+    payload["recipe_schema_version"] = "recipe-schema-v1"
+
+    restored = DoeSpec.from_dict(payload, schema=schema)
+
+    assert restored.recipe_schema_version == schema.recipe_schema_version
+
+
 def test_doe_spec_to_dict_always_writes_bounds_digest() -> None:
     schema = RecipeSchema()
     payload = DoeSpec(schema=schema, n_samples=8, seed=321).to_dict()

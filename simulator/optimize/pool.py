@@ -1008,7 +1008,12 @@ def _request_profile(
 
 def _normalize_patch(patch: RecipePatch | Mapping[str, Any]) -> RecipePatch:
     if isinstance(patch, RecipePatch):
-        return RecipePatch(dict(patch.values))
+        return RecipePatch(
+            dict(patch.values),
+            lab_schedule=patch.lab_schedule,
+            process_dt_s=patch.process_dt_s,
+            source_tags=patch.source_tags,
+        )
     return RecipePatch.from_nested(copy.deepcopy(dict(patch)))
 
 

@@ -14,6 +14,7 @@ from simulator.cost_parameters import (
     recipe_cost_parameters_from_payload,
 )
 from simulator.recipe import (
+    _RECIPE_OPTIONAL_FIELDS,
     RecipePatch,
     RecipeSchema,
     RecipeValidationError,
@@ -37,7 +38,7 @@ def load_recipe_patch(
     *,
     schema: RecipeSchema | None = None,
 ) -> dict[str, Any]:
-    """Load and validate a recipe YAML file as a setpoints patch."""
+    """Load a recipe's optimizer setpoints and optional lab-run fields."""
 
     recipe_path = Path(path)
     payload = _load_recipe_mapping(recipe_path)
@@ -84,10 +85,16 @@ def normalize_recipe_patch(
         patch = RecipePatch.from_nested(recipe_payload)
         patch = active_schema.resolve_conditional_patch(patch).patch
         normalized = active_schema.to_setpoints_patch(patch)
+        if patch.lab_schedule is not None:
+            normalized["lab_schedule"] = copy.deepcopy(dict(patch.lab_schedule))
+        if patch.process_dt_s is not None:
+            normalized["process_dt_s"] = patch.process_dt_s
+        if patch.source_tags:
+            normalized["source_tags"] = copy.deepcopy(dict(patch.source_tags))
     except RecipeValidationError as exc:
         raise RecipeIOError(f"invalid recipe {source}: {exc}") from exc
 
-    if not normalized:
+    if not normalized and not any(key in recipe_payload for key in _RECIPE_OPTIONAL_FIELDS):
         raise RecipeIOError(f"{source} produced an empty setpoints_patch")
     _validate_optimizer_shape(recipe_payload, normalized, source=source)
     return copy.deepcopy(normalized)
@@ -335,6 +342,7 @@ def _allowed_top_level_keys(schema: RecipeSchema) -> set[str]:
     keys = {spec.path[0] for spec in schema.allowlist}
     keys.update(path[0] for path in schema.FORBIDDEN_EXACT_PATH_EXCEPTIONS)
     keys.add(RECIPE_COST_PARAMETERS_KEY)
+    keys.update(_RECIPE_OPTIONAL_FIELDS)
     return keys
 
 
