@@ -200,7 +200,8 @@ def _proposal_to_ledger_transition(
     Reuses the registry-driven mol -> kg projection that the rest of the
     accounting layer uses while retaining the exact mol-native input in lot
     metadata. Empty species entries are dropped (matches
-    :class:`MaterialLot.without_empty`).
+    :class:`MaterialLot.without_empty`). A nonzero mol whose mass
+    underflows to 0.0 kg is dropped by :func:`_proposal_mol_as_kg`.
     """
 
     debits = _build_lots(
@@ -223,6 +224,34 @@ def _proposal_to_ledger_transition(
         credits=tuple(credits),
         reason=proposal.reason,
     )
+
+
+def _proposal_mol_as_kg(
+    species: str,
+    mol: float,
+    registry: Mapping[str, Any],
+) -> float | None:
+    """Kilograms for one proposal amount, or None when mol·M underflows.
+
+    Premise: binary64's smallest positive value is ``2**-1074``
+    ≈ 4.94e-324. ``M(SiO2)`` from the formula registry is 0.060083
+    kg/mol, about 0.060 kg/mol.
+    Algebra: the product is 0.0 when
+    ``mol < 2**-1074 / 0.060083`` ≈ 8.4e-323.
+    The runaway credit is SiO2 at 3.5e-323 mol, and
+    ``3.5e-323 * 0.060083 = 0.0``. That entry cannot be represented
+    on a kg basis, so posting it would break the mol-basis lot
+    invariant rather than conserve mass. ``1e-30 * 0.060083`` is
+    6.0e-32 kg and is kept.
+    The drop is the underflow itself (``kg == 0.0``). There is no
+    wider absolute cutoff.
+    """
+
+    formula = resolve_species_formula(str(species), registry)
+    kg = float(mol) * formula.molar_mass_kg_per_mol()
+    if kg == 0.0:
+        return None
+    return kg
 
 
 def _build_lots(
@@ -252,8 +281,10 @@ def _build_lots(
                 )
             if value == 0.0:
                 continue
-            formula = resolve_species_formula(str(species), registry)
-            species_kg[str(species)] = value * formula.molar_mass_kg_per_mol()
+            kg = _proposal_mol_as_kg(str(species), value, registry)
+            if kg is None:
+                continue
+            species_kg[str(species)] = kg
             retained_species_mol[str(species)] = value
         if species_kg:
             lot_meta = dict(meta or {})
