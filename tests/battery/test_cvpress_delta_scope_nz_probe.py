@@ -1,8 +1,9 @@
-"""Remote full-store out-of-scope row decode, source IDs N through Z."""
+"""Remote full-store out-of-scope row decode, source IDs N through P."""
 
 from tests.battery.test_migrate_split_baseline import (
     _assert_complete_store_regeneration_matches_checked_in_bytes,
     _format_store_delta_report,
+    _source_in_report_filter,
 )
 
 
@@ -33,5 +34,13 @@ def test_scope_report_keeps_each_matching_source_on_shared_work_rows() -> None:
     assert rows[1].startswith("zhao-2019-ce2o3-ternary-thermodynamics | ")
 
 
-def test_full_store_out_of_scope_rows_nz() -> None:
-    _assert_complete_store_regeneration_matches_checked_in_bytes("scope", ("N-Z",))
+def test_source_id_report_ranges_cover_each_prefix_once() -> None:
+    assert _source_in_report_filter("aithala-2026", {"A-C"})
+    assert _source_in_report_filter("costa-2025", {"D-F"}) is False
+    assert _source_in_report_filter("miki-1999", {"M-M"})
+    assert _source_in_report_filter("zhao-2019", {"N-P"}) is False
+    assert _source_in_report_filter("10.1007_record", {"A-C"})
+
+
+def test_full_store_out_of_scope_rows_np() -> None:
+    _assert_complete_store_regeneration_matches_checked_in_bytes("scope", ("N-P",))

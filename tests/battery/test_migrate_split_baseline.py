@@ -765,13 +765,15 @@ def _field_is_fold22_scope(
 
 def _source_in_report_filter(source_id: str, source_filter: set[str]) -> bool:
     for group in source_filter:
-        if group == "A-M":
+        if len(group) == 3 and group[1] == "-" and group[0].isalpha() and group[2].isalpha():
             first = source_id[:1].upper()
-            if first and ("A" <= first <= "M" or not first.isalpha()):
+            if not first.isalpha():
+                first = "A"
+            if group[0].upper() <= first <= group[2].upper():
                 return True
-        elif group == "N-Z":
+        elif len(group) == 1 and group.isalpha():
             first = source_id[:1].upper()
-            if first and "N" <= first <= "Z":
+            if first == group.upper() or not first.isalpha() and group.upper() == "A":
                 return True
         elif source_id == group:
             return True
