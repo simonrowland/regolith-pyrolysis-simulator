@@ -2903,16 +2903,21 @@ def gate_curve_provider_outcome_for_status(
         reason in transient_reasons - numerical_reasons for reason in reasons
     ):
         return GateCurveProviderOutcome.FAILED
+    if any(reason in numerical_reasons for reason in reasons):
+        return GateCurveProviderOutcome.NUMERICAL_FAILURE
+    projected_liquidus_status = None
+    if isinstance(diagnostic, Mapping):
+        projected_liquidus_status = diagnostic.get("projected_liquidus_status")
+        backend = diagnostic.get("backend_diagnostics")
+        if projected_liquidus_status is None and isinstance(backend, Mapping):
+            projected_liquidus_status = backend.get("projected_liquidus_status")
     if (
         normalized_status in {"out_of_domain", "unsupported", "refused"}
         and isinstance(diagnostic, Mapping)
         and reason_value(diagnostic.get("backend_status_reason"))
         == reason_value(OutOfDomainReason.COMPOSITION_PROJECTED)
-        and (
-            "projected_liquidus_status" in diagnostic
-            or isinstance(diagnostic.get("backend_diagnostics"), Mapping)
-            and "projected_liquidus_status" in diagnostic["backend_diagnostics"]
-        )
+        and str(projected_liquidus_status or "").strip().lower()
+        in {"unavailable", "not_converged"}
     ):
         # This is a stable refusal of the requested bulk. A numerical result
         # from the optional projected-bulk search must not hide the existing

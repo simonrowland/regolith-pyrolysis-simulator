@@ -715,7 +715,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/reduced_real_determinism.py:_source_module_digest': {
         "path": 'simulator/reduced_real_determinism.py',
-        "line": 4745,
+        "line": 4750,
         "kind": 'lru',
         "name": '_source_module_digest',
         "carries_disclosure": False,

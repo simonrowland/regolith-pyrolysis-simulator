@@ -1012,6 +1012,17 @@ def test_projected_search_failure_does_not_override_composition_refusal(
     }).value == expected
 
 
+def test_numerical_reason_in_projected_search_keeps_failure_classification():
+    assert gate_curve_provider_outcome_for_status('out_of_domain', {
+        'backend_status_reason': 'composition_projected',
+        'backend_diagnostics': {
+            'backend_status_reason': 'composition_projected',
+            'projected_liquidus_status': 'not_converged',
+            'projected_liquidus_diagnostics': {'reason': 'no_convergence'},
+        },
+    }).value == 'numerical_failure'
+
+
 @pytest.mark.parametrize('mode', ['reason', 'exception', 'backend_exception', 'aggregate_budget'])
 @pytest.mark.parametrize('recover', [False, True])
 def test_timeout_retries_same_declared_gate_once(
