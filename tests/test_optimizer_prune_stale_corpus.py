@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import runpy
 import sqlite3
 from pathlib import Path
+from threading import Thread
 
 import pytest
 
@@ -16,8 +18,14 @@ from simulator.optimize.results_store import (
     ResultStoreWriteLockTimeout,
     study_results_write_lock_path,
 )
+from simulator.optimize import import_bundle
 from simulator.optimize import results_store as results_store_module
-from simulator.optimize.import_bundle import IMPORT_OVERLAY_NAME, is_imported_path
+from simulator.optimize.import_bundle import (
+    IMPORTED_DIR_NAME,
+    IMPORT_OVERLAY_NAME,
+    IMPORT_STAGING_PREFIX,
+    is_imported_path,
+)
 from simulator.optimize.save_bundle import (
     ARTIFACT_INDEX_NAME,
     REQUIRED_MEMBERS,
@@ -357,7 +365,40 @@ def test_apply_reports_committed_stores_when_later_store_is_missing(
     tmp_path, monkeypatch, capsys
 ):
     store = _store_with_versions(tmp_path / "native")
-    missing = tmp_path / "runs" / "native-lost-during-prune" / "cache.sqlite"
+    root = tmp_path / "runs"
+    staging = root / IMPORTED_DIR_NAME / f"{IMPORT_STAGING_PREFIX}publication"
+    missing = staging / "cache.sqlite"
+    published = root / IMPORTED_DIR_NAME / "study123"
+    import_fixtures = runpy.run_path("tests/test_optimizer_import_bundle.py")
+    bundle = import_fixtures["_write_zip"](
+        tmp_path / "concurrent-import.rpstudy.zip",
+        import_fixtures["_members"](tmp_path),
+    )
+
+    def make_known_staging_dir(prefix, dir):
+        assert prefix == IMPORT_STAGING_PREFIX
+        staging.mkdir(parents=True)
+        return str(staging)
+
+    monkeypatch.setattr(import_bundle, "mkdtemp", make_known_staging_dir)
+    imported = []
+
+    def publish_import():
+        imported.append(
+            import_bundle.import_study_bundle(bundle, root, verification_tier=0)
+        )
+
+    prune_store = ResultStore.prune_stale_corpus_version
+
+    def prune_then_publish(self, versions, *, apply=False):
+        counts = prune_store(self, versions, apply=apply)
+        publisher = Thread(target=publish_import)
+        publisher.start()
+        publisher.join(timeout=10)
+        assert not publisher.is_alive()
+        return counts
+
+    monkeypatch.setattr(ResultStore, "prune_stale_corpus_version", prune_then_publish)
     monkeypatch.setattr(cli, "interoperable_corpus_versions", lambda: ("current", "older"))
 
     with pytest.raises(FileNotFoundError, match="optimizer result store not found"):
@@ -371,6 +412,8 @@ def test_apply_reports_committed_stores_when_later_store_is_missing(
         ])
 
     assert _keys(store) == {"current", "older-compatible", "unversioned"}
+    assert len(imported) == 1 and imported[0].path == published
+    assert not staging.exists()
     report = json.loads(capsys.readouterr().out.splitlines()[-1])
     assert report["stores"] == [{
         "store": str(store.path.resolve()),
