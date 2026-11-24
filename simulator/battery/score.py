@@ -17094,7 +17094,7 @@ def _sossi_residue_prediction(
                 and row.admission.status.value == "admitted"
             ]
             experiments_by_run: dict[str, Mapping[str, object]] = {}
-            trace_ppm_by_experiment: dict[str, dict[str, float]] = {}
+            trace_ppm_by_experiment: dict[str, dict[str, object]] = {}
             buffered_fO2_by_experiment: dict[str, float] = {}
             for row in live_rows:
                 short_id = row.experiment_id.rsplit("::", 1)[-1]
@@ -17103,10 +17103,11 @@ def _sossi_residue_prediction(
                 element = row.identity.species.formula
                 if element in {"Mn", "Ti"}:
                     trace = point.get("starting_component_ppm")
-                    if trace is not None and trace.state.is_value:
-                        trace_ppm_by_experiment.setdefault(short_id, {})[
-                            element
-                        ] = float(trace.state.value)
+                    trace_ppm_by_experiment.setdefault(short_id, {})[element] = (
+                        trace.state.value
+                        if trace is not None and trace.state.is_value
+                        else None
+                    )
             expected_experiments = (
                 {
                     experiment_id.rsplit("::", 1)[-1]
@@ -17330,6 +17331,33 @@ def _sossi_residue_prediction(
         prediction = cohort.get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
+        element_refusals = prediction.provenance.get("element_refusals")
+        element_refusal = (
+            element_refusals.get(formula)
+            if isinstance(element_refusals, Mapping)
+            else None
+        )
+        if (
+            isinstance(element_refusal, Mapping)
+            and element_refusal.get("reason") == "starting_component_ppm_missing"
+        ):
+            return EnginePrediction(
+                engine=engine,
+                channel=channel,
+                execution=Execution(state=ExecutionState.NOT_PROBED),
+                coefficient_sources=sources,
+                lineage_complete=False,
+                refusal_reason=RefusalReason.IDENTITY_INCOMPLETE,
+                refusal_detail={
+                    **element_refusal,
+                    "row": reference.observation_id,
+                    "engine": engine.value,
+                    "source_id": reference.source_id,
+                    "experiment_id": reference.experiment_id,
+                    "observation_id": reference.observation_id,
+                },
+                identity=reference.identity,
+            )
         run_refusal = prediction.provenance.get("run_refusal")
         if isinstance(run_refusal, Mapping):
             raise ResidueInventoryRefusal(

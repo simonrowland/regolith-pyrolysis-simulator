@@ -179,10 +179,9 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
     experiment = source["experiments"][0]
     experiment_id = experiment["experiment_id"]
     starting_trace = {
-        element: source["species"][element]["observations"][0]["values"][
+        "Ti": source["species"]["Ti"]["observations"][0]["values"][
             "starting_measured_ppm"
         ]
-        for element in ("Mn", "Ti")
     }
     original_channels = battery._openimcc_gas_channels_and_omission_notices
     selected: list[str] = []
@@ -241,8 +240,38 @@ def test_sossi_ti_only_cohort_still_evaluates_gas(monkeypatch) -> None:
 
     assert gas_calls
     assert prediction.provenance.get("run_refusal") is None
-    assert "Mn" in prediction.channel_missing_elements
+    assert "Mn" not in prediction.channel_missing_elements
+    assert prediction.provenance["element_refusals"]["Mn"] == {
+        "reason": "starting_component_ppm_missing",
+        "species": "Mn",
+        "row": experiment_id,
+        "detail": (
+            "missing positive starting_component_ppm for Mn in "
+            f"{experiment_id}"
+        ),
+    }
     assert prediction.primary_element_ppm["Ti"] > 0.0
+
+
+def test_sossi_missing_trace_rejects_restored_bare_lookup_mutation(monkeypatch) -> None:
+    pytest.importorskip("openimcc")
+    import simulator.battery.residue as residue
+
+    source = yaml.safe_load(SOURCE.read_text())
+    experiment = source["experiments"][0]
+
+    def bare_lookup_mutant(_experiment, starting_trace_ppm):
+        return starting_trace_ppm["Mn"]
+
+    monkeypatch.setattr(residue, "_sossi_initial_inventory", bare_lookup_mutant)
+    with pytest.raises(KeyError, match="Mn"):
+        residue._predict_sossi_residue_cohort(
+            [experiment],
+            yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text()),
+            starting_trace_ppm_by_experiment={experiment["experiment_id"]: {"Ti": 1.0}},
+            buffered_fO2_log_by_experiment={experiment["experiment_id"]: -10.0},
+            engine="openimcc",
+        )
 
 
 def test_sossi_openimcc_timeout_is_typed_and_later_runs_continue(

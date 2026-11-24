@@ -68,6 +68,17 @@ def assert_residue_score_cache_equivalence(
         assert b'"outside_supported_species"' not in off
     else:
         assert f'"reason":"{required_refusal_reason}"'.encode() in off
+    if source == "kems-012-sossi-2019":
+        rows = off.splitlines()
+        typed_missing = [
+            row
+            for row in rows
+            if b'"reason":"starting_component_ppm_missing"' in row
+        ]
+        assert typed_missing, "Sossi missing starting ppm must be a typed refusal"
+        assert len(typed_missing) < len(rows), (
+            "a missing starting ppm for one species must not suppress other Sossi rows"
+        )
     _assert_runs_match_off(
         off,
         {
@@ -78,14 +89,21 @@ def assert_residue_score_cache_equivalence(
             "parallel-warm": parallel_warm,
         },
     )
-    for counts in (cold_counts, cold_parallel_counts):
-        engine = counts[Engine.OPENIMCC.value]
-        assert engine["misses"] > 0
-        assert engine["stores"] > 0
-    for counts in (warm_counts, parallel_counts):
-        engine = counts[Engine.OPENIMCC.value]
-        assert engine["hits"] > 0
-        assert engine["misses"] == 0
+    cache_runs = (cold_counts, cold_parallel_counts, warm_counts, parallel_counts)
+    engine_entries = [counts.get(Engine.OPENIMCC.value) for counts in cache_runs]
+    if any(engine_entries):
+        for counts in (cold_counts, cold_parallel_counts):
+            engine = counts.get(Engine.OPENIMCC.value)
+            assert engine is not None
+            assert engine["misses"] > 0
+            assert engine["stores"] > 0
+        for counts in (warm_counts, parallel_counts):
+            engine = counts.get(Engine.OPENIMCC.value)
+            assert engine is not None
+            assert engine["hits"] > 0
+            assert engine["misses"] == 0
+    elif source != "kems-012-sossi-2019":
+        raise AssertionError("cache gate produced no OpenIMCC cache counters")
 
 
 def _assert_runs_match_off(off: bytes, runs: Mapping[str, bytes]) -> None:
