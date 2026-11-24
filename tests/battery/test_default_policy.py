@@ -19,6 +19,12 @@ from simulator.battery.enums import (
     Quantity,
     ResidualStatus,
 )
+from simulator.policy.enums import (
+    DEFAULT_POLICY_NOTICE_KINDS as OWNER_DEFAULT_POLICY_NOTICE_KINDS,
+    MethodToken as OwnerMethodToken,
+    NoticeKind as OwnerNoticeKind,
+    Phase as OwnerPhase,
+)
 from simulator.battery.migrate import to_plain
 from simulator.battery.records import Notice, NoticePolicy, union_notices
 from simulator.battery.score import (
@@ -50,6 +56,13 @@ EXPECTED_POLICY_FLAGS = {
     "method_unstated",
     "method_inferred",
 }
+
+
+def test_battery_policy_tokens_reexport_single_owner_definitions() -> None:
+    assert NoticeKind is OwnerNoticeKind
+    assert Phase is OwnerPhase
+    assert MethodToken is OwnerMethodToken
+    assert DEFAULT_POLICY_NOTICE_KINDS is OWNER_DEFAULT_POLICY_NOTICE_KINDS
 
 
 def _policy_json_bytes(policy: object) -> bytes:
@@ -356,7 +369,7 @@ def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
 
 
 def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monkeypatch) -> None:
-    import simulator.battery.default_policy as policy_module
+    import simulator.policy.default_policy as policy_module
 
     policy_path = tmp_path / "default_policy.yaml"
     policy_path.write_text("schema_version: 1\npolicies: []\n", encoding="utf-8")
@@ -528,7 +541,7 @@ def test_method_inferred_payload_without_policy_is_rejected_by_headline_census()
 def test_proposals_require_allocated_ids_and_refuse_duplicate_ids(
     tmp_path, monkeypatch
 ) -> None:
-    import simulator.battery.default_policy as policy_module
+    import simulator.policy.default_policy as policy_module
 
     policy_path = tmp_path / "default_policy.yaml"
     policy_path.write_text(

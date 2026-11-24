@@ -18536,7 +18536,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 sample_mass_g = self.lab_geometry.sample_mass_g
                 if sample_mass_g is None:
                     raise
-                from simulator.battery.default_policy import resolve
+                from simulator.policy.default_policy import resolve
 
                 # When b-1298 lands, DP-007 defers to its lab-geometry
                 # resolver for both evaporating area and film length.

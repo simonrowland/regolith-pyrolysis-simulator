@@ -49,6 +49,7 @@ from simulator.physical_constants import (
     MELT_DISSOCIATION_PO2_MIN_BAR,
     PA_PER_BAR,
 )
+from simulator.policy.default_policy import DP_019_VACUUM_BOUNDARY_BAR
 from simulator.melt_backend.base import (
     ANTOINE_FALLBACK_SOURCE_PREFIX,
     REDOX_MODE_NOT_AN_INPUT,
@@ -203,13 +204,6 @@ _IMCC_OUT_OF_BASIS_CODES = frozenset(
     }
 )
 
-# DP-019 uses this finite high-vacuum boundary when a vacuum method omits
-# total pressure. Unit check: 1e-6 bar × 1e5 Pa/bar = 0.1 Pa. This is a model
-# boundary, not inferred source pressure.
-# Limiting check: pressure-independent comparisons should be unchanged by this
-# input; lowering pressure moves a pressure-sensitive gas equilibrium toward
-# its vacuum limit. Actual higher pressure may therefore bias the prediction.
-DP_019_VACUUM_BOUNDARY_BAR = 1.0e-6
 # Gram-scale reference charge when an analytical Knudsen source omits mass.
 # It sets the physical scale of the loader cutoff and its trace-tail bounds.
 DEFAULT_ANALYTICAL_KNUDSEN_CHARGE_KG = 1e-3
