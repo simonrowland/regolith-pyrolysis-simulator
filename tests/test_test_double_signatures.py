@@ -1,11 +1,14 @@
 import ast
 import inspect
+import sys
 from collections import Counter
 from functools import partial, wraps
 from pathlib import Path
+from types import ModuleType
 
 import pytest
 
+from tools import test_double_signatures as checker
 from tools.test_double_signatures import _compatible, scan_tests
 
 
@@ -28,6 +31,11 @@ class _DescriptorFixture:
 class _NarrowBoundFixture:
     def sleep(self):
         return None
+
+
+class _RenamedBoundFixture:
+    def sleep(receiver, seconds=0):
+        return seconds
 
 
 class _SignaturePropertyCallable:
@@ -406,6 +414,130 @@ def test_scan_skips_wrapped_function_as_decorated(tmp_path: Path) -> None:
     )
     census = scan_tests(tmp_path)
     assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("nonstandard-metadata", 1),)
+
+
+def test_scan_skips_function_with_custom_kwdefaults_without_running_hook(
+    tmp_path: Path, monkeypatch
+) -> None:
+    reads: list[str] = []
+
+    class Defaults(dict):
+        def get(self, key, default=None):
+            reads.append(key)
+            return super().get(key, default)
+
+    def emit(*, value=1):
+        return value
+
+    emit.__kwdefaults__ = Defaults(value=1)
+    module = ModuleType("test_double_signature_custom_defaults")
+    module.emit = emit
+    monkeypatch.setitem(sys.modules, module.__name__, module)
+    (tmp_path / "test_custom_defaults.py").write_text(
+        "import test_double_signature_custom_defaults as api\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(api, 'emit', lambda *, value=1: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("nonstandard-metadata", 1),)
+    assert not reads
+
+
+def test_scan_skips_custom_metaclass_without_reading_class_dict(
+    tmp_path: Path, monkeypatch
+) -> None:
+    reads: list[str] = []
+
+    class Meta(type):
+        def __getattribute__(cls, name):
+            if name == "__dict__":
+                reads.append(name)
+            return super().__getattribute__(name)
+
+    class Receiver(metaclass=Meta):
+        def emit(self, value):
+            return value
+
+    module = ModuleType("test_double_signature_custom_metaclass")
+    module.Receiver = Receiver
+    monkeypatch.setitem(sys.modules, module.__name__, module)
+    (tmp_path / "test_custom_metaclass.py").write_text(
+        "from test_double_signature_custom_metaclass import Receiver\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(Receiver(), 'emit', lambda value: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("custom-metaclass", 1),)
+    assert not reads
+
+
+def test_string_and_object_targets_resolve_exported_instance_identically(
+    tmp_path: Path, monkeypatch
+) -> None:
+    class Receiver:
+        def emit(self, record):
+            return record
+
+    module = ModuleType("test_double_signature_exported_instance")
+    module.receiver = Receiver()
+    monkeypatch.setitem(sys.modules, module.__name__, module)
+    (tmp_path / "test_instance_targets.py").write_text(
+        "from test_double_signature_exported_instance import receiver\n"
+        "from unittest.mock import patch\n"
+        "def test_object_target():\n"
+        "    patch.object(receiver, 'emit', lambda: None)\n"
+        "def test_string_target():\n"
+        "    patch('test_double_signature_exported_instance.receiver.emit', lambda: None)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == census.resolved == 2
+    assert not census.skipped
+    assert len(census.violations) == 2
+    assert {item.split("::")[1] for item in census.violations} == {
+        "test_object_target",
+        "test_string_target",
+    }
+
+    resolver = checker._receiver_and_attribute_for_path
+    with monkeypatch.context() as mutation:
+        def drop_exported_instance(dotted, modules, objects):
+            if ".receiver.emit" in dotted:
+                return None, "emit"
+            return resolver(dotted, modules, objects)
+
+        mutation.setattr(
+            checker, "_receiver_and_attribute_for_path", drop_exported_instance
+        )
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 1 and len(changed.skipped) == 1
+        assert len(changed.violations) == 1
+
+
+def test_scan_skips_named_classmethod_replacement(tmp_path: Path) -> None:
+    (tmp_path / "test_named_classmethod_replacement.py").write_text(
+        "from collections import UserDict\n"
+        "@classmethod\n"
+        "def replacement(value): return value\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(UserDict, 'fromkeys', replacement)\n",
+        encoding="utf-8",
+    )
+
+    census = scan_tests(tmp_path)
+
+    assert census.scanned == 1 and census.resolved == 0
     assert census.skipped_by_reason == (("decorated", 1),)
 
 
@@ -554,3 +686,286 @@ def test_scan_resolves_local_descriptors_without_running_constructors(tmp_path: 
     assert not census.skipped
     assert not census.violations
     assert not side_effect.exists()
+
+
+def test_mutation_probe_compatibility_rules_remain_active(monkeypatch) -> None:
+    def signature(arguments: str) -> inspect.Signature:
+        node = ast.parse(f"lambda {arguments}: None", mode="eval").body
+        result = checker._replacement_signature(node)
+        assert result is not None
+        return result
+
+    production = signature("first, second, /")
+    narrow = signature("first, /")
+    assert not _compatible(production, narrow)
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_positional_parameters", lambda _signature: [])
+        assert _compatible(production, narrow)
+
+    production = signature("value=42")
+    renamed = signature("other=42")
+    assert not _compatible(production, renamed)
+    accepts_keyword = checker._keyword_accepted
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            checker,
+            "_keyword_accepted",
+            lambda candidate, name: (
+                candidate is renamed and name == "value"
+            ) or accepts_keyword(candidate, name),
+        )
+        assert _compatible(production, renamed)
+
+    production = signature("target=0, **kwargs")
+    required = signature("target=0, *, root, **kwargs")
+    assert not _compatible(production, required)
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_required_parameters_compatible", lambda *_args: True)
+        assert _compatible(production, required)
+
+    positional_production = signature("x, **kwargs")
+    positional_only_double = signature("x, /, **kwargs")
+    assert not _compatible(positional_production, positional_only_double)
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_required_parameters_compatible", lambda *_args: True)
+        assert _compatible(positional_production, positional_only_double)
+
+    production = signature("*args, **kwargs")
+    collision = signature("value=None, *args, **kwargs")
+    assert not _compatible(production, collision)
+    with monkeypatch.context() as mutation:
+        mutation.setattr(checker, "_has_positional_keyword_collision", lambda *_args: False)
+        assert _compatible(production, collision)
+
+    checker_source = Path(checker.__file__).read_text(encoding="utf-8")
+    assert checker_source.count("def _keyword_accepted(") == 1
+    assert "_keyword_is_production_accepted" not in checker_source
+    assert checker_source.count("def _required_positional_only_prefix(") == 1
+    assert checker_source.count("_required_positional_only_prefix(production)") == 2
+
+
+def test_mutation_probe_descriptor_binding_and_local_resolution(
+    tmp_path: Path, monkeypatch
+) -> None:
+    source = (
+        "from collections import UserDict\n"
+        "from builtins import dict as Dict\n"
+        "from unittest.mock import patch\n"
+        "def replacement(iterable=(), value=None): return None\n"
+        "def native_replacement(iterable, value=None, /): return None\n"
+        "class LocalDouble:\n"
+        "    @classmethod\n"
+        "    def fromkeys(cls, iterable=(), value=None): return None\n"
+        "def test_native():\n"
+        "    patch.object(UserDict, 'fromkeys', replacement)\n"
+        "def test_string_classmethod():\n"
+        "    patch('collections.UserDict.fromkeys', replacement)\n"
+        "def test_native_classmethod():\n"
+        "    patch.object(Dict, 'fromkeys', native_replacement)\n"
+        "def test_local(monkeypatch):\n"
+        "    mapping = UserDict()\n"
+        "    double = LocalDouble()\n"
+        "    monkeypatch.setattr(mapping, 'fromkeys', double.fromkeys)\n"
+    )
+    fixture = tmp_path / "test_descriptor_mutation.py"
+    fixture.write_text(source, encoding="utf-8")
+    baseline = scan_tests(tmp_path)
+    assert baseline.resolved == 4 and not baseline.violations
+
+    bind = checker._bind_descriptor_signature
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            checker,
+            "_bind_descriptor_signature",
+            lambda result, *, drop_first: bind(result, drop_first=False),
+        )
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 4 and len(changed.violations) == 3
+
+    local = checker._local_class_attribute_signature
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            checker,
+            "_local_class_attribute_signature",
+            lambda *_args: checker._SignatureResolution(None, "unresolvable", "mutated"),
+        )
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 3 and len(changed.skipped) == 1
+    assert local is checker._local_class_attribute_signature
+
+
+def test_mutation_probe_static_class_and_bound_method_binding(
+    tmp_path: Path, monkeypatch
+) -> None:
+    (tmp_path / "test_binding_mutation.py").write_text(
+        f"from {__name__} import _DescriptorFixture, _RenamedBoundFixture\n"
+        "from unittest.mock import patch\n"
+        "def replacement(value): return value\n"
+        "def test_static(monkeypatch):\n"
+        "    receiver = _DescriptorFixture()\n"
+        "    monkeypatch.setattr(receiver, 'static_call', replacement)\n"
+        "def test_classed():\n"
+        "    patch.object(_DescriptorFixture, 'class_call', replacement)\n"
+        "def test_bound(monkeypatch):\n"
+        "    receiver = _DescriptorFixture()\n"
+        "    double = _RenamedBoundFixture()\n"
+        "    monkeypatch.setattr(receiver, 'sleep', double.sleep)\n",
+        encoding="utf-8",
+    )
+    baseline = scan_tests(tmp_path)
+    assert baseline.resolved == 3 and not baseline.violations
+
+    class_attribute = checker._class_attribute_signature
+    with monkeypatch.context() as mutation:
+        def bind_static(class_object, name, is_instance):
+            descriptor = inspect.getattr_static(class_object, name)
+            if type(descriptor) is staticmethod:
+                return checker._bind_descriptor_signature(
+                    checker._signature_of(descriptor.__func__), drop_first=True
+                )
+            return class_attribute(class_object, name, is_instance)
+
+        mutation.setattr(checker, "_class_attribute_signature", bind_static)
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 3 and len(changed.violations) == 1
+
+    bind = checker._bind_descriptor_signature
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            checker,
+            "_bind_descriptor_signature",
+            lambda result, *, drop_first: bind(result, drop_first=False),
+        )
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 3 and len(changed.violations) == 2
+
+
+def test_mutation_probe_opaque_builtin_remains_skipped(tmp_path: Path, monkeypatch) -> None:
+    (tmp_path / "test_opaque_mutation.py").write_text(
+        "import time\n"
+        "def replacement(seconds): return None\n"
+        "def test_sleep(monkeypatch):\n"
+        "    monkeypatch.setattr(time, 'sleep', replacement)\n",
+        encoding="utf-8",
+    )
+    baseline = scan_tests(tmp_path)
+    assert baseline.resolved == 0 and len(baseline.skipped) == 1
+
+    signature_of = checker._signature_of
+    with monkeypatch.context() as mutation:
+        def pretend_inspectable(value):
+            if value is __import__("time").sleep:
+                return checker._SignatureResolution(inspect.Signature())
+            return signature_of(value)
+
+        mutation.setattr(checker, "_signature_of", pretend_inspectable)
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 1
+
+
+def test_mutation_probe_named_and_class_attribute_decorators_differ(
+    tmp_path: Path, monkeypatch
+) -> None:
+    (tmp_path / "test_decorator_mutation.py").write_text(
+        "from collections import UserDict\n"
+        "@classmethod\n"
+        "def replacement(value): return value\n"
+        "class LocalDouble:\n"
+        "    @classmethod\n"
+        "    def fromkeys(cls, iterable=(), value=None): return None\n"
+        "def test_named(monkeypatch):\n"
+        "    monkeypatch.setattr(UserDict, 'fromkeys', replacement)\n"
+        "def test_class_attribute(monkeypatch):\n"
+        "    mapping = UserDict()\n"
+        "    double = LocalDouble()\n"
+        "    monkeypatch.setattr(mapping, 'fromkeys', double.fromkeys)\n",
+        encoding="utf-8",
+    )
+    baseline = scan_tests(tmp_path)
+    assert baseline.resolved == 1 and baseline.skipped_by_reason == (("decorated", 1),)
+
+    replacement_resolver = checker._replacement_signature_for_site
+    with monkeypatch.context() as mutation:
+        def ignore_named_decorators(node, site, tree, parents, modules, objects):
+            definition = checker._callable_definition(node, site.call, parents, tree)
+            if isinstance(definition, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                signature = checker._replacement_signature(definition)
+                return checker._SignatureResolution(signature)
+            return replacement_resolver(node, site, tree, parents, modules, objects)
+
+        mutation.setattr(
+            checker, "_replacement_signature_for_site", ignore_named_decorators
+        )
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 2 and not changed.skipped
+
+
+def test_mutation_probe_importorskip_alias_is_preserved(tmp_path: Path, monkeypatch) -> None:
+    (tmp_path / "test_alias_mutation.py").write_text(
+        "import pytest\n"
+        "module_alias = pytest.importorskip('collections')\n"
+        "def replacement(iterable=(), /, **kwargs): return None\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(module_alias, 'Counter', replacement)\n",
+        encoding="utf-8",
+    )
+    baseline = scan_tests(tmp_path)
+    assert baseline.skipped_by_reason == (("unsafe-type", 1),)
+
+    aliases = checker._aliases
+    with monkeypatch.context() as mutation:
+        def without_importorskip(tree):
+            modules, objects = aliases(tree)
+            modules.pop("module_alias", None)
+            return modules, objects
+
+        mutation.setattr(checker, "_aliases", without_importorskip)
+        changed = scan_tests(tmp_path)
+        assert changed.skipped_by_reason == (("unresolvable", 1),)
+
+
+def test_mutation_probe_static_constructor_scan_has_no_side_effect(
+    tmp_path: Path, monkeypatch
+) -> None:
+    marker = tmp_path / "constructor-ran"
+
+    class SideEffect:
+        def __init__(self):
+            marker.write_text("ran", encoding="utf-8")
+
+        def emit(self, record):
+            return record
+
+    module = ModuleType("test_double_signature_side_effect")
+    module.SideEffect = SideEffect
+    monkeypatch.setitem(sys.modules, module.__name__, module)
+    (tmp_path / "test_constructor_mutation.py").write_text(
+        "from test_double_signature_side_effect import SideEffect\n"
+        "def test_patch(monkeypatch):\n"
+        "    receiver = SideEffect()\n"
+        "    monkeypatch.setattr(receiver, 'emit', lambda record: record)\n",
+        encoding="utf-8",
+    )
+    assert scan_tests(tmp_path).resolved == 1
+    assert not marker.exists()
+
+    receiver = checker._receiver
+    with monkeypatch.context() as mutation:
+        def instantiate_constructor(node, at, parents, modules, objects):
+            constructor_call = (
+                checker._assigned_constructor_call(node.id, at, parents)
+                if isinstance(node, ast.Name)
+                else node if isinstance(node, ast.Call) else None
+            )
+            if (
+                constructor_call is not None
+                and isinstance(constructor_call.func, ast.Name)
+                and constructor_call.func.id == "SideEffect"
+            ):
+                return checker._Receiver(SideEffect(), True)
+            return receiver(node, at, parents, modules, objects)
+
+        mutation.setattr(checker, "_receiver", instantiate_constructor)
+        changed = scan_tests(tmp_path)
+        assert changed.resolved == 1
+        assert marker.exists()

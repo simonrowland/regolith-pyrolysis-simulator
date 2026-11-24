@@ -15,6 +15,7 @@ Compatibility rules:
 from __future__ import annotations
 
 import argparse
+import abc
 import ast
 import importlib
 import inspect
@@ -270,6 +271,10 @@ def _imported_object(
         try:
             value = importlib.import_module(".".join(parts[:split]))
             for attribute in parts[split:]:
+                if _is_class_object(value) and not _is_allowed_type(
+                    type(value), _SAFE_METACLASSES
+                ):
+                    return None
                 value = inspect.getattr_static(value, attribute)
             return value
         except Exception:
@@ -341,6 +346,7 @@ _SAFE_SIGNATURE_TYPES = (
     types.WrapperDescriptorType,
     types.ClassMethodDescriptorType,
 )
+_SAFE_METACLASSES = (type, abc.ABCMeta)
 
 
 def _safe_signature_type(value) -> bool:
@@ -348,24 +354,25 @@ def _safe_signature_type(value) -> bool:
     if not _is_allowed_type(value_type, _SAFE_SIGNATURE_TYPES):
         return False
     if value_type is types.FunctionType:
-        try:
-            inspect.getattr_static(value, "__wrapped__")
-        except AttributeError:
-            pass
-        else:
+        defaults = object.__getattribute__(value, "__defaults__")
+        kwdefaults = object.__getattribute__(value, "__kwdefaults__")
+        annotations = object.__getattribute__(value, "__annotations__")
+        if type(defaults) is not tuple and type(defaults) is not type(None):
             return False
-        try:
-            inspect.getattr_static(value, "__signature__")
-        except AttributeError:
-            pass
-        else:
+        if type(kwdefaults) is not dict and type(kwdefaults) is not type(None):
+            return False
+        if type(annotations) is not dict:
+            return False
+        if _has_static_attribute(value, "__wrapped__"):
+            return False
+        if _has_static_attribute(value, "__signature__"):
             return False
     return True
 
 
 def _signature_of(value) -> _SignatureResolution:
     if not _safe_signature_type(value):
-        reason = "decorated" if type(value) is types.FunctionType and _has_static_attribute(value, "__wrapped__") else "unsafe-type"
+        reason = "nonstandard-metadata" if type(value) is types.FunctionType else "unsafe-type"
         return _SignatureResolution(None, reason, "callable type or signature metadata is outside the inspection allowlist")
     try:
         return _SignatureResolution(inspect.signature(value, follow_wrapped=False))
@@ -457,6 +464,8 @@ def _receiver_attribute_signature(
     if type(receiver.value) is ast.ClassDef:
         return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)
     if _is_class_object(receiver.value):
+        if not _is_allowed_type(type(receiver.value), _SAFE_METACLASSES):
+            return _SignatureResolution(None, "custom-metaclass", "class metaclass is outside the inspection allowlist")
         return _class_attribute_signature(receiver.value, name, receiver.is_instance)
     if type(receiver.value) is types.ModuleType:
         try:
@@ -468,6 +477,8 @@ def _receiver_attribute_signature(
         instance_attribute = inspect.getattr_static(receiver.value, name)
     except AttributeError:
         return _SignatureResolution(None, "unresolvable", "static instance attribute was not found")
+    if not _is_allowed_type(type(type(receiver.value)), _SAFE_METACLASSES):
+        return _SignatureResolution(None, "custom-metaclass", "receiver class metaclass is outside the inspection allowlist")
     try:
         class_attribute = inspect.getattr_static(type(receiver.value), name)
     except AttributeError:
@@ -491,12 +502,17 @@ def _receiver_and_attribute_for_path(
             continue
         try:
             for attribute in parts[split:-1]:
+                if _is_class_object(owner) and not _is_allowed_type(
+                    type(owner), _SAFE_METACLASSES
+                ):
+                    return _Receiver(owner, False), parts[-1]
                 owner = inspect.getattr_static(owner, attribute)
         except AttributeError:
             continue
-        if type(owner) is not types.ModuleType and not _is_class_object(owner):
-            return None, parts[-1]
-        return _Receiver(owner, type(owner) is not types.ModuleType and not _is_class_object(owner)), parts[-1]
+        return _Receiver(
+            owner,
+            type(owner) is not types.ModuleType and not _is_class_object(owner),
+        ), parts[-1]
     return None, parts[-1]
 
 
@@ -701,10 +717,7 @@ def _replacement_signature_for_site(
 ) -> _SignatureResolution:
     definition = _callable_definition(node, site.call, parents, tree)
     if definition is not None:
-        if isinstance(definition, (ast.FunctionDef, ast.AsyncFunctionDef)) and any(
-            not isinstance(decorator, ast.Name) or decorator.id not in {"classmethod", "staticmethod"}
-            for decorator in definition.decorator_list
-        ):
+        if isinstance(definition, (ast.FunctionDef, ast.AsyncFunctionDef)) and definition.decorator_list:
             return _SignatureResolution(None, "decorated", "replacement declaration has a decorator that can change its callable")
         signature = _replacement_signature(definition)
         if signature is None:
