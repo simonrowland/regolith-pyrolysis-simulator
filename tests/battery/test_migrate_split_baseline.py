@@ -585,7 +585,8 @@ def _format_store_delta_report(
             for row in record.get("rows", []):
                 for change in row.get("changes", []):
                     if not _field_is_fold22_scope(
-                        str(change["field"]), change, str(row["source_id"])
+                        str(change["field"]), change, str(row["source_id"]),
+                        str(row["id"]), row.get("changes", []),
                     ):
                         out_of_scope_sources.add(str(row["source_id"]))
         for record in work:
@@ -609,7 +610,9 @@ def _format_store_delta_report(
             source_row = _source_extract_row(source_id, str(row["id"]))
             for change in row.get("changes", []):
                 field = str(change["field"])
-                if mode == "scope" and _field_is_fold22_scope(field, change, source_id):
+                if mode == "scope" and _field_is_fold22_scope(
+                    field, change, source_id, str(row["id"]), row.get("changes", [])
+                ):
                     continue
                 cell, candidates, basis = _source_cell_basis(source_row, field)
                 old_match = _side_matches_cell(change["old"], candidates)
@@ -658,20 +661,40 @@ def _format_store_delta_report(
     return "\n".join([header, *decoded])
 
 
-def _field_is_fold22_scope(field: str, change: dict[str, object], source_id: str) -> bool:
-    if source_id in {
-        "kems-020-hastie-1981-nbsir",
-        *(row[0].removesuffix(".yaml") for row in _EXTRACT_ROWS),
-    }:
+def _field_is_fold22_scope(
+    field: str,
+    change: dict[str, object],
+    source_id: str,
+    observation_id: str = "",
+    row_changes: list[dict[str, object]] | None = None,
+) -> bool:
+    representative_rows = {row[1] for row in _EXTRACT_ROWS}
+    representative_rows.update({
+        "hastie_1981_fig4_illite_K_SiO_digitized",
+        "hastie_1981_fig5_glass_Na_this_work_digitized",
+        "hastie_1981_fig11_k1_slag_k2o_gamma_digitized",
+        "hastie_1981_fig11_k1_slag_k2o_gamma_tms_open_square",
+    })
+    if any(
+        observation_id == scoped_id or observation_id.startswith(f"{scoped_id}::")
+        for scoped_id in representative_rows
+    ):
         return True
     normalized = field.removeprefix("observation.")
-    if normalized.startswith("identity.fO2_Pa"):
-        return True
-    if normalized.startswith("notices"):
-        text = json.dumps((change.get("old"), change.get("new")), default=str)
-        return any(token in text for token in (
-            "CONDITION_EXCLUDED_TARGET_DEPENDENCY", "gas_ratio_requires_bench", "DP-010"
-        ))
+    rows = row_changes or [change]
+    scoped_notice_tokens = (
+        "CONDITION_EXCLUDED_TARGET_DEPENDENCY",
+        "gas_ratio_requires_bench_but_none_was_supplied",
+        "buffer_requires_bench_but_none_was_supplied",
+        "DP-010",
+    )
+    for row_change in rows:
+        if not str(row_change.get("field", "")).endswith("notices"):
+            continue
+        text = json.dumps((row_change.get("old"), row_change.get("new")), default=str)
+        if any(token in text for token in scoped_notice_tokens):
+            if normalized.startswith(("notices", "identity.fO2_Pa", "value.point")):
+                return True
     return False
 
 
