@@ -133,6 +133,19 @@ def _fail(reason: RefusalReason, checks: list[GateCheck], primary: str) -> GateO
     )
 
 
+def _effusion_policy_outcome(
+    checks: list[GateCheck], flag: str, *, reason: str
+) -> GateOutcome:
+    """Keep a numeric KEMS comparison and record its regime policy flag."""
+    return GateOutcome(
+        passed=True,
+        checks=(
+            *checks,
+            GateCheck("effusion_regime_policy", True, {"flag": flag, "reason": reason}),
+        ),
+    )
+
+
 def _pass(checks: list[GateCheck]) -> GateOutcome:
     return GateOutcome(passed=True, checks=tuple(checks))
 
@@ -694,7 +707,13 @@ def underdetermined_apparatus(
             )
         )
         calibration_flagged = (
-            quantity is Quantity.P_PARTIAL and ungrounded_detail is not None
+            quantity
+            in {
+                Quantity.P_SAT,
+                Quantity.P_PARTIAL,
+                Quantity.P_REFERENCE,
+            }
+            and ungrounded_detail is not None
         )
         checks.append(
             GateCheck(
@@ -827,7 +846,7 @@ def underdetermined_apparatus(
             None if calibrated else _calibration_not_grounded_detail(calibration)
         )
         calibration_flagged = (
-            quantity is Quantity.ACTIVITY and ungrounded_detail is not None
+            activity_quantity and ungrounded_detail is not None
         )
         if activity_quantity:
             checks.append(
@@ -970,8 +989,10 @@ def effusion_regime_unverified(
             )
         )
         if not molecular:
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED, checks, "orifice_knudsen"
+            return _effusion_policy_outcome(
+                checks,
+                "effusion_regime_violated",
+                reason="printed orifice Knudsen number is below the molecular limit",
             )
         return _pass(checks)
 
@@ -1010,10 +1031,10 @@ def effusion_regime_unverified(
             )
         )
         if not passed:
-            return _fail(
-                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+            return _effusion_policy_outcome(
                 checks,
-                "orifice_pressure_to_diameter",
+                "effusion_regime_violated",
+                reason="printed cell pressure and orifice diameter fail the molecular limit",
             )
         return _pass(checks)
 
@@ -1096,6 +1117,26 @@ def effusion_regime_unverified(
             # A lower bound already above the limit proves the cell is outside
             # the regime, even though species coverage is incomplete.
             pressure_detail["printed_partial_pressure_sum_Pa"] = str(lower_bound)
+            checks.append(
+                GateCheck("in_cell_partial_pressure_sum", False, pressure_detail)
+            )
+            if method_state.is_value and method_state.value is MethodToken.KNUDSEN_EFFUSION:
+                return _effusion_policy_outcome(
+                    checks,
+                    "effusion_regime_violated",
+                    reason="printed pressure lower bound exceeds the molecular limit",
+                )
+            return _fail(
+                RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+                checks,
+                "in_cell_partial_pressure_sum",
+            )
+        if method_state.is_value and method_state.value is MethodToken.KNUDSEN_EFFUSION:
+            return _effusion_policy_outcome(
+                checks,
+                "effusion_regime_assumed",
+                reason="no printed regime check is available for this reduced KEMS value",
+            )
         checks.append(
             GateCheck(
                 "in_cell_partial_pressure_sum",
@@ -1141,10 +1182,10 @@ def effusion_regime_unverified(
         GateCheck("in_cell_partial_pressure_sum", passed, gate_detail)
     )
     if not passed:
-        return _fail(
-            RefusalReason.EFFUSION_REGIME_UNVERIFIED,
+        return _effusion_policy_outcome(
             checks,
-            "in_cell_partial_pressure_sum",
+            "effusion_regime_violated",
+            reason="printed in-cell pressure sum exceeds the molecular limit",
         )
     return _pass(checks)
 

@@ -2289,6 +2289,7 @@ def _unverified_apparatus_notices(
         or calibration_flagged_activity
     )
     missing: dict[str, Mapping] = {}
+    policy_notices: list[Notice] = []
     calibration_notice = None
     calibration_reason = None
     for candidate in gates.checks:
@@ -2296,6 +2297,19 @@ def _unverified_apparatus_notices(
         detail = check.detail
         if not isinstance(detail, Mapping):
             detail = {}
+        policy_flag = detail.get("flag")
+        if policy_flag in {
+            "effusion_regime_assumed",
+            "effusion_regime_violated",
+        }:
+            policy_notices.append(
+                Notice(
+                    kind=NoticeKind.UNVERIFIED_APPARATUS,
+                    affected_quantities=(quantity,),
+                    reason=str(policy_flag),
+                    origin=reference.observation_id,
+                )
+            )
         if check.passed:
             if (
                 (allow_calibration or calibration_flagged_partial_pressure)
@@ -2320,8 +2334,8 @@ def _unverified_apparatus_notices(
             return ()
         missing[fact] = detail
     if not missing:
-        return ()
-    notices: list[Notice] = []
+        return tuple(policy_notices)
+    notices: list[Notice] = list(policy_notices)
     for fact in sorted(missing):
         detail = missing[fact]
         if fact == "in_cell_partial_pressure_sum":
@@ -2365,7 +2379,7 @@ def _unverified_apparatus_notices(
             continue
         if fact == "calibration_not_grounded":
             reason = (
-                f"calibration_not_grounded: "
+                "calibration_not_grounded: kems_calibration_by_source: "
                 f"{calibration_notice or 'Calibration is not grounded.'}"
                 + (f" ({calibration_reason})" if calibration_reason else "")
             )

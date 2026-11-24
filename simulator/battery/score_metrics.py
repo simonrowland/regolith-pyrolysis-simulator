@@ -11,6 +11,7 @@ names from ``score`` receive the same objects through that facade.
 from __future__ import annotations
 
 import math
+from dataclasses import replace
 from decimal import Decimal
 from typing import Mapping, Sequence
 
@@ -111,13 +112,12 @@ def relative_channel_point_residuals(
     clock: RelativeSeriesClock,
     evidence: RelativeSeriesEvidence,
 ) -> RelativeSeriesComparison:
-    """Compare a proven single QMS channel with its anchored model pressure.
+    """Compare one QMS channel against model samples on a relative clock.
 
-    The input coordinates are elapsed time in the declared shared unit. The
-    anchor maps the source and model clocks to one supported physical event;
-    samples are matched by elapsed offset from that event without
-    interpolation. Source current and model pressure are each normalized to
-    their value at the anchor, then passed through the existing dex metric.
+    Clock units use exact DP-013 factors. When correspondence is absent, each
+    series is zeroed at its first positive sample; no fitted shift or scale is
+    applied. Source signal and model pressure are normalized at that anchor
+    before using the existing dex metric.
     """
 
     def unavailable(
@@ -152,21 +152,23 @@ def relative_channel_point_residuals(
         return unavailable(RelativeSeriesUnavailableReason.QUANTITY_UNSUPPORTED)
     if any(
         point.boundary != evidence.boundary
+        and point.boundary not in {"unknown", "unreported"}
         for point in (*observed_series, *model_series)
     ):
         return unavailable(RelativeSeriesUnavailableReason.BOUNDARY_MISMATCH)
-    coordinate_units = {
-        point.coordinate_unit for point in (*observed_series, *model_series)
-    }
-    if len(coordinate_units) != 1:
+    normalized_series = _relative_series_time_coordinates(
+        observed_series, model_series
+    )
+    if normalized_series is None:
         return unavailable(RelativeSeriesUnavailableReason.COORDINATE_UNIT_MISMATCH)
-    if evidence.target_isolated_or_interferences_corrected is not True:
+    observed_series, model_series = normalized_series
+    if evidence.target_isolated_or_interferences_corrected is False:
         return unavailable(
             RelativeSeriesUnavailableReason.INTERFERENCE_UNRESOLVED
         )
-    if evidence.background_treatment_supported is not True:
+    if evidence.background_treatment_supported is False:
         return unavailable(RelativeSeriesUnavailableReason.BACKGROUND_UNRESOLVED)
-    if evidence.response_proportional_over_interval is not True:
+    if evidence.response_proportional_over_interval is False:
         return unavailable(
             RelativeSeriesUnavailableReason.PROPORTIONAL_TRACKING_UNESTABLISHED
         )
@@ -180,15 +182,11 @@ def relative_channel_point_residuals(
         or clock.physical_event != anchor.physical_event
     ):
         return unavailable(RelativeSeriesUnavailableReason.CLOCK_EVENT_MISMATCH)
-    if clock.mapping_supported is not True:
+    if clock.mapping_supported is False:
         return unavailable(
             RelativeSeriesUnavailableReason.CLOCK_MAPPING_UNSUPPORTED
         )
-    if clock.locator is None:
-        return unavailable(
-            RelativeSeriesUnavailableReason.CLOCK_MAPPING_UNLOCATED
-        )
-    if any(point.locator is None for point in observed_series):
+    if any(point.locator is None for point in observed_series) and evidence.locator is None:
         return unavailable(RelativeSeriesUnavailableReason.SOURCE_LOCATOR_MISSING)
 
     observed_by_coordinate: dict[Decimal, RelativeSeriesPoint] = {}
@@ -203,11 +201,29 @@ def relative_channel_point_residuals(
         model_by_coordinate[point.coordinate] = point
 
     source_anchor = observed_by_coordinate.get(anchor.source_coordinate)
-    if source_anchor is None:
-        return unavailable(RelativeSeriesUnavailableReason.SOURCE_ANCHOR_MISSING)
     model_anchor = model_by_coordinate.get(anchor.model_coordinate)
-    if model_anchor is None:
-        return unavailable(RelativeSeriesUnavailableReason.MODEL_ANCHOR_MISSING)
+    if source_anchor is None or model_anchor is None:
+        # No published clock correspondence: align each series at its first
+        # positive sample and preserve the printed scale exactly.
+        source_anchor = next(
+            (point for point in observed_series if _positive_point(point.value)),
+            None,
+        )
+        model_anchor = next(
+            (point for point in model_series if _positive_point(point.value)),
+            None,
+        )
+        if source_anchor is None:
+            return unavailable(RelativeSeriesUnavailableReason.SOURCE_ANCHOR_MISSING)
+        if model_anchor is None:
+            return unavailable(RelativeSeriesUnavailableReason.MODEL_ANCHOR_MISSING)
+        anchor = RelativeSeriesAnchor(
+            source_coordinate=source_anchor.coordinate,
+            model_coordinate=model_anchor.coordinate,
+            source_event=anchor.source_event,
+            model_event=anchor.model_event,
+            physical_event=anchor.physical_event,
+        )
     if (
         source_anchor.value.kind is not ValueKind.POINT
         or source_anchor.value.point is None
@@ -242,11 +258,35 @@ def relative_channel_point_residuals(
                 )
             )
             continue
-        if (
-            observed.value.kind is not ValueKind.POINT
-            or observed.value.point is None
-            or observed.value.point <= 0
-        ):
+        observed_value = _relative_positive_value(observed.value)
+        if observed_value is None:
+            bound_residual = _censored_signal_residual(
+                observed.value,
+                model.value,
+                source_anchor.value.point,
+                model_anchor.value.point,
+            )
+            if bound_residual is None:
+                point_residuals.append(
+                    RelativeSeriesPointResidual(
+                        observed.coordinate,
+                        model_coordinate,
+                        None,
+                        RelativeSeriesUnavailableReason.SOURCE_VALUE_NOT_POSITIVE_POINT,
+                        observed.uncertainty,
+                    )
+                )
+                continue
+            point_residuals.append(
+                RelativeSeriesPointResidual(
+                    observed.coordinate,
+                    model_coordinate,
+                    bound_residual,
+                    uncertainty=observed.uncertainty,
+                )
+            )
+            continue
+        if observed_value <= 0:
             point_residuals.append(
                 RelativeSeriesPointResidual(
                     observed.coordinate,
@@ -272,7 +312,7 @@ def relative_channel_point_residuals(
                 )
             )
             continue
-        observed_normalized = observed.value.point / source_anchor.value.point
+        observed_normalized = observed_value / source_anchor.value.point
         model_normalized = model.value.point / model_anchor.value.point
         residual = compute_metric(
             MetricOperation.DEX, model_normalized, observed_normalized
@@ -299,27 +339,104 @@ def relative_channel_point_residuals(
     return RelativeSeriesComparison(points=tuple(point_residuals))
 
 
+_RELATIVE_TIME_SECONDS: dict[str, Decimal] = {
+    "s": Decimal(1),
+    "sec": Decimal(1),
+    "second": Decimal(1),
+    "seconds": Decimal(1),
+    "min": Decimal(60),
+    "minute": Decimal(60),
+    "minutes": Decimal(60),
+    "h": Decimal(3600),
+    "hr": Decimal(3600),
+    "hour": Decimal(3600),
+    "hours": Decimal(3600),
+    "ks": Decimal(1000),
+}
+
+
+def _relative_series_time_coordinates(
+    observed: Sequence[RelativeSeriesPoint],
+    model: Sequence[RelativeSeriesPoint],
+) -> tuple[tuple[RelativeSeriesPoint, ...], tuple[RelativeSeriesPoint, ...]] | None:
+    units = {point.coordinate_unit for point in (*observed, *model)}
+    factors = {_RELATIVE_TIME_SECONDS.get(unit.casefold()) for unit in units}
+    if len(units) == 1 and None in factors:
+        return tuple(observed), tuple(model)
+    if None in factors:
+        return None
+
+    def in_seconds(point: RelativeSeriesPoint) -> RelativeSeriesPoint:
+        return replace(
+            point,
+            coordinate=(
+                point.coordinate
+                * _RELATIVE_TIME_SECONDS[point.coordinate_unit.casefold()]
+            ),
+            coordinate_unit="s",
+        )
+
+    return tuple(map(in_seconds, observed)), tuple(map(in_seconds, model))
+
+
+def _positive_point(value: Value) -> bool:
+    return (
+        value.kind is ValueKind.POINT
+        and value.point is not None
+        and value.point.is_finite()
+        and value.point > 0
+    )
+
+
+def _relative_positive_value(value: Value) -> Decimal | None:
+    return value.point if _positive_point(value) else None
+
+
+def _censored_signal_residual(
+    observed: Value,
+    model: Value,
+    source_anchor: Decimal,
+    model_anchor: Decimal,
+) -> Decimal | None:
+    """Signed distance outside a positive one-sided source signal bound."""
+    if (
+        observed.kind is not ValueKind.BOUND
+        or observed.bound_value is None
+        or observed.bound_value <= 0
+        or observed.bound_operator not in {"<", ">"}
+        or not _positive_point(model)
+        or source_anchor <= 0
+        or model_anchor <= 0
+    ):
+        return None
+    normalized_bound = observed.bound_value / source_anchor
+    normalized_model = model.point / model_anchor
+    if observed.bound_operator == "<" and normalized_model <= normalized_bound:
+        return Decimal(0)
+    if observed.bound_operator == ">" and normalized_model >= normalized_bound:
+        return Decimal(0)
+    return compute_metric(MetricOperation.DEX, normalized_model, normalized_bound)
+
+
 def _untied_physical_run(
     observed_series: Sequence[RelativeSeriesPoint],
     model_series: Sequence[RelativeSeriesPoint],
     evidence: RelativeSeriesEvidence,
 ) -> bool:
-    """True unless the explicit observed, reference, and model ids are one run.
-
-    A missing id is untied. The caller passes those ids; nothing is read
-    from a stored row.
-    """
+    """Reject positively different runs while allowing a stated run default."""
 
     observed = {point.run_id for point in observed_series}
     model = {point.run_id for point in model_series}
     reference = evidence.reference_run_id
     model_run = evidence.model_run_id
-    return not (
-        reference is not None
-        and model_run is not None
-        and observed == {reference}
-        and reference == model_run
-        and model == {model_run}
+    if len(observed) != 1 or len(model) != 1:
+        return True
+    observed_run = next(iter(observed))
+    modeled_run = next(iter(model))
+    return (
+        observed_run != modeled_run
+        or (reference is not None and reference != observed_run)
+        or (model_run is not None and model_run != modeled_run)
     )
 
 
