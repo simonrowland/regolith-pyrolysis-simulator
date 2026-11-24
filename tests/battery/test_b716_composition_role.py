@@ -970,6 +970,62 @@ def test_resolver_admits_declared_invalid_map_before_other_assays() -> None:
     assert resolved.composition.reason == "unsupported component: XxO"
 
 
+def test_resolver_does_not_admit_a_stamped_proxy_as_a_flat_run() -> None:
+    prior = composition_roles.AssayCandidate(
+        State.of(_composition(INITIAL_CHARGE_ONLY)),
+        source="point",
+        label="flat-run",
+        inherit_parent_role=False,
+    )
+    flat = composition_roles.AssayCandidate(
+        State.of(_composition(None)),
+        source="declared",
+        label="flat-run",
+        inherit_parent_role=False,
+    )
+
+    resolved = composition_roles.resolve_point_composition(
+        {},
+        {"composition_role": INITIAL_CHARGE_ONLY},
+        (prior, flat),
+    )
+
+    assert resolved.composition.is_value
+    assert resolved.composition.value.components == flat.state.value.components
+    assert resolved.composition.value.proxy_flag is None
+
+
+def test_stamped_proxy_without_flat_assay_does_not_fall_back_to_parent() -> None:
+    proxy = composition_roles.AssayCandidate(
+        State.of(_composition(INITIAL_CHARGE_ONLY)),
+        source="point",
+        label="flat-run",
+        inherit_parent_role=False,
+    )
+
+    resolved = composition_roles.resolve_point_composition(
+        {},
+        {"composition_role": INITIAL_CHARGE_ONLY},
+        (proxy,),
+    )
+
+    assert resolved.composition.is_unknown
+    assert resolved.composition.reason == (
+        "explicit printed point composition map is unusable"
+    )
+
+
+def test_admitting_a_stamped_proxy_as_a_flat_run_breaks_its_pin(monkeypatch) -> None:
+    test_resolver_does_not_admit_a_stamped_proxy_as_a_flat_run()
+    monkeypatch.setattr(
+        composition_roles,
+        "is_initial_charge_composition",
+        lambda _state: False,
+    )
+    with pytest.raises(AssertionError):
+        test_resolver_does_not_admit_a_stamped_proxy_as_a_flat_run()
+
+
 def test_ignoring_declared_map_admission_breaks_its_pin(monkeypatch) -> None:
     test_resolver_admits_declared_invalid_map_before_other_assays()
 
@@ -1200,7 +1256,7 @@ def test_owner_gets_flat_declared_parent_and_identity_assays(monkeypatch) -> Non
         run_composition_columns_declared=True,
     )
 
-    assert offered == [("point", "declared", "parent", "identity")]
+    assert offered == [("point", "declared", "parent", "identity", "none")]
 
 
 def test_owner_gets_invalid_point_parent_and_identity_assays(monkeypatch) -> None:
@@ -1230,7 +1286,7 @@ def test_owner_gets_invalid_point_parent_and_identity_assays(monkeypatch) -> Non
         },
     )
 
-    assert offered == [("point", "parent", "identity")]
+    assert offered == [("point", "parent", "identity", "none")]
 
 
 def test_owner_preserves_proxy_for_incomplete_initial_charge_map() -> None:
@@ -1319,7 +1375,7 @@ def test_partial_pressure_located_composition_is_decoded_without_role(
     observation = next(iter(result.observations.values()))
 
     assert observation.point_conditions["composition"].state.is_value
-    assert offered == [("point", "identity")]
+    assert offered == [("point", "identity", "none")]
 
 
 def test_preselecting_one_candidate_breaks_the_owner_pin(monkeypatch) -> None:

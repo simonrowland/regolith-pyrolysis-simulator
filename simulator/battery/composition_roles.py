@@ -29,6 +29,7 @@ COMPOSITION_ROLE_FIELD = "composition_role"
 DATUM_STATE = "datum_state"
 ROLE_DEFAULT_FLAG = "composition_role_defaulted_to_initial_charge_only"
 _ROLE_DEFAULT_PREFIX = f"typed-refusal:{ROLE_DEFAULT_FLAG}: "
+_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX = "malformed printed component amount"
 _ROLES = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, DATUM_STATE})
 _INVALID_RUN_COMPOSITION_PREFIXES = (
     "malformed declared amount",
@@ -150,7 +151,7 @@ def _reason_is_invalid_run_composition(
     folded = (reason or "").casefold()
     if not folded:
         return False
-    if folded.startswith("malformed printed component amount"):
+    if folded.startswith(_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX):
         return declared_map
     return any(
         folded.startswith(prefix) for prefix in _INVALID_RUN_COMPOSITION_PREFIXES
@@ -165,6 +166,22 @@ def _choose_assay(
 ) -> AssayCandidate:
     admitted: list[AssayCandidate] = []
     for candidate in candidates:
+        if (
+            candidate.label == "flat-run"
+            and candidate.source == "point"
+            and is_initial_charge_composition(candidate.state)
+        ):
+            if any(
+                other.source == "declared" and other.label == "flat-run"
+                for other in candidates
+            ):
+                continue
+            candidate = replace(
+                candidate,
+                state=State.unknown(
+                    "explicit printed point composition map is unusable"
+                ),
+            )
         if candidate.requires_declared_role and declared_role is None:
             if role_reason is not None:
                 return replace(candidate, state=State.unknown(role_reason))

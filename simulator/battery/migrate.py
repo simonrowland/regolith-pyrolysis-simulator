@@ -226,6 +226,7 @@ from simulator.battery import composition_roles
 from simulator.battery.composition_roles import (
     COMPOSITION_ROLE_FIELD,
     DATUM_STATE,
+    _MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX,
     invalid_run_composition,
 )
 from simulator.battery.records import (
@@ -1023,7 +1024,6 @@ def _mass_percent_component_key(name: str) -> tuple[str, bool]:
 
 
 _MALFORMED_DECLARED_AMOUNT_PREFIX = "malformed declared amount"
-_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX = "malformed printed component amount"
 
 
 def parse_declared_amount(value: object) -> Decimal:
@@ -9514,13 +9514,6 @@ def _initial_charge_only_composition_proxy(
 ) -> tuple[Identity, Mapping[str, Located[Any]] | None, list[Notice]]:
     conditions = dict(point_conditions or {})
     point_composition = conditions.get("composition")
-    point_composition_value = (
-        point_composition.state.value
-        if isinstance(point_composition, Located)
-        and point_composition.state.is_value
-        and isinstance(point_composition.state.value, Composition)
-        else None
-    )
     point_composition_state = (
         point_composition.state if isinstance(point_composition, Located) else None
     )
@@ -9586,11 +9579,7 @@ def _initial_charge_only_composition_proxy(
         flat_located: Located[Any] | None = None
         flat_unknown: State[Any] | None = None
         flat_reason = "explicit printed point composition map is unusable"
-        if (
-            point_composition_value is not None
-            and point_composition_value.proxy_flag != INITIAL_CHARGE_ONLY_PROXY_FLAG
-            and isinstance(point_composition, Located)
-        ):
+        if isinstance(point_composition, Located) and point_composition.state.is_value:
             flat_located = point_composition
         elif (
             isinstance(point_composition, Located)
@@ -9687,15 +9676,19 @@ def _initial_charge_only_composition_proxy(
             candidates.append(composition_roles.AssayCandidate(
                 initial.state,
                 source="declared",
+                label="flat-run" if run_composition_columns_declared else None,
                 locator=initial.locator,
                 declared_map=True,
+                inherit_parent_role=not run_composition_columns_declared,
             ))
         elif initial is not None and initial.state.is_unknown:
             candidates.append(composition_roles.AssayCandidate(
                 initial.state,
                 source="declared",
+                label="flat-run" if run_composition_columns_declared else None,
                 locator=initial.locator,
                 declared_map=True,
+                inherit_parent_role=not run_composition_columns_declared,
             ))
         elif declared_map is not None:
             candidates.append(composition_roles.AssayCandidate(
@@ -9705,15 +9698,19 @@ def _initial_charge_only_composition_proxy(
                     else "explicit printed point composition map is unusable"
                 ),
                 source="declared",
+                label="flat-run" if run_composition_columns_declared else None,
                 locator=locator,
                 declared_map=True,
+                inherit_parent_role=not run_composition_columns_declared,
             ))
         elif declared_composition_state is not None and declared_composition_state.is_unknown:
             candidates.append(composition_roles.AssayCandidate(
                 declared_composition_state,
                 source="declared",
+                label="flat-run" if run_composition_columns_declared else None,
                 locator=locator,
                 declared_map=True,
+                inherit_parent_role=not run_composition_columns_declared,
             ))
 
     if initial_charge_context is not None:
