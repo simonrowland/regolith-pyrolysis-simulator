@@ -2940,7 +2940,12 @@ def _assert_complete_store_regeneration_matches_checked_in_bytes(
 
     if report_mode:
         payload = _store_difference_payload(stored, regenerated, byte_differences)
-        print(_format_store_delta_report(payload, report_mode, set(source_filter)))
+        report = _format_store_delta_report(payload, report_mode, set(source_filter))
+        if report_mode == "scope":
+            compressed = lzma.compress(report.encode("utf-8"), preset=9)
+            print("STORE DELTA SCOPE LZMA BASE64 " + base64.b64encode(compressed).decode("ascii"))
+        else:
+            print(report)
         assert len(byte_differences) == 376
         raise AssertionError("intentional store delta report follows")
     assert byte_differences == [], _store_difference_details(
