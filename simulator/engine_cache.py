@@ -2282,6 +2282,7 @@ def cached_engine_call(
             del _MEMORY_CACHE[memory_key]
 
     path = _expanded_cache_path(path_value)
+    stale_persistent_row: tuple[str, int] | None = None
     try:
         connection = _connect(path, readonly=readonly)
     except (sqlite3.Error, OSError, EngineCacheSchemaMismatch) as exc:
@@ -2299,7 +2300,9 @@ def cached_engine_call(
     with _LOCK:
         try:
             row = None if connection is None or _definitely_absent(connection, cache_key) else connection.execute(
-                f"SELECT value, provenance_id FROM {_TABLE} WHERE key=?", (cache_key,)
+                f"SELECT value, provenance_id, source_box, row_seq "
+                f"FROM {_TABLE} WHERE key=?",
+                (cache_key,),
             ).fetchone()
         except sqlite3.Error:
             counts["read_error"] += 1
@@ -2317,15 +2320,9 @@ def cached_engine_call(
                     counts["hits"] += 1
                     _remember_memory_value(memory_key, result)
                     return _unwrap_engine_cache_value(engine_id, result)
-                row = None
                 if _engine_carries_disclosures(engine_id) and not readonly:
-                    try:
-                        connection.execute(
-                            f"DELETE FROM {_TABLE} WHERE key=?", (cache_key,)
-                        )
-                        connection.commit()
-                    except sqlite3.Error:
-                        counts["store_error"] += 1
+                    stale_persistent_row = (str(row[2]), int(row[3]))
+                row = None
         counts["misses"] += 1
 
     try:
@@ -2424,6 +2421,24 @@ def cached_engine_call(
         return hot
     try:
         with _LOCK:
+            if stale_persistent_row is not None:
+                cold_path = _cache_pair(path)[1]
+                has_cold = cold_path.exists()
+                attached = {
+                    str(row[1])
+                    for row in connection.execute("PRAGMA database_list")
+                }
+                if has_cold and "cold" not in attached:
+                    connection.execute(
+                        "ATTACH DATABASE ? AS cold",
+                        (str(cold_path.resolve()),),
+                    )
+                    _check_cold_schema(connection)
+                _delete_cached_rows(
+                    connection,
+                    has_cold,
+                    [stale_persistent_row],
+                )
             connection.execute("BEGIN IMMEDIATE")
             inserted, conflict = _insert_cache_row_if_absent(
                 connection,

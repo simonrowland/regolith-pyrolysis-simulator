@@ -1303,7 +1303,7 @@ def test_selected_binding_refusal_notice_preserves_primary_memo_scope(
     )
 
 
-def test_gate_curve_memo_is_ineligible_without_producer_evidence_and_records_notice_once(
+def test_gate_curve_memo_is_receipt_free_and_still_records_notice_once(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -1333,14 +1333,48 @@ def test_gate_curve_memo_is_ineligible_without_producer_evidence_and_records_not
     )
     sim = SimpleNamespace()
 
-    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
-    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    assert admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    assert admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
 
     notice = binding_admission_run_notice(sim)
     assert notice is not None
     assert len(notice["notices"]) == 1
     assert notice["notices"][0]["identity"] == SYNTHETIC_IDENTITY.as_dict()
     assert notice["notices"][0]["reason"] == "receipt missing"
+
+
+def test_gate_curve_memo_is_ineligible_without_verifiable_producer_provenance(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    missing_receipt = tmp_path / "missing-binding-admission.json"
+    provenance = {
+        "binding_provenance_verifiable": False,
+        "runtime_artifact": "test-only",
+    }
+    monkeypatch.setattr(
+        admission,
+        "binding_receipt_path",
+        lambda *_args, **_kwargs: missing_receipt,
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_identities",
+        lambda _sim, *, artifact, provider_role=None: (
+            (SYNTHETIC_IDENTITY,)
+            if artifact == "freeze_gate_curve"
+            else ()
+        ),
+    )
+    monkeypatch.setattr(
+        admission,
+        "selected_binding_provenance",
+        lambda _identity, _sim: provenance,
+    )
+    sim = SimpleNamespace()
+
+    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
 
 
 def test_gate_curve_memo_malformed_configuration_raises_typed_error() -> None:

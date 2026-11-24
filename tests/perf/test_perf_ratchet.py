@@ -385,14 +385,8 @@ def test_lunar_highland_campaign_chain_work_volume_is_derived_from_config() -> N
         )
 
 
-def test_optimizer_60h_eval_ratchet_is_visibly_unbaselined() -> None:
+def test_optimizer_60h_eval_ratchet_is_baselined_and_visible() -> None:
     stage = load_baselines(BASELINE_PATH)["stages"][bench.OPTIMIZER_STAGE_NAME]
-    if stage.get("status") == "needs_rebaseline":
-        assert stage == {
-            "status": "needs_rebaseline",
-            "reason": bench.OPTIMIZER_REBASELINE_REASON,
-        }
-        pytest.skip(bench.OPTIMIZER_REBASELINE_REASON)
     assert "status" not in stage
     assert "reason" not in stage
     assert math.isfinite(float(stage["ratchet_rate"]))

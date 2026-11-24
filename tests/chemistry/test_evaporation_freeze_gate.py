@@ -9084,6 +9084,7 @@ def test_core_gate_curve_memo_rejects_foreign_pid_or_configuration(
 
 @pytest.mark.parametrize('foreign_member', ['pid', 'configuration'])
 def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
+    monkeypatch,
     foreign_member,
     vapor_pressure_data,
     feedstocks_data,
@@ -9094,6 +9095,7 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
         feedstocks_data,
         setpoints_data,
         enabled=True,
+        liquid_fraction_provider='magemin',
     )
     curve = _freeze_gate_curve_fixture(sim, {
         'source': 'unit-test',
@@ -9112,6 +9114,20 @@ def test_per_tick_gate_authority_rejects_foreign_pid_or_configuration(
     sim._freeze_gate_liquid_fraction_curve_memo.clear()
     sim._melt_redox_gate_authority_this_tick = record
     sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    matching_identity = MAGEMinDomainIdentity(
+        silica_verdict='in_band',
+        projection_threshold_verdict='clear',
+        certified_band=None,
+        refusal_reason=None,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_gate_current_pin_verdict',
+        lambda: (matching_identity, True),
+    )
+    sim._melt_redox_gate_authority_tick_verdict_identity = matching_identity
     producer_calls = []
     sim._freeze_gate_curve_from_gate_dispatch = (
         lambda reasons, *, fO2_log, repair_notices=None, redox_state=None: (

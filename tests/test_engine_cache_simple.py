@@ -1358,6 +1358,98 @@ def test_isolated_cell_cache_stores_only_compact_hot_fields(
     assert isolated._worker.calls == 1
 
 
+def test_scoped_disclosure_miss_keeps_old_hot_species_and_cold_until_replace(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.engine_cache import EngineCacheValue
+    from simulator.vapour_rail import run_disclosure
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    engine_cache._MEMORY_CACHE.clear()
+    _engine_cache_counters(reset=True)
+    request = {"composition_wt_pct": {"SiO2": 50.0}}
+
+    original = engine_cache.cached_engine_call(
+        "alphamelts",
+        request,
+        lambda: EngineCacheValue(
+            {"answer": "unscoped"}, cold={"diagnostic": "retained"}
+        ),
+        disclosure_runtime=run_disclosure,
+    )
+    assert original == {"answer": "unscoped"}
+    engine_cache._MEMORY_CACHE.clear()
+
+    def failed_scoped_solve():
+        raise RuntimeError("scoped replacement failed")
+
+    with disclosure_scope(inherit=False):
+        with pytest.raises(RuntimeError, match="scoped replacement failed"):
+            engine_cache.cached_engine_call(
+                "alphamelts",
+                request,
+                failed_scoped_solve,
+                disclosure_runtime=run_disclosure,
+            )
+
+    with sqlite3.connect(database) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_outputs"
+        ).fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_output_species"
+        ).fetchone()[0] > 0
+    with sqlite3.connect(f"{database}.cold") as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_values"
+        ).fetchone()[0] == 1
+
+    engine_cache._MEMORY_CACHE.clear()
+    assert engine_cache.cached_engine_call(
+        "alphamelts",
+        request,
+        lambda: pytest.fail("failed scoped miss must preserve unscoped row"),
+        disclosure_runtime=run_disclosure,
+    ) == {"answer": "unscoped"}
+
+    engine_cache._MEMORY_CACHE.clear()
+    with disclosure_scope(inherit=False) as disclosures:
+        replacement = engine_cache.cached_engine_call(
+            "alphamelts",
+            request,
+            lambda: {"answer": "scoped"},
+            disclosure_runtime=run_disclosure,
+        )
+        assert replacement == {"answer": "scoped"}
+        assert disclosures.snapshot() == ()
+
+    engine_cache._MEMORY_CACHE.clear()
+    with disclosure_scope(inherit=False) as disclosures:
+        assert engine_cache.cached_engine_call(
+            "alphamelts",
+            request,
+            lambda: pytest.fail("successful scoped replacement must hit"),
+            disclosure_runtime=run_disclosure,
+        ) == {"answer": "scoped"}
+        assert disclosures.snapshot() == ()
+
+    with sqlite3.connect(database) as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_outputs"
+        ).fetchone()[0] == 1
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_output_species"
+        ).fetchone()[0] > 0
+    with sqlite3.connect(f"{database}.cold") as connection:
+        assert connection.execute(
+            "SELECT COUNT(*) FROM engine_values"
+        ).fetchone()[0] == 0
+
+
 def test_equilibrium_cache_value_contains_only_scoring_inputs() -> None:
     result = EquilibriumResult(
         temperature_C=1000.0,

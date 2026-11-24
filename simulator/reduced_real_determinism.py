@@ -442,7 +442,6 @@ _PT1_CACHE_MERGE_IDENTITY_FIELDS = (
     "corpus_version",
     "engine_version",
     "data_digests_json",
-    "created_at",
     "git_dirty",
 )
 

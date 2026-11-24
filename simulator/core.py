@@ -5393,9 +5393,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             pinned_verdict,
         )
         if isinstance(pinned_authority, Mapping):
+            from simulator.engine_binding_admission import (
+                gate_curve_memo_origin_matches,
+            )
+
             authority_is_reusable = (
-                _melt_redox_gate_authority_is_pin_candidate(
-                    pinned_authority
+                _melt_redox_gate_authority_is_pin_candidate(pinned_authority)
+                and gate_curve_memo_origin_matches(
+                    self,
+                    pinned_authority['curve'],
+                    pinned_authority.get('origin'),
+                    fresh_evidence=False,
                 )
             )
         else:

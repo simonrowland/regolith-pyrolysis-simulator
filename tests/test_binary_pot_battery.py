@@ -2884,6 +2884,56 @@ def test_carrying_engine_isolated_worker_keeps_disclosures_unknown(
     assert counts["stores"] == 1
 
 
+@pytest.mark.parametrize("engine_id", sorted(ENGINE_CACHE_DISCLOSURE_ENGINES))
+def test_isolated_cacheable_input_refusal_is_cached_inside_disclosure_scope(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    engine_id: str,
+) -> None:
+    import simulator.diagnostic_helpers.binary_pot_battery as battery
+    from simulator import engine_cache
+    from simulator.engine_cache import _engine_cache_path_scope
+    from simulator.vapour_rail.run_disclosure import disclosure_scope
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    worker = battery._IsolatedCellWorker(engine_id)
+    response = _ok_cell(engine=engine_id, gas={}).as_payload()
+    response.update(
+        status="refusal",
+        refusal_reason=engine_cache.REFUSAL_INVALID_INPUT,
+        engine_status="input_refusal",
+    )
+    calls = {"n": 0}
+
+    def fake_call(_payload, *, timeout_s: float):
+        calls["n"] += 1
+        return dict(response)
+
+    monkeypatch.setattr(worker._worker, "call", fake_call)
+    request = {
+        "pot_id": "isolated-cacheable-refusal",
+        "temperature_K": 1700.0,
+        "po2": Po2Request(mode="engine_default", po2_bar=None).as_payload(),
+    }
+    try:
+        with _engine_cache_path_scope(tmp_path / "isolated-refusal.sqlite"):
+            with disclosure_scope(inherit=False) as disclosures:
+                first = worker.request(request, timeout_s=1.0)
+                second = worker.request(request, timeout_s=1.0)
+                assert disclosures.snapshot() == ()
+    finally:
+        worker.close()
+
+    assert first["status"] == second["status"] == "refusal"
+    assert first["refusal_reason"] == second["refusal_reason"] == (
+        engine_cache.REFUSAL_INVALID_INPUT
+    )
+    assert calls["n"] == 1
+
+
 def test_internal_analytical_cpu_budget_tolerates_idle_wall_that_old_cap_refused(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

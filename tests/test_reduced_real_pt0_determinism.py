@@ -4408,6 +4408,51 @@ def test_pt1_assembly_transports_measured_gate_disclosures_and_hits(
     assert replay._accepted_hit_disclosures == list(disclosures)
 
 
+def test_populate_accepts_identical_pt1_payloads_with_different_capture_times(
+    tmp_path: Path,
+) -> None:
+    from scripts import populate_reduced_real_cache
+
+    shard_db = tmp_path / "capture-shard.sqlite"
+    target_db = tmp_path / "target-cache.sqlite"
+    _capture_pt0_gate_curve(
+        shard_db,
+        solidus_T_C=1100.0,
+        law_disclosures=[],
+    )
+    with sqlite3.connect(shard_db) as source, sqlite3.connect(target_db) as target:
+        source.backup(target)
+    with sqlite3.connect(target_db) as connection:
+        connection.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET created_at=?",
+            ("2000-01-01T00:00:00Z",),
+        )
+
+    with sqlite3.connect(shard_db) as source, sqlite3.connect(target_db) as target:
+        source_payload = source.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        target_payload = target.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        assert bytes(source_payload) == bytes(target_payload)
+        source_created_at = source.execute(
+            f"SELECT created_at FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        target_created_at = target.execute(
+            f"SELECT created_at FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        assert source_created_at != target_created_at
+
+    populate_reduced_real_cache._merge_cache_shard(shard_db, target_db)
+
+    with sqlite3.connect(target_db) as connection:
+        merged_payload = connection.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()[0]
+        assert bytes(merged_payload) == bytes(source_payload)
+
+
 def test_pt1_exact_replay_reuses_persistent_admission_decode(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
