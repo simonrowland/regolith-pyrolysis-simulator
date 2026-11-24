@@ -12,6 +12,7 @@ import base64
 import json
 import lzma
 import re
+from functools import lru_cache
 from pathlib import Path
 from unittest.mock import patch
 
@@ -418,17 +419,45 @@ def _store_difference_details(
     return f"store_delta_lzma_base64={payload}"
 
 
-def _source_extract_row(source_id: str, observation_id: str) -> dict[str, object] | None:
+@lru_cache(maxsize=32)
+def _source_extract_rows(source_id: str) -> dict[str, dict[str, object]]:
     path = REPO_ROOT / "data" / "literature" / "extracts" / f"{source_id}.yaml"
     if not path.is_file():
-        return None
+        return {}
     document = yaml.load(path.read_bytes(), Loader=_FAST_SAFE_YAML_LOADER)
-    local_id = observation_id.removeprefix(f"{source_id}::")
+    rows = {}
     for species in document.get("species", {}).values():
         for row in species.get("observations", []):
-            if row.get("observation_id") == local_id:
-                return row
-    return None
+            local_id = row.get("observation_id")
+            if isinstance(local_id, str):
+                rows[local_id] = row
+    return rows
+
+
+def _source_extract_row(source_id: str, observation_id: str) -> dict[str, object] | None:
+    local_id = observation_id.removeprefix(f"{source_id}::")
+    return _source_extract_rows(source_id).get(local_id)
+
+
+def test_source_extract_rows_load_each_source_once(monkeypatch) -> None:
+    source_id = "zhao-2019-ce2o3-ternary-thermodynamics"
+    _source_extract_rows.cache_clear()
+    original_load = yaml.load
+    load_count = 0
+
+    def counted_load(*args, **kwargs):
+        nonlocal load_count
+        load_count += 1
+        return original_load(*args, **kwargs)
+
+    monkeypatch.setattr(yaml, "load", counted_load)
+    assert _source_extract_row(
+        source_id, f"{source_id}::zhao_2019_table_iv_sample_301_ce2o3_activity"
+    ) is not None
+    assert _source_extract_row(
+        source_id, f"{source_id}::zhao_2019_table_iv_sample_302_ce2o3_activity"
+    ) is not None
+    assert load_count == 1
 
 
 def _source_cell_basis(
