@@ -19,7 +19,13 @@ import pytest
 
 import scripts.battery_hero_plot as hero_plot
 import simulator.battery.score as battery_score
-from simulator.battery.enums import NoticeKind
+from simulator.battery.enums import (
+    MetricOperation,
+    NoticeKind,
+    Quantity,
+    SourceRelation,
+)
+from simulator.battery.score_metrics import populate_numeric
 from scripts.battery_hero_plot import (
     HERO_MINOR_FACETS,
     HERO_RAILS,
@@ -2034,6 +2040,24 @@ def test_hero_scorecard_cells_show_n_for_each_metric_and_exposure_bucket() -> No
     assert "held-out RMS 1.10 dex (n=5)" in text
     assert "SD 0.30 dex (n=5)" in text
     assert "median |dex| 0.80 dex (n=5)" in text
+
+
+def test_residue_absolute_payload_numeric_golden() -> None:
+    numeric, refusal, detail = populate_numeric(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        candidate=Decimal("4"),
+        reference=Decimal("7"),
+        source_relation=SourceRelation.INDEPENDENT,
+        operation_override=MetricOperation.ABSOLUTE,
+    )
+
+    assert refusal is None, detail
+    assert numeric is not None
+    assert (numeric.operation, numeric.unit, numeric.value) == (
+        MetricOperation.ABSOLUTE,
+        "subtype_defined",
+        Decimal("-3"),
+    )
 
 
 def test_flagged_absolute_residual_has_separate_native_unit_tier(
