@@ -33,6 +33,49 @@ from tests.battery.test_migrate import (
 from tests.battery.factories import migrate_one_extract
 
 
+def test_lab_parameter_vocabulary_reloads_after_yaml_mutation(
+    tmp_path: Path,
+) -> None:
+    from simulator.battery.migrate import load_lab_parameter_vocabulary
+
+    vocabulary_path = tmp_path / "lab_parameter_vocabulary.yaml"
+    vocabulary_path.write_text(
+        yaml.safe_dump(
+            {
+                "entries": [
+                    {
+                        "printed": "pressure",
+                        "field": "apparatus.pressure_bar",
+                        "unit": "bar",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+    before = load_lab_parameter_vocabulary(vocabulary_path)
+    vocabulary_path.write_text(
+        yaml.safe_dump(
+            {
+                "entries": [
+                    {
+                        "printed": "pressure",
+                        "field": "apparatus.pressure_Pa",
+                        "unit": "Pa",
+                    }
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    after = load_lab_parameter_vocabulary(vocabulary_path)
+
+    assert before[0].field == "apparatus.pressure_bar"
+    assert after[0].field == "apparatus.pressure_Pa"
+    assert after[0].unit == "Pa"
+
+
 def test_wrapped_equipment_sample_and_composition_match_bare_form(
     tmp_path: Path,
 ) -> None:

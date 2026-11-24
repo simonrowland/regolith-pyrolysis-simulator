@@ -18809,7 +18809,10 @@ def _series_point_value(
 # ---------------------------------------------------------------------------
 
 LAB_PARAMETER_VOCAB_PATH = LITERATURE / "lab_parameter_vocabulary.yaml"
-_VOCAB_CACHE: dict[Path, tuple["VocabEntry", ...]] = {}
+_VOCAB_CACHE: dict[
+    Path,
+    tuple[tuple[int, int, int, int, int] | None, tuple["VocabEntry", ...]],
+] = {}
 _WALK_SKIP_KEYS = {
     "quote",
     "note",
@@ -18845,12 +18848,23 @@ class LabHit:
 
 def load_lab_parameter_vocabulary(path: Path | None = None) -> tuple[VocabEntry, ...]:
     target = (path or LAB_PARAMETER_VOCAB_PATH).resolve()
+    try:
+        stat = target.stat()
+        signature = (
+            int(stat.st_dev),
+            int(stat.st_ino),
+            int(stat.st_size),
+            int(stat.st_mtime_ns),
+            int(stat.st_ctime_ns),
+        )
+    except OSError:
+        signature = None
     cached = _VOCAB_CACHE.get(target)
-    if cached is not None:
-        return cached
+    if cached is not None and cached[0] == signature:
+        return cached[1]
     if not target.is_file():
         entries: tuple[VocabEntry, ...] = ()
-        _VOCAB_CACHE[target] = entries
+        _VOCAB_CACHE[target] = (signature, entries)
         return entries
     doc = load_yaml(target)
     rows = doc.get("entries") if isinstance(doc, Mapping) else None
@@ -18868,7 +18882,7 @@ def load_lab_parameter_vocabulary(path: Path | None = None) -> tuple[VocabEntry,
                 )
             )
     entries = tuple(parsed)
-    _VOCAB_CACHE[target] = entries
+    _VOCAB_CACHE[target] = (signature, entries)
     return entries
 
 
