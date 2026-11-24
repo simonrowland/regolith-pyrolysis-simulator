@@ -28,6 +28,7 @@ from simulator.accounting.formulas import (
     ATOMIC_WEIGHTS_G_PER_MOL,
     resolve_species_formula,
 )
+from simulator.float_tolerance import sum_roundoff_slack
 from simulator.condensation_routing import stage_key_for_stage
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.vapour_rail.instrumentation import (
@@ -1192,6 +1193,11 @@ class AccountingQueries:
             ceiling_mol = float(row["ceiling_mol"])
             if legacy_key == PLUME_SOURCE_SIO_SPECIES:
                 source_mol = sio_source_proxy_mol
+                roundoff_terms = (
+                    near_melt_sio_mol,
+                    plume_extent_mol,
+                    ceiling_mol,
+                )
                 matched_key = PLUME_SOURCE_SIO_SPECIES
             else:
                 source_mol = 0.0
@@ -1203,7 +1209,9 @@ class AccountingQueries:
                         )
                         matched_key = key
                         break
-            breached = source_mol > ceiling_mol + 1e-15
+                roundoff_terms = (source_mol, ceiling_mol)
+            slack = sum_roundoff_slack(roundoff_terms, noop=1e-15)
+            breached = source_mol > ceiling_mol + slack
             if breached:
                 # Keep legacy offender labels for pin compatibility
                 # (tests assert "FeO", "SiO", …).

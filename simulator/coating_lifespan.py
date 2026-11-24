@@ -27,6 +27,7 @@ from simulator.diagnostics import (
     _status_bearing_alpha_record,
     wall_deposit_sticking_authority_status,
 )
+from simulator.float_tolerance import sum_roundoff_slack
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.wall_deposit_availability import (
     WALL_SATURATION_PRESSURE_REFUSAL_EVENTS,
@@ -623,7 +624,14 @@ def cascade_knee_provisional(
     ]
     slopes = [maxima[index] - maxima[index - 1] for index in range(1, len(maxima))]
     for index in range(1, len(slopes)):
-        if slopes[index] > slopes[index - 1] + 1.0e-15:
+        roundoff_terms = (
+            maxima[index + 1],
+            -maxima[index],
+            -maxima[index],
+            maxima[index - 1],
+        )
+        slack = sum_roundoff_slack(roundoff_terms, noop=1.0e-15)
+        if slopes[index] > slopes[index - 1] + slack:
             return index + 2
     return None
 

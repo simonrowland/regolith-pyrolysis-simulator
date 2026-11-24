@@ -48,6 +48,7 @@ from simulator.physical_constants import (
     CELSIUS_TO_KELVIN_OFFSET as CELSIUS_TO_KELVIN,
     GAS_CONSTANT_6SIG as GAS_CONSTANT_J_PER_MOL_K,
 )
+from simulator.float_tolerance import sum_roundoff_slack
 from simulator.yaml_cache import load_cached_safe_yaml
 
 _PARAMS_PATH = (
@@ -537,7 +538,11 @@ def primary_pyrolysis(
         )
 
     gas_c = n_ch4 + n_co2 + n_cos
-    if gas_c > mob_c + 1e-15:
+    slack = sum_roundoff_slack(
+        (n_ch4, n_co2, n_cos, available["C"], -char_c),
+        noop=1e-15,
+    )
+    if gas_c > mob_c + slack:
         scale = mob_c / gas_c
         n_ch4 *= scale
         n_co2 *= scale
