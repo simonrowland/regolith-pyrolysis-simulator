@@ -223,7 +223,11 @@ from simulator.battery.stable_ids import (
     temperature_token,
 )
 from simulator.battery import composition_roles
-from simulator.battery.composition_roles import COMPOSITION_ROLE_FIELD, DATUM_STATE
+from simulator.battery.composition_roles import (
+    COMPOSITION_ROLE_FIELD,
+    DATUM_STATE,
+    invalid_run_composition,
+)
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
     AmbientPressureEvidence,
@@ -2030,12 +2034,6 @@ def _percent_composition_closure_error(
 class _CompositionRefusal:
     reason: str
     closure_refusal: bool = False
-
-
-class _CompositionProxyInputClass(Enum):
-    INVALID = "invalid"
-    NOT_PRINTED = "not_printed"
-    VALID_RUN = "valid_run"
 
 
 @dataclass(frozen=True)
@@ -8575,12 +8573,9 @@ def _composition_located_from_values(
     """
 
     source_note = values.get("composition_derivation") if isinstance(values, Mapping) else None
-    # No usable assay: an unrecognized token stays a refusal here. Defaulting
-    # belongs to the one resolver call that has the assay.
-    resolution = composition_roles.resolve_point_composition(values)
-    role = resolution.role
-    if resolution.original_reason is not None and role_refusal is not None:
-        role_refusal.append(resolution.original_reason)
+    role, role_reason = composition_roles.read_composition_role_field(values)
+    if role_reason is not None and role_refusal is not None:
+        role_refusal.append(role_reason)
     wt = _initial_oxide_map_from_values(
         values,
         declared_map=_declared_wt_composition_point_map(values, None),
@@ -8589,8 +8584,6 @@ def _composition_located_from_values(
     if not wt:
         return None
     has_feot = any(str(oxide).strip() == "FeOT" for oxide in wt)
-    if not has_feot and role is None:
-        return None
     complement_note = (
         isinstance(source_note, str)
         and "SiO2" in source_note
@@ -8633,30 +8626,27 @@ def _composition_located_from_values(
             derivation,
             relation="SiO2_wt_pct=100-K2O_wt_pct;" + derivation.relation,
         )
-    if composition_state.is_unknown:
-        return Located(composition_state, locator=locator, inference=derivation)
-    if role == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-        # The recognized token admits the map. The resolver stamps the flag
-        # and the starting-bulk provenance; this site does not write either.
-        stamped = composition_roles.resolve_point_composition(
-            values,
-            candidates=(
-                composition_roles.AssayCandidate(
-                    composition_state,
-                    source="point",
-                    locator=locator,
-                ),
+    resolution = composition_roles.resolve_point_composition(
+        values,
+        candidates=(
+            composition_roles.AssayCandidate(
+                composition_state,
+                source="point",
+                locator=locator,
+                requires_declared_role=not has_feot,
             ),
-        )
-        # Callers of this locator keep the conversion, including a printed
-        # note (round 9). The proxy store omits it for a starting charge.
-        return Located(
-            stamped.composition,
-            locator=locator,
-            inference=derivation,
-        )
+        ),
+    )
+    if (
+        resolution.original_reason is not None
+        and role_refusal is not None
+        and resolution.original_reason not in role_refusal
+    ):
+        role_refusal.append(resolution.original_reason)
+    if not has_feot and resolution.role is None:
+        return None
     return Located(
-        State.of(composition_state.value),
+        resolution.composition,
         locator=locator,
         inference=derivation,
     )
@@ -8666,46 +8656,6 @@ def composition_unknown_reason(refusal_reasons: Sequence[str] = ()) -> str:
     if refusal_reasons:
         return refusal_reasons[0]
     return f"no composition field under keys {_COMPOSITION_LOOKED_FOR} in this extract"
-
-
-# Stored reasons that mean the run composition was printed and is unusable.
-# A missing field or an unavailable initial charge is not in this list.
-_INVALID_RUN_COMPOSITION_PREFIXES = (
-    "malformed declared amount",
-    "unsupported component",
-    "mass-percent composition",
-    "partial_composition:",
-    "partial analysis contains unsupported component",
-    "explicit printed point composition map is unusable",
-    "printed point composition is unusable",
-)
-
-
-def invalid_run_composition(state: State[Any] | None) -> bool:
-    """True when a stored composition state is invalid run input.
-
-    Not-printed and not-applicable compositions are not this case. The
-    writer applies the declared-map gate before storing a bare malformed
-    printed amount, so a stored state with that reason is invalid.
-    """
-
-    return _reason_is_invalid_run_composition(
-        None if state is None or not state.is_unknown else state.reason,
-        declared_map=True,
-    )
-
-
-def _reason_is_invalid_run_composition(
-    reason: str | None, *, declared_map: bool
-) -> bool:
-    folded = (reason or "").casefold()
-    if not folded:
-        return False
-    if folded.startswith(_MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX):
-        return declared_map
-    return any(
-        folded.startswith(prefix) for prefix in _INVALID_RUN_COMPOSITION_PREFIXES
-    )
 
 
 def partial_composition_unknown_reason(omitted_components: Sequence[str]) -> str:
@@ -9575,43 +9525,13 @@ def _initial_charge_only_composition_proxy(
         point_composition.state if isinstance(point_composition, Located) else None
     )
     identity_composition_state = identity.composition
-    refusal_reasons = [
-        reason
-        for reason in composition_refusal_reasons
-        if point_composition_map_declared
-        or not reason.casefold().startswith(
-            _MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX
-        )
-    ]
+    refusal_reasons = list(composition_refusal_reasons)
     if malformed_composition_reason is not None:
         refusal_reasons.insert(0, malformed_composition_reason)
     elif omitted_composition_components:
         refusal_reasons.insert(
             0, partial_composition_unknown_reason(omitted_composition_components)
         )
-    identity_invalid_reason = None
-    for state in (
-        point_composition_state,
-        declared_composition_state,
-        identity_composition_state,
-    ):
-        if state is None or not state.is_unknown:
-            continue
-        state_reason = state.reason or ""
-        if _reason_is_invalid_run_composition(
-            state_reason,
-            declared_map=point_composition_map_declared,
-        ):
-            identity_invalid_reason = state_reason
-            break
-    if identity_invalid_reason is not None and not refusal_reasons:
-        refusal_reasons.append(identity_invalid_reason)
-    invalid_input = bool(refusal_reasons)
-    classification = (
-        _CompositionProxyInputClass.INVALID
-        if invalid_input
-        else _CompositionProxyInputClass.NOT_PRINTED
-    )
     candidates: list[composition_roles.AssayCandidate] = []
 
     def add_valued(
@@ -9619,14 +9539,15 @@ def _initial_charge_only_composition_proxy(
         *,
         source: str,
         label: str | None = None,
-        terminal: bool = False,
         inherit_parent_role: bool = True,
         keep_inference: bool = False,
     ) -> bool:
-        if (
-            located is None
-            or not located.state.is_value
-            or not isinstance(located.state.value, Composition)
+        if located is None or not (
+            located.state.is_unknown
+            or (
+                located.state.is_value
+                and isinstance(located.state.value, Composition)
+            )
         ):
             return False
         candidates.append(
@@ -9635,33 +9556,35 @@ def _initial_charge_only_composition_proxy(
                 source=source,
                 label=label,
                 locator=located.locator,
+                declared_map=(
+                    point_composition_map_declared or source == "declared"
+                ),
                 # A rebuilt charge map's conversion derivation is not the
                 # point's. Only an assay that arrived as a Located keeps it
                 # (Plante's complement; a flat run's own point).
                 inference=located.inference if keep_inference else None,
-                terminal=terminal,
                 inherit_parent_role=inherit_parent_role,
+                incomplete_initial_charge=(
+                    source == "point"
+                    and label != "flat-run"
+                    and located.state.is_unknown
+                    and (located.state.reason or "")
+                    == "mass-percent composition contains invalid component cells"
+                    and bool(
+                        _missing_major_oxide_names(
+                            point_composition_context,
+                            point_declared_component_map,
+                        )
+                    )
+                ),
             )
         )
         return True
 
-    if classification is _CompositionProxyInputClass.INVALID:
-        reason = (
-            refusal_reasons[0]
-            if refusal_reasons
-            else composition_unknown_reason()
-        )
-        candidates.append(
-            composition_roles.AssayCandidate(
-                State.unknown(reason),
-                source="point",
-                terminal=True,
-                locator=locator,
-            )
-        )
-    elif run_composition_columns_declared:
+    if run_composition_columns_declared:
         # Flat columns are the run. The parent's role does not describe them.
         flat_located: Located[Any] | None = None
+        flat_unknown: State[Any] | None = None
         flat_reason = "explicit printed point composition map is unusable"
         if (
             point_composition_value is not None
@@ -9669,6 +9592,11 @@ def _initial_charge_only_composition_proxy(
             and isinstance(point_composition, Located)
         ):
             flat_located = point_composition
+        elif (
+            isinstance(point_composition, Located)
+            and point_composition.state.is_unknown
+        ):
+            flat_unknown = point_composition.state
         else:
             declared_map = point_oxide_map or point_declared_component_map
             initial = None
@@ -9682,167 +9610,170 @@ def _initial_charge_only_composition_proxy(
                 and initial.state.is_value
                 and isinstance(initial.state.value, Composition)
             ):
-                run = replace(
-                    initial.state.value,
-                    proxy_flag=None,
-                    input_provenance=None,
-                )
                 flat_located = Located(
-                    State.of(run),
+                    initial.state,
                     locator=initial.locator or locator,
                 )
             elif initial is not None and initial.state.is_unknown:
+                flat_unknown = initial.state
                 flat_reason = initial.state.reason or flat_reason
         if not add_valued(
             flat_located,
             source="point",
             label="flat-run",
-            terminal=True,
             inherit_parent_role=False,
             keep_inference=flat_located is point_composition,
         ):
+            flat_candidate = composition_roles.AssayCandidate(
+                State.unknown(flat_reason),
+                source="point",
+                label="flat-run",
+                locator=locator,
+                declared_map=point_composition_map_declared,
+                inherit_parent_role=False,
+                terminal=True,
+            )
+            if flat_unknown is not None:
+                flat_candidate = replace(flat_candidate, state=flat_unknown)
+            candidates.append(flat_candidate)
+    else:
+        point_added = add_valued(
+            point_composition if isinstance(point_composition, Located) else None,
+            source="point",
+            keep_inference=True,
+        )
+        if not point_added and (
+            declared_composition_state is not None or refusal_reasons
+        ):
+            point_reason = (
+                declared_composition_state.reason
+                if declared_composition_state is not None
+                and declared_composition_state.is_unknown
+                else refusal_reasons[0]
+                if refusal_reasons
+                else composition_unknown_reason()
+            )
             candidates.append(
                 composition_roles.AssayCandidate(
-                    State.unknown(flat_reason),
+                    State.unknown(point_reason),
                     source="point",
-                    label="flat-run",
-                    terminal=True,
                     locator=locator,
-                    inherit_parent_role=False,
+                    declared_map=point_composition_map_declared,
+                    incomplete_initial_charge=(
+                        (point_reason or "")
+                        == "mass-percent composition contains invalid component cells"
+                        and bool(
+                            _missing_major_oxide_names(
+                                point_composition_context,
+                                point_declared_component_map,
+                            )
+                        )
+                    ),
                 )
             )
-    else:
-        stop_cascade = False
-        declared_candidate: composition_roles.AssayCandidate | None = None
-        if point_composition_map_declared:
-            declared_map = point_declared_component_map or point_oxide_map
-            initial = None
-            if declared_map is not None:
-                initial = _owner_initial_from_printed(
-                    Located(State.of(declared_map), locator=locator),
-                    closure_context=point_composition_context,
-                )
-            declared_reason = None
-            if (
-                initial is not None
-                and initial.state.is_value
-                and isinstance(initial.state.value, Composition)
-            ):
-                declared_candidate = composition_roles.AssayCandidate(
-                    initial.state,
-                    source="declared",
-                    locator=initial.locator,
-                )
-            elif initial is not None and initial.state.is_unknown:
-                declared_reason = (
-                    initial.state.reason
-                    or "printed point composition is unusable"
-                )
-            elif declared_map is not None:
-                declared_reason = (
+
+    if point_composition_map_declared:
+        declared_map = point_declared_component_map or point_oxide_map
+        initial = None
+        if declared_map is not None:
+            initial = _owner_initial_from_printed(
+                Located(State.of(declared_map), locator=locator),
+                closure_context=point_composition_context,
+            )
+        if (
+            initial is not None
+            and initial.state.is_value
+            and isinstance(initial.state.value, Composition)
+        ):
+            candidates.append(composition_roles.AssayCandidate(
+                initial.state,
+                source="declared",
+                locator=initial.locator,
+                declared_map=True,
+            ))
+        elif initial is not None and initial.state.is_unknown:
+            candidates.append(composition_roles.AssayCandidate(
+                initial.state,
+                source="declared",
+                locator=initial.locator,
+                declared_map=True,
+            ))
+        elif declared_map is not None:
+            candidates.append(composition_roles.AssayCandidate(
+                State.unknown(
                     refusal_reasons[0]
                     if refusal_reasons
                     else "explicit printed point composition map is unusable"
-                )
-            # An invalid printed point is terminal. A usable later assay must
-            # not replace it. A map that is not a composition ("multiple
-            # columns") still leaves a decoded point available.
-            if declared_reason is not None and (
-                point_composition_value is None
-                or _reason_is_invalid_run_composition(
-                    declared_reason, declared_map=True
-                )
-            ):
-                candidates.append(
-                    composition_roles.AssayCandidate(
-                        State.unknown(declared_reason),
-                        source="point",
-                        terminal=True,
-                        locator=locator,
-                    )
-                )
-                stop_cascade = True
-                declared_candidate = None
-        if not stop_cascade:
-            add_valued(
-                point_composition
-                if isinstance(point_composition, Located)
-                else None,
-                source="point",
-                keep_inference=True,
+                ),
+                source="declared",
+                locator=locator,
+                declared_map=True,
+            ))
+        elif declared_composition_state is not None and declared_composition_state.is_unknown:
+            candidates.append(composition_roles.AssayCandidate(
+                declared_composition_state,
+                source="declared",
+                locator=locator,
+                declared_map=True,
+            ))
+
+    if initial_charge_context is not None:
+        initial_map = _named_printed_composition_map(initial_charge_context)
+        if initial_map:
+            initial = _owner_initial_from_printed(
+                Located(State.of(initial_map), locator=locator),
+                closure_context=initial_charge_context,
             )
-        if not stop_cascade and declared_candidate is not None:
-            candidates.append(declared_candidate)
-        if not stop_cascade and initial_charge_context is not None:
-            initial_map = _named_printed_composition_map(initial_charge_context)
-            if initial_map:
-                initial = _owner_initial_from_printed(
-                    Located(State.of(initial_map), locator=locator),
-                    closure_context=initial_charge_context,
+            if not add_valued(initial, source="parent"):
+                parent_reason = (
+                    initial.state.reason
+                    if initial is not None and initial.state.is_unknown
+                    else "printed initial charge is not a usable composition proxy"
                 )
-                if not add_valued(initial, source="parent"):
-                    if not any(
-                        candidate.state.is_value for candidate in candidates
-                    ):
-                        parent_reason = (
-                            initial.state.reason
-                            if initial is not None and initial.state.is_unknown
-                            else (
-                                "printed initial charge is not a usable "
-                                "composition proxy"
-                            )
-                        )
-                        candidates.append(
-                            composition_roles.AssayCandidate(
-                                State.unknown(parent_reason),
-                                source="parent",
-                                terminal=True,
-                                locator=locator,
-                            )
-                        )
-                        stop_cascade = True
-        if not stop_cascade:
-            printed = conditions.get("printed_composition")
-            if isinstance(printed, Located) and printed.state.is_value:
-                initial = _owner_initial_from_printed(
-                    printed,
-                    closure_context=initial_charge_context,
-                )
-                if not add_valued(initial, source="printed"):
-                    refusal_reasons.append(
-                        "printed initial charge is not a usable composition proxy"
-                    )
-            if (
-                identity.composition is not None
-                and identity.composition.is_value
-                and isinstance(identity.composition.value, Composition)
-            ):
-                candidates.append(
-                    composition_roles.AssayCandidate(
-                        identity.composition,
-                        source="identity",
-                    )
-                )
-        if not candidates:
-            if refusal_reasons:
-                missing_reason = refusal_reasons[0]
-            elif point_composition_map_declared:
-                missing_reason = (
-                    "explicit printed point composition map is unusable"
-                )
-            else:
-                missing_reason = (
-                    "missing input: printed initial charge is unavailable for "
-                    "initial_charge_only composition proxy"
-                )
-            candidates.append(
-                composition_roles.AssayCandidate(
-                    State.unknown(missing_reason),
-                    source="none",
-                    terminal=True,
+                candidates.append(composition_roles.AssayCandidate(
+                    State.unknown(parent_reason),
+                    source="parent",
                     locator=locator,
-                )
+                ))
+
+    printed = conditions.get("printed_composition")
+    if isinstance(printed, Located) and printed.state.is_value:
+        initial = _owner_initial_from_printed(
+            printed,
+            closure_context=initial_charge_context,
+        )
+        if not add_valued(initial, source="printed"):
+            refusal_reasons.append(
+                "printed initial charge is not a usable composition proxy"
             )
+    if identity.composition is not None and (
+        identity.composition.is_unknown
+        or (
+            identity.composition.is_value
+            and isinstance(identity.composition.value, Composition)
+        )
+    ):
+        candidates.append(
+            composition_roles.AssayCandidate(
+                identity.composition,
+                source="identity",
+            )
+        )
+    if not candidates:
+        if refusal_reasons:
+            missing_reason = refusal_reasons[0]
+        elif point_composition_map_declared:
+            missing_reason = "explicit printed point composition map is unusable"
+        else:
+            missing_reason = (
+                "missing input: printed initial charge is unavailable for "
+                "initial_charge_only composition proxy"
+            )
+        candidates.append(composition_roles.AssayCandidate(
+            State.unknown(missing_reason),
+            source="none",
+            locator=locator,
+        ))
 
     resolution = composition_roles.resolve_point_composition(
         row,
@@ -9888,8 +9819,8 @@ def _initial_charge_only_composition_proxy(
     if (
         resolution.original_reason is not None
         and isinstance(point_composition, Located)
-        and _reason_is_invalid_run_composition(
-            point_composition.state.reason or "",
+        and invalid_run_composition(
+            point_composition.state,
             declared_map=point_composition_map_declared,
         )
     ):
@@ -9943,7 +9874,6 @@ def _initial_charge_only_composition_proxy(
 def _owner_initial_from_printed(
     printed: Located[Any] | None,
     *,
-    proxy_flag: str | None = None,
     closure_context: object = None,
 ) -> Located[Composition] | None:
     """Convert the printed map already selected by the typed-role owner."""
@@ -9953,10 +9883,7 @@ def _owner_initial_from_printed(
     raw = printed.state.value
     locator = printed.locator
     if isinstance(raw, Composition):
-        composition = raw
-        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-            composition = replace(composition, proxy_flag=proxy_flag)
-        return Located(State.of(composition), locator=locator)
+        return Located(State.of(raw), locator=locator)
     if (
         isinstance(raw, Mapping)
         and _enum(AmountBasis, raw.get("amount_basis"))
@@ -9966,8 +9893,6 @@ def _owner_initial_from_printed(
             composition = _composition_from_plain(raw)
         except ValueError as exc:
             return Located(State.unknown(str(exc)), locator=locator)
-        if proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG:
-            composition = replace(composition, proxy_flag=proxy_flag)
         return Located(State.of(composition), locator=locator)
     if isinstance(raw, Mapping) and sum(
         isinstance(value, Mapping) for value in raw.values()
@@ -10030,17 +9955,6 @@ def _owner_initial_from_printed(
             closure_context=raw if closure_context is None else closure_context,
             declared_component_map=declared_component_map,
         )
-        if (
-            initial is not None
-            and initial.state.is_value
-            and proxy_flag == INITIAL_CHARGE_ONLY_PROXY_FLAG
-        ):
-            initial = replace(
-                initial,
-                state=State.of(
-                    replace(initial.state.value, proxy_flag=proxy_flag)
-                ),
-            )
         return initial
     if refusal_reason:
         return Located(
@@ -20306,7 +20220,6 @@ def sample_from_equipment(
 
     vocab = vocabulary if vocabulary is not None else load_lab_parameter_vocabulary()
     roots = _lab_roots(equipment, values)
-    role = composition_roles.read_composition_role_field(equipment, values)[0]
     hits = collect_lab_hits(roots, vocab, fallback_locator=locator)
     mass_located = _unique_located(_hits_for(hits, "sample.mass_kg"))
     volume_located = _unique_located(_hits_for(hits, "sample.volume_m3"))
@@ -20357,8 +20270,21 @@ def sample_from_equipment(
         ),
     ):
         initial = _owner_initial_from_printed(
-            printed, proxy_flag=role, closure_context=values
+            printed, closure_context=values
         )
+        if initial is not None and initial.state.is_value:
+            resolved = composition_roles.resolve_point_composition(
+                equipment,
+                values,
+                (
+                    composition_roles.AssayCandidate(
+                        initial.state,
+                        source="point",
+                        locator=initial.locator,
+                    ),
+                ),
+            )
+            initial = replace(initial, state=resolved.composition)
     if (
         mass_located is None
         and volume_located is None
@@ -30853,10 +30779,6 @@ class Migrator:
             if (
                 q_for_species is Quantity.P_PARTIAL
                 and point_composition_located is None
-                and (
-                    point_composition_role == DATUM_STATE
-                    or point_composition_role_refusal is not None
-                )
             ):
                 raw_point_conditions = raw_item.get("point_conditions")
                 raw_composition_condition = (
@@ -30870,7 +30792,7 @@ class Migrator:
                         key="composition",
                         closure_context=raw_item,
                     )
-                    if (
+                    if point_condition_composition.state.is_unknown or (
                         point_condition_composition.state.is_value
                         and isinstance(
                             point_condition_composition.state.value, Composition
@@ -31108,16 +31030,19 @@ class Migrator:
             refusal.closure_refusal
             for refusal in point_composition_refusal_classifications
         )
-        missing_major_for_initial_charge = (
+        missing_major_oxide_names = (
             _missing_major_oxide_names(raw_item, point_declared_component_map)
             if (
-                point_composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
-                and composition_unknown_reason(point_composition_refusal)
+                composition_unknown_reason(point_composition_refusal)
                 == "mass-percent composition contains invalid component cells"
             )
             else ()
         )
-        preserve_initial_charge_identity = bool(missing_major_for_initial_charge)
+        missing_major_for_initial_charge = (
+            missing_major_oxide_names
+            if point_composition_role == INITIAL_CHARGE_ONLY_PROXY_FLAG
+            else ()
+        )
         if q_token_point is Quantity.P_PARTIAL and point_oxide_map:
             ident_kwargs["composition"] = _wt_percent_conversion_state(
                 point_oxide_map,
@@ -31173,14 +31098,6 @@ class Migrator:
                 )
             )
             and not (
-                preserve_initial_charge_identity
-                and isinstance(ident_kwargs.get("composition"), State)
-                and ident_kwargs["composition"].is_value
-                and isinstance(ident_kwargs["composition"].value, Composition)
-                and ident_kwargs["composition"].value.proxy_flag
-                == INITIAL_CHARGE_ONLY_PROXY_FLAG
-            )
-            and not (
                 point_mass_closure_refused
                 and q_token_point
                 in {
@@ -31193,9 +31110,27 @@ class Migrator:
                 and ident_kwargs["composition"].is_value
             )
         ):
-            ident_kwargs["composition"] = State.unknown(
-                composition_unknown_reason(point_composition_refusal)
+            point_candidate = composition_roles.AssayCandidate(
+                State.unknown(composition_unknown_reason(point_composition_refusal)),
+                source="point",
+                terminal=True,
+                incomplete_initial_charge=bool(missing_major_oxide_names),
             )
+            candidates = [point_candidate]
+            prior_identity = ident_kwargs.get("composition")
+            if isinstance(prior_identity, State):
+                candidates.append(
+                    composition_roles.AssayCandidate(
+                        prior_identity,
+                        source="identity",
+                    )
+                )
+            selected = composition_roles.resolve_point_composition(
+                raw_item,
+                parent_values,
+                tuple(candidates),
+            )
+            ident_kwargs["composition"] = selected.composition
         elif (
             ident_kwargs.get("composition") is None
         ):

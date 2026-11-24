@@ -30,6 +30,15 @@ DATUM_STATE = "datum_state"
 ROLE_DEFAULT_FLAG = "composition_role_defaulted_to_initial_charge_only"
 _ROLE_DEFAULT_PREFIX = f"typed-refusal:{ROLE_DEFAULT_FLAG}: "
 _ROLES = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, DATUM_STATE})
+_INVALID_RUN_COMPOSITION_PREFIXES = (
+    "malformed declared amount",
+    "unsupported component",
+    "mass-percent composition",
+    "partial_composition:",
+    "partial analysis contains unsupported component",
+    "explicit printed point composition map is unusable",
+    "printed point composition is unusable",
+)
 _Composition = TypeVar("_Composition", Composition, dict[str, float])
 
 
@@ -74,6 +83,9 @@ class AssayCandidate:
     # False when this assay is a flat run: the parent's role describes the
     # parent, not these columns. An explicit role on the row still applies.
     inherit_parent_role: bool = True
+    declared_map: bool = False
+    requires_declared_role: bool = False
+    incomplete_initial_charge: bool = False
 
 
 def is_initial_charge_composition(state: State[object] | None) -> bool:
@@ -121,15 +133,99 @@ def _assay_usable(candidate: AssayCandidate) -> bool:
     return isinstance(value, Mapping) and len(value) > 0
 
 
-def _choose_assay(candidates: Sequence[AssayCandidate]) -> AssayCandidate:
+def invalid_run_composition(
+    state: State[Any] | None, *, declared_map: bool = True
+) -> bool:
+    """Whether a stored composition is a printed but unusable run assay."""
+
+    return _reason_is_invalid_run_composition(
+        None if state is None or not state.is_unknown else state.reason,
+        declared_map=declared_map,
+    )
+
+
+def _reason_is_invalid_run_composition(
+    reason: str | None, *, declared_map: bool
+) -> bool:
+    folded = (reason or "").casefold()
+    if not folded:
+        return False
+    if folded.startswith("malformed printed component amount"):
+        return declared_map
+    return any(
+        folded.startswith(prefix) for prefix in _INVALID_RUN_COMPOSITION_PREFIXES
+    )
+
+
+def _choose_assay(
+    candidates: Sequence[AssayCandidate],
+    *,
+    declared_role: str | None = None,
+    role_reason: str | None = None,
+) -> AssayCandidate:
+    admitted: list[AssayCandidate] = []
+    for candidate in candidates:
+        if candidate.requires_declared_role and declared_role is None:
+            if role_reason is not None:
+                return replace(candidate, state=State.unknown(role_reason))
+            continue
+        admitted.append(candidate)
+    candidates = tuple(admitted)
     if not candidates:
         return AssayCandidate(
             State.unknown("missing_condition:melt_composition"),
             source="none",
         )
-    for index, candidate in enumerate(candidates):
+    # Admission is one resolver rule. Migration supplies every candidate and
+    # its decoded source; it does not stop the cascade when one candidate wins.
+    if declared_role == INITIAL_CHARGE_ONLY_PROXY_FLAG and any(
+        candidate.source == "point"
+        and candidate.inherit_parent_role
+        and candidate.incomplete_initial_charge
+        for candidate in candidates
+    ):
+        prior_charge = next(
+            (
+                candidate
+                for candidate in candidates
+                if candidate.source == "identity"
+                and is_initial_charge_composition(candidate.state)
+            ),
+            None,
+        )
+        if prior_charge is not None:
+            return prior_charge
+    for candidate in candidates:
+        state = candidate.state
+        if state.is_unknown and candidate.source in {
+            "point",
+            "declared",
+            "identity",
+        }:
+            invalid = _reason_is_invalid_run_composition(
+                state.reason,
+                declared_map=(
+                    candidate.declared_map or candidate.source == "declared"
+                ),
+            )
+            if invalid:
+                return candidate
+    flat_run = next(
+        (candidate for candidate in candidates if candidate.label == "flat-run"),
+        None,
+    )
+    if flat_run is not None:
+        return flat_run
+    for candidate in candidates:
         if candidate.terminal:
             return candidate
+    for index, candidate in enumerate(candidates):
+        state = candidate.state
+        if candidate.source == "parent" and state.is_unknown and not any(
+            _assay_usable(previous) for previous in candidates[:index]
+        ):
+            return candidate
+    for index, candidate in enumerate(candidates):
         if not _assay_usable(candidate):
             continue
         # A point recipe that is not a Composition must not hide a usable identity.
@@ -246,9 +342,19 @@ def resolve_point_composition(
             # the same stored assay. Explicit candidates keep point-first order.
             chosen = choose_stored_run(candidates)
         else:
-            chosen = _choose_assay(candidates)
+            declared_role, role_reason = read_composition_role_field(row, parent)
+            chosen = _choose_assay(
+                candidates,
+                declared_role=declared_role,
+                role_reason=role_reason,
+            )
     else:
-        chosen = _choose_assay(candidates)
+        declared_role, role_reason = read_composition_role_field(row, parent)
+        chosen = _choose_assay(
+            candidates,
+            declared_role=declared_role,
+            role_reason=role_reason,
+        )
     composition = chosen.state
     arrived_proxy = is_initial_charge_composition(composition)
     role_contexts = (row, parent) if chosen.inherit_parent_role else (row,)

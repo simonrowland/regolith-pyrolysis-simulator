@@ -557,6 +557,34 @@ def test_initial_charge_role_without_printed_charge_still_refuses(tmp_path) -> N
     assert "printed initial charge is unavailable" in point_composition.state.reason
 
 
+def test_unprinted_point_can_use_a_flagged_initial_charge_proxy() -> None:
+    identity = replace(F.activity_identity(), composition=None)
+    updated, conditions, notices = _initial_charge_only_composition_proxy(
+        identity,
+        {
+            "composition": Located(
+                State.unknown("missing_condition:melt_composition")
+            )
+        },
+        (),
+        row={"composition_role": INITIAL_CHARGE_ONLY},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="unprinted-point-proxy",
+        initial_charge_context={
+            "composition_wt_pct": {"SiO2": "70", "MgO": "30"}
+        },
+    )
+
+    assert updated.composition is not None and updated.composition.is_value
+    assert updated.composition.value.proxy_flag == INITIAL_CHARGE_ONLY
+    assert conditions["composition"].state.value == updated.composition.value
+    assert any(
+        INITIAL_CHARGE_ONLY_PROXY_NOTICE in notice.reason for notice in notices
+    )
+
+
 def test_malformed_point_mole_amount_refuses_before_initial_charge_fallback(
     tmp_path: Path,
 ) -> None:
@@ -848,7 +876,6 @@ def test_resolver_invalid_run_precedes_every_later_assay() -> None:
     point = composition_roles.AssayCandidate(
         State.unknown("unsupported component: XxO"),
         source="point",
-        label="invalid-run",
     )
     declared = composition_roles.AssayCandidate(
         State.of(_composition(None)), source="declared"
@@ -870,18 +897,51 @@ def test_resolver_invalid_run_precedes_every_later_assay() -> None:
     assert resolved.composition.reason == "unsupported component: XxO"
 
 
-def test_ignoring_invalid_run_candidate_breaks_its_pin(monkeypatch) -> None:
-    test_resolver_invalid_run_precedes_every_later_assay()
+def test_resolver_terminal_point_precedes_every_later_assay() -> None:
+    point = composition_roles.AssayCandidate(
+        State.unknown("missing_condition:melt_composition"),
+        source="point",
+        terminal=True,
+    )
+    later = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="identity"
+    )
+
+    resolved = composition_roles.resolve_point_composition(
+        {"composition_role": DATUM_STATE}, candidates=(point, later)
+    )
+
+    assert resolved.composition.is_unknown
+    assert resolved.composition.reason == "missing_condition:melt_composition"
+
+
+def test_ignoring_terminal_candidate_breaks_its_pin(monkeypatch) -> None:
+    test_resolver_terminal_point_precedes_every_later_assay()
 
     real = composition_roles._choose_assay
 
-    def skip_terminal(candidates):
-        retained = tuple(
-            candidate for candidate in candidates if candidate.label != "invalid-run"
+    def skip_terminal(candidates, **kwargs):
+        return real(
+            tuple(candidate for candidate in candidates if not candidate.terminal),
+            **kwargs,
         )
-        return real(retained)
 
     monkeypatch.setattr(composition_roles, "_choose_assay", skip_terminal)
+    with pytest.raises(AssertionError):
+        test_resolver_terminal_point_precedes_every_later_assay()
+
+
+def test_ignoring_invalid_run_candidate_breaks_its_pin(monkeypatch) -> None:
+    test_resolver_invalid_run_precedes_every_later_assay()
+
+    def allow_invalid_run_fallback(reason, *, declared_map):
+        return False
+
+    monkeypatch.setattr(
+        composition_roles,
+        "_reason_is_invalid_run_composition",
+        allow_invalid_run_fallback,
+    )
     with pytest.raises(AssertionError):
         test_resolver_invalid_run_precedes_every_later_assay()
 
@@ -915,11 +975,11 @@ def test_ignoring_declared_map_admission_breaks_its_pin(monkeypatch) -> None:
 
     real = composition_roles._choose_assay
 
-    def skip_declared(candidates):
+    def skip_declared(candidates, **kwargs):
         retained = tuple(
             candidate for candidate in candidates if candidate.source != "declared"
         )
-        return real(retained)
+        return real(retained, **kwargs)
 
     monkeypatch.setattr(composition_roles, "_choose_assay", skip_declared)
     with pytest.raises(AssertionError):
@@ -1108,6 +1168,158 @@ def test_owner_gets_both_located_and_identity_assays(monkeypatch) -> None:
         printed.components,
         identity_assay.components,
     }, seen
+
+
+def test_owner_gets_flat_declared_parent_and_identity_assays(monkeypatch) -> None:
+    offered = []
+    real = composition_roles.resolve_point_composition
+
+    def spy(row, parent=None, candidates=(), **kwargs):
+        offered.append(tuple(candidate.source for candidate in candidates))
+        return real(row, parent, candidates, **kwargs)
+
+    monkeypatch.setattr(composition_roles, "resolve_point_composition", spy)
+    identity = F.activity_identity(
+        composition=_oxide_assay("0.7", "0.3", proxy=None)
+    )
+    _initial_charge_only_composition_proxy(
+        identity,
+        None,
+        (),
+        row={"composition_role": DATUM_STATE},
+        parent={"composition_role": INITIAL_CHARGE_ONLY},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="flat-run-candidate-probe",
+        initial_charge_context={
+            "composition_wt_pct": {"SiO2": "50", "MgO": "50"}
+        },
+        point_declared_component_map={"SiO2": "70", "MgO": "30"},
+        point_composition_map_declared=True,
+        run_composition_columns_declared=True,
+    )
+
+    assert offered == [["point", "declared", "parent", "identity"]]
+
+
+def test_owner_gets_invalid_point_parent_and_identity_assays(monkeypatch) -> None:
+    offered = []
+    real = composition_roles.resolve_point_composition
+
+    def spy(row, parent=None, candidates=(), **kwargs):
+        offered.append(tuple(candidate.source for candidate in candidates))
+        return real(row, parent, candidates, **kwargs)
+
+    monkeypatch.setattr(composition_roles, "resolve_point_composition", spy)
+    identity = F.activity_identity(
+        composition=_oxide_assay("0.7", "0.3", proxy=None)
+    )
+    _initial_charge_only_composition_proxy(
+        identity,
+        {"composition": Located(State.unknown("unsupported component: XxO"))},
+        (),
+        row={"composition_role": DATUM_STATE},
+        parent={"composition_role": INITIAL_CHARGE_ONLY},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="invalid-point-candidate-probe",
+        initial_charge_context={
+            "composition_wt_pct": {"SiO2": "50", "MgO": "50"}
+        },
+    )
+
+    assert offered == [["point", "parent", "identity"]]
+
+
+def test_owner_preserves_proxy_for_incomplete_initial_charge_map() -> None:
+    prior = _composition(INITIAL_CHARGE_ONLY)
+    identity = F.activity_identity(composition=prior)
+    updated, _conditions, _notices = _initial_charge_only_composition_proxy(
+        identity,
+        {
+            "composition": Located(
+                State.unknown("mass-percent composition contains invalid component cells")
+            )
+        },
+        (),
+        row={"composition_role": INITIAL_CHARGE_ONLY},
+        quantity=Quantity.ACTIVITY,
+        quantity_as_printed="activity",
+        locator=None,
+        origin="incomplete-initial-charge-probe",
+        point_composition_context={
+            "composition_wt_pct": {"SiO2": None, "MgO": "50", "CaO": "50"}
+        },
+        point_declared_component_map={
+            "SiO2": None,
+            "MgO": "50",
+            "CaO": "50",
+        },
+        point_composition_map_declared=True,
+    )
+
+    assert updated.composition is not None and updated.composition.is_value
+    assert updated.composition.value.components == prior.components
+    assert updated.composition.value.proxy_flag == INITIAL_CHARGE_ONLY
+
+
+def test_ignoring_incomplete_initial_charge_rule_breaks_its_pin(monkeypatch) -> None:
+    test_owner_preserves_proxy_for_incomplete_initial_charge_map()
+    real = composition_roles._choose_assay
+
+    def ignore_incomplete(candidates, **kwargs):
+        retained = tuple(
+            replace(candidate, incomplete_initial_charge=False)
+            for candidate in candidates
+        )
+        return real(retained, **kwargs)
+
+    monkeypatch.setattr(composition_roles, "_choose_assay", ignore_incomplete)
+    with pytest.raises(AssertionError):
+        test_owner_preserves_proxy_for_incomplete_initial_charge_map()
+
+
+def test_partial_pressure_located_composition_is_decoded_without_role(
+    monkeypatch, tmp_path
+) -> None:
+    offered = []
+    real = composition_roles.resolve_point_composition
+
+    def spy(row, parent=None, candidates=(), **kwargs):
+        point = next(
+            (candidate for candidate in candidates if candidate.source == "point"),
+            None,
+        )
+        if point is not None and point.state.is_value:
+            offered.append(tuple(candidate.source for candidate in candidates))
+        return real(row, parent, candidates, **kwargs)
+
+    monkeypatch.setattr(
+        "simulator.battery.migrate.composition_roles.resolve_point_composition",
+        spy,
+    )
+    extract = _series_extract()
+    point = extract["species"]["Fe"]["observations"][0]["values"]["points"][0]
+    point.pop("composition_wt_pct")
+    point["point_conditions"] = {
+        "composition": {
+            "state": {
+                "tag": "value",
+                "value": {
+                    "basis": "oxide_mole_fraction_as_published",
+                    "amount_basis": "mole_fraction",
+                    "components": [["SiO2", "0.6"], ["MgO", "0.4"]],
+                },
+            }
+        }
+    }
+    result = migrate(_write_min_tree(tmp_path, extract), write=False)
+    observation = next(iter(result.observations.values()))
+
+    assert observation.point_conditions["composition"].state.is_value
+    assert offered == [["point"]]
 
 
 def test_preselecting_one_candidate_breaks_the_owner_pin(monkeypatch) -> None:
