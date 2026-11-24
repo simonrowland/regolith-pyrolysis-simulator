@@ -2345,7 +2345,7 @@ def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
     """Watts at ``time_s`` from the existing bracketing interpolator.
 
     Times on the trace are minutes. The curve handed to
-    ``timeseries_concordance._interpolate`` is seconds. Outside the
+    ``simulator.curve_utils`` interpolator receives seconds. Outside the
     first and last sample the interpolator raises; this wraps that as
     ``power_trace_does_not_bracket`` and does not hold the last point.
     ``reproduction_compare._interpolate_runtime_sample`` is a different
