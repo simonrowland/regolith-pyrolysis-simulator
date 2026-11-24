@@ -1,6 +1,7 @@
 """Source-owned declarations for narrowly scoped reader behaviour."""
 
 from dataclasses import dataclass
+from typing import Literal
 
 from simulator.battery.enums import Phase
 from simulator.reference_data.robie_hemingway_fisher_1978_usgs_b1452_loader import (
@@ -21,8 +22,22 @@ from simulator.source_ids import (
 
 
 @dataclass(frozen=True)
+class CompositionProjectionRule:
+    source_basis: Literal[
+        "elemental wt %", "partial oxide analysis with Cl/S/F"
+    ]
+    reason: str
+    applies_to_quantities: tuple[str, ...]
+    source_valences: tuple[tuple[str, int], ...] = ()
+    default_valences: tuple[tuple[str, int], ...] = ()
+    element_aliases: tuple[tuple[str, str], ...] = ()
+    required_elements: tuple[str, ...] = ()
+    retained_components: tuple[str, ...] = ()
+
+
+@dataclass(frozen=True)
 class SourceRule:
-    value: bool | Phase | str
+    value: bool | Phase | str | CompositionProjectionRule
     reason: str
 
 
@@ -34,7 +49,25 @@ KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 B677_SOURCE_ID = "pankratz-1984-usbm-b677"
 B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
 B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
+RUSIECKA_SOURCE_ID = "rusiecka-2026-chlorine-data"
 SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
+    RUSIECKA_SOURCE_ID: {
+        "composition_projection": SourceRule(
+            CompositionProjectionRule(
+                source_basis="partial oxide analysis with Cl/S/F",
+                reason=(
+                    "Rusiecka 2026 reports partial quenched-glass oxide analyses; "
+                    "preserve the printed oxides and identify supported Cl/S/F"
+                ),
+                applies_to_quantities=(
+                    "equilibrium_phase_composition",
+                    "chloride_capacity",
+                ),
+                retained_components=("Cl", "S", "F"),
+            ),
+            "Project a located Rusiecka run analysis at migration",
+        ),
+    },
     SF04_WORKBOOK_SOURCE_ID: {
         "sf04_workbook": SourceRule(
             True,
@@ -163,6 +196,19 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
 def source_rule_enabled(source_id: str | None, key: str) -> bool:
     rule = SOURCE_DECLARATIONS.get(source_id or "", {}).get(key)
     return rule is not None and rule.value is True
+
+
+def composition_projection_rule(
+    source_id: str | None,
+) -> CompositionProjectionRule | None:
+    rule = SOURCE_DECLARATIONS.get(source_id or "", {}).get(
+        "composition_projection"
+    )
+    return (
+        rule.value
+        if rule is not None and isinstance(rule.value, CompositionProjectionRule)
+        else None
+    )
 
 
 def declared_residue_predictor(source_id: str | None) -> str | None:

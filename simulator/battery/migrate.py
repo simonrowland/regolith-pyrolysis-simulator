@@ -91,6 +91,7 @@ from simulator.battery.source_declarations import (
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
     KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
     SOURCE_DECLARATIONS,
+    composition_projection_rule,
 )
 from simulator.source_ids import SOSSI_FEGLEY_SOURCE_ID
 from simulator.battery.oxygen_identity import (
@@ -7651,6 +7652,54 @@ def _mass_percent_composition_located(
                 closure_result=closure_result,
             )
     return Located(state, locator=locator, inference=inference)
+
+
+def _project_source_declared_composition(
+    source_id: str,
+    obs: Mapping[str, Any],
+    *,
+    quantity: Quantity | None,
+    locator: Locator | None,
+) -> Located[Composition] | None:
+    """Resolve a source's printed run map through the shared composition path."""
+
+    rule = composition_projection_rule(source_id)
+    if (
+        rule is None
+        or rule.source_basis != "partial oxide analysis with Cl/S/F"
+        or quantity is None
+        or quantity.value not in rule.applies_to_quantities
+    ):
+        return None
+    values = obs.get("values")
+    if not isinstance(values, Mapping):
+        return None
+    raw_conditions = obs.get("point_conditions")
+    point_conditions = (
+        dict(raw_conditions) if isinstance(raw_conditions, Mapping) else {}
+    )
+    payload = {**values, "point_conditions": point_conditions}
+    declared_map = _named_printed_composition_map(payload) or (
+        _declared_printed_composition_map(payload)
+    )
+    if declared_map is None:
+        return None
+    projection_locator = (
+        _locator_from_plain(values.get("composition_locator"))
+        or _composition_source_locator(payload, fallback=locator)
+    )
+    wt = {
+        str(name): amount
+        for name, raw_amount in declared_map.items()
+        if (amount := _as_dec_or_none(raw_amount)) is not None
+    }
+    return _mass_percent_composition_located(
+        wt,
+        basis="printed_oxides",
+        locator=projection_locator,
+        closure_context=payload,
+        declared_component_map=declared_map,
+    )
 
 
 def _total_iron_reported_as_feo_notice(
@@ -28175,6 +28224,17 @@ class Migrator:
                     )
                     for key, value in raw_point_conditions.items()
                 },
+            }
+        source_projection = _project_source_declared_composition(
+            source_id,
+            obs,
+            quantity=q_token if isinstance(q_token, Quantity) else None,
+            locator=locator,
+        )
+        if source_projection is not None:
+            point_conditions = {
+                **(point_conditions or {}),
+                "composition": source_projection,
             }
         # b-1052: an explicit point composition already carries its printed
         # locator. A values map is anchored at the observation and must not
