@@ -30,6 +30,7 @@ from simulator.vacuum_oxygen_balance import (
     PressureEvaluation,
     PressureLawChannelDiagnostic,
     PressureLawExponentMismatch,
+    iron_mean_oxygen_per_atom,
 )
 from simulator.battery.records import nominal_pressure_pa
 from simulator.source_ids import (
@@ -588,31 +589,6 @@ class _ChannelTerms:
             self.parent_moles_per_product == 0.0
             or inventory.get(self.source.parent_oxide or "", 0.0) > 0.0
         )
-
-
-def mean_oxygen_per_metal_atom(
-    valence_fractions: Sequence[tuple[float, float]],
-) -> float:
-    """Melt mean oxygen per metal atom, o_bar_M = sum_v x_v * (v/2).
-
-    v is the cation charge and x_v is the fraction of metal atoms in that
-    charge. The result is O atoms per metal atom (dimensionless count).
-    Fe2+ (v = 2) contributes 1; Fe3+ (v = 3) contributes 3/2.
-    """
-
-    total = 0.0
-    for valence, fraction in valence_fractions:
-        total += float(fraction) * float(valence) / 2.0
-    return total
-
-
-def iron_mean_oxygen_per_atom(fe3_over_sum_fe: float) -> float:
-    """o_bar_Fe = 1 + q/2, q = Fe3+/sumFe. q = 0 is exactly 1 O per Fe."""
-
-    q = float(fe3_over_sum_fe)
-    if not math.isfinite(q) or q < 0.0 or q > 1.0:
-        raise ValueError(f"Fe3+/sumFe must be in [0, 1], got {fe3_over_sum_fe!r}")
-    return mean_oxygen_per_metal_atom(((2.0, 1.0 - q), (3.0, q)))
 
 
 def _kress91_fe_speciation(

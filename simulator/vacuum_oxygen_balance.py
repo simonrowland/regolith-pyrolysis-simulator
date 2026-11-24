@@ -6,7 +6,8 @@ code must import them from this module, never from ``simulator.battery``.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Mapping
+import math
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Literal
 
@@ -21,6 +22,31 @@ _OXYGEN_GAS_ALPHA_SOURCE = (
     "declared common-unity sensitivity alpha=1.0 for O/O2 free-molecular gas escape; "
     "absolute oxygen-gas alpha is not measured"
 )
+
+
+def mean_oxygen_per_metal_atom(
+    valence_fractions: Sequence[tuple[float, float]],
+) -> float:
+    """Melt mean oxygen per metal atom, o_bar_M = sum_v x_v * (v/2).
+
+    v is the cation charge and x_v is the fraction of metal atoms in that
+    charge. The result is O atoms per metal atom (dimensionless count).
+    Fe2+ (v = 2) contributes 1; Fe3+ (v = 3) contributes 3/2.
+    """
+
+    total = 0.0
+    for valence, fraction in valence_fractions:
+        total += float(fraction) * float(valence) / 2.0
+    return total
+
+
+def iron_mean_oxygen_per_atom(fe3_over_sum_fe: float) -> float:
+    """o_bar_Fe = 1 + q/2, q = Fe3+/sumFe. q = 0 is exactly 1 O per Fe."""
+
+    q = float(fe3_over_sum_fe)
+    if not math.isfinite(q) or q < 0.0 or q > 1.0:
+        raise ValueError(f"Fe3+/sumFe must be in [0, 1], got {fe3_over_sum_fe!r}")
+    return mean_oxygen_per_metal_atom(((2.0, 1.0 - q), (3.0, q)))
 
 
 @dataclass(frozen=True)
