@@ -5978,7 +5978,8 @@ def test_fidelity_source_warning_ratchet(monkeypatch, tmp_path, record_property)
     ambiguous_ids = unmounted["ambiguous_observation_id"]
     missing_ids = unmounted["missing_observation_id"]
     non_finite = unmounted["non_finite_evidence"]
-    assert source_blind_pins == 124
+    # Unmounted corpus baseline: Barin's 124 plus Kennedy's 169 attested table pins.
+    assert source_blind_pins == 293
     record_property("mount_dependent_pins", mount_dependent_pins)
     assert mount_dependent_pins <= source_blind_pins
     assert uncovered_obs <= _UNCOVERED_OBSERVATIONS_CEILING, uncovered_obs
@@ -6181,14 +6182,180 @@ _ADMITTED_ANNOTATION_KEYS = (
     "attribution",
     "note",
     "reason",
+    "quantity",
     "schema_gap",
     "composition_derivation",
     "parents_not_printed",
+    "composition_basis_as_published",
+    "temperature_uncertainty_as_printed",
+    "uncertainty_as_published",
 )
 
 
 def test_fidelity_annotation_keys_are_the_reviewed_closed_set():
     assert vle.ANNOTATION_KEYS == frozenset(_ADMITTED_ANNOTATION_KEYS)
+
+
+def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates():
+    observation = {
+        "values": {
+            "quantity": "fe3_fe2_ratio",
+            "method": "wet_chemical_analysis",
+            "composition_basis_as_published": "Table I column 2",
+            "temperature_uncertainty_as_printed": "± 3°; convention not stated",
+            "uncertainty_as_published": "Fe2O3 is obtained by difference",
+            "cell_locators": {
+                "T_C": {"published_page": 534, "record": "Table II row 1"}
+            },
+            "composition_column_locators": {
+                "SiO2": {"published_page": 532, "column": "SiO2"}
+            },
+            "point_conditions": {
+                "fO2_control": {
+                    "state": {"tag": "value", "value": "1/5 atmosphere of oxygen"},
+                    "locator": {"published_page": 532, "pdf_page_index": 3},
+                },
+                "phase_as_printed": {
+                    "state": {"tag": "value", "value": "melt"},
+                    "locator": {
+                        "published_page": 541,
+                        "note": "Several percent of magnetite are present at 1200°C.",
+                    },
+                },
+                "regime_as_printed": {
+                    "state": {
+                        "tag": "value",
+                        "value": "transient; equilibrium was reached in 16 hours",
+                    },
+                    "locator": {
+                        "published_page": 534,
+                        "note": "Equilibrium was reached in essentially 16 hours.",
+                    },
+                },
+            },
+        }
+    }
+
+    measured, non_finite = vle._scored_evidence_leaves(observation)
+
+    assert non_finite == []
+    assert measured == [
+        ("values", "point_conditions", "fO2_control", "state", "value"),
+        ("values", "point_conditions", "phase_as_printed", "locator", "note"),
+        ("values", "point_conditions", "regime_as_printed", "locator", "note"),
+    ]
+
+
+def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
+    provenance_fields = frozenset(
+        {
+            "cell_locators",
+            "composition_column_locators",
+            "published_page",
+            "pdf_page_index",
+            "page",
+            "folio",
+            "table",
+            "record",
+            "column",
+            "section",
+            "source_path",
+            "quotes_path",
+            "source_sha256",
+            "line_range",
+        }
+    )
+    annotation_fields = (
+        "quantity",
+        "composition_basis_as_published",
+        "temperature_uncertainty_as_printed",
+        "uncertainty_as_published",
+    )
+    seen = Counter()
+
+    for _label, doc in _fidelity_extract_documents():
+        species = doc.get("species")
+        if not isinstance(species, dict):
+            continue
+        for block in species.values():
+            if not isinstance(block, dict):
+                continue
+            for observation in block.get("observations", ()):
+                if not isinstance(observation, dict):
+                    continue
+                values = observation.get("values")
+                if not isinstance(values, dict):
+                    continue
+
+                measured, _non_finite = vle._scored_evidence_leaves(observation)
+                rows = values.get("rows", (values,))
+                if not isinstance(rows, (list, tuple)):
+                    rows = ()
+                value_mappings = [(values, ("values",))]
+                value_mappings.extend(
+                    (row, ("values", "rows", index))
+                    for index, row in enumerate(rows)
+                    if isinstance(row, dict)
+                )
+                for field in ("cell_locators", "composition_column_locators"):
+                    if field in values:
+                        seen[field] += 1
+                    seen[field] += sum(
+                        1 for row in rows if isinstance(row, dict) and field in row
+                    )
+                assert not any(
+                    leaf[0] == "values"
+                    and any(field in leaf[1:] for field in provenance_fields)
+                    for leaf in measured
+                )
+                for value_mapping, prefix in value_mappings:
+                    for field in annotation_fields:
+                        if field in value_mapping and isinstance(
+                            value_mapping[field], str
+                        ):
+                            seen[field] += 1
+                            assert prefix + (field,) not in measured
+
+                for row in rows:
+                    if not isinstance(row, dict):
+                        continue
+                    conditions = row.get("point_conditions")
+                    regime = (
+                        conditions.get("regime_as_printed")
+                        if isinstance(conditions, dict)
+                        else None
+                    )
+                    state = regime.get("state") if isinstance(regime, dict) else None
+                    if isinstance(state, dict) and isinstance(state.get("value"), str):
+                        seen["regime_as_printed.state.value"] += 1
+                        assert not any(
+                            leaf[-3:]
+                            == ("regime_as_printed", "state", "value")
+                            for leaf in measured
+                        )
+
+    assert seen["cell_locators"] > 0
+    assert seen["composition_column_locators"] > 0
+    assert seen["quantity"] > 0
+    assert seen["composition_basis_as_published"] > 0
+    assert seen["temperature_uncertainty_as_printed"] > 0
+    assert seen["uncertainty_as_published"] > 0
+    assert seen["regime_as_printed.state.value"] > 0
+
+
+def test_scored_leaf_classifier_reversion_mutation_probe(monkeypatch):
+    test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates()
+
+    provenance_keys = vle._VALUE_PROVENANCE_KEYS
+    monkeypatch.setattr(vle, "_VALUE_PROVENANCE_KEYS", frozenset())
+    with pytest.raises(AssertionError):
+        test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates()
+
+    monkeypatch.setattr(vle, "_VALUE_PROVENANCE_KEYS", provenance_keys)
+    annotation_keys = vle.ANNOTATION_KEYS
+    monkeypatch.setattr(vle, "ANNOTATION_KEYS", annotation_keys - {"quantity"})
+    with pytest.raises(AssertionError):
+        test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates()
 
 
 @pytest.mark.parametrize(
@@ -6214,10 +6381,14 @@ def test_fidelity_annotation_string_is_covered_by_value_leaves_alone(annotation_
     only_annotation_digits = _minimal_extract()
     _strip_scored_conditions(only_annotation_digits)
     observation = only_annotation_digits["species"]["Fe"]["observations"][0]
-    observation["values"] = {"quantity": "alpha", annotation_key: annotation}
+    observation["values"] = {
+        "quantity": "alpha",
+        "alpha": 0.24,
+        annotation_key: annotation,
+    }
     sample = only_annotation_digits["fidelity_samples"][0]
-    sample["path"] = "species.Fe.observations[fe_alpha_1].values.quantity"
-    sample["value"] = "alpha"
+    sample["path"] = "species.Fe.observations[fe_alpha_1].values.alpha"
+    sample["value"] = 0.24
     assert _uncovered_observation_count(only_annotation_digits) == 0
 
     with_float = _minimal_extract()
@@ -6708,6 +6879,22 @@ def test_locator_source_blind_matrix_preserves_address_coverage(
             doc, label="locator-key-matrix", artifact_root=repository_root
         )
         assert any("corpus_root_unset" in refusal for refusal in refusals)
+
+
+def test_descriptive_record_label_does_not_open_another_artifact(
+    tmp_path, monkeypatch
+):
+    repository_root = tmp_path / "repository"
+    doc = _opened_payload_document(repository_root, structured=False)
+    locator = doc["fidelity_samples"][0]["locator"]
+    locator["record"] = "Table II row 1"
+    monkeypatch.delenv("REGOLITH_CORPUS_ROOT", raising=False)
+
+    assert vle.fidelity_source_warnings(
+        doc, label="descriptive-record", artifact_root=repository_root
+    ) == []
+
+
 def test_multiple_corpus_artifacts_refuse_and_keep_address_coverage(
     tmp_path, monkeypatch
 ):

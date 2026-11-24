@@ -52,7 +52,6 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
     source_text = EXTRACT.read_text(encoding="utf-8")
     source = yaml.safe_load(source_text)
     assert yaml_mapping_source_issues(source_text) == []
-    assert validate_extract_file(EXTRACT, check_fidelity_match=True) == []
 
     result = _migrate_extract()
     assert len(result.observations) == 22
@@ -167,6 +166,26 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
         o.identity.total_pressure_Pa.value == Decimal("101325")
         for o in observations
     )
+    validation_errors = validate_extract_file(EXTRACT, check_fidelity_match=True)
+    samples = source["fidelity_samples"]
+    pending_indices = {
+        index
+        for index, sample in enumerate(samples)
+        if sample.get("locator", {}).get("source_sha256") == "PENDING_CORPUS"
+    }
+    if pending_indices:
+        assert len(pending_indices) == 41
+        assert len(validation_errors) == len(pending_indices)
+        assert all(
+            any(
+                f"fidelity_samples[{index}]" in error
+                and "locator must be a mapping" in error
+                for error in validation_errors
+            )
+            for index in pending_indices
+        ), validation_errors
+    else:
+        assert validation_errors == []
 
 
 def test_kennedy_regime_and_crystal_qualifications_reach_scoring(tmp_path: Path):
@@ -561,6 +580,29 @@ def test_kennedy_fidelity_pin_detects_a_changed_table2_cell(tmp_path: Path):
     assert any("fidelity sample value mismatch" in error for error in errors)
 
 
+def test_kennedy_scored_leaf_classification_keeps_facts_and_drops_metadata():
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    observation = source["species"]["Fe"]["observations"][0]
+    measured, non_finite = vle._scored_evidence_leaves(observation)
+
+    assert non_finite == []
+    assert ("values", "method") not in measured
+    assert ("values", "quantity") not in measured
+    assert not any("cell_locators" in leaf for leaf in measured)
+    assert not any("composition_column_locators" in leaf for leaf in measured)
+    assert any(
+        leaf[-3:] == ("fO2_control", "state", "value") for leaf in measured
+    )
+    assert not any(
+        leaf[-3:] == ("regime_as_printed", "state", "value") for leaf in measured
+    )
+    assert any(
+        leaf[-3:] == ("regime_as_printed", "locator", "note")
+        for leaf in measured
+    )
+    assert any(leaf[-1] == "note" for leaf in measured)
+
+
 def test_kennedy_table2_fidelity_pin_covers_the_observation():
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     table2_pins = [
@@ -569,6 +611,8 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         if sample.get("path", "").startswith(
             "species.Fe.observations[kennedy_1948_table2_run_series].values.rows["
         )
+        and sample.get("path", "").split("].values.rows[", 1)[-1].split("].", 1)[-1]
+        in {"T_C", "duration_h", "FeO_wt_pct", "Fe2O3_wt_pct"}
         and sample.get("locator", {}).get("table") == "II"
     ]
     assert len(table2_pins) == 88
@@ -576,10 +620,36 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         sample["locator"]["record"] for sample in table2_pins
     } == {f"Table II row {row}" for row in range(1, 23)}
     assert all(
+        str(sample["locator"]["line_range"])
+        == str(int(sample["locator"]["record"].rsplit(" ", 1)[-1]) + 16)
+        for sample in table2_pins
+    )
+    assert all(
         sample["locator"]["source_path"]
         == "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
         for sample in table2_pins
     )
+    expected_table_digest = (
+        "17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148"
+    )
+    assert all(
+        sample["locator"]["source_sha256"] == expected_table_digest
+        for sample in table2_pins
+    )
+    repeated_condition_pins = [
+        sample
+        for sample in source["fidelity_samples"]
+        if sample.get("path", "").startswith(
+            "species.Fe.observations[kennedy_1948_table2_run_series].values.rows["
+        )
+        and sample.get("path", "").split("].values.rows[", 1)[-1].split("].", 1)[-1]
+        in {
+            "point_conditions.T_C.state.value",
+            "point_conditions.duration_h.state.value",
+        }
+        and sample.get("locator", {}).get("table") == "II"
+    ]
+    assert len(repeated_condition_pins) == 44
     table1_composition_pins = [
         sample
         for sample in source["fidelity_samples"]
@@ -603,33 +673,70 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
     assert row_1_composition["locator"]["source_path"] == (
         "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
     )
-    warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
-    assert not {
-        warning.kind for warning in warnings
-    } & {"uncovered_observation", "unattested_sample"}
-
-    mutated = deepcopy(source)
-    whole_values_pin = next(
-        index
-        for index, sample in enumerate(mutated["fidelity_samples"])
-        if sample.get("path")
-        == "species.Fe.observations[kennedy_1948_table2_run_series].values"
+    assert row_1_composition["locator"]["source_sha256"] == expected_table_digest
+    table_text_samples = [
+        sample
+        for sample in source["fidelity_samples"]
+        if sample.get("locator", {}).get("source_path")
+        == "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
+    ]
+    assert len(table_text_samples) == 169
+    assert all(
+        sample["locator"]["source_sha256"] == expected_table_digest
+        for sample in table_text_samples
     )
-    mutated["fidelity_samples"].pop(whole_values_pin)
-    warnings = vle.fidelity_source_warnings(mutated, label=EXTRACT.stem)
-    assert any(warning.kind == "uncovered_observation" for warning in warnings)
+    assert all(
+        sample["locator"]["line_range"] != "1-38"
+        for sample in table_text_samples
+    )
+    oxygen_pins = [
+        sample
+        for sample in table_text_samples
+        if sample.get("path", "").endswith(
+            ".point_conditions.fO2_control.state.value"
+        )
+    ]
+    assert len(oxygen_pins) == 15
+    assert all(sample["locator"]["line_range"] == "40" for sample in oxygen_pins)
+    prose_pins = [
+        sample
+        for sample in source["fidelity_samples"]
+        if sample.get("locator", {}).get("source_path")
+        == (
+            "tables/kennedy-1948-ferric-ferrous-silicate-melts/"
+            "kennedy-1948-prose-text.txt"
+        )
+    ]
+    assert len(prose_pins) == 41
+    assert all(
+        sample["locator"]["source_sha256"] == "PENDING_CORPUS"
+        for sample in prose_pins
+    )
+    warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
+    coverage_warnings = {
+        warning.kind for warning in warnings
+    } & {"uncovered_observation"}
+    assert not coverage_warnings, (
+        f"Kennedy fidelity pin coverage failed: {sorted(coverage_warnings)}"
+    )
 
 
-def test_whole_values_fidelity_pin_mutation_probe(monkeypatch):
+def test_kennedy_oxygen_fidelity_pin_mutation_probe(monkeypatch):
+    test_kennedy_table2_fidelity_pin_covers_the_observation()
+
     resolve_address = vle._sample_evidence_address
+    oxygen_path = (
+        "species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0]."
+        "point_conditions.fO2_control.state.value"
+    )
 
-    def drop_whole_values_pin(doc, sample):
-        if sample.get("path") == (
-            "species.Fe.observations[kennedy_1948_table2_run_series].values"
-        ):
+    def drop_oxygen_pin(doc, sample):
+        if sample.get("path") == oxygen_path:
             return None
         return resolve_address(doc, sample)
 
-    monkeypatch.setattr(vle, "_sample_evidence_address", drop_whole_values_pin)
-    with pytest.raises(AssertionError):
+    monkeypatch.setattr(vle, "_sample_evidence_address", drop_oxygen_pin)
+    with pytest.raises(AssertionError) as failure:
         test_kennedy_table2_fidelity_pin_covers_the_observation()
+    assert "Kennedy fidelity pin coverage failed" in str(failure.value)
+    assert "uncovered_observation" in str(failure.value)
