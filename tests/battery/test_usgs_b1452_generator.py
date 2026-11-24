@@ -501,13 +501,16 @@ def test_rejected_span_keeps_separate_formula_tokens(name: str) -> None:
 
 def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatch) -> None:
     source = getsource(generator._formula_from_name).replace(
-        'not (name[cursor].isspace() or name[cursor] in "()")',
-        "not name[cursor - 1].isspace()",
+        "cursor < len(name)",
+        "cursor > 0",
     ).replace(
-        'not (name[start - 1].isspace() or name[start - 1] in "()")',
+        "not is_separator(name[cursor])",
+        "not is_separator(name[cursor - 1])",
+    ).replace(
+        "not is_separator(name[start - 1])",
         "not name[start - 1].isspace()",
     ).replace(
-        'not (tail[0].isspace() or tail[0] in "()")',
+        "not is_separator(tail[0])",
         "not tail[0].isspace()",
     )
     assert source != getsource(generator._formula_from_name)

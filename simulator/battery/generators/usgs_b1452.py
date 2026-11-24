@@ -861,6 +861,23 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
     must not become ``AlSi_{3}O_{10}``.
     """
 
+    def is_separator(character: str) -> bool:
+        return character.isspace() or character in "()"
+
+    def tokens_outside_spans(text: str) -> list[str]:
+        tokens: list[str] = []
+        start: int | None = None
+        for index, character in enumerate(text):
+            if is_separator(character):
+                if start is not None:
+                    tokens.append(text[start:index])
+                    start = None
+            elif start is None:
+                start = index
+        if start is not None:
+            tokens.append(text[start:])
+        return tokens
+
     charge: int | None = None
     rejected: list[tuple[int, int]] = []
     for match in _LATEX_MATH_RE.finditer(name):
@@ -878,16 +895,16 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
     cursor = 0
     for start, end in rejected:
         segment = name[cursor:start]
-        segment_tokens = segment.replace("(", " ").replace(")", " ").split()
+        segment_tokens = tokens_outside_spans(segment)
         if (
             cursor < len(name)
-            and not (name[cursor].isspace() or name[cursor] in "()")
+            and not is_separator(name[cursor])
             and segment_tokens
         ):
             boundary_tokens[token_count] = segment_tokens[0]
         if (
             start > cursor
-            and not (name[start - 1].isspace() or name[start - 1] in "()")
+            and not is_separator(name[start - 1])
             and segment_tokens
         ):
             boundary_tokens[token_count + len(segment_tokens) - 1] = segment_tokens[-1]
@@ -895,15 +912,15 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
         token_count += len(segment_tokens)
         cursor = end
     tail = name[cursor:]
-    tail_tokens = tail.replace("(", " ").replace(")", " ").split()
-    if rejected and tail and not (tail[0].isspace() or tail[0] in "()") and tail_tokens:
+    tail_tokens = tokens_outside_spans(tail)
+    if rejected and tail and not is_separator(tail[0]) and tail_tokens:
         boundary_tokens[token_count] = tail_tokens[0]
     fallback_parts.append(tail)
     fallback = " ".join(fallback_parts)
     tokens = [
         token
         for index, token in enumerate(
-            fallback.replace("(", " ").replace(")", " ").split()
+            tokens_outside_spans(fallback)
         )
         if boundary_tokens.get(index) != token
     ]
