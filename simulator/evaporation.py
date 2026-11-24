@@ -3512,17 +3512,6 @@ class EvaporationMixin:
             )
         return curve
 
-    @staticmethod
-    def _freeze_gate_curve_is_solved(
-        curve: Mapping[str, Any] | None,
-    ) -> bool:
-        """Only provider-solved curves enter cross-tick gate memos."""
-        return (
-            isinstance(curve, Mapping)
-            and curve.get('source') != _KRESS91_LIQUID_CALIBRATION_FLOOR_SOURCE
-            and 'gate_provider_refusal' not in curve
-        )
-
     def _refuse_freeze_gate_without_liquidus_authority(
         self,
         notice: Mapping[str, Any],
@@ -3762,7 +3751,6 @@ class EvaporationMixin:
             if (
                 isinstance(process_cached, Mapping)
                 and process_cached.get('disposition') in {'live', 'memo-hit'}
-                and self._freeze_gate_curve_is_solved(shared_value)
                 and gate_curve_memo_is_cacheable(
                     self,
                     shared_value,
@@ -3971,10 +3959,7 @@ class EvaporationMixin:
                     **record,
                     'key': key,
                 }
-                if (
-                    isinstance(shared_curve_cache, dict)
-                    and self._freeze_gate_curve_is_solved(curve)
-                ):
+                if isinstance(shared_curve_cache, dict):
                     # Store a copy so later sim mutations of their local cache
                     # cannot corrupt the caller-owned memo used by sibling rows.
                     shared_curve_cache[key] = record
