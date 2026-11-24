@@ -398,6 +398,25 @@ def test_flagged_censuses_sort_rows_with_missing_policy_ids() -> None:
     assert [row.get("policy_id") for row in summarized_rows] == [None, "DP-010"]
 
 
+def test_dispatch_environment_does_not_supply_proposer(monkeypatch) -> None:
+    import simulator.policy.default_policy as policy_module
+
+    monkeypatch.setenv("GOALFLIGHT_DISPATCH_ID", "dispatcher-only")
+    with pytest.raises(ValueError, match="proposed_by is required"):
+        policy_module.append_proposal(
+            {
+                "id": "DP-109",
+                "condition": "test-only missing apparatus knob",
+                "value": "runtime supplied",
+                "units": "knob-specific",
+                "physical_basis": "test fixture only",
+                "bias": "test fixture only",
+                "flag": "knob_defaulted",
+            },
+            evidence=["fixture row and source"],
+        )
+
+
 def test_proposal_resolves_as_proposed_and_stays_out_of_headline(tmp_path, monkeypatch) -> None:
     import simulator.policy.default_policy as policy_module
 

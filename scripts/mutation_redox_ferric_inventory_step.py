@@ -145,7 +145,6 @@ def _expect_red(
                 test,
             ],
             cwd=ROOT,
-            env={**os.environ, "PYTHONPATH": str(ROOT)},
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

@@ -130,10 +130,11 @@ def _prune_stale_corpus(argv: Sequence[str]) -> int:
         prog="python -m simulator.optimize prune-stale-corpus"
     )
     parser.add_argument("--store", action="append", type=Path, default=[])
+    parser.add_argument("--runs-root", type=Path, default=Path.cwd() / "runs")
     parser.add_argument("--apply", action="store_true")
     args = parser.parse_args(argv)
     keep_versions = tuple(interoperable_corpus_versions())
-    runs_root = Path(os.environ.get("OPTIMIZER_RUNS_DIR") or Path.cwd() / "runs").expanduser()
+    runs_root = args.runs_root.expanduser()
     auto_archive_stores: set[Path] = set()
     if args.store:
         stores = args.store
