@@ -514,8 +514,10 @@ def test_steurer_effusion_row_has_a_numeric_internal_residual() -> None:
         context=context,
     )
     assert residual.numeric is not None, residual.refusal
+    # OpenIMCC 9c327c2 / d-436 adds AlSiO and Si2O2 to the shared oxygen balance;
+    # the prior internal-analytical residual pin was 0.10508901884588326.
     assert float(residual.numeric.value) == pytest.approx(
-        0.10508901884588326, abs=1e-12
+        0.09892713497480812, abs=1e-12
     )
     assert any(
         notice.origin == "fo2_ladder"

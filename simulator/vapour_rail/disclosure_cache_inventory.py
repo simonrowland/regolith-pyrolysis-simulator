@@ -235,7 +235,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/engine_cache.py:runtime_identity': {
         "path": 'simulator/engine_cache.py',
-        "line": 1666,
+        "line": 1671,
         "kind": 'lru',
         "name": 'runtime_identity',
         "carries_disclosure": False,
@@ -275,7 +275,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/engine_cache.py:_MEMORY_CACHE': {
         "path": 'simulator/engine_cache.py',
-        "line": 769,
+        "line": 774,
         "kind": 'store',
         "name": '_MEMORY_CACHE',
         "carries_disclosure": True,
@@ -283,7 +283,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'sqlite:simulator/engine_cache.py:engine_outputs': {
         "path": 'simulator/engine_cache.py',
-        "line": 1865,
+        "line": 1870,
         "kind": 'sqlite',
         "name": 'engine_outputs',
         "carries_disclosure": True,
@@ -331,7 +331,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/compilation_tier.py:fit_evaluation_cache': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 4823,
+        "line": 5219,
         "kind": 'store',
         "name": 'fit_evaluation_cache',
         "carries_disclosure": False,
@@ -587,7 +587,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:_vapor_pressures_payload': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 1027,
+        "line": 1014,
         "kind": 'lru',
         "name": '_vapor_pressures_payload',
         "carries_disclosure": False,
@@ -611,7 +611,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:vapour_rail_catalog': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 1032,
+        "line": 1019,
         "kind": 'lru',
         "name": 'vapour_rail_catalog',
         "carries_disclosure": False,
@@ -619,7 +619,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/diagnostic_helpers/species_rail_differential.py:vapour_rail_legacy_view': {
         "path": 'simulator/diagnostic_helpers/species_rail_differential.py',
-        "line": 1041,
+        "line": 1028,
         "kind": 'lru',
         "name": 'vapour_rail_legacy_view',
         "carries_disclosure": False,
@@ -659,7 +659,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/melt_backend/openimcc_bridge.py:_load_pack': {
         "path": 'simulator/melt_backend/openimcc_bridge.py',
-        "line": 1018,
+        "line": 1055,
         "kind": 'lru',
         "name": '_load_pack',
         "carries_disclosure": False,
@@ -899,7 +899,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/battery/validate.py:_cache': {
         "path": 'simulator/battery/validate.py',
-        "line": 2288,
+        "line": 2305,
         "kind": 'store',
         "name": '_cache',
         "carries_disclosure": False,
@@ -1155,7 +1155,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_b677_printed_ideal_gas_h298': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 2796,
+        "line": 3190,
         "kind": 'lru',
         "name": '_b677_printed_ideal_gas_h298',
         "carries_disclosure": False,
@@ -1163,7 +1163,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_polynomial': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 1201,
+        "line": 1203,
         "kind": 'lru',
         "name": '_nasa_cea_9_polynomial',
         "carries_disclosure": False,
@@ -1171,7 +1171,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/battery/compilation_tier.py:_nasa_cea_9_record_index': {
         "path": 'simulator/battery/compilation_tier.py',
-        "line": 1145,
+        "line": 1147,
         "kind": 'lru',
         "name": '_nasa_cea_9_record_index',
         "carries_disclosure": False,
@@ -1336,6 +1336,22 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "name": '_janaf_state_for_source',
         "carries_disclosure": False,
         "how": 'Caches a source Gibbs state with its authority and published range for wall-law assembly; it does not cache a law result.',
+    },
+    'lru:simulator/battery/feo_standard.py:_openimcc_pack_identity_and_payload': {
+        "path": 'simulator/battery/feo_standard.py',
+        "line": 387,
+        "kind": 'lru',
+        "name": '_openimcc_pack_identity_and_payload',
+        "carries_disclosure": False,
+        "how": 'Caches OpenIMCC pack identity and payload by pack name; it stores pack data, not evaluated vapour-law results.',
+    },
+    'lru:simulator/battery/source_lineage.py:_default_openimcc_pack_source_refs': {
+        "path": 'simulator/battery/source_lineage.py',
+        "line": 47,
+        "kind": 'lru',
+        "name": '_default_openimcc_pack_source_refs',
+        "carries_disclosure": False,
+        "how": 'Caches default OpenIMCC pack source refs; it stores source metadata, not evaluated vapour-law results.',
     },
 }
 

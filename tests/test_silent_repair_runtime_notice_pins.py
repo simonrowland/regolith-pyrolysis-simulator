@@ -115,6 +115,7 @@ def test_sr21_rejected_backend_message_names_producer_without_claiming_fallback(
 
 def test_sr22_missing_curve_has_no_floor_repair_notice() -> None:
     sim = PyrolysisSimulator.__new__(PyrolysisSimulator)
+    sim._melt_redox_liquidus_gate_diagnostic_seq = 0
     sim.melt = SimpleNamespace(
         hour=2,
         campaign_hour=3,

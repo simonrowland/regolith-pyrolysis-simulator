@@ -992,13 +992,34 @@ def test_post_selection_refusal_preserves_oxygen_caveat_and_extent(extent_point,
 
 def _real_analytical_cmas_pressure(temperature_K, inventory=None, extra_channels=()):
     openimcc = pytest.importorskip("openimcc")
-    from simulator.battery.residue import _make_residue_pressure_model
+    from simulator.battery.enums import NoticeKind
+    from simulator.battery.residue import (
+        _make_residue_pressure_model,
+        _openimcc_residue_channel_set,
+    )
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     pack = openimcc.load_gas_datapack()
     if inventory is None:
         inventory = {"SiO2": 0.44, "Al2O3": 0.05, "FeO": 0.08, "MgO": 0.36, "CaO": 0.07}
-    channels, omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
-    assert not omissions
+    raw_channels, source_omissions = battery._openimcc_gas_channels_and_omission_notices(tuple(inventory), pack)
+    assert not source_omissions
+    channels, _residue_channels, omissions = _openimcc_residue_channel_set(
+        raw_channels,
+        source_omissions,
+        engine="internal-analytical",
+        alpha=1.0,
+        alpha_source="Knudsen regression",
+    )
+    catalog_omissions = {
+        omission["channel"]: omission
+        for omission in omissions
+        if omission["reason"] == "internal_analytical_vapor_pressure_catalog_missing"
+    }
+    assert set(catalog_omissions) == {"AlSiO", "Si2O2"}
+    assert all(
+        omission["kind"] == NoticeKind.INPUT_OMITTED.value
+        for omission in catalog_omissions.values()
+    )
     channels = tuple(channels) + tuple(extra_channels)
     pressure_model = _make_residue_pressure_model(
         "internal-analytical", channels, pack, temperature_K=temperature_K, total_pressure_Pa=0,
@@ -1147,6 +1168,99 @@ def test_closure_continues_after_parent_exhaustion_with_atom_and_mass_closure(ox
     def mass(amounts):
         return sum(n * float(parse_formula(s).molar_mass_kg_per_mol()) for s, n in amounts.items())
     assert mass(result.evaporated_mol) / mass(initial) == pytest.approx(0.2, abs=1e-10)
+
+
+def test_knudsen_extent_fires_secondary_parent_exhaustion_event(monkeypatch):
+    from scipy import integrate as scipy_integrate
+
+    real_solve_ivp = scipy_integrate.solve_ivp
+    event_hits_by_solve = []
+
+    def record_solve_ivp(*args, **kwargs):
+        solution = real_solve_ivp(*args, **kwargs)
+        event_hits_by_solve.append(
+            tuple(tuple(float(hit) for hit in hits) for hits in solution.t_events)
+        )
+        return solution
+
+    monkeypatch.setattr(scipy_integrate, "solve_ivp", record_solve_ivp)
+    result = integrate_knudsen_residue_inventory(
+        {"Al2O3": 1.0, "SiO2": 0.01},
+        (
+            ResidueChannel(
+                "AlSiO", "AlSiO", "Al2O3", 1.0, "mixed-parent event",
+                parent_oxide_stoich={"Al2O3": 0.5, "SiO2": 1.0},
+            ),
+            ResidueChannel("O2", "O2", None, 1.0, "oxygen extent"),
+        ),
+        lambda _inventory, _logp, _temperature: {"AlSiO": 1.0e6, "O2": 1.0},
+        temperature_path=((0.02, 2000.0),),
+        measured_mass_loss_fraction=0.02,
+        near_saturated=True,
+        source_fO2_log_by_interval=(-10.0,),
+    )
+
+    # Parents follow inventory order, so event index 1 is secondary SiO2.
+    assert any(len(events) > 1 and events[1] for events in event_hits_by_solve)
+    assert result.residue_mol["SiO2"] == 0.0
+    assert result.residue_mol["Al2O3"] > 0.0
+
+
+def test_knudsen_cutoff_parent_does_not_stall_secondary_exhaustion(monkeypatch):
+    from scipy import integrate as scipy_integrate
+
+    from simulator import core
+    from simulator.battery.residue import _formula_terms
+
+    cutoff_kg = 4e-12
+    monkeypatch.setattr(core, "LEDGER_LOADER_SPECIES_CUTOFF_KG", cutoff_kg)
+    cutoff_ca_oxide_mol = cutoff_kg / _formula_terms("CaO")[1]
+    real_solve_ivp = scipy_integrate.solve_ivp
+    solves = []
+
+    def record_solve_ivp(*args, **kwargs):
+        events = kwargs["events"]
+        initial_event_values = tuple(
+            float(event(args[1][0], args[2])) for event in events
+        )
+        # An exactly-cutoff primary must not be scheduled at zero. The
+        # secondary SiO2 parent has a zero cutoff and remains eventable.
+        assert all(value > 0.0 for value in initial_event_values)
+        solution = real_solve_ivp(*args, **kwargs)
+        assert solution.t[-1] > solution.t[0]
+        solves.append((initial_event_values, solution.t_events))
+        return solution
+
+    monkeypatch.setattr(scipy_integrate, "solve_ivp", record_solve_ivp)
+    result = integrate_knudsen_residue_inventory(
+        {"CaO": cutoff_ca_oxide_mol, "Al2O3": 1.0, "SiO2": 0.01},
+        (
+            ResidueChannel("Ca", "Ca", "CaO", 1.0, "trace cutoff parent"),
+            ResidueChannel(
+                "AlSiO", "AlSiO", "Al2O3", 1.0, "mixed-parent event",
+                parent_oxide_stoich={"Al2O3": 0.5, "SiO2": 1.0},
+            ),
+            ResidueChannel("O2", "O2", None, 1.0, "oxygen extent"),
+        ),
+        lambda _inventory, _logp, _temperature: {
+            "Ca": 0.0, "AlSiO": 1.0e6, "O2": 1.0,
+        },
+        temperature_path=((0.02, 2000.0),),
+        measured_mass_loss_fraction=0.02,
+        near_saturated=True,
+        source_fO2_log_by_interval=(-10.0,),
+        analytical_loader_cutoff=True,
+    )
+
+    # The inventory order is CaO, Al2O3, SiO2, then oxygen. CaO is exactly
+    # at its positive loader cutoff and gets no event; SiO2 is the second
+    # scheduled parent event (zero cutoff) and is exhausted normally.
+    assert solves
+    assert any(len(t_events) > 1 and t_events[1] for _, t_events in solves)
+    assert result.trace_tail_kg["CaO"] == pytest.approx(cutoff_kg)
+    assert result.residue_mol["CaO"] == cutoff_ca_oxide_mol
+    assert result.residue_mol["SiO2"] == 0.0
+    assert result.residue_mol["Al2O3"] > 0.0
 
 
 @pytest.mark.parametrize("pressures,reason", (

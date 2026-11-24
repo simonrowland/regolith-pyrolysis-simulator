@@ -519,8 +519,22 @@ def test_expire_prune_and_drop_delete_neighbour_rows(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(bare))
     engine_cache._close_connections()
     engine_cache._MEMORY_CACHE.clear()
-    _call(_request(1800.0), {"answer": "exact"})
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    stale_version = 1
+    current_version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    assert stale_version != current_version
+    monkeypatch.setitem(
+        engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", stale_version
+    )
+    try:
+        _call(_request(1800.0), {"answer": "exact"})
+    finally:
+        monkeypatch.setitem(
+            engine_cache.ENGINE_CHEMISTRY_VERSION,
+            "openimcc",
+            current_version,
+        )
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"] == current_version
+    assert engine_cache.drop_chemistry_version("openimcc", stale_version) == 1
 
 
 def test_coarse_evaluate_stamps_the_score_and_a_fine_run_reexecutes(

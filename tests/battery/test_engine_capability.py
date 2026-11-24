@@ -10,8 +10,11 @@ from simulator.battery.compilation_tier import _engine_thermo_quantities
 from simulator.battery.enums import Engine, EvidenceClass, Quantity
 from simulator.battery.score import _engine_lacks_quantity_capability
 
-# Thermochemistry slice each engine declared before the table moved.
+# Thermochemistry slice declared by each engine at this pin.
 _THERMO_PIN: dict[Engine, frozenset[Quantity]] = {
+    Engine.OPENIMCC: frozenset(
+        {Quantity.CP, Quantity.S, Quantity.H_MINUS_H298}
+    ),
     Engine.INTERNAL_ANALYTICAL: frozenset(
         {
             Quantity.DELTA_FG,

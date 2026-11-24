@@ -14513,7 +14513,8 @@ def test_activity_without_row_composition_uses_sample_numeric_pin(tmp_path: Path
     )
 
     assert prediction.value is not None
-    assert float(prediction.value).hex() == "0x1.a4079127a495dp-5"
+    # OpenIMCC 9c327c2 / d-436 output; the prior pin was 0x1.a4079127a495dp-5.
+    assert float(prediction.value).hex() == "0x1.a4b00bf72eb44p-5"
     assert prediction.refusal_reason is None
     assert prediction.requested_composition is not None
     assert prediction.requested_composition.is_value

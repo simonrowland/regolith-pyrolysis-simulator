@@ -83,6 +83,7 @@ from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.chemistry.gas_rail_authority import (
     _gas_rail_block_is_authoritative,
 )
+from simulator.melt_regime import MeltRegime, melt_regime
 
 
 # Vapor-pressure convention contract (`data/vapor_pressures.yaml`):
@@ -621,8 +622,8 @@ _PROJECTED_COMPOSITION_WARNING_TIERS = (
 # The Zhang anchor passes composition_kg in oxide wt% (the eight supported
 # oxides from the bridge test); the bridge converts that mass basis to moles.
 # Activity and mole fraction are both dimensionless, so their ratio Gamma is
-# dimensionless too. This reproduces the wording-file sanity values: D066 is
-# 1.67e-6 / 9.44e-6 and published-core is 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
+# dimensionless too. The packaged default v4 evaluates to 2.1891401806319048e-6 /
+# 1.133192718678085e-5 and published-core to 3.5e-9 / 2.4e-8 at 1473 / 1673 K.
 # The content digest keys each evaluation so packs sharing a model id cannot
 # reuse one another's numbers.
 _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
@@ -639,13 +640,13 @@ _K2O_PACK_EVALUATIONS_BY_DIGEST: dict[str, dict[str, Any]] = {
             1673.15: True,
         },
     },
-    "02c88c04fe09f8f494adda8a76e1f95fee536d11b2b6d66639aaea097fce5e75": {
+    "0879f5a8e94dfd844ed5cfcd900677b496a89e717a85f320b3e0b374ebcdc3b0": {
         "pack_alias": "default",
         "model_id": "IMCC-SF04-D066",
-        "pack_version": "1.0.3-d066-v1",
+        "pack_version": "1.0.6-d066-v4",
         "gamma_ko0_5_by_temperature_K": {
-            1473.15: "1.67e-6",
-            1673.15: "9.44e-6",
+            1473.15: "2.1891401806319048e-06",
+            1673.15: "1.133192718678085e-05",
         },
         "kcaal_si2o7_active_by_temperature_K": {
             1473.15: False,
@@ -709,11 +710,55 @@ def _k2o_authority_exclusion_for_pack_digest(
     return exclusion
 
 
-# d-207 ("Move activity only", 2026-10-20): keep SiO evolution and the vapour
-# channels on the builtin analytical model through this boundary, then select
-# OpenIMCC above it pending investigation of OpenIMCC's 1700-1950 K SiO
-# under-prediction. This source-selection boundary is not a VapoRock band edge.
+# d-207 owner ruling (2026-11-14): use OpenIMCC for all-liquid vapour charges
+# from its own domain floor, while solid-bearing or phase-unknown charges keep
+# the 1950 K boundary. The 1700-1950 K SiO evidence is P10-P90 -0.283..+0.566
+# dex (n=45, OpenIMCC 9c327c2); it has no mare-composition rows (3 highland-
+# analogue rows only), and most liquid rows are from one CaO-SiO2 source. The
+# prior under-prediction rationale is unsupported at this version. Revisit
+# after seekq mare-basalt-liquid-sio-pressure-1700-1950k.
 BUILTIN_VAPOUR_CHANNEL_SWITCH_K = 1950.0
+OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE = {
+    "code": "openimcc_liquid_sio_below_1950K_band",
+    "type": "typed_notice",
+    "authority": (
+        "openimcc 9c327c2 at green fb3333092; SiO_evolution rail"
+    ),
+    "band": {
+        "temperature_K": [1700.0, 1950.0],
+        "error_dex_p10_p90": [-0.283, 0.566],
+        "n": 45,
+    },
+    "message": (
+        "OpenIMCC SiO P10-P90 error is -0.283..+0.566 dex (n=45) in "
+        "1700-1950 K; the band was measured only from 1700 K; no "
+        "mare-composition SiO evidence below 1950 K. Revisit when seekq "
+        "mare-basalt-liquid-sio-pressure-1700-1950k lands."
+    ),
+    "revisit_seekq": "mare-basalt-liquid-sio-pressure-1700-1950k",
+}
+OPENIMCC_VAPOUR_PHASE_SIGNAL_MISSING_NOTICE = {
+    "code": "openimcc_vapour_phase_signal_missing",
+    "type": "typed_notice",
+    "authority": (
+        "equilibrium_result.liquid_fraction or admitted freeze-gate curve"
+    ),
+    "message": (
+        "The equilibrium liquid_fraction phase signal was missing; the "
+        "charge is not treated as all-liquid and keeps the 1950 K vapour "
+        "switch."
+    ),
+}
+OPENIMCC_VAPOUR_PHASE_SIGNAL_INVALID_NOTICE = {
+    "code": "openimcc_vapour_phase_signal_invalid",
+    "type": "typed_notice",
+    "authority": "equilibrium_result.liquid_fraction",
+    "message": (
+        "The equilibrium liquid_fraction phase signal was invalid; the "
+        "charge is not treated as all-liquid and keeps the 1950 K vapour "
+        "switch."
+    ),
+}
 # Same physical outcome as _internal_analytical_equilibrium's cold path.
 # simulator.evaporation accepts an empty pressure map below this limit only
 # when the equilibrium diagnostic carries this exact token. The subprocess
@@ -726,6 +771,7 @@ def openimcc_binding_selected_by_inputs(
     temperature_K: float,
     controls: Mapping[str, Any],
     quantity_class: str = "activity",
+    phase_basis: str | None = None,
 ) -> bool:
     if quantity_class not in {"activity", "vapour"}:
         raise ValueError(f"Unknown OpenIMCC quantity class: {quantity_class!r}")
@@ -735,8 +781,73 @@ def openimcc_binding_selected_by_inputs(
     if mode != "openimcc":
         return False
     if quantity_class == "vapour":
-        return temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+        if phase_basis not in {None, "liquid", "solid_bearing", "missing", "invalid"}:
+            raise ValueError(f"Unknown OpenIMCC vapour phase basis: {phase_basis!r}")
+        return _openimcc_vapour_selected(temperature_K, phase_basis)
     return temperature_K >= openimcc_bridge._temperature_domain_K()[0]
+
+
+def _openimcc_vapour_phase_basis(liquid_fraction: Any) -> str:
+    """Classify the authoritative equilibrium liquid fraction for vapour use."""
+
+    if liquid_fraction is None:
+        return "missing"
+    try:
+        regime = melt_regime(liquid_fraction=liquid_fraction)
+    except (TypeError, ValueError):
+        return "invalid"
+    return "liquid" if regime is MeltRegime.MOLTEN else "solid_bearing"
+
+
+def _openimcc_vapour_phase_signal_notice(
+    phase_basis: str,
+) -> dict[str, Any] | None:
+    if phase_basis == "missing":
+        return dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_MISSING_NOTICE)
+    if phase_basis == "invalid":
+        return dict(OPENIMCC_VAPOUR_PHASE_SIGNAL_INVALID_NOTICE)
+    return None
+
+
+def _openimcc_vapour_switch_K(phase_basis: str) -> float:
+    if phase_basis == "liquid":
+        return float(openimcc_bridge._temperature_domain_K()[0])
+    return float(BUILTIN_VAPOUR_CHANNEL_SWITCH_K)
+
+
+def _openimcc_vapour_selected(
+    temperature_K: float,
+    phase_basis: str,
+) -> bool:
+    switch_K = _openimcc_vapour_switch_K(phase_basis)
+    if phase_basis == "liquid":
+        return temperature_K >= switch_K
+    return temperature_K > switch_K
+
+
+def _append_openimcc_liquid_sio_band_notice(
+    diagnostic: dict[str, Any],
+    *,
+    temperature_K: float,
+    phase_basis: str,
+    uses_openimcc_operands: bool,
+) -> None:
+    if not (
+        phase_basis == "liquid"
+        and temperature_K < BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+        and uses_openimcc_operands
+    ):
+        return
+    if any(
+        notice.get("code") == "openimcc_liquid_sio_below_1950K_band"
+        for notice in diagnostic["notices"]
+    ):
+        return
+    notice = dict(OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE)
+    phase_basis_notice = diagnostic.get("phase_basis_notice")
+    if isinstance(phase_basis_notice, Mapping):
+        notice["phase_basis_notice"] = dict(phase_basis_notice)
+    diagnostic["notices"].append(notice)
 
 
 def _high_t_composition_vector(composition_mol: Mapping[str, float]) -> dict[str, float]:
@@ -940,15 +1051,32 @@ def _build_high_t_melt_activity_authority(
     controls: Mapping[str, Any],
     below_cap_fe_activity: float,
     below_cap_fe_activity_basis: str,
+    phase_basis: str | None = None,
+    phase_basis_source: str | None = None,
 ) -> dict[str, Any] | None:
     """Resolve melt activity once; the quantity gate controls its pressure use."""
 
+    if phase_basis is None:
+        phase_basis = _openimcc_vapour_phase_basis(
+            controls.get("liquid_fraction")
+        )
+    if phase_basis_source is None:
+        phase_basis_source = str(
+            controls.get("phase_basis_source")
+            or (
+                "equilibrium_result.liquid_fraction"
+                if controls.get("liquid_fraction") is not None
+                else "missing"
+            )
+        )
+    phase_basis_continuation = controls.get('phase_basis_continuation')
     if not openimcc_binding_selected_by_inputs(
         temperature_K=temperature_K,
         controls=controls,
         quantity_class="activity",
     ):
         return None
+    applied_vapour_switch_K = _openimcc_vapour_switch_K(phase_basis)
     mode = "openimcc"
 
     base: dict[str, Any] = {
@@ -956,8 +1084,17 @@ def _build_high_t_melt_activity_authority(
         "requested": mode,
         "temperature_K": float(temperature_K),
         # Preserve the legacy metadata keys consumed by runner fixtures.
-        "vaporock_cap_K": float(BUILTIN_VAPOUR_CHANNEL_SWITCH_K),
-        "above_vaporock_cap": temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
+        "vaporock_cap_K": applied_vapour_switch_K,
+        "above_vaporock_cap": openimcc_binding_selected_by_inputs(
+            temperature_K=temperature_K,
+            controls=controls,
+            quantity_class="vapour",
+            phase_basis=phase_basis,
+        ),
+        "vapour_channel_switch_K": applied_vapour_switch_K,
+        "vapour_channel_phase_basis": phase_basis,
+        "phase_basis_source": phase_basis_source,
+        "phase_basis_continuation": phase_basis_continuation,
         "fallback": False,
         "provider": "openimcc",
         "composition_policy": {},
@@ -969,10 +1106,29 @@ def _build_high_t_melt_activity_authority(
         "consecutive_refusal_count": 0,
         "last_extrapolated_gamma_by_parent": {},
     }
+    phase_basis_notice = controls.get("phase_basis_notice")
+    if isinstance(phase_basis_notice, Mapping):
+        base["phase_basis_notice"] = dict(phase_basis_notice)
+    phase_signal_notice = _openimcc_vapour_phase_signal_notice(phase_basis)
+    if phase_signal_notice is not None:
+        base["notices"].append(phase_signal_notice)
+    # Trajectory certificates continue vapour operands. Fresh activity solves
+    # below that domain must not seed a later pressure secant.
+    previous = controls.get("high_t_melt_activity_previous") or {}
     vapour_selected = openimcc_binding_selected_by_inputs(
-        temperature_K=temperature_K, controls=controls, quantity_class="vapour",
+        temperature_K=temperature_K,
+        controls=controls,
+        quantity_class="vapour",
+        phase_basis=phase_basis,
     )
-    certificates: dict[str, Any] = {}
+    if not vapour_selected or (previous and not openimcc_binding_selected_by_inputs(
+        temperature_K=previous["temperature_K"],
+        controls=controls,
+        quantity_class="vapour",
+        phase_basis=phase_basis,
+    )):
+        previous = {}
+    certificates = dict(previous.get("certified_effective_gamma_by_parent") or {})
     base["certified_effective_gamma_by_parent"] = certificates
     from simulator.melt_backend.openimcc_bridge import (
         _IMCC_REFUSAL_ERROR_TYPE,
@@ -1204,6 +1360,12 @@ def _build_high_t_melt_activity_authority(
             held[parent] = notice
             base["notices"].append(notice)
         base["held_effective_gamma_by_parent"] = held
+        _append_openimcc_liquid_sio_band_notice(
+            base,
+            temperature_K=temperature_K,
+            phase_basis=phase_basis,
+            uses_openimcc_operands=bool(vapour_selected and held),
+        )
         return base
 
     bridge = cleaned.bridge
@@ -1413,6 +1575,16 @@ def _build_high_t_melt_activity_authority(
             if gamma_last > 0.0 and math.isfinite(gamma_last):
                 record["ln_gamma_last"] = math.log(gamma_last)
             certificates[parent] = record
+    # A successful solve ends the refusal streak. The next refusal
+    # extrapolates from the new certificate instead of a frozen gamma.
+    base["consecutive_refusal_count"] = 0
+    base["last_extrapolated_gamma_by_parent"] = {}
+    _append_openimcc_liquid_sio_band_notice(
+        base,
+        temperature_K=temperature_K,
+        phase_basis=phase_basis,
+        uses_openimcc_operands=vapour_selected,
+    )
     return base
 
 
@@ -2890,7 +3062,11 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         # Lazy import: simulator.state pulls in simulator/__init__ which
         # re-enters this module during package init -- see
         # engines/builtin/__init__.py for the cycle description.
-        from simulator.state import GAS_CONSTANT
+        from simulator.state import GAS_CONSTANT as STATE_GAS_CONSTANT
+        from simulator.chemistry.ellingham_graph import (
+            ElementalMetalSaturationCapNotice,
+            _cap_elemental_metal_pressure_at_saturation_Pa,
+        )
         from simulator.vapour_rail.channels import (
             REACTION_PLANE_MELT_INTERFACE,
             REACTION_PLANE_TRANSPORT_HEADSPACE,
@@ -2945,6 +3121,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
         vacuum_floor_bar = resolve_request_vacuum_floor_bar(request)
         transport_pO2_bar = self._resolve_transport_pO2_bar(request)
         controls = request.control_inputs or {}
+        vapour_phase_basis = _openimcc_vapour_phase_basis(
+            controls.get("liquid_fraction")
+        )
+        phase_basis_source = str(
+            controls.get("phase_basis_source")
+            or (
+                "equilibrium_result.liquid_fraction"
+                if controls.get("liquid_fraction") is not None
+                else "missing"
+            )
+        )
         intrinsic_fO2_log_supplied = (
             'intrinsic_fO2_log' in controls
             and controls.get('intrinsic_fO2_log') is not None
@@ -3008,11 +3195,30 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             controls=controls,
             below_cap_fe_activity=below_cap_fe_activity,
             below_cap_fe_activity_basis=below_cap_fe_activity_basis,
+            phase_basis=vapour_phase_basis,
+            phase_basis_source=phase_basis_source,
         )
+        d207_notices: list[dict[str, Any]] = []
+        phase_signal_notice = _openimcc_vapour_phase_signal_notice(
+            vapour_phase_basis
+        )
+        if phase_signal_notice is not None:
+            d207_notices.append(phase_signal_notice)
+        if high_t_activity_authority is not None:
+            d207_notices.extend(
+                dict(notice)
+                for notice in high_t_activity_authority.get("notices", ())
+                if isinstance(notice, Mapping)
+                and notice.get("code")
+                == OPENIMCC_LIQUID_SIO_BELOW_1950K_NOTICE["code"]
+            )
         vapour_activity_authority = (
             high_t_activity_authority
             if openimcc_binding_selected_by_inputs(
-                temperature_K=T_K, controls=controls, quantity_class="vapour",
+                temperature_K=T_K,
+                controls=controls,
+                quantity_class="vapour",
+                phase_basis=vapour_phase_basis,
             ) else None
         )
         # An openimcc activity can move a valid carrier below the numerical
@@ -3078,6 +3284,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
         vapor_pressures: dict[str, float] = {}
+        elemental_metal_saturation_caps: list[
+            ElementalMetalSaturationCapNotice
+        ] = []
         vapor_pressure_sources: dict[str, str] = {}
         vapor_pressure_provenance: dict[str, dict[str, Any]] = {}
         below_reporting_threshold_omissions: dict[str, dict[str, Any]] = {}
@@ -3346,6 +3555,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                    notices=elemental_metal_saturation_caps,
+                )
                 gamma_auth = _gamma_domain_authority(
                     parent_oxide, T_K, oxide_activity
                 )
@@ -3519,6 +3735,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_liquid_oxide_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                    notices=elemental_metal_saturation_caps,
+                )
                 if _publishes_vapor_pressure(
                     P_eq_Pa,
                     retain_subthreshold=retain_high_t_openimcc_carriers,
@@ -3687,6 +3910,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     species=species,
                     field="P_eq_gas_rail_standard_reaction",
                 )
+                P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                    species,
+                    T_K,
+                    P_eq_Pa,
+                    vapor_pressure_data=self._vapor_pressure_data,
+                    notices=elemental_metal_saturation_caps,
+                )
                 if _publishes_vapor_pressure(
                     P_eq_Pa,
                     retain_subthreshold=retain_high_t_openimcc_carriers,
@@ -3841,7 +4071,9 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             dG_f_kJ = ellingham_delta_g_kj_per_mol_o2(species, T_K)
             # K_decomp = exp(dG_f * 1000 / (R * T))
             try:
-                K_decomp = math.exp(dG_f_kJ * 1000.0 / (GAS_CONSTANT * T_K))
+                K_decomp = math.exp(
+                    dG_f_kJ * 1000.0 / (STATE_GAS_CONSTANT * T_K)
+                )
             except OverflowError as exc:
                 raise VaporPressureComputationError(
                     "vapor_pressure_nonfinite: "
@@ -3902,7 +4134,8 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             if metal_phase_kind == ELLINGHAM_METAL_PHASE_GAS:
                 # Gas-standard rows solve for f_M/p0, so P_M = root * p0.
                 # Pairing this root with condensed Antoine P_sat would count
-                # vaporization twice: P_wrong/P_right = P_sat/p0.
+                # vaporization twice: P_wrong/P_right = P_sat/p0. Convert the
+                # fugacity directly to Pa.
                 activity_factor = metal_activity_root
                 condensed_activity_cap_bound = False
                 pressure_reference_Pa = ELLINGHAM_STANDARD_PRESSURE_PA
@@ -3922,6 +4155,13 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_factor * pressure_reference_Pa,
                 species=species,
                 field="P_eq_Pa",
+            )
+            P_eq_Pa = _cap_elemental_metal_pressure_at_saturation_Pa(
+                species,
+                T_K,
+                P_eq_Pa,
+                vapor_pressure_data=self._vapor_pressure_data,
+                notices=elemental_metal_saturation_caps,
             )
             if species in metal_extrapolations:
                 metal_extrapolations[species]["computed_pressure_Pa"] = P_eq_Pa
@@ -4565,6 +4805,17 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             )
 
         diagnostic = {
+            "phase_basis": vapour_phase_basis,
+            "phase_basis_source": phase_basis_source,
+            "applied_vapour_switch_K": _openimcc_vapour_switch_K(
+                vapour_phase_basis
+            ),
+            "phase_basis_notice": (
+                dict(controls["phase_basis_notice"])
+                if isinstance(controls.get("phase_basis_notice"), Mapping)
+                else None
+            ),
+            "d207_notices": d207_notices,
             "vapor_pressures_Pa": vapor_pressures,
             "vapor_pressures_source": vapor_pressure_sources,
             "vapor_pressure_numerator_provenance": vapor_pressure_provenance,
@@ -4633,6 +4884,10 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
             },
             "species_authority": species_authority,
         }
+        if elemental_metal_saturation_caps:
+            diagnostic["elemental_metal_saturation_caps"] = [
+                dict(notice) for notice in elemental_metal_saturation_caps
+            ]
         if high_t_activity_authority is not None:
             selected_parent_activities = {}
             selected_parent_provenance = {}

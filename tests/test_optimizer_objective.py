@@ -5,7 +5,7 @@ import math
 from dataclasses import replace
 from itertools import permutations
 from types import MethodType, SimpleNamespace
-from typing import Mapping
+from typing import Any, Mapping
 
 import pytest
 
@@ -8220,6 +8220,7 @@ def _kernel_vapour_host(
         ),
         _evaluated_transport_pO2_bar=None,
         _evaluated_transport_pO2_recorded=False,
+        _melt_metal_saturation_fO2_floor_log=lambda _temperature_K: None,
     )
     return host, calls
 
@@ -11435,6 +11436,14 @@ def test_sso2_owner_execution_uses_certified_na_dose_and_partition_path() -> Non
     assert partition_basis["native_fe_source_account"] == "process.metal_phase"
     assert partition_basis["native_fe_split_commit_status"] == "ok"
     assert partition_basis["native_fe_vapor_route_status"] == "committed"
+    # 021cf4eedf credits the reacted C3 Na2O coproduct to process.cleaned_melt:
+    # 48.7362 kg (786.34 mol) at h0, after 36.1556 kg Na and 56.4938 kg FeO
+    # are consumed. This gives the gate 5.34-10.01 wt% Na2O (the series kept
+    # it in residue, leaving 0.44-0.46 wt%). MAGEMin's projected search is
+    # non-monotone (frac_M 0.364 at 1250 C, 0.270 at 1300 C) or unbracketed
+    # (max 0.982 at 2200 C), so owner d-299 selects the flagged Kress91 floor.
+    # At h0 the melt is treated as liquid, the native-Fe partition fires, and
+    # no later saturation split follows. Probe evidence: fgate2-* and fgate3-*.
     assert partition["native_fe_saturation_split_count"] == 0
     assert partition["native_fe_metal_partition_count"] >= 1
     assert partition["native_fe_partition_transition_count"] >= 1

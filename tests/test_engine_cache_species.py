@@ -17,16 +17,16 @@ from simulator import engine_cache
 from simulator.engine_cache import EngineCacheValue, pack, unpack
 
 
-# Recorded from engine_cache_key at 7714e73c20 for this probe. The function
-# body is unchanged; these bytes are that output, not a second implementation.
+# Recorded from engine_cache_key at 7714e73c20 for this probe. OpenIMCC's
+# version prefix is advanced below; the request payload bytes are unchanged.
 _PROBE = {
     "temperature_K": 1700.0,
     "composition_wt_pct": {"SiO2": 60.0, "MgO": 40.0},
 }
 _KEY_PINS = {
-    "openimcc": "01000100080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
-    # The train takes max+1 against Markova; keep the resulting v4 header pinned.
-    "internal-analytical": "02000400080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
+    "openimcc": "01000400080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
+    # IA v5 carries b-1124 chemistry over b274's independent v4.
+    "internal-analytical": "02000500080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
     "vaporock": "03000100080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
     "magemin": "04000400080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
     "alphamelts": "05000500080280080205034d674f090104380014000000000000050453694f3209010438001e000000000000840901043d001a900000000000",
@@ -763,23 +763,35 @@ def test_drop_chemistry_version_commits_hot_before_cold(
     tmp_path, monkeypatch
 ) -> None:
     path = tmp_path / "drop.sqlite"
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))
-    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
-    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    _enable_write(monkeypatch, path)
+    stale_version = 1
+    current_version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    assert stale_version != current_version
 
     def store() -> None:
-        engine_cache.cached_engine_call(
-            "openimcc",
-            {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
-            lambda: engine_cache.EngineCacheValue(
-                hot={"answer": 1}, cold={"enthalpy": 2.0}
-            ),
+        monkeypatch.setitem(
+            engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", stale_version
         )
+        try:
+            engine_cache.cached_engine_call(
+                "openimcc",
+                {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
+                lambda: engine_cache.EngineCacheValue(
+                    hot={"answer": 1}, cold={"enthalpy": 2.0}
+                ),
+            )
+        finally:
+            monkeypatch.setitem(
+                engine_cache.ENGINE_CHEMISTRY_VERSION,
+                "openimcc",
+                current_version,
+            )
 
     cold_path = path.with_name(path.name + ".cold")
     store()
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"] == current_version
     assert cold_path.is_file()
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    assert engine_cache.drop_chemistry_version("openimcc", stale_version) == 1
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
         assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
@@ -787,6 +799,7 @@ def test_drop_chemistry_version_commits_hot_before_cold(
         assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 0
 
     store()
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"] == current_version
 
     def boom(connection, _pairs) -> None:
         hot_left = connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0]
@@ -797,7 +810,7 @@ def test_drop_chemistry_version_commits_hot_before_cold(
     original = engine_cache._drop_attached_cold
     monkeypatch.setattr(engine_cache, "_drop_attached_cold", boom)
     with pytest.raises(sqlite3.OperationalError, match="injected between hot and cold"):
-        engine_cache.drop_chemistry_version("openimcc", 1)
+        engine_cache.drop_chemistry_version("openimcc", stale_version)
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
         assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
@@ -806,17 +819,21 @@ def test_drop_chemistry_version_commits_hot_before_cold(
 
     # The HOT row is gone, so the same request is not a hit. A plain dict
     # does not write a new COLD value, and the orphan stays until the retry.
-    served = engine_cache.cached_engine_call(
-        "openimcc",
-        {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
-        lambda: {"answer": 9},
-    )
+    with monkeypatch.context() as stale_engine:
+        stale_engine.setitem(
+            engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", stale_version
+        )
+        served = engine_cache.cached_engine_call(
+            "openimcc",
+            {"composition_wt_pct": {"MgO": 1.0}, "marker": 1},
+            lambda: {"answer": 9},
+        )
     assert served == {"answer": 9}
     with sqlite3.connect(cold_path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_values").fetchone()[0] == 1
 
     monkeypatch.setattr(engine_cache, "_drop_attached_cold", original)
-    assert engine_cache.drop_chemistry_version("openimcc", 1) == 1
+    assert engine_cache.drop_chemistry_version("openimcc", stale_version) == 1
     with sqlite3.connect(path) as connection:
         assert connection.execute("SELECT COUNT(*) FROM engine_outputs").fetchone()[0] == 0
         assert connection.execute("SELECT COUNT(*) FROM engine_output_species").fetchone()[0] == 0
@@ -835,8 +852,9 @@ def test_known_empty_digest_survives_species_expire(tmp_path, monkeypatch) -> No
     path = tmp_path / "empty-digest.sqlite"
     empty_digest = {"label": "x" * 200}
     natural_empty = {"temperature_K": 1700.0}
-    digest_key = engine_cache.engine_cache_key("openimcc", 1, empty_digest)
-    natural_key = engine_cache.engine_cache_key("openimcc", 1, natural_empty)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    digest_key = engine_cache.engine_cache_key("openimcc", version, empty_digest)
+    natural_key = engine_cache.engine_cache_key("openimcc", version, natural_empty)
     assert digest_key[3] == 0xFF
     assert natural_key[3] == 0x00
     assert engine_cache.cache_request_species(empty_digest) == frozenset()
@@ -845,14 +863,19 @@ def test_known_empty_digest_survives_species_expire(tmp_path, monkeypatch) -> No
     _store(monkeypatch, path, "openimcc", natural_empty)
     recorded = _species_by_row(path)
     assert list(recorded.values()) == [{""}]
-    raw = engine_cache.engine_cache_key("openimcc", 1, {"label": "y" * 200, "other": 1})
+    raw = engine_cache.engine_cache_key(
+        "openimcc", version, {"label": "y" * 200, "other": 1}
+    )
     assert raw[3] == 0xFF and raw != digest_key
     engine_cache._close_connections()
     with sqlite3.connect(path) as connection:
         seq = connection.execute("SELECT MAX(row_seq) FROM engine_outputs").fetchone()[0]
         connection.execute(
             "INSERT INTO engine_outputs VALUES (?,?,?,?,?,?,?)",
-            (raw, pack({"answer": 3}), "openimcc", "1", "laptop", seq + 1, 0),
+            (
+                raw, pack({"answer": 3}), "openimcc", str(version),
+                "laptop", seq + 1, 0,
+            ),
         )
     dry = engine_cache.expire_cache_file(path, engine="openimcc", species=("SiO2",))
     assert dry["species_unknown_rows"] == 1
@@ -1430,9 +1453,12 @@ def test_readonly_hit_does_not_backfill_species(tmp_path, monkeypatch) -> None:
 
     path = tmp_path / "readonly.sqlite"
     request = _long_composition("MgO")
-    key = engine_cache.engine_cache_key("openimcc", 1, request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    key = engine_cache.engine_cache_key("openimcc", version, request)
     assert key[3] == 0xFF
-    _plant_schema3(path, [(key, pack({"answer": 4}), "openimcc", "1")])
+    _plant_schema3(
+        path, [(key, pack({"answer": 4}), "openimcc", str(version))]
+    )
     engine_cache.migrate_cache_file(path, vacuum=False)
     assert engine_cache.engine_cache_stats(path)["species_unknown_by_engine"] == {
         "openimcc": 1
@@ -1576,14 +1602,15 @@ def test_refusal_hit_records_the_request_not_the_cached_value(
 ) -> None:
     path = tmp_path / "refusal.sqlite"
     request = _long_composition("SiO2")
-    key = engine_cache.engine_cache_key("openimcc", 1, request)
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    key = engine_cache.engine_cache_key("openimcc", version, request)
     assert key[3] == 0xFF
     cached = {
         "status": "refusal",
         "refusal_reason": "no_liquid",
         "species": "Na2O",
     }
-    _plant_schema3(path, [(key, pack(cached), "openimcc", "1")])
+    _plant_schema3(path, [(key, pack(cached), "openimcc", str(version))])
     engine_cache.migrate_cache_file(path, vacuum=False)
     _enable_write(monkeypatch, path)
     assert _hit("openimcc", request) == cached
@@ -1644,8 +1671,11 @@ def test_unreadable_request_hit_does_not_mark_the_row_known_empty(
 ) -> None:
     path = tmp_path / "unreadable.sqlite"
     request = {"composition_wt_pct": ["SiO2"]}
-    key = engine_cache.engine_cache_key("openimcc", 1, request)
-    _plant_schema3(path, [(key, pack({"answer": 8}), "openimcc", "1")])
+    version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    key = engine_cache.engine_cache_key("openimcc", version, request)
+    _plant_schema3(
+        path, [(key, pack({"answer": 8}), "openimcc", str(version))]
+    )
     report = engine_cache.migrate_cache_file(path, vacuum=False)
     assert report["skipped_unreadable_keys"] == 1
     _enable_write(monkeypatch, path)

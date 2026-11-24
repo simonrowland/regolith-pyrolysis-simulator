@@ -888,26 +888,13 @@ def elemental_reference_mismatch_applies(oxide: str, T_K: float) -> bool:
 def ellingham_oxide_stoichiometry_for_formula(
     oxide: str,
 ) -> tuple[float, float] | None:
-    """n_M, n_ox for n_M M + O2 → n_ox oxide from the table formula.
+    """Delegate the oxide-to-Ellingham stoichiometry to its chemistry owner."""
 
-    Premise: OXIDE_TO_METAL[oxide] = (metal, n_metal, n_O) with n_O the
-    oxygen atoms per formula unit, so one formula is
-    n_metal M + (n_O/2) O2 → 1 oxide.
-    Algebra: per mol O2, n_M = 2 n_metal / n_O and n_ox = 2 / n_O.
-    Unit check: n_M and n_ox are mole ratios per mol O2 (dimensionless).
-    Sanity: Fe2O3 → (4/3, 2/3); FeO → (2, 2); Na2O → (4, 2); Al2O3 → (4/3, 2/3).
-    """
-
-    stoich = OXIDE_TO_METAL.get(oxide)
-    if stoich is None:
-        return None
-    _metal, n_metal, n_oxygen = stoich
-    if n_oxygen <= 0:
-        return None
-    return (
-        2.0 * float(n_metal) / float(n_oxygen),
-        2.0 / float(n_oxygen),
+    from simulator.chemistry.ellingham_graph import (
+        ellingham_oxide_stoichiometry_for_formula as resolve_stoichiometry,
     )
+
+    return resolve_stoichiometry(oxide, oxide_to_metal=OXIDE_TO_METAL)
 
 
 def oxide_identity_mismatch_applies(oxide: str) -> bool:

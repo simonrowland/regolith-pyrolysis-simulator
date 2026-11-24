@@ -1124,6 +1124,9 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
         ellingham_stoichiometry,
     )
     from simulator.chemistry.melt_activity import melt_oxide_activity
+    from simulator.chemistry.ellingham_graph import (
+        metal_saturation_pressure_Pa,
+    )
     # The provider's Ellingham path evaluates K_decomp with the legacy
     # simulator.state gas constant (8.31446), not the CODATA value in
     # simulator.physical_constants — the recomputation must use the same one.
@@ -1176,6 +1179,17 @@ def test_builtin_linear_rail_o2_bit_identity_differential():
 
         def record(species_id, recomputed, label):
             key = (species_id, T_C, fO2_log, transport_pO2)
+            # Check the rail equation at its original operands, then apply the
+            # shared pure-metal saturation ceiling to the emitted pressure.
+            if species_id in metals:
+                recomputed = min(
+                    recomputed,
+                    metal_saturation_pressure_Pa(
+                        species_id,
+                        T_K,
+                        vapor_pressure_data=payload,
+                    ),
+                )
             emitted = pressures[species_id]
             if emitted != recomputed:
                 mismatches.append(

@@ -3144,6 +3144,9 @@ def test_isolated_cell_worker_timeout_kills_sleeping_grandchild(
     tmp_path: Path,
 ) -> None:
     battery = _install_fake_isolated_cell_worker(monkeypatch)
+    # A cached successful recovery would skip the worker and make the
+    # start-count assertion fail without exercising timeout retirement.
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE", raising=False)
     original_worker = battery.WarmEngineWorker
 
     def fatal_diagnostic_signal_worker(**kwargs):

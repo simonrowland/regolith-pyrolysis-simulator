@@ -67,6 +67,7 @@ from simulator.engine_pool import (
     EngineWorkerRemoteError,
     EngineWorkerTimeout,
     WarmEngineWorker,
+    _inherit_process_group_for_worker_children,
 )
 from simulator.yaml_cache import load_cached_safe_yaml
 from simulator.config import (
@@ -141,6 +142,58 @@ def _openimcc_gas_channels_and_omission_notices(
         for name, reason in omitted_channels.items()
     )
     return channels, notices
+
+
+def _openimcc_oxygen_balance_species_metadata(
+    activities: Mapping[str, float],
+    temperature_K: float,
+    datapack: Any,
+    channels: Sequence[tuple[str, Sequence[Any]]],
+    *,
+    parent_oxides: Sequence[str],
+) -> dict[str, Any]:
+    """Translate OpenIMCC's selected channel metadata for the cell solver."""
+    from openimcc.gas import (
+        OxygenBalanceSpeciesMetadata,
+        gas_channel_metadata,
+    )
+    from simulator.accounting.formulas import resolve_species_formula
+
+    try:
+        channel_metadata = gas_channel_metadata(
+            activities,
+            temperature_K,
+            datapack,
+            parent_oxides=parent_oxides,
+        )
+        result: dict[str, Any] = {}
+        for species, _reaction in channels:
+            source = channel_metadata.get(species)
+            if (
+                source is None
+                or not source.available
+                or source.charge != 0
+                or source.neutral_pO2_exponent is None
+            ):
+                raise ValueError(
+                    f"OpenIMCC has no available neutral oxygen metadata for {species!r}"
+                )
+            molar_mass_g_mol = (
+                resolve_species_formula(species).molar_mass_kg_per_mol() * 1000.0
+            )
+            result[species] = OxygenBalanceSpeciesMetadata(
+                molar_mass_g_mol,
+                float(source.oxygen_atoms),
+                float(source.parent_oxygen_demand),
+                float(source.neutral_pO2_exponent),
+            )
+        return result
+    except Exception as exc:  # noqa: BLE001 - keep optional-engine metadata failures typed
+        raise _OxygenBalanceRefusal(
+            "oxygen_balance_species_metadata_failed", str(exc)
+        ) from exc
+
+
 ARM_HEADLINE = "headline"
 ARM_QUALIFICATION = "qualification"
 
@@ -1833,6 +1886,27 @@ def engine_flags_from_result(
 
     provider_notices = _provider_notice_flags_from_result(result)
     notices.extend(provider_notices)
+    vapor_diagnostic = diagnostics.get("vapor_pressure_diagnostic")
+    d207_notices = (
+        vapor_diagnostic.get("d207_notices")
+        if isinstance(vapor_diagnostic, Mapping)
+        else None
+    )
+    for row in d207_notices or ():
+        if not isinstance(row, Mapping):
+            continue
+        code = row.get("code")
+        message = row.get("message")
+        if not isinstance(code, str) or not code or not isinstance(message, str):
+            continue
+        notices.append(
+            {
+                "kind": "openimcc_notice",
+                "authority": row.get("authority"),
+                "reason": f"{code}: {message}",
+            }
+        )
+
     if diagnostics.get("imcc_notices"):
         imcc_rows = diagnostics["imcc_notices"]
     else:
@@ -3587,7 +3661,6 @@ class _OpenImccBatteryBackend:
                     from openimcc import (
                         evaluate_gas,
                         oxygen_balance_from_pressure_model,
-                        oxygen_balance_species_metadata,
                     )
                 except (ImportError, AttributeError) as exc:
                     raise _OxygenBalanceRefusal(
@@ -3601,21 +3674,13 @@ class _OpenImccBatteryBackend:
                         result.parent_oxides, self._gas
                     )
                 )
-                base_species = oxygen_balance_species_metadata(
-                    {name: parent or None for name, (parent, _ng, _no2) in channels}
+                base_species = _openimcc_oxygen_balance_species_metadata(
+                    result.parent_oxide_activities,
+                    temperature_K,
+                    self._gas,
+                    channels,
+                    parent_oxides=result.parent_oxides,
                 )
-                for name, (parent, n_gas, n_o2) in channels:
-                    expected = -n_o2 / n_gas if parent else (
-                        1.0 if name == "O2" else 0.5
-                    )
-                    if not math.isclose(
-                        base_species[name].pO2_exponent, expected, abs_tol=1e-12
-                    ):
-                        raise _OxygenBalanceRefusal(
-                            "imcc_gas_oxygen_balance_failed",
-                            f"openimcc reaction exponent for {name!r} "
-                            "does not match formula metadata",
-                        )
 
                 def pressure_model(pO2_bar: float) -> Mapping[str, float]:
                     return evaluate_gas(
@@ -4105,6 +4170,14 @@ def _internal_analytical_vapor_pressure_adapter(
         "code_path": _INTERNAL_ANALYTICAL_VAPOR_PRESSURE_PATH,
         "authority": authority_status,
         "vapor_pressures_source": dict(equilibrium.vapor_pressures_source),
+        "phase_basis": core_diagnostic.get("phase_basis"),
+        "phase_basis_source": core_diagnostic.get("phase_basis_source"),
+        "phase_basis_detail": core_diagnostic.get("phase_basis_detail"),
+        "applied_vapour_switch_K": core_diagnostic.get(
+            "applied_vapour_switch_K"
+        ),
+        "phase_basis_notice": core_diagnostic.get("phase_basis_notice"),
+        "notices": list(core_diagnostic.get("d207_notices") or ()),
         "core_flags": core_flags,
         "oxygen_condition_source": oxygen_source,
         "oxygen_balance": oxygen_notices,
@@ -4329,11 +4402,16 @@ class _InternalAnalyticalBatteryBackend:
         po2_request: Po2Request | None = None,
         **_unused: object,
     ) -> Any:
-        # One core serves every cell. The core refresh owns the per-call
-        # vapor-pressure diagnostic on every temperature path. Residue
-        # integration calls the adapter directly on the same core.
+        # One core serves every cell. Clear unkeyed held freeze-gate curves so
+        # an independent cell cannot supply another cell's vapor phase basis.
+        # The input-keyed live curve memo remains safe to reuse. The core
+        # refresh owns the per-call vapor-pressure diagnostic on every
+        # temperature path. Residue integration calls the adapter directly on
+        # the same core and keeps its within-row trajectory state.
         core = self._core
         core._high_t_melt_activity_fallback_steps = []
+        core._freeze_gate_last_good_curve = None
+        core._freeze_gate_held_curve_record = None
         core._last_vapor_pressure_diagnostic = {}
         core._high_t_melt_activity_table_fallback_ticks = {}
         return _internal_analytical_vapor_pressure_adapter(
@@ -4814,6 +4892,11 @@ def _bootstrap_isolated_cell_engine(
     engine_settings: Mapping[str, Any] | None = None,
 ) -> tuple[_IsolatedCellEngine, str]:
     """Resolve the battery engine before WarmEngineWorker signals ready."""
+    if engine == "internal-analytical":
+        # The isolated-cell worker owns this process group. Keep nested
+        # MAGEMin workers and their binary in it so timeout cleanup reaches
+        # the full descendant tree.
+        _inherit_process_group_for_worker_children()
     settings = dict(engine_settings or {})
     handle = _open_battery_engine_with_settings(engine, settings or None)
     return _IsolatedCellEngine(handle, settings), engine
@@ -4893,9 +4976,10 @@ class _IsolatedCellWorker:
             ),
             call_timeout_s=_ENGINE_OUTER_TIMEOUT_S.get(self.engine, 30.0) + 2.0,
             diagnostic_signal=signal.SIGCONT,
-            # ThermoEngine cold start measured 43.99s here; only it needs this
-            # separate READY budget and child-capable worker.
-            daemon=self.engine != "thermoengine",
+            # InternalAnalytical resolves vapour phase through a nested
+            # MAGEMin worker pool; ThermoEngine needs child processes for its
+            # adapter. Neither isolated-cell worker can be daemonic.
+            daemon=self.engine not in {"internal-analytical", "thermoengine"},
         )
 
     @property

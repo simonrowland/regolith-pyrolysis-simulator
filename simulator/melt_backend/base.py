@@ -103,6 +103,7 @@ ENGINE_CACHE_NOTICE_CODE_TABLE = (
     ('internal-analytical', 2, 'floor_inversion', 'Analytical pressure used a floor inversion.'),
     ('internal-analytical', 3, 'fo2_oxygen_balance_effusion_solved', 'Analytical input used the solved effusion oxygen condition.'),
     ('internal-analytical', 90, 'warning_text', 'Analytical warning used by cell classification.'),
+    ('internal-analytical', 4, 'openimcc_notice', 'OpenIMCC emitted a d-207 vapour notice.'),
 )
 _ENGINE_NOTICE_BY_CODE = {
     (engine, code): number
@@ -414,10 +415,13 @@ def _equilibrium_cache_consumer_metadata(
         }
     vapor = selected_diagnostics.get('vapor_pressure_diagnostic')
     if isinstance(vapor, Mapping):
+        # The battery notice classifier reads these after a HOT cache hit just
+        # as it does on a cold result; dropping them made notice output depend
+        # on whether an earlier request had warmed this key.
         selected_diagnostics['vapor_pressure_diagnostic'] = {
             name: vapor[name] for name in (
                 'activities_standard_state', 'below_reporting_threshold_omissions',
-                'pO2_floor_inversion_notices_by_species',
+                'pO2_floor_inversion_notices_by_species', 'd207_notices',
             ) if name in vapor
         }
 
@@ -610,16 +614,19 @@ def equilibrium_to_hot(
         if (numeric := _cold_numbers(values.get(name))) is not None
     }
     status = values.get('status')
-    # Omitted status is not a refusal: successes that leave it unset must store.
-    # ``refused`` is not mapped to invalid_input; a subprocess message with
-    # that status is not an input predicate.
-    if status not in {None, 'ok', 'non_authoritative'}:
-        refusal_reason = None
-        if isinstance(diagnostics, Mapping):
-            refusal_reason = (
-                diagnostics.get('backend_status_reason')
-                or diagnostics.get('backend_failure_reason_code')
-            )
+    named_refusal = None
+    if isinstance(diagnostics, Mapping):
+        named_refusal = (
+            diagnostics.get('backend_status_reason')
+            or diagnostics.get('backend_failure_reason_code')
+        )
+    # Missing status is a hot success unless VapoRock has already named a
+    # refusal. ``refused`` is not mapped to invalid_input: a subprocess
+    # message with that status is not an input predicate.
+    if status not in {None, 'ok', 'non_authoritative'} or (
+        engine_id == 'vaporock' and status is None and named_refusal is not None
+    ):
+        refusal_reason = named_refusal
         if refusal_reason is None:
             refusal_reason = {
                 'out_of_domain': OutOfDomainReason.OUT_OF_DOMAIN.value,

@@ -1020,12 +1020,12 @@ def test_bridge_reports_single_cation_gamma_zhang_n_morb_anchor() -> None:
     }
     expected = {
         1473.15: {
-            "KO0.5": 1.6697561241999281e-6,
-            "NaO0.5": 0.00013466805822228952,
+            "KO0.5": 2.1891401806319048e-6,
+            "NaO0.5": 0.00017560125503048718,
         },
         1673.15: {
-            "KO0.5": 9.441799509227296e-6,
-            "NaO0.5": 0.0004922752489405557,
+            "KO0.5": 1.133192718678085e-5,
+            "NaO0.5": 0.0005829856233241274,
         },
     }
     for temperature_K, anchors in expected.items():
@@ -1087,26 +1087,57 @@ def test_openimcc_measured_ferric_split_keeps_feo_equivalent_projection_notice()
     }
 
 
+def _pyproject_openimcc_dependency() -> tuple[dict, str]:
+    import tomllib
+
+    project = tomllib.loads(
+        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
+    )["project"]
+    requirements = [
+        requirement
+        for requirement in project["dependencies"]
+        if requirement.split("@", 1)[0].strip() == "openimcc"
+    ]
+    assert len(requirements) == 1
+    return project, requirements[0]
+
+
 def test_recorded_openimcc_pin_matches_pyproject_dependency() -> None:
     # The refusal remedies cite OPENIMCC_RECORDED_PIN; it must name the same openimcc
     # commit that pyproject installs, so a remedy can never point at a revision that
     # lacks the features the code requires. openimcc is a core dependency, and the
     # `imcc` extra is kept empty only so existing ".[imcc]" installs still resolve.
-    import tomllib
-    from pathlib import Path
-
     from simulator.melt_backend.openimcc_bridge import OPENIMCC_RECORDED_PIN
 
-    pyproject = tomllib.loads(
-        (Path(__file__).resolve().parents[1] / "pyproject.toml").read_text()
-    )["project"]
-    openimcc_requirements = [
-        requirement
-        for requirement in pyproject["dependencies"]
-        if requirement.split("@", 1)[0].strip() == "openimcc"
-    ]
-    assert openimcc_requirements == [OPENIMCC_RECORDED_PIN]
+    pyproject, openimcc_requirement = _pyproject_openimcc_dependency()
+    assert openimcc_requirement == OPENIMCC_RECORDED_PIN
     assert pyproject["optional-dependencies"]["imcc"] == []
+
+
+def test_imported_openimcc_is_the_pyproject_pin() -> None:
+    from importlib import metadata
+
+    import openimcc
+
+    _project, dependency = _pyproject_openimcc_dependency()
+    pinned_commit = dependency.rsplit("@", 1)[-1]
+    assert len(pinned_commit) == 40
+    assert pinned_commit == "7cf98e62812b6a338158f6c7568e6f373c473056"
+
+    distribution = metadata.distribution("openimcc")
+    direct_url = distribution.read_text("direct_url.json")
+    assert direct_url is not None, "openimcc direct_url.json is required to verify the pin"
+    installation = json.loads(direct_url)
+    assert isinstance(installation, dict)
+    vcs_info = installation.get("vcs_info")
+    assert isinstance(vcs_info, dict)
+    assert vcs_info.get("commit_id") == pinned_commit
+
+    distribution_root = Path(distribution.locate_file("")).resolve()
+    imported_path = Path(openimcc.__file__).resolve()
+    assert imported_path.is_relative_to(distribution_root), (
+        f"imported openimcc at {imported_path} is outside {distribution_root}"
+    )
 
 
 def test_imported_openimcc_commit_comes_from_its_distribution(monkeypatch, tmp_path) -> None:
@@ -1419,8 +1450,227 @@ def test_evaluate_cache_request_names_selected_default_pack(monkeypatch) -> None
     assert requests[0][1]["pack"] == "published-ext"
 
 
-# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
-@pytest.mark.engine_cache_off
+def test_evaluate_bridge_notices_are_json_serializable(monkeypatch) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    notice = SimpleNamespace(code="melt_notice", detail="coded by openimcc")
+    package_labels = SimpleNamespace(
+        identity={"model_id": "test-model", "datapack_version": "test-version"},
+        coverage={},
+        envelope_status="inside",
+        flags=(),
+        notices=(notice,),
+        acid_sink_ratio=None,
+    )
+    package_result = SimpleNamespace(
+        parent_oxides=(), parent_activity=(), labels=package_labels,
+        extrapolated=False,
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            evaluate=lambda *_args, **_kwargs: package_result,
+            __version__="test-version",
+        ),
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_load_pack",
+        lambda _name: SimpleNamespace(binding_digest="test-digest"),
+    )
+
+    result = openimcc_bridge._evaluate_uncached(
+        composition_mol={"SiO2": 1.0}, temperature_K=1700.0
+    )
+
+    assert result.notices == (str(notice),)
+    assert result.labels.notices == result.notices
+    assert json.loads(json.dumps(result.notices)) == [str(notice)]
+
+
+def test_evaluate_preserves_boolean_temperature_for_openimcc_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    observed = []
+
+    class UpstreamRefusal(Exception):
+        pass
+
+    def evaluate(_composition, temperature_K, *_args, **_kwargs):
+        observed.append(temperature_K)
+        raise UpstreamRefusal("boolean temperatures are invalid")
+
+    monkeypatch.setattr(
+        openimcc_bridge, "_openimcc", SimpleNamespace(evaluate=evaluate)
+    )
+    monkeypatch.setattr(openimcc_bridge, "_load_pack", lambda _name: object())
+
+    with pytest.raises(UpstreamRefusal, match="boolean temperatures"):
+        openimcc_bridge._evaluate_uncached(
+            composition_mol={"SiO2": 1.0}, temperature_K=True
+        )
+
+    assert observed == [True]
+
+
+def test_gas_oxygen_balance_preserves_boolean_temperature_for_openimcc_refusal(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator.melt_backend import openimcc_bridge
+
+    observed = []
+
+    class UpstreamRefusal(Exception):
+        pass
+
+    def solve(_activities, temperature_K, _datapack, **_kwargs):
+        observed.append(temperature_K)
+        raise UpstreamRefusal("boolean temperatures are invalid")
+
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(evaluate_gas_oxygen_balance=solve),
+    )
+
+    with pytest.raises(UpstreamRefusal, match="boolean temperatures"):
+        openimcc_bridge.evaluate_gas_oxygen_balance({}, True, object())
+
+    assert observed == [True]
+
+
+def test_species_thermo_cache_request_covers_native_inputs(monkeypatch) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    calls = []
+    props = SimpleNamespace(
+        Cp_J_molK=42.0,
+        S_J_molK=20.0,
+        H_app_kJ_mol=3.0,
+        G_J_mol=400.0,
+        source_row_id="JANAF-FeO-gas",
+        source_table_id="gas-janaf-4th",
+        T_interval=(298.15, 6000.0),
+        T_min=298.15,
+        T_max=6000.0,
+        derivatives_fit_implied=False,
+        extrapolated=True,
+        declared_interval_K=(298.15, 6000.0),
+        continuation="Shomate fit continued above its declared interval",
+        authority="JANAF source row",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            load_gas_datapack=lambda: "default-gas-datapack",
+            species_thermo=lambda species, phase, temperature_K, datapack, *, allow_extrapolation: (
+                calls.append(
+                    (species, phase, temperature_K, datapack, allow_extrapolation)
+                )
+                or props
+            ),
+        ),
+    )
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+    requests = []
+
+    def cache_call(engine, request, solve):
+        requests.append((engine, request))
+        return engine_cache.live_hot(solve())
+
+    monkeypatch.setattr(engine_cache, "cached_engine_call", cache_call)
+
+    result = openimcc_bridge.species_thermo(
+        "FeO", "g", 6001.0, allow_extrapolation=True
+    )
+
+    assert result["source_row_id"] == "JANAF-FeO-gas"
+    assert result["extrapolated"] is True
+    assert result["T_interval"] == [298.15, 6000.0]
+    assert result["declared_interval_K"] == [298.15, 6000.0]
+    assert result["continuation"] == "Shomate fit continued above its declared interval"
+    assert result["authority"] == "JANAF source row"
+    assert calls == [("FeO", "g", 6001.0, "default-gas-datapack", True)]
+    assert requests == [
+        (
+            "openimcc",
+            {
+                "call": "species_thermo",
+                "species": "FeO",
+                "phase": "g",
+                "T_K": 6001.0,
+                "datapack": "default",
+                "allow_extrapolation": True,
+            },
+        )
+    ]
+
+
+def test_species_thermo_hot_shape_is_cacheable(tmp_path, monkeypatch) -> None:
+    from simulator import engine_cache
+    from simulator.melt_backend import openimcc_bridge
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "cache.sqlite"))
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "laptop")
+    monkeypatch.delenv("REGOLITH_ENGINE_CACHE_MODE", raising=False)
+    engine_cache._close_connections()
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    native_calls = []
+    props = SimpleNamespace(
+        Cp_J_molK=42.0,
+        S_J_molK=20.0,
+        H_app_kJ_mol=3.0,
+        G_J_mol=400.0,
+        source_row_id="JANAF-FeO-gas",
+        source_table_id="gas-janaf-4th",
+        T_interval=(298.15, 6000.0),
+        T_min=298.15,
+        T_max=6000.0,
+        derivatives_fit_implied=False,
+        extrapolated=True,
+        declared_interval_K=(298.15, 6000.0),
+        continuation="Shomate fit continued above its declared interval",
+        authority="JANAF source row",
+    )
+    monkeypatch.setattr(
+        openimcc_bridge,
+        "_openimcc",
+        SimpleNamespace(
+            load_gas_datapack=lambda: "default-gas-datapack",
+            species_thermo=lambda *_args, **_kwargs: (
+                native_calls.append(True) or props
+            ),
+        ),
+    )
+    monkeypatch.setattr(engine_cache, "record_engine_open", lambda *_args: None)
+
+    try:
+        cold = openimcc_bridge.species_thermo(
+            "FeO", "g", 6001.0, allow_extrapolation=True
+        )
+        warm = openimcc_bridge.species_thermo(
+            "FeO", "g", 6001.0, allow_extrapolation=True
+        )
+        counts = engine_cache.engine_cache_counters()["openimcc"]
+    finally:
+        engine_cache._close_connections()
+        engine_cache._MEMORY_CACHE.clear()
+        engine_cache.engine_cache_counters(reset=True)
+
+    assert cold["T_interval"] == [298.15, 6000.0]
+    assert cold["declared_interval_K"] == [298.15, 6000.0]
+    assert warm == cold
+    assert native_calls == [True]
+    assert counts["stores"] == 1
+    assert counts["hits"] == 1
+
+
 def test_redox_result_keeps_its_type_across_cache_round_trip(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1473,6 +1723,8 @@ def test_redox_result_keeps_its_type_across_cache_round_trip(
     }
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_candidate_redox_pack_keeps_the_raw_valence_amounts(
@@ -1560,6 +1812,12 @@ def test_openimcc_canonical_predictions_match_chemistry_version_pin(
         canonical_json_dumps(predictions).encode("ascii")
     ).hexdigest()
 
+    # Pin-port comparison: 38,482 values at 9c327c2 versus 979adb2 had zero
+    # numeric changes. Digest moved
+    # 95491c859bfde965707a441e0598bdd38bee327b2099229dbf3ead253f750547
+    # -> 2bec587e444805a7bd6ec091308c00c88840357191d2e3d27dfee37fc99581af.
+    # OpenIMCC's 9c327c2..979adb2 bisect found zero numeric changes across
+    # four text/identity commits, including c75456f's default redox-pack reissue.
     assert digest == engine_cache.OPENIMCC_CANONICAL_OUTPUT_SHA256, (
         "OpenIMCC predictions changed: bump ENGINE_CHEMISTRY_VERSION[openimcc] "
         "and re-pin"

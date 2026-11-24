@@ -21,6 +21,7 @@ from simulator.chemistry.kernel.dto import (
     LedgerTransitionProposal,
 )
 from simulator.chemistry.kernel.provider import ChemistryProvider
+from simulator.account_ids import OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
 from simulator.fe_redox import (
     floor_vacuum_pressure_bar,
     kress91_fe3_over_sigma_fe,
@@ -31,7 +32,6 @@ from simulator.fe_redox import (
 
 CLEANED_MELT_ACCOUNT = "process.cleaned_melt"
 OXYGEN_ACCOUNT = "process.overhead_gas"
-FO2_BUFFER_ACCOUNT = "reservoir.fo2_buffer"
 OXYGEN_SPECIES = "O2"
 OXYGEN_SOURCE_OVERHEAD = "overhead_gas"
 OXYGEN_SOURCE_FO2_BUFFER = "fo2_buffer"
@@ -67,7 +67,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
     DECLARED_ACCOUNTS = frozenset({
         CLEANED_MELT_ACCOUNT,
         OXYGEN_ACCOUNT,
-        FO2_BUFFER_ACCOUNT,
+        OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT,
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -88,7 +88,6 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         """
 
         from simulator.accounting.formulas import resolve_species_formula
-
         wrong_intent = reject_wrong_intent(
             request,
             ChemistryIntent.FE_REDOX_RESPECIATION,
@@ -115,7 +114,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
         if not math.isfinite(internal_o2_capacity_mol):
             raise ValueError("internal_o2_capacity_mol must be finite")
         o2_account = (
-            FO2_BUFFER_ACCOUNT
+            OXYGEN_RESERVOIR_FO2_BUFFER_ACCOUNT
             if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES
             else OXYGEN_ACCOUNT
         )

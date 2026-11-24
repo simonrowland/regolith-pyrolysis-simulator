@@ -72,7 +72,7 @@ OPENIMCC_INSTALL_HINT = (
 )
 OPENIMCC_RECORDED_PIN = (
     "openimcc @ git+https://github.com/simonrowland/openimcc"
-    "@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
+    "@7cf98e62812b6a338158f6c7568e6f373c473056"
 )
 DEFAULT_GAS_PACK_SELECTION = "default"
 
@@ -434,6 +434,7 @@ class OpenImccRedoxResult:
     extrapolated_redox_rows: tuple[str, ...]
     active_row_band_intersection_K: tuple[float, float]
     redox_pack_digest: str
+    melt_pack_binding_digest: str | None = None
 
     def lean(self) -> dict[str, Any]:
         return {
@@ -448,6 +449,7 @@ class OpenImccRedoxResult:
             "extrapolated_redox_rows": self.extrapolated_redox_rows,
             "active_row_band_intersection_K": self.active_row_band_intersection_K,
             "redox_pack_digest": self.redox_pack_digest,
+            "melt_pack_binding_digest": self.melt_pack_binding_digest,
         }
 
     def to_hot(self) -> Any:
@@ -459,16 +461,18 @@ class OpenImccRedoxResult:
             values["parent_activity"], values["ferric_fe_mol"], values["ferrous_fe_mol"],
             values["metal_buffered"], values["flags"], values["extrapolated_redox_rows"],
             values["active_row_band_intersection_K"], Provenance(values["redox_pack_digest"]),
+            Provenance(values["melt_pack_binding_digest"]),
         ])
 
     @classmethod
     def from_hot(cls, payload: Any) -> OpenImccRedoxResult:
-        if not isinstance(payload, list) or len(payload) != 11:
+        if not isinstance(payload, list) or len(payload) != 12:
             raise ValueError("invalid OpenIMCC redox HOT shape")
         return cls.from_lean(dict(zip((
             "temperature_K", "mode", "lambda_ln_f_o2", "parent_activity",
             "ferric_fe_mol", "ferrous_fe_mol", "metal_buffered", "flags",
             "extrapolated_redox_rows", "active_row_band_intersection_K", "redox_pack_digest",
+            "melt_pack_binding_digest",
         ), payload)))
 
     @classmethod
@@ -491,10 +495,31 @@ class OpenImccRedoxResult:
                 float(value) for value in payload["active_row_band_intersection_K"]
             ),
             redox_pack_digest=str(payload["redox_pack_digest"]),
+            melt_pack_binding_digest=(
+                str(payload["melt_pack_binding_digest"])
+                if isinstance(payload.get("melt_pack_binding_digest"), str)
+                and payload["melt_pack_binding_digest"]
+                else None
+            ),
         )
 
     @classmethod
     def from_engine_result(cls, result: Any) -> OpenImccRedoxResult:
+        melt_pack_binding_digest = getattr(
+            result, "melt_pack_binding_digest", None
+        )
+        if not isinstance(melt_pack_binding_digest, str) or not melt_pack_binding_digest:
+            receipt = getattr(result, "receipt", None)
+            data_digests = (
+                receipt.get("data_digests")
+                if isinstance(receipt, Mapping)
+                else getattr(receipt, "data_digests", None)
+            )
+            melt_pack_binding_digest = (
+                data_digests.get("melt")
+                if isinstance(data_digests, Mapping)
+                else None
+            )
         return cls(
             temperature_K=float(result.temperature_K),
             mode=str(result.mode),
@@ -513,6 +538,12 @@ class OpenImccRedoxResult:
                 float(value) for value in result.active_row_band_intersection_K
             ),
             redox_pack_digest=str(result.redox_pack_digest),
+            melt_pack_binding_digest=(
+                melt_pack_binding_digest
+                if isinstance(melt_pack_binding_digest, str)
+                and melt_pack_binding_digest
+                else None
+            ),
         )
 
 
@@ -579,6 +610,12 @@ def _require_openimcc() -> Any:
     return _openimcc
 
 
+def _openimcc_temperature_argument(temperature_K: float) -> Any:
+    """Keep bools intact so OpenIMCC can issue its typed invalid-input refusal."""
+
+    return temperature_K if isinstance(temperature_K, bool) else float(temperature_K)
+
+
 def evaluate_gas_oxygen_balance(
     parent_activities: Mapping[str, float],
     temperature_K: float,
@@ -603,7 +640,7 @@ def evaluate_gas_oxygen_balance(
         raise error from exc
     return solver(
         parent_activities,
-        float(temperature_K),
+        _openimcc_temperature_argument(temperature_K),
         datapack,
         parent_oxides=parent_oxides,
         allow_extrapolation=True,
@@ -1123,7 +1160,7 @@ def _evaluate_uncached(
     loaded_pack = _load_pack(pack)
     result = package.evaluate(
         composition,
-        float(temperature_K),
+        _openimcc_temperature_argument(temperature_K),
         loaded_pack,
         basis_type=basis_type,
         enable_sp_extension=pack in {"published-ext", "d066-ext"},
@@ -1173,13 +1210,17 @@ def _evaluate_uncached(
             },
         }
     package_labels = result.labels
+    # OpenIMCC 7cf98e62 returns coded melt notices rather than the strings
+    # exposed by the prior package contract. Keep the bridge's existing
+    # simulator-owned notice shape JSON-safe at this boundary.
+    notices = tuple(str(notice) for notice in package_labels.notices)
     labels = ImccAdapterLabels(
         identity=package_labels.identity,
         coverage=package_labels.coverage,
         trust="internal-analytical",
         envelope_status=package_labels.envelope_status,
         flags=tuple(package_labels.flags),
-        notices=tuple(package_labels.notices),
+        notices=notices,
         acid_sink_ratio=(
             None
             if package_labels.acid_sink_ratio is None
@@ -1191,7 +1232,7 @@ def _evaluate_uncached(
         parent_oxide_activities=activities,
         parent_oxides=parent_oxides,
         flags=tuple(labels.flags),
-        notices=tuple(labels.notices),
+        notices=notices,
         acid_sink_ratio=(
             None if labels.acid_sink_ratio is None else float(labels.acid_sink_ratio)
         ),
@@ -1450,6 +1491,102 @@ def evaluate_gas(
     return payload
 
 
+
+def species_thermo(
+    species: str,
+    phase: str,
+    temperature_K: float,
+    *,
+    allow_extrapolation: bool = False,
+) -> dict[str, Any]:
+    """Cached, JSON-safe view of OpenIMCC's selected pure-species function."""
+
+    from simulator.engine_cache import (
+        EngineCacheValue,
+        cached_engine_call,
+        record_engine_open,
+    )
+
+    module = _require_openimcc()
+    record_engine_open("openimcc")
+    request = {
+        "call": "species_thermo",
+        "species": species,
+        "phase": phase,
+        "T_K": float(temperature_K),
+        "datapack": DEFAULT_GAS_PACK_SELECTION,
+        "allow_extrapolation": allow_extrapolation,
+    }
+
+    def solve() -> EngineCacheValue:
+        datapack = module.load_gas_datapack()
+        props = module.species_thermo(
+            species,
+            phase,
+            float(temperature_K),
+            datapack=datapack,
+            allow_extrapolation=allow_extrapolation,
+        )
+        source_row_id = getattr(props, "source_row_id", None)
+        source_table_id = getattr(props, "source_table_id", None)
+        interval = getattr(props, "T_interval", None)
+        declared_interval = getattr(props, "declared_interval_K", None)
+        return EngineCacheValue(
+            {
+                "Cp_J_molK": getattr(props, "Cp_J_molK", None),
+                "S_J_molK": getattr(props, "S_J_molK", None),
+                "H_app_kJ_mol": getattr(props, "H_app_kJ_mol", None),
+                "G_J_mol": getattr(props, "G_J_mol", None),
+                "source_row_id": source_row_id,
+                "source_table_id": source_table_id,
+                "T_interval": (
+                    list(interval)
+                    if isinstance(interval, (tuple, list))
+                    else None
+                ),
+                "declared_interval_K": (
+                    list(declared_interval)
+                    if isinstance(declared_interval, (tuple, list))
+                    else None
+                ),
+                "T_min": getattr(props, "T_min", None),
+                "T_max": getattr(props, "T_max", None),
+                "derivatives_fit_implied": getattr(
+                    props, "derivatives_fit_implied", None
+                ),
+                "extrapolated": getattr(props, "extrapolated", None),
+                "continuation": getattr(props, "continuation", None),
+                "authority": getattr(props, "authority", None),
+            }
+        )
+
+    return dict(cached_engine_call("openimcc", request, solve))
+
+
+def _species_thermo_crystal_declared_interval(
+    species: str,
+    temperature_K: float,
+) -> tuple[float, float]:
+    """Return the interval of the OpenIMCC-selected crystal thermo row."""
+
+    module = _require_openimcc()
+    # OpenIMCC 979adb2's crystal no-continuation error omitted its selected
+    # interval. bae51f7's ImccGasTemperatureOutsideDomainError carries
+    # declared_interval_K. This helper still reads the private selector;
+    # switching it to that attribute is outside this re-pin. OpenIMCC was
+    # asked on 2026-11-19 to put the interval on the error.
+    row = module.gas._oxide_row_for_T(
+        module.load_gas_datapack().oxide_df,
+        f"{species}(cr)",
+        float(temperature_K),
+        allow_extrapolation=True,
+    )
+    low = float(row["T_min"])
+    high = float(row["T_max"])
+    if not math.isfinite(low) or not math.isfinite(high) or low > high:
+        raise ValueError("OpenIMCC selected crystal row has an invalid interval")
+    return low, high
+
 def evaluate_redox(
     inventory: Mapping[str, float],
     temperature_K: float,
@@ -1463,6 +1600,7 @@ def evaluate_redox(
     from simulator.engine_cache import cached_engine_call, record_engine_open
 
     record_engine_open("openimcc")
+    melt_pack_binding_digest = _pack_digest(_load_pack("default"))
 
     if redox_pack_path is not None:
         # The candidate Cr/Ti pack exposes valence amounts that the established
@@ -1482,6 +1620,7 @@ def evaluate_redox(
         "temperature_K": temperature_K,
         "mode": mode,
         "lambda_imposed": lambda_imposed,
+        "melt_pack_binding_digest": melt_pack_binding_digest,
     }
 
     def solve() -> Any:
