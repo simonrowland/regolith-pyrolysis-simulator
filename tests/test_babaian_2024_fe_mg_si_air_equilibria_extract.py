@@ -203,7 +203,9 @@ def test_every_typed_liquid_component_migrates_as_a_point_with_identity_and_cond
             assert observation.uncertainty.kind is UncertaintyKind.NONE
         if row["table"] == "2":
             # This paper's own runs: the air-pressure gap is the only notice.
-            assert other_notices == []
+            assert {notice.kind for notice in other_notices} == {
+                NoticeKind.PHASE_INFERRED
+            }
         else:
             # Values the paper quotes from its references may carry admission_status
             # quoted_attributed; the legacy-token mapping admits those with one notice naming

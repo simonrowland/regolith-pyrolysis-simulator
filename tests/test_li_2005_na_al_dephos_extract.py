@@ -157,8 +157,13 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
     metal_p = _row(result, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "P", "1", "1-1")
     assert metal_p.value.point == Decimal("0.00245")
     assert metal_p.identity.subtype.value == "wt_percent"
-    assert metal_p.identity.species.phase.is_unknown
-    assert "post-quench phase" in metal_p.identity.species.phase.reason
+    assert metal_p.identity.species.phase.value is Phase.UNSPECIFIED
+    assert {notice.kind.value for notice in metal_p.notices} == {"phase_inferred"}
+    assert "post-quench phase" in next(
+        notice.reason
+        for notice in metal_p.notices
+        if notice.kind.value == "phase_inferred"
+    )
     metal_o = _row(result, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "O", "1", "1-1")
     assert metal_o.value.point == Decimal("0.0862")
     slag_na2o = _row(result, Quantity.EQUILIBRIUM_PHASE_COMPOSITION, "Na2O", "1", "1-1")

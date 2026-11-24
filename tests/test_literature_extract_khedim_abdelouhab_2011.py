@@ -147,7 +147,10 @@ def test_context_tables_and_deferred_figures_survive_isolated_migration():
     }
     assert quoted_composition.locator.page == 10
     assert quoted.evidence.class_.value.value == "quoted_attributed"
-    assert not quoted.notices
+    assert {notice.kind.value for notice in quoted.notices} == {
+        "phase_inferred",
+        "method_unstated",
+    }
     assert quoted.locator.page == 10
     assert quoted.locator.pdf_page_index == 9
 

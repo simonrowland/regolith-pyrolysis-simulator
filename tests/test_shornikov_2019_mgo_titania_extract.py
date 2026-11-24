@@ -1081,7 +1081,7 @@ def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
                 ("unsupported", "engine-thermo-does-not-emit"): 23,
                 ("identity_incomplete", "solid_liquid_reference_conversion_missing_input"): 10,
                 ("identity_mismatch", "identity-mismatch-element-reference-phase"): 1,
-                ("method_unknown", "method_unknown"): 1,
+                ("identity_incomplete", "printed_solid_reference_above_melting"): 1,
             },
         ),
         "shornikov-2011-cao-mgo-alumina-melts": (
@@ -1170,6 +1170,14 @@ def test_condensed_element_frame_uses_production_predictions_or_typed_refusals(
                 residual.refusal.reason.value,
                 residual.refusal.detail.get("reason"),
             )
+            if key == (
+                "identity_incomplete",
+                "printed_solid_reference_above_melting",
+            ):
+                assert any(
+                    notice.kind is NoticeKind.METHOD_UNSTATED
+                    for notice in row.notices
+                )
             refusals[key] = refusals.get(key, 0) + 1
 
         expected_rows, expected_numeric_ids, expected_refusals = expected[source_id]

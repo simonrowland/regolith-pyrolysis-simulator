@@ -338,13 +338,23 @@ def test_all_scored_rows_migrate_as_points_with_printed_conditions() -> None:
     migrated = migrator.result.observations
     assert len(migrated) == len(source_rows)
     assert not migrator.result.registry_issues
+    experiment_methods = {
+        experiment["experiment_id"]: experiment.get("method") or {}
+        for experiment in document["experiments"]
+    }
 
     for container, raw in source_rows:
         values = raw["values"]
         observation = migrated[f"{SOURCE_ID}::{raw['observation_id']}"]
         quantity = values["quantity"]
         assert observation.value.kind is ValueKind.POINT, raw["observation_id"]
-        assert not observation.notices, raw["observation_id"]
+        method = experiment_methods[raw["experiment"]]
+        expected_notice_kinds = (
+            {"method_unstated"} if method.get("tag") != "value" else set()
+        )
+        assert {
+            notice.kind.value for notice in observation.notices
+        } == expected_notice_kinds, raw["observation_id"]
         raw_conditions = values.get("point_conditions", raw.get("point_conditions", {}))
         if quantity == "equilibrium_phase_composition":
             expected_value = Decimal(str(values["component_amount"]))

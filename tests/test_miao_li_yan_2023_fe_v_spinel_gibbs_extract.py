@@ -139,7 +139,9 @@ def test_all_typed_values_migrate_as_points_with_species_temperature_and_conditi
         values = raw["values"]
         observation = migrated[f"{SOURCE_ID}::{raw['observation_id']}"]
         assert observation.value.kind is ValueKind.POINT, raw["observation_id"]
-        assert not observation.notices, raw["observation_id"]
+        assert {notice.kind.value for notice in observation.notices} == {
+            "method_unstated"
+        }, raw["observation_id"]
         assert observation.identity.species.formula == str(values.get("formula") or container)
         if values["quantity"] == "equilibrium_phase_composition":
             assert observation.value.point == Decimal(str(values["component_amount"]))

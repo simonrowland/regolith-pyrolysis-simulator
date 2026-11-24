@@ -195,7 +195,10 @@ def test_every_typed_row_migrates_as_its_printed_point_with_identity_and_conditi
     for raw in typed:
         observation = migrated.observations[source_prefix + raw["observation_id"]]
         assert observation.value.kind.value == "point"
-        assert observation.notices == ()
+        assert {notice.kind.value for notice in observation.notices} == {
+            "phase_inferred",
+            "method_unstated",
+        }
         assert observation.identity.species.formula == raw["values"]["formula"]
         assert observation.value.point == stored_amount(raw)
         assert observation.identity.temperature_K.value == Decimal(str(raw["values"]["T_K"]))

@@ -16,6 +16,7 @@ import pytest
 import yaml
 
 from simulator.battery.enums import (
+    NoticeKind,
     QUANTITY_UNITS,
     Phase,
     Quantity,
@@ -877,7 +878,11 @@ def test_janaf_extract_ideal_gas_maps_only_for_that_source(tmp_path: Path) -> No
         obs for obs in other.observations.values() if "ideal_gas_row" in obs.observation_id
     ]
     assert other_rows
-    assert all(obs.identity.species.phase.is_unknown for obs in other_rows)
+    assert all(
+        obs.identity.species.phase.value is Phase.UNSPECIFIED
+        and {notice.kind for notice in obs.notices} == {NoticeKind.PHASE_INFERRED}
+        for obs in other_rows
+    )
     assert any(
         "ideal_gas_row" in entry.observation_id and "phase" in entry.axes
         for entry in other.queue

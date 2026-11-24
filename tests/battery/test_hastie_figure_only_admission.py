@@ -297,7 +297,7 @@ def test_hastie_fig4_rows_refuse_when_method_and_pressure_sum_are_missing(
                 if check.name == "in_cell_partial_pressure_sum"
             )
             assert not gates.passed
-            assert gates.reason is RefusalReason.METHOD_UNKNOWN
+            assert gates.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED
             assert gates.primary_check == "in_cell_partial_pressure_sum"
             assert [
                 check.name for check in gates.checks if not check.passed
@@ -406,4 +406,4 @@ def test_hastie_evidence_unknown_pressure_keeps_method_unknown_refusal(
 
     assert residual.numeric is None
     assert residual.refusal is not None
-    assert residual.refusal.reason is RefusalReason.METHOD_UNKNOWN
+    assert residual.refusal.reason is RefusalReason.EFFUSION_REGIME_UNVERIFIED

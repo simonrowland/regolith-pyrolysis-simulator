@@ -345,7 +345,12 @@ def test_isolated_migration_reaches_temperature_on_every_row():
         for row in activities
     )
     assert all(
-        result.experiments[row.experiment_id].method.is_unknown
+        result.experiments[row.experiment_id].method.value
+        is MethodToken.UNSPECIFIED
+        for row in curves
+    )
+    assert all(
+        {notice.kind.value for notice in row.notices} == {"method_unstated"}
         for row in curves
     )
 

@@ -121,7 +121,9 @@ def test_isolated_migration_scores_all_table_ii_components_and_conditions():
             assert argon.locator.page == 11
             assert observation.locator.page == 11
             assert observation.locator.pdf_page_index == 10
-            assert not observation.notices
+            assert {notice.kind.value for notice in observation.notices} == {
+                "phase_inferred"
+            }
             assert "fO2_log" not in observation.point_conditions
     assert len(experiment_ids_by_sample) == 21
     assert all(len(experiment_ids) == 1 for experiment_ids in experiment_ids_by_sample.values())

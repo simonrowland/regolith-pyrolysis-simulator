@@ -95,7 +95,8 @@ def test_liquidus_and_solidus_identities_stay_as_migrated(tmp_path: Path) -> Non
     )
     assert solidus.identity.subtype.value == "solidus"
     assert solidus.identity.species.formula == "MgO-FeO_melt"
-    assert solidus.identity.species.phase.is_unknown
+    assert solidus.identity.species.phase.value is Phase.UNSPECIFIED
+    assert {notice.kind.value for notice in solidus.notices} == {"phase_inferred"}
     assert solidus.identity.composition.is_unknown
     # The source prints the binary FeO mol-% axis for this Figure 1 point
     # (13 mol % FeO, 87 mol % MgO). It is unavailable because that basis is

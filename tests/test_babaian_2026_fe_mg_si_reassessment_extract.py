@@ -212,7 +212,10 @@ def test_every_typed_component_migrates_with_its_formula_conditions_and_point() 
             assert observation.uncertainty.verbatim["units"] == "mol.%"
         else:
             assert observation.uncertainty.kind is UncertaintyKind.NONE
-        assert not observation.notices
+        assert {notice.kind.value for notice in observation.notices} == {
+            "phase_inferred",
+            "method_unstated",
+        }
 
         experiment_id = expected_experiments.setdefault(row["experiment"], observation.experiment_id)
         assert observation.experiment_id == experiment_id

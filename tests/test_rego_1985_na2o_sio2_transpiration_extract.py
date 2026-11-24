@@ -247,10 +247,10 @@ def test_isolated_migration_binds_rendered_rows_and_refuses_only_the_input_bundl
         f"{SID}::rego_1985_table1_run_{run:02d}_inputs" for run in range(1, 32)
     }
     assert unavailable == expected_inputs
-    assert len(result.queue) == 93
+    assert len(result.queue) == 62
     assert {entry.observation_id for entry in result.queue} == expected_inputs
     assert Counter(axis for entry in result.queue for axis in entry.axes) == Counter(
-        {"quantity": 31, "method": 31, "value": 31}
+        {"quantity": 31, "value": 31}
     )
     print(
         "isolated migration:",

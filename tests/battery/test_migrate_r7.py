@@ -401,7 +401,11 @@ def test_g2_plante_source_points_and_comparison_fence(tmp_path):
         not any(notice.kind is NoticeKind.ADMISSION_DEFAULTED for notice in observation.notices)
         for observation in buckets["superseded"]
     )
-    assert all(not observation.notices for observation in buckets["superseded"])
+    assert all(
+        {notice.kind for notice in observation.notices}
+        == {NoticeKind.METHOD_UNSTATED}
+        for observation in buckets["superseded"]
+    )
     assert len(measured) == 383
     assert all(
         observation.identity.species.phase.is_value
@@ -1031,7 +1035,10 @@ def test_b2131_formation_gibbs_cells_land_at_printed_temperature(tmp_path):
         (Decimal("298.15"), Decimal("77.1"))
     ]
     assert point_magnitude(silver_ion[0].value) == Decimal("77.1")
-    assert silver_ion[0].identity.species.phase.is_unknown
+    assert silver_ion[0].identity.species.phase.value is Phase.UNSPECIFIED
+    assert {notice.kind for notice in silver_ion[0].notices} == {
+        NoticeKind.PHASE_INFERRED
+    }
 
     silver = _delta_fg_observations(result, source, "reference-p005-01")
     assert len(silver) == 1
@@ -1116,7 +1123,7 @@ def test_b2131_formation_gibbs_migration_serialization_is_pinned(tmp_path):
     # p007-13 are typed unavailable. These are source-page grounded changes.
     assert _b2131_formation_observation_serialization(tmp_path) == (
         945,
-        "13187d096dd3ffcc4079d147484c31edbfb8e432be9f2def01393a4cf1a2c2d7",
+        "0fcdba3fd3b745b357549f8c3c20c717b524ce04b0f8d4367a12eeb823218b43",
     )
 
 

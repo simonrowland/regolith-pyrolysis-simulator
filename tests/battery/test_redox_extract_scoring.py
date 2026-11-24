@@ -314,7 +314,9 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         assert backlog["admission_defaulted"] == 18
         assert backlog["total_iron_reported_as_feo"] == 18
     assert all(
-        not score_module.flagged_strata(residual.notices) for residual in residuals
+        score_module.flagged_strata(residual.notices)
+        == ("method_unstated", "proposed-policy")
+        for residual in residuals
     )
     assert not any(residual.score_eligible for residual in residuals)
 
@@ -1079,7 +1081,7 @@ def test_borisov_2018_rows_reach_redox_scoring_population():
     assert (
         measured_unknown["certified_numeric"],
         measured_unknown["flagged_numeric"],
-    ) == (0, 10)
+    ) == (0, 404)
     assert not any(
         row.get("source_relation") == "training" and row.get("candidates")
         for row in measured_rows
