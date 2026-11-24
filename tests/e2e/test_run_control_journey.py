@@ -17,6 +17,7 @@ Does not wait for Complete: the default recipe refuses at C4
 from __future__ import annotations
 
 import json
+import time
 
 import pytest
 
@@ -172,6 +173,7 @@ def test_pause_resume_cancel_restart_journey(page, evidence, artifacts_dir):
     except PlaywrightTimeoutError:
         fail_now("5-pause", "#btn-pause never enabled after the run advanced")
     log_before_pause = socket_log_count(page)
+    pause_requested_at = time.perf_counter()
     click_pause(page)
     try:
         pause_payload = wait_for_socket_event(
@@ -193,6 +195,7 @@ def test_pause_resume_cancel_restart_journey(page, evidence, artifacts_dir):
             "5-pause",
             f"paused ack was for run_id={pause_payload.get('run_id')!r}, expected {first_run_id!r}",
         )
+    pause_ack_latency_ms = (time.perf_counter() - pause_requested_at) * 1000
     try:
         expect(page.locator("#btn-pause")).to_be_disabled(timeout=STATUS_CHANGE_MS)
         expect(page.locator("#btn-resume")).to_be_enabled(timeout=STATUS_CHANGE_MS)
@@ -202,7 +205,8 @@ def test_pause_resume_cancel_restart_journey(page, evidence, artifacts_dir):
     record(
         "5-pause",
         True,
-        f"server answered 'paused' run_id={pause_payload.get('run_id')}; "
+        f"server answered 'paused' run_id={pause_payload.get('run_id')} in "
+        f"{pause_ack_latency_ms:.1f} ms; "
         "Pause disabled, Resume enabled, Start still disabled",
     )
 

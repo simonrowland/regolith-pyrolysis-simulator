@@ -687,13 +687,19 @@ def _emit_pending_pause_ack(socketio, sid: str, run_id: str) -> bool:
     """Acknowledge a pause once its current simulation step has settled."""
     with _simulations_guard:
         state = _simulations.get(sid)
+        pause_generation = (
+            state.get('pause_ack_generation') if state is not None else None
+        )
         if (
             state is None
             or state.get('run_id') != run_id
             or not state.get('running')
+            or not state.get('paused')
+            or state.get('pause_ack_pending_generation') != pause_generation
             or not state.pop('pause_ack_pending', False)
         ):
             return False
+        state.pop('pause_ack_pending_generation', None)
         socketio.emit(
             'simulation_status',
             _browser_socket_payload(
@@ -4182,19 +4188,26 @@ def register_events(socketio):
             if state is None or sid not in _sim_locks:
                 reject_control_without_active_run(sid, 'pause_simulation')
                 return
+            run_lock = _sim_locks[sid]
             if not state['running']:
                 reject_control_without_active_run(sid, 'pause_simulation')
                 return
             run_id = state['run_id']
             state['session'].pause()
             state['paused'] = True
+            pause_generation = int(state.get('pause_ack_generation', 0)) + 1
+            state['pause_ack_generation'] = pause_generation
             state['pause_ack_pending'] = True
-            loop_exited = state.get('loop_exited', False)
+            state['pause_ack_pending_generation'] = pause_generation
 
-        # The active loop emits at its next safe boundary. An already-parked
-        # loop has no boundary left to reach, so acknowledge it here.
-        if loop_exited:
-            _emit_pending_pause_ack(socketio, sid, run_id)
+        # If the worker is between steps, hold the step lock through the
+        # acknowledgement so it cannot start another step first. An in-flight
+        # step owns the lock and acknowledges at its post-step boundary.
+        if run_lock.acquire(blocking=False):
+            try:
+                _emit_pending_pause_ack(socketio, sid, run_id)
+            finally:
+                run_lock.release()
 
     @socketio.on('resume_simulation')
     def handle_resume(data=None):
@@ -4233,15 +4246,25 @@ def register_events(socketio):
                     },
                 )
                 return
-            state['session'].resume()
-            state['paused'] = False
-            _emit_if_current(
-                socketio,
-                sid,
-                run_id,
-                'simulation_status',
-                {'status': 'resumed'},
-            )
+            with _simulations_guard:
+                current = _simulations.get(sid)
+                if current is not state or current.get('run_id') != run_id:
+                    return
+                state['session'].resume()
+                state['paused'] = False
+                state['pause_ack_generation'] = int(
+                    state.get('pause_ack_generation', 0)
+                ) + 1
+                state['pause_ack_pending'] = False
+                state.pop('pause_ack_pending_generation', None)
+                socketio.emit(
+                    'simulation_status',
+                    _browser_socket_payload(
+                        'simulation_status',
+                        {'status': 'resumed', 'run_id': run_id},
+                    ),
+                    room=sid,
+                )
 
     @socketio.on('make_decision')
     def handle_decision(data):
