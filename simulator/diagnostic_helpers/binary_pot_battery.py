@@ -1762,16 +1762,14 @@ def _preserve_provider_notices_for_engine_cache(result: Any) -> Any:
     diagnostics["imcc_notices"] = existing_notices + [
         notice for notice in provider_notices if notice not in existing_notices
     ]
-    if any(
-        notice.get("authority") == AUTHORITY_EXTRAPOLATED
-        for notice in provider_notices
-    ):
-        diagnostics["authority"] = AUTHORITY_EXTRAPOLATED
     return result
 
 
 def engine_flags_from_result(
     result: Any,
+    *,
+    quantity: str | None = None,
+    species: str | None = None,
 ) -> tuple[list[dict[str, Any]], str | None, dict[str, Any] | None]:
     """Read the engine's own flag and all provider notices once.
 
@@ -1810,8 +1808,10 @@ def engine_flags_from_result(
 
     provider_notices = _provider_notice_flags_from_result(result)
     notices.extend(provider_notices)
-    if any(
+    if quantity is not None and any(
         row.get("authority") == AUTHORITY_EXTRAPOLATED
+        and _scope_matches(row.get("affected_quantities"), quantity)
+        and _scope_matches(row.get("affected_species"), species, species=True)
         for row in provider_notices
     ):
         authority = AUTHORITY_EXTRAPOLATED
@@ -1908,10 +1908,20 @@ def cell_score_authority(
     return str(authority or "bridge")
 
 
-def cell_score_notice_kinds(cell: Any) -> tuple[str, ...]:
+def cell_score_notice_kinds(
+    cell: Any,
+    *,
+    quantity: str | None = None,
+    species: str | None = None,
+) -> tuple[str, ...]:
     kinds: list[str] = []
     for row in getattr(cell, "notices", None) or []:
-        if isinstance(row, Mapping) and row.get("kind"):
+        if (
+            isinstance(row, Mapping)
+            and row.get("kind")
+            and _scope_matches(row.get("affected_quantities"), quantity)
+            and _scope_matches(row.get("affected_species"), species, species=True)
+        ):
             kinds.append(str(row["kind"]))
     return tuple(kinds)
 

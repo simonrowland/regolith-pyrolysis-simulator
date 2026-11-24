@@ -296,6 +296,68 @@ def _source_data():
     )
 
 
+def test_internal_hashimoto_keeps_fe_pressure_notice_cold_and_warm() -> None:
+    pytest.importorskip("openimcc")
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.migrate import Migrator
+    from simulator.battery.score import (
+        ScoreContext,
+        _hashimoto_residue_prediction,
+        quantity_token,
+    )
+
+    migrator = Migrator(ROOT)
+    migrator._migrate_extract(SOURCE)
+    context = ScoreContext(
+        works=migrator.result.works,
+        experiments=migrator.result.experiments,
+        observations=migrator.result.observations,
+        benches=migrator.result.benches,
+        root=ROOT,
+    )
+    reference = next(
+        row
+        for row in context.observations.values()
+        if row.source_id == "kems-015-hashimoto-1983"
+        and PRIMARY_TABLE3_PREFIX in row.observation_id
+        and row.identity.species.formula == "FeO"
+        and quantity_token(row.identity) is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    )
+    selected_run = frozenset({reference.experiment_id})
+    cache = {}
+    cold = _hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        cache,
+        test_experiment_ids=selected_run,
+    )
+    warm = _hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.INTERNAL_ANALYTICAL,
+        cache,
+        test_experiment_ids=selected_run,
+    )
+
+    assert cold.execution.state.value == "produced", cold.refusal_detail
+    raw_notices = cold.refusal_detail["engine_pressure_notices"]
+    assert any(
+        notice["affected_species"] == ["Fe"]
+        and notice["affected_quantities"] == ["p_partial"]
+        for notice in raw_notices
+    )
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    scored_notices = [notice for notice in cold.notices if reason in notice.reason]
+    assert len(scored_notices) == 1
+    assert scored_notices[0].affected_quantities == (
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+    )
+    assert "pressure species scope=Fe" in scored_notices[0].reason
+    assert warm.value == cold.value
+    assert warm.notices == cold.notices
+
+
 # PROVISIONAL CPU budget from the historical pre-fixture gate14 cohort cost:
 # 665 CPU s on Mac-Studio-256-3 (s3, loaded). The checked-in gate14 JUnit is
 # fixture-era (291.403 call CPU s / 354.982 wall s) and excludes that setup

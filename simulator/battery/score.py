@@ -12517,6 +12517,73 @@ def _predict_phase_row(
     )
 
 
+def _residue_engine_pressure_notices(
+    raw_notices: object,
+    dependent_quantity: Quantity,
+    *,
+    species_formula: str | None = None,
+) -> tuple[Notice, ...]:
+    from simulator.diagnostic_helpers.binary_pot_battery import _scope_matches
+
+    if not isinstance(raw_notices, (list, tuple)):
+        return ()
+    dependent_elements = set(
+        parse_formula_elements(species_formula) or ()
+    ) if species_formula else set()
+    built: list[Notice] = []
+    for row in raw_notices:
+        if not isinstance(row, Mapping):
+            continue
+        if not _scope_matches(row.get("affected_quantities"), "p_partial"):
+            continue
+        affected_species = row.get("affected_species")
+        if species_formula is not None and (
+            affected_species is None
+            or not any(
+                _scope_matches(affected_species, selected, species=True)
+                for selected in {species_formula, *dependent_elements}
+            )
+        ):
+            continue
+        try:
+            kind = NoticeKind(str(row.get("kind")))
+        except ValueError:
+            continue
+        reason = str(row.get("reason") or kind.value)
+        if affected_species is not None:
+            scope = affected_species
+            scope_items = (
+                scope if isinstance(scope, (list, tuple, set, frozenset))
+                else (scope,)
+            )
+            scope_text = ",".join(sorted(str(item) for item in scope_items))
+            reason = f"{reason}; pressure species scope={scope_text}"
+        band = row.get("certified_band") or row.get("band")
+        built.append(
+            Notice(
+                kind=kind,
+                affected_quantities=(dependent_quantity,),
+                reason=reason,
+                origin=str(
+                    row.get("origin")
+                    or "engine:internal-analytical:residue-pressure"
+                ),
+                band=(
+                    json.dumps(band, sort_keys=True, default=str)
+                    if isinstance(band, Mapping)
+                    else (None if band is None else str(band))
+                ),
+                authority=(
+                    Authority.EXTRAPOLATED
+                    if row.get("authority") == "extrapolated"
+                    or row.get("authority_level") == "extrapolated"
+                    else None
+                ),
+            )
+        )
+    return tuple(built)
+
+
 def _predict_mass_loss_with_residue(
     engine: Engine,
     identity: Identity,
@@ -12618,7 +12685,13 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=refusal,
             refusal_detail=detail,
-            notices=omission_notices(payload),
+            notices=(
+                *omission_notices(payload),
+                *_residue_engine_pressure_notices(
+                    getattr(exc, "pressure_notices", ()),
+                    Quantity.MASS_LOSS_FRACTION,
+                ),
+            ),
             identity=identity,
         )
     except ResidueEngineNonconvergence as exc:
@@ -12638,7 +12711,13 @@ def _predict_mass_loss_with_residue(
             lineage_complete=False,
             refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE,
             refusal_detail=detail,
-            notices=omission_notices(payload),
+            notices=(
+                *omission_notices(payload),
+                *_residue_engine_pressure_notices(
+                    getattr(exc, "pressure_notices", ()),
+                    Quantity.MASS_LOSS_FRACTION,
+                ),
+            ),
             identity=identity,
         )
 
@@ -12655,7 +12734,10 @@ def _predict_mass_loss_with_residue(
         for flag in result.engine_flags
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
-    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    ) + omission_notices(result.engine_metadata.get("below_threshold_omissions")) + _residue_engine_pressure_notices(
+        result.pressure_notices,
+        Quantity.MASS_LOSS_FRACTION,
+    )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
@@ -16789,6 +16871,13 @@ def _hashimoto_residue_prediction(
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
             )
         )
+        notices.extend(
+            _residue_engine_pressure_notices(
+                primary_provenance.get("engine_pressure_notices"),
+                reported_quantity,
+                species_formula=formula,
+            )
+        )
         surface_floor = primary_provenance.get("surface_pO2_balance_floor")
         if isinstance(surface_floor, Mapping):
             floor_steps = int(surface_floor.get("steps_at_floor") or 0)
@@ -17040,7 +17129,14 @@ def _knudsen_residue_prediction(
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=result["notices"], identity=reference.identity,
+            notices=(
+                *result["notices"],
+                *_residue_engine_pressure_notices(
+                    result.get("pressure_notices"),
+                    reported_quantity,
+                    species_formula=reference.identity.species.formula,
+                ),
+            ), identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:

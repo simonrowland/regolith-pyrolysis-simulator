@@ -456,6 +456,26 @@ class ResidueInventoryResult:
     pO2_balance_floor_pO2_bar: float | None
     atom_closure_mol: Mapping[str, float]
     buffer_oxygen_exchange_mol: float = 0.0
+    pressure_notices: tuple[Mapping[str, object], ...] = ()
+
+
+@dataclass(frozen=True)
+class ResiduePressureResult:
+    pressures_Pa: Mapping[str, float]
+    notices: tuple[Mapping[str, object], ...] = ()
+
+
+def _residue_pressure_values(
+    result: Mapping[str, float] | ResiduePressureResult,
+    notices: list[Mapping[str, object]],
+) -> Mapping[str, float]:
+    if not isinstance(result, ResiduePressureResult):
+        return result
+    for notice in result.notices:
+        row = dict(notice)
+        if row not in notices:
+            notices.append(row)
+    return result.pressures_Pa
 
 
 @dataclass(frozen=True)
@@ -463,6 +483,7 @@ class ResidueMassLossPrediction:
     mass_loss_fraction: float
     engine_flags: tuple[str, ...]
     engine_metadata: Mapping[str, str]
+    pressure_notices: tuple[Mapping[str, object], ...] = ()
 
 
 @dataclass(frozen=True)
@@ -475,6 +496,7 @@ class _HashimotoGeometryIntegration:
     inventory_mol: dict[str, float]
     evaporated_mol: Mapping[str, float]
     pO2_balance_floor: dict[str, float | int | None]
+    pressure_notices: tuple[Mapping[str, object], ...] = ()
 
     def __iter__(self):
         # Cohort callers unpack six results, with the balance floor last.
@@ -843,7 +865,9 @@ def _residue_oxygen_balance(
 def integrate_residue_inventory(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
-    pressure_model: Callable[[Mapping[str, float], float], Mapping[str, float]],
+    pressure_model: Callable[
+        [Mapping[str, float], float], Mapping[str, float] | ResiduePressureResult
+    ],
     *,
     temperature_K: float,
     duration_s: float,
@@ -915,6 +939,7 @@ def integrate_residue_inventory(
     evaporated: defaultdict[str, float] = defaultdict(float)
     pO2_steps: list[float | None] = []
     bracket_boundary_steps: list[OxygenBalanceBracketBoundary | None] = []
+    pressure_notices: list[Mapping[str, object]] = []
     buffer_oxygen_exchange_mol = 0.0
 
     # Supplied channels define the supported pressure bundle. Root metadata
@@ -938,7 +963,8 @@ def integrate_residue_inventory(
                 for species, amount in inventory.items()
                 if amount > 0.0
             }
-            return pressure_model(engine_inventory, float(log10_pO2_bar))
+            result = pressure_model(engine_inventory, float(log10_pO2_bar))
+            return _residue_pressure_values(result, pressure_notices)
 
         def accepted_pressure_evaluation(log10_pO2_bar: float) -> None:
             accepted_callback = getattr(
@@ -1111,6 +1137,7 @@ def integrate_residue_inventory(
         ),
         atom_closure_mol=closure,
         buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
+        pressure_notices=tuple(pressure_notices),
     )
 
 
@@ -1126,12 +1153,16 @@ class KnudsenResidueResult:
     retained_oxygen_atoms_mol: float
     atom_closure_mol: Mapping[str, float]
     pO2_bar_by_step: tuple[float, ...]
+    pressure_notices: tuple[Mapping[str, object], ...] = ()
 
 
 def integrate_knudsen_residue_inventory(
     initial_inventory_mol: Mapping[str, float],
     channels: Sequence[ResidueChannel],
-    pressure_model: Callable[[Mapping[str, float], float, float], Mapping[str, float]],
+    pressure_model: Callable[
+        [Mapping[str, float], float, float],
+        Mapping[str, float] | ResiduePressureResult,
+    ],
     *,
     temperature_path: Sequence[tuple[float, float]],
     measured_mass_loss_fraction: float,
@@ -1194,6 +1225,7 @@ def integrate_knudsen_residue_inventory(
     gas_offset = oxygen_index + 1
     state = [inventory[k] for k in parents] + [initial_atoms.get("O", 0.0)] + [0.0] * len(gases)
     pO2_steps: list[float] = []
+    pressure_notices: list[Mapping[str, object]] = []
     xi = 0.0
     previous_endpoint, previous_temperature = 0.0, path[0][1]
     absolute_tolerance = 1e-12 * math.fsum(inventory.values())
@@ -1213,7 +1245,8 @@ def integrate_knudsen_residue_inventory(
                 current_temperature = previous_temperature + fraction * (temperature - previous_temperature)
 
             def pressure_at(p):
-                return pressure_model(active, p, current_temperature)
+                result = pressure_model(active, p, current_temperature)
+                return _residue_pressure_values(result, pressure_notices)
 
             if logp is None:
                 try:
@@ -1297,7 +1330,10 @@ def integrate_knudsen_residue_inventory(
     final_atoms = _atom_totals(inventory, evaporated)
     final_atoms["O"] = oxygen + _atom_totals({}, evaporated).get("O", 0.0)
     closure = _residue_atom_closure(initial_atoms, final_atoms)
-    return KnudsenResidueResult(dict(inventory), dict(evaporated), oxygen, closure, tuple(pO2_steps))
+    return KnudsenResidueResult(
+        dict(inventory), dict(evaporated), oxygen, closure,
+        tuple(pO2_steps), tuple(pressure_notices),
+    )
 
 
 def _hashimoto_point_value(record: Mapping[str, Any]) -> float:
@@ -1431,7 +1467,9 @@ def _make_residue_pressure_model(
     missing_channels_reason: str,
     caller: str,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
-) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
+) -> Callable[
+    [Mapping[str, float], float], Mapping[str, float] | ResiduePressureResult
+]:
     """Build the engine pressure closure shared by the residue cohorts."""
     pressure_exponents = {
         str(species): (
@@ -1522,6 +1560,8 @@ def _make_residue_pressure_model(
             Po2Request,
             _InternalAnalyticalInputRefusal,
             _OxygenBalanceRefusal,
+            _scope_matches,
+            engine_flags_from_result,
             _gas_formula_for_oxygen_balance,
             internal_analytical_residue_vapor_pressure,
             _new_internal_analytical_core,
@@ -1548,7 +1588,7 @@ def _make_residue_pressure_model(
 
         def pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
-        ) -> Mapping[str, float]:
+        ) -> ResiduePressureResult:
             try:
                 response = internal_analytical_residue_vapor_pressure(
                     core=analytical_core,
@@ -1565,6 +1605,9 @@ def _make_residue_pressure_model(
                 )
             except _InternalAnalyticalInputRefusal as exc:
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
+            provider_notices, _provider_authority, _provider_band = (
+                engine_flags_from_result(response)
+            )
             pressures: dict[str, float] = {}
             for channel, pressure in response.vapor_pressures_Pa.items():
                 try:
@@ -1644,10 +1687,25 @@ def _make_residue_pressure_model(
                         separators=(",", ":"),
                     )
                 raise ResidueInventoryRefusal(missing_channels_reason, detail)
-            return {
+            pressure_values = {
                 str(species): float(pressures[str(species)])
                 for species, _reaction in gas_channels
             }
+            scoped_notices = tuple(
+                row
+                for row in provider_notices
+                if _scope_matches(row.get("affected_quantities"), "p_partial")
+                and (
+                    row.get("affected_species") is None
+                    or any(
+                        _scope_matches(
+                            row.get("affected_species"), species, species=True
+                        )
+                        for species in pressure_values
+                    )
+                )
+            )
+            return ResiduePressureResult(pressure_values, scoped_notices)
 
         if floor_inversion_diagnostics is not None:
             pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
@@ -1907,7 +1965,9 @@ def _mass_loss_bound_gate(
 
 def _mass_loss_corner_bounds(
     inventory: Mapping[str, float], channels: Sequence[ResidueChannel],
-    pressure_model: Callable[[Mapping[str, float], float], Mapping[str, float]],
+    pressure_model: Callable[
+        [Mapping[str, float], float], Mapping[str, float] | ResiduePressureResult
+    ],
     *, unsourced: Sequence[str], temperature_K: float, area_m2: float, duration_s: float,
     include_sourced: bool = False,
 ) -> tuple[dict[str, float], dict[str, Any]]:
@@ -2108,7 +2168,10 @@ def predict_knudsen_residue_composition(
         "measured_mass_loss_fraction": target, "temperature_path": path,
         "oxygen_sources": oxygen_sources,
     }
-    pressure_callbacks: dict[float, Callable[..., Mapping[str, float]]] = {}
+    pressure_callbacks: dict[
+        float,
+        Callable[..., Mapping[str, float] | ResiduePressureResult],
+    ] = {}
     try:
         try:
             from openimcc import load_gas_datapack
@@ -2157,6 +2220,7 @@ def predict_knudsen_residue_composition(
             "composition_wt_pct": composition, "linear_temperature_diagnostic": diagnostic,
             "measured_mass_loss_fraction": target, "temperature_path": path,
             "oxygen_sources": oxygen_sources, "notices": tuple(notices),
+            "pressure_notices": primary.pressure_notices,
             "initial_inventory_mol": dict(initial),
             "final_inventory_mol": dict(primary.residue_mol),
             "retained_oxygen_atoms_mol": primary.retained_oxygen_atoms_mol,
@@ -2316,6 +2380,7 @@ def predict_mass_loss_fraction(
     # This path keeps those notices and retargets only the mass-loss quantity.
     omission_notices: list[Any] = []
     omission_records: dict[str, list[dict[str, Any]]] = {}
+    pressure_notices: list[Mapping[str, object]] = []
 
     def retain_omissions(pressure_model: object) -> None:
         from simulator.battery.enums import Quantity
@@ -2353,6 +2418,8 @@ def predict_mass_loss_fraction(
         )
 
     def attach_omissions(exc: BaseException) -> None:
+        if pressure_notices:
+            setattr(exc, "pressure_notices", tuple(pressure_notices))
         payload = omission_payload()
         if payload is None:
             return
@@ -2386,9 +2453,15 @@ def predict_mass_loss_fraction(
             engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
         )
+
+        def pressures_at(inventory_at, logp):
+            return _residue_pressure_values(
+                pressure_model(inventory_at, logp), pressure_notices
+            )
+
         def measure(incoming, active_channels, area, duration):
             bounds, corners = _mass_loss_corner_bounds(
-                incoming, active_channels, pressure_model, unsourced=unsourced,
+                incoming, active_channels, pressures_at, unsourced=unsourced,
                 temperature_K=at_K, area_m2=area, duration_s=duration,
                 include_sourced=rectangle,
             )
@@ -2401,7 +2474,7 @@ def predict_mass_loss_fraction(
 
         try:
             result = _hashimoto_integrate_geometry(
-                inventory, channels, pressure_model, temperature_K=at_K,
+                inventory, channels, pressures_at, temperature_K=at_K,
                 duration_s=seconds, steps=min(_HASHIMOTO_N_CAP, max(1, math.ceil(seconds / 60.0))),
                 geometry_policy_id="sphere_constant" if rectangle else "sphere_shrinking",
                 initial_area_m2=area_m2, initial_sample_mass_kg=sample_mass_kg,
@@ -2523,6 +2596,7 @@ def predict_mass_loss_fraction(
         return ResidueMassLossPrediction(
             mass_loss_fraction=point_loss_kg / sample_mass_kg,
             engine_flags=tuple(sorted(flags)), engine_metadata=metadata,
+            pressure_notices=tuple(pressure_notices),
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         attach_omissions(exc)
@@ -2665,6 +2739,7 @@ def _hashimoto_integrate_geometry(
     dt_s = duration_s / steps
     pO2_steps: list[float] = []
     evaporated_mol: defaultdict[str, float] = defaultdict(float)
+    pressure_notices: list[Mapping[str, object]] = []
     exhausted_mol: dict[str, float] = {}
     exhaustion_notices: list[dict[str, float | int | str]] = []
     refusal: ResidueEngineNonconvergence | None = None
@@ -2727,7 +2802,9 @@ def _hashimoto_integrate_geometry(
         step = integrate_residue_inventory(
             inventory,
             active_channels,
-            pressure_model,
+            lambda inventory_at, logp: _residue_pressure_values(
+                pressure_model(inventory_at, logp), pressure_notices
+            ),
             temperature_K=temperature_K,
             duration_s=duration,
             area_evolution_m2=(area_m2,),
@@ -2822,6 +2899,7 @@ def _hashimoto_integrate_geometry(
         inventory_mol=dict(inventory),
         evaporated_mol=dict(evaporated_mol),
         pO2_balance_floor=pO2_balance_floor,
+        pressure_notices=tuple(pressure_notices),
     )
 
 
@@ -3197,6 +3275,9 @@ def _predict_hashimoto_residue_cohort(
             geometry_exhaustions: dict[str, tuple[dict[str, float | int | str], ...]] = {}
             geometry_refusals: dict[str, dict[str, object] | None] = {}
             geometry_atom_closure: dict[str, dict[str, float]] = {}
+            geometry_pressure_notices: dict[
+                str, tuple[Mapping[str, object], ...]
+            ] = {}
             refinement_steps_by_geometry: dict[str, tuple[int, ...]] = {}
             refinement_differences_by_geometry: dict[str, tuple[dict[str, float | int], ...]] = {}
             refinement_status_by_geometry: dict[str, str] = {}
@@ -3240,6 +3321,9 @@ def _predict_hashimoto_residue_cohort(
                         dict(integrated_inventory)
                         if isinstance(integrated_inventory, Mapping)
                         else None
+                    )
+                    geometry_pressure_notices[geometry] = (
+                        getattr(integration_result, "pressure_notices", ())
                     )
                     tried_steps.append(steps)
                     if refusal is not None:
@@ -3402,6 +3486,9 @@ def _predict_hashimoto_residue_cohort(
                 "engine_floor_inversion_diagnostics": tuple(
                     engine_floor_inversion_diagnostics.values()
                 ),
+                "engine_pressure_notices": geometry_pressure_notices[
+                    primary_geometry
+                ],
                 "liquid_rows_used": tuple(active_liquid_rows[row_key]),
                 "d060_pending": True,
                 "openimcc_version": str(getattr(openimcc, "__version__", "unknown")),

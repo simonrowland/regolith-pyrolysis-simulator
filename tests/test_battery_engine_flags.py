@@ -73,10 +73,15 @@ def _rail(*_args, **_kwargs):
 def _install_fake_vaporock(monkeypatch):
     def calc_vapor_pressures(composition=None, T_C=None, **_kwargs):
         composition = composition or {}
-        return {
+        pressures = {
             "Na": float(composition.get("Na2O", 0.0)) * (float(T_C) + 1.0) * 1e-9,
             "SiO": float(composition.get("SiO2", 0.0)) * 1e-9,
         }
+        if float(composition.get("FeO", 0.0)) > 0.0:
+            pressures["Fe"] = (
+                float(composition["FeO"]) * (float(T_C) + 1.0) * 1e-9
+            )
+        return pressures
 
     def fake_import_module(name):
         if name == "vaporock":
@@ -115,6 +120,15 @@ def _vaporock_cell(handle: EngineHandle, temperature_K: float):
         temperature_K=temperature_K,
         po2=_PO2,
         isolated=False,
+    )
+
+
+def _fe_bearing_pot() -> BinaryPot:
+    return BinaryPot(
+        pot_id="feo_na2o_sio2",
+        kato_1993_table4_system=None,
+        why="Fe-bearing leak probe",
+        composition_wt_pct={"FeO": 20.0, "Na2O": 20.0, "SiO2": 60.0},
     )
 
 
@@ -238,6 +252,78 @@ def test_vaporock_1773k_cell_keeps_extrapolated_flag(monkeypatch) -> None:
     assert [notice.kind for notice in scored] == [NoticeKind.OUT_OF_CERTIFIED_BAND]
     assert cell_notices(Quantity.P_PARTIAL, Engine.VAPOROCK, bare) == ()
     assert cell_notices(Quantity.P_PARTIAL, Engine.VAPOROCK, warm) == ()
+
+
+def test_vaporock_fe_pressure_does_not_inherit_builtin_holzheid_notice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _install_fake_vaporock(monkeypatch)
+    temperature_K = 1878.15
+    po2 = Po2Request(mode=PO2_COMMANDED, po2_bar=1.0e-8)
+    pot = _fe_bearing_pot()
+    vaporock_handle = _vaporock_handle()
+    vaporock_cell = equilibrate_cell(
+        vaporock_handle,
+        pot,
+        temperature_K=temperature_K,
+        po2=po2,
+        isolated=False,
+    )
+    assert vaporock_cell.status == "ok"
+    assert vaporock_cell.gas_partial_pressures_Pa["Fe"] > 0.0
+    reason = "Holzheid stoichiometric FeO gamma conversion extrapolated"
+    assert not any(reason in str(row.get("reason", "")) for row in vaporock_cell.notices)
+
+    builtin_handle = open_battery_engine("internal-analytical")
+    try:
+        builtin_cell = equilibrate_cell(
+            builtin_handle,
+            pot,
+            temperature_K=temperature_K,
+            po2=po2,
+            isolated=False,
+        )
+    finally:
+        from simulator.diagnostic_helpers.binary_pot_battery import (
+            close_battery_engine_handle,
+        )
+
+        close_battery_engine_handle(builtin_handle)
+    assert builtin_cell.status == "ok"
+    assert builtin_cell.gas_partial_pressures_Pa["Fe"] > 0.0
+    assert any(reason in str(row.get("reason", "")) for row in builtin_cell.notices)
+
+
+def test_provider_authority_requires_an_applicable_quantity_scope() -> None:
+    result = types.SimpleNamespace(
+        diagnostics={
+            "vapor_pressure_diagnostic": {
+                "Fe": {
+                    "notice": {
+                        "kind": "out_of_certified_band",
+                        "authority_level": AUTHORITY_EXTRAPOLATED,
+                        "reason": "scoped provider notice",
+                        "affected_species": ["Fe"],
+                        "affected_quantities": ["p_partial"],
+                    }
+                }
+            }
+        }
+    )
+
+    flags, aggregate_authority, _band = engine_flags_from_result(result)
+    assert aggregate_authority is None
+    assert engine_flags_from_result(
+        result, quantity="activity", species="Fe"
+    )[1] is None
+    assert engine_flags_from_result(
+        result, quantity="p_partial", species="SiO"
+    )[1] is None
+    scoped_flags, scoped_authority, _band = engine_flags_from_result(
+        result, quantity="p_partial", species="Fe"
+    )
+    assert scoped_authority == AUTHORITY_EXTRAPOLATED
+    assert scoped_flags == flags
 
 
 def test_openimcc_temperature_notice_survives_cell_notices() -> None:
