@@ -451,11 +451,14 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
 def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
 
-    ``b1a7c34db`` ``predict_with_engine(OPENIMCC, row4)`` returns this
-    Decimal from ``openimcc.evaluate_redox`` on the printed mole-fraction
-    composition. The row is not a mass-percent stand-in. OpenIMCC must
-    not open or equilibrate a cell. The pack digest is the digest on the
-    result the scorer just stamped, not a host-specific literal.
+    ``8e1d1ef23d`` carries this receipt onto L after the OpenIMCC numeric
+    repin ``5c670398e0`` (``9c327c2``) and DG46 redox pack ``938c3e3717``;
+    that moved the Decimal from ``1.6414352204105178`` to
+    ``2.3552879363945403``. It comes from ``openimcc.evaluate_redox`` on
+    the printed mole-fraction composition. The row is not a mass-percent
+    stand-in. OpenIMCC must not open or equilibrate a cell. The pack digest
+    is the digest on the result the scorer just stamped, not a host-specific
+    literal.
     """
 
     pytest.importorskip("openimcc")
