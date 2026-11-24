@@ -24,6 +24,7 @@ from simulator.battery.records import NoticePolicy
 
 ROOT = Path(__file__).resolve().parents[1]
 SOURCE_ID = "borisov-behrens-holtz-2013-ti-p-fe-redox"
+WORK_ID = "10.1007/s00410-013-0943-9"
 EXTRACT = ROOT / "data/literature/extracts" / f"{SOURCE_ID}.yaml"
 OXIDES = ("SiO2", "TiO2", "Al2O3", "Fe2O3", "MgO", "CaO", "P2O5")
 
@@ -239,14 +240,8 @@ def test_table1_post_run_p2o5_and_sample_weights_match_render() -> None:
             assert item["point_conditions"]["total_pressure_Pa"]["state"]["value"] == "101325"
 
 
-def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> None:
-    document = _document()
-    result = _migrate()
+def _assert_unstated_method_rows(result, document: dict) -> None:
     records = list(result.observations.values())
-    assert len(records) == 62
-    assert not result.registry_issues
-    assert not any("method" in item.axes for item in result.queue)
-
     unstated_method_ids = {
         "borisov_2013_morb_christie_1986_quoted",
         "borisov_2013_morb_cottrell_kelley_2011_quoted",
@@ -262,14 +257,36 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     }
     assert set(method_rows) == unstated_method_ids
     method_policy = NoticePolicy(**resolve("DP-106").payload["policy"])
+    source_rows = {
+        item["observation_id"]: item
+        for body in document["species"].values()
+        for item in body.get("observations", [])
+    }
     for record in method_rows.values():
+        local_id = record.observation_id.split("::", 1)[1]
+        assert record.experiment_id == f"{WORK_ID}::experiment::{local_id}"
         method = result.experiments[record.experiment_id].method
-        assert method.is_value and method.value is MethodToken.UNSPECIFIED
+        assert method.is_value and method.value is MethodToken.UNSPECIFIED, (
+            f"{local_id} must not inherit a quench experiment method"
+        )
         method_notice = next(
             notice for notice in record.notices
             if notice.kind is NoticeKind.METHOD_UNSTATED
         )
         assert method_notice.policy == method_policy
+        printed_method = source_rows[local_id]["values"]["method_as_printed"]
+        assert f"printed analytical method: {printed_method}" in method_notice.reason
+
+
+def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> None:
+    document = _document()
+    result = _migrate()
+    records = list(result.observations.values())
+    assert len(records) == 62
+    assert not result.registry_issues
+    assert not any("method" in item.axes for item in result.queue)
+    _assert_unstated_method_rows(result, document)
+
     remaining_non_method_queue = {
         (item.observation_id, tuple(item.axes), item.why)
         for item in result.queue
@@ -298,6 +315,11 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
     assert len(iron_rows) == 43
     assert all(r.identity.quantity.value is Quantity.VALENCE_RATIO for r in iron_rows)
     assert all(r.identity.species.formula == "Fe" for r in iron_rows)
+    quench_experiment_id = f"{WORK_ID}::{SOURCE_ID}"
+    assert all(r.experiment_id == quench_experiment_id for r in iron_rows)
+    quench_method = result.experiments[quench_experiment_id].method
+    assert quench_method.is_value
+    assert quench_method.value is MethodToken.QUENCH_EQUILIBRATION
     assert all(r.value.kind is ValueKind.POINT for r in iron_rows)
     assert all(r.identity.species.phase.value.value == Phase.L for r in iron_rows)
     for record in iron_rows:
@@ -420,6 +442,38 @@ def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> Non
         assert "T_C" in conditions or "temperature_K" in conditions
         assert "fO2_log" in conditions
         assert "composition" in conditions
+
+
+def test_mutating_method_resolver_to_drop_method_notice_fails(
+    monkeypatch,
+) -> None:
+    original = Migrator._resolve_method_for_observation
+    quoted_assay_ids = {
+        "borisov_2013_morb_christie_1986_quoted",
+        "borisov_2013_morb_cottrell_kelley_2011_quoted",
+        "borisov_2013_pu3_schuessler_2008_quoted_mean",
+        "borisov_2013_pu3_wet_chemistry_session_1",
+        "borisov_2013_pu3_wet_chemistry_session_2",
+        "borisov_2013_pu3_wet_chemistry_session_3",
+    }
+
+    def discard_method_notice(self, **kwargs):
+        method, notice = original(self, **kwargs)
+        if (
+            kwargs["observation_id"].split("::", 1)[1] in quoted_assay_ids
+            and notice is not None
+            and notice.kind is NoticeKind.METHOD_UNSTATED
+        ):
+            return method, None
+        return method, notice
+
+    monkeypatch.setattr(
+        Migrator,
+        "_resolve_method_for_observation",
+        discard_method_notice,
+    )
+    with pytest.raises(AssertionError, match="printed analytical method"):
+        _assert_unstated_method_rows(_migrate(), _document())
 
 
 def test_figure_records_are_deferred_and_keep_printed_oxygen_condition() -> None:

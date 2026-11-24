@@ -25889,6 +25889,18 @@ class Migrator:
                 )
         if method_was_unspecified:
             original_reason = method.reason or "source does not state method"
+            printed_method = next(
+                (
+                    candidate.strip()
+                    for candidate in evidence_candidates[:2]
+                    if isinstance(candidate, str) and candidate.strip()
+                ),
+                None,
+            )
+            if printed_method is not None:
+                original_reason = (
+                    f"{original_reason}; printed analytical method: {printed_method}"
+                )
             policy_resolution = resolve_default_policy("DP-106")
             method = State.of(MethodToken(str(policy_resolution.value)))
             method_notice = Notice(
@@ -28665,7 +28677,7 @@ class Migrator:
             method_raw = values.get("method")
         method = map_method(method_raw)
         quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
-        method, _ = self._resolve_method_for_observation(
+        method, method_notice = self._resolve_method_for_observation(
             observation_id=obs_id,
             experiment_id=experiment_id,
             method=method,
@@ -28687,6 +28699,9 @@ class Migrator:
         experiment = self.result.experiments.get(experiment_id)
         migration_axis_notices = (
             () if phase_flag_notice is None else (phase_flag_notice,)
+        )
+        method_resolution_notices = (
+            () if method_notice is None else (method_notice,)
         )
         effective_method = (
             method
@@ -29958,6 +29973,7 @@ class Migrator:
                         *migration_axis_notices,
                         *point_notices,
                         *ambient_pressure_notices,
+                        *method_resolution_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -30093,6 +30109,7 @@ class Migrator:
                                 else (total_iron_notice,)
                             ),
                             *ambient_pressure_notices,
+                            *method_resolution_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
@@ -30233,6 +30250,7 @@ class Migrator:
                         ),
                         *validity_notices,
                         *ambient_pressure_notices,
+                        *method_resolution_notices,
                     ),
                     equipment=obs.get("equipment"),
                     parent_reason=hold_reason,
@@ -30433,6 +30451,7 @@ class Migrator:
                             ),
                             *validity_notices,
                             *ambient_pressure_notices,
+                            *method_resolution_notices,
                         ),
                         equipment=obs.get("equipment"),
                         parent_reason=hold_reason,
