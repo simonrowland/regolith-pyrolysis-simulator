@@ -391,7 +391,6 @@ tests/test_engine_install_lock.py::test_check_reports_each_magemin_runtime_binar
 tests/test_engine_install_lock.py::test_check_reports_runtime_selected_alphamelts_launcher::(local_config, 'find_alphamelts_binary')
 tests/test_engine_install_lock.py::test_engine_verify_fails_install_when_a_fresh_import_fails::(alphamelts_backend, '_run_alphamelts_subprocess')
 tests/test_engine_install_lock.py::test_engine_verify_fails_install_when_a_fresh_import_fails::(installer.subprocess, 'run')
-tests/test_engine_install_lock.py::test_engine_verify_fails_install_when_a_fresh_import_fails::(magemin_backend, '_magemin_subprocess_slot')
 tests/test_engine_local_config.py::test_config_absent_fallback_uses_binary_digest::'simulator.melt_backend.alphamelts._run_alphamelts_subprocess'
 tests/test_engine_local_config.py::test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest::'simulator.melt_backend.alphamelts._run_alphamelts_subprocess'
 tests/test_engine_local_config.py::test_legacy_alphamelts_label_uses_probe_release_and_keeps_digest::'simulator.melt_backend.alphamelts._run_alphamelts_subprocess'
@@ -466,11 +465,8 @@ tests/test_magemin_fo2_readback.py::test_corrective_resolve_shares_budget_and_re
 tests/test_magemin_fo2_readback.py::test_fe_bearing_native_fo2_control_failure_remains_not_converged::(magemin_module.subprocess, 'run')
 tests/test_magemin_fo2_readback.py::test_fe_free_native_fo2_is_indeterminate_and_successful::(magemin_module.subprocess, 'run')
 tests/test_magemin_fo2_readback.py::test_subprocess_readback_cannot_self_confirm::(magemin_module.subprocess, 'run')
-tests/test_magemin_headless.py::test_every_launch_uses_headless_env_and_slot::(magemin, '_magemin_subprocess_slot')
 tests/test_magemin_headless.py::test_every_launch_uses_headless_env_and_slot::(magemin.subprocess, 'run')
 tests/test_magemin_headless.py::test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed::(local_config, 'warn_legacy_once')
-tests/test_magemin_headless.py::test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed::(magemin, '_magemin_subprocess_slot')
-tests/test_magemin_headless.py::test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed::(magemin, '_magemin_subprocess_slot')
 tests/test_magemin_headless.py::test_version_probe_is_cached_by_binary_and_slot_timeout_is_typed::(magemin.subprocess, 'run')
 tests/test_magemin_headless.py::test_version_probe_repeats_when_binary_changes_at_same_path::(local_config, 'warn_legacy_once')
 tests/test_magemin_headless.py::test_version_probe_repeats_when_binary_changes_at_same_path::(magemin.subprocess, 'run')
@@ -660,12 +656,8 @@ tests/test_web_thermal_train.py::test_passive_refusal_renders_reason_and_active_
 tests/test_web_thermal_train.py::test_selected_legacy_artifact_fails_closed_without_o2_series::(web_routes, '_optimizer_result_row')
 tests/test_web_thermal_train.py::test_unmeasured_thermal_train_values_render_as_not_measured::(web_routes, '_optimizer_result_row')
 tests/tools/test_extract_gate.py::test_cli_audits_changed_extracts::(extract_gate, '_tree_head')
-tests/tools/test_extract_gate.py::test_cli_audits_changed_extracts::(extract_gate, '_tree_modules')
 tests/tools/test_extract_gate.py::test_cli_audits_changed_extracts::(extract_gate.subprocess, 'run')
 tests/tools/test_extract_gate.py::test_cli_audits_extract_by_source_id::(extract_gate, '_tree_head')
-tests/tools/test_extract_gate.py::test_cli_audits_extract_by_source_id::(extract_gate, '_tree_modules')
-tests/tools/test_extract_gate.py::test_internal_gate_attribute_error_is_not_a_tree_import_error::(extract_gate, '_tree_modules')
 tests/tools/test_extract_gate.py::test_isolated_migration_reports_kinds_and_refusals::(gate, '_migrate_one')
 tests/tools/test_extract_gate.py::test_known_species_ids_io_failure_is_typed_validation_error::(Path, 'read_text')
 tests/tools/test_extract_gate.py::test_numeric_table_cells_rejects_parser_failure::(gate._TableCellParser, 'feed')
-tests/tools/test_extract_gate.py::test_tree_without_attestation_helper_uses_legacy_fidelity_check::(extract_gate, '_tree_modules')

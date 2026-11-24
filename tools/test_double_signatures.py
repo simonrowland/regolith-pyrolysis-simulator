@@ -290,7 +290,16 @@ def _class_for_constructor(
             return local_class
     dotted = _dotted(node)
     constructor = _imported_object(dotted, modules, objects) if dotted else None
-    return constructor if inspect.isclass(constructor) else None
+    return constructor if _is_class_object(constructor) else None
+
+
+def _is_class_object(value) -> bool:
+    value_type = type(value)
+    return value_type is type or issubclass(value_type, type)
+
+
+def _is_allowed_type(value_type: type, allowed: tuple[type, ...]) -> bool:
+    return isinstance(value_type, type) and any(value_type is candidate for candidate in allowed)
 
 
 def _receiver(
@@ -318,7 +327,10 @@ def _receiver(
     value = _imported_object(dotted, modules, objects) if dotted else None
     if value is None:
         return None
-    return _Receiver(value, not inspect.isclass(value) and not inspect.ismodule(value))
+    return _Receiver(
+        value,
+        type(value) is not types.ModuleType and not _is_class_object(value),
+    )
 
 
 _SAFE_SIGNATURE_TYPES = (
@@ -332,16 +344,41 @@ _SAFE_SIGNATURE_TYPES = (
 
 
 def _safe_signature_type(value) -> bool:
-    return type(value) in _SAFE_SIGNATURE_TYPES
+    value_type = type(value)
+    if not _is_allowed_type(value_type, _SAFE_SIGNATURE_TYPES):
+        return False
+    if value_type is types.FunctionType:
+        try:
+            inspect.getattr_static(value, "__wrapped__")
+        except AttributeError:
+            pass
+        else:
+            return False
+        try:
+            inspect.getattr_static(value, "__signature__")
+        except AttributeError:
+            pass
+        else:
+            return False
+    return True
 
 
 def _signature_of(value) -> _SignatureResolution:
     if not _safe_signature_type(value):
-        return _SignatureResolution(None, "unsafe-type", "callable type is outside the inspection allowlist")
+        reason = "decorated" if type(value) is types.FunctionType and _has_static_attribute(value, "__wrapped__") else "unsafe-type"
+        return _SignatureResolution(None, reason, "callable type or signature metadata is outside the inspection allowlist")
     try:
         return _SignatureResolution(inspect.signature(value, follow_wrapped=False))
     except (TypeError, ValueError):
         return _SignatureResolution(None, "signature-unavailable", "inspect.signature could not resolve the safe callable")
+
+
+def _has_static_attribute(value, name: str) -> bool:
+    try:
+        inspect.getattr_static(value, name)
+    except AttributeError:
+        return False
+    return True
 
 
 def _without_first_parameter(signature: inspect.Signature) -> inspect.Signature:
@@ -379,10 +416,7 @@ def _local_class_attribute_signature(
     )
     if member is None:
         return _SignatureResolution(None, "unresolvable", "local method declaration was not found")
-    decorators = [
-        _dotted(item.func if isinstance(item, ast.Call) else item)
-        for item in member.decorator_list
-    ]
+    decorators = [item.id if isinstance(item, ast.Name) else None for item in member.decorator_list]
     if any(decorator not in {"classmethod", "staticmethod"} for decorator in decorators):
         return _SignatureResolution(None, "decorated", "local method has a decorator that can change its callable")
     signature = _replacement_signature(member)
@@ -411,7 +445,7 @@ def _class_attribute_signature(
         return _bind_descriptor_signature(_signature_of(descriptor), drop_first=True)
     if type(descriptor) is types.FunctionType:
         return _bind_descriptor_signature(_signature_of(descriptor), drop_first=is_instance)
-    if type(descriptor) in (types.MethodDescriptorType, types.WrapperDescriptorType):
+    if _is_allowed_type(type(descriptor), (types.MethodDescriptorType, types.WrapperDescriptorType)):
         return _bind_descriptor_signature(_signature_of(descriptor), drop_first=is_instance)
     return _signature_of(descriptor)
 
@@ -420,11 +454,11 @@ def _receiver_attribute_signature(
     receiver: _Receiver,
     name: str,
 ) -> _SignatureResolution:
-    if isinstance(receiver.value, ast.ClassDef):
+    if type(receiver.value) is ast.ClassDef:
         return _local_class_attribute_signature(receiver.value, name, receiver.is_instance)
-    if inspect.isclass(receiver.value):
+    if _is_class_object(receiver.value):
         return _class_attribute_signature(receiver.value, name, receiver.is_instance)
-    if inspect.ismodule(receiver.value):
+    if type(receiver.value) is types.ModuleType:
         try:
             attribute = inspect.getattr_static(receiver.value, name)
         except AttributeError:
@@ -460,7 +494,9 @@ def _receiver_and_attribute_for_path(
                 owner = inspect.getattr_static(owner, attribute)
         except AttributeError:
             continue
-        return _Receiver(owner, not inspect.isclass(owner) and not inspect.ismodule(owner)), parts[-1]
+        if type(owner) is not types.ModuleType and not _is_class_object(owner):
+            return None, parts[-1]
+        return _Receiver(owner, type(owner) is not types.ModuleType and not _is_class_object(owner)), parts[-1]
     return None, parts[-1]
 
 
@@ -665,6 +701,11 @@ def _replacement_signature_for_site(
 ) -> _SignatureResolution:
     definition = _callable_definition(node, site.call, parents, tree)
     if definition is not None:
+        if isinstance(definition, (ast.FunctionDef, ast.AsyncFunctionDef)) and any(
+            not isinstance(decorator, ast.Name) or decorator.id not in {"classmethod", "staticmethod"}
+            for decorator in definition.decorator_list
+        ):
+            return _SignatureResolution(None, "decorated", "replacement declaration has a decorator that can change its callable")
         signature = _replacement_signature(definition)
         if signature is None:
             return _SignatureResolution(None, "signature-unavailable", "local replacement declaration has no readable signature")

@@ -1,7 +1,7 @@
 import ast
 import inspect
 from collections import Counter
-from functools import partial
+from functools import partial, wraps
 from pathlib import Path
 
 import pytest
@@ -49,6 +49,28 @@ class _SignaturePropertyTarget:
 
 class _PartialTarget:
     target = partial(lambda value: value, 1)
+
+
+class _WrappedTarget:
+    @wraps(lambda value: value)
+    def target(*args, **kwargs):
+        return None
+
+
+class _DynamicClassReceiver:
+    marker: Path | None = None
+
+    @property
+    def __class__(self):
+        if self.marker is not None:
+            self.marker.write_text("dynamic class read", encoding="utf-8")
+        return type(self)
+
+    def emit(self, record):
+        return record
+
+
+_DYNAMIC_CLASS_RECEIVER = _DynamicClassReceiver()
 
 
 def test_patch_double_violation_allowlist_only_shrinks() -> None:
@@ -209,6 +231,20 @@ def test_scan_preserves_pytest_importorskip_module_alias(tmp_path: Path) -> None
     assert not census.violations
 
 
+def test_scan_resolves_safe_callable_through_importorskip_alias(tmp_path: Path) -> None:
+    (tmp_path / "test_importorskip_safe_alias.py").write_text(
+        "import pytest\n"
+        "openimcc = pytest.importorskip('collections')\n"
+        "def replacement(iterable=()): return None\n"
+        "def test_alias(monkeypatch):\n"
+        "    monkeypatch.setattr(openimcc.UserDict, 'fromkeys', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and len(census.violations) == 1
+
+
 def test_scan_resolves_a_bound_method_double(tmp_path: Path) -> None:
     (tmp_path / "test_bound_method.py").write_text(
         f"from {__name__} import _DescriptorFixture, _NarrowBoundFixture\n"
@@ -344,6 +380,83 @@ def test_scan_binds_native_classmethod_for_class_and_instance_targets(tmp_path: 
     assert census.resolved == 2
     assert not census.skipped
     assert not census.violations
+
+
+def test_scan_flags_narrow_native_dict_fromkeys_double(tmp_path: Path) -> None:
+    (tmp_path / "test_narrow_native_classmethod.py").write_text(
+        "from builtins import dict as Dict\n"
+        "from unittest.mock import patch\n"
+        "def replacement(iterable, /): return None\n"
+        "def test_narrow():\n"
+        "    patch.object(Dict, 'fromkeys', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == census.resolved == 1
+    assert len(census.violations) == 1
+
+
+def test_scan_skips_wrapped_function_as_decorated(tmp_path: Path) -> None:
+    (tmp_path / "test_wrapped_function.py").write_text(
+        f"from {__name__} import _WrappedTarget\n"
+        "def replacement(value): return value\n"
+        "def test_wrapped(monkeypatch):\n"
+        "    monkeypatch.setattr(_WrappedTarget, 'target', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == 1 and census.resolved == 0
+    assert census.skipped_by_reason == (("decorated", 1),)
+
+
+def test_scan_never_uses_dynamic_instance_class_for_classification(tmp_path: Path, monkeypatch) -> None:
+    marker = tmp_path / "dynamic-class-read"
+    monkeypatch.setattr(_DynamicClassReceiver, "marker", marker)
+    (tmp_path / "test_static_classification.py").write_text(
+        f"from {__name__} import _DYNAMIC_CLASS_RECEIVER\n"
+        "def replacement(mode='r', *args, **kwargs): return None\n"
+        "def test_patch(monkeypatch):\n"
+        "    monkeypatch.setattr(_DYNAMIC_CLASS_RECEIVER, 'emit', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and not census.violations
+    assert not marker.exists()
+
+
+def test_signature_metadata_mutation_probe_exposes_property_execution(tmp_path: Path, monkeypatch) -> None:
+    import tools.test_double_signatures as checker
+
+    marker = tmp_path / "signature-property-mutant-ran"
+    monkeypatch.setattr(_SignaturePropertyCallable, "marker", marker)
+    monkeypatch.setattr(checker, "_safe_signature_type", lambda value: True)
+    (tmp_path / "test_signature_metadata_mutant.py").write_text(
+        f"from {__name__} import _SignaturePropertyTarget\n"
+        "def replacement(value): return value\n"
+        "def test_metadata(monkeypatch):\n"
+        "    monkeypatch.setattr(_SignaturePropertyTarget, 'target', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.resolved == 1
+    assert marker.exists()
+
+
+def test_wrapped_function_mutation_probe_exposes_false_clean_resolution(tmp_path: Path, monkeypatch) -> None:
+    import tools.test_double_signatures as checker
+
+    monkeypatch.setattr(checker, "_safe_signature_type", lambda value: True)
+    (tmp_path / "test_wrapped_function_mutant.py").write_text(
+        f"from {__name__} import _WrappedTarget\n"
+        "def replacement(*args, **kwargs): return None\n"
+        "def test_wrapped(monkeypatch):\n"
+        "    monkeypatch.setattr(_WrappedTarget, 'target', replacement)\n",
+        encoding="utf-8",
+    )
+    census = scan_tests(tmp_path)
+    assert census.scanned == census.resolved == 1
+    assert not census.skipped and not census.violations
 
 
 def test_scan_skips_local_method_with_an_unknown_decorator(tmp_path: Path) -> None:
