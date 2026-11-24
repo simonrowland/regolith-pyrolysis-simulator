@@ -674,6 +674,18 @@ def _format_store_delta_report(
         for change in record.get("changes", []):
             if mode == "scope" and _field_is_fold22_scope(str(change["field"]), change, source_id):
                 continue
+            if mode == "scope":
+                decoded.append(" | ".join((
+                    source_id,
+                    "locator=null",
+                    str(change["field"]),
+                    "old=" + json.dumps(change["old"], sort_keys=True, default=str),
+                    "new=" + json.dumps(change["new"], sort_keys=True, default=str),
+                    "printed_cell=<none>",
+                    "matched_side=neither",
+                    "basis=work metadata; no measurement cell",
+                )))
+                continue
             decoded.append(" | ".join((
                 source_id,
                 json.dumps(work_meta.get("locator"), sort_keys=True, default=str),
