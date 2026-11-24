@@ -32,6 +32,9 @@ from simulator.fe_redox import (
     KRESS91_LN_FO2_COEFFICIENT,
 )
 from simulator.melt_backend.base import InternalAnalyticalBackend
+from simulator.metal_saturation_floor import (
+    melt_metal_saturation_floor_log10_fO2_bar,
+)
 from simulator.runner import (
     RUNNER_MASS_BALANCE_LIMIT_PCT as MASS_BALANCE_MAX_PCT,
     build_per_hour_summary,
@@ -739,6 +742,35 @@ def _seed_o2_bubbler_redox_state(
     )
 
 
+def _plant_fO2_above_metal_saturation_floor(
+    sim: PyrolysisSimulator,
+    margin_dex: float,
+) -> float:
+    """Publish log10(fO2/bar) margin_dex above the production metal floor.
+
+    d-469 raises a planted value that sits below the condensed-metal
+    couple. The plant here is the production resolver's floor plus the
+    margin, so that floor does not bind and the test still sees the
+    move it is about.
+    """
+
+    temperature_K = float(sim.melt.temperature_C) + 273.15
+    floor_log, metal = melt_metal_saturation_floor_log10_fO2_bar(
+        temperature_K,
+        sim._melt_metal_saturation_activities(temperature_K),
+    )
+    if floor_log is None or metal is None:
+        raise AssertionError(
+            "this feedstock at the current temperature has no "
+            "condensed-metal saturation floor"
+        )
+    planted = float(floor_log) + float(margin_dex)
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = planted
+    sim.melt.oxygen_reservoir.reference_T_K = temperature_K
+    sim._sync_oxygen_reservoir_mirror()
+    return planted
+
+
 @pytest.mark.parametrize(
     ("pressure_mbar", "expected_fO2_log"),
     [
@@ -786,6 +818,11 @@ def test_o2_bubbler_cannot_exceed_total_pressure_or_double_book_passthrough() ->
 
 def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
     sim = _make_sim()
+    # The 0.5 dex step is the Kress check. At the default vacuum
+    # pressure the effervescence ceiling sits less than 0.5 dex above
+    # the Fe metal-saturation floor, so that step clips. 10 mbar puts
+    # log10(P/bar) = -2 above it.
+    sim.melt.p_total_mbar = 10.0
     _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
     before = sim._current_melt_redox_fO2_log()
     T_K = sim.melt.temperature_C + 273.15
@@ -794,6 +831,7 @@ def test_o2_bubbler_reoxidizes_by_kress91_capacity_math() -> None:
         T_K=T_K,
     )
     delta_log10 = 0.5
+    assert before + delta_log10 < sim._melt_redox_fO2_upper_bound_log()
     expected_absorbed_mol = capacity * math.log(10.0) * delta_log10
     _configure_o2_bubbler(
         sim,
@@ -1259,8 +1297,13 @@ def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
     sim = _make_sim()
     sim.melt.campaign = CampaignPhase.C4
     sim.melt.campaign_hour = 1
-    _seed_o2_bubbler_redox_state(sim, fO2_log=-10.0)
-    target = -9.75
+    sim.melt.temperature_C = 1600.0
+    # Ceiling log10(0.01) = -2 leaves room for a 0.25 dex raise above
+    # the metal floor. The planted state is that floor plus 0.10 dex.
+    sim.melt.p_total_mbar = 10.0
+    planted = _plant_fO2_above_metal_saturation_floor(sim, 0.10)
+    target = planted + 0.25
+    assert target < sim._melt_redox_fO2_upper_bound_log()
     _configure_o2_bubbler(
         sim,
         rate_kg_per_hr=1.0,
@@ -1294,7 +1337,7 @@ def test_o2_bubbler_raised_fo2_is_visible_to_equilibrium_path(
     assert seen_fO2
     # 2026-07-11 0.5.10 E-MOVE: with ledger-backed respeciation monkeypatched
     # away, the bubbler request is not enough to raise the active melt fO2.
-    assert seen_fO2[-1] == pytest.approx(-10.0)
+    assert seen_fO2[-1] == pytest.approx(planted)
 
 
 @pytest.mark.parametrize(
@@ -2775,8 +2818,9 @@ def test_managed_o2_floor_holds_fo2_without_real_o2_inventory() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    # Above the metal floor, still far below log10(0.0015 bar), so the
+    # managed claim still wants to oxidize and the floor does not bind.
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
     before_o2 = sim.atom_ledger.mol_by_account("process.overhead_gas").get(
         "O2",
@@ -2833,8 +2877,7 @@ def test_managed_o2_floor_mutation_proof_unbacked_dn_would_move_fo2() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
 
     reservoir = sim._apply_oxygen_reservoir_exchange()
@@ -2859,8 +2902,7 @@ def test_headspace_to_melt_clamp_advances_fo2_only_with_ledger_o2() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 1.5
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     sim.atom_ledger.load_external_mol(
         "process.overhead_gas",
         {"O2": 1.0e-6},
@@ -3102,8 +3144,7 @@ def test_pn2_sweep_without_o2_does_not_phantom_oxidize_melt() -> None:
     sim.melt.pO2_mbar = 1.5
     sim.melt.p_total_mbar = 10.0
     sim._overhead_headspace_config["enabled"] = True
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
-    sim._sync_oxygen_reservoir_mirror()
+    _plant_fO2_above_metal_saturation_floor(sim, 0.10)
     before_fO2 = sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log
 
     reservoir = sim._apply_oxygen_reservoir_exchange()

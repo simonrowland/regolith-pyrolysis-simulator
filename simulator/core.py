@@ -9588,10 +9588,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             self._last_native_fe_saturation_event = dict(event)
             return {**split, **event}
 
-        self._re_reference_melt_fO2_to_temperature(
+        # d-469 publishes the metal-saturation floor. This extent is the
+        # saturation driver: flooring first evaluates the couple on its
+        # own boundary, where native_fe_frac is 0, and the split returns
+        # without precipitating FeO. Temperature re-reference stays.
+        # The redox-source publisher floors the landing after the split.
+        fO2_log, reference_T_K = self._melt_fO2_reference_state_at_temperature(
             T_K,
             gate_authority=gate_authority,
         )
+        reservoir = self.melt.oxygen_reservoir
+        reservoir.melt_intrinsic_fO2_log = fO2_log
+        reservoir.reference_T_K = reference_T_K
+        self._sync_oxygen_reservoir_mirror()
         native_extent = self._compute_native_fe_saturation_extent()
         split = self._compute_fe_redox_split_diagnostic()
         native_frac = max(
@@ -9618,6 +9627,17 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 native_fe_source_account = 'process.metal_phase'
                 native_fe_intent = ChemistryIntent.NATIVE_FE_METALLIC_TAP
         if native_fe_mol <= 1.0e-12:
+            # No native Fe to precipitate. Still publish d-469's floor
+            # so a Si couple (or a melt already on the Fe line) is not
+            # left below the condensed-metal bound.
+            published_fO2_log = self._floor_published_melt_fO2_log(
+                self._current_melt_redox_fO2_log(),
+                T_K,
+            )
+            self.melt.oxygen_reservoir.melt_intrinsic_fO2_log = (
+                published_fO2_log
+            )
+            self._sync_oxygen_reservoir_mirror()
             event = {
                 'native_fe_event': 'no_native_fe_below_threshold',
                 'native_fe_event_reason': 'native_fe_inventory_below_threshold',
