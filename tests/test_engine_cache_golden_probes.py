@@ -34,7 +34,7 @@ ENGINE_GOLDEN_PROBES = {
     # Controller Studio reads measured the same digest at the base pin,
     # 05a9634f, and 7cf98e62; v4 is the bae51f7 chemistry version.
     "openimcc": (4, "fb0d744f1937ef198d1e615d13df838b39dfa66804a0d8f5513b363de99a1dad"),
-    "internal-analytical": (4, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
+    "internal-analytical": (5, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
     # The train regenerates this digest against the new provider-pressure cache version.
@@ -45,7 +45,7 @@ ENGINE_GOLDEN_PROBES = {
 # Keep the 1605 °C Holzheid extrapolation probe alongside the certified 1700 K
 # cache golden above; it guards the out-of-band behavior introduced by d-339.
 INTERNAL_ANALYTICAL_OUT_OF_BAND_GOLDEN = (
-    4,
+    5,
     "a294dc7fa183d8c0c9a51b01b887ae3c4816768213fddaf977721d9440d2d467",
 )
 
@@ -320,6 +320,26 @@ def _live_engine_probe(
             f"cell status={cell.status}, refusal={cell.refusal_reason}, "
             f"engine status={cell.engine_status}, reason={cell.engine_reason}"
         )
+        openimcc_import = None
+        if engine_name == "openimcc":
+            import openimcc
+
+            module_file = Path(openimcc.__file__).resolve()
+            source_hash = subprocess.run(
+                [
+                    "sh",
+                    "-c",
+                    "rg --files . -g '*.py' | sort | xargs shasum | shasum",
+                ],
+                cwd=module_file.parent,
+                capture_output=True,
+                check=True,
+                text=True,
+            ).stdout.strip()
+            openimcc_import = {
+                "module_file": str(module_file),
+                "source_hash": source_hash,
+            }
         return {
             "pid": os.getpid(),
             "version": engine_cache.ENGINE_CHEMISTRY_VERSION[engine_name],
@@ -331,6 +351,7 @@ def _live_engine_probe(
             "vapor_pressure_species": _cached_vapor_pressure_species(
                 engine_name, cached_values[-1]
             ),
+            "openimcc_import": openimcc_import,
         }
     finally:
         close_battery_engine_handle(handle)
@@ -531,6 +552,11 @@ def test_live_engine_numeric_probe_matches_version(
     engine_name, request, tmp_path
 ) -> None:
     result = _run_probe(engine_name, request, tmp_path)
+    print(
+        f"ENGINE_GOLDEN_MEASURED engine={engine_name} version={result['version']} "
+        f"digest={result['digest']} openimcc_import={result['openimcc_import']}",
+        flush=True,
+    )
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
     probe_request = result["request"]
     assert isinstance(probe_request, Mapping), (
@@ -579,6 +605,11 @@ def test_internal_analytical_out_of_band_numeric_probe_matches_version(
         request,
         tmp_path,
         temperature_K=1605.0 + 273.15,
+    )
+    print(
+        "ENGINE_GOLDEN_MEASURED engine=internal-analytical-out-of-band "
+        f"version={result['version']} digest={result['digest']}",
+        flush=True,
     )
     expected_version, expected_digest = INTERNAL_ANALYTICAL_OUT_OF_BAND_GOLDEN
     assert result["version"] == expected_version
