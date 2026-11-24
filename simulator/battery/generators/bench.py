@@ -20,7 +20,8 @@ from simulator.battery.records import (
 from simulator.battery.migrate import to_plain
 from simulator.battery.waypoints import (
     ConsumerReadiness, ReadinessStatus, ReadinessGap, GapReason,
-    ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES, Waypoint, WaypointFlag,
+    ENGINE_POINT_CONSUMERS, MELT_ACTIVITY_ENGINES,
+    VACUUM_PRESSURE_UPPER_BOUND_ROUTE, Waypoint, WaypointFlag,
     WaypointResult, _prediction_pressure_waypoint, pure_substance_engine_point_gap,
     is_invalid_row_composition_gap,
 )
@@ -104,7 +105,7 @@ def _requirements(inputs, consumer, engine=None):
                         and selected.kind is ValueKind.BOUND
                         and selected.bound_operator in {"<", "<=", "≤"}
                         and inputs.waypoints["oxygen_condition"].selected is not None
-                        and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
+                        and inputs.waypoints["oxygen_condition"].selected.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE):
                     continue
                 if not isinstance(selected, Value) or selected.kind is not ValueKind.POINT:
                     reason = (GapReason.INTERVAL_NEEDS_POINT
@@ -359,7 +360,7 @@ def _engine_pressure_point(inputs):
     if (value.kind is ValueKind.BOUND
             and value.bound_operator in {"<", "<=", "≤"}
             and inputs.waypoints["oxygen_condition"].selected is not None
-            and inputs.waypoints["oxygen_condition"].selected.route == "vacuum_total_pressure_upper_bound"):
+            and inputs.waypoints["oxygen_condition"].selected.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE):
         return value.bound_value
     if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
         raise UnsupportedValue("pressure_boundary")

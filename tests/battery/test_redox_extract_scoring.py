@@ -28,7 +28,7 @@ from simulator.battery.enums import (
     ResidualStatus,
     ValueKind,
 )
-from simulator.battery.identity import parse_valence_basis
+from simulator.battery.identity import Identity, parse_valence_basis
 from simulator.battery.migrate import (
     FERRIC_FRACTION_RELATION,
     Migrator,
@@ -2157,16 +2157,15 @@ def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
             ),
         ),
     )
-    refused = score_module._fe_redox_pressure(
+    defaulted_bar, defaulted_pressure = score_module._fe_redox_pressure(
         vacuum_row, vacuum_row.identity, gauge
     )
-    assert not isinstance(refused, tuple)
-    assert refused.reason is RefusalReason.INVALID_IDENTITY
-    assert refused.detail["input"] == "total_pressure_Pa"
+    assert defaulted_bar == pytest.approx(1.01325)
+    assert defaulted_pressure.value == Decimal(101325)
 
 
 def test_shared_ladder_vacuum_notice_keeps_its_route():
-    """The ladder's vacuum clauses are not the route, with or without a caller suffix."""
+    """Scoring reads the typed route while prose can change independently."""
 
     from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
 
@@ -2183,29 +2182,149 @@ def test_shared_ladder_vacuum_notice_keeps_its_route():
     assert "original_reason=" not in notice.reason
     assert "Dalton pO2 <= Ptotal" in notice.reason
     assert "selected_fO2_Pa=0.0001" in notice.reason
-    shared = score_module._ladder_route_text(notice.reason)
-    assert shared is not None
-    assert shared.group(3) == "vacuum_total_pressure_upper_bound"
-    redox = score_module._ladder_route_text(
-        notice.reason + "; original_reason=source does not print fO2 for this run"
+    assert notice.route == "vacuum_total_pressure_upper_bound"
+    assert notice.selected_fO2_Pa == Decimal("0.0001")
+    assert notice.pressure_qualification.value == "vacuum_upper_bound_substituted"
+    from simulator.battery.migrate import to_plain
+
+    assert "pressure_route" not in to_plain(notice)
+    prediction = SimpleNamespace(
+        engine=Engine.INTERNAL_ANALYTICAL,
+        identity=Identity(
+            quantity=Quantity.FE3_FE2_RATIO,
+            species=Species("Fe", Phase.L),
+            fO2_Pa=State.of(Decimal("0.0001")),
+        ),
+        notices=(replace(notice, reason="wording changed completely"),),
     )
-    assert redox is not None
-    assert redox.group(3) == "vacuum_total_pressure_upper_bound"
-    borrowed = score_module._ladder_route_text(
-        "fo2_tier=4; route=intrinsic_melt_fO2; borrowed; "
-        "selected_fO2_Pa=1; original_reason=source does not print fO2 for this run"
+    selected = score_module._selected_shared_ladder_oxygen(prediction)
+    assert selected == (
+        Decimal("0.0001"), 3, None, "vacuum_total_pressure_upper_bound"
     )
-    assert borrowed is not None
-    assert borrowed.group(3) == "intrinsic_melt_fO2; borrowed"
-    effusion = score_module._ladder_route_text(
-        "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
-        "route=effusion_oxygen_balance; effusion closure borrowed from internal-analytical; "
-        "borrowed"
+
+
+def test_vacuum_pressure_qualification_survives_printed_oxygen():
+    _, row, experiment, bench = _in_domain_buffer_context()
+    vacuum = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=F.located(
+                Value(
+                    ValueKind.BOUND,
+                    bound_operator="<=",
+                    bound_value=Decimal("0.0001"),
+                ),
+                note="printed vacuum during run",
+            ),
+        ),
     )
-    assert effusion is not None
-    assert effusion.group(3) == (
-        "effusion_oxygen_balance; effusion closure borrowed from internal-analytical; borrowed"
+    row = replace(
+        row,
+        point_conditions={
+            key: value
+            for key, value in (row.point_conditions or {}).items()
+            if key != "total_pressure_Pa"
+        },
+        identity=replace(
+            row.identity,
+            fO2_Pa=State.of(Decimal("0.00001")),
+            total_pressure_Pa=None,
+        ),
     )
+    prediction = score_module.predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=vacuum, bench=bench
+    )
+    pressure_notice = next(
+        notice
+        for notice in prediction.notices
+        if getattr(notice, "pressure_qualification", None) is not None
+        and getattr(notice, "pressure_pa", None) is not None
+    )
+    assert (
+        getattr(pressure_notice, "pressure_route", None) or pressure_notice.route
+    ) == "vacuum_total_pressure_upper_bound"
+    assert pressure_notice.pressure_pa == Decimal("0.0001")
+    assert pressure_notice.pressure_qualification.value == (
+        "vacuum_upper_bound_substituted"
+    )
+    assert prediction.identity.total_pressure_Pa.value == Decimal("0.0001")
+    assert prediction.identity.fO2_Pa.value == Decimal("0.00001")
+
+
+def test_missing_pressure_uses_flagged_one_atmosphere_default():
+    _, row, experiment, bench = _in_domain_buffer_context()
+    row = replace(
+        row,
+        source_id="unattributed-pressure-control",
+        point_conditions={
+            key: value
+            for key, value in (row.point_conditions or {}).items()
+            if key != "total_pressure_Pa"
+        },
+        identity=replace(row.identity, total_pressure_Pa=None),
+    )
+    experiment = replace(
+        experiment,
+        pressure_environment=replace(
+            experiment.pressure_environment,
+            total_pressure_Pa=Located(State.unknown("not printed")),
+        ),
+    )
+    prediction = score_module.predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, row, experiment=experiment, bench=bench
+    )
+    assert prediction.value is not None, prediction.refusal_detail
+    pressure_notice = next(
+        notice
+        for notice in prediction.notices
+        if getattr(notice, "pressure_qualification", None) is not None
+    )
+    assert (
+        getattr(pressure_notice, "pressure_route", None) or pressure_notice.route
+    ) == "default_standard_atmosphere"
+    assert pressure_notice.pressure_pa == Decimal(101325)
+    assert pressure_notice.pressure_qualification.value == (
+        "default_standard_atmosphere"
+    )
+    assert "out_of_certified_band" in score_module.flagged_strata(
+        prediction.notices
+    )
+
+
+@pytest.mark.parametrize(
+    ("element", "couple"),
+    (("Cr", "Cr2plus_over_Cr3plus"), ("Ti", "Ti3plus_over_Ti4plus")),
+)
+def test_named_non_fe_valence_uses_independent_fe_ferric_evidence(
+    element, couple
+):
+    from simulator.battery.fo2_ladder import resolve_row_fo2
+
+    _, row, experiment, bench = _in_domain_buffer_context()
+    row = replace(
+        row,
+        identity=replace(
+            row.identity,
+            quantity=Quantity.VALENCE_RATIO,
+            species=Species(element, Phase.L),
+            valence_basis=State.of(
+                parse_valence_basis(
+                    couple, species_formula=element
+                )
+            ),
+        ),
+        point_conditions={
+            **row.point_conditions,
+            "Fe3_over_sum_Fe": F.located(Decimal("0.2")),
+        },
+    )
+    resolved = resolve_row_fo2(
+        experiment, bench, row, quantity=Quantity.VALENCE_RATIO
+    )
+    assert resolved is not None
+    assert resolved.tier == 2
+    assert resolved.route.startswith("kress_inverse:")
 
 
 def _patch_melts_cell(monkeypatch, cell_for):

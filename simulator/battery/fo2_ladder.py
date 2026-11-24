@@ -50,7 +50,6 @@ from simulator.battery.identity import Identity, quantity_token
 from simulator.battery.redox_fields import (
     FE3_FE2_RATIO_PRINTED_FIELDS,
     FERRIC_FRACTION_FIELDS,
-    SCORED_REDOX_QUANTITIES,
 )
 from simulator.battery.oxygen_balance import _cell_oxygen_class
 from simulator.battery.records import (
@@ -63,6 +62,8 @@ from simulator.battery.records import (
 )
 from simulator.source_ids import RYS_SOURCE_ID
 from simulator.battery.waypoints import (
+    PressureQualification,
+    VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
     Waypoint,
     WaypointAuthority,
     WaypointResult,
@@ -82,10 +83,31 @@ _TIER3_ATMOSPHERE_ROUTES = (
     "graphite_c_co_buffer",
     "buffer_relation",
 )
-_VACUUM_ROUTE = "vacuum_total_pressure_upper_bound"
 _EFFUSION_ROUTE = "effusion_oxygen_balance"
 _BLANK_CARRIER = frozenset({"", "none", "n/a", "na", "absent", "unknown", "null"})
 _TEMPERATURE_UNSET = object()
+
+
+@dataclass(frozen=True)
+class Fo2LadderNotice(Notice):
+    """Typed ladder selection passed to prediction consumers."""
+
+    route: str = ""
+    fo2_tier: int = 0
+    physics_rung: int | None = None
+    selected_fO2_Pa: Decimal | None = None
+    pressure_qualification: PressureQualification | None = None
+    pressure_route: str | None = None
+    pressure_pa: Decimal | None = None
+
+
+@dataclass(frozen=True)
+class PredictionPressureNotice(Notice):
+    """Typed pressure route and qualification used for engine execution."""
+
+    route: str = ""
+    pressure_pa: Decimal | None = None
+    pressure_qualification: PressureQualification | None = None
 
 
 @dataclass(frozen=True)
@@ -114,7 +136,12 @@ _PHYSICS_RUNG_LABELS = {
 }
 
 
-def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
+def fo2_tier_notice(
+    quantity: Quantity,
+    resolved: ResolvedFo2,
+    *,
+    original_reason: str | None = None,
+) -> Notice:
     reason = f"fo2_tier={resolved.tier}"
     if resolved.physics_rung is not None:
         reason += (
@@ -136,7 +163,27 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
             if resolved.borrowed
             else NoticeKind.SOURCE_DISAGREEMENT
         )
-    notice = Notice(
+    selected_bar = (
+        resolved.po2_bar
+        if resolved.po2_bar is not None
+        else 10.0**resolved.log10_fO2_bar
+    )
+    selected_pa = Decimal(str(selected_bar * PA_PER_BAR))
+    pressure_qualification: PressureQualification | None = None
+    if resolved.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE:
+        pressure_qualification = PressureQualification.VACUUM_UPPER_BOUND_SUBSTITUTED
+    reason = (
+        f"{reason}; selected_fO2_Pa={selected_bar * PA_PER_BAR:g}"
+        if original_reason is not None
+        and resolved.route != VACUUM_PRESSURE_UPPER_BOUND_ROUTE
+        else reason
+    )
+    if (
+        original_reason is not None
+        and resolved.route != VACUUM_PRESSURE_UPPER_BOUND_ROUTE
+    ):
+        reason = f"{reason}; original_reason={original_reason}"
+    notice = Fo2LadderNotice(
         kind=kind,
         affected_quantities=(quantity,),
         reason=reason,
@@ -144,24 +191,28 @@ def fo2_tier_notice(quantity: Quantity, resolved: ResolvedFo2) -> Notice:
         band=f"borrowed fO2: {resolved.route}" if resolved.borrowed else None,
         authority=Authority.BRIDGE if resolved.borrowed else None,
         fo2_mode=Fo2Mode.SHARED_LADDER,
+        route=resolved.route,
+        fo2_tier=resolved.tier,
+        physics_rung=resolved.physics_rung,
+        selected_fO2_Pa=selected_pa,
+        pressure_qualification=pressure_qualification,
     )
-    if resolved.route == _VACUUM_ROUTE:
-        selected_pa_bar = (
-            resolved.po2_bar
-            if resolved.po2_bar is not None
-            else 10.0**resolved.log10_fO2_bar
-        )
-        selected_pa = selected_pa_bar * PA_PER_BAR
+    if resolved.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE:
         notice = replace(
             notice,
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
             band="vacuum pO2 upper bound substituted at Ptotal",
             authority=Authority.EXTRAPOLATED,
             reason=(
-                f"{reason}; selected_fO2_Pa={selected_pa:g}; "
+                f"{reason}; selected_fO2_Pa={selected_bar * PA_PER_BAR:g}; "
                 "Dalton pO2 <= Ptotal; the upper bound was substituted as a point"
             ),
         )
+        if original_reason is not None:
+            notice = replace(
+                notice,
+                reason=f"{notice.reason}; original_reason={original_reason}",
+            )
     return notice
 
 
@@ -297,7 +348,15 @@ def resolve_row_fo2(
     # does not replace the cell's explicit oxygen control or effusion balance.
     # A tier-2 inverse of the point's own ferric fraction is not an independent
     # oxygen condition (SC-458 / DP-017). Omitting quantity keeps the inverse.
-    scored_ferric_target = quantity in SCORED_REDOX_QUANTITIES
+    scored_ferric_target = (
+        quantity is Quantity.FE3_FE2_RATIO
+        or (
+            quantity is Quantity.VALENCE_RATIO
+            and identity is not None
+            and identity.species is not None
+            and identity.species.formula == "Fe"
+        )
+    )
     if not knudsen_vapour and not scored_ferric_target:
         tier2 = _tier2(observation, weights, temperature, experiment, bench, identity)
         if tier2 is not None:
@@ -387,7 +446,7 @@ def resolve_row_fo2(
     if metal_saturation_activity_refusal(experiment, observation, quantity) is not None:
         return None
     for route in routes:
-        if route.route == _VACUUM_ROUTE:
+        if route.route == VACUUM_PRESSURE_UPPER_BOUND_ROUTE:
             log = _log_point(route.value)
             if log is not None:
                 return ResolvedFo2(

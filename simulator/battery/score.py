@@ -8747,30 +8747,6 @@ def _comparison_identity(
 
 # Clauses the ladder owns. They are qualification, not the route name.
 # ``original_reason`` is a caller suffix and may follow any of them.
-_LADDER_OWNED_CLAUSE = re.compile(
-    r"; (?:selected_fO2_Pa=[^;]*"
-    r"|Dalton pO2 <= Ptotal"
-    r"|the upper bound was substituted as a point)"
-)
-_LADDER_ORIGINAL_REASON = re.compile(r"; original_reason=.*\Z")
-_SHARED_LADDER_REASON = re.compile(
-    r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)"
-)
-
-
-def _ladder_route_text(reason: str) -> re.Match[str] | None:
-    """Route text with ladder-owned qualification removed.
-
-    Vacuum places the Dalton sentence between the selected pressure and the
-    caller's missing-input reason. A shared caller may omit that reason.
-    Route suffixes the ladder does not own, including a borrowed marker and
-    an effusion-closure note, stay on the route.
-    """
-
-    stripped = _LADDER_ORIGINAL_REASON.sub("", _LADDER_OWNED_CLAUSE.sub("", reason))
-    return _SHARED_LADDER_REASON.fullmatch(stripped)
-
-
 def _selected_shared_ladder_oxygen(
     prediction: EnginePrediction,
 ) -> tuple[Decimal | None, int, int | None, str] | None:
@@ -8782,20 +8758,21 @@ def _selected_shared_ladder_oxygen(
     reports one. The selected-pressure qualification is not part of the route.
     """
 
+    from simulator.battery.fo2_ladder import Fo2LadderNotice
+
     for notice in prediction.notices:
         if (
-            notice.origin != "fo2_ladder"
+            not isinstance(notice, Fo2LadderNotice)
             or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
         ):
             continue
-        match = _ladder_route_text(notice.reason)
-        if match is None:
-            continue
-        route = match.group(3)
-        borrowed_suffix = "; borrowed"
-        if route.endswith(borrowed_suffix):
-            route = route[:-len(borrowed_suffix)]
-        physics_rung = None if match.group(2) is None else int(match.group(2))
+        route = notice.route
+        physics_rung = None
+        # The ladder notice owns the rung in its typed qualification; older
+        # payloads without it simply have no rung.
+        rung = getattr(notice, "physics_rung", None)
+        if rung is not None:
+            physics_rung = int(rung)
         value_pa: Decimal | None = None
         if has_own_engine_solved_oxygen_balance(
             prediction.engine, prediction.notices
@@ -8807,7 +8784,7 @@ def _selected_shared_ladder_oxygen(
             state = prediction.identity.fO2_Pa
             if state is not None and state.is_value and state.value is not None:
                 value_pa = state.value
-        return value_pa, int(match.group(1)), physics_rung, route
+        return value_pa, notice.fo2_tier, physics_rung, route
     return None
 
 
@@ -9279,8 +9256,8 @@ def _fe_redox_pressure(
 
     A typed identity point wins. Otherwise one eligible prediction pressure
     supplies the amount: the shared waypoint, including a printed vacuum
-    upper bound and excluding Knudsen chamber background. A bound that is
-    not that vacuum evidence stays an invalid input. The returned state is
+    upper bound and excluding Knudsen chamber background. Missing or
+    unqualified pressure uses the stated 1-atm default. The returned state is
     never a ``Value`` wrapper.
     """
 
@@ -9305,41 +9282,28 @@ def _fe_redox_pressure(
         pressure_bar = float(amount) / PA_PER_BAR
         pressure_pa = typed
     else:
-        point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
-        if point_pressure is not None:
-            pressure_bar = float(point_pressure) / PA_PER_BAR
-            pressure_pa = State.of(point_pressure)
-        elif experiment is not None:
+        if experiment is not None:
             from simulator.battery.waypoints import (
-                _prediction_pressure_waypoint,
                 eligible_prediction_pressure,
-                pressure_boundary,
             )
 
             selected = eligible_prediction_pressure(experiment, bench, observation)
             if selected is not None:
-                typed, _route = selected
+                typed = selected.value
                 amount = nominal_pressure_pa(typed)
                 if amount is None:
                     return invalid()
                 pressure_bar = float(amount) / PA_PER_BAR
                 pressure_pa = typed
-            else:
-                boundary = _prediction_pressure_waypoint(
-                    pressure_boundary(experiment, bench, observation),
-                    experiment.method,
-                )
-                if boundary is not None:
-                    return invalid()
         if pressure_pa is None and observation.source_id == "borisov-2018-compilation":
             # The cited compilation is explicitly a 1-atm dataset.
-            pressure_bar = 1.01325
+            pressure_bar = float(ATM_PA_DECIMAL) / PA_PER_BAR
             pressure_pa = State.of(ATM_PA_DECIMAL)
         elif pressure_pa is None:
-            return _FeRedoxRefusal(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "total_pressure_Pa"},
-            )
+            # Unknown or unqualified pressure is a stated 1-atm extension.
+            # The prediction wrapper attaches the typed default qualification.
+            pressure_bar = float(ATM_PA_DECIMAL) / PA_PER_BAR
+            pressure_pa = State.of(ATM_PA_DECIMAL)
     if (
         pressure_bar is None
         or pressure_pa is None
@@ -9691,19 +9655,10 @@ def _unprinted_redox_oxygen(
         if resolved.po2_bar is not None
         else log10_fo2_to_pa(Decimal(str(fo2_log)))
     )
-    notice = fo2_tier_notice(quantity, resolved)
-    reason = notice.reason
-    if "selected_fO2_Pa=" not in reason:
-        selected_bar = (
-            resolved.po2_bar
-            if resolved.po2_bar is not None
-            else 10.0 ** resolved.log10_fO2_bar
-        )
-        reason = (
-            f"{reason}; selected_fO2_Pa={selected_bar * float(PA_PER_BAR):g}"
-        )
-    reason = (
-        f"{reason}; original_reason=source does not print fO2 for this run"
+    notice = fo2_tier_notice(
+        quantity,
+        resolved,
+        original_reason="source does not print fO2 for this run",
     )
     # A non-borrowed ladder default is SOURCE_DISAGREEMENT, which the headline
     # still treats as measured. The redox fallback is a stated default, so it
@@ -9714,10 +9669,7 @@ def _unprinted_redox_oxygen(
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
             band=notice.band or f"defaulted fO2: {resolved.route}",
             authority=notice.authority or Authority.BRIDGE,
-            reason=reason,
         )
-    else:
-        notice = replace(notice, reason=reason)
     return fo2_log, commanded, notice
 
 
@@ -13096,7 +13048,7 @@ def predict_with_engine(
             handles and handles.get(Engine.INTERNAL_ANALYTICAL.value) is not None
         )
     if isinstance(handles, dict):
-        return _engine_prediction_or_unparseable_component(
+        prediction = _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -13107,11 +13059,14 @@ def predict_with_engine(
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
         )
+        return _with_pressure_qualification(
+            prediction, observation, experiment, bench
+        )
 
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _engine_prediction_or_unparseable_component(
+        prediction = _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,
@@ -13121,6 +13076,9 @@ def predict_with_engine(
             fo2_mode=fo2_mode,
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
+        )
+        return _with_pressure_qualification(
+            prediction, observation, experiment, bench
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -13132,6 +13090,90 @@ def predict_with_engine(
             exclude=provided_handles,
             active_error=sys.exc_info()[1],
         )
+
+
+def _with_pressure_qualification(
+    prediction: EnginePrediction,
+    observation: Observation,
+    experiment: Experiment | None,
+    bench: Bench | None,
+) -> EnginePrediction:
+    """Carry pressure substitutions and defaults into the prediction tier."""
+
+    quantity = quantity_token(observation.identity)
+    if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+        return prediction
+    from simulator.battery.fo2_ladder import (
+        Fo2LadderNotice,
+        PredictionPressureNotice,
+    )
+    from simulator.battery.waypoints import (
+        PressureQualification,
+        eligible_prediction_pressure,
+    )
+
+    selected = (
+        eligible_prediction_pressure(experiment, bench, observation)
+        if experiment is not None
+        else None
+    )
+    if selected is not None:
+        if selected.qualification is None:
+            return prediction
+        route = selected.route
+        pressure = nominal_pressure_pa(selected.value)
+        qualification = selected.qualification
+    else:
+        identity = observation.identity
+        identity_pressure = (
+            identity.total_pressure_Pa if isinstance(identity, Identity) else None
+        )
+        if identity_pressure is not None:
+            typed = identity_pressure_state(identity_pressure)
+            if typed is not None and nominal_pressure_pa(typed) is not None:
+                return prediction
+        if observation.source_id == "borisov-2018-compilation":
+            # Its 1-atm condition is explicitly established by the source.
+            return prediction
+        route = "default_standard_atmosphere"
+        pressure = ATM_PA_DECIMAL
+        qualification = PressureQualification.DEFAULT_STANDARD_ATMOSPHERE
+    if pressure is None:
+        return prediction
+    notice = PredictionPressureNotice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(quantity,),
+        reason=f"pressure qualification: {qualification.value}",
+        origin="fo2_ladder",
+        band=f"pressure default or substitution: {qualification.value}",
+        authority=Authority.BRIDGE,
+        fo2_mode=Fo2Mode.SHARED_LADDER,
+        route=route,
+        pressure_pa=pressure,
+        pressure_qualification=qualification,
+    )
+    ladder_notice = next(
+        (
+            item
+            for item in prediction.notices
+            if isinstance(item, Fo2LadderNotice)
+        ),
+        None,
+    )
+    if ladder_notice is None:
+        notices = (*prediction.notices, notice)
+    else:
+        qualified = replace(
+            ladder_notice,
+            pressure_route=route,
+            pressure_pa=pressure,
+            pressure_qualification=qualification,
+        )
+        notices = tuple(
+            qualified if item is ladder_notice else item
+            for item in prediction.notices
+        )
+    return replace(prediction, notices=notices)
 
 
 _BUILTIN_SCORE_PREDICTOR = predict_with_engine

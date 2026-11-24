@@ -58,6 +58,15 @@ class WaypointAuthority(StrEnum):
     ASSUMED = "assumed"
 
 
+class PressureQualification(StrEnum):
+    APPROXIMATE_POINT = "approximate_point"
+    VACUUM_UPPER_BOUND_SUBSTITUTED = "vacuum_upper_bound_substituted"
+    DEFAULT_STANDARD_ATMOSPHERE = "default_standard_atmosphere"
+
+
+VACUUM_PRESSURE_UPPER_BOUND_ROUTE = "vacuum_total_pressure_upper_bound"
+
+
 class WaypointFlag(StrEnum):
     GEOMETRIC_ONLY = "geometric_only"
     ASSUMPTION = "assumption"
@@ -141,6 +150,15 @@ class WaypointResult:
     selected: Waypoint | None
     routes: tuple[Waypoint, ...]
     absence: WaypointAbsence | None = None
+
+
+@dataclass(frozen=True)
+class PredictionPressure:
+    """The pressure passed to a prediction and its evidence qualification."""
+
+    value: State
+    route: str
+    qualification: PressureQualification | None = None
 
 
 @dataclass(frozen=True)
@@ -1907,7 +1925,7 @@ def eligible_prediction_pressure(
     experiment: Experiment,
     bench: Bench | None,
     observation: Observation | None = None,
-) -> tuple[State, str] | None:
+) -> PredictionPressure | None:
     """One eligible prediction pressure and the waypoint route that supplied it.
 
     A point keeps the typed identity state, including an approximate band.
@@ -1924,15 +1942,21 @@ def eligible_prediction_pressure(
         return None
     typed = identity_pressure_state(boundary.value)
     if typed is not None and nominal_pressure_pa(typed) is not None:
-        return typed, boundary.route
+        qualification = (
+            PressureQualification.APPROXIMATE_POINT
+            if boundary.value.approximate
+            else None
+        )
+        return PredictionPressure(typed, boundary.route, qualification)
     vacuum_pa = printed_vacuum_upper_bound_pa(boundary, experiment, observation)
     if vacuum_pa is None:
         return None
-    return (
-        identity_pressure_from_converted_point(
+    return PredictionPressure(
+        value=identity_pressure_from_converted_point(
             vacuum_pa, approximate=boundary.value.approximate
         ),
-        boundary.route,
+        route=VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
+        qualification=PressureQualification.VACUUM_UPPER_BOUND_SUBSTITUTED,
     )
 
 
@@ -2122,7 +2146,7 @@ def oxygen_condition(
             routes.append(Waypoint(
                 "oxygen_condition",
                 value,
-                "vacuum_total_pressure_upper_bound",
+                VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
                 WaypointAuthority.EXTRAPOLATED,
                 (*boundary.inputs, "Dalton: pO2 <= P_total"),
                 notice=f"{qualification}upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",
