@@ -550,7 +550,7 @@ def test_d139_rows_are_kept_flagged_in_temperature_panels(
 
     methods = files["methods"].read_text(encoding="utf-8").casefold()
     assert (
-        "plotted scatter, chart a, and the headline rms share one population; "
+        "the dex scatter, dex rows in chart a, and the headline rms share one population; "
         "uncalibrated kems p_partial rows (d-139) are drawn tinted and counted, "
         "not excluded."
     ) in methods

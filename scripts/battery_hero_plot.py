@@ -4169,7 +4169,7 @@ def _draw_scorecard_png(
     figure.text(
         0.5,
         0.94,
-        "Error = log10(predicted / measured), dex · closer to 0 is better · "
+        "Dex error = log10(predicted / measured) · closer to 0 is better · "
         "hollow diamonds: each engine on its own rows; not a like-for-like comparison",
         ha="center",
         fontsize=6.6,
@@ -4343,7 +4343,7 @@ def _draw_scorecard_png(
             axis.text(
                 0.02,
                 absolute_heading_y,
-                "Flagged absolute (native units)",
+                "Flagged absolute: predicted − measured (native units)",
                 transform=axis.get_yaxis_transform(),
                 ha="left",
                 va="center",

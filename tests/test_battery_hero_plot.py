@@ -2162,7 +2162,7 @@ def test_flagged_absolute_residual_has_separate_native_unit_tier(
         [],
         (("residue_composition", "Residue composition"),),
     )
-    assert "Flagged absolute (native units)" in rendered_text
+    assert "Flagged absolute: predicted − measured (native units)" in rendered_text
     assert any("RMS 3 wt_percent (n=1" in text for text in rendered_text)
     assert any(NoticeKind.OUT_OF_CERTIFIED_BAND.value in text for text in rendered_text)
     assert not any(text.startswith("not scored:") for text in rendered_text)
@@ -2303,7 +2303,7 @@ def test_flagged_absolute_probe_detects_reenabled_dex_only_drop(
             [],
             (("residue_composition", "Residue composition"),),
         )
-        assert "Flagged absolute (native units)" in rendered_text and any(
+        assert "Flagged absolute: predicted − measured (native units)" in rendered_text and any(
             "RMS 2 wt_percent (n=1" in text for text in rendered_text
         ), "native RMS missing from rendered collection scorecard"
 
