@@ -6834,6 +6834,16 @@ def _uncertainty_unit(
     return QUANTITY_UNITS[quantity]
 
 
+def _battery_hero_subtype_scale(subtype: str | None) -> str | None:
+    """Return the physical percent scale declared by a closed subtype."""
+
+    if subtype in {"wt_percent", "oxide_wt_percent", "mass_percent"}:
+        return "mass_percent"
+    if subtype in {"mole_percent", "mol_percent"}:
+        return "mole_percent"
+    return None
+
+
 def _convert_uncertainty_width(
     quantity: Quantity,
     width: Decimal,
@@ -6867,15 +6877,7 @@ def _convert_uncertainty_width(
         # A series point inherits its unit from the parent column and carries
         # that parent id; its subtype supplies the same explicit scale. Sanity:
         # a 0.17 wt% width stays 0.17 mass_percent, never 0.0017.
-        mass_percent_subtypes = {"wt_percent", "oxide_wt_percent", "mass_percent"}
-        mole_percent_subtypes = {"mole_percent", "mol_percent"}
-        declared_scale = (
-            "mass_percent"
-            if subtype in mass_percent_subtypes
-            else "mole_percent"
-            if subtype in mole_percent_subtypes
-            else None
-        )
+        declared_scale = _battery_hero_subtype_scale(subtype)
         mass_percent_units = {
             "wt%", "wt.%", "wt_percent", "mass%", "masspercent",
             "mass_percent", "mass-percent",
