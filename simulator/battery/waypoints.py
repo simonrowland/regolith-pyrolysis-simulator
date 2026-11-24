@@ -30,6 +30,7 @@ from simulator.battery.migrate import (
     invalid_run_composition,
 )
 from simulator.battery.records import (
+    ApproxPressure,
     Bench,
     Composition,
     Derivation,
@@ -47,7 +48,11 @@ from simulator.battery.records import (
     nominal_pressure_pa,
 )
 from simulator.lab_schedule import LAB_SCHEDULE_PRESSURE_FLOOR_MBAR
-from simulator.physical_constants import BAR_PA_DECIMAL, GAS_CONSTANT_DECIMAL
+from simulator.physical_constants import (
+    ATM_PA_DECIMAL,
+    BAR_PA_DECIMAL,
+    GAS_CONSTANT_DECIMAL,
+)
 from simulator.transport_constants import COLLISION_DIAMETERS_M, FREE_MOLECULAR_KNUDSEN_MIN
 
 
@@ -56,6 +61,15 @@ class WaypointAuthority(StrEnum):
     DERIVED = "derived"
     EXTRAPOLATED = "extrapolated"
     ASSUMED = "assumed"
+
+
+class PressureQualification(StrEnum):
+    APPROXIMATE_POINT = "approximate_point"
+    VACUUM_UPPER_BOUND_SUBSTITUTED = "vacuum_upper_bound_substituted"
+    DEFAULT_STANDARD_ATMOSPHERE = "default_standard_atmosphere"
+
+
+VACUUM_PRESSURE_UPPER_BOUND_ROUTE = "vacuum_total_pressure_upper_bound"
 
 
 class WaypointFlag(StrEnum):
@@ -141,6 +155,16 @@ class WaypointResult:
     selected: Waypoint | None
     routes: tuple[Waypoint, ...]
     absence: WaypointAbsence | None = None
+
+
+@dataclass(frozen=True)
+class PredictionPressure:
+    """The pressure passed to a prediction and its evidence qualification."""
+
+    value: State
+    route: str
+    qualification: PressureQualification | None = None
+    source_gap: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -273,11 +297,14 @@ def _condition_value(experiment: Experiment, name: str) -> Value | None:
 
 
 def _point_condition(
-    experiment: Experiment, observation: Observation | None, key: str, name: str
+    experiment: Experiment | None, observation: Observation | None, key: str, name: str
 ) -> Waypoint | None:
     if observation is None:
         return None
-    if observation.experiment_id != experiment.experiment_id:
+    if (
+        experiment is not None
+        and observation.experiment_id != experiment.experiment_id
+    ):
         raise ValueError("Observation belongs to a different experiment")
     located = (observation.point_conditions or {}).get(key)
     if located is None or not located.state.is_value:
@@ -1474,17 +1501,24 @@ def relevant_volume(experiment: Experiment, bench: Bench) -> WaypointResult:
 
 
 def pressure_boundary(
-    experiment: Experiment,
+    experiment: Experiment | None,
     bench: Bench | None,
     observation: Observation | None = None,
 ) -> WaypointResult:
     routes: list[Waypoint] = []
-    point = _point_condition(experiment, observation, "total_pressure_Pa", "pressure_boundary")
+    point = _point_condition(
+        experiment, observation, "total_pressure_Pa", "pressure_boundary"
+    )
     if point is not None:
         routes.append(point)
-    printed = _value(experiment.pressure_environment.total_pressure_Pa)
+    run_pressure = (
+        None
+        if experiment is None
+        else experiment.pressure_environment.total_pressure_Pa
+    )
+    printed = _value(run_pressure)
     if printed is not None:
-        run_pressure = experiment.pressure_environment.total_pressure_Pa
+        assert run_pressure is not None
         routes.append(Waypoint("pressure_boundary", printed, "printed_run_pressure",
             WaypointAuthority.DERIVED if run_pressure.inference else WaypointAuthority.PRINTED,
             ("experiment.pressure_environment.total_pressure_Pa",)))
@@ -1510,9 +1544,7 @@ def pressure_boundary(
                 # Sanity: Q=1e-5 Pa*m3/s and S=1e-2 m3/s gives 1e-3 Pa.
                 routes.append(Waypoint("pressure_boundary", derived, "steady_gas_load_over_pump_speed", WaypointAuthority.DERIVED, ("bench.other_facts.gas_load_Pa_m3_s", "bench.pumping_speed_m3_s")))
     pressure_inputs = {
-        "experiment.pressure_environment.total_pressure_Pa": _value(
-            experiment.pressure_environment.total_pressure_Pa
-        ) is not None,
+        "experiment.pressure_environment.total_pressure_Pa": printed is not None,
         "bench.other_facts.gas_load_Pa_m3_s": gas_load is not None and _value(gas_load.value) is not None,
         "bench.pumping_speed_m3_s": speed is not None,
     }
@@ -1861,7 +1893,7 @@ _VACUUM_PRESSURE_NOTE_TOKENS = (
 
 def printed_vacuum_upper_bound_pa(
     boundary: Waypoint,
-    experiment: Experiment,
+    experiment: Experiment | None,
     observation: Observation | None,
 ) -> Decimal | None:
     """Eligible printed vacuum upper bound in pascals, or None.
@@ -1874,7 +1906,11 @@ def printed_vacuum_upper_bound_pa(
 
     if boundary.route not in {"printed_run_pressure", "observation_total_pressure_Pa"}:
         return None
-    located_pressure = experiment.pressure_environment.total_pressure_Pa
+    located_pressure = (
+        None
+        if experiment is None
+        else experiment.pressure_environment.total_pressure_Pa
+    )
     if boundary.route == "observation_total_pressure_Pa" and observation is not None:
         located_pressure = (observation.point_conditions or {}).get("total_pressure_Pa")
     locator_note = (
@@ -1903,11 +1939,84 @@ def printed_vacuum_upper_bound_pa(
     return upper_pa
 
 
-def eligible_prediction_pressure(
-    experiment: Experiment,
+def _prediction_pressure_candidate(
+    experiment: Experiment | None,
     bench: Bench | None,
     observation: Observation | None = None,
-) -> tuple[State, str] | None:
+) -> tuple[PredictionPressure | None, tuple[str, ...]]:
+    identity = getattr(observation, "identity", None)
+    identity_pressure = getattr(identity, "total_pressure_Pa", None)
+    identity_gap = (
+        (f"identity.total_pressure_Pa: {identity_pressure.reason}",)
+        if isinstance(identity_pressure, State)
+        and not identity_pressure.is_value
+        and identity_pressure.reason
+        else ()
+    )
+    typed_identity_pressure = (
+        identity_pressure_state(identity_pressure)
+        if identity_pressure is not None
+        else None
+    )
+    amount = (
+        nominal_pressure_pa(typed_identity_pressure)
+        if typed_identity_pressure is not None
+        else None
+    )
+    if amount is not None and amount.is_finite() and amount > 0:
+        raw = typed_identity_pressure.value if typed_identity_pressure.is_value else None
+        approximate = isinstance(raw, ApproxPressure) or (
+            isinstance(raw, Value) and raw.approximate
+        )
+        return PredictionPressure(
+            typed_identity_pressure,
+            "identity.total_pressure_Pa",
+            PressureQualification.APPROXIMATE_POINT if approximate else None,
+        ), ()
+
+    boundary = pressure_boundary(experiment, bench, observation)
+    method = None if experiment is None else experiment.method
+
+    selected = _prediction_pressure_waypoint(boundary, method)
+    missing = (
+        tuple(boundary.absence.missing)
+        if boundary.absence is not None
+        else ()
+    )
+    missing = (*missing, *identity_gap)
+    if selected is None or not isinstance(selected.value, Value):
+        return None, missing
+    typed = identity_pressure_state(selected.value)
+    amount = None if typed is None else nominal_pressure_pa(typed)
+    if typed is not None and amount is not None and amount.is_finite() and amount > 0:
+        qualification = (
+            PressureQualification.APPROXIMATE_POINT
+            if selected.value.approximate
+            else None
+        )
+        return PredictionPressure(typed, selected.route, qualification), missing
+
+    vacuum_pa = (
+        None
+        if experiment is None
+        else printed_vacuum_upper_bound_pa(selected, experiment, observation)
+    )
+    if vacuum_pa is None:
+        return None, missing
+    return PredictionPressure(
+        value=identity_pressure_from_converted_point(
+            vacuum_pa, approximate=selected.value.approximate
+        ),
+        route=VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
+        qualification=PressureQualification.VACUUM_UPPER_BOUND_SUBSTITUTED,
+    ), missing
+
+
+def eligible_prediction_pressure(
+    experiment: Experiment | None,
+    bench: Bench | None,
+    observation: Observation | None = None,
+) -> PredictionPressure | None:
     """One eligible prediction pressure and the waypoint route that supplied it.
 
     A point keeps the typed identity state, including an approximate band.
@@ -1915,24 +2024,39 @@ def eligible_prediction_pressure(
     which is the evidence ``oxygen_condition`` accepts. Any other bound stays
     absent. Knudsen chamber background is not a prediction pressure.
     """
-
-    boundary = _prediction_pressure_waypoint(
-        pressure_boundary(experiment, bench, observation),
-        experiment.method,
+    selected, _missing = _prediction_pressure_candidate(
+        experiment, bench, observation
     )
-    if boundary is None or not isinstance(boundary.value, Value):
-        return None
-    typed = identity_pressure_state(boundary.value)
-    if typed is not None and nominal_pressure_pa(typed) is not None:
-        return typed, boundary.route
-    vacuum_pa = printed_vacuum_upper_bound_pa(boundary, experiment, observation)
-    if vacuum_pa is None:
-        return None
-    return (
-        identity_pressure_from_converted_point(
-            vacuum_pa, approximate=boundary.value.approximate
-        ),
-        boundary.route,
+    return selected
+
+
+def redox_prediction_pressure(
+    experiment: Experiment | None,
+    bench: Bench | None,
+    observation: Observation,
+) -> PredictionPressure:
+    """Return the redox pressure selection, including its flagged default."""
+
+    selected, missing = _prediction_pressure_candidate(
+        experiment, bench, observation
+    )
+    if selected is not None:
+        return selected
+    if observation.source_id == "borisov-2018-compilation":
+        return PredictionPressure(
+            State.of(ATM_PA_DECIMAL),
+            "borisov_source_stated_1_atm",
+            source_gap=missing,
+        )
+    if experiment is not None:
+        source_pressure = experiment.pressure_environment.total_pressure_Pa
+        if source_pressure is not None and source_pressure.state.reason:
+            missing = (*missing, f"source reason: {source_pressure.state.reason}")
+    return PredictionPressure(
+        State.of(ATM_PA_DECIMAL),
+        "default_standard_atmosphere",
+        PressureQualification.DEFAULT_STANDARD_ATMOSPHERE,
+        missing,
     )
 
 
@@ -2122,7 +2246,7 @@ def oxygen_condition(
             routes.append(Waypoint(
                 "oxygen_condition",
                 value,
-                "vacuum_total_pressure_upper_bound",
+                VACUUM_PRESSURE_UPPER_BOUND_ROUTE,
                 WaypointAuthority.EXTRAPOLATED,
                 (*boundary.inputs, "Dalton: pO2 <= P_total"),
                 notice=f"{qualification}upper bound from printed vacuum {upper_pa} Pa, {locator_text}; bound, not a measurement",

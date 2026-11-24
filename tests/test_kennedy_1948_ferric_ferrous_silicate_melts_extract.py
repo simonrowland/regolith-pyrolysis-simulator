@@ -562,6 +562,23 @@ def test_kennedy_fidelity_pin_detects_a_changed_table2_cell(tmp_path: Path):
 
 def test_kennedy_table2_fidelity_pin_covers_the_observation():
     source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    table2_pins = [
+        sample
+        for sample in source["fidelity_samples"]
+        if sample.get("path", "").startswith(
+            "species.Fe.observations[kennedy_1948_table2_run_series].values.rows["
+        )
+        and sample.get("locator", {}).get("table") == "II"
+    ]
+    assert len(table2_pins) == 88
+    assert {
+        sample["locator"]["record"] for sample in table2_pins
+    } == {f"Table II row {row}" for row in range(1, 23)}
+    assert all(
+        sample["locator"]["source_path"]
+        == "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
+        for sample in table2_pins
+    )
     warnings = vle.fidelity_source_warnings(source, label=EXTRACT.stem)
     assert not {
         warning.kind for warning in warnings

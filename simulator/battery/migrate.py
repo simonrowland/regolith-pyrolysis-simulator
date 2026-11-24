@@ -1400,6 +1400,17 @@ def to_plain(obj: object) -> object:
         if obj.rejection_kind is not None:
             payload["rejection_kind"] = obj.rejection_kind.value
         return payload
+    if isinstance(obj, Notice):
+        # Prediction-only notice subclasses carry typed selection data in
+        # memory. Serialize the stable Notice contract, not those internal
+        # scorer fields.
+        return {
+            ("class" if item.name == "class_" else item.name): to_plain(
+                getattr(obj, item.name)
+            )
+            for item in fields(Notice)
+            if getattr(obj, item.name) is not None
+        }
     if is_dataclass(obj) and not isinstance(obj, type):
         out: dict[str, object] = {}
         for item in fields(obj):

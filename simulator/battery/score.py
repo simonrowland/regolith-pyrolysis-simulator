@@ -44,6 +44,9 @@ from typing import (
 
 import yaml
 
+if TYPE_CHECKING:
+    from simulator.battery.waypoints import PredictionPressure
+
 from simulator.chemistry.formula_text import fold_subscript_digits
 from simulator.battery.decimal_tokens import decimal_token as _dec_token
 from simulator.battery.oxygen_identity import log10_fo2_to_pa
@@ -120,6 +123,7 @@ from simulator.battery.identity import (
     IdentityEqualOutcome,
     PA_PER_BAR_DEC,
     THERMOCHEMICAL_CALORIE_J,
+    _pa_to_bar_float,
     _AXIS_NAMES,
     identity_equal,
     _identity_equal,
@@ -158,7 +162,6 @@ from simulator.battery.input_provenance import (
     single_phase_printed_bulk_policy,
 )
 from simulator.physical_constants import (
-    ATM_PA_DECIMAL,
     GAS_CONSTANT,
     GAS_CONSTANT_DECIMAL,
     PA_PER_BAR,
@@ -230,7 +233,6 @@ from simulator.battery.records import (
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
-    identity_pressure_state,
     nominal_pressure_pa,
     charge_value,
     phase_token,
@@ -8747,30 +8749,6 @@ def _comparison_identity(
 
 # Clauses the ladder owns. They are qualification, not the route name.
 # ``original_reason`` is a caller suffix and may follow any of them.
-_LADDER_OWNED_CLAUSE = re.compile(
-    r"; (?:selected_fO2_Pa=[^;]*"
-    r"|Dalton pO2 <= Ptotal"
-    r"|the upper bound was substituted as a point)"
-)
-_LADDER_ORIGINAL_REASON = re.compile(r"; original_reason=.*\Z")
-_SHARED_LADDER_REASON = re.compile(
-    r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)"
-)
-
-
-def _ladder_route_text(reason: str) -> re.Match[str] | None:
-    """Route text with ladder-owned qualification removed.
-
-    Vacuum places the Dalton sentence between the selected pressure and the
-    caller's missing-input reason. A shared caller may omit that reason.
-    Route suffixes the ladder does not own, including a borrowed marker and
-    an effusion-closure note, stay on the route.
-    """
-
-    stripped = _LADDER_ORIGINAL_REASON.sub("", _LADDER_OWNED_CLAUSE.sub("", reason))
-    return _SHARED_LADDER_REASON.fullmatch(stripped)
-
-
 def _selected_shared_ladder_oxygen(
     prediction: EnginePrediction,
 ) -> tuple[Decimal | None, int, int | None, str] | None:
@@ -8782,20 +8760,21 @@ def _selected_shared_ladder_oxygen(
     reports one. The selected-pressure qualification is not part of the route.
     """
 
+    from simulator.battery.fo2_ladder import Fo2LadderNotice
+
     for notice in prediction.notices:
         if (
-            notice.origin != "fo2_ladder"
+            not isinstance(notice, Fo2LadderNotice)
             or notice.fo2_mode is not Fo2Mode.SHARED_LADDER
         ):
             continue
-        match = _ladder_route_text(notice.reason)
-        if match is None:
-            continue
-        route = match.group(3)
-        borrowed_suffix = "; borrowed"
-        if route.endswith(borrowed_suffix):
-            route = route[:-len(borrowed_suffix)]
-        physics_rung = None if match.group(2) is None else int(match.group(2))
+        route = notice.route
+        physics_rung = None
+        # The ladder notice owns the rung in its typed qualification; older
+        # payloads without it simply have no rung.
+        rung = getattr(notice, "physics_rung", None)
+        if rung is not None:
+            physics_rung = int(rung)
         value_pa: Decimal | None = None
         if has_own_engine_solved_oxygen_balance(
             prediction.engine, prediction.notices
@@ -8807,7 +8786,7 @@ def _selected_shared_ladder_oxygen(
             state = prediction.identity.fO2_Pa
             if state is not None and state.is_value and state.value is not None:
                 value_pa = state.value
-        return value_pa, int(match.group(1)), physics_rung, route
+        return value_pa, notice.fo2_tier, physics_rung, route
     return None
 
 
@@ -9270,19 +9249,10 @@ def _printed_fe_redox_fo2_log(
 
 
 def _fe_redox_pressure(
-    observation: Observation,
-    identity: Identity,
-    experiment: Experiment | None,
-    bench: Bench | None = None,
+    *,
+    pressure_selection: PredictionPressure,
 ) -> tuple[float, State[Any]] | _FeRedoxRefusal:
-    """Physical pressure for a redox command, as a typed identity state.
-
-    A typed identity point wins. Otherwise one eligible prediction pressure
-    supplies the amount: the shared waypoint, including a printed vacuum
-    upper bound and excluding Knudsen chamber background. A bound that is
-    not that vacuum evidence stays an invalid input. The returned state is
-    never a ``Value`` wrapper.
-    """
+    """Physical pressure for a redox command from the shared typed selection."""
 
     def invalid() -> _FeRedoxRefusal:
         return _FeRedoxRefusal(
@@ -9290,62 +9260,10 @@ def _fe_redox_pressure(
             {"reason": "invalid_input", "input": "total_pressure_Pa"},
         )
 
-    pressure_bar: float | None = None
-    pressure_pa: State[Any] | None = None
-    identity_pressure = identity.total_pressure_Pa
-    if (
-        identity_pressure is not None
-        and identity_pressure.is_value
-        and identity_pressure.value is not None
-    ):
-        typed = identity_pressure_state(identity_pressure)
-        amount = None if typed is None else nominal_pressure_pa(typed)
-        if typed is None or amount is None:
-            return invalid()
-        pressure_bar = float(amount) / PA_PER_BAR
-        pressure_pa = typed
-    else:
-        point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
-        if point_pressure is not None:
-            pressure_bar = float(point_pressure) / PA_PER_BAR
-            pressure_pa = State.of(point_pressure)
-        elif experiment is not None:
-            from simulator.battery.waypoints import (
-                _prediction_pressure_waypoint,
-                eligible_prediction_pressure,
-                pressure_boundary,
-            )
-
-            selected = eligible_prediction_pressure(experiment, bench, observation)
-            if selected is not None:
-                typed, _route = selected
-                amount = nominal_pressure_pa(typed)
-                if amount is None:
-                    return invalid()
-                pressure_bar = float(amount) / PA_PER_BAR
-                pressure_pa = typed
-            else:
-                boundary = _prediction_pressure_waypoint(
-                    pressure_boundary(experiment, bench, observation),
-                    experiment.method,
-                )
-                if boundary is not None:
-                    return invalid()
-        if pressure_pa is None and observation.source_id == "borisov-2018-compilation":
-            # The cited compilation is explicitly a 1-atm dataset.
-            pressure_bar = 1.01325
-            pressure_pa = State.of(ATM_PA_DECIMAL)
-        elif pressure_pa is None:
-            return _FeRedoxRefusal(
-                RefusalReason.IDENTITY_INCOMPLETE,
-                {"reason": "missing_input", "input": "total_pressure_Pa"},
-            )
-    if (
-        pressure_bar is None
-        or pressure_pa is None
-        or pressure_bar < 0.0
-        or not math.isfinite(pressure_bar)
-    ):
+    pressure_pa = pressure_selection.value
+    amount = nominal_pressure_pa(pressure_pa)
+    pressure_bar = None if amount is None else _pa_to_bar_float(amount)
+    if pressure_bar is None:
         return invalid()
     return pressure_bar, pressure_pa
 
@@ -9663,6 +9581,7 @@ def _unprinted_redox_oxygen(
     bench: Bench | None,
     observation: Observation,
     material: _FeRedoxMaterial,
+    pressure_selection: PredictionPressure | None = None,
 ) -> tuple[float, State, Notice] | None:
     """Shared-ladder oxygen when the source does not print fO2.
 
@@ -9682,6 +9601,7 @@ def _unprinted_redox_oxygen(
         composition_wt=material.composition_wt,
         temperature_K=float(material.temperature),
         quantity=quantity,
+        prediction_pressure=pressure_selection,
     )
     if resolved is None:
         return None
@@ -9691,19 +9611,10 @@ def _unprinted_redox_oxygen(
         if resolved.po2_bar is not None
         else log10_fo2_to_pa(Decimal(str(fo2_log)))
     )
-    notice = fo2_tier_notice(quantity, resolved)
-    reason = notice.reason
-    if "selected_fO2_Pa=" not in reason:
-        selected_bar = (
-            resolved.po2_bar
-            if resolved.po2_bar is not None
-            else 10.0 ** resolved.log10_fO2_bar
-        )
-        reason = (
-            f"{reason}; selected_fO2_Pa={selected_bar * float(PA_PER_BAR):g}"
-        )
-    reason = (
-        f"{reason}; original_reason=source does not print fO2 for this run"
+    notice = fo2_tier_notice(
+        quantity,
+        resolved,
+        original_reason="source does not print fO2 for this run",
     )
     # A non-borrowed ladder default is SOURCE_DISAGREEMENT, which the headline
     # still treats as measured. The redox fallback is a stated default, so it
@@ -9714,10 +9625,7 @@ def _unprinted_redox_oxygen(
             kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
             band=notice.band or f"defaulted fO2: {resolved.route}",
             authority=notice.authority or Authority.BRIDGE,
-            reason=reason,
         )
-    else:
-        notice = replace(notice, reason=reason)
     return fo2_log, commanded, notice
 
 
@@ -9731,6 +9639,7 @@ def _predict_redox(
     isolated: bool | None = None,
     experiment: Experiment | None = None,
     bench: Bench | None = None,
+    pressure_selection: PredictionPressure | None = None,
 ) -> EnginePrediction:
     """Predict Fe redox or a pinned OpenIMCC Cr/Ti valence couple.
 
@@ -9760,6 +9669,12 @@ def _predict_redox(
                 "detail": _FE_REDOX_NO_SPLIT_DETAIL,
             },
             identity=identity,
+        )
+    if pressure_selection is None:
+        from simulator.battery.waypoints import redox_prediction_pressure
+
+        pressure_selection = redox_prediction_pressure(
+            experiment, bench, observation
         )
 
     melts = engine in _MELTS_FE_REDOX_ENGINES
@@ -9848,7 +9763,7 @@ def _predict_redox(
                     {"reason": "missing_input", "input": "printed_fO2"},
                 )
             selected = _unprinted_redox_oxygen(
-                experiment, bench, observation, material
+                experiment, bench, observation, material, pressure_selection
             )
             if selected is None:
                 return refused(
@@ -9859,7 +9774,7 @@ def _predict_redox(
             material_notices.append(oxygen_notice)
     elif fo2_log is None:
         selected = _unprinted_redox_oxygen(
-            experiment, bench, observation, material
+            experiment, bench, observation, material, pressure_selection
         )
         if selected is None:
             return refused(
@@ -10010,7 +9925,9 @@ def _predict_redox(
             ),
         )
 
-    pressure = _fe_redox_pressure(observation, identity, experiment, bench)
+    pressure = _fe_redox_pressure(
+        pressure_selection=pressure_selection,
+    )
     if isinstance(pressure, _FeRedoxRefusal):
         return refused(pressure.reason, pressure.detail)
     pressure_bar, pressure_pa = pressure
@@ -12935,6 +12852,7 @@ def _predict_named_fe_valence(
     isolated: bool | None,
     experiment: Experiment | None = None,
     bench: Bench | None = None,
+    pressure_selection: PredictionPressure | None = None,
 ) -> EnginePrediction:
     """Route a named valence to the engine that models its couple.
 
@@ -12977,6 +12895,7 @@ def _predict_named_fe_valence(
                 isolated=isolated,
                 experiment=experiment,
                 bench=bench,
+                pressure_selection=pressure_selection,
             )
         if engine is Engine.OPENIMCC:
             basis_state = identity.valence_basis
@@ -13022,6 +12941,7 @@ def _predict_named_fe_valence(
         isolated=isolated,
         experiment=experiment,
         bench=bench,
+        pressure_selection=pressure_selection,
     )
 
 
@@ -13036,6 +12956,7 @@ def _engine_prediction_or_unparseable_component(
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
     phase_siblings: Mapping[str, Decimal] | None = None,
     phase_sibling_refusal: str | None = None,
+    pressure_selection: PredictionPressure | None = None,
 ) -> EnginePrediction:
     """Return one prediction. One unparseable component refuses that row."""
 
@@ -13052,6 +12973,7 @@ def _engine_prediction_or_unparseable_component(
             fo2_mode=fo2_mode,
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
+            pressure_selection=pressure_selection,
         )
     except UnparseableCompositionComponent as exc:
         identity = (
@@ -13095,8 +13017,17 @@ def predict_with_engine(
         isolated = not bool(
             handles and handles.get(Engine.INTERNAL_ANALYTICAL.value) is not None
         )
+    identity = observation.identity if isinstance(observation.identity, Identity) else None
+    quantity = quantity_token(identity) if identity is not None else None
+    pressure_selection = None
+    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+        from simulator.battery.waypoints import redox_prediction_pressure
+
+        pressure_selection = redox_prediction_pressure(
+            experiment, bench, observation
+        )
     if isinstance(handles, dict):
-        return _engine_prediction_or_unparseable_component(
+        prediction = _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=handles,
@@ -13106,12 +13037,16 @@ def predict_with_engine(
             fo2_mode=fo2_mode,
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
+            pressure_selection=pressure_selection,
+        )
+        return _with_pressure_qualification(
+            prediction, pressure_selection
         )
 
     provided_handles = handles or {}
     resolved_handles = dict(provided_handles)
     try:
-        return _engine_prediction_or_unparseable_component(
+        prediction = _engine_prediction_or_unparseable_component(
             engine,
             observation,
             handles=resolved_handles,
@@ -13121,6 +13056,10 @@ def predict_with_engine(
             fo2_mode=fo2_mode,
             phase_siblings=phase_siblings,
             phase_sibling_refusal=phase_sibling_refusal,
+            pressure_selection=pressure_selection,
+        )
+        return _with_pressure_qualification(
+            prediction, pressure_selection
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -13132,6 +13071,86 @@ def predict_with_engine(
             exclude=provided_handles,
             active_error=sys.exc_info()[1],
         )
+
+
+def _with_pressure_qualification(
+    prediction: EnginePrediction,
+    pressure_selection: PredictionPressure | None,
+) -> EnginePrediction:
+    """Report the selected pressure without re-running the waypoint selector."""
+
+    if pressure_selection is None or pressure_selection.qualification is None:
+        return prediction
+    quantity = quantity_token(prediction.identity)
+    if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+        return prediction
+    from simulator.battery.fo2_ladder import (
+        Fo2LadderNotice,
+        PredictionPressureNotice,
+    )
+    pressure = nominal_pressure_pa(pressure_selection.value)
+    if pressure is None or not pressure.is_finite():
+        return prediction
+    inverse_pressure_used = any(
+        isinstance(item, Fo2LadderNotice)
+        and item.route.startswith("kress_inverse:")
+        for item in prediction.notices
+    )
+    identity = prediction.identity
+    actual_pressure = (
+        None
+        if not isinstance(identity, Identity) or identity.total_pressure_Pa is None
+        else nominal_pressure_pa(identity.total_pressure_Pa)
+    )
+    pressure_was_used = inverse_pressure_used or (
+        prediction.engine is not Engine.OPENIMCC
+        and prediction.execution.state is ExecutionState.PRODUCED
+        and prediction.execution.call_evidence is not None
+        and actual_pressure == pressure
+    )
+    if not pressure_was_used:
+        return prediction
+    route = pressure_selection.route
+    qualification = pressure_selection.qualification
+    source_gap = " | ".join(pressure_selection.source_gap) or "none"
+    detail = (
+        f"pressure qualification={qualification.value}; selected_pressure_Pa={pressure}; "
+        f"pressure_route={route}; pressure_source_gap={source_gap}"
+    )
+    notice = PredictionPressureNotice(
+        kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+        affected_quantities=(quantity,),
+        reason=detail,
+        origin="fo2_ladder",
+        band=f"pressure default or substitution: {qualification.value}",
+        authority=Authority.BRIDGE,
+        route=route,
+        pressure_pa=pressure,
+        pressure_qualification=qualification,
+    )
+    ladder_notice = next(
+        (
+            item
+            for item in prediction.notices
+            if isinstance(item, Fo2LadderNotice)
+        ),
+        None,
+    )
+    if ladder_notice is None:
+        notices = (*prediction.notices, notice)
+    else:
+        qualified = replace(
+            ladder_notice,
+            reason=f"{ladder_notice.reason}; {detail}",
+            pressure_route=route,
+            pressure_pa=pressure,
+            pressure_qualification=qualification,
+        )
+        notices = tuple(
+            qualified if item is ladder_notice else item
+            for item in prediction.notices
+        )
+    return replace(prediction, notices=notices)
 
 
 _BUILTIN_SCORE_PREDICTOR = predict_with_engine
@@ -14257,6 +14276,7 @@ def _predict_with_engine(
     fo2_mode: Fo2Mode = Fo2Mode.SHARED_LADDER,
     phase_siblings: Mapping[str, Decimal] | None = None,
     phase_sibling_refusal: str | None = None,
+    pressure_selection: PredictionPressure | None = None,
 ) -> EnginePrediction:
     """Dispatch one engine at the observation Identity. Isolated MELTS cells."""
 
@@ -14367,6 +14387,7 @@ def _predict_with_engine(
             isolated=isolated,
             experiment=experiment,
             bench=bench,
+            pressure_selection=pressure_selection,
         )
     phase_basis = _subtype_text(identity)
     # Equilibrium ratios share EQUILIBRIUM_PHASE_COMPOSITION but are not
@@ -14401,6 +14422,7 @@ def _predict_with_engine(
             isolated=isolated,
             experiment=experiment,
             bench=bench,
+            pressure_selection=pressure_selection,
         )
     wall_prediction = _wall_deposition_quantity_prediction(
         engine, observation, identity, quantity, channel, sources

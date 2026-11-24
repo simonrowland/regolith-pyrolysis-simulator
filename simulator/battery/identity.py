@@ -264,6 +264,20 @@ def bar_to_pa(pressure_bar: object) -> Decimal:
     return as_decimal(pressure_bar) * PA_PER_BAR_DEC
 
 
+# Premise: Kress consumers receive total pressure in Pa and require bar.
+# Algebra: P_bar = P_Pa / 100000. Unit check: Pa / (Pa/bar) = bar.
+# Sanity: 250000 Pa becomes 2.5 bar.
+def _pa_to_bar_float(pressure_pa: object) -> float | None:
+    try:
+        pressure = as_decimal(pressure_pa)
+        if not pressure.is_finite() or pressure <= 0:
+            return None
+        pressure_bar = float(pressure) / float(PA_PER_BAR_DEC)
+    except (ArithmeticError, TypeError, ValueError):
+        return None
+    return pressure_bar if math.isfinite(pressure_bar) and pressure_bar > 0 else None
+
+
 def atm_to_pa(pressure_atm: object) -> Decimal:
     return as_decimal(pressure_atm) * PA_PER_ATM_DEC
 

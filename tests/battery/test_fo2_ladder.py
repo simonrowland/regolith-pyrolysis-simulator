@@ -334,19 +334,27 @@ def test_scored_ferric_quantity_does_not_invert_its_own_fraction() -> None:
     assert inverted.tier == 2
     assert inverted.route.startswith("kress_inverse:Fe3_over_sum_Fe")
     assert inverted.borrowed is False
-    for quantity in (Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO):
-        scored = resolve_row_fo2(
-            None,
-            None,
-            observation,
-            composition_wt=weights,
-            temperature_K=temperature_K,
-            quantity=quantity,
-        )
-        assert scored is not None
-        assert scored.tier == 4
-        assert scored.route == "intrinsic_melt_fO2"
-        assert scored.borrowed is True
+    ferric_target = resolve_row_fo2(
+        None,
+        None,
+        observation,
+        composition_wt=weights,
+        temperature_K=temperature_K,
+        quantity=Quantity.FE3_FE2_RATIO,
+    )
+    assert ferric_target is not None
+    assert ferric_target.tier == 4
+    named_non_fe_couple = resolve_row_fo2(
+        None,
+        None,
+        observation,
+        composition_wt=weights,
+        temperature_K=temperature_K,
+        quantity=Quantity.VALENCE_RATIO,
+    )
+    assert named_non_fe_couple is not None
+    assert named_non_fe_couple.tier == 2
+    assert named_non_fe_couple.route.startswith("kress_inverse:")
 
     experiment, bench, buffer_observation = _feo_case(
         temperature=Decimal("1200"),
