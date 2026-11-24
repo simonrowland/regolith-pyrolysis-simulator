@@ -783,10 +783,11 @@ def test_raw_key_hot_binary_and_exact_round_trip(
     _engine_cache_counters(reset=True)
     hot = {"status": "ok", "activity": 0.12345678901234566}
     request = {"temperature_K": 1700.0}
-    digest = engine_cache_key("openimcc", "1", request)
+    chemistry_version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    digest = engine_cache_key("openimcc", chemistry_version, request)
 
     assert isinstance(digest, bytes) and 4 <= len(digest) <= 128
-    assert digest[:3] == bytes((1, 0, 1))
+    assert digest[:3] == bytes((1, 0, chemistry_version))
     assert engine_cache.cached_engine_call(
         "openimcc", request, lambda: hot
     ) == hot
@@ -805,7 +806,7 @@ def test_raw_key_hot_binary_and_exact_round_trip(
         "activity": 0.12345678901234566,
         "status": "ok",
     }
-    assert row[2:4] == ("openimcc", "1")
+    assert row[2:4] == ("openimcc", str(chemistry_version))
 
 
 def test_sqlite_hit_populates_bounded_memory_cache_and_next_hit_skips_sqlite(
@@ -928,31 +929,40 @@ def test_stateless_internal_analytical_cache_call_hits(
     assert database.exists()
 
 
-def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
+@pytest.mark.parametrize(
+    ("engine_name", "old_version", "new_version"),
+    (("openimcc", 1, 2), ("internal-analytical", 3, 4)),
+)
+def test_scored_projection_chemistry_version_change_is_a_miss(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
+    engine_name: str,
+    old_version: int,
+    new_version: int,
 ) -> None:
     database = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     _engine_cache_counters(reset=True)
-    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", 1)
+    assert engine_cache.ENGINE_CHEMISTRY_VERSION[engine_name] == new_version
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, engine_name, old_version)
     request = {
-        "call": "evaluate_gas",
-        "pack": "default",
+        "call": "scored oxygen-balance composition",
+        "composition_wt_pct": {"K2O": 7.0, "SiO2": 93.0},
+        "po2": {"mode": "oxygen_balance_effusion", "po2_bar": None},
     }
     calls = 0
 
     def solve() -> dict[str, str]:
         nonlocal calls
         calls += 1
-        return {"chemistry_version": str(engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"])}
+        return {"chemistry_version": str(engine_cache.ENGINE_CHEMISTRY_VERSION[engine_name])}
 
-    first = engine_cache.cached_engine_call("openimcc", request, solve)
-    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", 2)
-    second = engine_cache.cached_engine_call("openimcc", request, solve)
+    first = engine_cache.cached_engine_call(engine_name, request, solve)
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, engine_name, new_version)
+    second = engine_cache.cached_engine_call(engine_name, request, solve)
 
-    assert first == {"chemistry_version": "1"}
-    assert second == {"chemistry_version": "2"}
+    assert first == {"chemistry_version": str(old_version)}
+    assert second == {"chemistry_version": str(new_version)}
     assert calls == 2
 
 
@@ -1877,7 +1887,8 @@ def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
     engine_cache.engine_cache_counters(reset=True)
     request = {"call": "conflicting-writer"}
-    digest = engine_cache.engine_cache_key("openimcc", 1, request)
+    chemistry_version = engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"]
+    digest = engine_cache.engine_cache_key("openimcc", chemistry_version, request)
 
     def solve() -> dict[str, str]:
         connection = engine_cache._CONNECTIONS[(str(database), False)]
@@ -1890,7 +1901,7 @@ def test_concurrent_cache_writer_counts_different_bytes_without_replacing(
                 digest,
                 sqlite3.Binary(existing_value),
                 "openimcc",
-                "1",
+                str(chemistry_version),
                 "existing-box",
                 1,
             ),
@@ -1958,7 +1969,9 @@ def test_malformed_hot_value_is_a_counted_conflict_and_not_replaced(
 
     connection = engine_cache._connect(database, readonly=False)
     assert connection is not None
-    digest = engine_cache_key("openimcc", 1, request)
+    digest = engine_cache_key(
+        "openimcc", engine_cache.ENGINE_CHEMISTRY_VERSION["openimcc"], request
+    )
     connection.execute(
         "UPDATE engine_outputs SET value=? WHERE key=?",
         (sqlite3.Binary(b"not-zlib"), digest),

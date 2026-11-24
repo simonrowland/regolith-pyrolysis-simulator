@@ -21,6 +21,28 @@ def _isolated_cache():
     engine_cache._MEMORY_CACHE.clear()
 
 
+def _assert_probe_key_ignores_source_changes(
+    engine: str,
+    version: int,
+    probe_request: dict,
+    _tmp_path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """Changing forensic build identity must not change engine request keys."""
+    expected_key = engine_cache.engine_cache_key(engine, version, probe_request)
+    original_identity = engine_cache._forensic_build_identity
+    original_value = original_identity(engine)
+
+    def changed_identity(engine_id: str) -> str:
+        if engine_id == engine:
+            return f"{original_value}:changed-source"
+        return original_identity(engine_id)
+
+    monkeypatch.setattr(engine_cache, "_forensic_build_identity", changed_identity)
+    assert engine_cache._forensic_build_identity(engine) != original_value
+    assert engine_cache.engine_cache_key(engine, version, probe_request) == expected_key
+
+
 def test_new_cold_row_records_forensic_build_identity(tmp_path, monkeypatch) -> None:
     path = tmp_path / "engine-cache.sqlite"
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(path))

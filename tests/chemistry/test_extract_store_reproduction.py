@@ -1274,6 +1274,31 @@ def test_adopted_observation_reproduction(
     for record in evaluation.records:
         assert record.status in COMPARISON_STATUSES
 
+    if (
+        obs.source_id == "kems-022-demaria-1971"
+        and obs.observation_id == "demaria_1971_k_psat_figure2_digitized"
+    ):
+        initial_charge = [
+            record for record in evaluation.records
+            if record.status == "assumed-input"
+        ]
+        missing_composition = [
+            record for record in evaluation.records
+            if record.status == "unsupported-speciation"
+        ]
+        assert len(initial_charge) == 2
+        assert {
+            float(record.coordinate["temperature_K"])
+            for record in initial_charge
+        } == {1366.12, 1314.06}
+        assert all(
+            record.actual_value is not None and record.actual_value > 0
+            for record in initial_charge
+        )
+        assert len(missing_composition) == 8
+        assert all(record.actual_value is None for record in missing_composition)
+        assert "melt-only oxygen balance" in evaluation.skip_reason
+
     mismatches = [r for r in evaluation.records if r.status == "mismatch"]
     matches = [r for r in evaluation.records if r.status == "match"]
     ordering_scored = [
@@ -1475,6 +1500,7 @@ def test_numeric_activity_executes_melt_activity_model(
     monkeypatch, adopted_observations: tuple[AdoptedObservation, ...]
 ) -> None:
     import simulator.diagnostic_helpers.extract_reproduction as er
+    from dataclasses import replace
 
     real_activity = er.melt_oxide_activity
     calls: list[str] = []
@@ -1491,12 +1517,43 @@ def test_numeric_activity_executes_melt_activity_model(
     )
     evaluation = evaluate_observation(obs, vapor_pressure_data=load_vapor_pressure_data())
     comparable = [r for r in evaluation.records if r.status in {"match", "mismatch"}]
-    assert calls == ["FeO"]
+    assert calls == []
     assert not comparable
-    assert {r.status for r in evaluation.records} == {"assumed-input"}
+    assert {record.status for record in evaluation.records} == {"out-of-domain"}
+    assert all(record.actual_value is None for record in evaluation.records)
+    assert (
+        "typed-refusal:missing_condition:melt_composition"
+        in evaluation.skip_reasons
+    )
+
+    calls.clear()
+    fixture = replace(
+        obs,
+        observation_id="fixture_fe_activity_with_printed_composition",
+        values={
+            **obs.values,
+            "composition_wt_pct": {
+                "SiO2": 45.0,
+                "MgO": 10.0,
+                "Al2O3": 15.0,
+                "CaO": 12.0,
+                "FeO": 18.0,
+            },
+        },
+    )
+    fixture_evaluation = evaluate_observation(
+        fixture, vapor_pressure_data=load_vapor_pressure_data()
+    )
+    fixture_comparable = [
+        record for record in fixture_evaluation.records
+        if record.status in {"match", "mismatch"}
+    ]
+    assert calls == ["FeO"]
+    assert not fixture_comparable
+    assert {record.status for record in fixture_evaluation.records} == {"assumed-input"}
     assert (
         "typed-refusal:missing_capability:documented_melt_activity_coefficient:FeO"
-        in evaluation.skip_reasons
+        in fixture_evaluation.skip_reasons
     )
 
 
@@ -2002,10 +2059,48 @@ def test_coverage_ledger_is_observation_first_and_exact(
     assert coverage["skipped"] == 2050
     assert coverage["comparable"] + coverage["skipped"] == coverage["observations"]
     assert coverage["comparable_points"] == 25
-    # Gap records follow the same +16: Ichise Table 4 adds 17 gap points and
-    # the Markova VI row leaves one, then the residue refusal replaces its
-    # scored point with one gap record.
-    assert coverage["gap_points"] == 2029
+    # The current extracted store has 2,056 gap points, up 27 from the prior
+    # 2,029 pin. The source-role census is separate from that gap arithmetic:
+    # kems-007-costa-2015 has 23 qualifications across 113 migrated children
+    # of costa_2015_fe_partial_pressure_ir_digitized,
+    # costa_2015_fe_partial_pressure_mo_digitized,
+    # costa_2015_fe_vaporization_coefficient_alpha_digitized,
+    # costa_2015_mg_partial_pressure_ir_digitized, and
+    # costa_2015_mg_partial_pressure_mo_digitized. Fo93Fa7 is only the
+    # starting material; no post-run composition is linked. kems-022-
+    # demaria-1971 has 34 across 117 children from its 12022
+    # o2_psat_table1_alkali_range, mn_psat_table2_sample_12022,
+    # cr_psat_table2_sample_12022, mg_psat_table3_lunar_basalt,
+    # al2o_psat_table4, o_atomic_psat_table5,
+    # na_psat_figure1_sample_12022_digitized, and k_psat_figure2_digitized
+    # series (2/3/2/3/9/7/6/2). Those series cite 12022's stated starting
+    # assay, not a post-run composition; 17 separate catalogue proxies remain.
+    # kems-023-demaria-1973 has 16
+    # across 75 children from the quoted De Maria 1971 12022 Table I series
+    # demaria_1973_na_psat_table1_quoted_demaria_1971,
+    # demaria_1973_fe_psat_table1_quoted_demaria_1971,
+    # demaria_1973_mg_psat_table1_quoted_demaria_1971,
+    # demaria_1973_sio_psat_table1_quoted_demaria_1971,
+    # demaria_1973_ca_psat_table1_quoted_demaria_1971,
+    # demaria_1973_tio_psat_table1_quoted_demaria_1971, and
+    # demaria_1973_al_psat_table1_quoted_demaria_1971 (2/3/3/3/2/2/1).
+    # Those vapor-pressure rows cite Smales' complete starting 12022 oxide
+    # suite, with no post-run composition; 11 separate catalogue proxies
+    # remain. Separately reported 0.36 wt% Na2O and 0.068 wt% K2O stay
+    # attributed alkali context.
+    # Source gap points are Costa 15 -> 15, De Maria 1971 40 -> 67, and
+    # De Maria 1973 30 -> 30. The +27 is confined to the De Maria 1971 Na/K
+    # vapor-pressure observations above: their 12022 charge is only an
+    # initial assay, and the Na series' Table 1 oxygen values are contextual
+    # rather than same-temperature run conditions. Its newly exposed Na
+    # points are 1439.68, 1421.06, 1377.03, 1358.33, 1334.94, and 1297.35 K;
+    # its K points are 1366.12 and 1314.06 K. Costa's Fo93Fa7 is likewise
+    # starting material only, while De Maria 1973's Smales assay was already
+    # a gap for unrelated reported-data limits.
+    # The regenerated comparison moves K from 70 points / 69 gaps to 79 / 78
+    # and Na from 109 / 108 to 127 / 126; both still have one mismatch and no
+    # matches. Do not silently repin this result.
+    assert coverage["gap_points"] == 2056, coverage["by_source"]
     assert all(reason.startswith("typed-refusal:") for reason in coverage["skip_reasons"])
     assert any(
         reason.startswith("typed-refusal:not_comparable_system_class:")

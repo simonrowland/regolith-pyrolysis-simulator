@@ -1,0 +1,38 @@
+source_id: kems-007-costa-2015
+source:
+  citation: Costa and Jacobson (2015), Vaporization Studies of Olivine via Knudsen Effusion Mass Spectrometry.
+scope: Mark the existing Fo93Fa7 composition on the paper's own KEMS points as initial charge only.
+target_observable:
+  engine: OpenIMCC vapour equilibrium
+  quantity: p_partial
+sample_link:
+  printed_sample: Fo93Fa7, 93% forsterite and 7% fayalite
+  linkage_quote: An analysis of the starting material is given below.
+  linkage_locator:
+    source_path: text/kems-007-costa-2015/pdftotext-layout.txt
+    page: 2
+    pdf_page_index: 1
+    section: 'Experimental: Starting Material and Characterization'
+  role: initial_charge_only
+linked_rows:
+  direct_study_rows: 23
+  component_basis: MgO, FeO, and SiO2 from Fo93Fa7
+  covered_by_openimcc: true
+  census_comparator_refusals: 30
+  comparator_rows_linked: 0
+  comparator_composition: typed unknown; no sample composition is assigned to Piacente comparator rows
+initial_charge_context:
+  measurement_state_composition: no per-pressure-point composition is linked; after-KEMS characterization is described but not assigned per point
+  run_order_index: not_published per row
+  depletion_evidence: unreported per-run KEMS mass loss, conversion, or fractional loss; the TGA trace is preliminary heat treatment
+  vaporization_congruence: no congruent/incongruent statement reported
+engine_readiness:
+  composition_ready_rows: 23
+  expected_refused_to_callable: 0
+  prediction_tier: existing observations receive composition_from_initial_charge flag
+  comparator_rows_still_refused: 30
+numeric_values_changed: false
+comparison: no new numeric table or plotted values transcribed in this linkage change
+verification:
+  focused_test: tests/battery/test_migrate.py::test_costa_2015_fo93fa7_composition_reaches_migrated_observations
+  isolated_migration_and_store_regen: not run under owner hold

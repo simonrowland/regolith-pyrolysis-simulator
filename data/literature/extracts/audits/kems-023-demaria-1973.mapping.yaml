@@ -1,0 +1,62 @@
+source_id: kems-023-demaria-1973
+source:
+  citation: De Maria and Piacente (1973), Lunar Science IV, 175-177.
+scope: Link only the quoted sample 12022 comparison rows through their cited De Maria et al. 1971 sample identity.
+target_observable:
+  engine: OpenIMCC vapour equilibrium
+  quantity: p_partial
+  evidence_class: quoted_attributed, De Maria et al. 1971 (ref 4)
+  row_count_before: 48 census refusals for missing condensed composition
+sample_link:
+  printed_sample: 12022 in Table I comparison columns
+  row_link: Table I row sample and temperature identify the quoted De Maria 1971 measurements
+  composition_link_quote: >-
+    The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971).
+  composition_link_locator:
+    source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+    page: 2
+    published_page: 1368
+    pdf_page_index: 1
+    line_range: '50'
+  composition_source: data/literature/extracts/audits/smales-1971-lpsc-12022.mapping.yaml
+  role: initial_charge_only
+linked_rows:
+  count: 16
+  groups:
+    - species: Na
+      count: 2
+    - species: Fe
+      count: 3
+    - species: Mg
+      count: 3
+    - species: SiO
+      count: 3
+    - species: Ca
+      count: 2
+    - species: TiO
+      count: 2
+    - species: Al
+      count: 1
+  table: '1'
+  page: 2
+  published_page: 176
+  pdf_page_index: 1
+  page_proof: rendered Table I; the scan's pdftotext layer does not return the table cells
+initial_charge_context:
+  measurement_state_composition: not_published per point in the cited 1971 study
+  run_order_index: not_published in Table I
+  depletion_evidence: unreported quantitative per-run evidence in the cited study
+  vaporization_congruence: no congruent/incongruent statement reported in the cited study
+openimcc_basis:
+  supported: [SiO2, Al2O3, FeO, MgO, CaO, Na2O, K2O, TiO2, MnO]
+  coverage: all selected oxide components are covered; MnO uses the relaxed Cr/Mn oxide basis
+engine_readiness:
+  composition_ready_rows: 16
+  typed_quantity_rows: 16
+  prediction_tier: composition proxy and partial-pressure quantity are typed; engine/species callability is not claimed; evidence remains quoted_attributed
+  unlinked: 32 of the 48 census refusals remain composition-unknown
+  other_sample: 12065 Table I points retain their separately cited 12065 composition; no 12022 charge is copied onto them
+numeric_values_changed: false
+verification:
+  focused_test: tests/battery/test_migrate.py::test_demaria_1973_table1_temperature_and_conditions_reach_every_row
+  isolated_migration: measured in memory after the extract fixes; store regeneration not run under owner hold

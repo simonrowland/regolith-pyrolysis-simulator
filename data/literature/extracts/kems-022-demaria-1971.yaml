@@ -59,7 +59,7 @@ experiments:
   method: knudsen_effusion
   locator:
     published_page: 1370
-    pdf_page_index: 4
+    pdf_page_index: 3
     figure: '2'
     note: Figure-only K pressure readings over samples 12022 and 12065.
 - experiment_id: demaria-1971-main-kems
@@ -118,10 +118,98 @@ species:
           p_atm: 5.54e-09
           p_Pa: 0.0005613405
           sample: '12022'
+          composition_role: &demaria_1971_12022_initial_charge_role
+            value: initial_charge_only
+            quote: >-
+              The chemical and mineralogical composition of the 12022 specimen is reported elsewhere
+              (SMALES, 1971).
+            locator:
+              source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+              page: 2
+              published_page: 1368
+              pdf_page_index: 1
+              paragraph: sample 12022 composition
+              line_range: '50'
+          initial_charge_context: &demaria_1971_12022_initial_charge_context
+            measurement_state_composition:
+              state: {tag: unknown, reason: not_published}
+              locator:
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+                page: 2
+                published_page: 1368
+                pdf_page_index: 1
+                paragraph: initial points
+                line_range: '44'
+                note: >-
+                  The authors say the initial points were selected where they presumed no appreciable
+                  composition variation, but print no composition at each measurement point.
+            run_order_index:
+              state: {tag: unknown, reason: not_published}
+              locator:
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+                page: 2
+                published_page: 1368
+                pdf_page_index: 1
+                paragraph: progressive depletion and fixed temperature procedures
+                line_range: '32'
+                note: The procedures are described but no row-specific run sequence is given.
+            depletion_evidence:
+              state: {tag: unknown, reason: not_published}
+              note: unreported
+              locator:
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+                page: 2
+                published_page: 1368
+                pdf_page_index: 1
+                paragraph: initial points
+                line_range: '44'
+                note: >-
+                  The paper reports qualitative depletion of volatile components but no per-run mass
+                  loss, conversion, or fractional loss.
+            vaporization_congruence:
+              state: {tag: unknown, reason: not_published}
+              locator:
+                source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+                page: 2
+                published_page: 1368
+                pdf_page_index: 1
+                paragraph: vaporization procedure
+                line_range: '32-56'
+                note: No congruent or incongruent vaporization statement is reported.
+          point_conditions:
+            composition: &smales_12022_initial_charge_composition
+              state:
+                tag: value
+                value:
+                  basis: oxide_weight_percent_as_published
+                  amount_basis: mass_percent
+                  components:
+                  - [SiO2, '42.3']
+                  - [Al2O3, '8.2']
+                  - [FeO, '21.6']
+                  - [MgO, '11.9']
+                  - [CaO, '9.0']
+                  - [Na2O, '0.23']
+                  - [K2O, '0.061']
+                  - [TiO2, '4.9']
+                  - [MnO, '0.31']
+              locator:
+                source_path: raw/smales-1971-lpsc-12022/smales-1971-lpsc-12022.pdf
+                page: 2
+                published_page: 1254
+                pdf_page_index: 1
+                table: '2'
+                note: >-
+                  Smales et al. Table 2, sample 12022. The listed oxide sum is 98.501 wt.% by arithmetic;
+                  no total is printed. Cr2O3 is blank and trace components are not included in this map.
         - T_K: 1475.0
           p_atm: 4.96e-08
           p_Pa: 0.00502572
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1433.0
           p_atm: 3.78e-09
           p_Pa: 0.0003830085
@@ -266,7 +354,7 @@ species:
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: Mn(g)
-        quantity: partial_pressure_initial_points
+        quantity: partial_pressure
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
@@ -275,14 +363,26 @@ species:
           p_atm: 7.66e-09
           p_Pa: 0.0007761495
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1609.0
           p_atm: 1.32e-08
           p_Pa: 0.00133749
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1725.0
           p_atm: 8.47e-08
           p_Pa: 0.0085822275
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         co_measured_with:
         - demaria_1971_cr_psat_table2_sample_12022
         co_measurement_note: Mn and Cr tabulated on same Table 2; both present at 1725 K (ratio-recoverable
@@ -327,7 +427,7 @@ species:
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: Cr(g)
-        quantity: partial_pressure_initial_points
+        quantity: partial_pressure
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         activity_order: 1e-5 to 1e-6 (authors)
@@ -336,10 +436,18 @@ species:
           p_atm: 1.03e-08
           p_Pa: 0.0010436475
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1794.0
           p_atm: 6.2e-08
           p_Pa: 0.00628215
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         co_measured_with:
         - demaria_1971_mn_psat_table2_sample_12022
         co_measurement_note: Cr co-tabulated with Mn on Table 2; co-present at 1725 K
@@ -383,7 +491,7 @@ species:
       units: atm as published (p_Pa = p_atm × 101325)
       values:
         gas_species: Mg(g)
-        quantity: partial_pressure_initial_points
+        quantity: partial_pressure
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         activity_note: low activity; same order as pure-oxide decomposition pressures (Altman 1963)
@@ -393,16 +501,28 @@ species:
           p_Pa: 0.0016212000000000002
           instrument: BC
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1694.0
           p_atm: 5.7e-08
           p_Pa: 0.005775525
           instrument: NAA
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1815.0
           p_atm: 3.96e-06
           p_Pa: 0.401247
           instrument: NAA
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1747.0
           p_atm: 1.65e-09
           p_Pa: 0.0001671862
@@ -1284,81 +1404,87 @@ species:
         reliability_note: Only intermediate-range data included by authors; initial (other species still
           depleting) and final (exhaustion) ranges excluded due to poor T-reproducibility of ion intensity.
         points:
-        - <<: &smales_12022_catalogue_composition
-            composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
-            composition_from_sample_catalog: true
-            composition_source_kind: published_same_sample_bulk_analysis
-            composition_source: >-
-              Smales et al. 1971, Tables 1–3, pp. 1254–1255; source observation
-              smales_1971_apollo_12022_bulk_composition_tables1_2_3. Selection rule: use the first
-              reported value for each major oxide in the held Apollo 12 whole-sample bulk analysis;
-              do not average methods. This is the starting bulk composition, not a per-step residue
-              composition. Above about 2000 K DeMaria's stepwise KEMS measures a depleted residue,
-              and no step-specific residue composition is printed.
-            composition_source_observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
-            sample_oxide_composition_wt_pct:
-              SiO2: 42.3
-              Al2O3: 8.2
-              FeO: 21.6
-              MgO: 11.9
-              CaO: 9.0
-              Na2O: 0.23
-              K2O: 0.061
-              TiO2: 4.9
-              MnO: 0.31
-          T_K: 2060.0
+        - T_K: 2060.0
           p_atm: 5.07e-09
           p_Pa: 0.0005137178
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2104.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2104.0
           p_atm: 1.13e-08
           p_Pa: 0.0011449725000000001
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2125.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2125.0
           p_atm: 1.57e-08
           p_Pa: 0.0015908025000000003
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2146.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2146.0
           p_atm: 2.24e-08
           p_Pa: 0.00226968
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2180.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2180.0
           p_atm: 3.65e-08
           p_Pa: 0.0036983625000000003
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2183.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2183.0
           p_atm: 3.82e-08
           p_Pa: 0.003870615
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2194.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2194.0
           p_atm: 4.01e-08
           p_Pa: 0.0040631325
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2290.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2290.0
           p_atm: 1.55e-07
           p_Pa: 0.015705375
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2270.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2270.0
           p_atm: 1.04e-07
           p_Pa: 0.0105378
           instrument: NAA
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - <<: &smales_12065_catalogue_composition
             composition_basis: same_sample_catalog_first_complete_whole_sample_bulk_analysis
             composition_from_sample_catalog: true
@@ -1795,48 +1921,69 @@ species:
         material: Apollo_12_12022_and_12065
         condensed_phase: lunar_basalt_melt
         points:
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2015.0
+        - T_K: 2015.0
           p_atm: 9.2e-08
           p_Pa: 0.009321900000000001
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2060.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2060.0
           p_atm: 2.2e-07
           p_Pa: 0.022291500000000002
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2104.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2104.0
           p_atm: 3.2e-07
           p_Pa: 0.032424
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2146.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2146.0
           p_atm: 6.5e-07
           p_Pa: 0.06586125
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2162.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2162.0
           p_atm: 9.0e-07
           p_Pa: 0.0911925
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2194.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2194.0
           p_atm: 8.54e-07
           p_Pa: 0.08653155
           instrument: NAA
           sample: '12022'
-        - <<: *smales_12022_catalogue_composition
-          T_K: 2270.0
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
+        - T_K: 2270.0
           p_atm: 2.0e-06
           p_Pa: 0.20265
           instrument: NAA
           sample: '12022'
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - <<: *smales_12065_catalogue_composition
           T_K: 2320.0
           p_atm: 1.63e-06
@@ -1983,19 +2130,26 @@ species:
         material: Apollo_12_12022
         condensed_phase: lunar_basalt_melt
         sample: '12022'
+        composition_role: *demaria_1971_12022_initial_charge_role
+        initial_charge_context: *demaria_1971_12022_initial_charge_context
         <<: &composition_12022
-          sample_Na2O_wt_pct: 0.36
-          sample_K2O_wt_pct: 0.068
           sample_alkali_content_wt_pct:
             Na2O: 0.36
             K2O: 0.068
+          sample_alkali_content_locator:
+            source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+            page: 3
+            published_page: 1369
+            pdf_page_index: 2
+            paragraph: Alkaline components
+            note: Separate printed alkali values retained as context, not merged into the Smales bulk analysis.
           composition_method_class: quoted_literature
           composition_attribution: "Smales 1971, as cited by DeMaria et al. 1971 ('reported elsewhere (SMALES, 1971)')"
-          composition_source_gap: >-
-            DeMaria et al. (1971, p. 1368) state that the chemical and mineralogical composition of sample
-            12022 is reported elsewhere (SMALES, 1971). Their p. 1369 alkaline-components paragraph prints
-            only Na2O 0.36 wt % and K2O 0.068 wt %. These partial values do not represent the lunar-basalt
-            bulk composition and are not normalized.
+          composition_source_note: >-
+            DeMaria et al. (1971, p. 1368) refer the 12022 bulk composition to Smales (1971), Table 2.
+            Their p. 1369 alkaline-components paragraph separately prints Na2O 0.36 wt % and K2O 0.068 wt %;
+            those partial values are retained as printed context and are not merged into or averaged with
+            the Smales bulk analysis.
           composition_source_locator:
             source_id: smales-1971-lpsc-12022
             observation_id: smales_1971_apollo_12022_bulk_composition_tables1_2_3
@@ -2003,7 +2157,7 @@ species:
             quote: Apollo 12 rock 12022 analytical composition
             cited_by_source_id: kems-022-demaria-1971
             citing_published_page: 1368
-            citing_pdf_page_index: 2
+            citing_pdf_page_index: 1
             citing_paragraph: sample 12022 composition
             citing_quote: “The chemical and mineralogical composition of the 12022 specimen is reported elsewhere (SMALES, 1971).”
         prior_figure_digitization_present: true
@@ -2090,6 +2244,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018427, repeatability: 0.010374, total: 0.028932}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.018717, total: 0.061774}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1421.06
           invT_times_1e4_K_inv: 7.037
           log10_p_atm: -6.145
@@ -2106,6 +2262,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000641, total: 0.019123}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000135, total: 0.043192}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1377.03
           invT_times_1e4_K_inv: 7.262
           log10_p_atm: -6.716
@@ -2122,6 +2280,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000438, total: 0.018920}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001314, total: 0.044371}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1358.33
           invT_times_1e4_K_inv: 7.362
           log10_p_atm: -7.148
@@ -2138,6 +2298,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000665, total: 0.019147}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001943, total: 0.045000}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1334.94
           invT_times_1e4_K_inv: 7.491
           log10_p_atm: -7.460
@@ -2154,6 +2316,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000620, total: 0.019102}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.001950, total: 0.045007}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
         - T_K: 1297.35
           invT_times_1e4_K_inv: 7.708
           log10_p_atm: -8.037
@@ -2170,6 +2334,8 @@ species:
           reading_uncertainty:
             x: {calibration_residual: 0.000131, marker_half_width: 0.018351, repeatability: 0.000899, total: 0.019381}
             y: {calibration_residual: 0.003188, marker_half_width: 0.039869, repeatability: 0.000780, total: 0.043837}
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
       equipment:
         orifice_area:
           value: 4.154756e-06
@@ -2780,7 +2946,7 @@ species:
       type: psat_series
       locator:
         published_page: 1370
-        pdf_page_index: 4
+        pdf_page_index: 3
         figure: '2'
         paragraph: Temperature dependence of K partial pressures over samples 12022 and 12065
         note: Figure-only readings from the 300 dpi page image; axes are log10(P/atm) and 1/T × 10^4 K^-1.
@@ -2806,12 +2972,20 @@ species:
         points:
         - T_K: 1366.12
           <<: *composition_12022
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
           invT_times_1e4_K_inv: 7.32
           log10_p_atm: -7.35
           p_atm: 4.466836e-08
           series: sample_12022_circle_line
         - T_K: 1314.06
           <<: *composition_12022
+          composition_role: *demaria_1971_12022_initial_charge_role
+          initial_charge_context: *demaria_1971_12022_initial_charge_context
+          point_conditions:
+            composition: *smales_12022_initial_charge_composition
           invT_times_1e4_K_inv: 7.61
           log10_p_atm: -7.60
           p_atm: 2.511886e-08
@@ -2962,14 +3136,15 @@ fidelity_samples:
     source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
     table: '8'
     line_range: 328-330
-- species: Na
-  observable: psat_series
-  observation_id: demaria_1971_na_psat_figure1_sample_12022_digitized
-  field: sample_Na2O_wt_pct
+- path: species.Na.observations[demaria_1971_na_psat_figure1_sample_12022_digitized].values.sample_alkali_content_wt_pct.Na2O
   value: 0.36
   locator:
-    figure: '1'
-    paragraph: 0.36 wt% Na2O in sample 12022 text
+    source_path: text/kems-022-demaria-1971/mineru/source/vlm/source.md
+    page: 3
+    published_page: 1369
+    pdf_page_index: 2
+    paragraph: Alkaline components
+    note: Printed Na2O 0.36 wt% retained as context, not as the starting-charge analysis.
 - species: Fe
   observable: activity_coefficient
   observation_id: demaria_1971_multi_rotating_geometry_absence_b1
