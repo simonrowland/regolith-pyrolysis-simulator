@@ -994,8 +994,7 @@ def test_categorical_printed_composition_routes_no_wt_percent() -> None:
 
 
 def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
-    """An inferred point composition must never outrank a printed wt%: the
-    observation scope bit is not evidence authority."""
+    """A point map located separately from its temperature is lower evidence."""
     printed = {"MgO": Decimal("40.304"), "SiO2": Decimal("60.083")}
     sample = Sample(
         mass_kg=Located(factories.State.unknown("intensive point only")),
@@ -1010,15 +1009,22 @@ def test_printed_wt_percent_outranks_inferred_observation_composition() -> None:
                 AmountBasis.MOLE_FRACTION,
             )
         ),
-        factories.loc(),
+        factories.loc(published_page=10, table="1"),
         Derivation(
-            "calculated_from_printed_recipe_or_aimed_target",
-            ("assumed",), (), "mol_fraction",
+            "wt_pct_to_mole_fraction",
+            ("printed but separately located inferred map",), (), "mole_fraction",
         ),
+    )
+    point_temperature = Located(
+        factories.State.of(Decimal("1743")),
+        factories.loc(published_page=11, table="2"),
     )
     observation = replace(
         factories.observation("obs", experiment.experiment_id, factories.o2_identity(), 1),
-        point_conditions={"composition": inferred},
+        point_conditions={
+            "composition": inferred,
+            "temperature_K": point_temperature,
+        },
     )
     result = normalized_composition(experiment, _bench(), observation)
     assert result.selected is not None
@@ -1041,9 +1047,10 @@ def test_same_temperature_printed_datum_outranks_shared_starting_charge() -> Non
         )
     )
     experiment = replace(factories.kems_experiment(), sample=sample)
+    point_locator = factories.loc(published_page=277, table="2")
     point = Located(
         factories.State.of(datum),
-        factories.loc(published_page=277, table="2"),
+        point_locator,
         Derivation(
             "SiO2_wt_pct=100-K2O_wt_pct;wt_pct_to_mole_fraction",
             ("printed Table 2 datum: 18.44 wt% K2O at 1743 K",),
@@ -1058,7 +1065,12 @@ def test_same_temperature_printed_datum_outranks_shared_starting_charge() -> Non
             factories.o2_identity(),
             1,
         ),
-        point_conditions={"composition": point},
+        point_conditions={
+            "composition": point,
+            "temperature_K": Located(
+                factories.State.of(Decimal("1743")), point_locator
+            ),
+        },
     )
 
     result = normalized_composition(experiment, _bench(), observation)
@@ -1066,6 +1078,7 @@ def test_same_temperature_printed_datum_outranks_shared_starting_charge() -> Non
     assert result.selected is not None
     assert result.selected.route == "observation_normalized_initial_composition"
     assert result.selected.value == dict(datum.components)
+    assert result.selected.notice is not None
 
 
 def test_initial_charge_proxy_does_not_rank_as_same_temperature_print() -> None:

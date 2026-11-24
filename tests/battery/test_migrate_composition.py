@@ -3803,6 +3803,26 @@ def test_gaillard_as_printed_water_echoes_keep_live_compositions() -> None:
     )
 
 
+def test_treating_printed_charge_as_run_breaks_gaillard_composition_pin(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    resolver = migrate_module.composition_roles.resolve_point_composition
+
+    def treat_printed_as_run(*args, **kwargs):
+        result = resolver(*args, **kwargs)
+        if result.source == "printed" and result.composition.is_unknown:
+            return replace(result, source="point")
+        return result
+
+    monkeypatch.setattr(
+        migrate_module.composition_roles,
+        "resolve_point_composition",
+        treat_printed_as_run,
+    )
+    with pytest.raises(AssertionError):
+        test_gaillard_as_printed_water_echoes_keep_live_compositions()
+
+
 def test_refused_high_kept_total_has_no_projection_notice() -> None:
     printed = {
         "SiO2": Decimal("40"),
@@ -7710,9 +7730,8 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
         f"{source_id}.yaml",
         write=False,
     )
-    # Hashimoto 1983, Table 3, p. 116. The two C3-(2) run observations at
-    # 1700 and 1800 C are the explicitly labelled run rows; the other two
-    # pins cover the remaining printed temperatures.
+    # Hashimoto 1983, Table 3, p. 116. Pin the two C3-(2) run observations,
+    # the 18C5 C5-(1) row, and the 19B2 and 20B2 rows.
     expected_by_row = {
         (
             "table3_residue_composition_series_quoted__run_17c3-2::"
@@ -7740,6 +7759,13 @@ def test_hashimoto_residue_cells_keep_full_printed_point_compositions(
             "FeO": Decimal("29.14"),
             "MgO": Decimal("26.09"),
             "CaO": Decimal("3.29"),
+        },
+        "table3_residue_composition_series::T=2073.15:row=c5-(1):": {
+            "SiO2": Decimal("47.35"),
+            "Al2O3": Decimal("5.33"),
+            "FeO": Decimal("4.18"),
+            "MgO": Decimal("38.43"),
+            "CaO": Decimal("4.70"),
         },
         "table3_residue_composition_series::T=2273.15:row=20b2:": {
             "SiO2": Decimal("40.87"),
@@ -7899,6 +7925,8 @@ def test_ta_badro_unparameterized_wt_relation_keeps_sample_waypoint() -> None:
             "kems-015-hashimoto-1983.yaml",
             "table3_residue_composition_series::T=2273.15:row=20b2:",
             {
+                # Exact normalized output from the printed Table 3 residue;
+                # the source wt% cells are pinned in the test above.
                 "SiO2": Decimal("0.3704143841895679608300598825"),
                 "Al2O3": Decimal("0.02211082773740152264158571330"),
                 "FeO": Decimal("0.1550779101975305617296293917"),
@@ -8037,7 +8065,7 @@ def _internal_engine_point_for_real_extract(
             # complement is 81.56 wt%. x_K2O=(18.44/94.1956) /
             # ((18.44/94.1956) + (81.56/60.083)), unlike the 43.94 wt%
             # shared starting charge.
-            {"K2O": 0.1260369192276479, "SiO2": 0.8739630807723522},
+            {"K2O": 0.1260369192276479, "SiO2": 0.8739630807723521},
             "calculated",
             None,
             id="plante-point-datum-outranks-charge",
@@ -8163,6 +8191,8 @@ def _internal_engine_point_for_real_extract(
             "kems-015-hashimoto-1983.yaml",
             "T=2073.15:row=c5-(1)",
             {
+                # Exact float output for the printed Table 3 18C5/C5 (1)
+                # residue row; source wt% cells are pinned above.
                 "SiO2": 0.40709580956160435,
                 "Al2O3": 0.02700382669858546,
                 "FeO": 0.030054813370486367,

@@ -29,11 +29,13 @@ COMPOSITION_ROLE_FIELD = "composition_role"
 DATUM_STATE = "datum_state"
 ROLE_DEFAULT_FLAG = "composition_role_defaulted_to_initial_charge_only"
 _ROLE_DEFAULT_PREFIX = f"typed-refusal:{ROLE_DEFAULT_FLAG}: "
+_MALFORMED_DECLARED_AMOUNT_PREFIX = "malformed declared amount"
 _MALFORMED_PRINTED_COMPONENT_AMOUNT_PREFIX = "malformed printed component amount"
 _ROLES = frozenset({INITIAL_CHARGE_ONLY_PROXY_FLAG, DATUM_STATE})
 _INVALID_RUN_COMPOSITION_PREFIXES = (
-    "malformed declared amount",
+    _MALFORMED_DECLARED_AMOUNT_PREFIX,
     "unsupported component",
+    "ambiguous total iron components",
     "mass-percent composition",
     "partial_composition:",
     "partial analysis contains unsupported component",
@@ -58,6 +60,7 @@ class RoleResolution(Generic[_Composition]):
     reason: str | None = None
     original_reason: str | None = None
     notices: tuple[Notice, ...] = ()
+    source: str | None = None
     source_label: str | None = None
     locator: object | None = None
     inference: Derivation | None = None
@@ -193,6 +196,18 @@ def _choose_assay(
             State.unknown("missing_condition:melt_composition"),
             source="none",
         )
+    partial = next(
+        (
+            candidate
+            for candidate in candidates
+            if candidate.source in {"point", "declared", "identity"}
+            and candidate.state.is_unknown
+            and (candidate.state.reason or "").startswith("partial_composition:")
+        ),
+        None,
+    )
+    if partial is not None:
+        return partial
     # Admission is one resolver rule. Migration supplies every candidate and
     # its decoded source; it does not stop the cascade when one candidate wins.
     if declared_role == INITIAL_CHARGE_ONLY_PROXY_FLAG and any(
@@ -212,6 +227,24 @@ def _choose_assay(
         )
         if prior_charge is not None:
             return prior_charge
+    malformed = next(
+        (
+            candidate
+            for candidate in candidates
+            if candidate.state.is_unknown
+            and (candidate.state.reason or "").startswith(
+                _MALFORMED_DECLARED_AMOUNT_PREFIX
+            )
+            and candidate.source in {"point", "declared", "identity"}
+        ),
+        None,
+    )
+    has_usable_explicit_assay = any(
+        candidate.source in {"point", "declared"} and _assay_usable(candidate)
+        for candidate in candidates
+    )
+    if malformed is not None and not has_usable_explicit_assay:
+        return malformed
     for candidate in candidates:
         state = candidate.state
         if state.is_unknown and candidate.source in {
@@ -226,6 +259,13 @@ def _choose_assay(
                 ),
             )
             if invalid:
+                if (
+                    (state.reason or "").startswith(
+                        _MALFORMED_DECLARED_AMOUNT_PREFIX
+                    )
+                    and has_usable_explicit_assay
+                ):
+                    continue
                 return candidate
     flat_run = next(
         (candidate for candidate in candidates if candidate.label == "flat-run"),
@@ -289,6 +329,13 @@ def choose_stored_run(candidates: Sequence[AssayCandidate]) -> AssayCandidate:
             and candidate.state.is_value
         )
 
+    if (
+        point is not None
+        and point.state is not None
+        and point.state.is_unknown
+        and not usable(identity)
+    ):
+        return point
     if (
         identity is not None
         and is_initial_charge_composition(identity.state)
@@ -457,6 +504,7 @@ def resolve_point_composition(
         reason,
         original_reason,
         role_notices,
+        chosen.source,
         chosen.label,
         chosen.locator,
         chosen.inference,

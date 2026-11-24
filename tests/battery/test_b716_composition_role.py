@@ -950,9 +950,6 @@ def test_resolver_admits_declared_invalid_map_before_other_assays() -> None:
     point = composition_roles.AssayCandidate(
         State.of(_composition(None)), source="point"
     )
-    declared = composition_roles.AssayCandidate(
-        State.unknown("unsupported component: XxO"), source="declared"
-    )
     parent = composition_roles.AssayCandidate(
         State.of(_composition(None)), source="parent"
     )
@@ -960,14 +957,36 @@ def test_resolver_admits_declared_invalid_map_before_other_assays() -> None:
         State.of(_composition(None)), source="identity"
     )
 
-    resolved = composition_roles.resolve_point_composition(
-        {"composition_role": DATUM_STATE},
-        {"composition_role": INITIAL_CHARGE_ONLY},
-        (point, declared, parent, identity),
-    )
+    for reason in (
+        "unsupported component: XxO",
+        "ambiguous total iron components: FeOT with FeO",
+    ):
+        declared = composition_roles.AssayCandidate(
+            State.unknown(reason), source="declared"
+        )
+        resolved = composition_roles.resolve_point_composition(
+            {"composition_role": DATUM_STATE},
+            {"composition_role": INITIAL_CHARGE_ONLY},
+            (point, declared, parent, identity),
+        )
 
-    assert resolved.composition.is_unknown
-    assert resolved.composition.reason == "unsupported component: XxO"
+        assert resolved.composition.is_unknown
+        assert resolved.composition.reason == reason
+
+
+def test_admitting_ambiguous_total_iron_breaks_its_refusal_pin(monkeypatch) -> None:
+    test_resolver_admits_declared_invalid_map_before_other_assays()
+    monkeypatch.setattr(
+        composition_roles,
+        "_INVALID_RUN_COMPOSITION_PREFIXES",
+        tuple(
+            prefix
+            for prefix in composition_roles._INVALID_RUN_COMPOSITION_PREFIXES
+            if prefix != "ambiguous total iron components"
+        ),
+    )
+    with pytest.raises(AssertionError):
+        test_resolver_admits_declared_invalid_map_before_other_assays()
 
 
 def test_resolver_does_not_admit_a_stamped_proxy_as_a_flat_run() -> None:
@@ -1449,6 +1468,31 @@ def test_unknown_point_is_not_replaced_by_a_charge_identity() -> None:
     assert used is not None and used.is_unknown
     assert "XxO" in (used.reason or "")
     assert _initial_charge_composition_notice(row) is None
+
+
+def _assert_point_refusal_wins_over_identity_refusal() -> None:
+    point = composition_roles.AssayCandidate(
+        State.unknown("point refusal"), source="point"
+    )
+    identity = composition_roles.AssayCandidate(
+        State.unknown("identity refusal"), source="identity"
+    )
+    selected = composition_roles.choose_stored_run((point, identity))
+    assert selected.state.reason == "point refusal"
+
+
+def test_point_refusal_wins_over_identity_refusal() -> None:
+    _assert_point_refusal_wins_over_identity_refusal()
+
+
+def test_identity_first_stored_choice_breaks_point_refusal_pin(monkeypatch) -> None:
+    monkeypatch.setattr(
+        composition_roles,
+        "choose_stored_run",
+        lambda candidates: candidates[1],
+    )
+    with pytest.raises(AssertionError):
+        _assert_point_refusal_wins_over_identity_refusal()
 
 
 def test_an_unmapped_identity_hides_the_missing_charge_refusal(

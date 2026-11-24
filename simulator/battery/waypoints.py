@@ -1330,16 +1330,32 @@ def normalized_composition(
                         inference=basis_inference,
                     )
                 )
+                point_temperature = point.get("temperature_K")
+                relation = (
+                    located.inference.relation
+                    if located.inference is not None
+                    else ""
+                )
                 same_temperature_print = (
                     use_point_composition
                     and not is_initial_charge_composition(located.state)
+                    and not (
+                        observation_identity is not None
+                        and observation_identity.quantity.is_value
+                        and observation_identity.quantity.value
+                        in {
+                            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+                            Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
+                        }
+                    )
                     and located.inference is not None
                     and (
-                        located.inference.relation == "wt_pct_to_mole_fraction"
-                        or located.inference.relation.endswith(
-                            ";wt_pct_to_mole_fraction"
-                        )
+                        relation == "wt_pct_to_mole_fraction"
+                        or relation.endswith(";wt_pct_to_mole_fraction")
                     )
+                    and isinstance(point_temperature, Located)
+                    and point_temperature.locator is not None
+                    and located.locator == point_temperature.locator
                 )
                 evidence_ranks.append(
                     (same_temperature_print, not bool(located.inference), directness)
