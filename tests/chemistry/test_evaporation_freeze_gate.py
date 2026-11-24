@@ -1058,6 +1058,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
         raise AssertionError(
             f'{name}: got {len(got)} pinned {len(pinned)} '
             f'mismatch={mismatch} '
+            f'observed_rows={got!r} pinned_rows={pinned!r} '
             f'extra={[ends(row) for row in got[len(pinned):]]!r} '
             f'missing={[ends(row) for row in pinned[len(got):]]!r} '
             f'floor={floor_refusals.get(name)!r}'
@@ -3606,6 +3607,21 @@ def test_freeze_gate_pre_curve_tick_builds_curve_before_native_split(
 
     monkeypatch.setattr(sim, '_dispatch_only', fake_dispatch)
     monkeypatch.setattr(sim, '_get_equilibrium', lambda: _equilibrium())
+    # This test pins gate ordering, not the production saturation threshold.
+    # Holzheid chemistry can correctly yield zero native Fe for this melt,
+    # which would otherwise skip the partition path.
+    monkeypatch.setattr(
+        sim,
+        '_compute_native_fe_saturation_extent',
+        lambda *_args, **_kwargs: {
+            'native_fe_frac': 0.5,
+            'native_fe_mol': 1.0,
+            'native_fe_state': {
+                'native_fe_saturation': True,
+                'native_fe_frac': 0.5,
+            },
+        },
+    )
     monkeypatch.setattr(sim, '_apply_fe_redox_respeciation', record_respeciation)
     monkeypatch.setattr(sim, '_apply_native_fe_saturation_split', record_native_split)
 
