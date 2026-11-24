@@ -133,16 +133,21 @@ def test_b984_actual_oxygen_reaction_law_and_notice(
     # SiO2 -> SiO + 1/2 O2 gives exponent -1/2; SiO2 -> Si + O2 gives -1.
     # Fixed T/activity cancels the equilibrium constant in P/P_ref, leaving
     # (pO2/p_ref)**exponent (bar/bar dimensionless), continuous through p_ref.
-    # The Si elemental rail also cannot exceed its pure-component saturation
-    # pressure: the source reaction's implied metal activity is at most unity.
+    # The Si elemental rail cannot exceed its pure-component saturation
+    # pressure: its source reaction implies metal activity at most unity. Use
+    # the owner lookup, which resolves the catalog shape used by production.
     saturation_Pa = (
         ellingham_graph.metal_saturation_pressure_Pa(
             species, 1873.15, vapor_pressure_data=saturation_pressure_data,
         )
-        if species in saturation_pressure_data.get("metals", {})
+        if species == "Si"
         else math.inf
     )
+    # At 1000 bar, the Si power-law pressure is still below saturation; at
+    # 1e-31 bar its uncapped value (~8.84e14 Pa) greatly exceeds P_sat ~0.894 Pa.
     assert answers[1000.0] < saturation_Pa
+    if species == "Si":
+        assert answers[1e-31] == pytest.approx(saturation_Pa)
     for oxygen, pressure in answers.items():
         expected = min(
             answers[1000.0] * (oxygen / 1000.0) ** exponent,
