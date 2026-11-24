@@ -99,6 +99,82 @@ def _pin_tangent(
     )
 
 
+@pytest.mark.parametrize(
+    ("gap", "exhausted"),
+    [("two_ulp", False), ("1e-9", True)],
+)
+def test_ferric_handover_guard_scales_the_source_comparison(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+    gap: str,
+    exhausted: bool,
+) -> None:
+    _pin_tangent(sim, monkeypatch, fe2o3_mol=10.0)
+    bookable = _bookable_ferric_o2(sim)
+    demand = (
+        math.nextafter(math.nextafter(bookable, math.inf), math.inf)
+        if gap == "two_ulp"
+        else bookable + 1e-9
+    )
+
+    sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_roundoff": -demand},
+        temperature_K=_TEMPERATURE_K,
+    )
+
+    assert sim._ferric_tangent_exhausted is exhausted
+    if exhausted:
+        assert sim._ferric_exhausted_bookable_o2_mol == pytest.approx(bookable)
+
+
+@pytest.mark.parametrize(
+    ("gap", "exhausted"),
+    [("two_ulp", False), ("1e-9", True)],
+)
+def test_ferric_tangent_guard_scales_the_source_comparison(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+    gap: str,
+    exhausted: bool,
+) -> None:
+    bookable = 5.0
+    monkeypatch.setattr(sim, "_bookable_ferric_o2_mol", lambda: bookable)
+    demand = (
+        math.nextafter(math.nextafter(bookable, math.inf), math.inf)
+        if gap == "two_ulp"
+        else bookable + 1e-9
+    )
+
+    _, _, ferric_exhausted = sim._melt_redox_tangent_fO2_step(
+        signed_o2_equiv_mol=-demand,
+        base_fO2_log=_BASE_LOG,
+        capacity_mol_per_ln=1.0,
+        apply_pressure_ceiling=False,
+    )
+
+    assert ferric_exhausted is exhausted
+
+
+def test_ferric_lock_reappearance_ignores_two_ulp_inventory_noise(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    frozen = 5.0
+    sim._ferric_tangent_exhausted = True
+    sim._ferric_exhausted_bookable_o2_mol = frozen
+    current = math.nextafter(math.nextafter(frozen, math.inf), math.inf)
+    monkeypatch.setattr(sim, "_bookable_ferric_o2_mol", lambda: current)
+
+    assert sim._ferric_inventory_reappeared() is False
+
+    monkeypatch.setattr(
+        sim,
+        "_bookable_ferric_o2_mol",
+        lambda: frozen + 1e-9,
+    )
+    assert sim._ferric_inventory_reappeared() is True
+
+
 def test_in_inventory_reducing_source_step_is_demand_over_capacity(
     sim: PyrolysisSimulator,
     monkeypatch: pytest.MonkeyPatch,
@@ -475,6 +551,120 @@ def test_buffer_debit_lowers_fo2_and_a_buffer_credit_does_not(
         ),
     )
     assert sim._evaporative_redox_source_terms_from_transition(credit) == {}
+
+
+def test_evaporative_buffer_posting_sum_keeps_roundoff_and_real_source(
+    sim: PyrolysisSimulator,
+) -> None:
+    o2_molar_mass = resolve_species_formula(
+        "O2",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+
+    def source_terms(overhead_credit_mol: float) -> dict[str, float]:
+        transition = LedgerTransition(
+            name="evaporate_SiO",
+            debits=(
+                MaterialLot(
+                    "process.overhead_gas",
+                    {"O2": 10.089568621263579 * o2_molar_mass},
+                    source="test overhead oxygen debit",
+                ),
+                MaterialLot(
+                    "reservoir.fo2_buffer",
+                    {"O2": 5.0 * o2_molar_mass},
+                    source="test buffer oxygen debit",
+                ),
+            ),
+            credits=(
+                MaterialLot(
+                    "process.overhead_gas",
+                    {"O2": overhead_credit_mol * o2_molar_mass},
+                    source="test overhead oxygen credit",
+                ),
+            ),
+        )
+        return sim._evaporative_redox_source_terms_from_transition(transition)
+
+    near_equality = source_terms(5.089568621263581)
+    real_source = source_terms(5.089568622263581)
+
+    assert near_equality == {}
+    assert real_source["redox_source:evaporative_oxygen_loss"] < -9e-10
+
+
+def test_cleaned_melt_reduction_sum_keeps_roundoff_and_real_source(
+    sim: PyrolysisSimulator,
+) -> None:
+    oxygen_mass = resolve_species_formula(
+        "O2",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+
+    def source_terms(credit_mol: float) -> dict[str, float]:
+        transition = LedgerTransition(
+            name="cleaned_melt_oxygen_exchange",
+            debits=(
+                MaterialLot(
+                    "process.cleaned_melt",
+                    {"O2": 5.089568621263581 * oxygen_mass},
+                    source="test cleaned-melt oxygen debit",
+                ),
+            ),
+            credits=(
+                MaterialLot(
+                    "process.cleaned_melt",
+                    {"O2": credit_mol * oxygen_mass},
+                    source="test cleaned-melt oxygen credit",
+                ),
+            ),
+        )
+        return sim._cleaned_melt_reduction_source_terms_from_transition(
+            transition,
+            label="redox_source:test_cleaned_melt",
+            target_oxides=("O2",),
+        )
+
+    near_equality = source_terms(5.089568621263579)
+    real_source = source_terms(5.089568622263581)
+
+    assert near_equality == {}
+    assert real_source["redox_source:test_cleaned_melt"] > 9e-10
+
+
+def test_evaporative_metal_loss_sum_keeps_roundoff_and_real_source(
+    sim: PyrolysisSimulator,
+) -> None:
+    oxide_mass = resolve_species_formula(
+        "Na2O",
+        sim.species_formula_registry,
+    ).molar_mass_kg_per_mol()
+
+    def source_terms(credit_o2_equiv_mol: float) -> dict[str, float]:
+        transition = LedgerTransition(
+            name="evaporate_Na",
+            debits=(
+                MaterialLot(
+                    "process.cleaned_melt",
+                    {"Na2O": 10.179137242527162 * oxide_mass},
+                    source="test cleaned-melt sodium oxide debit",
+                ),
+            ),
+            credits=(
+                MaterialLot(
+                    "process.cleaned_melt",
+                    {"Na2O": 2.0 * credit_o2_equiv_mol * oxide_mass},
+                    source="test cleaned-melt sodium oxide credit",
+                ),
+            ),
+        )
+        return sim._evaporative_redox_source_terms_from_transition(transition)
+
+    near_equality = source_terms(5.089568621263579)
+    real_source = source_terms(5.089568622263581)
+
+    assert near_equality == {}
+    assert real_source["redox_source:evaporative_metal_loss"] > 9e-10
 
 
 def test_load_batch_clears_ferric_tangent_exhaustion(
