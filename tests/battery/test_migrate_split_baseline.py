@@ -355,8 +355,11 @@ def _store_difference_details(
                 )
                 source_id = Path(path).stem
                 short_id = observation_id.removeprefix(f"{source_id}::")
-                fields = differences or ["bytes differ without a YAML field difference"]
-                for field in fields:
+                field_paths = [
+                    difference.split(": stored=", 1)[0]
+                    for difference in differences
+                ] or ["bytes differ without a YAML field difference"]
+                for field in field_paths:
                     source_fields.setdefault(field, []).append(short_id)
             details["observations"][path] = {
                 field: _compact_observation_ids(observation_ids)
