@@ -420,6 +420,34 @@ def test_two_phase_transition_temperature_preserves_explicit_unknown(tmp_path: P
     )
 
 
+def test_tagged_unknown_phase_survives_observation_assembly(tmp_path: Path) -> None:
+    extract = _scalar_fixture_extract()
+    raw = extract["species"]["Na"]["observations"][0]
+    raw["phase"] = {"tag": "unknown", "reason": "source does not state phase"}
+
+    tagged = _only_observation(
+        migrate(_write_min_tree(tmp_path / "tagged", extract), write=False)
+    )
+    assert tagged.identity.species.phase.is_unknown
+    assert tagged.identity.species.phase.reason == "source does not state phase"
+    assert not any(
+        notice.kind is NoticeKind.PHASE_INFERRED for notice in tagged.notices
+    )
+
+    omitted_extract = _scalar_fixture_extract()
+    omitted_extract["species"]["Na"]["observations"][0].pop("phase")
+    omitted = _only_observation(
+        migrate(
+            _write_min_tree(tmp_path / "omitted", omitted_extract), write=False
+        )
+    )
+    assert omitted.identity.species.phase.is_value
+    assert omitted.identity.species.phase.value is Phase.UNSPECIFIED
+    assert sum(
+        notice.kind is NoticeKind.PHASE_INFERRED for notice in omitted.notices
+    ) == 1
+
+
 def test_added_phase_spellings_have_single_closed_phases() -> None:
     for spelling, expected in (
         ("g, singlet", Phase.G),

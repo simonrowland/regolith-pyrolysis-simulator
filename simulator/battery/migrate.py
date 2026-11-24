@@ -35,9 +35,9 @@ pending. Missing class/pressure/phase/method
 remain unknown, never certified / liquid / knudsen_effusion. An explicit
 experiment-level ``ambient_pressure_evidence`` may supply 101325 Pa only for
 an otherwise missing total pressure on an open/flowing-gas furnace.
-Unknown rail spellings raise. Unmapped or unprinted phases follow DP-016:
-row physics may infer a phase; otherwise the stored phase is ``unspecified``
-with a ``phase_inferred`` policy notice.
+Unknown rail spellings raise. An unmapped explicit phase with no resolving
+evidence remains an unknown state with its source reason. An absent phase may
+use a role fallback; otherwise row evidence or DP-016 supplies a flagged phase.
 """
 
 from __future__ import annotations
@@ -10628,6 +10628,8 @@ def unknown_pressure_environment(reason: str) -> PressureEnvironment:
 class _PhaseSourceState(Enum):
     RESOLVED = "resolved"
     EXPLICITLY_UNKNOWN = "explicitly_unknown"
+    TAGGED_UNKNOWN = "tagged_unknown"
+    BULK_ASSEMBLAGE = "bulk_assemblage"
     ABSENT = "absent"
 
 
@@ -10670,11 +10672,57 @@ def _phase_source_state(
         ):
             return _PhaseSourceState.EXPLICITLY_UNKNOWN
         return _PhaseSourceState.ABSENT
+    if isinstance(source_phase, Mapping) and source_phase.get("tag") == "unknown":
+        return _PhaseSourceState.TAGGED_UNKNOWN
+    if phase.is_unknown and _is_bulk_phase_description(source_phase):
+        return _PhaseSourceState.BULK_ASSEMBLAGE
     return (
         _PhaseSourceState.RESOLVED
         if phase.is_value
         else _PhaseSourceState.EXPLICITLY_UNKNOWN
     )
+
+
+def _is_bulk_phase_description(raw: object) -> bool:
+    if not isinstance(raw, str):
+        return False
+    text = " ".join(raw.replace("_", " ").split())
+    if _printed_point_phase_kind(text) == "two_phase":
+        return True
+    lowered = text.casefold()
+    return (
+        re.search(r"\b(?:partial|partly|partially)\s+melt(?:ed)?\b", lowered)
+        is not None
+        and "run product" in lowered
+    )
+
+
+def _phase_resolution_required(
+    source_state: _PhaseSourceState,
+    phase: State[Phase],
+    *,
+    source_evidence_available: bool = False,
+) -> bool:
+    if source_state is _PhaseSourceState.ABSENT:
+        return source_evidence_available or _phase_needs_default(phase)
+    if source_state is _PhaseSourceState.BULK_ASSEMBLAGE:
+        return _phase_needs_default(phase)
+    return (
+        source_evidence_available
+        and source_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
+        and _phase_needs_default(phase)
+    )
+
+
+def _phase_original_reason(
+    source_state: _PhaseSourceState,
+    phase: State[Phase],
+) -> str:
+    if source_state is _PhaseSourceState.ABSENT:
+        return "source does not state phase"
+    if phase.is_unknown and phase.reason:
+        return phase.reason
+    return "source explicitly leaves phase unspecified"
 
 
 def _phase_policy_resolution(
@@ -25991,6 +26039,7 @@ class Migrator:
         source_key: str,
         *,
         source_row_index: int | None = None,
+        phase_source_state: _PhaseSourceState | None = None,
     ) -> None:
         identity = observation.identity
         observation_notices = list(observation.notices)
@@ -25998,17 +26047,18 @@ class Migrator:
             phase_state = identity.species.phase
             provenance = observation.provenance or {}
             source_phase_raw = provenance.get("printed_phase")
-            source_phase_state = _phase_source_state(
-                source_phase_raw,
-                phase_state,
-                None,
-                phase_is_role_input=(
-                    provenance.get(PHASE_SOURCE_KIND_KEY) == ROLE_DERIVED_PHASE_KIND
-                ),
-            )
+            if phase_source_state is None:
+                phase_source_state = _phase_source_state(
+                    source_phase_raw,
+                    phase_state,
+                    None,
+                    phase_is_role_input=(
+                        provenance.get(PHASE_SOURCE_KIND_KEY)
+                        == ROLE_DERIVED_PHASE_KIND
+                    ),
+                )
             if (
-                source_phase_state is _PhaseSourceState.ABSENT
-                and _phase_needs_default(phase_state)
+                _phase_resolution_required(phase_source_state, phase_state)
                 and not any(
                     notice.kind is NoticeKind.PHASE_INFERRED
                     for notice in observation_notices
@@ -26019,28 +26069,35 @@ class Migrator:
                     if identity.quantity.is_value
                     else None
                 )
-                original_reason = (
-                    phase_state.reason
-                    if phase_state.is_unknown
-                    else "source explicitly leaves phase unspecified"
+                inference = (
+                    None
+                    if phase_source_state is _PhaseSourceState.BULK_ASSEMBLAGE
+                    else _phase_inference_from_evidence(
+                        quantity,
+                        phase_state.reason,
+                    )
                 )
-                inference = _phase_inference_from_evidence(
-                    quantity,
-                    phase_state.reason,
-                )
-                # DP-016 preserves an unresolved row as unspecified; the
-                # notice keeps the physical evidence and original absence.
-                phase, phase_notice = _phase_policy_resolution(
-                    inference,
-                    quantity=quantity if isinstance(quantity, Quantity) else None,
-                    origin=observation.observation_id,
-                    original_reason=original_reason or "source does not state phase",
-                )
-                identity = replace(
-                    identity,
-                    species=replace(identity.species, phase=State.of(phase)),
-                )
-                observation_notices.append(phase_notice)
+                if not (
+                    phase_source_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
+                    and inference is None
+                ):
+                    phase, phase_notice = _phase_policy_resolution(
+                        inference,
+                        quantity=(
+                            quantity if isinstance(quantity, Quantity) else None
+                        ),
+                        origin=observation.observation_id,
+                        original_reason=_phase_original_reason(
+                            phase_source_state, phase_state
+                        ),
+                    )
+                    identity = replace(
+                        identity,
+                        species=replace(
+                            identity.species, phase=State.of(phase)
+                        ),
+                    )
+                    observation_notices.append(phase_notice)
 
         experiment = self.result.experiments.get(observation.experiment_id)
         if (
@@ -27479,19 +27536,11 @@ class Migrator:
             transition_reason,
             phase_is_role_input=role_phase_raw not in (None, ""),
         )
-        phase_needs_resolution = (
-            source_phase_state is _PhaseSourceState.ABSENT
-            or (
-                source_phase_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
-                and _phase_needs_default(phase)
-            )
+        phase_needs_resolution = _phase_resolution_required(
+            source_phase_state, phase, source_evidence_available=True
         )
-        phase_original_reason = (
-            phase.reason
-            if phase.is_unknown
-            else "source does not state phase"
-            if source_phase_state is _PhaseSourceState.ABSENT
-            else "source explicitly leaves phase unspecified"
+        phase_original_reason = _phase_original_reason(
+            source_phase_state, phase
         )
         phase_resolution_evidence: str | None = None
         condensed_form = obs.get("condensed_form")
@@ -27649,7 +27698,13 @@ class Migrator:
                 transition_temperature_K=transition_temperature_K,
                 liquidus_temperature_K=liquidus_temperature_K,
             )
-            if phase_inference is None and phase_resolution_evidence is not None:
+            if source_phase_state is _PhaseSourceState.BULK_ASSEMBLAGE:
+                phase_inference = None
+            if (
+                phase_inference is None
+                and phase_resolution_evidence is not None
+                and source_phase_state is not _PhaseSourceState.BULK_ASSEMBLAGE
+            ):
                 phase_inference = (
                     phase.value if phase.is_value else Phase.UNSPECIFIED,
                     phase_resolution_evidence,
@@ -27659,7 +27714,11 @@ class Migrator:
             # An explicit unmapped source token stays unknown without evidence.
             if not (
                 phase_inference is None
-                and source_phase_state is _PhaseSourceState.EXPLICITLY_UNKNOWN
+                and source_phase_state
+                in {
+                    _PhaseSourceState.EXPLICITLY_UNKNOWN,
+                    _PhaseSourceState.TAGGED_UNKNOWN,
+                }
             ):
                 quantity_for_notice = q_token if isinstance(q_token, Quantity) else None
                 inferred_phase, phase_flag_notice = _phase_policy_resolution(
@@ -30835,7 +30894,9 @@ class Migrator:
             derived_from,
             value_derivation,
         )
-        self._add_observation(observation, source_key)
+        self._add_observation(
+            observation, source_key, phase_source_state=source_phase_state
+        )
 
     def _emit_mass_fraction_pair_ratio(
         self,
@@ -33177,7 +33238,18 @@ class Migrator:
             derived_from,
             derivation,
         )
-        self._add_observation(observation, source_key)
+        phase_source_state = (
+            _phase_source_state(
+                printed_phase_text,
+                identity.species.phase,
+                None,
+            )
+            if printed_phase_text is not None and identity.species is not None
+            else None
+        )
+        self._add_observation(
+            observation, source_key, phase_source_state=phase_source_state
+        )
         children = self._exploded_children.setdefault(parent_id, [])
         if point_id not in children:
             children.append(point_id)

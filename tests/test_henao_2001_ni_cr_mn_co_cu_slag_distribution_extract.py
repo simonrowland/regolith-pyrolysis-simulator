@@ -381,6 +381,41 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
         and row.identity.species.phase.value is Phase.L
         for row in observations
     ), "phase roles must fill only rows whose source-phase field is absent"
+    assert all(
+        len(
+            [
+                notice
+                for notice in row.notices
+                if notice.kind is NoticeKind.PHASE_INFERRED
+            ]
+        )
+        == 1
+        and next(
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        ).reason.endswith("original_reason=source does not state phase")
+        for row in observations
+    ), "every role fallback notice must cite source phase absence"
+    for observation_id in (
+        "henao_2001_t1_A-1_slag_Ni",
+        "henao_2001_t1_A-1_alloy_Fe",
+    ):
+        row = next(
+            row
+            for row in observations
+            if row.observation_id.endswith(f"::{observation_id}")
+        )
+        notice, = [
+            notice
+            for notice in row.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        ]
+        assert row.identity.species.phase.value is Phase.L
+        assert (row.provenance or {}).get(PHASE_SOURCE_KIND_KEY) == ROLE_DERIVED_PHASE_KIND
+        assert notice.reason.endswith(
+            "original_reason=source does not state phase"
+        )
     assert not [entry for entry in result.queue if entry.source.endswith(EXTRACT.name)]
     assert all(row.identity.temperature_K.value == 1773 for row in observations)
     _assert_henao_pressure_pins(result.experiments, observations)
