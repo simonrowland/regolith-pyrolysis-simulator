@@ -23,7 +23,6 @@ from simulator.chemistry.kernel.dto import (
 from simulator.chemistry.kernel.provider import ChemistryProvider
 from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.account_ids import OXYGEN_CISTERN_LIQUID_INVENTORY_ACCOUNT
-from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
 
 
 PROCESS_OVERHEAD_GAS_ACCOUNT = "process.overhead_gas"
@@ -206,6 +205,8 @@ class BuiltinOverheadBleedProvider(ChemistryProvider):
         )
 
     def dispatch(self, request: IntentRequest) -> IntentResult:
+        from simulator.thermal_train import OXYGEN_VAPORIZATION_ENTHALPY_J_PER_MOL
+
         from simulator.accounting.formulas import resolve_species_formula
 
         wrong_intent = reject_wrong_intent(
