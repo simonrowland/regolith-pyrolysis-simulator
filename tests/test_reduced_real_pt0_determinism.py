@@ -4387,6 +4387,38 @@ def test_pt1_assembly_transports_measured_gate_disclosures_and_hits(
     assert replay._accepted_hit_disclosures == disclosures
 
 
+def test_pt1_exact_replay_reuses_persistent_admission_decode(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "single-admission-decode.sqlite"
+    _capture, _capture_sim, _capture_fO2, curve = _capture_pt0_gate_curve(
+        db_path,
+        solidus_T_C=1100.0,
+        law_disclosures=[],
+    )
+    replay = PT0DeterminismStore("replay", db_path=db_path)
+    replay_sim = _build_pt0_sim(replay)
+    replay_sim.start_campaign(CampaignPhase.C2A_STAGED)
+    register_synthetic_gate_curve_producer(replay_sim)
+
+    original_decode = rrd._decode_payload_for_admission
+    calls = 0
+
+    def count_admission_decode(*args: Any, **kwargs: Any) -> Any:
+        nonlocal calls
+        calls += 1
+        return original_decode(*args, **kwargs)
+
+    monkeypatch.setattr(rrd, "_decode_payload_for_admission", count_admission_decode)
+    assert replay.replay_gate_curve(
+        replay_sim,
+        fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
+    ) == curve
+    assert replay.hits == 1
+    assert calls == 1
+
+
 @pytest.mark.parametrize("transport", ("seed", "populate", "epoch"))
 def test_pt1_assembly_replaces_stale_equilibrium_payload_bytes(
     tmp_path: Path,
