@@ -60,3 +60,24 @@ def test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
         test_experiment_ids=test_experiment_ids,
         required_refusal_reason="outside_supported_species",
     )
+
+
+def test_sossi_cache_invariant_rejects_restored_whole_run_refusal_mutation(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    import simulator.battery.residue as residue
+
+    original_initial_inventory = residue._sossi_initial_inventory
+
+    def reject_missing_mn(experiment, starting_trace_ppm):
+        if starting_trace_ppm.get("Mn") is None:
+            raise residue.ResidueInventoryRefusal(
+                "starting_component_ppm_missing"
+            )
+        return original_initial_inventory(experiment, starting_trace_ppm)
+
+    monkeypatch.setattr(residue, "_sossi_initial_inventory", reject_missing_mn)
+    with pytest.raises(AssertionError, match="same Sossi cohort's Ti row"):
+        test_scored_sossi_residues_match_off_cold_warm_and_parallel_cache(
+            tmp_path, monkeypatch
+        )
