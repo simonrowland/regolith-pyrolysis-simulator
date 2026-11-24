@@ -2747,6 +2747,7 @@ def test_redox_pressure_roles_reach_scoring_and_headline(borisov_redox_row, orig
         "redox-pressure-matrix", run.experiment_id,
         replace(borisov_redox_row.identity, total_pressure_Pa=None),
         Decimal("1.867"), evidence=EvidenceClass.MEASURED_DIRECT,
+        source_id="borisov-2018-compilation",
     )
     location = Locator(page=7, record="run setup", note="column=pressure")
     run = replace(run, pressure_environment=replace(

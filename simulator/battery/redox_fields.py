@@ -202,10 +202,28 @@ def classify_target_provenance(
                     references_run_control |= _is_run_control(
                         CandidateInput(field, operand, axis, field in imposed_inputs),
                     )
+        # A unit conversion restates this condition's own printed magnitude
+        # without the unit. That collision is the same-cell check below,
+        # which still has the printed unit. It is not a further dependency.
+        own_print = _printed_cell(condition)
         for operand in operands:
-            match = derivation_match(operand) or _match_target_cell(
-                targets, _printed_cell(operand, address_only=operand.inference is not None),
-            )
+            nested = derivation_match(operand)
+            if nested is not None:
+                return nested
+            cell = _printed_cell(operand, address_only=operand.inference is not None)
+            if (
+                cell is not None
+                and own_print is not None
+                and cell.value is not None
+                and cell.value == own_print.value
+                and (
+                    cell.unit is None
+                    or own_print.unit is None
+                    or cell.unit == own_print.unit
+                )
+            ):
+                continue
+            match = _match_target_cell(targets, cell)
             if match is not None:
                 return match
         return None
