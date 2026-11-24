@@ -301,7 +301,10 @@ def test_explicit_gap_beats_parent_flat_columns_at_pressure_boundary(monkeypatch
     assert observation_admission_reason(obs) is None
     result = evaluate_observation(obs)
     assert calls == []
-    assert [record.status for record in result.records] == ["unsupported-observable"]
+    # A printed pressure with an explicit composition gap is the same
+    # missing-melt refusal as the unreported 12065 points: speciation, not
+    # an unsupported observable. The gap still wins over the flat columns.
+    assert [record.status for record in result.records] == ["unsupported-speciation"]
     assert runtimes[0]["melt_recipe_source"] == "extract composition_source_gap"
     assert runtimes[0]["refusal"] == "missing_condition:melt_composition"
 
