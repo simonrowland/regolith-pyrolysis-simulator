@@ -3388,6 +3388,7 @@ def predict_mass_loss_fraction(
         inventory: Mapping[str, float], at_K: float, seconds: float, *,
         rectangle: bool = False, unsourced_unity: bool = False,
     ) -> tuple[Mapping[str, float], float]:
+        nonlocal corner_evaluations, corner_root_solves, corner_neighbour_evaluations
         at_fits = _mass_loss_sourced_alphas(experiment, source_document or {}, at_K)
         for species, fit in at_fits.items():
             if fit["extrapolated"]:
