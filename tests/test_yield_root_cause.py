@@ -15,6 +15,7 @@ from simulator.chemistry.kernel import ChemistryIntent, IntentRequest
 from simulator.chemistry.kernel.dto import ProviderAccountView
 from simulator.core import PyrolysisSimulator
 from simulator.electrolysis import ELECTRONS_PER_OXIDE, FARADAY, MOLAR_MASS
+from simulator.feedstock_composition import normalized_feedstock_component_masses_kg
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.run_executor import RunExecutor
 from simulator.session import SimSessionConfig
@@ -197,6 +198,17 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     feo_initial = _initial_feo_kg(sim)
     feo_left = sim.melt.composition_kg.get("FeO", 0.0)
     na2o_left = sim.melt.composition_kg.get("Na2O", 0.0)
+    feed_na2o_kg = normalized_feedstock_component_masses_kg(
+        sim.feedstocks[FEEDSTOCK], sim.record.batch_mass_kg
+    )["Na2O"]
+    c4_stop_kg = (
+        float(
+            sim.campaign_mgr.setpoints[
+                "outdoor_alkali_loss_limit_fraction_of_feed"
+            ]
+        )
+        * feed_na2o_kg
+    )
     reduced_pct = (feo_initial - feo_left) / feo_initial * 100.0
 
     assert sim.melt.campaign == CampaignPhase.COMPLETE
@@ -213,21 +225,16 @@ def test_pyrolysis_track_c5_reduces_feo_without_additives(
     # This fixture selects internal-analytical with HKL-only transport, not MAGEMin.
     # C5 exits at its 800 h max hold without the final-rung current-decay endpoint.
     # That incomplete-extraction failure mode is an endpoint miss once b-846 lands.
-    # This test asserts Fe reduction and Na2O pins, not extraction success.
-    # t-1457 d-252 C0 contract (200 C/h ramp, 1 mbar dry Ar, computed exit): the full-run trajectory shifts.
-    # Bisected along the golden car: the move enters at 375537bff; every later car item is bit-identical.
-    # d-329 (owner 2026-11-03, all three approved): the d-137 capture law
-    # (d-320) cuts the Stage-4 Na harvest 1.889 -> 0.0802 kg, so the zero-dose
-    # C3 shuttle no longer rebuilds melt Na2O. C5 still reduces FeO. The pin
-    # is the production value (train rpp nightly and the laptop run agree).
-    # Condenser branch (d-344 14.74 m2 cartridge + e-NTU stage capture): more
-    # Na is held in the train, so the zero-dose shuttle returns less Na2O to
-    # the melt; 0.0763 -> 4.1e-5 kg. Studio-3 actual; the laptop agrees.
-    # FeO reduction (>80 %) and the 5e-12 % closure still hold.
-    # Freeze-gate liquidus fix (285420627): the gate follows composition, so
-    # the zero-dose C5 Na2O moves 4.1155e-5 -> 4.5216e-5 kg. Studio-3 full
-    # gate actual at 101aebdaf.
-    assert na2o_left == pytest.approx(4.5215994651378906e-05, abs=1e-6)
+    # This test asserts Fe reduction and the C4-bounded Na2O residual, not
+    # extraction success.
+    # C5 does not evaporate (EVAPORATION_ROUTE_PHASES ends at C4), so this is
+    # the C4 exit inventory. The C4 Na endpoint (81686919c0) stops after the
+    # hour that crosses the threshold: configured dimensionless fraction ×
+    # resolved feed Na2O mass gives the stop in kg, and that hour's flux can
+    # undershoot it. L leaves 1.29e-3 kg against a 0.002 kg stop. At a zero
+    # stop only zero residual qualifies; this fixture's positive stop bounds
+    # its positive exit inventory.
+    assert 0 < na2o_left <= c4_stop_kg
     assert sim.melt.composition_kg.get("Al2O3", 0.0) > 100.0
     assert sim.melt.composition_kg.get("MgO", 0.0) > 50.0
     assert max(abs(s.mass_balance_error_pct) for s in result.snapshots) < MASS_BALANCE_MAX_PCT
