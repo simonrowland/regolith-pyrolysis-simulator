@@ -20,6 +20,7 @@ from simulator.battery.enums import (
     Engine,
     ExecutionState,
     FO2Channel,
+    NoticeKind,
     Quantity,
     RefusalReason,
 )
@@ -30,6 +31,7 @@ from simulator.battery.records import (
     Derivation,
     Execution,
     FO2Control,
+    GasRatio,
     Located,
     Locator,
     State,
@@ -37,6 +39,7 @@ from simulator.battery.records import (
     Value,
 )
 from simulator.battery.score import EnginePrediction, predict_with_engine
+from simulator.battery.printed_cells import located_printed_cell
 from tests.battery import factories as F
 from tests.battery.census_cvpress_round18_round20 import admitted_engine_input
 
@@ -136,6 +139,7 @@ def _install_spy(monkeypatch):
     def spy(**kwargs):
         decision = original(**kwargs)
         seen["po2"] = getattr(decision, "po2_bar", None)
+        seen["input_notices"] = tuple(kwargs["input_notices"])
         return EnginePrediction(
             engine=kwargs["engine"],
             channel=kwargs["channel"],
@@ -236,6 +240,161 @@ def test_value_equality_does_not_decide_target_dependence(monkeypatch):
     assert _po2(seen, different, run, bench) == pytest.approx(DP010_BAR)
 
 
+def test_unitless_operand_at_another_cell_cannot_reuse_the_target(monkeypatch):
+    """The conversion skip is limited to its own printed address.
+
+    The ordinary request must drop a control whose conversion operand points
+    at the measured target, even when both cells print 12.
+    """
+
+    target = Locator(page=3, table="2", record="run 1", note="column=assay")
+    row, run = _row("12", target, fo2=None)
+    command = Located(
+        State.of(Value.point_of(Decimal("1200000"))),
+        located_printed_cell(
+            replace(target, note="column=command"), "12", "bar",
+        ),
+        Derivation(
+            "pressure conversion", (),
+            (("original", Located(State.of(row.value), target)),),
+            "Pa",
+        ),
+    )
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.COMMANDED), oxygen_partial_pressure_Pa=command,
+    ))
+    seen = _install_spy(monkeypatch)
+
+    def request():
+        po2 = _po2(seen, row, run, _bench(run))
+        excluded = any(
+            notice.kind is NoticeKind.CONDITION_EXCLUDED_TARGET_DEPENDENCY
+            for notice in seen["input_notices"]
+        )
+        return po2, excluded
+
+    expected = (pytest.approx(DP010_BAR), True)
+    assert request() == expected
+
+    original = provenance.classify_target_provenance
+
+    def value_only_restatement_skip(observation, candidate):
+        result = original(observation, candidate)
+        condition = candidate.condition
+        inference = condition.inference
+        own_print = provenance._printed_cell(condition)
+        if inference is not None and own_print is not None and own_print.unit is not None:
+            for name, operand in inference.parameters:
+                cell = provenance._printed_cell(operand)
+                if (
+                    name == "original"
+                    and cell is not None
+                    and cell.unit is None
+                    and cell.value == own_print.value
+                ):
+                    return provenance.TargetProvenance(
+                        provenance.TargetRelation.INDEPENDENT
+                    )
+        return result
+
+    monkeypatch.setattr(
+        provenance, "classify_target_provenance", value_only_restatement_skip,
+    )
+    with pytest.raises(AssertionError):
+        assert request() == expected
+
+
+def test_gas_ratio_without_bench_defaults_for_both_oxygen_quantities(monkeypatch):
+    target = Locator(page=3, table="2", record="run 1", note="column=assay")
+    row, run = _row("12", target, fo2=None)
+    gas_ratio = GasRatio(
+        "CO2", "CO",
+        Located(State.of(Value.point_of(Decimal("1"))), Locator(page=9, record="gas ratio")),
+        "partial_pressure",
+    )
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.GAS_MIX), gas_ratio=gas_ratio,
+    ))
+    fugacity = replace(
+        row, identity=replace(row.identity, quantity=State.of(Quantity.FUGACITY)),
+    )
+
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, fugacity, experiment=run, bench=None, isolated=False,
+    )
+    seen = _install_spy(monkeypatch)
+    partial_pressure = _po2(seen, row, run, bench=None)
+
+    assert prediction.value == Decimal("21278.25")
+    assert partial_pressure == pytest.approx(DP010_BAR)
+    fugacity_default = next(
+        notice for notice in prediction.notices
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    )
+    partial_default = next(
+        notice for notice in seen["input_notices"]
+        if notice.policy is not None and notice.policy.id == "DP-010"
+    )
+    assert "original_reason=gas_ratio_requires_bench_but_none_was_supplied" in fugacity_default.reason
+    assert "original_reason=gas_ratio_requires_bench_but_none_was_supplied" in partial_default.reason
+
+    bench = _bench(run)
+    selected_route = _po2(seen, row, run, bench=bench)
+    assert selected_route != pytest.approx(DP010_BAR)
+    assert any(
+        "route=experiment_gas_ratio" in notice.reason
+        for notice in seen["input_notices"]
+    )
+
+    from simulator.battery import fo2_ladder
+
+    original_resolver = fo2_ladder.resolve_row_fo2
+
+    def gas_ratio_without_bench(experiment, bench, observation, **kwargs):
+        if bench is None and experiment is not None and experiment.fO2_control is not None:
+            ratio = experiment.fO2_control.gas_ratio
+            temperature = kwargs.get("temperature_K")
+            if ratio is not None and temperature is not None:
+                return fo2_ladder._gas_ratio_fo2(experiment, temperature)
+        return original_resolver(experiment, bench, observation, **kwargs)
+
+    monkeypatch.setattr(fo2_ladder, "resolve_row_fo2", gas_ratio_without_bench)
+    with pytest.raises(AssertionError):
+        assert _po2(seen, row, run, bench=None) == pytest.approx(DP010_BAR)
+
+
+def test_buffer_with_sibling_scalar_and_no_bench_uses_the_default(monkeypatch):
+    target = Locator(page=3, table="2", record="run 1", note="column=assay")
+    row, run = _row("12", target, fo2=None)
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.BUFFER),
+        oxygen_partial_pressure_Pa=Located(
+            State.of(Value.point_of(Decimal("10000"))),
+            Locator(page=9, record="sibling scalar"),
+        ),
+        buffer=Located(State.of("QFM"), Locator(page=9, record="buffer")),
+    ))
+    fugacity = replace(
+        row, identity=replace(row.identity, quantity=State.of(Quantity.FUGACITY)),
+    )
+    prediction = predict_with_engine(
+        Engine.INTERNAL_ANALYTICAL, fugacity, experiment=run, bench=None, isolated=False,
+    )
+    seen = _install_spy(monkeypatch)
+    partial_pressure = _po2(seen, row, run, bench=None)
+
+    assert prediction.value == Decimal("21278.25")
+    assert partial_pressure == pytest.approx(DP010_BAR)
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in prediction.notices
+    )
+    assert any(
+        notice.policy is not None and notice.policy.id == "DP-010"
+        for notice in seen["input_notices"]
+    )
+
+
 def test_unsourced_identity_equal_to_the_target_is_commanded(monkeypatch):
     """Ruling 2, the deleted identity echo. No located oxygen source."""
 
@@ -322,7 +481,7 @@ def test_missing_apparatus_stays_a_flagged_default(monkeypatch):
 
     monkeypatch.setattr(
         score_module,
-        "_lost_exemption_oxygen_prediction",
+        "_recover_fugacity_from_shared_oxygen",
         lambda prediction, *_args, **_kwargs: prediction,
     )
     mutant = predict_with_engine(
