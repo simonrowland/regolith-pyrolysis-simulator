@@ -101,6 +101,7 @@ IMAGE_VERIFIED_METADATA = {
     217: {"formula_as_published": "Ca2MgSi2O7"},
     219: {"formula_as_published": "Fe2SiO4"},
     224: {"formula_as_published": "CaSiO3"},
+    226: {"formula_as_published": "CaAl2SiO6"},
     206: {"formula_as_published": "Ca5(PO4)3OH"},
     228: {"formula_as_published": "MgSiO3"},
     233: {"phase": "Crystals 298.15° to 1400°K."},
@@ -130,6 +131,7 @@ IMAGE_VERIFIED_LAYOUT_RAWS = {
     (217, "formula_as_published"): "Ca 2 MgSi 20 7",
     (219, "formula_as_published"): "Fe 2 Si0 4",
     (224, "formula_as_published"): "CaSi0 3",
+    (226, "formula_as_published"): "CaAl.SiCK",
     (232, "formula_as_published"): "CaAl Si_0 0",
     (134, "name_as_published"): "8UNSENITE",
     (145, "phase"): "a tridymite 298. 15° to 390°K.       & tridymite 390° to 2000°K.",
@@ -646,6 +648,7 @@ IMAGE_VERIFIED_GRID_ROWS = {
 }
 
 IMAGE_VERIFIED_CELLS_R3 = {
+    226: [(500.0, 1, "delta_f_H", "-786.941")],
     48: [
         (1400.0, 1, 'delta_f_G', '.000'),
         (1400.0, 1, 'log_Kf', '.000'),

@@ -11,6 +11,10 @@ from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
+from simulator.chemistry.formula_text import (
+    _strip_formula_markup,
+    fold_subscript_digits,
+)
 from simulator.accounting.exceptions import AccountingError, UnknownSpeciesError
 from simulator.yaml_cache import load_cached_safe_yaml
 
@@ -111,6 +115,20 @@ MOLAR_MASS_REL_TOLERANCE = 1e-6
 _OPEN_TO_CLOSE = {"(": ")", "[": "]", "{": "}"}
 _CLOSE_TO_OPEN = {v: k for k, v in _OPEN_TO_CLOSE.items()}
 _NUMBER_RE = re.compile(r"\d+(?:\.\d+)?")
+# A caller may use this while expanding an explicitly delimited decimal
+# coefficient. It survives adduct splitting and becomes a decimal only once
+# the accounting parser has assigned all separator dots.
+_DECIMAL_DOT_SENTINEL = "\x00"
+# Source: controller ruling for t-1795 lists H2O, CO2, NH3, SO3, and HCl.
+# SiO2 is an adduct unit in B1452's printed mullite formula 3Al2O3·2SiO2.
+# D2O was on that list, but accounting has no deuterium mass, so a
+# recognised D2O unit would be parsed and then refused. It stays out until
+# a real deuterium entry exists. Keep this vocabulary beside the sole
+# dot classifier.
+_ASCII_ADDUCT_UNITS = frozenset({"H2O", "CO2", "NH3", "SO3", "HCl", "SiO2"})
+_ASCII_ADDUCT_UNITS_LONGEST_FIRST = tuple(
+    sorted(_ASCII_ADDUCT_UNITS, key=len, reverse=True)
+)
 _PHASE_SUFFIX_RE = re.compile(
     r"(?:\((?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\)|"
     r"\[(?:s|l|g|aq|cr|liq|liquid|solid|gas|vapor)\])$",
@@ -244,7 +262,7 @@ def parse_formula(
     totals: defaultdict[str, float] = defaultdict(float)
     for segment in _split_formula_segments(cleaned):
         multiplier, body = _leading_multiplier(segment)
-        parser = _FormulaParser(body)
+        parser = _FormulaParser(body.replace(_DECIMAL_DOT_SENTINEL, "."))
         elements = parser.parse()
         for element, count in elements.items():
             totals[element] += count * multiplier
@@ -261,17 +279,30 @@ def atoms_parse_formula_else_janaf(
     A successful ``parse_formula`` wins. A hydrate stays waters
     (``CuSO4.5H2O`` and ``CuSO4·5H2O`` are five waters, not decimal
     oxygen). A printed decimal subscript stays one species and is not
-    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). ``AccountingError``
-    falls back to JANAF ``formula_composition``. None means both failed.
-    Other exceptions propagate.
+    integerised (``FeO1.5``, ``KO0.5``, ``Fe0.947O``). D2O adducts outside
+    the closed vocabulary are refused, while standalone JANAF deuterium
+    formulas keep their counts. ``AccountingError`` falls back to JANAF
+    ``formula_composition``. None means both failed. Other exceptions
+    propagate.
     """
 
+    cleaned = _clean_formula_text(formula)
+    if _has_empty_middle_dot_segment(cleaned):
+        return None
+    # D2O remains available as an ordinary JANAF component, but it is not in
+    # accounting's closed adduct vocabulary. Refuse the hydrate spelling
+    # before a JANAF fallback can reinterpret the separator or multiplier.
+    if re.search(r"[.·]\d*D2O(?:$|[^a-z])", cleaned):
+        return None
+
     try:
-        parsed = parse_formula(formula)
+        parsed = parse_formula(cleaned)
     except AccountingError:
+        if "." in cleaned or "·" in cleaned:
+            return None
         from simulator.reference_data.janaf import formula_composition
 
-        return formula_composition(formula)
+        return formula_composition(cleaned.replace(_DECIMAL_DOT_SENTINEL, "."))
     return tuple(
         sorted(
             (str(element), float(count))
@@ -583,99 +614,169 @@ def _declared_molar_mass(value: Mapping[str, Any]) -> float | None:
 
 
 def _clean_formula_text(formula: str) -> str:
+    """Normalize notation while leaving dot classification to the splitter."""
+
     text = re.sub(r"\s+", "", str(formula).strip())
+    if text.startswith("$") and text.endswith("$"):
+        text = text[1:-1]
+    text = _strip_formula_markup(text)
+    text = (
+        text.replace(r"\cdot", "·")
+        .replace(r"\bullet", "·")
+        .replace("•", "·")
+        .replace("⋅", "·")
+    )
+
+    def _expand_subscript(match: re.Match[str]) -> str:
+        braced = match.group(1)
+        if braced is not None:
+            return braced.replace(".", _DECIMAL_DOT_SENTINEL)
+        return match.group(2) or ""
+
+    text = re.sub(
+        r"_\{(\d+(?:\.\d+)?)\}|_(\d+(?:\.\d+)?)",
+        _expand_subscript,
+        text,
+    )
+    text = fold_subscript_digits(text)
     previous = None
     while text and previous != text:
         previous = text
         text = _PHASE_SUFFIX_RE.sub("", text)
+    # Preserve established leading-zero terminal decimals such as Fe.9470.
+    text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
     return text
 
 
-def _strip_one_leading_integer(part: str) -> str:
-    end = 0
-    while end < len(part) and part[end].isdigit():
-        end += 1
-    return part[end:]
+def _has_empty_middle_dot_segment(formula: str) -> bool:
+    """Reject empty adduct segments before a fallback can drop them."""
+
+    return "·" in formula and any(
+        not segment for segment in formula.split("·")
+    )
 
 
-def _distinct_integer_elements(text: str) -> int | None:
-    """How many elements one integer-subscript formula names.
+def _has_malformed_ascii_adduct(formula: str) -> bool:
+    for segment in formula.split("·"):
+        trailing_zero_coefficient = re.search(r"\.0+$", segment)
+        leading_formula_multiplier = re.match(r"^\d+[A-Z]", segment)
+        if (
+            segment.startswith(".")
+            or segment.endswith(".")
+            or ".." in segment
+            or (
+                trailing_zero_coefficient is not None
+                and leading_formula_multiplier is not None
+            )
+        ):
+            return True
+        for unit in _ASCII_ADDUCT_UNITS_LONGEST_FIRST:
+            if re.search(rf"\.0+{re.escape(unit)}(?:$|\.)", segment):
+                return True
+    return False
 
-    None when the text is empty, does not parse, or a count is not a
-    positive integer. A leading segment multiplier is not an element.
+
+def _adduct_boundary(text: str, dot: int) -> int | None:
+    """End index of a closed-vocabulary adduct after ``dot``.
+
+    The tail has an optional positive integer, decimal, or fractional
+    coefficient and one closed-vocabulary unit. Each dot is judged alone.
     """
 
-    if not text or "." in text or "·" in text:
+    start = dot + 1
+    if start >= len(text):
         return None
-    try:
-        multiplier, body = _leading_multiplier(text)
-        if multiplier <= 0.0 or not multiplier.is_integer():
+    coefficient = re.match(r"(?:\d+/\d+|\d+(?:\.\d+)?)", text[start:])
+    if coefficient is not None:
+        number = coefficient.group(0)
+        if "/" in number:
+            numerator, denominator = number.split("/", 1)
+            if int(denominator) == 0 or int(numerator) <= 0:
+                return None
+        elif float(number) <= 0.0:
             return None
-        elements = _FormulaParser(body).parse()
-    except AccountingError:
-        return None
-    if not elements:
-        return None
-    for count in elements.values():
-        if count <= 0.0 or not float(count).is_integer():
-            return None
-    return len(elements)
+        start += coefficient.end()
+    for unit in _ASCII_ADDUCT_UNITS_LONGEST_FIRST:
+        if text.startswith(unit, start):
+            unit_end = start + len(unit)
+            if unit_end == len(text) or text[unit_end] == ".":
+                return unit_end
+    return None
 
 
-def _is_integer_compound_adduct(text: str) -> bool:
-    """True when every ASCII dot separates multi-element integer formulas.
+def _ascii_adduct_parts(text: str) -> list[str] | None:
+    """Split only the dots that introduce a vocabulary adduct unit.
 
-    Split on '.' and strip one leading integer multiplier from each part
-    after the first. It is an adduct only if every part is an
-    integer-subscript formula with at least two distinct elements;
-    otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
-    ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
-    ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
-    ``Mg1.5SiO4``, and ``Fe2.3O4`` stay one species because a part is a
-    single element. ``FeO1.5`` stays one species because the part after
-    the dot has no element. ``SiO1.5C0.5`` stays one species because it
-    has a single-element part and an elementless part. An empty piece
-    from a leading, trailing, or doubled dot is not an adduct.
+    ``Fe0.947O.2H2O`` keeps the decimal in ``Fe0.947O`` and splits at the
+    water. ``MgAl1.5SiO3`` has no adduct tail, so it stays one part.
+    ``Al2O3.3H2O`` splits. A doubled or trailing dot is not an adduct.
     """
 
     if not text or "." not in text or "·" in text:
-        return False
-    parts = text.split(".")
-    if any(part == "" for part in parts):
-        return False
-    for index, part in enumerate(parts):
-        body = part if index == 0 else _strip_one_leading_integer(part)
-        count = _distinct_integer_elements(body)
-        if count is None or count < 2:
-            return False
-    return True
+        return None
+    parts: list[str] = []
+    start = 0
+    index = 0
+    found = False
+    while index < len(text):
+        if text[index] == "." and (
+            index == 0 or text[index - 1] != _DECIMAL_DOT_SENTINEL
+        ):
+            boundary = _adduct_boundary(text, index)
+            if boundary is not None:
+                parts.append(text[start:index])
+                start = index + 1
+                index = boundary
+                found = True
+                continue
+        index += 1
+    if not found:
+        return None
+    parts.append(text[start:])
+    if any(not part or part.startswith(".") or part.endswith(".") for part in parts):
+        return None
+    return parts
+
+
+def _is_ascii_adduct(text: str) -> bool:
+    """True when at least one ASCII dot introduces a vocabulary adduct unit."""
+
+    return _ascii_adduct_parts(text) is not None
 
 
 def _split_ascii_adducts(text: str) -> list[str]:
     if not text:
         return []
-    if _is_integer_compound_adduct(text):
-        return text.split(".")
-    return [text]
+    parts = _ascii_adduct_parts(text)
+    if parts is None:
+        return [text]
+    return parts
 
 
 def _split_formula_segments(formula: str) -> list[str]:
     """Split hydrate and adduct boundaries. Keep a decimal subscript intact.
 
     A middle dot (U+00B7) always separates segments: ``CuSO4·5H2O`` is
-    five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. An ASCII
-    dot-string is an adduct only when splitting on '.' and stripping one
-    leading integer from each part after the first leaves every part an
-    integer-subscript formula of at least two distinct elements;
-    otherwise every dot is a decimal point. ``Al2O3.2SiO2.2H2O``,
-    ``CuSO4.5H2O``, and ``Na2O.2SiO2`` split. ``Fe1.17Si3.13O8``,
-    ``Mg1.8Fe1.2SiO4``, ``Na1.2Fe1.3Si3O8``, ``Ca1.5SiO3``,
-    ``Mg1.5SiO4``, ``Fe2.3O4``, ``FeO1.5``, and ``SiO1.5C0.5`` stay one
-    species.
+    five waters, and ``2Na2O·CaO·3SiO2`` is three oxides. Each ASCII dot
+    is judged alone: it separates an adduct only when the tail is an
+    optional positive integer, decimal, or fractional coefficient and one
+    unit in ``_ASCII_ADDUCT_UNITS``.
+    A dot between digits that is not that tail stays a decimal, including
+    when a later dot is a water. Thus ``Al2O3.3H2O``, ``3Al2O3.2SiO2``,
+    and ``Fe0.947O.2H2O`` split, while ``Fe0.947O``, ``MgAl1.5SiO3``,
+    ``FeO1.5``, and ``SiO1.5C0.5`` stay one species.
     """
+
+    if _has_empty_middle_dot_segment(formula):
+        raise UnknownSpeciesError("formula has an empty middle-dot segment")
+    if _has_malformed_ascii_adduct(formula):
+        raise UnknownSpeciesError("formula has a malformed ASCII adduct")
 
     pieces: list[str] = []
     for part in formula.split("·"):
+        if re.match(r"^\d+\.\d+(?=[A-Z\[(])", part):
+            dot = part.index(".")
+            part = part[:dot] + _DECIMAL_DOT_SENTINEL + part[dot + 1 :]
         pieces.extend(_split_ascii_adducts(part))
     segments = [segment for segment in pieces if segment]
     if not segments:
@@ -684,13 +785,21 @@ def _split_formula_segments(formula: str) -> list[str]:
 
 
 def _leading_multiplier(segment: str) -> tuple[float, str]:
-    match = _NUMBER_RE.match(segment)
+    match = re.match(r"(\d+/\d+|\d+(?:\.|\x00)\d+|\d+)", segment)
     if match is None:
         return 1.0, segment
     body = segment[match.end() :]
     if not body:
         raise UnknownSpeciesError(f"formula segment {segment!r} has no body")
-    return float(match.group(0)), body
+    number = match.group(0).replace(_DECIMAL_DOT_SENTINEL, ".")
+    if "/" in number:
+        numerator, denominator = number.split("/", 1)
+        if int(denominator) == 0:
+            raise UnknownSpeciesError(
+                f"formula segment {segment!r} has a zero denominator"
+            )
+        return int(numerator) / int(denominator), body
+    return float(number), body
 
 
 def _close_enough(left: float, right: float, absolute: float, relative: float) -> bool:

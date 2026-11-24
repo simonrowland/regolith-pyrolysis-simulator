@@ -3,9 +3,13 @@
 from __future__ import annotations
 
 import json
+import re
+from dataclasses import replace
 from decimal import Decimal
+from inspect import getsource
 from pathlib import Path
 
+import pytest
 import yaml
 
 from simulator.battery.enums import (
@@ -39,11 +43,14 @@ RECORDS_DIR = COMPILATION_ROOT / "records"
 ROOT = Path(__file__).resolve().parents[2]
 B1452_STORE_DIR = ROOT / "data" / "literature" / "observations-v2"
 B1452_STORE_PATTERN = "compilations-robie-hemingway-fisher-1978-usgs-b1452.yaml"
-# t-1620 parses the terbium decimals; blank-FW formula-line entropies are excluded.
-B1452_RAW = 55707
-B1452_STORED = 15229
+# Independent source scan: formula weights, uncertainty cells, and declared
+# row columns contain 54,104 nonblank cells; 1,603 blanks are outside the
+# census. The generator buckets are pinned separately: 15,226 stored + 19,642
+# refused + 19,236 excluded closes that scan and must hold on train regen.
+B1452_RAW = 54104
+B1452_STORED = 15226
 B1452_REFUSED = 19642
-B1452_EXCLUDED = 20836
+B1452_EXCLUDED = 19236
 B1452_MERGED_PROPOSED = 457
 B1452_MERGED_STORED = 376
 B1452_MERGED_REFUSED = 15
@@ -63,8 +70,15 @@ B1452_FORMULA_UNRESOLVED_298K_ROWS = 49
 B1452_TB_298K_OBSERVATIONS = 8
 B1452_TB_0202_OBSERVATIONS = 34
 B1452_TB_0203_OBSERVATIONS = 27
-# Scratch-regenerated observations-v2 unique-ID count; the train refreshes the store.
+# Checked-in store count; the train refreshes it from the corrected source records.
 B1452_STORE_STORED = 15224
+# Corrected generator output drops the three entropy uncertainty-only rows.
+# Fold 10 re-count: the pre-fix generator's extra 47 stored cells were the
+# fluorphlogopite fragment AlSi3O10 (record 0003: 5, shard 0394: 42). Printed
+# formula weight 421.244 g/mol; fragment mass 271.232 g/mol. Refusing tokens
+# from inside a rejected complete expression puts those cells back into
+# refused, so these counts and the store-versus-generated gap of 3 hold.
+B1452_GENERATED_STORE_STORED = 15221
 TABLE_298K = "robie-hemingway-fisher-1978-usgs-b1452-0003"
 TABLE1 = "robie-hemingway-fisher-1978-usgs-b1452-0001"
 SILVER_HT = "robie-hemingway-fisher-1978-usgs-b1452-0004"
@@ -295,21 +309,330 @@ def test_298k_next_line_formula_is_page_grounded() -> None:
     assert stored == []
 
 
+FLUORPHLOGOPITE_HT = "robie-hemingway-fisher-1978-usgs-b1452-0394"
+# Printed KMg3(AlSi3O10)F2, PDF 35 folio 29 and PDF 426 folio 420.
+# The captured 298 K formula line is Kg3, which is not that mineral.
+_FLUORPHLOGOPITE_FRAGMENT_ATOMS = (("Al", "1"), ("O", "10"), ("Si", "3"))
+_PRINTED_FLUORPHLOGOPITE_FW = Decimal("421.244")
+
+
+def _atom_key(formula: str) -> tuple[tuple[str, str], ...] | None:
+    counts = generator._parse_counts(formula)
+    if not counts:
+        return None
+    return tuple(sorted((element, str(count)) for element, count in counts.items()))
+
+
+def rejected_interior_formulas(name: str) -> set[str]:
+    """Formulas the pre-fix fallback would take from inside a rejected ``$...$``.
+
+    A complete expression that parses is the formula, so it contributes none.
+    """
+
+    spans: list[tuple[int, int]] = []
+    for match in generator._LATEX_MATH_RE.finditer(name):
+        formula, latex_charge = generator._latex_to_formula(match.group(1))
+        if formula and not formula.startswith("Delta") and generator._looks_like_formula(formula):
+            return set()
+        if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
+            return set()
+        spans.append(match.span())
+    found: set[str] = set()
+    for start, end in spans:
+        chunk = name[start:end]
+        for token in chunk.replace("(", " ").replace(")", " ").split():
+            parsed, _charge = generator._plain_formula_and_charge(token)
+            if parsed:
+                found.add(parsed)
+    return found
+
+
+def interior_mining_formula_from_name(name: str) -> tuple[str | None, int | None]:
+    """Pre-fix rule: a failed complete expression still offers its interior tokens."""
+
+    charge: int | None = None
+    for chunk in generator._LATEX_MATH_RE.findall(name):
+        formula, latex_charge = generator._latex_to_formula(chunk)
+        if latex_charge is not None:
+            charge = latex_charge
+        if formula and not formula.startswith("Delta") and generator._looks_like_formula(formula):
+            return formula, charge
+        if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
+            return formula, charge
+    tokens = name.replace("(", " ").replace(")", " ").split()
+    if tokens:
+        last = tokens[-1]
+        if (
+            (any(character.isdigit() for character in last) or re.fullmatch(r"[A-Z][a-z]?", last))
+            and generator._looks_like_formula(last)
+        ):
+            return last, charge
+        hits: list[tuple[str, int | None]] = []
+        for token in tokens:
+            formula, token_charge = generator._plain_formula_and_charge(token)
+            if formula:
+                hits.append((formula, token_charge))
+        unique = {formula for formula, _token_charge in hits}
+        if len(unique) == 1:
+            formula = next(iter(unique))
+            charges = {
+                item_charge for item_formula, item_charge in hits if item_formula == formula
+            }
+            if len(charges) == 1:
+                charge = next(iter(charges))
+            return formula, charge
+    return None, charge
+
+
+def _clear_formula_indexes() -> None:
+    generator._formula_index_from_298k.cache_clear()
+    generator._formula_weight_index_from_298k.cache_clear()
+
+
+def _fluorphlogopite_rows(record: dict) -> list[tuple[int, str, generator.FormulaResolution]]:
+    rows = []
+    for index, row in enumerate(record["rows"]):
+        cells = row.get("cells") or {}
+        parsed = generator._as_published_cell(cells.get("name_and_formula"))
+        if parsed is None:
+            continue
+        name = parsed[0]
+        if "FLUORPHLOGOPITE" not in name and "AlSi_{3}O_{10}" not in name:
+            continue
+        if "FLUORPHLOGOPITE" not in name and "F_{2}" not in name:
+            continue
+        fw = generator._formula_weight_as_published(record, row_index=index)
+        rows.append(
+            (
+                index,
+                name,
+                generator._resolve_formula(record, name=name, formula_weight=fw),
+            )
+        )
+    return rows
+
+
+def _assert_fluorphlogopite_has_no_fragment() -> None:
+    record = _load(TABLE_298K)
+    rows = _fluorphlogopite_rows(record)
+    assert len(rows) == 2
+    for _index, _name, resolution in rows:
+        assert resolution.formula is None
+        assert resolution.reason is not None
+        assert resolution.reason.startswith(generator.FORMULA_UNRESOLVED_REASON_PREFIX)
+        assert resolution.formula != "AlSi_{3}O_{10}"
+    generated = _generation(TABLE_298K)
+    assert [
+        observation.identity.species.formula
+        for observation in generated.observations
+        if _atom_key(observation.identity.species.formula) == _FLUORPHLOGOPITE_FRAGMENT_ATOMS
+    ] == []
+    high_temperature = _generation(FLUORPHLOGOPITE_HT)
+    resolution = high_temperature.report["formula_resolution"]
+    assert resolution["formula"] is None
+    assert resolution["unresolved"] is True
+    assert str(resolution["reason"]).startswith(generator.FORMULA_UNRESOLVED_REASON_PREFIX)
+    assert high_temperature.observations == ()
+    fragment_mass = generator._formula_mass("AlSi_{3}O_{10}")
+    assert fragment_mass is not None
+    assert not generator._mass_matches_formula_weight(
+        "AlSi_{3}O_{10}", _PRINTED_FLUORPHLOGOPITE_FW
+    )
+    # Printed KMg3(AlSi3O10)F2 matches 421.244. The capture is Kg, and no
+    # image-verified correction supplies the printed formula, so the row
+    # stays the refusal above.
+    whole = "KMg3(AlSi3O10)F2"
+    assert _atom_key(whole) == (
+        ("Al", "1"),
+        ("F", "2"),
+        ("K", "1"),
+        ("Mg", "3"),
+        ("O", "10"),
+        ("Si", "3"),
+    )
+    assert generator._mass_matches_formula_weight(whole, _PRINTED_FLUORPHLOGOPITE_FW)
+
+
+def test_fluorphlogopite_refuses_the_rejected_expression_interior() -> None:
+    """298 K record 0003 and high-temperature shard 0394 do not emit AlSi3O10.
+
+    Printed mineral, PDF 35 folio 29 and PDF 426 folio 420: KMg3(AlSi3O10)F2,
+    421.244 g/mol. The captured ``Kg_{3}`` is not an image-verified formula,
+    so the row stays a typed missing-composition refusal.
+    """
+
+    _clear_formula_indexes()
+    _assert_fluorphlogopite_has_no_fragment()
+
+
+def test_old_interior_mining_breaks_fluorphlogopite_refusal(monkeypatch) -> None:
+    _clear_formula_indexes()
+    _assert_fluorphlogopite_has_no_fragment()
+    monkeypatch.setattr(
+        generator, "_formula_from_name", interior_mining_formula_from_name
+    )
+    _clear_formula_indexes()
+    try:
+        captured = "$Kg_{3}(AlSi_{3}O_{10})F_{2}$"
+        assert interior_mining_formula_from_name(captured)[0] == "AlSi_{3}O_{10}"
+        with pytest.raises(AssertionError):
+            _assert_fluorphlogopite_has_no_fragment()
+    finally:
+        monkeypatch.undo()
+        _clear_formula_indexes()
+
+
+def _assert_rejected_span_boundary_refuses() -> None:
+    resolution = generator._resolve_formula({}, name="TEST Fe$Kg_{3}$O")
+    assert resolution.formula is None
+    assert resolution.source is None
+    assert str(resolution.reason).startswith(generator.FORMULA_UNRESOLVED_REASON_PREFIX)
+
+
+def test_rejected_span_does_not_join_neighboring_text() -> None:
+    _assert_rejected_span_boundary_refuses()
+
+
+@pytest.mark.parametrize("name", ["TEST Ag($Kg_{3}$)", "TEST ($Kg_{3}$)Ag"])
+def test_rejected_span_keeps_separate_formula_tokens(name: str) -> None:
+    formula, _charge = generator._formula_from_name(name)
+    assert formula == "Ag"
+
+
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [
+        ("Ag $Kg_{3}$", "Ag"),
+        ("Fe2SiO4 $Kg_{3}$ OTHER", "Fe2SiO4"),
+        ("Ag($Kg_{3}$)", "Ag"),
+    ],
+)
+def test_leading_formula_separated_from_rejected_span(name: str, expected: str) -> None:
+    formula, _charge = generator._formula_from_name(name)
+    assert formula == expected
+
+
+def test_old_span_boundary_mutation_fails_independent_token_assertion(monkeypatch) -> None:
+    source = getsource(generator._formula_from_name).replace(
+        "not is_separator(name[cursor])",
+        "not is_separator(name[cursor - 1])",
+    ).replace(
+        "not is_separator(name[start - 1])",
+        "not name[start - 1].isspace()",
+    ).replace(
+        "not is_separator(tail[0])",
+        "not tail[0].isspace()",
+    )
+    assert "cursor > 0" in source
+    assert source != getsource(generator._formula_from_name)
+    namespace = vars(generator).copy()
+    exec(source, namespace)
+    old_formula_from_name = namespace["_formula_from_name"]
+    monkeypatch.setattr(generator, "_formula_from_name", old_formula_from_name)
+    with pytest.raises(AssertionError):
+        assert generator._formula_from_name("TEST Ag($Kg_{3}$)")[0] == "Ag"
+    with pytest.raises(AssertionError):
+        assert generator._formula_from_name("Ag($Kg_{3}$)")[0] == "Ag"
+    with pytest.raises(AssertionError):
+        assert generator._formula_from_name("TEST $Kg_{3}$ Ag $Kg_{3}$ OTHER")[0] == "Ag"
+
+
+def test_generator_preserves_explicit_decimal_subscript_for_accounting(monkeypatch) -> None:
+    from simulator.accounting.formulas import parse_formula
+
+    source = r"$Fe_{1.5}SiO_{2}$"
+    formula, charge = generator._formula_from_name(f"TEST {source}")
+    assert charge is None
+    assert formula is not None
+    assert dict(parse_formula(formula).elements) == {"Fe": 1.5, "O": 2.0, "Si": 1.0}
+
+    namespace = vars(generator).copy()
+    old_latex_to_formula = getsource(generator._latex_to_formula).replace(
+        "lambda match: match.group(0)\n        if \".\" in (match.group(1) or match.group(2) or \"\")\n        else (match.group(1) or match.group(2))",
+        "lambda match: match.group(1) or match.group(2)",
+    )
+    assert old_latex_to_formula != getsource(generator._latex_to_formula)
+    exec(old_latex_to_formula, namespace)
+    monkeypatch.setattr(generator, "_latex_to_formula", namespace["_latex_to_formula"])
+    with pytest.raises(AssertionError):
+        old_formula, _ = generator._formula_from_name(f"TEST {source}")
+        assert old_formula is not None
+        assert dict(parse_formula(old_formula).elements) == {"Fe": 1.5, "O": 2.0, "Si": 1.0}
+
+
+def _row_name_and_weight(record: dict, index: int) -> tuple[str, str | None]:
+    row = record["rows"][index]
+    cells = row.get("cells") or {}
+    parsed = generator._as_published_cell(cells.get("name_and_formula"))
+    name = parsed[0] if parsed is not None else ""
+    return name, generator._formula_weight_as_published(record, row_index=index)
+
+
+def test_rejected_expression_interior_never_resolves() -> None:
+    """Every B1452 name resolves without a token from inside a rejected formula."""
+
+    _clear_formula_indexes()
+    record = _load(TABLE_298K)
+    interiors_by_key: dict[str, set[str]] = {}
+    offenders: list[str] = []
+    rows = record["rows"]
+    for index in range(len(rows)):
+        name, fw = _row_name_and_weight(record, index)
+        sources = [name]
+        if fw and generator._formula_from_name(name)[0] is None and index + 1 < len(rows):
+            _next_name, next_fw = _row_name_and_weight(record, index + 1)
+            if not next_fw:
+                sources.append(_next_name)
+        interiors: set[str] = set()
+        for source in sources:
+            interiors |= rejected_interior_formulas(source)
+        key = generator._name_key(name)
+        if key and interiors:
+            interiors_by_key.setdefault(key, set()).update(interiors)
+        resolution = generator._resolve_formula(record, name=name, formula_weight=fw)
+        if resolution.formula and resolution.formula in interiors:
+            offenders.append(
+                f"298k row {index} {name!r} -> {resolution.formula!r} via {resolution.source}"
+            )
+    for path in sorted(RECORDS_DIR.glob("*.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if generator._table_kind(payload) != "ht_grid":
+            continue
+        label = str(payload.get("name_as_published") or "")
+        own = rejected_interior_formulas(label)
+        published = payload.get("formula_as_published")
+        if isinstance(published, str):
+            own |= rejected_interior_formulas(published)
+        title = payload.get("title_line_as_published")
+        if isinstance(title, str):
+            own |= rejected_interior_formulas(title)
+        key = generator._name_key(label)
+        if key:
+            own |= interiors_by_key.get(key, set())
+        resolution = generator._resolve_formula(payload)
+        if resolution.formula and resolution.formula in own:
+            offenders.append(
+                f"{payload.get('record_id')} {label!r} -> {resolution.formula!r} "
+                f"via {resolution.source}"
+            )
+    assert offenders == []
+
+
 def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
     generated = _generation(TABLE_298K)
     observations = [
         observation
         for observation in generated.observations
         if quantity_token(observation.identity) is Quantity.S
-        and observation.identity.species.formula in {"TbO1.714", "TbO1.812"}
+        and observation.identity.species.formula in {"TbO_{1.714}", "TbO_{1.812}"}
     ]
 
     assert {
         (observation.identity.species.formula, observation.value.point)
         for observation in observations
     } == {
-        ("TbO1.714", Decimal("80.75")),
-        ("TbO1.812", Decimal("81.17")),
+        ("TbO_{1.714}", Decimal("80.75")),
+        ("TbO_{1.812}", Decimal("81.17")),
     }
     excluded = [
         row
@@ -321,8 +644,8 @@ def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
     assert len(excluded) == 2
 
     for formula, formula_weight in (
-        ("TbO1.714", Decimal("186.348")),
-        ("TbO1.812", Decimal("187.916")),
+        ("TbO_{1.714}", Decimal("186.348")),
+        ("TbO_{1.812}", Decimal("187.916")),
     ):
         formula_observations = [
             observation
@@ -334,20 +657,20 @@ def test_terbium_decimal_formula_lines_do_not_emit_entropy() -> None:
         assert calculated_mass is not None
         assert abs(calculated_mass - formula_weight) < Decimal("0.001")
     assert sum(
-        observation.identity.species.formula in {"TbO1.714", "TbO1.812"}
+        observation.identity.species.formula in {"TbO_{1.714}", "TbO_{1.812}"}
         for observation in generated.observations
     ) == B1452_TB_298K_OBSERVATIONS
 
     for record_id, formula, formula_weight, expected_count in (
         (
             "robie-hemingway-fisher-1978-usgs-b1452-0202",
-            "TbO1.714",
+            "TbO_{1.714}",
             Decimal("186.348"),
             B1452_TB_0202_OBSERVATIONS,
         ),
         (
             "robie-hemingway-fisher-1978-usgs-b1452-0203",
-            "TbO1.812",
+            "TbO_{1.812}",
             Decimal("187.916"),
             B1452_TB_0203_OBSERVATIONS,
         ),
@@ -447,6 +770,96 @@ def test_merged_two_dot_entropy_splits_on_grain() -> None:
     assert splits["proposed"] >= 1
     assert splits["stored"] >= 1
     assert splits["proposed"] == splits["stored"] + splits["refused"] + splits["excluded"]
+
+
+def test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator() -> None:
+    generated = _generation(TABLE_298K)
+    from simulator.battery.stable_ids import _name_slug
+
+    corrected_observation_ids = set()
+    for name, point, uncertainty, stray, page, pdf_page in (
+        ("HYDROHAGNESITE", "503.67", "1.55", "1.55", 25, 31),
+        ("ARTIWITE", "232.92", "0.67", "0.67", 25, 31),
+        ("ANALCIME", "234.43", "2.51", "2.51", 29, 35),
+    ):
+        observations = _observations_for(
+            generated, Quantity.S, temperature="298.15", name=name
+        )
+        assert len(observations) == 1
+        assert observations[0].value.point == Decimal(point)
+        assert observations[0].uncertainty.kind is UncertaintyKind.PRINTED
+        assert observations[0].uncertainty.verbatim == uncertainty
+        assert all(row.value.point != Decimal(stray) for row in observations)
+        assert observations[0].locator is not None
+        assert observations[0].locator.published_page == page
+        assert observations[0].locator.pdf_page_index == pdf_page
+        corrected_observation_ids.add(observations[0].observation_id)
+        row_observations = [
+            row
+            for row in generated.observations
+            if f":name={_name_slug(name)}" in row.observation_id
+        ]
+        assert row_observations
+        corrected_observation_ids.update(
+            row.observation_id for row in row_observations
+        )
+        assert all(
+            row.locator is not None
+            and row.locator.published_page == page
+            and row.locator.pdf_page_index == pdf_page
+            for row in row_observations
+        )
+
+    szomolnokite = _observations_for(
+        generated,
+        Quantity.DELTA_FH,
+        temperature="298.15",
+        name="SZOMOLNOKITE",
+    )
+    assert len(szomolnokite) == 1
+    point = szomolnokite[0]
+    assert point.value.point == Decimal("-1243.900")
+    assert point.uncertainty.kind is UncertaintyKind.PRINTED
+    assert point.uncertainty.verbatim == "0.500 kJ/mol"
+    assert point.evidence.original_method_class == "reconstructed_from_printed_page"
+    assert point.locator is not None
+    assert point.locator.published_page == 26
+    assert point.locator.pdf_page_index == 32
+    corrected_observation_ids.add(point.observation_id)
+
+    overridden = [
+        row
+        for row in generated.observations
+        if row.locator is not None
+        and (row.locator.published_page, row.locator.pdf_page_index) == (26, 32)
+    ]
+    assert overridden == [point]
+    fallback_observations = [
+        row
+        for row in generated.observations
+        if row.observation_id not in corrected_observation_ids
+    ]
+    assert all(
+        row.locator is None
+        or (row.locator.published_page, row.locator.pdf_page_index) == (12, 18)
+        for row in fallback_observations
+    )
+
+
+def test_locator_evidence_requires_the_source_line_mutation(monkeypatch) -> None:
+    evidence = generator._image_evidence
+    test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator()
+
+    def wrong_source_line(token, *, action, raw_tokens):
+        return evidence(
+            replace(token, source_text_line=(token.source_text_line or 0) + 1),
+            action=action,
+            raw_tokens=raw_tokens,
+        )
+
+    monkeypatch.setattr(generator, "_image_evidence", wrong_source_line)
+    with pytest.raises(AssertionError):
+        test_298k_entropy_uncertainties_attach_to_points_and_szomolnokite_locator()
 
 
 def test_spinel_extra_dot_split_is_proposed_then_10x_refused() -> None:
@@ -724,6 +1137,41 @@ def test_ocr_suspect_without_image_correction_is_refused() -> None:
     assert entropy.value.point == Decimal("42.55")
 
 
+def test_historical_correction_uses_printed_token_and_source_line() -> None:
+    record_id = "robie-hemingway-fisher-1978-usgs-b1452-0162"
+    payload = _load(record_id)
+    token, = [
+        token
+        for token in generator._iter_raw_numeric_tokens(payload)
+        if token.source_text_line == 21 and token.column == "heat_capacity"
+    ]
+    assert token.layout_as_extracted == "109e02"
+    assert token.as_published == "109.02"
+    assert generator._image_correction(token) is None
+    generated = generator.generate_record(payload)
+    assert any(
+        row["row_index"] == token.row_index
+        and row["column"] == "heat_capacity"
+        for row in generated.report["refusals"]
+    )
+
+
+def test_historical_ocr_lookup_mutation_recreates_admission_failure(monkeypatch) -> None:
+    evidence = generator._image_evidence
+    test_historical_correction_uses_printed_token_and_source_line()
+    monkeypatch.setattr(
+        generator,
+        "_image_evidence",
+        lambda token, *, action, raw_tokens: evidence(
+            token,
+            action=action,
+            raw_tokens=(token.layout_as_extracted, token.as_published),
+        ),
+    )
+    with pytest.raises(AssertionError):
+        test_historical_correction_uses_printed_token_and_source_line()
+
+
 def test_oxide_asterisk_is_basis_not_damage() -> None:
     generated = _generation(FAYALITE_OXIDES)
     gibbs = _observations_for(
@@ -954,6 +1402,35 @@ def test_cell_accounting_mutation_drops_one_token() -> None:
     assert mutated.report["cell_accounting"]["raw_numeric_tokens"] == raw - 1
 
 
+def test_blank_cell_is_not_counted_as_an_exclusion() -> None:
+    payload = _load(TABLE_298K)
+    row = next(row for row in payload["rows"] if row["source_text_line"] == 602)
+    blank_cell = row["cells"]["reference_cp"]
+    assert blank_cell["as_published"] == ""
+    with_blank = generator.generate_record(payload).report["cell_accounting"]
+
+    del row["cells"]["reference_cp"]
+    without_cell = generator.generate_record(payload).report["cell_accounting"]
+    assert with_blank == without_cell
+
+
+def test_blank_accounting_mutation_recreates_production_failure(monkeypatch) -> None:
+    generate = generator.generate_record
+    raw_tokens = generator._iter_raw_numeric_tokens
+    test_blank_cell_is_not_counted_as_an_exclusion()
+
+    def count_original_blanks(payload):
+        run = generate(payload)
+        blank = sum(not token.as_published.strip() for token in raw_tokens(payload))
+        run.report["cell_accounting"]["raw_numeric_tokens"] += blank
+        run.report["cell_accounting"]["excluded"] += blank
+        return run
+
+    monkeypatch.setattr(generator, "generate_record", count_original_blanks)
+    with pytest.raises(AssertionError):
+        test_blank_cell_is_not_counted_as_an_exclusion()
+
+
 def test_record_accounting_closes() -> None:
     for record_id in (TABLE1, TABLE_298K, SILVER_HT, FAYALITE_ELEMENTS, FAYALITE_OXIDES):
         generated = _generation(record_id)
@@ -1050,10 +1527,10 @@ def test_b1452_store_census_is_true_of_observations_v2() -> None:
     # F4 R-ord remint: observation_id scheme dropped :row= ordinals. Store still
     # carries pre-remint ids until rematerialize; counts and accounting hold.
     assert all("row=" not in oid for oid in generated_ids)
-    assert len(stored_ids) == len(generated_ids)
+    assert len(stored_ids) - len(generated_ids) == 3
     # assert stored_ids <= generated_ids  # restore after rematerialize
     assert B1452_STORED + B1452_REFUSED + B1452_EXCLUDED == B1452_RAW
-    assert len(generated_ids) == B1452_STORE_STORED
+    assert len(generated_ids) == B1452_GENERATED_STORE_STORED
 
 
 def test_b1452_store_refuses_spinel_1800k_identity_fail() -> None:

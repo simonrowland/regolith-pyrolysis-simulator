@@ -52,6 +52,12 @@ UNICODE_PLUS_SIGNS = (
 _SUP_TAG_RE = re.compile(r"<\s*/?\s*sup\b", re.IGNORECASE)
 
 
+def _strip_formula_markup(text: str) -> str:
+    """Remove TeX text/font wrappers while retaining their contents."""
+
+    return re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
+
+
 def is_superscripted(text: str) -> bool:
     """True when a formula token or cell carries a superscript.
 

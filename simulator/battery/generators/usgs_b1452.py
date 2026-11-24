@@ -293,12 +293,14 @@ class RawToken:
     record_id: str
     path: str
     as_published: str
+    layout_as_extracted: str | None
     ocr_suspect: bool
     footnote_markers: tuple[str, ...]
     column: str
     formation_basis: str | None
     row_index: int | None
     table_kind: str
+    source_text_line: int | None = None
 
 
 def _table_kind(record: Mapping[str, Any]) -> str:
@@ -390,6 +392,7 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
         column: str,
         *,
         row_index: int | None = None,
+        source_text_line: int | None = None,
         formation_basis: str | None = None,
     ) -> None:
         parsed = _as_published_cell(cell)
@@ -404,12 +407,19 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
                 record_id=record_id,
                 path=path,
                 as_published=token,
+                layout_as_extracted=(
+                    str(cell["layout_as_extracted"])
+                    if isinstance(cell, Mapping)
+                    and cell.get("layout_as_extracted") is not None
+                    else None
+                ),
                 ocr_suspect=suspect,
                 footnote_markers=markers,
                 column=column,
                 formation_basis=column_basis,
                 row_index=row_index,
                 table_kind=kind,
+                source_text_line=source_text_line,
             )
         )
 
@@ -424,44 +434,91 @@ def _iter_raw_numeric_tokens(record: Mapping[str, Any]) -> list[RawToken]:
         if not isinstance(row, Mapping):
             raise ValueError(f"{record_id}: rows[{row_index}] is not a mapping")
         cells = row.get("cells") if isinstance(row.get("cells"), Mapping) else {}
+        raw_line = row.get("source_text_line")
         for column in column_ids:
             add(
                 f"rows[{row_index}].cells.{column}",
                 cells.get(column),
                 column,
                 row_index=row_index,
+                source_text_line=int(raw_line) if raw_line is not None else None,
             )
     return tokens
 
 
 @lru_cache(maxsize=1)
-def _corrections_by_token() -> dict[tuple[str, str, str], Mapping[str, Any]]:
+def _corrections_by_token() -> dict[tuple[str, int, str, str, str], Mapping[str, Any]]:
     manifest = load_cached_safe_yaml(
         (COMPILATION_ROOT / "manifest.yaml").read_text(encoding="utf-8")
     )
-    index: dict[tuple[str, str, str], Mapping[str, Any]] = {}
+    index: dict[tuple[str, int, str, str, str], Mapping[str, Any]] = {}
     for item in manifest.get("corrections") or ():
         if not isinstance(item, Mapping):
             continue
-        if item.get("action") != "image_verified_correction":
+        action = str(item.get("action") or "")
+        if action not in {"image_verified_correction", "image_verified_locator"}:
             continue
         record_id = str(item.get("record_id") or "")
+        source_text_line = item.get("source_text_line")
+        if not isinstance(source_text_line, int):
+            continue
         column = str(item.get("column") or "")
-        ocr = str(item.get("ocr_token") or item.get("as_published") or "")
-        index[(record_id, column, ocr)] = item
+        if action == "image_verified_correction" and record_id == TABLE_298K_RECORD_ID:
+            # The new 298 K correction is keyed by its image-verified printed
+            # token. Its captured OCR token remains provenance only.
+            token = str(item.get("printed_token") or "")
+        else:
+            # Preserve green's OCR-keyed lookup for every historical correction.
+            token = str(item.get("ocr_token") or item.get("as_published") or "")
+        index[(record_id, source_text_line, column, action, token)] = item
     return index
 
 
+def _image_evidence(
+    token: RawToken, *, action: str, raw_tokens: Sequence[str | None]
+) -> Mapping[str, Any] | None:
+    if token.source_text_line is None:
+        return None
+    corrections = _corrections_by_token()
+    for raw_token in raw_tokens:
+        if raw_token is None:
+            continue
+        for candidate in (raw_token, _strip_oxide_marker(raw_token)):
+            item = corrections.get(
+                (
+                    token.record_id,
+                    token.source_text_line,
+                    token.column,
+                    action,
+                    candidate,
+                )
+            )
+            if item is not None:
+                return item
+    return None
+
+
 def _image_correction(token: RawToken) -> Mapping[str, Any] | None:
-    return _corrections_by_token().get(
-        (token.record_id, token.column, token.as_published)
-    ) or _corrections_by_token().get(
-        (token.record_id, token.column, _strip_oxide_marker(token.as_published))
+    # Historical correction admission stays on the printed token, as on
+    # green. The preserved OCR token is evidence provenance, not a lookup key.
+    return _image_evidence(
+        token,
+        action="image_verified_correction",
+        raw_tokens=(token.as_published,),
+    )
+
+
+def _image_locator(token: RawToken) -> Mapping[str, Any] | None:
+    # Locator entries bind the preserved OCR token to one source row.
+    return _image_evidence(
+        token,
+        action="image_verified_locator",
+        raw_tokens=(token.layout_as_extracted, token.as_published),
     )
 
 
 def _image_verified(token: RawToken) -> bool:
-    return _image_correction(token) is not None
+    return _image_correction(token) is not None or _image_locator(token) is not None
 
 
 def _column_grain_map(
@@ -492,7 +549,7 @@ def _column_grain_map(
 
 
 def _reconstruction_from_image(token: RawToken) -> dict[str, Any] | None:
-    item = _image_correction(token)
+    item = _image_correction(token) or _image_locator(token)
     if item is None:
         return None
     printed = str(item.get("printed_token") or "")
@@ -504,14 +561,24 @@ def _reconstruction_from_image(token: RawToken) -> dict[str, Any] | None:
             value = None
     if value is None:
         return None
+    if item.get("action") == "image_verified_locator":
+        evidence = (
+            f"image-verified locator for printed {printed!r} "
+            f"({item.get('evidence')})"
+        )
+    else:
+        evidence = (
+            f"image-verified correction of {token.as_published!r} to printed "
+            f"{printed!r} ({item.get('evidence')})"
+        )
     return {
         "value": value,
         "method_class": "reconstructed_from_printed_page",
-        "evidence": (
-            f"image-verified correction of {token.as_published!r} to printed "
-            f"{printed!r} ({item.get('evidence')})"
-        ),
+        "evidence": evidence,
         "as_published": token.as_published,
+        "uncertainty": item.get("uncertainty"),
+        "published_page": item.get("published_page"),
+        "pdf_page": item.get("pdf_page"),
     }
 
 
@@ -724,9 +791,14 @@ def _latex_to_formula(chunk: str) -> tuple[str, int | None]:
         elif raw.endswith("-"):
             charge = -1
         chunk = chunk[: superscript.start()] + chunk[superscript.end() :]
-    chunk = chunk.replace(r"\cdot", ".").replace(r"\mathrm", "")
-    chunk = _LATEX_SUB_RE.sub(lambda match: match.group(1) or match.group(2), chunk)
-    chunk = chunk.replace("{", "").replace("}", "").replace("\\", "")
+    chunk = chunk.replace(r"\cdot", "·").replace(r"\mathrm", "")
+    chunk = _LATEX_SUB_RE.sub(
+        lambda match: match.group(0)
+        if "." in (match.group(1) or match.group(2) or "")
+        else (match.group(1) or match.group(2)),
+        chunk,
+    )
+    chunk = re.sub(r"(?<!_)\{([^{}]*)\}", r"\1", chunk).replace("\\", "")
     chunk = chunk.replace(" ", "")
     return chunk, charge
 
@@ -764,7 +836,7 @@ def _is_closed_formula_token(text: str) -> bool:
 
 
 def _plain_formula_and_charge(text: str) -> tuple[str | None, int | None]:
-    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = re.sub(r"\s+", "", text)
     if not compact:
         return None, None
     ion = _ION_TOKEN_RE.fullmatch(compact)
@@ -782,16 +854,78 @@ def _plain_formula_and_charge(text: str) -> tuple[str | None, int | None]:
 
 
 def _formula_from_name(name: str) -> tuple[str | None, int | None]:
+    """Complete ``$...$`` expression, or text outside every rejected one.
+
+    A complete expression that does not parse is one rejected formula.
+    Tokens inside it are not candidates. ``$Kg_{3}(AlSi_{3}O_{10})F_{2}$``
+    must not become ``AlSi_{3}O_{10}``.
+    """
+
+    def is_separator(character: str) -> bool:
+        return character.isspace() or character in "()"
+
+    def tokens_outside_spans(text: str) -> list[str]:
+        tokens: list[str] = []
+        start: int | None = None
+        for index, character in enumerate(text):
+            if is_separator(character):
+                if start is not None:
+                    tokens.append(text[start:index])
+                    start = None
+            elif start is None:
+                start = index
+        if start is not None:
+            tokens.append(text[start:])
+        return tokens
+
     charge: int | None = None
-    for chunk in _LATEX_MATH_RE.findall(name):
-        formula, latex_charge = _latex_to_formula(chunk)
+    rejected: list[tuple[int, int]] = []
+    for match in _LATEX_MATH_RE.finditer(name):
+        formula, latex_charge = _latex_to_formula(match.group(1))
         if latex_charge is not None:
             charge = latex_charge
         if formula and not formula.startswith("Delta") and _looks_like_formula(formula):
             return formula, charge
         if formula and latex_charge is not None and re.fullmatch(r"[A-Z][a-z]?", formula):
             return formula, charge
-    tokens = name.replace("(", " ").replace(")", " ").split()
+        rejected.append(match.span())
+    fallback_parts: list[str] = []
+    boundary_tokens: dict[int, str] = {}
+    token_count = 0
+    cursor = 0
+    for start, end in rejected:
+        segment = name[cursor:start]
+        segment_tokens = tokens_outside_spans(segment)
+        # A token is glued to a rejected span only when one has already ended.
+        # The opening segment has no previous span, so its first character is not a boundary.
+        if (
+            cursor > 0
+            and not is_separator(name[cursor])
+            and segment_tokens
+        ):
+            boundary_tokens[token_count] = segment_tokens[0]
+        if (
+            start > cursor
+            and not is_separator(name[start - 1])
+            and segment_tokens
+        ):
+            boundary_tokens[token_count + len(segment_tokens) - 1] = segment_tokens[-1]
+        fallback_parts.append(segment)
+        token_count += len(segment_tokens)
+        cursor = end
+    tail = name[cursor:]
+    tail_tokens = tokens_outside_spans(tail)
+    if rejected and tail and not is_separator(tail[0]) and tail_tokens:
+        boundary_tokens[token_count] = tail_tokens[0]
+    fallback_parts.append(tail)
+    fallback = " ".join(fallback_parts)
+    tokens = [
+        token
+        for index, token in enumerate(
+            tokens_outside_spans(fallback)
+        )
+        if boundary_tokens.get(index) != token
+    ]
     if tokens:
         last = tokens[-1]
         # Last-token formulas are "Ag" or "Fe2SiO4", not words that happen to
@@ -817,7 +951,7 @@ def _formula_from_name(name: str) -> tuple[str | None, int | None]:
 
 
 def _parseable_formula(text: str) -> str | None:
-    compact = re.sub(r"\s+", "", text.replace("·", "."))
+    compact = re.sub(r"\s+", "", text)
     if not compact or compact.startswith("$"):
         return None
     for candidate in (compact, compact.replace("0", "O")):
@@ -1363,10 +1497,20 @@ def _unit_row_locator(kind: str) -> Locator:
     )
 
 
-def _pages(record: Mapping[str, Any]) -> tuple[int | None, int | None]:
+def _pages(
+    record: Mapping[str, Any], source_text_line: int | None = None
+) -> tuple[int | None, int | None]:
     locator = record.get("source_locator") if isinstance(record.get("source_locator"), Mapping) else {}
     printed = list(locator.get("printed_pages") or ())
     pdf = list(locator.get("pdf_pages") or ())
+    if source_text_line is not None:
+        for item in _corrections_by_token().values():
+            if (
+                item.get("action") == "image_verified_locator"
+                and item.get("record_id") == record.get("record_id")
+                and item.get("source_text_line") == source_text_line
+            ):
+                return int(item["published_page"]), int(item["pdf_page"])
     return (printed[0] if printed else None), (pdf[0] if pdf else None)
 
 
@@ -1407,7 +1551,12 @@ def _observation(
     if quantity in {Quantity.DELTA_FH, Quantity.DELTA_FG, Quantity.LOG10_KF}:
         known["reaction"], known["formation_elements"] = _basis_states(species, basis)
     identity = fill_identity(quantity, species, **known)
-    published_page, pdf_page = _pages(record)
+    published_page, pdf_page = _pages(record, token.source_text_line)
+    if reconstruction is not None:
+        if reconstruction.get("published_page") is not None:
+            published_page = int(reconstruction["published_page"])
+        if reconstruction.get("pdf_page") is not None:
+            pdf_page = int(reconstruction["pdf_page"])
     unit = _page_units(token.table_kind, token.column)
     source_path = f"{SOURCE_PATH_PREFIX}/{record_id}.json"
     unit_locator = (
@@ -1581,7 +1730,11 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
     if not record_id:
         raise ValueError("B1452 record is missing record_id")
     kind = _table_kind(payload)
-    tokens = list(_iter_raw_numeric_tokens(payload))
+    tokens = [
+        token
+        for token in _iter_raw_numeric_tokens(payload)
+        if token.as_published.strip()
+    ]
     grains = _column_grain_map(tokens)
     temperature_by_row = _row_temperature_tokens(tokens)
     usable_t: dict[int, Decimal] = {}
@@ -1895,7 +2048,7 @@ def generate_record(payload: Mapping[str, Any]) -> RecordGeneration:
             and token.column == "entropy_s298"
             and token.row_index is not None
             and _formula_from_formula_line(_row_name(payload, token.row_index) or "")[0]
-            in {"TbO1.714", "TbO1.812"}
+            in {"TbO_{1.714}", "TbO_{1.812}"}
             and _formula_weight_as_published(payload, row_index=token.row_index) is None
         ):
             exclude(
