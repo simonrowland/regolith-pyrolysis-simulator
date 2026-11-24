@@ -196,7 +196,8 @@ def test_b677_potassium_gas_uses_printed_ideal_gas_basis(tmp_path: Path) -> None
     phase = mismatched_enthalpy.identity.species.phase
     assert phase.is_value and phase.value is Phase.UNSPECIFIED
     assert {notice.kind for notice in mismatched_enthalpy.notices} == {
-        NoticeKind.PHASE_INFERRED
+        NoticeKind.PHASE_INFERRED,
+        NoticeKind.ADMISSION_DEFAULTED,
     }
     # The record flags its "(c,1,g)" heading as OCR-suspect; the extract
     # prints K(c,l,g). Keep the typed default rather than assigning one of
