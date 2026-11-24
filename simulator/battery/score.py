@@ -192,6 +192,8 @@ from simulator.battery.migrate import (
     _hold_reason_notice,
     _STANDARD_PRESSURE_UNPRINTED_REASON,
     _standard_pressure_ambiguity_uncertainty,
+    _TWO_PHASE_BULK_COMPOSITION_STATUS as TWO_PHASE_BULK_COMPOSITION_STATUS,
+    _TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER as TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER,
     phase_for_sample_form,
     source_filter_tokens,
     to_plain,
@@ -439,8 +441,6 @@ def _score_identity_equal(
     return identity_equal(left, right)
 
 
-TWO_PHASE_BULK_COMPOSITION_STATUS = "two_phase_bulk_composition_not_liquid_composition"
-TWO_PHASE_BULK_COMPOSITION_PHASE_MARKER = "bulk_composition_in_two_phase_region"
 SF04_WORKBOOK_REGIME = "magma_model_companion_workbook"
 
 INTERNAL_CONSISTENCY_STEMS: frozenset[str] = frozenset(
