@@ -414,7 +414,24 @@ class PT1PersistentStoreCorrupt(PT0CacheCollision):
 
 
 class _PT1CacheMergeCollision(RuntimeError):
-    """Two current PT-1 rows share a key but have different payload bytes."""
+    """Two current PT-1 rows share a key but disagree on row identity."""
+
+
+_PT1_CACHE_MERGE_IDENTITY_FIELDS = (
+    "artifact",
+    "store_schema_version",
+    "request_schema_version",
+    "key_sha256",
+    "payload_sha256",
+    "key_bytes",
+    "payload_bytes",
+    "code_version",
+    "corpus_version",
+    "engine_version",
+    "data_digests_json",
+    "created_at",
+    "git_dirty",
+)
 
 
 class PT0InvalidControls(RuntimeError):
@@ -3050,10 +3067,9 @@ class PT1PersistentEquilibriumStore:
 
 def _pt1_row_admission(
     row: Mapping[str, Any],
-) -> tuple[bool, bytes]:
-    """Return current-codec admission and the stored payload bytes."""
+) -> bool:
+    """Return whether a stored PT-1 row passes current codec admission."""
 
-    payload_bytes = b""
     try:
         key_hash = str(row["key_hash"])
         key_bytes = _sqlite_bytes(row["key_bytes"])
@@ -3063,7 +3079,7 @@ def _pt1_row_admission(
         canonical_key_bytes = canonical_json_bytes(key)
         canonical_payload_bytes = canonical_json_bytes(payload)
     except (KeyError, TypeError, ValueError, UnicodeDecodeError, OverflowError):
-        return False, payload_bytes
+        return False
     if (
         not isinstance(key, Mapping)
         or not isinstance(payload, Mapping)
@@ -3073,17 +3089,17 @@ def _pt1_row_admission(
         or row["key_sha256"] != key_hash
         or _sha256(payload_bytes) != row["payload_sha256"]
     ):
-        return False, payload_bytes
-    return (
-        _decode_payload_for_admission(
-            str(row["artifact"]),
-            payload,
-            payload_codec_version=row["payload_codec_version"],
-            keys=(key,),
-        )
-        is not None,
-        payload_bytes,
-    )
+        return False
+    return _decode_payload_for_admission(
+        str(row["artifact"]),
+        payload,
+        payload_codec_version=row["payload_codec_version"],
+        keys=(key,),
+    ) is not None
+
+
+def _pt1_cache_merge_identity(row: Mapping[str, Any]) -> tuple[Any, ...]:
+    return tuple(row[field] for field in _PT1_CACHE_MERGE_IDENTITY_FIELDS)
 
 
 def _copy_pt1_equilibrium_rows(
@@ -3092,21 +3108,19 @@ def _copy_pt1_equilibrium_rows(
     *,
     key_hashes: Iterable[str] | None = None,
 ) -> dict[str, Any]:
-    """Migrate and merge PT-1 rows using the current codec and full schema."""
+    """Migrate the target, then merge source rows by destination column names."""
 
     target_path = Path(target_path).expanduser()
     target_resolved = target_path.resolve()
     target_store = PT1PersistentEquilibriumStore(target_path)
-    sources: list[tuple[Path, PT1PersistentEquilibriumStore]] = []
+    sources: list[Path] = []
     for source_path in source_paths:
         source_path = Path(source_path).expanduser()
         if source_path.resolve() == target_resolved:
             continue
         if not source_path.exists():
             raise FileNotFoundError(f"PT-1 cache source does not exist: {source_path}")
-        sources.append(
-            (source_path, PT1PersistentEquilibriumStore(source_path))
-        )
+        sources.append(source_path)
 
     with target_store._connect() as conn:
         target_columns = tuple(
@@ -3119,22 +3133,6 @@ def _copy_pt1_equilibrium_rows(
             str(row["key_hash"]): dict(row)
             for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}")
         }
-    source_columns: dict[Path, tuple[str, ...]] = {}
-    for source_path, source_store in sources:
-        with source_store._connect() as conn:
-            source_columns[source_path] = tuple(
-                str(row["name"])
-                for row in conn.execute(
-                    f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
-                )
-            )
-    for source_path, columns in source_columns.items():
-        if set(columns) != set(target_columns):
-            raise ValueError(
-                "PT-1 cache source schema mismatch after migration: "
-                f"{source_path} does not match {target_path}"
-            )
-
     selected_hashes = None if key_hashes is None else {str(item) for item in key_hashes}
     planned_rows = dict(original_target_rows)
     planned_admission = {
@@ -3144,9 +3142,17 @@ def _copy_pt1_equilibrium_rows(
     changed_rows: dict[str, dict[str, Any]] = {}
     source_summaries: list[dict[str, Any]] = []
 
-    for source_path, source_store in sources:
-        source_conn = source_store._connect()
+    for source_path in sources:
+        source_uri = f"{source_path.resolve().as_uri()}?mode=ro"
+        source_conn = sqlite3.connect(source_uri, uri=True)
+        source_conn.row_factory = sqlite3.Row
         try:
+            source_columns = {
+                str(row["name"])
+                for row in source_conn.execute(
+                    f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+                )
+            }
             if selected_hashes is None:
                 source_rows = source_conn.execute(
                     f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
@@ -3174,25 +3180,24 @@ def _copy_pt1_equilibrium_rows(
         for source_row in source_rows:
             key_hash = str(source_row["key_hash"])
             incoming_row = {
-                column: source_row[column] for column in target_columns
+                column: source_row[column] if column in source_columns else None
+                for column in target_columns
             }
-            incoming_admitted, incoming_payload_bytes = _pt1_row_admission(
-                incoming_row
-            )
+            incoming_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+            incoming_admitted = _pt1_row_admission(incoming_row)
             existing_row = planned_rows.get(key_hash)
             if existing_row is None:
                 planned_rows[key_hash] = incoming_row
-                planned_admission[key_hash] = (
-                    incoming_admitted,
-                    incoming_payload_bytes,
-                )
+                planned_admission[key_hash] = incoming_admitted
                 changed_rows[key_hash] = incoming_row
                 inserted += 1
                 continue
 
-            existing_admitted, existing_payload_bytes = planned_admission[key_hash]
+            existing_admitted = planned_admission[key_hash]
             if existing_admitted and incoming_admitted:
-                if existing_payload_bytes != incoming_payload_bytes:
+                if _pt1_cache_merge_identity(existing_row) != _pt1_cache_merge_identity(
+                    incoming_row
+                ):
                     raise _PT1CacheMergeCollision(
                         f"PT-1 cache collision while merging {key_hash}"
                     )
@@ -3209,20 +3214,14 @@ def _copy_pt1_equilibrium_rows(
                     merged_disclosures
                 )
                 planned_rows[key_hash] = merged_row
-                planned_admission[key_hash] = (
-                    True,
-                    incoming_payload_bytes,
-                )
+                planned_admission[key_hash] = True
                 if merged_row != existing_row:
                     changed_rows[key_hash] = merged_row
             elif existing_admitted:
                 continue
             else:
                 planned_rows[key_hash] = incoming_row
-                planned_admission[key_hash] = (
-                    incoming_admitted,
-                    incoming_payload_bytes,
-                )
+                planned_admission[key_hash] = incoming_admitted
                 changed_rows[key_hash] = incoming_row
                 if key_hash in original_target_rows:
                     replaced += 1

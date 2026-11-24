@@ -3356,7 +3356,7 @@ def test_pt0_exact_route_refuses_dependency_vector_mismatch(
     sim, result = _pt0_equilibrium_capture_context(capture)
     capture.capture_equilibrium(sim, result)
     source_key = capture.capture_sequence[-1]["key"]
-    source_entry = capture._entries[_key_hash(source_key)]
+    source_entry = capture.entries[_key_hash(source_key)]
     query_key = copy.deepcopy(source_key)
     query_key["model"]["model"] = "different-admitted-model"
     monkeypatch.setattr(
@@ -4548,6 +4548,7 @@ def test_epoch_seed_migrates_b265_columns_and_legacy_row_still_misses(
         conn.execute(
             f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} DROP COLUMN law_disclosures_json"
         )
+    base_sha256 = hashlib.sha256(base_db.read_bytes()).hexdigest()
 
     summary = epoch_grind.seed_job_cache(
         shard_db,
@@ -4562,19 +4563,19 @@ def test_epoch_seed_migrates_b265_columns_and_legacy_row_still_misses(
             str(row[1])
             for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
         }
-        assert {"payload_codec_version", "law_disclosures_json"} <= columns
-        (base_codec, base_disclosures) = conn.execute(
-            f"SELECT payload_codec_version, law_disclosures_json "
-            f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
-            (key_hash,),
-        ).fetchone()
+        assert not {"payload_codec_version", "law_disclosures_json"} & columns
     with sqlite3.connect(shard_db) as conn:
+        shard_columns = {
+            str(row[1])
+            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
+        }
+        assert {"payload_codec_version", "law_disclosures_json"} <= shard_columns
         (shard_codec, shard_disclosures) = conn.execute(
             f"SELECT payload_codec_version, law_disclosures_json "
             f"FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
             (key_hash,),
         ).fetchone()
-    assert (base_codec, base_disclosures) == (None, None)
+    assert hashlib.sha256(base_db.read_bytes()).hexdigest() == base_sha256
     assert (shard_codec, shard_disclosures) == (None, None)
 
     replay = PT0DeterminismStore(

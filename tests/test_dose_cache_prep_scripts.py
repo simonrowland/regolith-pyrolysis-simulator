@@ -322,7 +322,7 @@ def test_seed_and_merge_accept_v2_source_without_modifying_it(
             f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
             "DROP COLUMN repair_notices_json"
         )
-    source_row_before = (key_hash, key_bytes, payload_bytes)
+    source_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
 
     if transport == "seed":
         result = seed_cache(target, [source])
@@ -338,16 +338,44 @@ def test_seed_and_merge_accept_v2_source_without_modifying_it(
             (key_hash,),
         ).fetchone()
     assert stored == (PT1_STORE_SCHEMA_VERSION, key_bytes, payload_bytes, None)
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == source_sha256
+
+
+def test_seed_cache_ignores_source_only_columns_and_leaves_source_unchanged(
+    tmp_path: Path,
+) -> None:
+    source = tmp_path / "source-with-extra-column.db"
+    target = tmp_path / "target-current-schema.db"
+    _put_cache_row(source, tag="source-only-column")
     with sqlite3.connect(source) as conn:
-        source_columns = {
+        (key_hash,) = conn.execute(
+            f"SELECT key_hash FROM {PT1_EQUILIBRIUM_TABLE}"
+        ).fetchone()
+        conn.execute(
+            f"ALTER TABLE {PT1_EQUILIBRIUM_TABLE} "
+            "ADD COLUMN source_only_metadata TEXT"
+        )
+        conn.execute(
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
+            "SET source_only_metadata = 'ignored' WHERE key_hash = ?",
+            (key_hash,),
+        )
+    source_sha256 = hashlib.sha256(source.read_bytes()).hexdigest()
+
+    summary = seed_cache(target, [source])
+
+    assert summary["inserted_rows"] == 1
+    with sqlite3.connect(target) as conn:
+        target_columns = {
             str(row[1])
             for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
         }
-        assert {"payload_codec_version", "repair_notices_json"} <= source_columns
-        source_row_after = conn.execute(
-            f"SELECT key_hash, key_bytes, payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
-        ).fetchone()
-    assert source_row_after == source_row_before
+        assert "source_only_metadata" not in target_columns
+        assert conn.execute(
+            f"SELECT 1 FROM {PT1_EQUILIBRIUM_TABLE} WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone() == (1,)
+    assert hashlib.sha256(source.read_bytes()).hexdigest() == source_sha256
 
 
 def test_seed_cache_refuses_cross_schema_source(tmp_path: Path) -> None:
@@ -483,19 +511,9 @@ def test_seed_cache_refuses_mixed_epoch_collision_without_mutating_target(
     _put_cache_row(target, tag="same-key")
     shutil.copyfile(target, conflicting)
     with sqlite3.connect(conflicting) as con:
-        (payload_bytes,) = con.execute(
-            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE}"
-        ).fetchone()
-        payload = json.loads(payload_bytes.decode("utf-8"))
-        payload["curve"]["source"] = "unit-test:seed-cache:alternate"
-        changed_payload_bytes = canonical_json_bytes(payload)
         con.execute(
-            f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-            "SET payload_bytes = ?, payload_sha256 = ?",
-            (
-                sqlite3.Binary(changed_payload_bytes),
-                hashlib.sha256(changed_payload_bytes).hexdigest(),
-            ),
+            f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET created_at=?",
+            ("2026-07-12T01:02:03Z",),
         )
     before = target.read_bytes()
 

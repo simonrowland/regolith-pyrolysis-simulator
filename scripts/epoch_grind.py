@@ -1011,8 +1011,6 @@ def seed_job_cache(
     del seed_fn
     _remove_sqlite_file_set(shard_db)
     shard_db.parent.mkdir(parents=True, exist_ok=True)
-    if base_cache.exists():
-        PT1PersistentEquilibriumStore(base_cache)
     PT1PersistentEquilibriumStore(
         shard_db,
         read_only_base_db_path=base_cache if base_cache.exists() else None,
@@ -1067,12 +1065,20 @@ def _seed_cache_rows_from_base(
             f"ATTACH DATABASE ? AS {_SEED_BASE_ALIAS}",
             (f"{base_cache.resolve().as_uri()}?mode=ro",),
         )
-        columns = _pt1_payload_columns(conn, PT1_EQUILIBRIUM_TABLE)
         source_columns = _pt1_payload_columns(
             conn,
             f"{_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}",
         )
-        if set(columns) != set(source_columns):
+        required_columns = {
+            str(row["name"])
+            for row in conn.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+            if bool(row["notnull"]) or bool(row["pk"])
+        }
+        # Nullable destination columns are supplied as NULL by the row copier.
+        source_required_columns = required_columns.intersection(source_columns)
+        if required_columns != source_required_columns:
             raise ValueError(
                 "acquisition seed source schema mismatch: "
                 f"{base_cache} does not match {shard_db}"
