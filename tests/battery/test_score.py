@@ -2629,6 +2629,12 @@ def test_source_method_activity_band_uses_explicit_basis_and_meaning(
     assert band.band_basis == "source_method"
     assert band.value == Decimal(expected_band)
     assert band.rule.startswith(f"{rule}:")
+    if basis == "relative_percent":
+        assert not any(
+            isinstance(notice.reason, str)
+            and notice.reason.startswith("uncertainty_basis_defaulted:")
+            for notice in residual.notices
+        )
 
 
 @pytest.mark.parametrize(

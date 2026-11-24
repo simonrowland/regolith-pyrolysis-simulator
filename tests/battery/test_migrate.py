@@ -21965,8 +21965,221 @@ def test_missing_percent_basis_is_the_stated_relative_default() -> None:
     assert explicit.notice is None or explicit.notice.reason != _PERCENT_BASIS_DEFAULT_REASON
 
 
+def test_qualifier_is_not_a_unit_and_shape_stays_with_the_field() -> None:
+    from simulator.battery.score import _printed_uncertainty_source
+    from simulator.battery.uncertainty_conventions import (
+        mapping_uncertainty_value,
+        resolve_observed_width_basis,
+    )
+
+    relative = mapping_uncertainty_value({"sigma": "3% relative", "units": "%"})
+    assert (relative.value, relative.unit, relative.shape) == ("3", "%", "scalar")
+    resolved = resolve_observed_width_basis(
+        {"sigma": "3% relative", "units": "%"},
+        inline_unit=relative.unit,
+        selected_text=relative.text,
+    )
+    assert resolved.conflict is None
+    assert resolved.basis == "relative"
+    assert resolved.basis_default_reason is None
+
+    as_printed = mapping_uncertainty_value(
+        {"sigma": "3 % (as printed)", "units": "%"}
+    )
+    assert (as_printed.value, as_printed.unit) == ("3", "%")
+    printed_basis = resolve_observed_width_basis(
+        {"sigma": "3 % (as printed)", "units": "%"},
+        inline_unit=as_printed.unit,
+        selected_text=as_printed.text,
+    )
+    assert printed_basis.conflict is None
+
+    matzen = (
+        "±0.03 (estimated error reported by the authors; Table 2 footnote f)"
+    )
+    prose = mapping_uncertainty_value(
+        {"Fe3_over_FeT": matzen}, exact_fields=("Fe3_over_FeT",)
+    )
+    assert prose.value == "0.03"
+    assert prose.unit is None
+    assert "footnote" not in str(prose.unit)
+    parsed = _printed_uncertainty_source(
+        uncertainty_for({"Fe3_over_FeT": matzen}),
+        exact_fields=("Fe3_over_FeT",),
+    )
+    assert parsed[0] == Decimal("0.03")
+    assert parsed[2] is None or "footnote" not in str(parsed[2])
+
+    ranged = mapping_uncertainty_value({"sigma": "[2, 4] %"})
+    assert ranged.value == ("2", "4")
+    assert ranged.unit == "%"
+    assert ranged.shape == "range"
+    pair = mapping_uncertainty_value({"sigma": "2 to 4 %"})
+    assert pair.value == ("2", "4")
+    assert pair.unit == "%"
+    assert pair.shape == "pair"
+    ranged_source = _printed_uncertainty_source(
+        uncertainty_for({"sigma": "[2, 4] %"})
+    )
+    pair_source = _printed_uncertainty_source(
+        uncertainty_for({"sigma": "2 to 4 %"})
+    )
+    assert ranged_source[1] == "range"
+    assert pair_source[1] == "pair"
+    assert ranged_source[0] == (Decimal("2"), Decimal("4"))
+    assert pair_source[0] == (Decimal("2"), Decimal("4"))
+
+
+def test_nested_source_width_keeps_demaria_digitization_and_leister() -> None:
+    from simulator.battery.uncertainty_conventions import mapping_uncertainty_value
+
+    demaria = {
+        "figure_reading_estimate": {
+            "log10_p_atm_absolute_uncertainty_dex": "0.1",
+            "invT_times_1e4_K_inv_absolute_uncertainty": "0.02",
+            "note": "Estimated from the 300 dpi Fig. 2 axes.",
+        }
+    }
+    selected = mapping_uncertainty_value(demaria)
+    assert (selected.value, selected.unit, selected.shape) == ("0.1", "dex", "scalar")
+    digitization = {
+        "digitization": {
+            "read_uncertainty": "0.0089856",
+            "unit": "dex",
+            "note": "half difference between independent centre reads",
+        }
+    }
+    read = mapping_uncertainty_value(digitization)
+    assert read.value == "0.0089856"
+    assert read.unit is None
+    esr = mapping_uncertainty_value(
+        {
+            "form": "relative_bound",
+            "bound_value": "≤15%",
+            "locator": {
+                "page": 2,
+                "pdf_page_index": 1,
+                "published_page": 320,
+                "note": "relative error ≤15%",
+            },
+        }
+    )
+    assert (esr.value, esr.unit) == (None, None)
+
+
+def test_migration_and_scoring_share_paired_value_basis() -> None:
+    from simulator.battery.score import (
+        _printed_uncertainty_band,
+        _printed_uncertainty_source,
+    )
+
+    raw = {
+        "sigma": "3%",
+        "units": "%",
+        "value_as_published": "70(3)%",
+    }
+    selection = select_declared_source(
+        Quantity.VALENCE_RATIO, "%", {"value": "70"}
+    )
+    original = uncertainty_for(raw)
+    migrated = _uncertainty_for_value_selection(
+        original, selection, Quantity.VALENCE_RATIO, "70(3)%"
+    )
+    before_source = _printed_uncertainty_source(original, paired_value="70(3)%")
+    after_source = _printed_uncertainty_source(migrated, paired_value="70(3)%")
+    assert before_source[3] == after_source[3] == "dimensionless"
+    assert before_source[4] is None
+    before = _printed_uncertainty_band(
+        Quantity.ACTIVITY, original, Decimal("0.7")
+    )
+    after = _printed_uncertainty_band(
+        Quantity.ACTIVITY, migrated, Decimal("0.7")
+    )
+    explicit = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty_for(
+            {"sigma": "3%", "units": "%", "basis": "absolute"}
+        ),
+        Decimal("0.7"),
+    )
+    assert before.band is not None and after.band is not None
+    assert explicit.band is not None
+    assert before.refusal is None and after.refusal is None
+    assert before.band.value == after.band.value == explicit.band.value
+
+
+def test_defaulted_basis_is_flagged_on_live_and_serialized_headline() -> None:
+    from simulator.battery.score import (
+        _flagged_payload_strata,
+        _headline_payload_admits,
+        _printed_uncertainty_band,
+        flagged_strata,
+    )
+
+    band = _printed_uncertainty_band(
+        Quantity.ACTIVITY,
+        uncertainty_for({"sigma": "3", "units": "%"}),
+        Decimal("0.7"),
+    )
+    notices = [
+        notice
+        for notice in (band.notice, band.basis_notice)
+        if notice is not None
+    ]
+    reasons = [notice.reason for notice in notices]
+    assert _PERCENT_BASIS_DEFAULT_REASON in reasons
+    confidence = next(
+        notice for notice in notices
+        if notice.reason != _PERCENT_BASIS_DEFAULT_REASON
+    )
+    assert _PERCENT_BASIS_DEFAULT_REASON not in (confidence.band or "")
+    assert "uncertainty-basis-defaulted" in flagged_strata(tuple(notices))
+    row = {
+        "rail": "score",
+        "exclusions": (),
+        "notices": [
+            {"kind": notice.kind.value, "reason": notice.reason}
+            for notice in notices
+        ],
+    }
+    assert "uncertainty-basis-defaulted" in _flagged_payload_strata(row)
+    assert _headline_payload_admits(row, tier="score") is False
+    buried = {
+        "rail": "score",
+        "exclusions": (),
+        "notices": [
+            {
+                "kind": "input_omitted",
+                "reason": "uncertainty_confidence_level_assumed_1sigma",
+                "band": _PERCENT_BASIS_DEFAULT_REASON,
+            }
+        ],
+    }
+    assert _flagged_payload_strata(buried) == ()
+    assert _headline_payload_admits(buried, tier="score") is True
+
+
 _GREEN_WIDTH_TOKENS = ("uncert", "error", "sigma", "std", "dex", "width", "range")
-_PERSISTED_WIDTH_STORES = (
+_LOCATOR_METADATA = frozenset({
+    "locator",
+    "provenance",
+    "page",
+    "published_page",
+    "pdf_page_index",
+    "page_verification",
+    "table_caption_page",
+    "table_continued",
+    "table",
+    "figure",
+    "paragraph",
+    "section",
+    "equation",
+    "line_range",
+    "note",
+    "source_path",
+    "record",
+})
+_SHORNIKOV_WIDTH_STORES = (
     "shornikov-2011-cao-mgo-alumina-melts.yaml",
     "shornikov-2005-potassium-germanate.yaml",
     "shornikov-2020-mgo-feo-melts.yaml",
@@ -21981,41 +22194,202 @@ _PINNED_WIDTHS = {
         None,
     ),
 }
+_DE_MARIA_FIGURE_POINT = (
+    "kems-022-demaria-1971::demaria_1971_k_psat_figure2_digitized"
+    "::T=1308.9:h=2bd6349d0eab"
+)
 
 
-def _green_top_level_width(mapping: Mapping) -> tuple[object | None, str | None]:
-    """Green's top-level token rule, without locator recursion or bare two-lists."""
+def _green_width_selector(
+    mapping: Mapping,
+    path: tuple[str, ...] = (),
+    *,
+    exact_fields: tuple[str, ...] = (),
+) -> tuple[object | None, str | None, tuple[str, ...], str | None]:
+    """Selector at 5cef454d1b^ (simulator/battery/uncertainty.py).
 
-    for key, value in mapping.items():
-        name = str(key).casefold()
-        if not any(token in name for token in _GREEN_WIDTH_TOKENS):
+    Frozen walk: exact fields win, nested mappings are entered, and a percent
+    sign is the only textual unit. This is the green side of the census, not
+    the branch selector.
+    """
+
+    from simulator.battery.uncertainty_conventions import (
+        uncertainty_scalar_from_text,
+    )
+
+    for field_name in exact_fields:
+        if field_name not in mapping:
             continue
+        value = mapping[field_name]
         if isinstance(value, (tuple, list)) and len(value) == 2:
-            return value, "range"
+            return value, "range", path + (field_name,), None
         try:
             as_decimal(value)
         except (TypeError, ValueError, ArithmeticError):
-            continue
-        return value, "dex" if "dex" in name else None
-    return None, None
+            if isinstance(value, str):
+                scalar = uncertainty_scalar_from_text(value)
+                if scalar is not None:
+                    unit = (
+                        "%"
+                        if re.search(r"%|percent", value, re.IGNORECASE)
+                        else None
+                    )
+                    return scalar, unit, path + (field_name,), value
+            return None, None, path + (field_name,), None
+        else:
+            return value, None, path + (field_name,), None
+    for key, value in mapping.items():
+        if str(key).casefold() in {
+            "value", "amount", "error_value", "uncertainty_value",
+        }:
+            if isinstance(value, (tuple, list)) and len(value) == 2:
+                return value, "range", path + (str(key),), None
+            try:
+                as_decimal(value)
+            except (TypeError, ValueError, ArithmeticError):
+                if isinstance(value, str):
+                    scalar = uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = (
+                            "%"
+                            if re.search(r"%|percent", value, re.IGNORECASE)
+                            else None
+                        )
+                        return scalar, unit, path + (str(key),), value
+            else:
+                return value, None, path + (str(key),), None
+    for key, value in mapping.items():
+        name = str(key).casefold()
+        if (
+            name in {"range", "bounds", "interval", "limits"}
+            and isinstance(value, (tuple, list))
+            and len(value) == 2
+        ):
+            return value, "range", path + (str(key),), None
+        if isinstance(value, Mapping):
+            nested, unit, nested_path, text = _green_width_selector(
+                value, path + (str(key),)
+            )
+            if nested is not None:
+                return (
+                    nested,
+                    unit or ("dex" if "dex" in name else None),
+                    nested_path,
+                    text,
+                )
+        if isinstance(value, (tuple, list)) and len(value) == 2:
+            try:
+                as_decimal(value[0])
+                as_decimal(value[1])
+            except (TypeError, ValueError, ArithmeticError):
+                continue
+            return value, "range", path + (str(key),), None
+        if any(token in name for token in _GREEN_WIDTH_TOKENS):
+            try:
+                as_decimal(value)
+            except (TypeError, ValueError, ArithmeticError):
+                if isinstance(value, str):
+                    scalar = uncertainty_scalar_from_text(value)
+                    if scalar is not None:
+                        unit = (
+                            "%"
+                            if re.search(r"%|percent", value, re.IGNORECASE)
+                            else None
+                        )
+                        return (
+                            scalar,
+                            "dex" if "dex" in name else unit,
+                            path + (str(key),),
+                            value,
+                        )
+                continue
+            return (
+                value,
+                "dex" if "dex" in name else None,
+                path + (str(key),),
+                None,
+            )
+    return None, None, path, None
 
 
-def test_persisted_width_selector_census_matches_green_top_level() -> None:
+def _width_identity(value: object) -> tuple[str, str] | tuple[str, str, str] | None:
+    if value is None:
+        return None
+    if isinstance(value, (tuple, list)) and len(value) == 2:
+        return ("span", str(value[0]), str(value[1]))
+    return ("scalar", str(value))
+
+
+# The full store is about a gigabyte of YAML. One walk exceeded the default
+# 300 s CPU budget (971 s). Eight name-stable shards stay under that budget.
+# The loader is the C parser when this interpreter has it.
+_CENSUS_SHARDS = 8
+_CENSUS_YAML_LOADER = getattr(yaml, "CSafeLoader", yaml.SafeLoader)
+_PIN_FILES = frozenset(
+    {
+        "kems-022-demaria-1971.yaml",
+        "yakovlev-2024-cai-vaporization.yaml",
+        "kems-029-yakovlev-shornikov-2011.yaml",
+        *_SHORNIKOV_WIDTH_STORES,
+    }
+)
+
+
+def _census_shard_of(name: str) -> int:
+    return hashlib.sha1(name.encode("utf-8")).digest()[0] % _CENSUS_SHARDS
+
+
+def _persisted_observation_documents(
+    *, shard: int | None = None, only_names: frozenset[str] | None = None
+):
+    root = Path(__file__).resolve().parents[2] / "data" / "literature"
+    for directory in ("extracts-v2", "observations-v2"):
+        store = root / directory
+        for path in sorted(store.rglob("*.yaml")):
+            if only_names is not None and path.name not in only_names:
+                continue
+            if shard is not None and _census_shard_of(path.name) != shard:
+                continue
+            text = path.read_text()
+            if "uncertainty:" not in text:
+                continue
+            document = yaml.load(text, Loader=_CENSUS_YAML_LOADER)
+            observations = (
+                document.get("observations")
+                if isinstance(document, Mapping)
+                else None
+            )
+            if not isinstance(observations, list):
+                continue
+            yield path.name, observations
+
+
+def _width_census(
+    *, shard: int | None = None, only_names: frozenset[str] | None = None
+) -> tuple[list[str], dict[str, object]]:
     from simulator.battery.uncertainty_conventions import (
         mapping_uncertainty_value,
+        printed_width_span,
         uncertainty_exact_fields,
     )
 
-    root = Path(__file__).resolve().parents[2] / "data/literature/extracts-v2"
     seen_pins: set[str] = set()
+    saw_demaria_point = False
+    demaria_rows = 0
+    yakovlev_rows = 0
+    kems029_rows = 0
     dex_rows = 0
     half_rows = 0
     gamma_rows = 0
-    for name in _PERSISTED_WIDTH_STORES:
-        document = yaml.safe_load((root / name).read_text())
-        for observation in document.get("observations") or []:
+    mismatches: list[str] = []
+    for name, observations in _persisted_observation_documents(
+        shard=shard, only_names=only_names
+    ):
+        for observation in observations:
+            if not isinstance(observation, Mapping):
+                continue
             uncertainty = observation.get("uncertainty")
-            if not isinstance(uncertainty, dict):
+            if not isinstance(uncertainty, Mapping):
                 continue
             verbatim = uncertainty.get("verbatim")
             if not isinstance(verbatim, Mapping):
@@ -22031,42 +22405,185 @@ def test_persisted_width_selector_census_matches_green_top_level() -> None:
                 if isinstance(subtype, Mapping) and subtype.get("tag") == "value":
                     subtype_name = subtype.get("value")
             fields = uncertainty_exact_fields(quantity_name, subtype=subtype_name)
-            green_value, green_unit = _green_top_level_width(verbatim)
-            produced_value, produced_unit = mapping_uncertainty_value(
+            green_value, green_unit, green_path, green_text = _green_width_selector(
                 verbatim, exact_fields=fields
             )
-            if green_value is not None:
-                assert produced_value is not None, observation.get("observation_id")
-                earlier = any(
-                    key in verbatim
-                    for key in (
-                        "value",
-                        "amount",
-                        "error_value",
-                        "uncertainty_value",
-                        *fields,
+            produced = mapping_uncertainty_value(verbatim, exact_fields=fields)
+            observation_id = str(observation.get("observation_id"))
+            green_key = _width_identity(green_value)
+            produced_key = _width_identity(produced.value)
+            locator_path = any(
+                part.casefold() in _LOCATOR_METADATA for part in green_path
+            )
+            shape_recovered = False
+            if (
+                green_key != produced_key
+                and green_text
+                and printed_width_span(green_text) is not None
+                and isinstance(produced.value, (tuple, list))
+                and len(produced.value) == 2
+                and str(green_value) in {str(produced.value[0]), str(produced.value[1])}
+            ):
+                shape_recovered = True
+            if green_key != produced_key and not locator_path and not shape_recovered:
+                if len(mismatches) < 20:
+                    mismatches.append(
+                        f"{observation_id}: green={green_key}@{green_path} "
+                        f"branch={produced_key}"
                     )
+            elif (
+                green_key == produced_key
+                and green_key is not None
+                and not locator_path
+                and green_unit not in {None, "range"}
+                and produced.unit != green_unit
+                and not (
+                    isinstance(green_unit, str)
+                    and produced.unit == "%"
+                    and "%" in green_unit
                 )
-                if not earlier:
-                    assert produced_value == green_value
-                    assert produced_unit == green_unit
-            observation_id = observation.get("observation_id")
+                and not (
+                    # 95% CI ±0.3 dex: green's percent scan sees the CI,
+                    # the branch unit is the suffix bound to the number.
+                    green_unit == "%"
+                    and isinstance(produced.unit, str)
+                    and green_text is not None
+                    and produced.unit.casefold() in green_text.casefold()
+                )
+            ):
+                if len(mismatches) < 20:
+                    mismatches.append(
+                        f"{observation_id}: unit green={green_unit!r} "
+                        f"branch={produced.unit!r} path={green_path}"
+                    )
             if observation_id in _PINNED_WIDTHS:
                 seen_pins.add(observation_id)
-                assert (produced_value, produced_unit) == _PINNED_WIDTHS[observation_id]
-            if "read_uncertainty_dex" in verbatim:
-                dex_rows += 1
-                assert produced_value is not None
-            if "log10_half_width" in verbatim:
-                half_rows += 1
-                assert produced_value is not None
-            if "read_uncertainty_gamma_FeO" in verbatim:
-                gamma_rows += 1
-                assert produced_value is not None
-    assert seen_pins == set(_PINNED_WIDTHS)
-    assert dex_rows == 12
-    assert half_rows == 7
-    assert gamma_rows == 73
+                assert (produced.value, produced.unit) == _PINNED_WIDTHS[observation_id]
+            if observation_id == _DE_MARIA_FIGURE_POINT:
+                saw_demaria_point = True
+                assert (produced.value, produced.unit, produced.shape) == (
+                    "0.1",
+                    "dex",
+                    "scalar",
+                )
+            figure = verbatim.get("figure_reading_estimate")
+            if (
+                isinstance(figure, Mapping)
+                and figure.get("log10_p_atm_absolute_uncertainty_dex") == "0.1"
+            ):
+                demaria_rows += 1
+                assert (produced.value, produced.unit) == ("0.1", "dex")
+            digitization = verbatim.get("digitization")
+            if isinstance(digitization, Mapping) and "read_uncertainty" in digitization:
+                assert produced.value == digitization["read_uncertainty"]
+                if name == "yakovlev-2024-cai-vaporization.yaml":
+                    yakovlev_rows += 1
+                elif name == "kems-029-yakovlev-shornikov-2011.yaml":
+                    kems029_rows += 1
+            if name in _SHORNIKOV_WIDTH_STORES:
+                if "read_uncertainty_dex" in verbatim:
+                    dex_rows += 1
+                    assert produced.value is not None
+                if "log10_half_width" in verbatim:
+                    half_rows += 1
+                    assert produced.value is not None
+                if "read_uncertainty_gamma_FeO" in verbatim:
+                    gamma_rows += 1
+                    assert produced.value is not None
+    return mismatches, {
+        "seen_pins": seen_pins,
+        "saw_demaria_point": saw_demaria_point,
+        "demaria_rows": demaria_rows,
+        "yakovlev_rows": yakovlev_rows,
+        "kems029_rows": kems029_rows,
+        "dex_rows": dex_rows,
+        "half_rows": half_rows,
+        "gamma_rows": gamma_rows,
+    }
+
+
+@pytest.mark.parametrize("shard", range(_CENSUS_SHARDS))
+def test_persisted_width_selector_census_matches_green_except_locator(
+    shard: int,
+) -> None:
+    mismatches, _counts = _width_census(shard=shard)
+    assert mismatches == []
+
+
+def test_persisted_width_selector_pins_keep_demaria_digitization_and_shornikov() -> None:
+    mismatches, counts = _width_census(only_names=_PIN_FILES)
+    assert mismatches == []
+    assert counts["seen_pins"] == set(_PINNED_WIDTHS)
+    assert counts["saw_demaria_point"] is True
+    assert counts["demaria_rows"] == 10
+    assert counts["yakovlev_rows"] == 167
+    assert counts["kems029_rows"] == 109
+    assert counts["dex_rows"] == 12
+    assert counts["half_rows"] == 7
+    assert counts["gamma_rows"] == 73
+
+
+def test_nested_width_mutation_drops_demaria(monkeypatch) -> None:
+    from simulator.battery import uncertainty_conventions as conventions
+
+    test_nested_source_width_keeps_demaria_digitization_and_leister()
+
+    def stop_descent(*_args, **_kwargs):
+        return None
+
+    monkeypatch.setattr(conventions, "_nested_width_selection", stop_descent)
+    with pytest.raises(AssertionError):
+        test_nested_source_width_keeps_demaria_digitization_and_leister()
+
+
+def test_qualifier_mutation_treats_suffix_as_unit(monkeypatch) -> None:
+    from simulator.battery import uncertainty_conventions as conventions
+
+    test_qualifier_is_not_a_unit_and_shape_stays_with_the_field()
+
+    def pass_through(unit):
+        text = (unit or "").strip()
+        if not text or text.casefold() == "range":
+            return ""
+        compact = re.sub(r"\s+", "", text.casefold())
+        if compact in {"%", "percent", "percentage"}:
+            return "%"
+        return compact
+
+    monkeypatch.setattr(conventions, "_alias_unit", pass_through)
+    with pytest.raises(AssertionError):
+        test_qualifier_is_not_a_unit_and_shape_stays_with_the_field()
+
+
+def test_paired_value_mutation_splits_migration_and_scoring(monkeypatch) -> None:
+    from simulator.battery import uncertainty_conventions as conventions
+
+    test_migration_and_scoring_share_paired_value_basis()
+
+    def drop_paired(*_args, **_kwargs):
+        return None
+
+    monkeypatch.setattr(conventions, "source_paired_value", drop_paired)
+    with pytest.raises(AssertionError):
+        test_migration_and_scoring_share_paired_value_basis()
+
+
+def test_defaulted_basis_mutation_drops_flagged_stratum(monkeypatch) -> None:
+    from simulator.battery import score as score_module
+
+    test_defaulted_basis_is_flagged_on_live_and_serialized_headline()
+    classify = score_module._classify_flagged_notice_facts
+
+    def without_basis(notices):
+        return tuple(
+            stratum
+            for stratum in classify(notices)
+            if stratum != score_module.FLAGGED_STRATUM_UNCERTAINTY_BASIS_DEFAULTED
+        )
+
+    monkeypatch.setattr(score_module, "_classify_flagged_notice_facts", without_basis)
+    with pytest.raises(AssertionError):
+        test_defaulted_basis_is_flagged_on_live_and_serialized_headline()
 
 
 def test_width_field_mutation_removes_half_width_token(monkeypatch) -> None:
@@ -22083,8 +22600,6 @@ def test_width_field_mutation_removes_half_width_token(monkeypatch) -> None:
 
 
 def test_inline_unit_mutation_hides_genuine_unit_conflict(monkeypatch) -> None:
-    from simulator.battery import migrate as migrate_module
-    from simulator.battery import score as score_module
     from simulator.battery import uncertainty_conventions as conventions
 
     test_width_unit_disagreement_is_typed_in_migration_and_scoring()
@@ -22093,8 +22608,9 @@ def test_inline_unit_mutation_hides_genuine_unit_conflict(monkeypatch) -> None:
     def discard_inline(unit, *, inline_unit=None, **kwargs):
         return resolve(unit, **kwargs)
 
-    monkeypatch.setattr(migrate_module, "resolve_width_unit_basis", discard_inline)
-    monkeypatch.setattr(score_module, "resolve_width_unit_basis", discard_inline)
+    # Both paths call this owner function. Patching a call-site alias would
+    # miss resolve_observed_width_basis.
+    monkeypatch.setattr(conventions, "resolve_width_unit_basis", discard_inline)
     with pytest.raises(AssertionError):
         test_width_unit_disagreement_is_typed_in_migration_and_scoring()
 
@@ -22115,18 +22631,15 @@ def test_width_basis_mutation_collapses_absolute_and_relative(monkeypatch) -> No
 
 
 def test_width_token_unit_mutation_drops_bound_dex(monkeypatch) -> None:
-    from simulator.battery import score as score_module
     from simulator.battery import uncertainty_conventions as conventions
 
     test_existing_printed_width_field_census_and_unit_conflict_orders()
 
-    def unbound(raw):
-        token = conventions.printed_width_token(raw)
-        if token is None:
-            return None
-        return token[0], None
+    def unbound(_raw: str) -> None:
+        return None
 
-    monkeypatch.setattr(score_module, "printed_width_token", unbound)
+    # The bound unit is read in the owner, then used by both entry points.
+    monkeypatch.setattr(conventions, "_unit_from_width_text", unbound)
     with pytest.raises(AssertionError):
         test_existing_printed_width_field_census_and_unit_conflict_orders()
 

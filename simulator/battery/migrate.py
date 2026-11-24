@@ -91,7 +91,7 @@ from simulator.battery.uncertainty_conventions import (
     mapping_uncertainty_value,
     paired_width_unit,
     printed_uncertainty_convention,
-    resolve_width_unit_basis,
+    resolve_observed_width_basis,
     standard_uncertainty_width,
     uncertainty_exact_fields,
 )
@@ -15930,12 +15930,13 @@ def _uncertainty_for_value_selection(
         derivation_parameters=derivation.parameters if derivation is not None else (),
         subtype=subtype,
     )
-    width, unit_hint = mapping_uncertainty_value(
+    selected = mapping_uncertainty_value(
         verbatim,
         exact_fields=exact_fields,
     )
-    # "range" is the selector's shape sentinel, not a printed unit.
-    width_unit = None if unit_hint == "range" else unit_hint
+    width = selected.value
+    # Shape stays on the selection. The unit is only a closed-vocabulary unit.
+    width_unit = selected.unit
     source_unit = (
         mapping_uncertainty_unit(verbatim)
         or width_unit
@@ -15951,23 +15952,13 @@ def _uncertainty_for_value_selection(
                 return uncertainty
         else:
             return uncertainty
-    locator = verbatim.get("locator")
-    basis_evidence = ""
-    if isinstance(locator, Mapping):
-        basis_evidence = str(locator.get("note") or "")
-    stored_printed_units = verbatim.get("printed_units")
-    printed_units = (
-        stored_printed_units if isinstance(stored_printed_units, str) else None
-    )
-    resolved = resolve_width_unit_basis(
-        source_unit,
+    resolved = resolve_observed_width_basis(
+        verbatim,
         inline_unit=width_unit,
-        expected_unit="dimensionless",
-        declared_basis=str(verbatim.get("basis") or uncertainty.basis or ""),
-        printed_value=str(verbatim.get("as_printed") or ""),
+        uncertainty_basis=str(uncertainty.basis or ""),
         paired_value=printed_value,
-        basis_evidence=basis_evidence,
-        printed_units=printed_units,
+        expected_unit="dimensionless",
+        selected_text=selected.text,
     )
     basis = resolved.basis
     conflict = resolved.conflict

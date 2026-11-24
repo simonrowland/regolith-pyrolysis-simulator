@@ -202,15 +202,16 @@ from simulator.battery.migrate import (
 from simulator.battery.uncertainty_conventions import (
     NORMAL_95_TICKET_MULTIPLIER,
     UncertaintyConventionConflict,
+    _selection_from_width_text,
     mapping_uncertainty_unit as _mapping_uncertainty_unit,
     mapping_uncertainty_value as _mapping_uncertainty_value,
     printed_uncertainty_convention,
     printed_width_span,
-    printed_width_token,
-    resolve_width_unit_basis,
+    resolve_observed_width_basis,
     standard_uncertainty_width,
     uncertainty_exact_fields,
 )
+from simulator.battery import uncertainty_conventions as _width_conventions
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -635,6 +636,8 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_UNCERTAINTY_BASIS_DEFAULTED = "uncertainty-basis-defaulted"
+_BASIS_DEFAULTED_REASON_PREFIX = "uncertainty_basis_defaulted:"
 
 
 @dataclass(frozen=True)
@@ -1069,10 +1072,22 @@ class _PrintedBandResolution:
     band: DecisionBand | None = None
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
+    basis_notice: Notice | None = None
     standard_uncertainty_dex: Decimal | None = None
     standard_uncertainty: Decimal | None = None
     standard_uncertainty_unit: str | None = None
     two_sigma_band: DecisionBand | None = None
+
+
+def _resolution_notices(resolution: _PrintedBandResolution) -> tuple[Notice, ...]:
+    """Confidence notice and, separately, a defaulted-basis notice."""
+
+    found: list[Notice] = []
+    if resolution.notice is not None:
+        found.append(resolution.notice)
+    if resolution.basis_notice is not None:
+        found.append(resolution.basis_notice)
+    return tuple(found)
 
 
 @dataclass(frozen=True)
@@ -2558,6 +2573,13 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN)
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
+    if any(
+        kind == NoticeKind.INPUT_OMITTED.value
+        and isinstance(reason, str)
+        and reason.startswith(_BASIS_DEFAULTED_REASON_PREFIX)
+        for kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_UNCERTAINTY_BASIS_DEFAULTED)
     return tuple(strata)
 
 
@@ -3619,10 +3641,12 @@ def _fusion_energy_when_polymorph_absent(
                 reference.value.point,
                 source_observation=reference,
             )
-            if row_band.notice is not None:
+            if _resolution_notices(row_band):
                 reference = replace(
                     reference,
-                    notices=union_notices(reference.notices, (row_band.notice,)),
+                    notices=union_notices(
+                        reference.notices, _resolution_notices(row_band)
+                    ),
                 )
             bound_exceeds_row_band = (
                 None
@@ -4286,8 +4310,7 @@ def _banya_feto_activity_comparison(
         reference.value.point,
         source_observation=reference,
     )
-    if row_band.notice is not None:
-        notices += (row_band.notice,)
+    notices += _resolution_notices(row_band)
     stoichiometric = _stoichiometric_standard(standard_state)
     if identity.species.formula == "Fe_tO":
         identity = replace(
@@ -4837,8 +4860,7 @@ def _iron_saturated_feo_comparison(
         reference.value.point,
         source_observation=reference,
     )
-    if row_band.notice is not None:
-        notices += (row_band.notice,)
+    notices += _resolution_notices(row_band)
     notices += (composition_notice,)
     return replace(
         reference,
@@ -6213,6 +6235,7 @@ def _printed_uncertainty_source(
     uncertainty: Uncertainty,
     *,
     exact_fields: Sequence[str] = (),
+    paired_value: str | None = None,
 ) -> tuple[
     Decimal | tuple[Decimal, Decimal] | None,
     str,
@@ -6225,15 +6248,12 @@ def _printed_uncertainty_source(
     Scalar strings and scalar-valued mappings take their number and unit from
     the shared width-token parser. A stored ``basis_default_reason`` is kept
     when migration already wrote the stated relative default into ``basis``.
+    Basis resolution is ``resolve_observed_width_basis``, the same call
+    migration makes, including ``paired_value``.
     """
     raw = uncertainty.verbatim
     basis = uncertainty.basis or ""
     printed_unit = _mapping_uncertainty_unit(raw) if isinstance(raw, Mapping) else None
-    printed_units_text = None
-    if isinstance(raw, Mapping):
-        stored_printed_units = raw.get("printed_units")
-        if isinstance(stored_printed_units, str):
-            printed_units_text = stored_printed_units
     unit = (
         "dex" if "dex" in basis.casefold()
         else "fraction" if basis.casefold() in {"relative", "fraction"}
@@ -6242,59 +6262,39 @@ def _printed_uncertainty_source(
     value: object | None = uncertainty.value
     inline_unit: str | None = None
     shape = "scalar"
+    selected_text = None
     if isinstance(value, tuple):
-        shape = "range"
+        shape = getattr(value, "shape", "range")
     if isinstance(raw, Mapping):
-        mapped_value, mapped_unit = _mapping_uncertainty_value(
-            raw, exact_fields=exact_fields
-        )
+        mapped = _mapping_uncertainty_value(raw, exact_fields=exact_fields)
         if value is None:
-            value = mapped_value
-        if mapped_unit == "range":
-            shape = "range"
-        else:
-            inline_unit = mapped_unit
+            value = mapped.value
+        if mapped.shape in {"range", "pair"}:
+            shape = mapped.shape
+        inline_unit = mapped.unit
+        selected_text = mapped.text
         unit = printed_unit or inline_unit or unit
     elif isinstance(raw, str):
-        span = printed_width_span(raw)
-        token = None if span is not None else printed_width_token(raw)
-        if value is None and span is not None:
-            value = (span[0], span[1])
-            shape = "range"
-        elif value is None and token is not None:
-            value = token[0]
-        bound_unit = (
-            span[2] if span is not None else None if token is None else token[1]
-        )
-        if bound_unit:
-            inline_unit = bound_unit
+        # Same span-versus-scalar choice as the mapping selector.
+        selected = _selection_from_width_text(raw, "")
+        if value is None and selected is not None:
+            value = selected.value
+            shape = selected.shape
+            selected_text = selected.text
+        if selected is not None and selected.unit:
+            inline_unit = selected.unit
             if unit is None:
-                unit = bound_unit
-    declared_basis = (
-        basis
-        if basis.startswith("uncertainty_convention_conflict:")
-        else str(raw.get("basis") or basis)
-        if isinstance(raw, Mapping)
-        else basis
-    )
-    basis_evidence = ""
-    printed_width = raw
-    if isinstance(raw, Mapping):
-        printed_width = raw.get("as_printed")
-        basis_evidence = " ".join(
-            str(raw.get(key) or "") for key in ("as_printed", "basis")
-        )
-        locator = raw.get("locator")
-        if isinstance(locator, Mapping):
-            basis_evidence += " " + str(locator.get("note") or "")
-    declared_unit = printed_unit or (None if isinstance(raw, Mapping) else unit)
-    resolved = resolve_width_unit_basis(
-        declared_unit,
+                unit = selected.unit
+    if paired_value is None:
+        # Attribute lookup, not a copied binding: the paired-value mutation
+        # patches this name on the owner module.
+        paired_value = _width_conventions.source_paired_value(raw)
+    resolved = resolve_observed_width_basis(
+        raw,
         inline_unit=inline_unit,
-        declared_basis=declared_basis,
-        printed_value=None if printed_width is None else str(printed_width),
-        basis_evidence=basis_evidence,
-        printed_units=printed_units_text,
+        uncertainty_basis=basis,
+        paired_value=paired_value,
+        selected_text=selected_text,
     )
     if resolved.conflict is not None:
         raise UncertaintyConventionConflict(resolved.conflict)
@@ -6313,9 +6313,10 @@ def _printed_uncertainty_source(
     try:
         if isinstance(value, (tuple, list)) and len(value) == 2:
             lower, upper = as_decimal(value[0]), as_decimal(value[1])
+            interval_shape = shape if shape in {"range", "pair"} else "range"
             if not lower.is_finite() or not upper.is_finite() or upper < lower:
-                return None, "range", unit, resolved_basis, basis_default_reason
-            return (lower, upper), "range", unit, resolved_basis, basis_default_reason
+                return None, interval_shape, unit, resolved_basis, basis_default_reason
+            return (lower, upper), interval_shape, unit, resolved_basis, basis_default_reason
         parsed = abs(as_decimal(value))
     except (TypeError, ValueError, ArithmeticError, InvalidOperation):
         return None, shape, unit, resolved_basis, basis_default_reason
@@ -6958,6 +6959,7 @@ def _printed_uncertainty_band(
                 band_basis=band_basis,
             ),
             notice=printed.notice,
+            basis_notice=printed.basis_notice,
             two_sigma_band=two_sigma_band,
         )
     if uncertainty.kind is not UncertaintyKind.PRINTED:
@@ -7034,13 +7036,24 @@ def _printed_uncertainty_band(
     else:
         exact_fields = uncertainty_exact_fields(quantity)
     try:
+        provenance = (
+            None
+            if source_observation is None
+            else getattr(source_observation, "provenance", None)
+        )
         (
             source_value,
             shape,
             mapped_unit,
             resolved_basis,
             basis_default_reason,
-        ) = _printed_uncertainty_source(uncertainty, exact_fields=exact_fields)
+        ) = _printed_uncertainty_source(
+            uncertainty,
+            exact_fields=exact_fields,
+            paired_value=_width_conventions.source_paired_value(
+                uncertainty.verbatim, provenance
+            ),
+        )
     except UncertaintyConventionConflict as exc:
         return _PrintedBandResolution(
             refusal={
@@ -7094,7 +7107,7 @@ def _printed_uncertainty_band(
     else:
         kind = "printed_unstated"
     if confidence_level == "not_stated":
-        if shape == "range" or kind == "printed_range":
+        if shape in {"range", "pair"} or kind == "printed_range":
             kind = "printed_range"
         elif not native_width and _has_printed_plus_minus(uncertainty):
             confidence_level = "one_sigma"
@@ -7346,26 +7359,20 @@ def _printed_uncertainty_band(
             and not log10_activity_sigma
         ),
     )
+    basis_notice = None
     if basis_default_reason:
-        # A confidence notice keeps its reason so the two-sigma reading still
-        # attaches. The basis default is named on that notice, or occupies the
-        # single slot when confidence was stated and produced no notice.
+        # The confidence notice keeps its own reason so the two-sigma reading
+        # still attaches. The basis default is a separate notice: the headline
+        # classifier reads kind and reason, not the confidence notice's band.
+        basis_notice = Notice(
+            kind=NoticeKind.INPUT_OMITTED,
+            affected_quantities=(quantity,),
+            reason=basis_default_reason,
+            origin="decision-band",
+        )
         if notice is None:
-            notice = Notice(
-                kind=NoticeKind.INPUT_OMITTED,
-                affected_quantities=(quantity,),
-                reason=basis_default_reason,
-                origin="decision-band",
-            )
-        else:
-            notice = replace(
-                notice,
-                band=(
-                    f"{notice.band}; {basis_default_reason}"
-                    if notice.band
-                    else basis_default_reason
-                ),
-            )
+            notice = basis_notice
+            basis_notice = None
     standard_uncertainty_dex = None
     standard_uncertainty = None
     standard_uncertainty_unit = None
@@ -7404,6 +7411,7 @@ def _printed_uncertainty_band(
     return _PrintedBandResolution(
         DecisionBand(ticket, unit, rule, band_basis=band_basis),
         notice=notice,
+        basis_notice=basis_notice,
         standard_uncertainty_dex=standard_uncertainty_dex,
         standard_uncertainty=standard_uncertainty,
         standard_uncertainty_unit=standard_uncertainty_unit,
@@ -18926,16 +18934,25 @@ def _compile_residual_with_lineage(
                     "absolute": QUANTITY_UNITS[quantity],
                     "relative_percent": "%",
                 }[source_method_uncertainty.basis]
+                # relative_percent is a stated basis, not a missing one. The
+                # unit stays "%" so the width still scales; the basis token
+                # the resolver reads is "relative", not the unit.
+                stated_basis = {
+                    "log10_dex": "dex",
+                    "absolute": "absolute",
+                    "relative_percent": "relative",
+                }[source_method_uncertainty.basis]
                 band_uncertainty = Uncertainty(
                     kind=UncertaintyKind.PRINTED,
                     verbatim={
                         "value": source_method_uncertainty.value,
                         "unit": printed_unit,
+                        "basis": stated_basis,
                         "confidence_level": source_method_uncertainty.meaning,
                         "note": source_method_uncertainty.locator.note,
                     },
                     value=source_method_uncertainty.value,
-                    basis=printed_unit,
+                    basis=stated_basis,
                 )
         if printed.refusal is None:
             printed = _printed_uncertainty_band(
@@ -18951,8 +18968,8 @@ def _compile_residual_with_lineage(
                 band_basis=band_basis or "row_printed",
                 confidence_level_override=confidence_level_override,
             )
-        if printed.notice is not None:
-            notices = union_notices(notices, (printed.notice,))
+        if _resolution_notices(printed):
+            notices = union_notices(notices, _resolution_notices(printed))
 
         source_phase_missing = any(
             notice.reason in _REFERENCE_POLYMORPH_REFUSAL_REASONS
