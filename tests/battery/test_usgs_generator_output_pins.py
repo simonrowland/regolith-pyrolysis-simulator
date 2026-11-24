@@ -14,9 +14,12 @@ GENERATORS = (
     ("b1544", usgs_b1544),
 )
 
+# b1452 moved because the formula ledger changes text candidates, not
+# formula arithmetic. Studio 2 request e26f96f4 printed the new digest.
+# Previous pin: c5db0e9edf343d80920afdb401775daabcda010137d7a566ae34d0563e53f6fa.
 EXPECTED_PARSER_OUTPUT_SHA256 = {
     "b1259": "45e7170e8fdc1513b0077f7a554ab653bb7cac51b4db15f8eaeb86bbe09d1dc7",
-    "b1452": "c5db0e9edf343d80920afdb401775daabcda010137d7a566ae34d0563e53f6fa",
+    "b1452": "ecafdbb8a65db93da5ffd1a61a9c0211b6c5ff4c4f2a34e6ed89e5ad8077d9ec",
     "b1544": "c446507f621c4018bd470d558bf79fcb5a0a736283dc093932bc7a67d6af1b9b",
 }
 
