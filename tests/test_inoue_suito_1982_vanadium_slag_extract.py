@@ -138,6 +138,13 @@ def test_inoue_suito_phase_compositions_migrate_with_sample_identity_and_tempera
     }
     assert len(rows) == 61 * 9
 
+    measured_slag = rows["inoue_suito_1982_t02_sample_253_slag_CaO"]
+    assert measured_slag.value.point == Decimal("26.70")
+    assert measured_slag.locator.page == 4
+    assert measured_slag.locator.published_page == 708
+    assert measured_slag.locator.table == "2"
+    assert measured_slag.identity.composition.is_unknown
+
     for source_row in _read_grid():
         sample = source_row["sample_id"]
         page = int(source_row["pdf_page"])

@@ -82,6 +82,15 @@ def test_html_table_cells_and_row_counts_are_pinned_and_mutations_fail() -> None
     assert sum(row["locator"]["table"] == "3" for row in observations.values()) == 254
     _assert_html_pins(document)
 
+    measured_product = _observations(document)[
+        "abdeyazdan_2026_t2_run01_NSnS2_glass_sio2"
+    ]
+    assert measured_product["locator"]["html_row"] == 4
+    assert measured_product["locator"]["table"] == "2"
+    assert measured_product["values"]["component_amount_as_published"] == (
+        "53.1 ± 0.60 mol.%"
+    )
+
     mutated = deepcopy(document)
     mutated_observation = _observations(mutated)[
         "abdeyazdan_2026_t2_run01_NSnS2_glass_sio2"

@@ -309,6 +309,16 @@ def test_xanes_tables_and_deferred_figures_preserve_printed_evidence() -> None:
         and row.point_conditions["composition"].state.reason == "not_published"
         for row in migrated
     )
+    measured_glass = next(
+        row
+        for row in migrated
+        if "b030106p2b" in row.observation_id.casefold()
+        and row.identity.species.formula == "Si"
+    )
+    assert measured_glass.value.point == Decimal("19.93")
+    assert measured_glass.locator.page == 7
+    assert measured_glass.locator.published_page == 6853
+    assert measured_glass.identity.composition.is_unknown
     assert all(
         row.point_conditions["fO2_log"].state.is_value
         and row.point_conditions["fO2_log"].locator.table == "1"

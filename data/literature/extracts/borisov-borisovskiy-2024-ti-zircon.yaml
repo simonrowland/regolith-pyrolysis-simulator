@@ -3754,7 +3754,31 @@ species:
               pdf_page_index: 2
               table: '1'
         attribution: Borisov and Aranovich (2019)
-    context: []
+    context:
+    - observation_id: borisov_borisovskiy_2024_starting_mixture_recipe
+      type: starting_mixture_recipe_context
+      units: wt.%
+      locator:
+        page: 2
+        published_page: 498
+        pdf_page_index: 1
+        section: Experimental details
+        column: left
+        source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+        line_range: '2-9'
+      values:
+        basis: wt_percent
+        sample_series_as_printed: [T8, T15, T25]
+        components_as_printed:
+          SiO2: '56.9'
+          Al2O3: '10.1'
+          MgO: '9.4'
+          CaO: '10.1'
+          ZrO2: '13.5'
+        TiO2_target_wt_percent_as_printed:
+          T8: {value: '8', approximate: true}
+          T15: {value: '15', approximate: true}
+          T25: {value: '25', approximate: true}
   Al2O3:
     observations:
     - observation_id: borisov-borisovskiy-2024-ti-zircon_t8_16_glass_al2o3
@@ -8580,6 +8604,102 @@ species:
         attribution: Borisov and Aranovich (2019)
     context: []
 fidelity_samples:
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.components_as_printed.SiO2
+  value: '56.9'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; printed starting-mixture SiO2 wt.% cell
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '2'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.components_as_printed.Al2O3
+  value: '10.1'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; printed starting-mixture Al2O3 wt.% cell
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '3'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.components_as_printed.MgO
+  value: '9.4'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; printed starting-mixture MgO wt.% cell
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '4'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.components_as_printed.CaO
+  value: '10.1'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; printed starting-mixture CaO wt.% cell
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '5'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.components_as_printed.ZrO2
+  value: '13.5'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; printed starting-mixture ZrO2 wt.% cell
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '6'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.TiO2_target_wt_percent_as_printed.T8.value
+  value: '8'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; approximate starting-mixture TiO2 target for T8
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '7'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.TiO2_target_wt_percent_as_printed.T15.value
+  value: '15'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; approximate starting-mixture TiO2 target for T15
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '8'
+- path: species.TiO2.context[borisov_borisovskiy_2024_starting_mixture_recipe].values.TiO2_target_wt_percent_as_printed.T25.value
+  value: '25'
+  reviewed_by: codex
+  reviewed_on: '2026-11-24'
+  locator:
+    page: 2
+    published_page: 498
+    pdf_page_index: 1
+    section: Experimental details
+    note: column left; approximate starting-mixture TiO2 target for T25
+    source_path: tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv
+    line_range: '9'
 - path: species.TiO2.observations[borisov-borisovskiy-2024-ti-zircon_t15_12_glass_tio2].values.component_amount
   value: '15.24'
   locator:
