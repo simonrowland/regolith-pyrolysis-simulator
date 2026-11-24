@@ -17,6 +17,8 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
 from simulator.melt_backend.base import EquilibriumResult
 from tests.battery.cache_test_support import CACHE_TEST_ENGINES
 
+pytestmark = pytest.mark.engine_cache_off
+
 @dataclass(frozen=True)
 class _SettingCase:
     label: str
@@ -2060,10 +2062,23 @@ def test_all_cacheable_real_cell_paths_preserve_scorer_fields_through_sqlite(
         close_battery_engine_handle(handle)
 
 
-def test_alphamelts_out_of_domain_cell_is_not_stored(
+def test_alphamelts_no_convergence_cell_is_stored(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    """MgO-SiO2 at 1700 K stores the parser's no_convergence refusal.
+
+    Round 2 allowlisted ``no_convergence`` after the s3 probe: two requests,
+    each identical across three fresh processes, status ``out_of_domain``.
+    This cell is that code. Studio diagnostic e06b0d242ff84deda488373e2d73af05
+    (Mac-Studio-256-2) returned engine_reason no_convergence, engine_status
+    out_of_domain, no exit code and no signal, and stores 1. It is not a
+    crash. A non-allowlisted out-of-domain death stays unstored:
+    test_alphamelts_signal_death_is_stored_only_for_a_binary_fault
+    (exit_signal) and test_alphamelts_timeout_is_not_stored_as_a_crash
+    (process_failure).
+    """
+
     from simulator import engine_cache
     from simulator.diagnostic_helpers.binary_pot_battery import (
         Po2Request,
@@ -2071,10 +2086,11 @@ def test_alphamelts_out_of_domain_cell_is_not_stored(
         equilibrate_cell,
         load_binary_pots,
     )
+    from simulator.melt_backend.alphamelts import ALPHAMELTS_REASON_NO_CONVERGENCE
     from tests.battery.cache_test_support import open_available_engine
 
     handle = open_available_engine(
-        Engine.ALPHAMELTS, nodeid="AlphaMELTS out-of-domain cache refusal"
+        Engine.ALPHAMELTS, nodeid="AlphaMELTS no_convergence cache store"
     )
     pots, _metadata = load_binary_pots()
     pot = next(pot for pot in pots if pot.pot_id == "mgo_sio2_40_60")
@@ -2090,9 +2106,13 @@ def test_alphamelts_out_of_domain_cell_is_not_stored(
             isolated=False,
         )
         assert cell.engine_status == "out_of_domain"
-        assert engine_cache.engine_cache_counters(reset=True)["alphamelts"][
-            "stores"
-        ] == 0
+        assert cell.engine_reason == ALPHAMELTS_REASON_NO_CONVERGENCE
+        assert cell.exit_code is None
+        assert cell.exit_signal is None
+        counts = engine_cache.engine_cache_counters(reset=True)["alphamelts"]
+        assert counts["misses"] == 1
+        assert counts["hits"] == 0
+        assert counts["stores"] == 1
     finally:
         close_battery_engine_handle(handle)
 
@@ -2867,6 +2887,7 @@ def test_hashimoto_internal_residue_path_reads_diagnostics_without_cache(
         total_pressure_Pa=100_000.0,
         engine_metadata={},
         engine_flags=set(),
+        starting_inventory={"Na2O": 1.0},
         missing_channels_reason="residue_pressure_channels_missing",
         caller="Hashimoto cache diagnostics",
         floor_inversion_diagnostics=floor_diagnostics,

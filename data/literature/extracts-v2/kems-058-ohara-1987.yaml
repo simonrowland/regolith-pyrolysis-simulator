@@ -11,12 +11,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -84,7 +83,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''dilute_P2O5_in_FetO'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_cao_epsilon_p2o5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1337
@@ -166,12 +177,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -259,7 +269,19 @@ observations:
         figure: '1'
         note: 'a_P2O5 vs X_P2O5 at 1370 C with CaO, MgO, MnO, SiO2 additions; figure-only placeholder, not digitised. bound_not_point_ordering:
           figure carries an ordering/bound, never a point value.'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_fig1_a_p2o5_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1339
@@ -290,12 +312,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -369,7 +390,19 @@ observations:
         figure: '2'
         note: 'ln gamma_P2O5 vs N_i for CaO, MgO, MnO, SiO2; figure-only placeholder, not digitised. bound_not_point_ordering:
           figure carries an ordering/bound, never a point value.'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_fig2_ln_gamma_vs_Ni_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1340
@@ -400,12 +433,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -438,7 +470,18 @@ observations:
         figure: '3'
         note: 'L_P vs mol% P2O5 at 1370 C; Kambayashi FetO-P2O5 L_P curve is figure-only and not digitised. bound_not_point_ordering:
           figure carries an ordering/bound, never a point value.'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_fig3_Lp_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1341
@@ -469,12 +512,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'dilute_P2O5_in_FetO_with_CaO_MgO_MnO_SiO2' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -548,7 +590,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''dilute_P2O5_in_FetO_with_CaO_MgO_MnO_SiO2'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_interaction_parameters_1643k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1337
@@ -632,12 +686,11 @@ observations:
     species:
       formula: Fe
       phase:
-        tag: unknown
-        reason: phase string 'quoted_FeO-CaO-SiO2_carbon_saturated_iron' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -662,7 +715,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''quoted_FeO-CaO-SiO2_carbon_saturated_iron'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_iwasaki_quoted_Lp
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1341
@@ -689,12 +753,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -762,7 +825,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''dilute_P2O5_in_FetO'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_mgo_epsilon_p2o5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1337
@@ -844,12 +919,11 @@ observations:
     species:
       formula: MnO
       phase:
-        tag: unknown
-        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -917,7 +991,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''dilute_P2O5_in_FetO'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_mno_epsilon_p2o5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1337
@@ -6096,6 +6182,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas declared by source standard_state P4O10(g); original_reason=phase
+      string ''P4O10_s_saturation_used_as_P2O5_solid_standard'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_p4o10_sat_janaf_1643k
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -11183,12 +11281,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'dilute_P2O5_in_FetO' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -11256,7 +11353,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - interaction_parameter
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''dilute_P2O5_in_FetO'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_sio2_epsilon_p2o5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1337
@@ -18757,12 +18866,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -18852,6 +18960,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -18948,12 +19068,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19043,6 +19162,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19139,12 +19270,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19234,6 +19364,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19330,12 +19472,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19425,6 +19566,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_12
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19521,12 +19674,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19616,6 +19768,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_13
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19712,12 +19876,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19807,6 +19970,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_14
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -19903,12 +20078,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -19998,6 +20172,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_15
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20094,12 +20280,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20189,6 +20374,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_16
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20285,12 +20482,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20380,6 +20576,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_17
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20476,12 +20684,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20573,6 +20780,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_18
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20669,12 +20888,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20766,6 +20984,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_19
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -20862,12 +21092,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -20957,6 +21186,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21053,12 +21294,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21148,6 +21388,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21244,12 +21496,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21339,6 +21590,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21435,12 +21698,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21530,6 +21792,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21626,12 +21900,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21721,6 +21994,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -21817,12 +22102,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -21912,6 +22196,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -22008,12 +22304,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22103,6 +22398,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -22199,12 +22506,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'FetO-P2O5-i_oxide_melt_in_Fe_crucible' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22294,6 +22600,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: FetO-P2O5-i oxide melt in Fe
+      crucible; original_reason=phase string ''FetO-P2O5-i_oxide_melt_in_Fe_crucible'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_table2_compositions_and_raoultian_a_p2o5_sample_9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - activity
@@ -22390,12 +22708,11 @@ observations:
     species:
       formula: P2O5
       phase:
-        tag: unknown
-        reason: phase string 'CaO-rich_steelmaking_slag_quoted' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -22420,7 +22737,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CaO-rich_steelmaking_slag_quoted'' is not in the closed automatic map'
+    origin: kems-058-ohara-1987::ohara_1987_turkdogan_quoted_ln_gamma_eq11
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-058-ohara-1987
   locator:
     published_page: 1340

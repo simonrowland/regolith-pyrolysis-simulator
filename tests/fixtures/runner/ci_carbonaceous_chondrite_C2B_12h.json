@@ -709,8 +709,8 @@
         },
         {
           "site": "organics_pyrolysis.char_fate",
-          "cco_source": "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context",
-          "cco_status": "inside_or_marked",
+          "cco_source": "NIST-JANAF C-093 CO(g) and C-095 CO2(g) formation Gibbs energies; Jakobsson & Oskarsson 1994 GCA Table 6 fit inside its calibrated field",
+          "cco_status": "cco_fit_out_of_band_ideal_gas_used; T_K=[1373.15,1773.15]; P_bar=[7500,20000]",
           "doctrine_category": 2,
           "detail": "1-bar Boudouard crossover is ~697 C (REF-059); Kp has no total-P term so the vacuum-max-char rule is the 1-bar statement; high pO2 gasifies char at any T"
         },
@@ -814,7 +814,7 @@
           "pO2_bar": 1e-12,
           "temperature_K": 1323.15
         },
-        "pO2_cco_bar": 7.029080220373093e-13,
+        "pO2_cco_bar": 9.015477108457444e-19,
         "boudouard_Kp": 300.1195837860941,
         "T_crossover_C": 696.7853448275863,
         "survive_fraction": 0.880456725797973,
@@ -822,8 +822,8 @@
         "notes": [
           {
             "site": "organics_pyrolysis.char_fate",
-            "cco_source": "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context",
-            "cco_status": "inside_or_marked",
+            "cco_source": "NIST-JANAF C-093 CO(g) and C-095 CO2(g) formation Gibbs energies; Jakobsson & Oskarsson 1994 GCA Table 6 fit inside its calibrated field",
+            "cco_status": "cco_fit_out_of_band_ideal_gas_used; T_K=[1373.15,1773.15]; P_bar=[7500,20000]",
             "doctrine_category": 2,
             "detail": "1-bar Boudouard crossover is ~697 C (REF-059); Kp has no total-P term so the vacuum-max-char rule is the 1-bar statement; high pO2 gasifies char at any T"
           }
@@ -848,8 +848,8 @@
           "notes": [
             {
               "site": "organics_pyrolysis.char_fate",
-              "cco_source": "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context",
-              "cco_status": "inside_or_marked",
+              "cco_source": "NIST-JANAF C-093 CO(g) and C-095 CO2(g) formation Gibbs energies; Jakobsson & Oskarsson 1994 GCA Table 6 fit inside its calibrated field",
+              "cco_status": "cco_fit_out_of_band_ideal_gas_used; T_K=[1373.15,1773.15]; P_bar=[7500,20000]",
               "doctrine_category": 2,
               "detail": "1-bar Boudouard crossover is ~697 C (REF-059); Kp has no total-P term so the vacuum-max-char rule is the 1-bar statement; high pO2 gasifies char at any T"
             }
@@ -979,8 +979,8 @@
           },
           {
             "site": "organics_pyrolysis.char_fate",
-            "cco_source": "Jakobsson & Oskarsson 1994 GCA (CCO point formula, via LEPR/ThermoEngine); Stagno & Frost 2010 EPSL 300:72-84 graphite-saturation context",
-            "cco_status": "inside_or_marked",
+            "cco_source": "NIST-JANAF C-093 CO(g) and C-095 CO2(g) formation Gibbs energies; Jakobsson & Oskarsson 1994 GCA Table 6 fit inside its calibrated field",
+            "cco_status": "cco_fit_out_of_band_ideal_gas_used; T_K=[1373.15,1773.15]; P_bar=[7500,20000]",
             "doctrine_category": 2,
             "detail": "1-bar Boudouard crossover is ~697 C (REF-059); Kp has no total-P term so the vacuum-max-char rule is the 1-bar statement; high pO2 gasifies char at any T"
           },
@@ -3295,7 +3295,9 @@
       "accepted_species": [
         "Cr",
         "Cr2O3",
+        "CrO",
         "CrO2",
+        "CrO3",
         "Mn"
       ],
       "designated_species_kg": {},
@@ -4835,12 +4837,12 @@
           "species_id": "FeO_association_gas",
           "pressure": {
             "kind": "upper_bound",
-            "pa": 6894960.572549752,
+            "pa": 1.1679462269794835e-18,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "selected_runtime_pressure": {
             "kind": "upper_bound",
-            "pa": 6894960.572549752,
+            "pa": 1.1679462269794835e-18,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "flux": {
@@ -4882,13 +4884,13 @@
             "extrapolation_notice": {
               "temperature_K": 418.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -8045,12 +8047,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -8092,13 +8094,13 @@
               "extrapolation_notice": {
                 "temperature_K": 418.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -11198,12 +11200,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -11245,13 +11247,13 @@
               "extrapolation_notice": {
                 "temperature_K": 418.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -14864,12 +14866,12 @@
           "species_id": "FeO_association_gas",
           "pressure": {
             "kind": "upper_bound",
-            "pa": 6894960.572549752,
+            "pa": 1.1679462269794835e-18,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "selected_runtime_pressure": {
             "kind": "upper_bound",
-            "pa": 6894960.572549752,
+            "pa": 1.1679462269794835e-18,
             "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
           },
           "flux": {
@@ -14911,13 +14913,13 @@
             "extrapolation_notice": {
               "temperature_K": 418.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -16606,19 +16608,19 @@
     },
     "unmeasured_alpha_evaporation_fallback": {
       "engaged": true,
-      "total_count": 12,
+      "total_count": 2,
       "by_hour": [
         {
           "campaign": "C2B",
           "hour": 10,
           "campaign_hour": 10,
-          "count": 6
+          "count": 1
         },
         {
           "campaign": "C2B",
           "hour": 11,
           "campaign_hour": 11,
-          "count": 6
+          "count": 1
         }
       ]
     },
@@ -40747,12 +40749,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 16901032.68318273,
+              "pa": 3.411605850892325e-19,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 16901032.68318273,
+              "pa": 3.411605850892325e-19,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -40794,13 +40796,13 @@
               "extrapolation_notice": {
                 "temperature_K": 408.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -42629,13 +42631,13 @@
             "FeO_association_gas": {
               "temperature_K": 408.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },
@@ -46511,12 +46513,12 @@
             "species_id": "FeO_association_gas",
             "pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "selected_runtime_pressure": {
               "kind": "upper_bound",
-              "pa": 6894960.572549752,
+              "pa": 1.1679462269794835e-18,
               "evidence_ref": "hkl_ideal_upper_bound_status_bearing"
             },
             "flux": {
@@ -46558,13 +46560,13 @@
               "extrapolation_notice": {
                 "temperature_K": 418.15,
                 "valid_range_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ],
                 "authority_level": "extrapolated",
                 "certified_band": {
                   "temperature_K": [
-                    1400.0,
+                    1809.0,
                     1900.0
                   ]
                 },
@@ -48393,13 +48395,13 @@
             "FeO_association_gas": {
               "temperature_K": 418.15,
               "valid_range_K": [
-                1400.0,
+                1809.0,
                 1900.0
               ],
               "authority_level": "extrapolated",
               "certified_band": {
                 "temperature_K": [
-                  1400.0,
+                  1809.0,
                   1900.0
                 ]
               },

@@ -94,7 +94,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_approximate_high_temperature_na_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_approximate_high_temperature_na_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 19
@@ -118,12 +142,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -187,7 +210,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1006:row=6:h=7ac60ec11a1f
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17
@@ -216,12 +263,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -285,7 +331,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1241:row=4:h=32f054211f0b
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17
@@ -314,12 +384,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -383,7 +452,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1260:row=3:h=819d15c848c0
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17
@@ -412,12 +505,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -481,7 +573,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=1467:row=1:h=73ef0f153d5c
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17
@@ -510,12 +626,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -579,7 +694,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=918:row=2:h=2eba3cba4908
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17
@@ -608,12 +747,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -677,7 +815,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=943:row=5:h=fdbb02c94538
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17
@@ -706,12 +868,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -775,7 +936,31 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''Knudsen effusion'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: brewer-margrave-1952-alkali-oxides-ucrl1864::brewer_margrave_1952_table3_total_mass_loss::T=998:row=7:h=0cf8c2a228f7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: brewer-margrave-1952-alkali-oxides-ucrl1864
   locator:
     page: 17

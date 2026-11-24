@@ -3225,7 +3225,13 @@ class CondensationModel:
                 for segment in self.pipe_segments
                 if segment.upstream_stage != 'stage_3']
 
-    def _admit_stage3_route(self, evap_flux: EvaporationFlux, melt: MeltState):
+    def _admit_stage3_route(
+        self,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        *,
+        dt_h: float = 1.0,
+    ):
         from simulator.condensation_routing import STAGE3_PURITY_FIELDS, validate_stage3_purity
         route = dict(self.train.collection_route)
         diagnostic: dict[str, Any] = {
@@ -3233,7 +3239,7 @@ class CondensationModel:
             'retained_supply_projection': copy.deepcopy(self.retained_supply_projection)}
         self.last_stage3_route_diagnostic = diagnostic
         if route['stage3_route'] == 'divert':
-            result = self._route(evap_flux, melt)
+            result = self._route(evap_flux, melt, dt_h=dt_h)
             self._commit_vapour_fog_notice()
             return result
         if route['stage3_route'] != 'through':
@@ -3304,6 +3310,7 @@ class CondensationModel:
                     evap_flux,
                     melt,
                     publish_audit=not probe_mass_only,
+                    dt_h=dt_h,
                 )
                 if not unknown and evap_flux.species_kg_hr.get('SiO', 0.0) > 0.0
                 else None
@@ -3350,11 +3357,11 @@ class CondensationModel:
                 campaign_hour=melt.campaign_hour,
                 reason='alkali_purity_exceeded', resolved_stage3_route='divert')
             self.cold_spot_history.append(copy.deepcopy(diagnostic))
-            result = self._route(evap_flux, melt)
+            result = self._route(evap_flux, melt, dt_h=dt_h)
             self._commit_vapour_fog_notice()
             return result
         if result is None:
-            result = self._route(evap_flux, melt)
+            result = self._route(evap_flux, melt, dt_h=dt_h)
         elif probe_mass_only:
             # The accepted through parcel was mass-only. Roll the probe's
             # appends back and publish audit on one landed route. Refusal
@@ -3366,7 +3373,7 @@ class CondensationModel:
             del self.stage_bulk_gas_history[prior_bulk_spots:]
             if prior_operating is not None:
                 self.operating_history[-1] = prior_operating
-            result = self._route(evap_flux, melt)
+            result = self._route(evap_flux, melt, dt_h=dt_h)
         self._commit_vapour_fog_notice()
         return result
 
@@ -3602,16 +3609,35 @@ class CondensationModel:
         self.lab_geometry = geometry
         return geometry
 
-    def route(self, evap_flux: EvaporationFlux, melt: MeltState):
-        """Route one flux batch with mutation-checked catalog reuse."""
+    def route(
+        self,
+        evap_flux: EvaporationFlux,
+        melt: MeltState,
+        *,
+        dt_h: float = 1.0,
+    ):
+        """Route one flux batch with mutation-checked catalog reuse.
+
+        ``dt_h`` is this process step in hours. The default is one hour,
+        so existing callers keep the inventory-mole oxygen clip.
+        """
+        if isinstance(dt_h, bool) or not isinstance(dt_h, (int, float)):
+            raise ValueError(
+                f'dt_h must be a positive finite hour count; got {dt_h!r}'
+            )
+        dt_h = float(dt_h)
+        if not math.isfinite(dt_h) or dt_h <= 0.0:
+            raise ValueError(
+                f'dt_h must be a positive finite hour count; got {dt_h!r}'
+            )
         data = self.vapor_pressure_data
         if not isinstance(data, VaporPressureCompatibilityView):
-            return self._admit_stage3_route(evap_flux, melt)
+            return self._admit_stage3_route(evap_flux, melt, dt_h=dt_h)
         missing = object()
         previous = getattr(data, '_route_catalog', missing)
         data._route_catalog = None
         try:
-            return self._admit_stage3_route(evap_flux, melt)
+            return self._admit_stage3_route(evap_flux, melt, dt_h=dt_h)
         finally:
             if previous is missing:
                 del data._route_catalog
@@ -3624,6 +3650,7 @@ class CondensationModel:
         melt: MeltState,
         *,
         publish_audit: bool = True,
+        dt_h: float = 1.0,
     ):
         """
         Route all evaporated species through the train.
@@ -3923,6 +3950,18 @@ class CondensationModel:
         # species at that location have been evaluated, preserving carrier flow.
         # The bulk temperature changes only on a visited stage that has capture
         # area. A hot duct keeps its wall schedule and does not reset the gas.
+        # Oxygen inventory is mol. The vapour extent in this route is mol/h
+        # (kg/h / M). The clip is min(n_v_hour, n_O2_hour / a) with
+        # n_O2_hour = inventory_mol / dt_h. Booked mols stay mol/h; the
+        # evaporation caller multiplies them by dt_h once. At dt_h == 1
+        # the budget is the inventory, so the hour path is the same clip.
+        # mol/h * h = mol, and that step cannot exceed the inventory.
+        # The Dalton line above keeps inventory_mol / 3600. That co-flow
+        # is an hour, not this step.
+        if dt_h == 1.0:
+            oxygen_budget = oxygen_mol
+        else:
+            oxygen_budget = oxygen_mol / dt_h
         for stage in sorted(self.train.active_stages, key=stage_visit_key):
             # Validate this destination's coefficient before its incoming wall
             # can consume the supply; a clean stage cannot hide missing alpha.
@@ -3990,14 +4029,14 @@ class CondensationModel:
                     )
                     deposit = candidates.get(segment.name, 0.0)
                     if isinstance(deposit, (int, float)) and deposit > 0.0:
-                        deposit, oxygen_mol = _keep_declared_wall_deposit(
+                        deposit, oxygen_budget = _keep_declared_wall_deposit(
                             species,
                             float(deposit),
                             surface="wall",
                             T_K=float(segment.wall_temperature_C) + CELSIUS_TO_KELVIN_OFFSET,
                             p_local_pa=partials.get(species),
                             pO2_Pa=partials["O2"] if "O2" in partials else None,
-                            oxygen_mol=oxygen_mol,
+                            oxygen_mol=oxygen_budget,
                             vapor_pressure_data=self.vapor_pressure_data,
                             registry=self.species_formula_registry,
                             bookings=wall_reaction_bookings,
@@ -4101,7 +4140,10 @@ class CondensationModel:
                         stream_po2_bar=stream_po2_bar,
                     )
                     reaction.update(
-                        available_oxygen_mol=oxygen_mol,
+                        available_oxygen_mol=(
+                            oxygen_budget if dt_h == 1.0
+                            else oxygen_budget * dt_h
+                        ),
                         stream_oxygen_mol=0.0,
                     )
                     reactive_alkali[species] = reaction
@@ -4209,14 +4251,14 @@ class CondensationModel:
                     continue
                 deposit = supply * eta
                 if deposit > 1e-15 and reaction is None:
-                    deposit, oxygen_mol = _keep_declared_wall_deposit(
+                    deposit, oxygen_budget = _keep_declared_wall_deposit(
                         species,
                         float(deposit),
                         surface="baffle",
                         T_K=_stage_midpoint_temperature_K(stage),
                         p_local_pa=partials.get(species),
                         pO2_Pa=partials.get("O2"),
-                        oxygen_mol=oxygen_mol,
+                        oxygen_mol=oxygen_budget,
                         vapor_pressure_data=self.vapor_pressure_data,
                         registry=self.species_formula_registry,
                         bookings=wall_reaction_bookings,
@@ -4257,18 +4299,21 @@ class CondensationModel:
                     reactive_alkali[species]['transport_uptake_mol']
                     for species in reactive_stage_capture_kg
                 )
-                # 4 M + O2 -> 2 M2O. All species share this step's oxygen
-                # budget: uptake is demand * min(1, 4*n_O2/sum(demand)).
-                # The ratio is dimensionless; the debit cannot exceed n_O2,
-                # and zero oxygen produces zero reactive capture.
+                # 4 M + O2 -> 2 M2O. Demand and the oxygen budget are both
+                # mol/h (inventory mol / dt_h; the inventory when dt_h == 1).
+                # uptake_hour = demand * min(1, 4*n_O2_hour/sum(demand)).
+                # The ratio is dimensionless, so the mol/h debit cannot
+                # exceed the mol/h budget. The caller scales that debit by
+                # dt_h once, and the step cannot exceed the inventory.
+                # Zero oxygen produces zero reactive capture.
                 uptake_scale = (
-                    min(1.0, 4.0 * oxygen_mol / demand_mol)
+                    min(1.0, 4.0 * oxygen_budget / demand_mol)
                     if demand_mol > 0.0
                     else 0.0
                 )
                 if 0.0 < uptake_scale < 1.0:
                     # Round downward so species-to-mol projections cannot
-                    # exceed the shared oxygen inventory by one floating ULP.
+                    # exceed the shared oxygen budget by one floating ULP.
                     uptake_scale = math.nextafter(uptake_scale, 0.0)
                 for species, transport_kg in reactive_stage_capture_kg.items():
                     reaction = reactive_alkali[species]
@@ -8612,7 +8657,8 @@ def _assign_declared_wall_capture(
     Oxygen is the committed parcel inventory, never a forecast coproduct.
     For n_v mol captured and a = ν_O2/ν_v mol O2 per mol vapour,
     n_oxidised = min(n_v, n_O2/a); n_free = n_v - n_oxidised.
-    Units: mol/(mol/mol) = mol. n_O2 = 0 leaves only the free route;
+    The ratio a is mol/mol, so n_O2/a is the shared unit of the two
+    arguments. n_O2 = 0 leaves only the free route;
     n_O2 >= a*n_v permits full oxidation. The residual uses the free
     route only if supersaturated; otherwise it remains vapour.
 
@@ -8627,8 +8673,12 @@ def _assign_declared_wall_capture(
     only when it is itself supersaturated. Anything left is unbooked
     vapour, not a deposit.
 
-    Units. Extents and the oxygen budget are moles. Pressures are
-    pascals. Stoichiometry ratios are mol per mol of vapour.
+    Units. The captured extent and the oxygen budget share one unit.
+    route() passes mol/h: inventory mol / dt_h, or the inventory
+    itself when dt_h == 1. Pressures are pascals. Stoichiometry
+    ratios are mol O2 per mol of vapour, so the debit is in that
+    same unit. The evaporation caller multiplies the booked mols
+    by dt_h once.
     """
 
     from simulator.vapour_rail.nasa_cea import NasaCeaError, WallSaturationLawRefusal

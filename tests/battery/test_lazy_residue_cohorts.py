@@ -96,13 +96,15 @@ def test_hashimoto_selected_experiments_match_full_rows_and_integrate_only_selec
         shift = 0.8 / steps
         values["FeO"] += shift
         values["MgO"] -= shift
-        return (
-            values,
-            (0.1,),
-            (),
-            None,
-            {"Fe": 0.0, "O": 0.0},
-            {
+        return residue._HashimotoGeometryIntegration(
+            composition_wt_pct=values,
+            pO2_steps=(0.1,),
+            exhaustion_notices=(),
+            refusal=None,
+            atom_closure={"Fe": 0.0, "O": 0.0},
+            inventory_mol=dict(inventory),
+            evaporated_mol={},
+            pO2_balance_floor={
                 "steps_at_floor": 0,
                 "first_step": None,
                 "fraction_of_time_at_floor": 0.0,
@@ -236,6 +238,8 @@ def test_sossi_selected_experiments_match_full_rows_and_integrate_only_selected(
     assert set(integrated_experiments) == {target_id}
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_residue_cohort_caches_are_scoped_by_selected_experiments(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

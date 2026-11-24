@@ -108,6 +108,12 @@ JANAF_CRYSTAL_TABLE_IDS: dict[tuple[str, str], tuple[str, ...]] = {
     (formula, qualifier): ids for formula, qualifier, _token, ids in _JANAF_CRYSTAL_ROWS
 }
 
+# Neutral JANAF crystal tables whose title/state names no polymorph. O-013
+# identifies SrO(cr), so its only safe canonical phase token is crystalline.
+JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS: dict[str, Polymorph] = {
+    "O-013": Polymorph.CRYSTALLINE,
+}
+
 # Transition-label sides that already split JANAF grids (ALPHA <--> GAMMA, I <--> II).
 # IV/V/Kappa are closed dictionary tokens from table names; adding them here
 # would newly split tables such as Na-020 (IV <--> I) and change series counts.

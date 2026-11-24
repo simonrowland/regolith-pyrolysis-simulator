@@ -11,12 +11,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -91,7 +90,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Cd row; isotope data attributed to Morton et al. (2024).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_cd_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_cd_table2_quoted_isotope_data::points:row=cd:h=b6bb2d9b329f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -107,12 +129,11 @@ observations:
     species:
       formula: Cd
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -187,7 +208,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Cd row; isotope data attributed to Morton et al. (2024).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_cd_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_cd_table2_quoted_isotope_data::points:row=cd:h=d0deb98cfa55
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -203,12 +247,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -283,7 +326,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Ge row; isotope data attributed to Wölfer et al. (2025).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_ge_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_ge_table2_quoted_isotope_data::points:row=ge:h=d6a9bd716d16
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -299,12 +365,11 @@ observations:
     species:
       formula: Ge
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -379,7 +444,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Ge row; isotope data attributed to Wölfer et al. (2025).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_ge_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_ge_table2_quoted_isotope_data::points:row=ge:h=da284c77c007
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -395,12 +483,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -475,7 +562,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, K row; isotope data attributed to Nie et al. (2021).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_k_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_k_table2_quoted_isotope_data::points:row=k:h=46e427a08bb9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -491,12 +601,11 @@ observations:
     species:
       formula: K
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -571,7 +680,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, K row; isotope data attributed to Nie et al. (2021).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_k_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_k_table2_quoted_isotope_data::points:row=k:h=4f1c55873958
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -587,12 +719,11 @@ observations:
     species:
       formula: Li
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -667,7 +798,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Li row; isotope data attributed to Seitz et al. (2007, 2012).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_li_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_li_table2_quoted_isotope_data::points:row=li:h=4c75e008ad25
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -683,12 +837,11 @@ observations:
     species:
       formula: Li
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -763,7 +916,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Li row; isotope data attributed to Seitz et al. (2007, 2012).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_li_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_li_table2_quoted_isotope_data::points:row=li:h=f5289253d7a8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -779,12 +955,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -859,7 +1034,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Rb row; isotope data attributed to Nie et al. (2021).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_rb_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_rb_table2_quoted_isotope_data::points:row=rb:h=03eca7eae011
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -875,12 +1073,11 @@ observations:
     species:
       formula: Rb
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -955,7 +1152,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Rb row; isotope data attributed to Nie et al. (2021).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_rb_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_rb_table2_quoted_isotope_data::points:row=rb:h=0e953ca61cf2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -971,12 +1191,11 @@ observations:
     species:
       formula: Chondrule
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1003,7 +1222,28 @@ observations:
         pdf_page_index: 33
         table: '3'
         note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=chb:h=2de1a10e05cc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 34
@@ -1019,12 +1259,11 @@ observations:
     species:
       formula: Chondrule
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1051,7 +1290,28 @@ observations:
         pdf_page_index: 33
         table: '3'
         note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cmo:h=560a45afd32f
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 34
@@ -1067,12 +1327,11 @@ observations:
     species:
       formula: Chondrule
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1099,7 +1358,28 @@ observations:
         pdf_page_index: 33
         table: '3'
         note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=cr:h=db363ee24bfa
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 34
@@ -1115,12 +1395,11 @@ observations:
     species:
       formula: Chondrule
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1147,7 +1426,28 @@ observations:
         pdf_page_index: 33
         table: '3'
         note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=eh:h=d0fd93b1c7dd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 34
@@ -1163,12 +1463,11 @@ observations:
     species:
       formula: Chondrule
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1195,7 +1494,28 @@ observations:
         pdf_page_index: 33
         table: '3'
         note: Table 3 group means and sample counts; values are based on the authors’ mesostasis compilation.
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table3_ci_normalized_alkali_averages::points:row=oc:h=3add4d348773
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 34
@@ -1211,12 +1531,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1244,7 +1563,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=al2o3:h=380fb9f70bce
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1260,12 +1600,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1293,7 +1632,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=cao:h=f657c6d412fa
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1309,12 +1669,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1342,7 +1701,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=feo:h=161a85e559fe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1358,12 +1738,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1391,7 +1770,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=mgo:h=8f439d9fe62b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1407,12 +1807,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1440,7 +1839,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=mno:h=619e5e68f452
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1456,12 +1876,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1489,7 +1908,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=p2o5:h=12548f300f8b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1505,12 +1945,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1538,7 +1977,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=sio2:h=59648d4624e2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1554,12 +2014,11 @@ observations:
     species:
       formula: Melt_oxide
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1587,7 +2046,28 @@ observations:
         pdf_page_index: 36
         table: A.4
         note: Table A.4 reports optical basicities attributed to Mathieu (2009).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a4_optical_basicity::points:row=tio2:h=79b8bae945e2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1603,12 +2083,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1683,7 +2162,18 @@ observations:
         pdf_page_index: 36
         table: A.5
         note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.48:h=cacfad5063ad
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1777,12 +2267,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1857,7 +2346,18 @@ observations:
         pdf_page_index: 36
         table: A.5
         note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.55:h=a7f027a631de
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -1951,12 +2451,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2031,7 +2530,18 @@ observations:
         pdf_page_index: 36
         table: A.5
         note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.60:h=1ee15365bdb6
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -2125,12 +2635,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2205,7 +2714,18 @@ observations:
         pdf_page_index: 36
         table: A.5
         note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.65:h=c58e68b695c9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -2299,12 +2819,11 @@ observations:
     species:
       formula: Na
       phase:
-        tag: unknown
-        reason: phase string 'melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2379,7 +2898,18 @@ observations:
         pdf_page_index: 36
         table: A.5
         note: Table A.5; five values calculated from Mathieu (2009) experiments at 1400 °C and NNO.
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_table_a5_na_activity_coefficient::T=1673.15:row=lambda-0.72:h=be425f40dddc
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 37
@@ -2473,12 +3003,11 @@ observations:
     species:
       formula: Te
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2553,7 +3082,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Te row; isotope data attributed to Morton et al. (2024).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data::points:row=te:h=38f2da8655b8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -2569,12 +3121,11 @@ observations:
     species:
       formula: Te
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2649,7 +3200,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Te row; isotope data attributed to Morton et al. (2024).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_te_table2_quoted_isotope_data::points:row=te:h=d4030c6014cd
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -2665,12 +3239,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2745,7 +3318,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Zn row; isotope data attributed to Morton et al. (2024).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_zn_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_zn_table2_quoted_isotope_data::points:row=zn:h=71778647fd3b
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27
@@ -2761,12 +3357,11 @@ observations:
     species:
       formula: Zn
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2841,7 +3436,30 @@ observations:
         pdf_page_index: 26
         table: '2'
         note: Table 2, Zn row; isotope data attributed to Morton et al. (2024).
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_zn_table2_quoted_isotope_data
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - isotope_delta
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: jacquet-2026-alkali-recondensation::jacquet_2026_zn_table2_quoted_isotope_data::points:row=zn:h=f5d5b75d9dbf
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: jacquet-2026-alkali-recondensation
   locator:
     page: 27

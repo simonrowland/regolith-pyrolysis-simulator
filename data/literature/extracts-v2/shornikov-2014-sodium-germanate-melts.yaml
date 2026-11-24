@@ -11,12 +11,11 @@ observations:
     species:
       formula: Na2Ge4O9
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -47,7 +46,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1300_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1300_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -78,12 +98,11 @@ observations:
     species:
       formula: Na2Ge4O9
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -114,7 +133,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1400_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1400_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -145,12 +185,11 @@ observations:
     species:
       formula: Na2Ge4O9
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -181,7 +220,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1450_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2Ge4O9_1450_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -212,12 +272,11 @@ observations:
     species:
       formula: Na2GeO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -248,7 +307,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1300_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1300_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -279,12 +359,11 @@ observations:
     species:
       formula: Na2GeO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -315,7 +394,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1400_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1400_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -346,12 +446,11 @@ observations:
     species:
       formula: Na2GeO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -382,7 +481,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -413,12 +533,11 @@ observations:
     species:
       formula: Na2GeO3
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -449,7 +568,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450b_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na2GeO3_1450b_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -480,12 +620,11 @@ observations:
     species:
       formula: Na4Ge9O20
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -516,7 +655,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1300_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1300_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -547,12 +707,11 @@ observations:
     species:
       formula: Na4Ge9O20
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -583,7 +742,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1400_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1400_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -614,12 +794,11 @@ observations:
     species:
       formula: Na4Ge9O20
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -650,7 +829,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -681,12 +881,11 @@ observations:
     species:
       formula: Na4Ge9O20
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -717,7 +916,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450b_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4Ge9O20_1450b_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -748,12 +968,11 @@ observations:
     species:
       formula: Na4GeO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -784,7 +1003,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4GeO4_1400_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na4GeO4_1400_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -815,12 +1055,11 @@ observations:
     species:
       formula: Na6Ge2O7
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -851,7 +1090,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1300_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1300_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -882,12 +1142,11 @@ observations:
     species:
       formula: Na6Ge2O7
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -918,7 +1177,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1400_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1400_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -949,12 +1229,11 @@ observations:
     species:
       formula: Na6Ge2O7
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -985,7 +1264,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1450_dfH
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t1_Na6Ge2O7_1450_dfH
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2014-sodium-germanate-melts
   locator:
     page: 2
@@ -1088,6 +1388,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_GeO2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1197,6 +1508,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_Na2Ge4O9
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1306,6 +1628,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_Na2GeO3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1415,6 +1748,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_Na2O
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1524,6 +1868,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_Na4Ge9O20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1633,6 +1988,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_Na4GeO4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1742,6 +2108,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_cr_Na6Ge2O7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1850,6 +2227,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Ge
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -1958,6 +2346,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Ge2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2066,6 +2465,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Ge2O2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2174,6 +2584,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Ge3O3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2282,6 +2703,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_GeO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2390,6 +2822,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_GeO2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2498,6 +2941,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Na
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2606,6 +3060,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Na2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2714,6 +3179,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Na2O
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2822,6 +3298,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_Na2O2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -2930,6 +3417,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_NaO
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3038,6 +3536,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_O
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3146,6 +3655,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_O2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3254,6 +3774,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_g_O3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3362,6 +3893,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_l_GeO2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3472,6 +4014,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_l_Na2GeO3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3580,6 +4133,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_l_Na2O
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG
@@ -3688,6 +4252,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2014-sodium-germanate-melts::na_2014_t2_l_Na4Ge9O20
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - delta_fG

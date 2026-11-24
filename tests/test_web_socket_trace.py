@@ -6,6 +6,7 @@ import web.events as web_events
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from tests.chemistry.test_condensation_green_pins import (
     _without_engine_versions,
+    deterministic_gate_payload,
 )
 
 
@@ -50,15 +51,10 @@ GOLDEN_TRACE = (
 #   notice instead of omitting it. MnO_gas (domain floor 1519 K) is
 #   the only such row this lunar_mare_low_ti feedstock carries;
 #   CoO_gas is the other typed_refusal row and has no flux here.
-# Byte 2218 is the n_species digit 3 -> 5. The remaining growth is the
-# gate_provider_step_down diagnostic. That object carries host
-# engine_version strings (a local alphaMELTS path among them). The byte
-# compare strips those keys with the condensation green-pin helper and
-# requires each value to be a non-empty string. alphamelts_reference_pressure
-# is written once per hour on the liquid-fraction gate
-# (EvaporationMixin._freeze_gate_curve_from_gate_dispatch) and then echoed
-# with the oxygen-reservoir object onto that hour's tick delta and
-# per_hour_summary. It is not per species and not a second emission per tick.
+# Byte 2218 is the n_species digit 3 -> 5. The prior golden also included
+# gate_provider_step_down and alphamelts_reference_pressure records for the
+# projected MAGEMin result. b-1303 removes those records because its usable
+# projected bounds no longer trigger an AlphaMELTS continuation.
 
 VOLATILE_KEYS = {
     "duration_s",
@@ -77,11 +73,10 @@ class StopRunLoop(Exception):
 
 
 def _without_host_engine_versions(trace):
-    # Two one-hour campaigns, three oxygen-reservoir copies each (the gate
-    # record, the tick's per_hour_summary_delta, and per_hour_summary), and
-    # two engine identities on each copy: 2 * 3 * 2 = 12.
-    stripped, count = _without_engine_versions(trace)
-    assert count == 12
+    # These two projected MAGEMin curves have usable bounds, so neither the
+    # step-down notice nor AlphaMELTS reference-pressure metadata is emitted.
+    stripped, count = _without_engine_versions(deterministic_gate_payload(trace))
+    assert count == 0
     return stripped
 
 

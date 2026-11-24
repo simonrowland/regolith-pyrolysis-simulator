@@ -5885,7 +5885,18 @@ observations:
         section: 3.3 Standard Gibbs Energy of Formation
         note: Figure 3 discussion; the quoted FactSage value is also shown by a star marker in Figure 3.
         source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: miao-li-yan-2023-fe-v-spinel-gibbs::miao_2023_text_fe3o4_delta_fg_1473k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: miao-li-yan-2023-fe-v-spinel-gibbs
   locator:
     page: 11
@@ -5994,7 +6005,18 @@ observations:
         section: 3.3 Standard Gibbs Energy of Formation
         note: Figure 2 discussion; the quoted FactSage value is also shown by a star marker in Figure 2.
         source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: miao-li-yan-2023-fe-v-spinel-gibbs::miao_2023_text_fev2o4_delta_fg_1473k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: miao-li-yan-2023-fe-v-spinel-gibbs
   locator:
     page: 10
@@ -6103,7 +6125,18 @@ observations:
         section: 3.2 Chemical Potential of V
         note: Text following Equation (18); prints the reported V2O3 value at 1473 K without an inline attribution.
         source_path: raw/miao-li-yan-2023-fe-v-spinel-gibbs/miao-li-yan-2023-fe-v-spinel-gibbs.pdf
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - delta_fG
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: miao-li-yan-2023-fe-v-spinel-gibbs::miao_2023_text_v2o3_delta_fg_1473k
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: miao-li-yan-2023-fe-v-spinel-gibbs
   locator:
     page: 8

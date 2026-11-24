@@ -11,12 +11,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'average_CAI_starting_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -37,7 +36,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''average_CAI_starting_melt'' is not in the closed automatic map'
+    origin: kems-033-shornikov-2010::shornikov_2010_cai_start_quoted_paque_stolper
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-033-shornikov-2010
   locator:
     published_page: 1
@@ -55,12 +65,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'CAI_average_composition_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -85,6 +94,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''CAI_average_composition_melt'' is not in the closed automatic map'
+    origin: kems-033-shornikov-2010::shornikov_2010_fig1_cai_calc_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -107,12 +127,11 @@ observations:
     species:
       formula: Al2O3
       phase:
-        tag: unknown
-        reason: phase string 'Ap-16_68415_40_lunar_basalt_melt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -137,6 +156,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ap-16_68415_40_lunar_basalt_melt'' is not in the closed automatic map'
+    origin: kems-033-shornikov-2010::shornikov_2010_fig2_lunar_calc_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -169,12 +199,11 @@ observations:
     species:
       formula: CaO
       phase:
-        tag: unknown
-        reason: phase string 'Ap-16_68415_40_lunar_basalt' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -195,7 +224,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Ap-16_68415_40_lunar_basalt'' is not in the closed automatic map'
+    origin: kems-033-shornikov-2010::shornikov_2010_lunar_basalt_start_quoted_markova
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-033-shornikov-2010
   locator:
     published_page: 1
@@ -213,12 +253,11 @@ observations:
     species:
       formula: O
       phase:
-        tag: unknown
-        reason: phase string 'preset_reducing_atmosphere_for_calculation' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -243,7 +282,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''preset_reducing_atmosphere_for_calculation'' is not in the closed automatic map'
+    origin: kems-033-shornikov-2010::shornikov_2010_reducing_pO_pO2_model
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-033-shornikov-2010
   locator:
     published_page: 2

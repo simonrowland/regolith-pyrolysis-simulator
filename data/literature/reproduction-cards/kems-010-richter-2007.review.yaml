@@ -1,4 +1,7 @@
 study_id: kems-010-richter-2007
+# qu repin: apparatus follows the linked Table 1 sample context; R3-12 is 22.4 mm² and R3-10 is 24.0 mm².
+# Before, the review had no context FK and retained an OCR-derived R3-12 area; now it records the PDF-backed per-run area.
+# Non-R3-12 context equipment blocks that still repeat 22.4 mm² remain source_conflict.
 reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
 reviewer: Codex w1113phaseA selected-page review
 source_asset: {path: raw/kems-010-richter-2007/kems-010-richter-2007.pdf, sha256: b4155d8af4d8ab48ae6a90d954596d9d9daa5e3c5bb35d13b54480721ccb19a9}
@@ -39,7 +42,7 @@ runs:
         blockers: *id003
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id004 [extracts, kems-010-richter-2007, species, Mg, observations, 9, values, series, 0]
+        context_ref: &id004 [extracts, kems-010-richter-2007, species, Mg, observations, 1, values, series, 0]
         locator: &id005 {table: '1', page: 6, published_page: 5549, pdf_page_index: 5}
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -111,6 +114,7 @@ runs:
     - &id063 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r3-12::T=2173.15:row=r3-12:h=4d1ce9dd6461']
     - &id064 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r3-12::T=2173.15:row=r3-12:h=5f731a7d1362']
     - &id065 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-12::T=2173.15:row=r3-12:h=b99e36bccbaf']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12']
     entries:
     - ref: *id006
       role: setup
@@ -351,22 +355,25 @@ runs:
     - ref: *id026
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state:
               tag: value
               value: {kind: point, point: '0.0000224', approximate: false}
-            locator: &id027 {table: '1', paragraph: R3-12 Init area 22.4 mm2, source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md}
-            inference:
-              relation: extract_inference
-              inputs: [inferred=true, A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples, extract_value=2.24e-05
-                  m2, extract_field=sample_surface_area, 'unit_conversion=identity:m2']
-              parameters:
-              - - original
-                - state: &id036 {tag: value, value: '0.0000224'}
-                  locator: *id027
-              output_unit: m2
-              references: *id002
+            locator: &id027
+              published_page: 5549
+              table: '1'
+              paragraph: R3-12
+              note: Table 1 initial_area_mm2; exact mm^2-to-m^2 conversion; exposed sample area for free evaporation
+              source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf
       status: reviewed
       unit: source units
       locator: *id005
@@ -390,17 +397,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 1, bench_id]
     - ref: *id029
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r3-12'}
+      quote: "Linked Table 1 equipment context for r3-12"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 1, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12']
     - ref: *id030
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -481,7 +487,7 @@ runs:
           exposure: &id052
             tag: value
             value:
-              area_m2: *id036
+              area_m2: &id036 {tag: value, value: '0.0000224'}
               duration_s: &id043 {tag: value, value: '0'}
           sample_mass_kg: &id053 {tag: value, value: '0.0000254'}
         value: {kind: point, point: '11.37', approximate: false}
@@ -864,6 +870,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 60]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R3-12
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R3-12
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2173.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R3-12
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R3-12
+            diam_mm: '2.5'
+            T_C: 1900
+            init_area_mm2: '22.4'
+            final_area_mm2: '21.3'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r3-12
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: reviewed
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R3-12, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R3-12 | 2.5 | 0 | 11.37 | 44.53 | 19.26 | 24.84 | 22.4 | 21.3 | 25.4 | 7.9 | 0.29 | [blank] | [blank] | [blank]"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-12']
   cai-r3-10:
     frozen_run:
       card_id: cai-r3-10
@@ -901,7 +1012,7 @@ runs:
         blockers: *id003
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id082 [extracts, kems-010-richter-2007, species, Mg, observations, 10, values, series, 0]
+        context_ref: &id082 [extracts, kems-010-richter-2007, species, Mg, observations, 2, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -973,6 +1084,7 @@ runs:
     - &id124 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r3-10::T=2173.15:row=r3-10:h=a05e6d491c97']
     - &id126 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r3-10::T=2173.15:row=r3-10:h=a6de880581c6']
     - &id128 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-10::T=2173.15:row=r3-10:h=bb991fa3b924']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10']
     entries:
     - ref: *id083
       role: setup
@@ -1138,6 +1250,14 @@ runs:
     - ref: *id106
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state: &id1190
@@ -1168,17 +1288,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 2, bench_id]
     - ref: *id108
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r3-10'}
+      quote: "Linked Table 1 equipment context for r3-10"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 2, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10']
     - ref: *id109
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -1549,6 +1668,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 61]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R3-10
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R3-10
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2173.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R3-10
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R3-10
+            diam_mm: '2.5'
+            T_C: 1900
+            init_area_mm2: '24'
+            final_area_mm2: '18.9'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r3-10
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R3-10, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R3-10 | 2.5 | 15 | 9.13 | 31.52 | 26.86 | 32.48 | 24.0 | 18.9 | 28.4 | 32.0 | 42.59 | 1.92 × 10−7 | 6.02 × 10−7 | 8.135 ± 0.007"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-10']
   cai-r3-11:
     frozen_run:
       card_id: cai-r3-11
@@ -1574,7 +1798,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id142 [extracts, kems-010-richter-2007, species, Mg, observations, 11, values, series, 0]
+        context_ref: &id142 [extracts, kems-010-richter-2007, species, Mg, observations, 3, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -1646,6 +1870,7 @@ runs:
     - &id168 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r3-11::T=2173.15:row=r3-11:h=7640faa2a75c']
     - &id169 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r3-11::T=2173.15:row=r3-11:h=e72da24d1db1']
     - &id170 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R3-11::T=2173.15:row=r3-11:h=a82e079ee9c1']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11']
     entries:
     - ref: *id143
       role: setup
@@ -1807,6 +2032,14 @@ runs:
     - ref: *id156
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state: &id555
@@ -1837,17 +2070,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 3, bench_id]
     - ref: *id158
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r3-11'}
+      quote: "Linked Table 1 equipment context for r3-11"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 3, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11']
     - ref: *id159
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -2218,6 +2450,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 62]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R3-11
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R3-11
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2173.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R3-11
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R3-11
+            diam_mm: '2.5'
+            T_C: 1900
+            init_area_mm2: '20.9'
+            final_area_mm2: '15.9'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r3-11
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R3-11, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R3-11 | 2.5 | 20 | 3.33 | 25.24 | 32.35 | 39.09 | 20.9 | 15.9 | 22.6 | 43.8 | 82.61 | 2.44 × 10−7 | 5.42 × 10−7 | 25.810 ± 0.020"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r3-11']
   cai-r-8:
     frozen_run:
       card_id: cai-r-8
@@ -2243,7 +2580,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id173 [extracts, kems-010-richter-2007, species, Mg, observations, 28, values, series, 0]
+        context_ref: &id173 [extracts, kems-010-richter-2007, species, Mg, observations, 20, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -2315,6 +2652,7 @@ runs:
     - &id201 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-8::T=2073.15:row=r-8:h=ce95f3c20da8']
     - &id202 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-8::T=2073.15:row=r-8:h=da25fbb6fb20']
     - &id203 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-8::T=2073.15:row=r-8:h=5375d10a57aa']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8']
     entries:
     - ref: *id174
       role: setup
@@ -2490,6 +2828,14 @@ runs:
     - ref: *id187
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state:
@@ -2520,17 +2866,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 4, bench_id]
     - ref: *id189
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r-8'}
+      quote: "Linked Table 1 equipment context for r-8"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 4, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8']
     - ref: *id190
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -2918,6 +3263,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 78]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R-8
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R-8
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2073.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R-8
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R-8
+            diam_mm: '6'
+            T_C: 1800
+            init_area_mm2: '87.5'
+            final_area_mm2: '83.4'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r-8
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R-8, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R-8 | 6.0 | 30 | 11.94 | 40.59 | 21.69 | 25.77 | 87.5 | 83.4 | 171.9 | 11.1 | 7.02 | 2.39 × 10−8 | 1.84 × 10−7 | 0.935 ± 0.029"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-8']
   cai-r-9:
     frozen_run:
       card_id: cai-r-9
@@ -2943,7 +3393,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id221 [extracts, kems-010-richter-2007, species, Mg, observations, 29, values, series, 0]
+        context_ref: &id221 [extracts, kems-010-richter-2007, species, Mg, observations, 21, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -3015,6 +3465,7 @@ runs:
     - &id248 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-9::T=2073.15:row=r-9:h=ab71f2ebdf91']
     - &id249 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-9::T=2073.15:row=r-9:h=f7f658941173']
     - &id250 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-9::T=2073.15:row=r-9:h=36955ca4396f']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9']
     entries:
     - ref: *id222
       role: setup
@@ -3178,6 +3629,14 @@ runs:
     - ref: *id236
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state:
@@ -3208,17 +3667,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 5, bench_id]
     - ref: *id238
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r-9'}
+      quote: "Linked Table 1 equipment context for r-9"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 5, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9']
     - ref: *id239
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -3589,6 +4047,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 79]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R-9
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R-9
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2073.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R-9
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R-9
+            diam_mm: '6'
+            T_C: 1800
+            init_area_mm2: '82.6'
+            final_area_mm2: '76.6'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r-9
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R-9, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R-9 | 6.0 | 60 | 11.08 | 35.70 | 24.31 | 28.91 | 82.6 | 76.6 | 146.6 | 20.6 | 23.02 | 3.40 × 10−8 | 1.50 × 10−7 | 3.547 ± 0.027"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-9']
   cai-r-11:
     frozen_run:
       card_id: cai-r-11
@@ -3614,7 +4177,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id254 [extracts, kems-010-richter-2007, species, Mg, observations, 30, values, series, 0]
+        context_ref: &id254 [extracts, kems-010-richter-2007, species, Mg, observations, 22, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -3686,6 +4249,7 @@ runs:
     - &id279 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-11::T=2073.15:row=r-11:h=1ab1ee489d96']
     - &id280 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-11::T=2073.15:row=r-11:h=8a6cabc4f8f4']
     - &id281 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-11::T=2073.15:row=r-11:h=0d649fba8fb2']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11']
     entries:
     - ref: *id255
       role: setup
@@ -3849,6 +4413,14 @@ runs:
     - ref: *id267
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state:
@@ -3879,17 +4451,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 6, bench_id]
     - ref: *id269
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r-11'}
+      quote: "Linked Table 1 equipment context for r-11"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 6, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11']
     - ref: *id270
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -4260,6 +4831,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 80]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R-11
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R-11
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2073.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R-11
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R-11
+            diam_mm: '6'
+            T_C: 1800
+            init_area_mm2: '91.3'
+            final_area_mm2: '80'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r-11
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R-11, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R-11 | 6.0 | 90 | 9.16 | 32.36 | 26.78 | 31.70 | 91.3 | 80.0 | 190.4 | 27.8 | 42.23 | 4.97 × 10−8 | 1.55 × 10−7 | 7.689 ± 0.028"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-11']
   cai-r2-4:
     frozen_run:
       card_id: cai-r2-4
@@ -4285,7 +4961,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id284 [extracts, kems-010-richter-2007, species, Mg, observations, 31, values, series, 0]
+        context_ref: &id284 [extracts, kems-010-richter-2007, species, Mg, observations, 23, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -4357,6 +5033,7 @@ runs:
     - &id309 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r2-4::T=2073.15:row=r2-4:h=b2b1356a07e2']
     - &id310 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r2-4::T=2073.15:row=r2-4:h=d1de226dc5c4']
     - &id311 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R2-4::T=2073.15:row=r2-4:h=2bcdf9c57fce']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4']
     entries:
     - ref: *id285
       role: setup
@@ -4520,6 +5197,14 @@ runs:
     - ref: *id297
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state:
@@ -4550,17 +5235,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 7, bench_id]
     - ref: *id299
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r2-4'}
+      quote: "Linked Table 1 equipment context for r2-4"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 7, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4']
     - ref: *id300
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -4931,6 +5615,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 81]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R2-4
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R2-4
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2073.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R2-4
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R2-4
+            diam_mm: '6'
+            T_C: 1800
+            init_area_mm2: '88.5'
+            final_area_mm2: '75.5'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r2-4
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R2-4, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R2-4 | 6.0 | 120 | 4.92 | 28.11 | 30.57 | 36.40 | 88.5 | 75.5 | 176.6 | 37.0 | 72.82 | 6.22 × 10−8 | 1.41 × 10−7 | 18.867 ± 0.083"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r2-4']
   cai-r-16:
     frozen_run:
       card_id: cai-r-16
@@ -4954,7 +5743,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id314 [extracts, kems-010-richter-2007, species, Mg, observations, 15, values, series, 0]
+        context_ref: &id314 [extracts, kems-010-richter-2007, species, Mg, observations, 7, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -5026,6 +5815,7 @@ runs:
     - &id342 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-16::T=2073.15:row=r-16:h=8f56cdd8df21']
     - &id343 [observations, 'kems-010-richter-2007::richter_2007_residue_table1_r-16::T=2073.15:row=r-16:h=c0f75db76049']
     - &id344 [observations, 'kems-010-richter-2007::richter_2007_mg_table1_mass_loss_fraction_R-16::T=2073.15:row=r-16:h=1dda858f0556']
+    - [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16']
     entries:
     - ref: *id315
       role: setup
@@ -5189,6 +5979,14 @@ runs:
     - ref: *id328
       role: setup
       resolved:
+        cell_material_and_liner:
+          state:
+            tag: value
+            value: iridium wire loops
+          locator:
+            page: 5
+            published_page: 5548
+            section: 3.1 Starting materials and experimental procedure
         geometry:
           exposed_area_m2:
             state: &id1333
@@ -5219,17 +6017,16 @@ runs:
         path: [extracts, kems-010-richter-2007, experiments, 8, bench_id]
     - ref: *id330
       role: setup
-      resolved: null
-      status: reviewed_missing
+      resolved: 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16'
+      status: reviewed
       unit: reference
-      locator: *id024
-      quote: 'Typed path is absent/unknown. Source review: University of Chicago using a high-temperature vacuum furnace; source-only context
-        retained, not silently adopted.'
-      reviewer: Codex w1113phaseA
-      reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: 'r-16'}
+      quote: "Linked Table 1 equipment context for r-16"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
       origin:
         extract: kems-010-richter-2007
-        path: [extracts, kems-010-richter-2007, experiments, 8, equipment_context_id]
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16']
     - ref: *id331
       role: setup
       resolved: 10.1016/j.gca.2007.09.005
@@ -5598,6 +6395,111 @@ runs:
         extract: kems-010-richter-2007
         path: [extracts, kems-010-richter-2007, species, Mg, observations, 66]
         observation_id: richter_2007_mg_table1_mass_loss_fraction_R-16
+    - ref: [contexts, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16']
+      role: equipment_context
+      resolved:
+        observation_id: richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16
+        type: sample_geometry
+        locator:
+          source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+          page: 6
+          published_page: 5549
+          pdf_page_index: 5
+          table: '1'
+          paragraph: Init/Final area mm2 columns
+          row: R-16
+        T_range_K:
+        - '1973.15'
+        - '2173.15'
+        phase: l
+        regime: langmuir_free_evaporation
+        units: as published
+        point_conditions:
+          temperature_K:
+            state:
+              tag: value
+              value: '2073.15'
+            locator:
+              page: 6
+              published_page: 5549
+              table: '1'
+              row: R-16
+          atmosphere:
+            state:
+              tag: value
+              value: vacuum
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+          total_pressure_Pa:
+            state:
+              tag: value
+              value:
+                kind: bound
+                bound_operator: <
+                bound_value: '0.0001333223684210526315789473684'
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Printed <10^-6 Torr outside heating elements and heat shields; unit conversion only.
+          fO2_Pa:
+            state:
+              tag: unknown
+              reason: not_published
+            locator:
+              page: 5
+              published_page: 5548
+              section: 3.1 Starting materials and experimental procedure
+              note: Chamber total pressure is not a point oxygen fugacity.
+        values:
+          system_note: Type B CAI-like silicate melt; starting composition is printed in Table 1.
+          quantity: sample_surface_area_series
+          method_class: measured_direct
+          system_class: silicate_melt
+          samples:
+          - sample: R-16
+            diam_mm: '1'
+            T_C: 1800
+            init_area_mm2: '5.9'
+            final_area_mm2: '5.8'
+          area_uncertainty_pct: '10'
+          note: Table 1 Init/Final area (mm2) for Ir wire-loop samples. 1 mm samples have ~20% area uncertainty; rates often exclude
+            them. Not Knudsen orifice geometry.
+          missing_for_motzfeldt:
+          - orifice_area
+          - clausing_factor
+          - P_eq
+        equipment:
+          sample_surface_area:
+            value: '0.0000224'
+            units: m2
+            inferred: true
+            inference: A = 22.4 mm2 (R3-12 Init) * 1e-6 m2/mm2 = 2.24e-5 m2; full series in values.samples
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              table: '1'
+              paragraph: R3-12 Init area 22.4 mm2
+          cell_material:
+            value: Ir wire loop (vacuum free-evap furnace; not Knudsen cell)
+            locator:
+              source_path: text/kems-010-richter-2007/mineru/kems-010-richter-2007.md
+              paragraph: iridium loops
+        experiment: cai-r-16
+        context_id: kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16
+        work_id: 10.1016/j.gca.2007.09.005
+        source_id: kems-010-richter-2007
+        species: Mg
+      status: source_conflict
+      unit: source context
+      locator: {page: 6, published_page: 5549, table: '1', paragraph: R-16, source_path: docs/references/pdfs/99-kems-langmuir/kems-010-richter-2007.pdf}
+      quote: "R-16 | 1.0 | 0 | 11.77 | 44.44 | 20.01 | 23.78 | 5.9 | 5.8 | 4.2 | 2.4 | 0.68 | [blank] | [blank] | [blank]"
+      reviewer: Codex w1120fqu rendered source review
+      reviewed_revision: a2299343ebb1d373ecc7e1aaf76380904b7c4cbe
+      origin:
+        extract: kems-010-richter-2007
+        path: [works, '10.1016/j.gca.2007.09.005', context, 'kems-010-richter-2007::context::richter_2007_mg_table1_numeric_areas_b1_r3-12_r-16']
   cai-r3-13:
     frozen_run:
       card_id: cai-r3-13
@@ -5622,7 +6524,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id347 [extracts, kems-010-richter-2007, species, Mg, observations, 12, values, series, 0]
+        context_ref: &id347 [extracts, kems-010-richter-2007, species, Mg, observations, 4, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -6292,7 +7194,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id378 [extracts, kems-010-richter-2007, species, Mg, observations, 13, values, series, 0]
+        context_ref: &id378 [extracts, kems-010-richter-2007, species, Mg, observations, 5, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -6955,7 +7857,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id412 [extracts, kems-010-richter-2007, species, Mg, observations, 14, values, series, 0]
+        context_ref: &id412 [extracts, kems-010-richter-2007, species, Mg, observations, 6, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -7621,7 +8523,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id444 [extracts, kems-010-richter-2007, species, Mg, observations, 16, values, series, 0]
+        context_ref: &id444 [extracts, kems-010-richter-2007, species, Mg, observations, 8, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -8282,7 +9184,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id478 [extracts, kems-010-richter-2007, species, Mg, observations, 17, values, series, 0]
+        context_ref: &id478 [extracts, kems-010-richter-2007, species, Mg, observations, 9, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -8954,7 +9856,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id510 [extracts, kems-010-richter-2007, species, Mg, observations, 18, values, series, 0]
+        context_ref: &id510 [extracts, kems-010-richter-2007, species, Mg, observations, 10, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -9614,7 +10516,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id550 [extracts, kems-010-richter-2007, species, Mg, observations, 19, values, series, 0]
+        context_ref: &id550 [extracts, kems-010-richter-2007, species, Mg, observations, 11, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -10276,7 +11178,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id586 [extracts, kems-010-richter-2007, species, Mg, observations, 20, values, series, 0]
+        context_ref: &id586 [extracts, kems-010-richter-2007, species, Mg, observations, 12, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -10939,7 +11841,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id616 [extracts, kems-010-richter-2007, species, Mg, observations, 21, values, series, 0]
+        context_ref: &id616 [extracts, kems-010-richter-2007, species, Mg, observations, 13, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -11600,7 +12502,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id647 [extracts, kems-010-richter-2007, species, Mg, observations, 22, values, series, 0]
+        context_ref: &id647 [extracts, kems-010-richter-2007, species, Mg, observations, 14, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -12263,7 +13165,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id680 [extracts, kems-010-richter-2007, species, Mg, observations, 23, values, series, 0]
+        context_ref: &id680 [extracts, kems-010-richter-2007, species, Mg, observations, 15, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -12924,7 +13826,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id711 [extracts, kems-010-richter-2007, species, Mg, observations, 24, values, series, 0]
+        context_ref: &id711 [extracts, kems-010-richter-2007, species, Mg, observations, 16, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -13596,7 +14498,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id741 [extracts, kems-010-richter-2007, species, Mg, observations, 25, values, series, 0]
+        context_ref: &id741 [extracts, kems-010-richter-2007, species, Mg, observations, 17, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -14264,7 +15166,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id774 [extracts, kems-010-richter-2007, species, Mg, observations, 26, values, series, 0]
+        context_ref: &id774 [extracts, kems-010-richter-2007, species, Mg, observations, 18, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -14916,7 +15818,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id805 [extracts, kems-010-richter-2007, species, Mg, observations, 27, values, series, 0]
+        context_ref: &id805 [extracts, kems-010-richter-2007, species, Mg, observations, 19, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -15493,7 +16395,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id840 [extracts, kems-010-richter-2007, species, Mg, observations, 32, values, series, 0]
+        context_ref: &id840 [extracts, kems-010-richter-2007, species, Mg, observations, 24, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -16162,7 +17064,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id870 [extracts, kems-010-richter-2007, species, Mg, observations, 33, values, series, 0]
+        context_ref: &id870 [extracts, kems-010-richter-2007, species, Mg, observations, 25, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -16859,7 +17761,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id905 [extracts, kems-010-richter-2007, species, Mg, observations, 34, values, series, 0]
+        context_ref: &id905 [extracts, kems-010-richter-2007, species, Mg, observations, 26, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -17525,7 +18427,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id943 [extracts, kems-010-richter-2007, species, Mg, observations, 35, values, series, 0]
+        context_ref: &id943 [extracts, kems-010-richter-2007, species, Mg, observations, 27, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -18192,7 +19094,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id979 [extracts, kems-010-richter-2007, species, Mg, observations, 36, values, series, 0]
+        context_ref: &id979 [extracts, kems-010-richter-2007, species, Mg, observations, 28, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -18864,7 +19766,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1011 [extracts, kems-010-richter-2007, species, Mg, observations, 37, values, series, 0]
+        context_ref: &id1011 [extracts, kems-010-richter-2007, species, Mg, observations, 29, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -19532,7 +20434,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1046 [extracts, kems-010-richter-2007, species, Mg, observations, 38, values, series, 0]
+        context_ref: &id1046 [extracts, kems-010-richter-2007, species, Mg, observations, 30, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -20205,7 +21107,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1080 [extracts, kems-010-richter-2007, species, Mg, observations, 39, values, series, 0]
+        context_ref: &id1080 [extracts, kems-010-richter-2007, species, Mg, observations, 31, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -20864,7 +21766,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1112 [extracts, kems-010-richter-2007, species, Mg, observations, 40, values, series, 0]
+        context_ref: &id1112 [extracts, kems-010-richter-2007, species, Mg, observations, 32, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -21532,7 +22434,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1144 [extracts, kems-010-richter-2007, species, Mg, observations, 41, values, series, 0]
+        context_ref: &id1144 [extracts, kems-010-richter-2007, species, Mg, observations, 33, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -22204,7 +23106,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1176 [extracts, kems-010-richter-2007, species, Mg, observations, 42, values, series, 0]
+        context_ref: &id1176 [extracts, kems-010-richter-2007, species, Mg, observations, 34, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -22870,7 +23772,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1212 [extracts, kems-010-richter-2007, species, Mg, observations, 43, values, series, 0]
+        context_ref: &id1212 [extracts, kems-010-richter-2007, species, Mg, observations, 35, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -23541,7 +24443,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1242 [extracts, kems-010-richter-2007, species, Mg, observations, 44, values, series, 0]
+        context_ref: &id1242 [extracts, kems-010-richter-2007, species, Mg, observations, 36, values, series, 0]
         locator: *id005
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -24207,7 +25109,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1275 [extracts, kems-010-richter-2007, species, Mg, observations, 45, values, series, 0]
+        context_ref: &id1275 [extracts, kems-010-richter-2007, species, Mg, observations, 37, values, series, 0]
         locator: &id1276 {table: '1', page: 7, published_page: 5550, pdf_page_index: 6}
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -24918,7 +25820,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1316 [extracts, kems-010-richter-2007, species, Mg, observations, 46, values, series, 0]
+        context_ref: &id1316 [extracts, kems-010-richter-2007, species, Mg, observations, 38, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -25588,7 +26490,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1357 [extracts, kems-010-richter-2007, species, Mg, observations, 47, values, series, 0]
+        context_ref: &id1357 [extracts, kems-010-richter-2007, species, Mg, observations, 39, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -26256,7 +27158,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1392 [extracts, kems-010-richter-2007, species, Mg, observations, 48, values, series, 0]
+        context_ref: &id1392 [extracts, kems-010-richter-2007, species, Mg, observations, 40, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -26924,7 +27826,7 @@ runs:
       - *id081
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1425 [extracts, kems-010-richter-2007, species, Mg, observations, 49, values, series, 0]
+        context_ref: &id1425 [extracts, kems-010-richter-2007, species, Mg, observations, 41, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -27595,7 +28497,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1458 [extracts, kems-010-richter-2007, species, Mg, observations, 50, values, series, 0]
+        context_ref: &id1458 [extracts, kems-010-richter-2007, species, Mg, observations, 42, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -28268,7 +29170,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1491 [extracts, kems-010-richter-2007, species, Mg, observations, 51, values, series, 0]
+        context_ref: &id1491 [extracts, kems-010-richter-2007, species, Mg, observations, 43, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -28931,7 +29833,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1526 [extracts, kems-010-richter-2007, species, Mg, observations, 52, values, series, 0]
+        context_ref: &id1526 [extracts, kems-010-richter-2007, species, Mg, observations, 44, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -29600,7 +30502,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1557 [extracts, kems-010-richter-2007, species, Mg, observations, 53, values, series, 0]
+        context_ref: &id1557 [extracts, kems-010-richter-2007, species, Mg, observations, 45, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -30259,7 +31161,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1591 [extracts, kems-010-richter-2007, species, Mg, observations, 54, values, series, 0]
+        context_ref: &id1591 [extracts, kems-010-richter-2007, species, Mg, observations, 46, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -30928,7 +31830,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1626 [extracts, kems-010-richter-2007, species, Mg, observations, 55, values, series, 0]
+        context_ref: &id1626 [extracts, kems-010-richter-2007, species, Mg, observations, 47, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -31598,7 +32500,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1659 [extracts, kems-010-richter-2007, species, Mg, observations, 56, values, series, 0]
+        context_ref: &id1659 [extracts, kems-010-richter-2007, species, Mg, observations, 48, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -32270,7 +33172,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1689 [extracts, kems-010-richter-2007, species, Mg, observations, 57, values, series, 0]
+        context_ref: &id1689 [extracts, kems-010-richter-2007, species, Mg, observations, 49, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -32933,7 +33835,7 @@ runs:
       - *id141
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1723 [extracts, kems-010-richter-2007, species, Mg, observations, 58, values, series, 0]
+        context_ref: &id1723 [extracts, kems-010-richter-2007, species, Mg, observations, 50, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS
@@ -33604,7 +34506,7 @@ runs:
       - *id140
       printed_inventory:
       - group_id: residue-oxide-vector
-        context_ref: &id1753 [extracts, kems-010-richter-2007, species, Mg, observations, 59, values, series, 0]
+        context_ref: &id1753 [extracts, kems-010-richter-2007, species, Mg, observations, 51, values, series, 0]
         locator: *id1276
         blocker: NO_BAND
         note: Full Table 1 row; blank cells remain absence. Published reduced fluxes/depletion are dependent checks, not extra independent RMS

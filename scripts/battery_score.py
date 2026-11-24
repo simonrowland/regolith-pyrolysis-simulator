@@ -529,11 +529,19 @@ def _engine_cache_summary(
         engine: {name: 0 for name in ("hits", "misses", "stores")}
         for engine in engines
     }
+    counters_by_engine: dict[str, dict[str, int]] = {}
     sources = [local_counters or {}]
     if studio_cache_summary is not None:
-        studio_by_engine = studio_cache_summary.get("by_engine", {})
-        if isinstance(studio_by_engine, Mapping):
-            sources.append(studio_by_engine)
+        # A studio summary written by this scorer carries counters_by_engine,
+        # a superset of by_engine (hits/misses/stores plus not_stored:* and
+        # uncacheable:*). Prefer it so studio-dispatched MELTS engines keep
+        # their not-stored breakdown; fall back to by_engine for an older
+        # studio summary that predates the field.
+        studio_counts = studio_cache_summary.get("counters_by_engine")
+        if not isinstance(studio_counts, Mapping):
+            studio_counts = studio_cache_summary.get("by_engine", {})
+        if isinstance(studio_counts, Mapping):
+            sources.append(studio_counts)
     for source in sources:
         if not isinstance(source, Mapping):
             continue
@@ -541,10 +549,15 @@ def _engine_cache_summary(
             if not isinstance(counts, Mapping):
                 continue
             target = by_engine.setdefault(str(engine), {"hits": 0, "misses": 0, "stores": 0})
+            detail = counters_by_engine.setdefault(str(engine), {})
             diagnostics = []
             for name, value in sorted(counts.items()):
                 if not isinstance(value, int):
                     continue
+                # Every integer counter (not_stored:<reason>, uncacheable:<type>,
+                # read/store errors) is kept per engine for the not-stored audit
+                # (b-1272); by_engine stays the hits/misses/stores contract.
+                detail[name] = detail.get(name, 0) + value
                 if name in target:
                     target[name] += value
                 elif value:
@@ -561,6 +574,7 @@ def _engine_cache_summary(
     summary: dict[str, object] = {
         "enabled": cache_path is not None or studio_cache_summary is not None,
         "by_engine": by_engine,
+        "counters_by_engine": counters_by_engine,
         "runtime_identities": runtime_identities,
     }
     if cache_path is not None:
@@ -741,6 +755,7 @@ def main(argv: list[str] | None = None) -> int:
             mismatch_warning=mismatch,
             observations=context.observations,
             origins=context.origins,
+            experiments=context.experiments,
         )
         report = format_nasa9_fit_comparison_stratum(
             report,
@@ -758,6 +773,7 @@ def main(argv: list[str] | None = None) -> int:
             engines=engines,
             observations=context.observations,
             origins=context.origins,
+            experiments=context.experiments,
             store_stamp=recorded,
         )
         _attach_engine_cache_summary(summary_partial_path, engine_cache_path)

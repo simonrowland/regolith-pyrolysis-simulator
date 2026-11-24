@@ -28,12 +28,12 @@ from tests.test_optimizer_evalspec import _c2a_window_profile
 # 14.7388 m2 area). Those moves change ledger bytes. This pin is not a
 # with/without check of the fog flag; the history assertion below is.
 _LEDGER_DIGEST = {
-    "lunar_c2a_18h": "2c6c392904e1fbec287d9d3a2c2a86e6233dc877ca424a52ead0599f41b9d580",
+    "lunar_c2a_18h": "bb88aafd93b3022d1692d30004c8e087ff554a0ed347314b962fd4a014730f14",
     "mars_c2a_18h_declared_carbon": (
-        "03777f56497ec7ff81a01ceef1c55bd4aaf84c4b1613a293e432b6a559656a83"
+        "ac611224a755ad99d474794ccc36c5ef73ea47748e75d6e3affd574c15207d9c"
     ),
-    "ci_c2a_18h": "d958b2a5a3716255fbb9c1a352425388e70c42955583c1ae266d89306e0e670a",
-    "lunar_c0_24h": "e125a0f6a21198b99d55fe346c34700c6bde42840ff0f5a54b37752945be537f",
+    "ci_c2a_18h": "4a46c2783fa6027b1a70d5c8283ce74c98e5c0e492f87d7221af1d87cedcd748",
+    "lunar_c0_24h": "4cc08d07f14f337cf710ebe4dce80dffa4f46ae9f68193fd0dd1d70b2ad74038",
 }
 
 
@@ -177,6 +177,11 @@ def _assert_ledger(name: str, run: PyrolysisRun) -> None:
     result = run._run_session(session)
     _record(name, session, result)
     assert result["status"] == "ok"
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    deterministic_gate_payload(session.simulator)
     digest = ledger_digest(
         session.simulator.atom_ledger.kg_by_account(),
         session.simulator.product_ledger(),

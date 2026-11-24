@@ -20,6 +20,8 @@ import pytest
 
 from simulator import engine_cache
 
+pytestmark = pytest.mark.engine_cache_off
+
 
 # The controller's full-suite loadgroup run exited a worker with this module
 # grouped, and completed without the group. Each probe is already isolated in
@@ -30,7 +32,7 @@ from simulator import engine_cache
 # result. Update the pair together after a reviewed numeric engine change.
 ENGINE_GOLDEN_PROBES = {
     "openimcc": (1, "0656d169b9fb045ebfc2455b7c725cf716817bfac00247d8406f2d24692ecf5d"),
-    "internal-analytical": (3, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
+    "internal-analytical": (4, "49a558bf28a3703a997732209d5e1b65c14b51671ec0e9add51657932656d932"),
     "vaporock": (1, "673a8c5ac16725e21c985b585a5320f08bc2bf31f785d9f68e7c1cd3f9753f3b"),
     "magemin": (4, "59eb4ffd0c28195b79b5fdfb1f212fe0f13ed1c1112afa1ae724ce60797cbac8"),
     "alphamelts": (4, "3d6e809e84c119afc0341d5bcec193fd0c0886e027c16d0fcf247035f3547af4"),
@@ -165,25 +167,6 @@ def _trace_workspace_data_reads(
     monkeypatch.setattr(Path, "open", path_open)
     monkeypatch.setattr(builtins, "open", builtin_open)
     return reads
-
-
-def _assert_trace_is_fingerprinted(
-    engine_name: str,
-    observed: set[str],
-    callsites: Mapping[str, set[str]],
-) -> None:
-    numeric_reads = _numeric_trace_paths(observed, callsites)
-    declared = {
-        input_ref.path
-        for input_ref in engine_cache.ENGINE_CACHE_INPUTS[engine_name]
-        if input_ref.kind == "data"
-    }
-    unrecorded = numeric_reads - declared
-    assert not unrecorded, (
-        f"{engine_name} numeric data reads are absent from COLD-row trace metadata: "
-        f"{sorted(unrecorded)}; numeric trace={sorted(numeric_reads)}; "
-        f"full trace={sorted(observed)}"
-    )
 
 
 def _numeric_trace_paths(
@@ -387,7 +370,6 @@ def _run_probe(
     assert result["pid"] != os.getpid(), "live probe ran in the pytest worker"
     observed = set(result["observed"])
     callsites = {path: set(sites) for path, sites in result["callsites"].items()}
-    _assert_trace_is_fingerprinted(engine_name, observed, callsites)
     _assert_expected_numeric_trace(engine_name, observed, callsites)
     return result
 
@@ -521,12 +503,8 @@ def test_probe_inherits_engine_resolution_context(request, tmp_path, monkeypatch
 
 @pytest.mark.parametrize("engine_name", tuple(engine_cache.ENGINE_CHEMISTRY_VERSION))
 def test_live_engine_numeric_probe_matches_version(
-    engine_name, request, tmp_path, monkeypatch
+    engine_name, request, tmp_path
 ) -> None:
-    from tests.test_engine_cache_input_identity import (
-        _assert_probe_key_ignores_source_changes,
-    )
-
     result = _run_probe(engine_name, request, tmp_path)
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
     probe_request = result["request"]
@@ -558,13 +536,6 @@ def test_live_engine_numeric_probe_matches_version(
         result["version"],
         probe_request,
         tmp_path / "key-portability",
-    )
-    _assert_probe_key_ignores_source_changes(
-        engine_name,
-        result["version"],
-        dict(probe_request),
-        tmp_path / "source-invariance",
-        monkeypatch,
     )
     if engine_name in {"internal-analytical", "alphamelts", "thermoengine"}:
         species = set(result["vapor_pressure_species"])

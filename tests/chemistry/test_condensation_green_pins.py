@@ -2,10 +2,18 @@
 
 import json
 import hashlib
+from collections.abc import Mapping
 from pathlib import Path
 from types import SimpleNamespace
 
 import pytest
+
+from simulator.reduced_real_determinism import (
+    ENVIRONMENT_RETRIES_KEY,
+    failed_provider_attempt_is_environment,
+    gate_curve_provider_diagnostic_reasons,
+    gate_curve_provider_timeout_reason,
+)
 
 from simulator.condensation import CondensationModel
 from simulator.condensation_routing import stage_key_for_stage
@@ -28,8 +36,8 @@ def route_totals(monkeypatch):
     }
     original = CondensationModel.route
 
-    def measure(model, flux, melt):
-        result = original(model, flux, melt)
+    def measure(model, flux, melt, **kwargs):
+        result = original(model, flux, melt, **kwargs)
         for species in SPECIES:
             row = totals[species]
             row["inlet"] += flux.species_kg_hr.get(species, 0.0)
@@ -134,8 +142,13 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
         assert active
         # Engine registration maps and engine_version strings are excluded
         # because host-specific registrations and builds are not run results.
-        digest_payload, engine_version_count = _runner_digest_payload(runner_output)
-        assert engine_version_count >= 1
+        # engine_version strings rode only on the alphaMELTS continuation
+        # records. Since b-1303 that continuation runs only when MAGEMin has
+        # no usable curve, so a clean run can strip zero of them. Engine
+        # identity is still asserted above through engines_used["active"].
+        digest_payload, _engine_version_count = _runner_digest_payload(
+            runner_output
+        )
         digest_serialized = json.dumps(digest_payload, sort_keys=True)
         actual["runner_sha256"] = hashlib.sha256(
             digest_serialized.encode()
@@ -150,8 +163,11 @@ def assert_pin(name, actual, tmp_path, runner_output=None):
     # and the terminal rises by that mass. t-1604 remains D_AB at
     # T_film = (T_gas,in + T_wall) / 2, with T_gas,in now this stage's
     # bulk inlet. b1113 remains the removal of the designated-species
-    # skip. Inlets are unchanged. full_lunar is still the t-1604
-    # measurement and was not re-run.
+    # skip. full_lunar was re-run on studio-2 at a2299343eb (b271 regen
+    # tip) and matches the d-441 owner card for b265: under d-402 each
+    # stage captures what its wall saturation pressure condenses, so
+    # Stage 4 now holds Fe 74.20, SiO 255.54 and Mg 30.11 kg, and the
+    # terminal falls (Fe 85.64 -> 18.04, SiO 311.51 -> 59.99 kg).
     expected = json.loads(PINS.read_text())[name]
     # Collect every species before failing: stopping at the first mismatch
     # hid stale Cr/SiO pins behind an Fe miss through two repins.
@@ -186,7 +202,355 @@ def _runner_digest_payload(runner_output):
     del engines_used["registry"]
     metadata["engines_used"] = engines_used
     payload["run_metadata"] = metadata
-    return _without_engine_versions(payload)
+    return _without_engine_versions(deterministic_gate_payload(payload))
+
+
+def _without_environment_attempts(value):
+    """Drop load-timeout failed-provider attempts from a deterministic compare.
+
+    Returns the same object when nothing is removed, so ``sort_keys=False``
+    golden text stays byte-identical on a clean run. The production payload
+    still carries the attempt.
+    """
+
+    if isinstance(value, dict):
+        rebuilt = None
+        for key, item in value.items():
+            if key == ENVIRONMENT_RETRIES_KEY:
+                if rebuilt is None:
+                    rebuilt = dict(value)
+                rebuilt.pop(key, None)
+                continue
+            if key == "failed_providers" and isinstance(item, (list, tuple)):
+                kept = []
+                changed = False
+                for attempt in item:
+                    if (
+                        isinstance(attempt, Mapping)
+                        and failed_provider_attempt_is_environment(attempt)
+                    ):
+                        changed = True
+                        continue
+                    stripped_attempt = _without_environment_attempts(attempt)
+                    if stripped_attempt is not attempt:
+                        changed = True
+                    kept.append(stripped_attempt)
+                if changed:
+                    if rebuilt is None:
+                        rebuilt = dict(value)
+                    rebuilt[key] = kept if isinstance(item, list) else type(item)(kept)
+                continue
+            stripped_item = _without_environment_attempts(item)
+            if stripped_item is not item:
+                if rebuilt is None:
+                    rebuilt = dict(value)
+                rebuilt[key] = stripped_item
+        return value if rebuilt is None else rebuilt
+    if isinstance(value, list):
+        rebuilt = None
+        for index, item in enumerate(value):
+            stripped_item = _without_environment_attempts(item)
+            if stripped_item is not item:
+                if rebuilt is None:
+                    rebuilt = list(value)
+                rebuilt[index] = stripped_item
+        return value if rebuilt is None else rebuilt
+    if isinstance(value, tuple):
+        rebuilt = None
+        for index, item in enumerate(value):
+            stripped_item = _without_environment_attempts(item)
+            if stripped_item is not item:
+                if rebuilt is None:
+                    rebuilt = list(value)
+                rebuilt[index] = stripped_item
+        return value if rebuilt is None else tuple(rebuilt)
+    return value
+
+
+_MISSING = object()
+
+_ENVIRONMENT_HOLD_MESSAGE = (
+    "environment: gate_provider_refusal records a load timeout "
+    "(disposition=environment); the held-last-good curve is not a golden mismatch"
+)
+
+
+def _refusal_is_environment_hold(refusal: Mapping) -> bool:
+    return (
+        refusal.get("disposition") == "environment"
+        or refusal.get("backend_failure_disposition") == "environment"
+    )
+
+
+def _refuse_environment_gate_hold(value) -> None:
+    """A held curve is an environment failure, not a golden mismatch.
+
+    A recovered timeout has no ``gate_provider_refusal``. A stable
+    out-of-domain refusal has no environment disposition. Both compare.
+    """
+
+    seen: set[int] = set()
+
+    def walk(node) -> None:
+        if node is None or isinstance(node, (str, bytes, int, float, bool)):
+            return
+        marker = id(node)
+        if marker in seen:
+            return
+        seen.add(marker)
+        if isinstance(node, Mapping):
+            refusal = node.get("gate_provider_refusal")
+            if isinstance(refusal, Mapping) and _refusal_is_environment_hold(refusal):
+                raise AssertionError(_ENVIRONMENT_HOLD_MESSAGE)
+            for item in node.values():
+                walk(item)
+            return
+        if isinstance(node, (list, tuple)):
+            for item in node:
+                walk(item)
+            return
+        for name in ("record", "snapshots", "liquid_fraction_gate"):
+            child = getattr(node, name, _MISSING)
+            if child is not _MISSING:
+                walk(child)
+
+    walk(value)
+
+
+def deterministic_gate_payload(value):
+    """Gate payload a golden or digest compares.
+
+    Load-timeout attempts stay in the production payload and are omitted here.
+    A held-last-good curve refuses before that compare.
+    """
+
+    _refuse_environment_gate_hold(value)
+    return _without_environment_attempts(value)
+
+
+def _planner_attempt(diagnostic, provider="magemin-shadow"):
+    """The attempt record ``planner._dispatch_gate_provider_order`` stores."""
+
+    reasons = gate_curve_provider_diagnostic_reasons(diagnostic)
+    return {
+        "provider": provider,
+        "status": "not_converged",
+        "reason": "; ".join(reasons) or "not_converged",
+        "diagnostic": diagnostic,
+    }
+
+
+def _timeout_escape_diagnostics():
+    """The four shapes that retry and used to miss the digest predicate."""
+
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.liquidus import liquidus_sample_error_from_exception
+
+    warm = liquidus_sample_error_from_exception(
+        EngineWorkerTimeout("thermoengine", 15.0, phase="equilibrium"),
+    )
+    return {
+        "alphamelts_gate_cooling_path_timeout": {"reason": "timeout"},
+        "liquidus_aggregate_budget_exceeded": {
+            "reason": "aggregate_budget_exceeded",
+        },
+        "magemin_aggregate_budget_exceeded": {
+            "backend_status": "not_converged",
+            "backend_failure_exception": "MAGEMinAggregateBudgetExceeded",
+        },
+        "magemin_subprocess_slot_timeout": {
+            "backend_status": "not_converged",
+            "backend_failure_exception": "MAGEMinSubprocessSlotTimeout",
+        },
+        "thermoengine_warm_call_equilibrium_timeout": dict(warm.diagnostics),
+    }
+
+
+def _timeout_escape_attempts():
+    return [
+        _planner_attempt(diagnostic)
+        for diagnostic in _timeout_escape_diagnostics().values()
+    ]
+
+
+def test_timeout_escape_shapes_match_the_retry_predicate():
+    for name, diagnostic in _timeout_escape_diagnostics().items():
+        attempt = _planner_attempt(diagnostic)
+        assert gate_curve_provider_timeout_reason(diagnostic) is not None, name
+        assert failed_provider_attempt_is_environment(attempt) is (
+            gate_curve_provider_timeout_reason(attempt) is not None
+            or gate_curve_provider_timeout_reason(diagnostic) is not None
+        ), name
+        assert failed_provider_attempt_is_environment(attempt) is True, name
+
+
+@pytest.mark.parametrize(
+    "reason",
+    [
+        "composition_projected",
+        "incomplete_cooling_path",
+        "no_convergence",
+        "not_converged",
+    ],
+)
+def test_physics_gate_reason_is_not_an_environment_attempt(reason):
+    diagnostic = {
+        "reason": reason,
+        "backend_status_reason": reason,
+        "backend_failure_disposition": "environment",
+    }
+    attempt = _planner_attempt(diagnostic)
+    attempt["disposition"] = "environment"
+    assert gate_curve_provider_timeout_reason(diagnostic) is None
+    assert failed_provider_attempt_is_environment(attempt) is False
+
+
+def test_deterministic_gate_payload_drops_only_environment_attempts():
+    clean = {
+        "gate_provider_step_down": {
+            "failed_providers": [
+                {"provider": "magemin-shadow", "reason": "composition_projected"},
+                {
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "incomplete_cooling_path",
+                },
+            ],
+        },
+    }
+    assert deterministic_gate_payload(clean) is clean
+    assert json.dumps(clean, sort_keys=False) == json.dumps(
+        deterministic_gate_payload(clean), sort_keys=False,
+    )
+
+    recovered = {
+        "gate_provider_step_down": {
+            "failed_providers": [
+                {
+                    "provider": "magemin-shadow",
+                    "reason": "engine_worker_timeout",
+                    "disposition": "environment",
+                },
+                {"provider": "magemin-shadow", "reason": "composition_projected"},
+                {
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "incomplete_cooling_path",
+                },
+            ],
+        },
+    }
+    assert [
+        item["reason"]
+        for item in deterministic_gate_payload(recovered)["gate_provider_step_down"][
+            "failed_providers"
+        ]
+    ] == ["composition_projected", "incomplete_cooling_path"]
+    assert recovered["gate_provider_step_down"]["failed_providers"][0]["disposition"] == (
+        "environment"
+    )
+
+    stable = {
+        "gate_provider_refusal": {
+            "qualification": "out_of_domain_kress91_floor_prediction",
+            "reason": "composition_projected",
+        },
+    }
+    assert deterministic_gate_payload(stable) is stable
+
+    timed_out = {
+        "gate_provider_refusal": {
+            "disposition": "environment",
+            "qualification": "held_last_good_curve",
+        },
+        "gate_provider_step_down": {
+            "failed_providers": [
+                {
+                    "provider": "magemin-shadow",
+                    "reason": "engine_worker_timeout",
+                    "disposition": "environment",
+                    "engine_version": "magemin-timeout",
+                },
+                {
+                    "provider": "alphamelts-diagnostic",
+                    "reason": "incomplete_cooling_path",
+                },
+                {
+                    "provider": "magemin-shadow",
+                    "reason": "unavailable",
+                    "diagnostic": {"backend_failure_disposition": "environment"},
+                },
+                {"provider": "magemin-shadow", "reason": "composition_projected"},
+                *_timeout_escape_attempts(),
+            ],
+        },
+    }
+    stripped = _without_environment_attempts(timed_out)
+    assert stripped["gate_provider_refusal"]["qualification"] == "held_last_good_curve"
+    # A non-timeout disposition stays. The retry predicate does not match it.
+    assert [
+        item["reason"]
+        for item in stripped["gate_provider_step_down"]["failed_providers"]
+    ] == ["incomplete_cooling_path", "unavailable", "composition_projected"]
+    with pytest.raises(AssertionError, match="environment"):
+        deterministic_gate_payload(timed_out)
+
+    floor = {
+        "gate_provider_refusal": {
+            "backend_failure_disposition": "environment",
+            "qualification": "first_call_kress91_floor_prediction",
+        },
+    }
+    with pytest.raises(AssertionError, match="not a golden mismatch"):
+        deterministic_gate_payload(floor)
+
+    held_sim = SimpleNamespace(
+        record=SimpleNamespace(
+            snapshots=[
+                SimpleNamespace(
+                    liquid_fraction_gate={
+                        "redox": {
+                            "gate_provider_refusal": {
+                                "disposition": "environment",
+                                "qualification": "held_last_good_curve",
+                            },
+                        },
+                    },
+                ),
+            ],
+        ),
+    )
+    with pytest.raises(AssertionError, match="held-last-good curve"):
+        deterministic_gate_payload(held_sim)
+    clean_sim = SimpleNamespace(
+        record=SimpleNamespace(
+            snapshots=[SimpleNamespace(liquid_fraction_gate={"redox": {"source": "gate"}})],
+        ),
+    )
+    assert deterministic_gate_payload(clean_sim) is clean_sim
+
+
+def test_environment_retries_drop_as_one_key():
+    clean = {"source": "gate", "solidus_T_C": 1000}
+    recovered = {
+        **clean,
+        ENVIRONMENT_RETRIES_KEY: {
+            "disposition": "environment",
+            "gate_provider_step_down": {
+                "failed_providers": [
+                    {"provider": "magemin-shadow", "reason": "engine_worker_timeout"},
+                    {
+                        "provider": "alphamelts-diagnostic",
+                        "reason": "incomplete_cooling_path",
+                    },
+                ],
+            },
+            "alphamelts_reference_pressure": {
+                "condensed_phase_reference_pressure_bar": 1,
+            },
+        },
+    }
+    assert deterministic_gate_payload(clean) is clean
+    assert deterministic_gate_payload(recovered) == clean
+    assert ENVIRONMENT_RETRIES_KEY in recovered
 
 
 def _without_engine_versions(value):
@@ -214,9 +578,11 @@ def _without_engine_versions(value):
 
 
 @pytest.mark.nightly
-@pytest.mark.xdist_group("magemin_fullrun_c")
+@pytest.mark.xdist_group("magemin_fullrun_a")
 @pytest.mark.timeout(5400)
 def test_green_full_lunar_capture_pin(route_totals, tmp_path):
+    # Current full_lunar pins: studio-2 actuals at a2299343eb, equal to the
+    # d-441 owner card (b265 values). History of the earlier pins follows.
     # full_lunar Fe capture totals are the studio-3 actuals (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen); Cr and SiO are the studio-3
     # actuals at 16fcc5985, identical across two isolated runs. Lunar full runs
@@ -233,6 +599,8 @@ def test_green_full_lunar_capture_pin(route_totals, tmp_path):
         SimpleNamespace(param=("lunar_mare_low_ti", None))
     )
     assert sim.is_complete()
+    # Species pins do not carry the gate refusal. Refuse a held curve here.
+    deterministic_gate_payload(sim)
     assert_pin("full_lunar", route_totals, tmp_path)
 
 

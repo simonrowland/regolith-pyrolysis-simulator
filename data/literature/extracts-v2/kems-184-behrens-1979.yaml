@@ -11,12 +11,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -38,7 +37,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_knudsen_detected_species
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 132
@@ -57,12 +67,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -82,7 +91,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_si2c_formation_enthalpies
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 139
@@ -100,12 +120,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -131,7 +150,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''hexagonal_SiC_basal_plane'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_si_activation_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -149,12 +179,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -219,6 +248,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_si_assumed_entropy_alpha
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -250,12 +291,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -275,7 +315,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_si_equilibrium_enthalpy_and_barrier
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -292,12 +343,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -315,7 +365,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''hexagonal_SiC_basal_plane'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_si_langmuir_intensity_induction
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -333,12 +394,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -360,7 +420,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_si_langmuir_vs_extrapolated_knudsen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -387,12 +458,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -418,7 +488,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''hexagonal_SiC_basal_plane'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_sic2_activation_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -436,12 +517,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -506,6 +586,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - evaporation_coefficient_alpha
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_sic2_assumed_entropy_alpha
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - evaporation_coefficient_alpha
@@ -537,12 +629,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -562,7 +653,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_sic2_equilibrium_enthalpy_and_barrier
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -579,12 +681,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -604,7 +705,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_sic2_formation_enthalpies
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 139
@@ -622,12 +734,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -655,7 +766,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_reference_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -673,12 +805,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -706,7 +837,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si2c_second_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -724,12 +866,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -757,7 +898,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_reference_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -775,12 +937,11 @@ observations:
     species:
       formula: Si2C
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -808,7 +969,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si2c_third_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -826,12 +998,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -859,7 +1030,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si_second_law_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=experiment method not published'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si_second_law_reference_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -877,12 +1069,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -910,7 +1101,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si_second_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -928,12 +1130,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -961,7 +1162,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si_third_law_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si_third_law_reference_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -979,12 +1201,11 @@ observations:
     species:
       formula: Si
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1012,7 +1233,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_si_third_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -1030,12 +1262,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1063,7 +1294,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_reference_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -1081,12 +1333,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1114,7 +1365,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_sic2_second_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -1132,12 +1394,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1165,7 +1426,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_reference_10
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -1183,12 +1465,11 @@ observations:
     species:
       formula: SiC2
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1216,7 +1497,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table1_sic2_third_law_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -1304,6 +1596,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::T=1800:h=2ee965b5fff4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1455,6 +1770,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::T=2000:h=942470278bf7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1606,6 +1944,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_reference_10::T=2200:h=0748d4ddda06
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1757,6 +2118,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -1908,6 +2281,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2059,6 +2444,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si2c_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2210,6 +2607,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::T=1800:h=dbc69c973531
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2361,6 +2781,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::T=2000:h=628c3e0f2d6e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2512,6 +2955,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_reference_10::T=2200:h=627362fa14ee
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2663,6 +3129,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2814,6 +3292,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -2965,6 +3455,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_si_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3116,6 +3618,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::T=1800:h=b6e38572c374
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3267,6 +3792,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::T=2000:h=3507e02e2cbe
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3418,6 +3966,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_partial
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_reference_10::T=2200:h=fae0f32980ae
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3569,6 +4140,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3720,6 +4303,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3871,6 +4466,18 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_partial
+    reason: 'phase_inferred: value=g; evidence=partial pressure identifies the gas-phase species; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_sic2_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
   - kind: admission_defaulted
     affected_quantities:
     - p_partial
@@ -3952,12 +4559,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3979,7 +4585,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::T=1800:h=a05990ca94d4
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -4004,12 +4631,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4031,7 +4657,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::T=2000:h=9c88acb2eb5e
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -4056,12 +4703,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4083,7 +4729,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_reference_10::T=2200:h=e0b6f175282a
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -4108,12 +4775,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4135,7 +4801,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -4160,12 +4837,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4187,7 +4863,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -4212,12 +4899,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'SiC_hexagonal_plus_graphite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4239,7 +4925,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''SiC_hexagonal_plus_graphite'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_table2_total_vapor_this_work
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 136
@@ -4264,12 +4961,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4288,7 +4984,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: kems-184-behrens-1979::behrens_1979_total_flux_time_dependence
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135
@@ -4305,12 +5012,11 @@ observations:
     species:
       formula: total_vapor
       phase:
-        tag: unknown
-        reason: phase string 'hexagonal_SiC_basal_plane' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4332,7 +5038,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''hexagonal_SiC_basal_plane'' is not in the closed automatic map'
+    origin: kems-184-behrens-1979::behrens_1979_total_initial_langmuir_flux
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-184-behrens-1979
   locator:
     page: 135

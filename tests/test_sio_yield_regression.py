@@ -435,9 +435,14 @@ def test_sio_evolved_pins_agree_across_every_place_they_are_stored():
 
 # Stage-3 purity admission bypasses rejected parcels; downstream Stage-4
 # collector values below are pinned from the production CLI and Studio fixture.
+# Repinned on studio-2 at a2299343eb (b271 regen tip) from the regenerated
+# sio_yield fixtures. sio_evolved_kg is unchanged; the Stage-4 carryover rises
+# 8.76551515134e-07 -> 8.77425273074e-07 kg (lunar, +0.10 %) and
+# 8.90876677849e-07 -> 8.9850073745e-07 kg (Mars, +0.86 %) under the b265
+# condenser physics (d-402 wall-saturation capture).
 BASELINE_STAGE4_SIO2_KG = {
-    "lunar_mare_low_ti": 8.76551515134e-07,
-    "mars_basalt": 8.90876677849e-07,
+    "lunar_mare_low_ti": 8.77425273074e-07,
+    "mars_basalt": 8.9850073745e-07,
 }
 
 # Production Stage-3 product after the d-402 flagged pO2-free solid-state wall
@@ -541,8 +546,14 @@ def test_sio_yield_cli_matches_golden(tmp_path, feedstock, golden_name):
     )
 
     assert completed.returncode == 0, completed.stderr
-    actual = json.loads(output_path.read_text())
-    expected = json.loads((FIXTURE_DIR / golden_name).read_text())
+    from tests.chemistry.test_condensation_green_pins import (
+        deterministic_gate_payload,
+    )
+
+    actual = deterministic_gate_payload(json.loads(output_path.read_text()))
+    expected = deterministic_gate_payload(
+        json.loads((FIXTURE_DIR / golden_name).read_text())
+    )
 
     _assert_golden_close(actual, expected)
     assert actual["sio_to_silica_fume_kg"] == expected["sio_to_silica_fume_kg"]

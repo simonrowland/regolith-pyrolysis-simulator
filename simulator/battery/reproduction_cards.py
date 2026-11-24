@@ -54,8 +54,6 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
     Candidates are comparison data only. No prediction or engine route is added.
     Native membership is the same owner's policy with confidence unstated.
     """
-    from dataclasses import replace
-
     identity = observation.identity
     result: dict[str, Any] = {
         "observation_id": observation.observation_id,
@@ -88,10 +86,12 @@ def compare_point(observation: Observation, candidate: Decimal | None) -> dict[s
     result["band_refusal"] = to_plain(resolution.refusal)
     result["band_notice"] = to_plain(resolution.notice)
     native = observation.uncertainty
-    if isinstance(native.verbatim, Mapping):
-        native = replace(native, verbatim={**native.verbatim, "confidence_level": "not_stated"})
     native_resolution = _printed_uncertainty_band(
-        quantity, native, reference, source_observation=observation,
+        quantity,
+        native,
+        reference,
+        source_observation=observation,
+        native_width=True,
     )
     result["native_band"] = to_plain(native_resolution.band)
     if candidate is None or not isinstance(candidate, Decimal) or not candidate.is_finite():
@@ -221,6 +221,13 @@ def _rms_text(values: Sequence[Decimal]) -> str | None:
     return None if value is None else str(value)
 
 
+def _band_rms_text(values: Sequence[Decimal]) -> str | None:
+    value = _rms(values)
+    if value is None:
+        return None
+    return "0.00" if value.is_zero() else str(value)
+
+
 def evaluate_card(
     manifest: Document,
     run: Document,
@@ -308,7 +315,7 @@ def evaluate_card(
         band_values = [Decimal(row["band"]["value"]) for row in rows if row["band"]]
         rms_band = None
         if complete and all(width > 0 for width in band_values):
-            rms_band = _rms_text([Decimal(row["residual"]) / Decimal(row["band"]["value"]) for row in rows])
+            rms_band = _band_rms_text([Decimal(row["residual"]) / Decimal(row["band"]["value"]) for row in rows])
         # Diagnostic native RMS is separate for each output unit; ppm/dex and
         # wt% coordinates must never be averaged together.
         units = {row.get("native_unit") for row in rows if row["native_residual"] is not None}
@@ -336,7 +343,7 @@ def evaluate_card(
     independent = [group for group in groups if group["independent"]]
     full_rms = None
     if groups and all(group["rms_band"] is not None for group in groups) and independent:
-        full_rms = _rms_text([Decimal(group["rms_band"]) for group in independent])
+        full_rms = _band_rms_text([Decimal(group["rms_band"]) for group in independent])
     return {
         "card_id": frozen["card_id"], "evidence_label": "development_validation",
         "verdict": ("PASS_WITH_FLAGS" if flagged else "PASS") if passed else "NOT_PASS", "causes": all_causes,

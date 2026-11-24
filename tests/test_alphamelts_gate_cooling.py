@@ -3,6 +3,7 @@ from types import SimpleNamespace
 import json
 from pathlib import Path
 import subprocess
+from unittest.mock import Mock
 
 import pytest
 
@@ -102,6 +103,8 @@ def test_terminal_input_outcome_pin_before_owner_reuse(reason):
     assert gate_curve_provider_outcome_for_status('ok', {'reason': reason}).value == 'failed'
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_exit_zero_without_rows_is_a_failed_provider(monkeypatch):
     backend = AlphaMELTSBackend()
     backend._mode = 'subprocess'
@@ -274,9 +277,11 @@ def test_gate_order_steps_down_before_hold_or_floor(
             assert solved['numerical_path_warning'] == 'original solved path warning'
 
 
-def test_retry_recovery_preserves_step_down_notice(
+def test_primary_timeout_retries_without_alpha_continuation(
     monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
 ):
+    """Mutation note: calling AlphaMELTS before the retry fails the mock assertion."""
+
     from tests.chemistry.test_declared_liquid_fraction_provider import _sim
 
     sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
@@ -294,36 +299,63 @@ def test_retry_recovery_preserves_step_down_notice(
             'solidus_T_C': 1000, 'liquidus_T_C': 1300,
         })
 
-    def alternate(request):
-        calls.append('alphamelts')
-        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
-            'backend_status_reason': 'incomplete_cooling_path',
-            'backend_diagnostics': {
-                'physical_overhead_pressure_bar': .009,
-                'condensed_phase_reference_pressure_bar': 1,
-                'numerical_path_warning': 'incomplete native path',
-            },
-        })
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='not_converged',
+        diagnostic={'backend_status_reason': 'incomplete_cooling_path'},
+    ))
 
     monkeypatch.setattr(magemin, 'dispatch', primary)
     monkeypatch.setattr(alpha, 'dispatch', alternate)
     curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
-    assert calls == ['magemin', 'alphamelts', 'magemin']
+    assert calls == ['magemin', 'magemin']
+    alternate.assert_not_called()
     assert curve['source'] == 'gate_liquid_fraction:fallback:magemin-shadow'
     assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1300)
-    notice = curve['gate_provider_step_down']
-    assert notice['requested_provider_order'] == ['magemin-shadow', 'alphamelts-diagnostic']
-    assert notice['realized_provider'] == 'magemin-shadow'
-    assert [p['provider'] for p in notice['failed_providers']] == [
-        'magemin-shadow', 'alphamelts-diagnostic',
-    ]
-    assert 'engine_worker_timeout' in notice['failed_providers'][0]['reason']
-    assert 'incomplete_cooling_path' in notice['failed_providers'][1]['reason']
-    assert curve['alphamelts_reference_pressure'] == {
-        'physical_overhead_pressure_bar': .009,
-        'condensed_phase_reference_pressure_bar': 1,
-        'numerical_path_warning': 'incomplete native path',
-    }
+    # The retry is the recovery; the skipped continuation has no notice.
+    assert 'gate_provider_step_down' not in curve
+    assert 'alphamelts_reference_pressure' not in curve
+    record = curve['environment_retries']
+    assert record['disposition'] == 'environment'
+    assert 'gate_provider_step_down' not in record
+    assert 'alphamelts_reference_pressure' not in record
+    attempt = record['provider_attempt']
+    assert attempt['provider'] == 'magemin-shadow'
+    assert attempt['disposition'] == 'environment'
+    assert 'engine_worker_timeout' in attempt['reason']
+
+
+def test_engine_worker_timeout_retries_freeze_gate_dispatch_once(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    from simulator.engine_pool import EngineWorkerTimeout
+    from simulator.melt_backend.magemin import MAGEMIN_WARM_CALL_TIMEOUT_S
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    calls = []
+
+    def dispatch_only(*_args, **_kwargs):
+        calls.append(len(calls) + 1)
+        if len(calls) == 1:
+            raise EngineWorkerTimeout(
+                'fake MAGEMin worker',
+                MAGEMIN_WARM_CALL_TIMEOUT_S,
+                phase='job',
+            )
+        return IntentResult(
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            status='ok',
+            diagnostic={'solidus_T_C': 1000, 'liquidus_T_C': 1300},
+        )
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch_only)
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    assert calls == [1, 2]
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert curve['environment_retries']['disposition'] == 'environment'
+    assert curve['environment_retries']['reason'] == 'engine_worker_timeout'
 
 
 def test_magemin_success_does_not_call_alpha(
@@ -344,3 +376,630 @@ def test_magemin_success_does_not_call_alpha(
     assert curve['liquidus_T_C'] == 1300
     assert 'gate_provider_step_down' not in curve
     assert alpha._backend is None
+
+
+def _bind_gate_providers(sim, magemin_dispatch, alpha_dispatch):
+    sim._register_freeze_gate_liquid_fraction_providers()
+    magemin, alpha = sim._chem_registry.gate_provider_order
+    magemin.dispatch = magemin_dispatch
+    alpha.dispatch = alpha_dispatch
+    return magemin, alpha
+
+
+def test_projected_out_of_domain_bounds_skip_alpha_continuation(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: removing the usable-bounds stop calls the AlphaMELTS mock."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='out_of_domain',
+        diagnostic={
+            'backend_status_reason': 'composition_projected',
+            'solidus_T_C': 1000,
+            'liquidus_T_C': 1400,
+            'composition_projected_notice': {
+                'dropped_components': [
+                    {'component': 'P2O5', 'mass_fraction': 0.001},
+                ],
+            },
+        },
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='ok',
+        diagnostic={'solidus_T_C': 950, 'liquidus_T_C': 1500},
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    primary.assert_called_once()
+    alternate.assert_not_called()
+    assert curve['source'] == (
+        'gate_liquid_fraction:fallback:magemin-shadow:composition_projected'
+    )
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1400)
+    assert curve['composition_projected_notice']['authority'] == 'extrapolated'
+    assert 'gate_provider_step_down' not in curve
+
+
+def test_primary_terminal_refusal_does_not_claim_a_step_down(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: a notice before any alternate call fails this assertion."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='unavailable',
+        diagnostic={'reason': 'missing_input'},
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='ok',
+        diagnostic={'solidus_T_C': 950, 'liquidus_T_C': 1500},
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    result = sim._dispatch_only(
+        ChemistryIntent.GATE_LIQUID_FRACTION,
+        control_inputs={},
+        fO2_log=-2,
+    )
+
+    primary.assert_called_once()
+    alternate.assert_not_called()
+    assert result.status == 'unavailable'
+    assert result.diagnostic['reason'] == 'missing_input'
+    assert 'gate_provider_step_down' not in result.diagnostic
+
+
+def test_flagged_alpha_bounds_are_published_as_the_step_down_curve(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """Mutation note: dropping flagged bounds or their reason loses publication data."""
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    primary = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='not_converged',
+        diagnostic={'backend_status_reason': 'no_convergence'},
+    ))
+    alternate = Mock(return_value=IntentResult(
+        intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+        status='out_of_domain',
+        diagnostic={
+            'solidus_T_C': 950,
+            'liquidus_T_C': 1420,
+            'backend_status_reason': 'out_of_calibration_range',
+        },
+    ))
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+
+    primary.assert_called_once()
+    alternate.assert_called_once()
+    assert curve['source'] == 'gate_liquid_fraction:fallback:alphamelts-diagnostic'
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (950, 1420)
+    assert curve['gate_provider_step_down']['realized_provider'] == (
+        'alphamelts-diagnostic'
+    )
+    assert curve['gate_provider_step_down']['failed_providers'][0]['provider'] == (
+        'magemin-shadow'
+    )
+    assert curve['gate_provider_step_down']['realized_provider_reason'] == (
+        'out_of_calibration_range'
+    )
+
+
+def _stripped_gate_bytes(value):
+    from simulator.reduced_real_determinism import canonical_json_bytes
+    from tests.chemistry.test_condensation_green_pins import deterministic_gate_payload
+
+    return canonical_json_bytes(deterministic_gate_payload(value))
+
+
+def _run_gate_shape(
+    shape, monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+    *,
+    shared_cache=None,
+    core=False,
+):
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    if shared_cache is not None:
+        sim._freeze_gate_shared_curve_cache = shared_cache
+    calls = []
+
+    def primary(request):
+        calls.append('magemin')
+        if shape.startswith('recovered') and calls.count('magemin') == 1:
+            return IntentResult(
+                intent=request.intent, status='not_converged', diagnostic={
+                    'backend_status_reason': 'engine_worker_timeout',
+                },
+            )
+        if 'projected' in shape:
+            return IntentResult(
+                intent=request.intent, status='out_of_domain', diagnostic={
+                    'backend_status_reason': 'composition_projected',
+                },
+            )
+        return IntentResult(
+            intent=request.intent, status='ok', diagnostic={
+                'solidus_T_C': 1000, 'liquidus_T_C': 1300,
+            },
+        )
+
+    def alternate(request):
+        calls.append('alphamelts')
+        if shape.startswith('recovered') and calls.count('alphamelts') == 1:
+            return IntentResult(
+                intent=request.intent, status='not_converged', diagnostic={
+                    'backend_status_reason': 'incomplete_cooling_path',
+                    'backend_diagnostics': {
+                        'physical_overhead_pressure_bar': .009,
+                        'condensed_phase_reference_pressure_bar': 1,
+                        'numerical_path_warning': 'abandoned path',
+                    },
+                },
+            )
+        return IntentResult(
+            intent=request.intent, status='ok', diagnostic={
+                'solidus_T_C': 1100, 'liquidus_T_C': 1400,
+                'backend_diagnostics': {
+                    'physical_overhead_pressure_bar': .02,
+                    'condensed_phase_reference_pressure_bar': 1,
+                },
+            },
+        )
+
+    magemin, alpha = _bind_gate_providers(sim, primary, alternate)
+    monkeypatch.setattr(magemin, 'dispatch', primary)
+    monkeypatch.setattr(alpha, 'dispatch', alternate)
+    if core:
+        record = sim._melt_redox_liquidus_gate_record()
+    else:
+        record = sim._freeze_gate_curve_record()
+    return sim, record, calls
+
+
+def test_recovered_dispatch_strips_to_the_clean_dispatch(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A recovered hour equals the final dispatch once the retry record is dropped."""
+
+    def run(shape):
+        return _run_gate_shape(
+            shape, monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+        )
+
+    clean_sim, clean_record, clean_calls = run('clean')
+    recovered_sim, recovered_record, recovered_calls = run('recovered')
+    assert clean_calls == ['magemin']
+    assert recovered_calls == ['magemin', 'magemin']
+    assert 'environment_retries' in recovered_record['curve']
+    assert 'environment_retries' not in clean_record['curve']
+    assert recovered_record['curve']['environment_retries']['disposition'] == 'environment'
+    assert 'gate_provider_step_down' not in recovered_record['curve'][
+        'environment_retries'
+    ]
+    assert 'alphamelts_reference_pressure' not in recovered_record['curve'][
+        'environment_retries'
+    ]
+    assert recovered_record['curve']['environment_retries']['provider_attempt'][
+        'provider'
+    ] == 'magemin-shadow'
+    assert _stripped_gate_bytes(clean_record['curve']) == _stripped_gate_bytes(
+        recovered_record['curve'],
+    )
+    assert _stripped_gate_bytes(clean_record) == _stripped_gate_bytes(recovered_record)
+    assert clean_sim._freeze_gate_last_good_curve.get('realized_provider') == (
+        recovered_sim._freeze_gate_last_good_curve.get('realized_provider')
+    )
+
+    assert clean_sim._freeze_gate_last_good_curve.get('realized_provider') is None
+
+    projected_sim, projected_record, projected_calls = run('projected')
+    recovered_projected_sim, recovered_projected_record, recovered_projected_calls = run(
+        'recovered-projected',
+    )
+    assert projected_calls == ['magemin', 'alphamelts']
+    assert recovered_projected_calls == ['magemin', 'magemin', 'alphamelts']
+    projected_curve = projected_record['curve']
+    recovered_projected_curve = recovered_projected_record['curve']
+    assert projected_curve['source'] == (
+        'gate_liquid_fraction:fallback:alphamelts-diagnostic'
+    )
+    assert 'composition_projected' in projected_curve['gate_provider_step_down'][
+        'failed_providers'
+    ][0]['reason']
+    assert projected_curve['alphamelts_reference_pressure'][
+        'physical_overhead_pressure_bar'
+    ] == .02
+    assert 'environment_retries' not in projected_curve
+    abandoned = recovered_projected_curve['environment_retries']
+    assert abandoned['disposition'] == 'environment'
+    assert 'alphamelts_reference_pressure' not in abandoned
+    assert 'gate_provider_step_down' not in abandoned
+    assert abandoned['provider_attempt']['provider'] == 'magemin-shadow'
+    assert 'engine_worker_timeout' in abandoned['provider_attempt']['reason']
+    assert recovered_projected_curve['alphamelts_reference_pressure'][
+        'physical_overhead_pressure_bar'
+    ] == .02
+    assert 'incomplete_cooling_path' not in recovered_projected_curve[
+        'gate_provider_step_down'
+    ]['failed_providers'][0]['reason']
+    assert _stripped_gate_bytes(projected_curve) == _stripped_gate_bytes(
+        recovered_projected_curve,
+    )
+    assert _stripped_gate_bytes(projected_record) == _stripped_gate_bytes(
+        recovered_projected_record,
+    )
+    assert projected_sim._freeze_gate_last_good_curve.get('realized_provider') == (
+        'alphamelts-diagnostic'
+    )
+    assert recovered_projected_sim._freeze_gate_last_good_curve.get(
+        'realized_provider',
+    ) == 'alphamelts-diagnostic'
+
+
+def test_store_payload_omits_environment_retries(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data, tmp_path,
+):
+    """A recovered timeout is not curve identity in the PT-0 store."""
+
+    from simulator.chemistry.kernel import ChemistryIntent
+    from simulator.reduced_real_determinism import (
+        PT0DeterminismStore,
+        _curve_from_payload,
+        canonical_json_bytes,
+        canonical_replay_key,
+        canonical_replay_output_projection,
+    )
+
+    def stored(sim, curve):
+        key = canonical_replay_key(
+            sim,
+            artifact='freeze_gate_curve',
+            intent=ChemistryIntent.GATE_LIQUID_FRACTION,
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+            fe_redox_policy='intrinsic',
+            provider_role='fallback',
+        )
+        payload = canonical_replay_output_projection(
+            'freeze_gate_curve', sim, curve,
+        )
+        return key, payload
+
+    clean_sim, clean_record, _clean_calls = _run_gate_shape(
+        'clean', monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    recovered_sim, recovered_record, _recovered_calls = _run_gate_shape(
+        'recovered', monkeypatch,
+        vapor_pressure_data, feedstocks_data, setpoints_data,
+    )
+    clean_curve = clean_record['curve']
+    recovered_curve = recovered_record['curve']
+    assert recovered_curve['environment_retries']['disposition'] == 'environment'
+    clean_key, clean_payload = stored(clean_sim, clean_curve)
+    recovered_key, recovered_payload = stored(recovered_sim, recovered_curve)
+    assert canonical_json_bytes(clean_key) == canonical_json_bytes(recovered_key)
+    assert canonical_json_bytes(clean_payload) == canonical_json_bytes(recovered_payload)
+    assert 'environment_retries' not in clean_payload['curve']
+    assert 'environment_retries' not in recovered_payload['curve']
+    assert 'environment_retries' in recovered_curve
+    assert 'environment_retries' not in (
+        recovered_sim._freeze_gate_liquid_fraction_cache['curve']
+    )
+
+    store = PT0DeterminismStore('capture', db_path=tmp_path / 'pt1.sqlite')
+    store._store('freeze_gate_curve', clean_key, clean_payload)
+    store._store('freeze_gate_curve', recovered_key, recovered_payload)
+    assert len(store.entries) == 1
+    stored_curve = next(iter(store.entries.values()))['payload']['curve']
+    replayed = _curve_from_payload(stored_curve)
+    assert 'environment_retries' not in replayed
+    poisoned = {
+        **stored_curve,
+        'environment_retries': recovered_curve['environment_retries'],
+    }
+    assert 'environment_retries' not in _curve_from_payload(poisoned)
+
+
+def test_later_hour_memo_hit_omits_environment_retries(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A memo hit does not publish the producing hour's timeout.
+
+    The hour that retried still has environment_retries on its live
+    snapshot. The same-sim cache, the shared memo, and the core memo
+    each return an identity curve to a later hour.
+    """
+
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    shared = {}
+    sim, record, calls = _run_gate_shape(
+        'recovered', monkeypatch, vapor_pressure_data, feedstocks_data,
+        setpoints_data, shared_cache=shared, core=True,
+    )
+    assert calls == ['magemin', 'magemin']
+    assert record['curve']['environment_retries']['disposition'] == 'environment'
+    assert 'environment_retries' not in (
+        sim._freeze_gate_liquid_fraction_cache['curve']
+    )
+    assert sim._freeze_gate_liquid_fraction_curve_memo
+    for stored in sim._freeze_gate_liquid_fraction_curve_memo.values():
+        assert 'environment_retries' not in stored['curve']
+    assert shared
+    for stored in shared.values():
+        assert 'environment_retries' not in stored['curve']
+
+    diagnostic = sim._last_melt_redox_liquidus_gate_diagnostic
+    assert diagnostic['environment_retries']['disposition'] == 'environment'
+    sim._melt_redox_gate_authority_this_tick = record
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._freeze_gate_liquid_fraction_factor()
+    assert sim._last_freeze_gate_diagnostic['environment_retries'][
+        'disposition'
+    ] == 'environment'
+    snapshot = sim._make_snapshot()
+    assert snapshot.liquid_fraction_gate['redox']['environment_retries'][
+        'disposition'
+    ] == 'environment'
+    assert snapshot.liquid_fraction_gate['evaporation']['environment_retries'][
+        'disposition'
+    ] == 'environment'
+
+    produced = len(calls)
+    sim.melt.hour = int(sim.melt.hour) + 1
+    same_sim_hit = sim._freeze_gate_curve_record()
+    assert same_sim_hit['disposition'] == 'memo-hit'
+    assert 'environment_retries' not in same_sim_hit['curve']
+    assert len(calls) == produced
+
+    sim._freeze_gate_liquid_fraction_cache = None
+    core_hit = sim._melt_redox_liquidus_gate_record()
+    assert core_hit['disposition'] == 'memo-hit'
+    assert 'environment_retries' not in core_hit['curve']
+    assert 'environment_retries' not in (
+        sim._last_melt_redox_liquidus_gate_diagnostic
+    )
+    assert len(calls) == produced
+    later = sim._make_snapshot()
+    assert 'environment_retries' not in later.liquid_fraction_gate['redox']
+
+    other = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    other._freeze_gate_shared_curve_cache = shared
+    other_calls = []
+
+    def refuse(request):
+        other_calls.append(request)
+        raise AssertionError('shared memo miss dispatched')
+
+    magemin, alpha = _bind_gate_providers(other, refuse, refuse)
+    monkeypatch.setattr(magemin, 'dispatch', refuse)
+    monkeypatch.setattr(alpha, 'dispatch', refuse)
+    shared_hit = other._freeze_gate_curve_record()
+    assert shared_hit['disposition'] == 'memo-hit'
+    assert 'environment_retries' not in shared_hit['curve']
+    assert other_calls == []
+
+
+def _clear_gate_memos(sim):
+    sim._freeze_gate_liquid_fraction_cache = None
+    memo = sim._freeze_gate_liquid_fraction_curve_memo
+    if isinstance(memo, dict):
+        memo.clear()
+    shared = getattr(sim, '_freeze_gate_shared_curve_cache', None)
+    if isinstance(shared, dict):
+        shared.clear()
+    sim._freeze_gate_held_curve_record = None
+
+
+def _hold_snapshot(sim, record):
+    sim._freeze_gate_liquid_fraction_factor(gate_authority=record['curve'])
+    return sim._make_snapshot()
+
+
+def test_held_last_good_omits_prior_environment_retries(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """A later hold publishes this hour's retry, not an earlier hour's.
+
+    Last-good is kept past the hour, so it stores the identity curve.
+    A hold that did not retry has no environment_retries. A hold that
+    did retry carries only the record this dispatch abandoned.
+    """
+
+    from simulator.melt_backend.magemin import (
+        MAGEMinBackend,
+        _magemin_bulk_projection_details,
+    )
+
+    def recovered():
+        sim, record, _calls = _run_gate_shape(
+            'recovered', monkeypatch, vapor_pressure_data, feedstocks_data,
+            setpoints_data, core=True,
+        )
+        assert record['curve']['environment_retries']['reason'] == (
+            'engine_worker_timeout'
+        )
+        assert 'environment_retries' not in sim._freeze_gate_last_good_curve['curve']
+        _clear_gate_memos(sim)
+        sim.melt.hour = int(sim.melt.hour) + 1
+        return sim
+
+    # (1) Later miss, no_convergence, hold. This hour did not retry.
+    sim = recovered()
+    calls = []
+
+    def no_convergence(request):
+        calls.append(request)
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'no_convergence',
+        })
+
+    magemin, alpha = _bind_gate_providers(sim, no_convergence, no_convergence)
+    monkeypatch.setattr(magemin, 'dispatch', no_convergence)
+    monkeypatch.setattr(alpha, 'dispatch', no_convergence)
+    record = sim._melt_redox_liquidus_gate_record()
+    assert calls
+    assert record['disposition'] == 'live'
+    assert record['curve']['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    assert record['curve']['gate_provider_refusal']['reason'] == 'no_convergence'
+    assert 'environment_retries' not in record['curve']
+    assert 'environment_retries' not in sim._last_melt_redox_liquidus_gate_diagnostic
+    snapshot = _hold_snapshot(sim, record)
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['redox']
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['evaporation']
+
+    # (2) This hour retried, then held. Only its own abandoned dispatch.
+    sim = recovered()
+
+    def retried_then_numerical(request):
+        calls.append('magemin')
+        if calls.count('magemin') == 1:
+            return IntentResult(
+                intent=request.intent, status='not_converged', diagnostic={
+                    'backend_status_reason': 'aggregate_budget_exceeded',
+                },
+            )
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'no_convergence',
+        })
+
+    def numerical_alternate(request):
+        calls.append('alphamelts')
+        return IntentResult(intent=request.intent, status='not_converged', diagnostic={
+            'backend_status_reason': 'no_convergence',
+        })
+
+    calls = []
+    magemin, alpha = _bind_gate_providers(
+        sim, retried_then_numerical, numerical_alternate,
+    )
+    monkeypatch.setattr(magemin, 'dispatch', retried_then_numerical)
+    monkeypatch.setattr(alpha, 'dispatch', numerical_alternate)
+    record = sim._melt_redox_liquidus_gate_record()
+    abandoned = record['curve']['environment_retries']
+    assert abandoned['reason'] == 'aggregate_budget_exceeded'
+    assert abandoned['hour'] == int(sim.melt.hour)
+    assert 'engine_worker_timeout' not in json.dumps(abandoned)
+    assert record['curve']['gate_provider_refusal']['qualification'] == (
+        'held_last_good_curve'
+    )
+    snapshot = _hold_snapshot(sim, record)
+    assert snapshot.liquid_fraction_gate['redox']['environment_retries']['hour'] == (
+        int(sim.melt.hour)
+    )
+    assert snapshot.liquid_fraction_gate['evaporation']['environment_retries'][
+        'reason'
+    ] == 'aggregate_budget_exceeded'
+
+    # (3) Stable-refusal hold, with and without a retry on this hour.
+    projection = MAGEMinBackend()._build_db_bulk_projection({
+        'SiO2': 85.0, 'Al2O3': 10.0, 'CaO': 3.0, 'MnO': 2.0,
+    })
+    projected = {
+        'backend_status_reason': 'composition_projected',
+        'input_composition_projection': _magemin_bulk_projection_details(projection),
+        'solidus_T_C': 900.0,
+        'liquidus_T_C': 1100.0,
+    }
+
+    def stable_dispatch(intent, **kwargs):
+        return IntentResult(intent=intent, status='out_of_domain', diagnostic=projected)
+
+    sim = recovered()
+    monkeypatch.setattr(sim, '_dispatch_only', stable_dispatch)
+    record = sim._melt_redox_liquidus_gate_record()
+    assert 'composition_projected_over_threshold' in record['curve'][
+        'composition_projected_notice'
+    ]['reason']
+    assert 'environment_retries' not in record['curve']
+    assert 'environment_retries' not in sim._last_melt_redox_liquidus_gate_diagnostic
+    snapshot = _hold_snapshot(sim, record)
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['redox']
+    assert 'environment_retries' not in snapshot.liquid_fraction_gate['evaporation']
+
+    sim = recovered()
+    attempt = {'n': 0}
+
+    def retried_then_stable(intent, **kwargs):
+        attempt['n'] += 1
+        if attempt['n'] == 1:
+            return IntentResult(
+                intent=intent, status='not_converged', diagnostic={
+                    'backend_status_reason': 'aggregate_budget_exceeded',
+                },
+            )
+        return IntentResult(intent=intent, status='out_of_domain', diagnostic=projected)
+
+    monkeypatch.setattr(sim, '_dispatch_only', retried_then_stable)
+    record = sim._melt_redox_liquidus_gate_record()
+    abandoned = record['curve']['environment_retries']
+    assert abandoned['reason'] == 'aggregate_budget_exceeded'
+    assert abandoned['hour'] == int(sim.melt.hour)
+    assert 'engine_worker_timeout' not in json.dumps(abandoned)
+    assert 'composition_projected_over_threshold' in record['curve'][
+        'composition_projected_notice'
+    ]['reason']
+    snapshot = _hold_snapshot(sim, record)
+    assert snapshot.liquid_fraction_gate['redox']['environment_retries']['hour'] == (
+        int(sim.melt.hour)
+    )
+
+
+def test_engine_worker_timeout_outside_planner_keeps_primary_attempt(
+    monkeypatch, vapor_pressure_data, feedstocks_data, setpoints_data,
+):
+    """An outside-planner timeout is an environment attempt, not a step-down."""
+
+    from simulator.engine_pool import EngineWorkerTimeout
+    from tests.chemistry.test_declared_liquid_fraction_provider import _sim
+
+    sim = _sim('magemin', vapor_pressure_data, feedstocks_data, setpoints_data)
+    calls = []
+
+    def dispatch(intent, **kwargs):
+        calls.append(intent)
+        if len(calls) == 1:
+            raise EngineWorkerTimeout('magemin', 15.0, phase='liquidus')
+        return IntentResult(intent=intent, status='ok', diagnostic={
+            'solidus_T_C': 1000, 'liquidus_T_C': 1300,
+        })
+
+    monkeypatch.setattr(sim, '_dispatch_only', dispatch)
+    curve = sim._freeze_gate_curve_from_gate_dispatch([], fO2_log=-2)
+    assert len(calls) == 2
+    assert curve['source'] == 'gate_liquid_fraction'
+    assert (curve['solidus_T_C'], curve['liquidus_T_C']) == (1000, 1300)
+    assert 'gate_provider_step_down' not in curve
+    record = curve['environment_retries']
+    assert record['disposition'] == 'environment'
+    assert 'gate_provider_step_down' not in record
+    attempt = record['provider_attempt']
+    assert attempt['provider'] == 'magemin'
+    assert attempt['disposition'] == 'environment'
+    assert 'engine_worker_timeout' in attempt['reason']
+    assert 'gate_provider_step_down' not in attempt['diagnostic']

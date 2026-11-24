@@ -11,12 +11,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -103,7 +102,30 @@ observations:
         table: '1'
         note: 'Table 1 row A0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_01_a0_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_01_a0_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -204,12 +226,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -228,7 +249,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_01_a0_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_01_a0_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -249,12 +291,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -341,7 +382,30 @@ observations:
         table: '1'
         note: 'Table 1 row A0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_02_a0_1500
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_02_a0_1500
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -442,12 +506,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -466,7 +529,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_02_a0_1500_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_02_a0_1500_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -487,12 +571,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -579,7 +662,30 @@ observations:
         table: '1'
         note: 'Table 1 row B0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_03_b0_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_03_b0_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -680,12 +786,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -704,7 +809,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_03_b0_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_03_b0_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -725,12 +851,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -817,7 +942,30 @@ observations:
         table: '1'
         note: 'Table 1 row B0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_04_b0_1500
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_04_b0_1500
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -918,12 +1066,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -942,7 +1089,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_04_b0_1500_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_04_b0_1500_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -963,12 +1131,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1055,7 +1222,30 @@ observations:
         table: '1'
         note: 'Table 1 row C0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_05_c0_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_05_c0_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1156,12 +1346,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1180,7 +1369,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_05_c0_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_05_c0_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1201,12 +1411,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1293,7 +1502,30 @@ observations:
         table: '1'
         note: 'Table 1 row C0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_06_c0_1500
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_06_c0_1500
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1394,12 +1626,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1418,7 +1649,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_06_c0_1500_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_06_c0_1500_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1439,12 +1691,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1531,7 +1782,30 @@ observations:
         table: '1'
         note: 'Table 1 row D0 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_07_d0_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_07_d0_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1632,12 +1906,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1656,7 +1929,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_07_d0_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_07_d0_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1677,12 +1971,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1769,7 +2062,30 @@ observations:
         table: '1'
         note: 'Table 1 row D0 at 1500 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_08_d0_1500
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_08_d0_1500
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1870,12 +2186,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1894,7 +2209,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_08_d0_1500_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_08_d0_1500_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -1915,12 +2251,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2009,7 +2344,30 @@ observations:
         table: '1'
         note: 'Table 1 row A1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_09_a1_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_09_a1_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2112,12 +2470,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2136,7 +2493,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_09_a1_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_09_a1_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2157,12 +2535,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2251,7 +2628,30 @@ observations:
         table: '1'
         note: 'Table 1 row A2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_10_a2_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_10_a2_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2354,12 +2754,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2378,7 +2777,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_10_a2_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_10_a2_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2399,12 +2819,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2493,7 +2912,30 @@ observations:
         table: '1'
         note: 'Table 1 row B1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_11_b1_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_11_b1_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2596,12 +3038,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2620,7 +3061,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_11_b1_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_11_b1_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2641,12 +3103,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2735,7 +3196,30 @@ observations:
         table: '1'
         note: 'Table 1 row B2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_12_b2_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_12_b2_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2838,12 +3322,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2862,7 +3345,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_12_b2_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_12_b2_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -2883,12 +3387,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2977,7 +3480,30 @@ observations:
         table: '1'
         note: 'Table 1 row B3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_13_b3_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_13_b3_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3080,12 +3606,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3104,7 +3629,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_13_b3_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_13_b3_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3125,12 +3671,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3219,7 +3764,30 @@ observations:
         table: '1'
         note: 'Table 1 row C1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_14_c1_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_14_c1_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3322,12 +3890,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3346,7 +3913,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_14_c1_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_14_c1_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3367,12 +3955,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3461,7 +4048,30 @@ observations:
         table: '1'
         note: 'Table 1 row C2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_15_c2_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_15_c2_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3564,12 +4174,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3588,7 +4197,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_15_c2_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_15_c2_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3609,12 +4239,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3703,7 +4332,30 @@ observations:
         table: '1'
         note: 'Table 1 row C3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_16_c3_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_16_c3_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3806,12 +4458,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3830,7 +4481,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_16_c3_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_16_c3_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -3851,12 +4523,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3945,7 +4616,30 @@ observations:
         table: '1'
         note: 'Table 1 row C4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_17_c4_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_17_c4_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4048,12 +4742,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4072,7 +4765,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_17_c4_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_17_c4_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4093,12 +4807,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4187,7 +4900,30 @@ observations:
         table: '1'
         note: 'Table 1 row C5 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_18_c5_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_18_c5_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4290,12 +5026,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4314,7 +5049,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_18_c5_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_18_c5_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4335,12 +5091,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4429,7 +5184,30 @@ observations:
         table: '1'
         note: 'Table 1 row D1 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_19_d1_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_19_d1_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4532,12 +5310,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4556,7 +5333,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_19_d1_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_19_d1_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4577,12 +5375,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4671,7 +5468,30 @@ observations:
         table: '1'
         note: 'Table 1 row D2 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_20_d2_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_20_d2_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4774,12 +5594,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4798,7 +5617,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_20_d2_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_20_d2_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -4819,12 +5659,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4913,7 +5752,30 @@ observations:
         table: '1'
         note: 'Table 1 row D3 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_21_d3_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_21_d3_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -5016,12 +5878,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5040,7 +5901,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_21_d3_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_21_d3_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -5061,12 +5943,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5155,7 +6036,30 @@ observations:
         table: '1'
         note: 'Table 1 row D4 at 1400 °C; printed -log a_Na2O column; printed composition columns: Na2O, CaO, SiO2; printed
           temperature column'
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: liquid slag; original_reason=phase
+      string ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_22_d4_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_22_d4_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -5258,12 +6162,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'liquid slag' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5282,7 +6185,28 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid slag'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_22_d4_1400_printed_log_input
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities: []
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_row_22_d4_1400_printed_log_input
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -5303,12 +6227,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2 reference melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5389,7 +6312,30 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Na2O-SiO2 reference melt; original_reason=phase
+      string ''Na2O-SiO2 reference melt'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_yamaguchi_reference_1400
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_yamaguchi_reference_1400
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3
@@ -5475,12 +6421,11 @@ observations:
     species:
       formula: Na2O
       phase:
-        tag: unknown
-        reason: phase string 'Na2O-SiO2 reference melt' is not in the closed automatic map
+        tag: value
+        value: l
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5561,7 +6506,30 @@ observations:
         pdf_page_index: 2
         table: '1'
         note: Table 1 footnote; quoted calibration value attributed to Yamaguchi et al. (ref. 4)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=l; evidence=source describes the activity sample as a melt: Na2O-SiO2 reference melt; original_reason=phase
+      string ''Na2O-SiO2 reference melt'' is not in the closed automatic map'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_yamaguchi_reference_1500
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: l
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags::pak_1989_table1_yamaguchi_reference_1500
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: pak-ito-fruehan-1989-isij-na2o-activity-cao-slags
   locator:
     page: 3

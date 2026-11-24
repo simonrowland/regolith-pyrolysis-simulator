@@ -357,13 +357,20 @@ def test_c2a_staged_knudsen_floor_updates_stage_and_sso_evidence():
     sim._condensation_model = CondensationModel(
         CondensationTrain.create_default()
     )
+    # The property passes the live train into collection routing.
+    # Routing is not under test; the train only has to exist.
+    sim.train = sim._condensation_model.train
     sim.overhead = SimpleNamespace(
         composition={"N2": 1.0e-6},
         pressure_mbar=1.0e-6,
         pipe_diameter_m=0.12,
     )
     sim._overhead_model = sim.overhead
+    # condensation_model refreshes the collection route and retained
+    # vapor before returning. This double only carries the staged gas
+    # control dict the floor writes; routing is not under test.
     sim.campaign_mgr = SimpleNamespace(
+        apply_collection_route=lambda _melt, _train: None,
         last_c2a_staged_gas_control={
             "stage_name": "sio_window",
             "gas_cover_mode": "pn2_sweep",
@@ -382,6 +389,10 @@ def test_c2a_staged_knudsen_floor_updates_stage_and_sso_evidence():
                 "certified_band": {"pN2_mbar": [5.0, 15.0]},
             },
         }
+    )
+    sim.atom_ledger = SimpleNamespace(
+        physical_mol_by_account=lambda _account: {},
+        last_physical_mol_projection={},
     )
 
     PyrolysisSimulator._apply_c2a_knudsen_pressure_adjustment(sim)

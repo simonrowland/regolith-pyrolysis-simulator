@@ -102,7 +102,18 @@ observations:
         paragraph: CaO–MgO–SiO2 at 50 mol% CaO
         note: Printed a(MgO) = 0.61 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a). Read
           from the text on the 600 dpi page, not from the curve.; abstract=1134
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_cms_50cao_mgo_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2017-cai-mgo-sio-fugacity
   locator:
     page: 1
@@ -254,7 +265,18 @@ observations:
         paragraph: CaO–MgO–SiO2 at 50 mol% CaO
         note: Printed a(SiO2) = 0.0032 for the CaO–MgO–SiO2 melt with 50 mol% CaO and MgO/SiO2 = 2/3 at 2300 K (Fig. 3a).
           Read from the text on the 600 dpi page, not from the curve.; abstract=1134
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_cms_50cao_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2017-cai-mgo-sio-fugacity
   locator:
     page: 1
@@ -406,7 +428,18 @@ observations:
         paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
         note: Printed a(MgO) = 0.066 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
           Read from the text on the 600 dpi page, not from the curve.; abstract=1134
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_mas_50al2o3_mgo_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2017-cai-mgo-sio-fugacity
   locator:
     page: 1
@@ -558,7 +591,18 @@ observations:
         paragraph: MgO–Al2O3–SiO2 at 50 mol% Al2O3
         note: Printed a(SiO2) = 0.11 for the MgO–Al2O3–SiO2 melt with 50 mol% Al2O3 and MgO/SiO2 = 2/3 at 2300 K (Fig. 3b).
           Read from the text on the 600 dpi page, not from the curve.; abstract=1134
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shornikov-2017-cai-mgo-sio-fugacity::shornikov_2017_mas_50al2o3_sio2_activity
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: shornikov-2017-cai-mgo-sio-fugacity
   locator:
     page: 1

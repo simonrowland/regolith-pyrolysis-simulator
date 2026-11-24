@@ -47,6 +47,74 @@ if TYPE_CHECKING:
     )
 
 
+def _residue_adapter_kinds(point, engine, experiment, quantity) -> tuple[object, ...]:
+    """Residue predictors this pair selects, in assignment order.
+
+    Hashimoto and Sossi bind only on openimcc and internal-analytical.
+    Method-specific extent adapters are last so they overwrite an earlier
+    prediction.
+    Shard-failure and duplicate guards are not part of this choice: the
+    score loop applies those before it calls a predictor.
+    """
+
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import _extent_residue_method
+
+    if quantity not in {
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        Quantity.ELEMENT_RETENTION_RATIO,
+    }:
+        return ()
+    if not isinstance(getattr(point, "identity", None), Identity):
+        return ()
+    kinds: list[object] = []
+    predictor = declared_residue_predictor(getattr(point, "source_id", None))
+    if predictor == HASHIMOTO_RESIDUE_PREDICTOR and engine in {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+    }:
+        kinds.append(HASHIMOTO_RESIDUE_PREDICTOR)
+    if predictor == SOSSI_RESIDUE_PREDICTOR and engine in {
+        Engine.OPENIMCC,
+        Engine.INTERNAL_ANALYTICAL,
+    }:
+        kinds.append(SOSSI_RESIDUE_PREDICTOR)
+    if (extent_method := _extent_residue_method(point, experiment, quantity)) is not None:
+        kinds.append(extent_method)
+    return tuple(kinds)
+
+
+def _residue_adapter_binds(point, engine, experiment, quantity) -> bool:
+    """Whether a source-specific residue predictor will run for this pair."""
+
+    return bool(_residue_adapter_kinds(point, engine, experiment, quantity))
+
+
+def _scoring_quantity(point, quantity):
+    """Quantity this pair offers the engine.
+
+    A Zhang implied-alpha row stays an evaporation-coefficient observation.
+    The engine request is the activity coefficient, and coverage follows
+    that request. Every other row keeps its own quantity.
+    """
+
+    from simulator.battery.enums import Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        _implied_alpha_activity_observation,
+        quantity_token,
+    )
+
+    if quantity is not Quantity.EVAPORATION_COEFFICIENT_ALPHA:
+        return quantity
+    implied = _implied_alpha_activity_observation(point)
+    if implied is None or not isinstance(getattr(implied, "identity", None), Identity):
+        return quantity
+    rewritten = quantity_token(implied.identity)
+    return quantity if rewritten is None else rewritten
+
+
 def _residue_cohort_selection(
     selected_experiment_ids: frozenset[str] | None,
     test_experiment_ids: frozenset[str] | None,
@@ -345,11 +413,11 @@ def _score_store_with_decisions(
         _compilation_decision_strata,
         _compile_residual_with_lineage,
         _duplicate_observation_refusal_detail,
+        _extent_residue_prediction,
         _group_token,
         _has_duplicate_observation_link,
         _has_intrinsic_redox_activity,
         _hashimoto_residue_prediction,
-        _knudsen_residue_prediction,
         _prepare_score_run,
         _source_alignment_group_key,
         _sossi_residue_prediction,
@@ -400,6 +468,7 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
+    from simulator.battery.engine_capability import engine_covers_quantity
     from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
@@ -412,6 +481,7 @@ def _score_store_with_decisions(
     started = time.monotonic()
     last_progress = started
     done = 0
+    skipped_capability = 0
     total = sum(
         prepared.series_point_counts.get(obs.observation_id, 1) for obs in refs
     ) * max(len(engine_set), 1)
@@ -424,6 +494,8 @@ def _score_store_with_decisions(
         if _stream is not None:
             _stream.flush()
         progress = f"score progress {done}/{total} residuals"
+        if skipped_capability:
+            progress += f" skipped_capability={skipped_capability}"
         if _stream is not None:
             progress += f" written={_stream.count}"
         print(
@@ -504,6 +576,29 @@ def _score_store_with_decisions(
                         point_origin,
                         production_scoring=predict is None,
                     ):
+                        # An engine with no adapter for this quantity is a
+                        # capability-matrix cell, not a residual. Injected
+                        # predictors still see every engine. Residue adapters
+                        # stay in the loop even though the quantity is absent
+                        # from the generic table. Implied-alpha coverage uses
+                        # the activity-coefficient request, not the stored alpha.
+                        offered_quantity = (
+                            None
+                            if quantity is None
+                            else _scoring_quantity(point, quantity)
+                        )
+                        if (
+                            predict is None
+                            and offered_quantity is not None
+                            and not engine_covers_quantity(engine, offered_quantity)
+                            and not _residue_adapter_binds(
+                                point, engine, experiment, quantity
+                            )
+                        ):
+                            done += 1
+                            skipped_capability += 1
+                            report_progress_if_due()
+                            continue
                         prediction = None
                         scoring_predict = (
                             partial(
@@ -537,19 +632,18 @@ def _score_store_with_decisions(
                                 refusal_detail={"reason": "diagnostic_population"},
                                 identity=point.identity if isinstance(point.identity, Identity) else None,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and declared_residue_predictor(point.source_id)
-                            == HASHIMOTO_RESIDUE_PREDICTOR
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
+                        residue_kinds = (
+                            ()
+                            if (
+                                _shard_failure_reason is not None
+                                or duplicate_detail is not None
+                                or predict is not None
+                            )
+                            else _residue_adapter_kinds(
+                                point, engine, experiment, quantity
+                            )
+                        )
+                        if HASHIMOTO_RESIDUE_PREDICTOR in residue_kinds:
                             prediction = _hashimoto_residue_prediction(
                                 context,
                                 point,
@@ -558,19 +652,7 @@ def _score_store_with_decisions(
                                 selected_experiment_ids=prepared.hashimoto_experiment_ids,
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
-                        if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and declared_residue_predictor(point.source_id)
-                            == SOSSI_RESIDUE_PREDICTOR
-                            and engine in {Engine.OPENIMCC, Engine.INTERNAL_ANALYTICAL}
-                        ):
+                        if SOSSI_RESIDUE_PREDICTOR in residue_kinds:
                             prediction = _sossi_residue_prediction(
                                 context,
                                 point,
@@ -580,18 +662,10 @@ def _score_store_with_decisions(
                                 test_experiment_ids=prepared.test_experiment_ids,
                             )
                         if (
-                            _shard_failure_reason is None
-                            and duplicate_detail is None
-                            and predict is None
-                            and isinstance(point.identity, Identity)
-                            and quantity in {
-                                Quantity.RESIDUE_COMPONENT_COMPOSITION,
-                                Quantity.ELEMENT_RETENTION_RATIO,
-                            }
-                            and experiment is not None and experiment.method.is_value
-                            and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+                            MethodToken.KNUDSEN_EFFUSION in residue_kinds
+                            or MethodToken.LANGMUIR_FREE_EVAPORATION in residue_kinds
                         ):
-                            prediction = _knudsen_residue_prediction(
+                            prediction = _extent_residue_prediction(
                                 context, point, engine, residue_prediction_cache,
                             )
                         intrinsic_redox_activity = _has_intrinsic_redox_activity(

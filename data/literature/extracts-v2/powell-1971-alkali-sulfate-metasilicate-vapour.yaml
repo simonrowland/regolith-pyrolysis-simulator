@@ -68,7 +68,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r01_log_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -268,7 +280,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r02_log_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -468,7 +492,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r03_log_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -668,7 +704,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r04_log_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -868,7 +916,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r05_log_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -1068,7 +1128,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - log10_K_reaction
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_eyber_na2so4_r06_log_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 45
@@ -1154,7 +1226,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r01_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1240,7 +1323,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r02_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1326,7 +1420,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r03_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1412,7 +1517,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_nickel_r04_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1498,7 +1614,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r05_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1584,7 +1711,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r06_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1670,7 +1808,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r07_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1756,7 +1905,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_k2so4_platinum_r08_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 47
@@ -1842,7 +2002,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r01_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -1928,7 +2099,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r02_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2014,7 +2196,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r03_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2100,7 +2293,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r04_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2186,7 +2390,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r05_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2272,7 +2487,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r06_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2358,7 +2584,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r07_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2444,7 +2681,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_kroger_stratmann_na2so4_r08_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 46
@@ -2528,7 +2776,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r01_dissociation_and_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2593,7 +2852,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r02_dissociation_and_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2659,7 +2929,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r03_dissociation_and_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2725,7 +3006,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r04_dissociation_and_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -2791,7 +3083,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p100_r05_dissociation_and_kp
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 100
@@ -3025,12 +3328,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3052,7 +3354,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r04_dissociation_and_kp
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -3089,12 +3402,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3116,7 +3428,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_p101_r05_dissociation_and_kp
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 101
@@ -3600,12 +3923,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3627,7 +3949,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -3653,12 +3986,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3721,7 +4053,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r05_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -4784,12 +5128,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4811,7 +5154,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -4837,12 +5191,11 @@ observations:
     species:
       formula: Li2SO4
       phase:
-        tag: unknown
-        reason: source does not state phase
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4905,7 +5258,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=source does
+      not state phase'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t01_r13_mass_loss_rate
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 79
@@ -7779,7 +8144,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -7875,7 +8251,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -7928,7 +8316,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8024,7 +8423,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8077,7 +8488,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8173,7 +8595,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8226,7 +8660,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8322,7 +8767,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8375,7 +8832,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8471,7 +8939,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8524,7 +9004,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8620,7 +9111,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8673,7 +9176,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8769,7 +9283,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8822,7 +9348,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8918,7 +9455,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -8971,7 +9520,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r10_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9067,7 +9627,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r10_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9120,7 +9692,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r11_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9216,7 +9799,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r11_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9269,7 +9864,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r12_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9365,7 +9971,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r12_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9418,7 +10036,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9514,7 +10143,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t03_r13_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 83
@@ -9567,7 +10208,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -9663,7 +10315,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -9716,7 +10380,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -9812,7 +10487,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -9865,7 +10552,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -9961,7 +10659,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10014,7 +10724,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10110,7 +10831,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10163,7 +10896,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10259,7 +11003,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10312,7 +11068,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10408,7 +11175,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10461,7 +11240,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10557,7 +11347,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10610,7 +11412,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10706,7 +11519,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10759,7 +11584,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r10_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10855,7 +11691,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r10_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -10908,7 +11756,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r11_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11004,7 +11863,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r11_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11057,7 +11928,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r12_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11153,7 +12035,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r12_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11206,7 +12100,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11302,7 +12207,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r13_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11355,7 +12272,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r14_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11451,7 +12379,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r14_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11504,7 +12444,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r15_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11600,7 +12551,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t04_r15_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 85
@@ -11653,7 +12616,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -11749,7 +12723,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -11802,7 +12788,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -11898,7 +12895,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -11951,7 +12960,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12047,7 +13067,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12100,7 +13132,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12196,7 +13239,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12249,7 +13304,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12345,7 +13411,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12398,7 +13476,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12494,7 +13583,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12547,7 +13648,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12643,7 +13755,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12696,7 +13820,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12792,7 +13927,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12845,7 +13992,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r10_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12941,7 +14099,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r10_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -12994,7 +14164,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r11_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13090,7 +14271,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r11_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13143,7 +14336,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r12_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13239,7 +14443,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r12_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13292,7 +14508,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13388,7 +14615,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r13_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13441,7 +14680,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r14_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13537,7 +14787,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t05_r14_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 87
@@ -13851,7 +15113,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen cell''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r05_slope_enthalpy
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13914,7 +15187,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r06_slope_enthalpy
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -13979,7 +15263,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t06_r07_slope_enthalpy
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 92
@@ -14205,7 +15500,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r02_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14258,7 +15564,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r03_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14311,7 +15628,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r04_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14364,7 +15692,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t08_r05_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 106
@@ -14417,7 +15756,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14513,7 +15863,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14566,7 +15928,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14662,7 +16035,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14715,7 +16100,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14811,7 +16207,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14864,7 +16272,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -14960,7 +16379,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15013,7 +16444,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15109,7 +16551,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15162,7 +16616,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15258,7 +16723,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15311,7 +16788,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15407,7 +16895,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15460,7 +16960,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15556,7 +17067,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15609,7 +17132,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r10_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15705,7 +17239,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r10_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15758,7 +17304,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r11_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15854,7 +17411,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r11_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -15907,7 +17476,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r12_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16003,7 +17583,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r12_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16056,7 +17648,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16152,7 +17755,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r13_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16205,7 +17820,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r14_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16301,7 +17927,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r14_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16354,7 +17992,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r15_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16450,7 +18099,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r15_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16503,7 +18164,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r16_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16599,7 +18271,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r16_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16652,7 +18336,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r17_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16748,7 +18443,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r17_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16801,7 +18508,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r18_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16897,7 +18615,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t09_r18_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 116
@@ -16950,7 +18680,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17046,7 +18787,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17099,7 +18852,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17195,7 +18959,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17248,7 +19024,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17344,7 +19131,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17397,7 +19196,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17493,7 +19303,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17546,7 +19368,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17642,7 +19475,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17695,7 +19540,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17791,7 +19647,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17844,7 +19712,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17940,7 +19819,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -17993,7 +19884,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -18089,7 +19991,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t10_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 119
@@ -18142,7 +20056,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r02_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18195,7 +20120,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r03_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18248,7 +20184,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r04_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18301,7 +20248,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r05_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18354,7 +20312,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t11_r06_torsion_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 131
@@ -18407,7 +20376,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18503,7 +20483,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18556,7 +20548,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18652,7 +20655,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18705,7 +20720,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18801,7 +20827,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18854,7 +20892,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -18950,7 +20999,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19003,7 +21064,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19099,7 +21171,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19152,7 +21236,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19248,7 +21343,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19301,7 +21408,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19397,7 +21515,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19450,7 +21580,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19546,7 +21687,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19599,7 +21752,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r10_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19695,7 +21859,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r10_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19748,7 +21924,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r11_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19844,7 +22031,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r11_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19897,7 +22096,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r12_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -19993,7 +22203,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r12_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -20046,7 +22268,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r13_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -20142,7 +22375,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r13_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -20195,7 +22440,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r14_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -20291,7 +22547,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t12_r14_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 136
@@ -20344,7 +22612,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r02_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20440,7 +22719,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r02_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20493,7 +22784,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r03_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20589,7 +22891,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r03_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20642,7 +22956,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r04_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20738,7 +23063,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r04_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20791,7 +23128,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r05_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20887,7 +23235,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r05_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -20940,7 +23300,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r06_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21036,7 +23407,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r06_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21089,7 +23472,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r07_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21185,7 +23579,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r07_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21238,7 +23644,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r08_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21334,7 +23751,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r08_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21387,7 +23816,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r09_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21483,7 +23923,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r09_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21536,7 +23988,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r10_apparent_knudsen_pressure
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142
@@ -21632,7 +24095,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_inferred
+    affected_quantities:
+    - mass_loss_rate
+    reason: 'method_inferred: value=knudsen_effusion; evidence=source text names ''knudsen effusion''; original_reason=regime
+      ''quoted_vapour_pressure'' is not a closed method token (kems_effusion alone is insufficient)'
+    origin: powell-1971-alkali-sulfate-metasilicate-vapour::powell_1971_t13_r10_mass_loss_rate
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: knudsen_effusion
+      units: method token
   source_id: powell-1971-alkali-sulfate-metasilicate-vapour
   locator:
     page: 142

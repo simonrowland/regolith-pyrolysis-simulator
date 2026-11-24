@@ -89,7 +89,7 @@ def test_recipe_run_inputs_and_corpus_version_remain_identity() -> None:
     assert cache_key(prior_corpus) != cache_key(base)
     assert cache_key(base) != OLD_FINGERPRINT_KEY_SHAPE
     assert current_corpus_version() == (
-        "analytical-corpus-2026-11-19-c2a-staged-pressure-v1"
+        "analytical-corpus-2026-11-23-furnace-langmuir-fe-obar-v1"
     )
 
 

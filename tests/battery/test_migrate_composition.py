@@ -8078,6 +8078,10 @@ def _internal_engine_point_for_real_extract(
         pytest.param(
             "aithala-2026-magmatic-iron-redox-to-2100c.yaml",
             "aithala_2026_1800_30_xanes",
+            # fam13 binds this reviewed SI-8 / Table S-2 row to its PDF source.
+            # Printed FeO* is 16.04 wt%; the resulting FeO mole fraction stays
+            # 0.13850021506701168 before and after. The notice locator changes
+            # from source_path=None to the hashed supplementary PDF path.
             {
                 "Al2O3": 0.06887361206879163,
                 "CaO": 0.08717220545569997,
@@ -8101,7 +8105,10 @@ def _internal_engine_point_for_real_extract(
                 "table_continued=None, table='S-2', figure=None, "
                 "paragraph=None, section=None, equation=None, "
                 "line_range=None, note='WDS EPMA composition for 1800-30; "
-                "all oxide columns in wt.% as printed.', source_path=None, "
+                "all oxide columns in wt.% as printed.; "
+                "source_sha256=ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa', "
+                "source_path='raw/aithala-2026-magmatic-iron-redox-to-2100c/"
+                "aithala-2026-magmatic-iron-redox-to-2100c-si.pdf', "
                 "record=None)"
             ),
             id="aithala-green-notice-has-one-feot-clause",

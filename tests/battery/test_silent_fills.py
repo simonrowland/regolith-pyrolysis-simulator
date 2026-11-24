@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     BenchIdentityBasis,
     CellMaterial,
     Engine,
+    MethodToken,
     NoticeKind,
     Phase,
     Quantity,
@@ -34,6 +35,7 @@ from simulator.battery.records import (
 from simulator.battery.score import (
     _cell_material_class,
     cell_notices,
+    flagged_strata,
     predict_with_engine,
 )
 from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -45,7 +47,7 @@ from simulator.diagnostic_helpers.binary_pot_battery import (
     EngineHandle,
     Po2Request,
     _DEFAULT_FO2_LOG,
-    _DEFAULT_PRESSURE_BAR,
+    DP_019_VACUUM_BOUNDARY_BAR,
     _fo2_log_for_request,
     equilibrate_cell,
 )
@@ -311,7 +313,7 @@ def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
     assert seen["pressure_bar"] == pytest.approx(1.0)
     reasons = [notice.reason for notice in prediction.notices if notice.kind is NoticeKind.INPUT_OMITTED]
     assert any("no multivalent element" in reason and "omitted" in reason for reason in reasons)
-    assert not any(notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices)
+    assert not any(notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in prediction.notices)
 
 
 def test_printed_oxygen_is_commanded(monkeypatch) -> None:
@@ -816,20 +818,38 @@ def test_unallowlisted_formation_quantity_refuses_before_engine(monkeypatch) -> 
 
 def test_stated_pure_reservoir_is_the_pot_and_oxygen_is_omitted(monkeypatch) -> None:
     seen = _capture_cell(monkeypatch)
+    experiment = F.tabulation_experiment(
+        method=MethodToken.LANGMUIR_FREE_EVAPORATION
+    )
     ident = F.psat_identity("Na")
-    obs = F.observation("na-psat", "exp", ident, Decimal("1"))
-    prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
+    obs = F.observation(
+        "na-psat", experiment.experiment_id, ident, Decimal("1")
+    )
+    prediction = predict_with_engine(
+        Engine.VAPOROCK, obs, isolated=False, experiment=experiment
+    )
     assert seen["wt"] == {"Na": 100.0}
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
-    assert seen["pressure_bar"] == pytest.approx(_DEFAULT_PRESSURE_BAR)
+    assert seen["pressure_bar"] == pytest.approx(DP_019_VACUUM_BOUNDARY_BAR)
     reasons = [notice.reason for notice in prediction.notices]
     assert any("pure condensed substance Na (l)" in reason for reason in reasons)
     assert any("p_sat does not take oxygen" in reason and "omitted" in reason for reason in reasons)
-    assert any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
-        and f"{_DEFAULT_PRESSURE_BAR:g} bar" in notice.reason
+    from simulator.battery.default_policy import resolve
+
+    policy = resolve("DP-019")
+    pressure_notice = next(
+        notice
         for notice in prediction.notices
+        if notice.policy is not None and notice.policy.id == "DP-019"
+    )
+    assert pressure_notice.kind is NoticeKind.METHOD_IMPLIED
+    assert "observation does not carry total_pressure_Pa" in pressure_notice.reason
+    assert pressure_notice.policy is not None
+    assert pressure_notice.policy.value == policy.payload["policy"]["value"]
+    assert pressure_notice.policy.units == policy.units
+    assert flagged_strata((pressure_notice,)) == (
+        NoticeKind.METHOD_IMPLIED.value,
     )
 
 
@@ -841,7 +861,14 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
     )
     obs = F.observation("no-p", "exp", ident, Decimal("0.2"))
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
-    assert seen["pressure_bar"] == pytest.approx(_DEFAULT_PRESSURE_BAR)
+    from simulator.battery.default_policy import resolve
+    from simulator.physical_constants import PA_PER_BAR
+
+    policy = resolve("DP-001")
+    expected_pressure_bar = float(
+        Decimal(str(policy.value)) / Decimal(str(PA_PER_BAR))
+    )
+    assert seen["pressure_bar"] == pytest.approx(expected_pressure_bar)
     assert seen["mode"] == PO2_NOT_AN_INPUT
     assert seen["po2_bar"] is None
     assert any(
@@ -851,9 +878,12 @@ def test_missing_total_pressure_is_a_visible_assumption(monkeypatch) -> None:
         for notice in prediction.notices
     )
     assert any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN
+        notice.kind is NoticeKind.ASSUMED_PRESSURE
         and "does not carry total_pressure_Pa" in notice.reason
-        and f"assumes {_DEFAULT_PRESSURE_BAR:g} bar" in notice.reason
+        and notice.policy is not None
+        and notice.policy.id == "DP-001"
+        and notice.policy.value == policy.payload["policy"]["value"]
+        and notice.policy.units == policy.units
         for notice in prediction.notices
     )
 
@@ -870,7 +900,7 @@ def test_printed_total_pressure_is_passed_without_an_assumption(monkeypatch) -> 
     prediction = predict_with_engine(Engine.VAPOROCK, obs, isolated=False)
     assert seen["pressure_bar"] == pytest.approx(2500 / 1.0e5)
     assert not any(
-        notice.kind is NoticeKind.PRESSURE_PROVENANCE_UNKNOWN for notice in prediction.notices
+        notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in prediction.notices
     )
 
 

@@ -801,3 +801,52 @@ def test_solved_total_below_existing_oxygen_partial_refuses() -> None:
     sim.melt.pO2_mbar = 0.0
     apply_process_chamber_pressure(sim, dt_s=_HOUR_S)
     assert sim.melt.p_total_mbar == pytest.approx(expected_mbar, rel=1e-12)
+
+
+def _apparatus_sim(*, offgas_mol_hr: float, timestep):
+    speed_m3_s = 0.004
+    sim = _Sim(
+        _schedule(driver="apparatus", flow=0.3),
+        _geometry(speed=speed_m3_s, ultimate=0.0, path=[]),
+        campaign=CampaignPhase.C0,
+        p_total_mbar=13.0,
+        offgas_mol_hr=offgas_mol_hr,
+    )
+    sim.process_timestep = timestep
+    return sim
+
+
+def test_process_hook_passes_process_dt_and_keeps_the_literal_hour() -> None:
+    """The hour hook passes 3600 s. A shorter step passes process_dt.
+
+    Carrier Q is ``_Q_NL_0_3``. An evolved rate equal to that carrier
+    doubles it, so steady P = 2 Q / S. The molar rate divides dt back
+    out, so both lengths share that pressure. The recorded ``dt_s`` is
+    the length the solver received.
+
+    Mutation: leave every call on ``dt_s=3600``. The 60 s diagnostic
+    stays 3600.
+    """
+
+    from simulator.core import PyrolysisSimulator
+    from simulator.process_timestep import ONE_HOUR, resolve_process_timestep
+
+    speed_m3_s = 0.004
+    n_dot = normal_litres_per_minute_to_mol_per_s(0.3)
+    expected_mbar = 2.0 * (_Q_NL_0_3 / speed_m3_s) / 100.0
+    offgas_mol_hr = n_dot * _HOUR_S
+
+    hourly = _apparatus_sim(offgas_mol_hr=offgas_mol_hr, timestep=ONE_HOUR)
+    PyrolysisSimulator._apply_teststand_chamber_pressure(hourly)
+    assert hourly.last_teststand_pressure["dt_s"] == 3600.0
+    assert hourly.last_teststand_pressure["form"] == "steady_state"
+    assert hourly.melt.p_total_mbar == pytest.approx(expected_mbar, rel=1e-12)
+
+    short = _apparatus_sim(
+        offgas_mol_hr=offgas_mol_hr,
+        timestep=resolve_process_timestep(60.0),
+    )
+    PyrolysisSimulator._apply_teststand_chamber_pressure(short)
+    assert short.last_teststand_pressure["dt_s"] == 60.0
+    assert short.last_teststand_pressure["form"] == "steady_state"
+    assert short.melt.p_total_mbar == pytest.approx(expected_mbar, rel=1e-12)

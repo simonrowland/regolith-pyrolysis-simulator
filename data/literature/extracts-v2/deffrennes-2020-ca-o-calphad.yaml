@@ -89,6 +89,17 @@ observations:
     - transition_temperature
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_air_solidification
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -208,6 +219,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_manara_reducing_solidification
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -310,6 +332,17 @@ observations:
     - transition_temperature
     reason: bound_type=degenerate_air_interval; computed pO2=0.20946 x stated total pressure; interval condition not yet scorable
     origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: deffrennes-2020-ca-o-calphad::deffrennes_2020_yamada_solidification
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature

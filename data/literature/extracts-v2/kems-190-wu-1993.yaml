@@ -11,12 +11,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -51,6 +50,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_calculated_ternary_peritectic
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -157,12 +167,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -184,6 +193,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -204,12 +224,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -231,6 +250,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -251,12 +281,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -278,6 +307,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -298,12 +338,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -325,6 +364,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -345,12 +395,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -372,6 +421,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -392,12 +452,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -419,6 +478,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -439,12 +509,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-MgO-SiO2_binary_liquid_and_solid_solution_models' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -466,6 +535,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-MgO-SiO2_binary_liquid_and_solid_solution_models'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_optimized_binary_model_parameters
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -486,12 +566,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -524,7 +603,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-FeO-SiO2_peritectic_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_reported_ternary_peritectic
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33
@@ -627,12 +717,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Fe2SiO4(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -654,6 +743,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Fe2SiO4(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_fe2sio4_optimized_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -675,12 +775,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -702,6 +801,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_feo_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -723,12 +833,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -750,6 +859,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_feo_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -771,12 +891,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -798,6 +917,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_feo_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -819,12 +949,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -846,6 +975,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: FeO(l); FeO(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_feo_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -867,12 +1007,11 @@ observations:
     species:
       formula: FeSiO3
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: FeSiO3(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -894,6 +1033,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: FeSiO3(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_fesio3_optimized_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -915,12 +1065,11 @@ observations:
     species:
       formula: Mg2SiO4
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: Mg2SiO4(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -942,6 +1091,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: Mg2SiO4(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_mg2sio4_optimized_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -963,12 +1123,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: MgO(l); MgO(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -988,7 +1147,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: MgO(l); MgO(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_mgo_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 28
@@ -1006,12 +1176,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: MgO(l); MgO(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1031,7 +1200,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: MgO(l); MgO(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_mgo_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 28
@@ -1049,12 +1229,11 @@ observations:
     species:
       formula: MgSiO3
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: MgSiO3(s)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1076,6 +1255,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: MgSiO3(s)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_mgsio3_optimized_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1097,12 +1287,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1122,7 +1311,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_sio2_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 28
@@ -1140,12 +1340,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1165,7 +1364,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_sio2_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 28
@@ -1183,12 +1393,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1208,7 +1417,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_sio2_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 28
@@ -1226,12 +1446,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: 'phase string ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1251,7 +1470,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''multi-phase table: SiO2(l); SiO2(tr); SiO2(cr)'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table1_sio2_compiled_thermochemistry
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 28
@@ -1269,12 +1499,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1297,6 +1526,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1318,12 +1558,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1346,6 +1585,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1367,12 +1617,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1395,6 +1644,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1416,12 +1676,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1444,6 +1703,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1465,12 +1735,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1493,6 +1762,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1514,12 +1794,11 @@ observations:
     species:
       formula: FeO
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1542,6 +1821,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_feo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1563,12 +1853,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1591,6 +1880,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1612,12 +1912,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1640,6 +1939,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1661,12 +1971,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1689,6 +1998,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1710,12 +2030,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1738,6 +2057,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1759,12 +2089,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1787,6 +2116,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1808,12 +2148,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1836,6 +2175,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''FeO-SiO2_liquid_in_equilibrium_with_metallic_Fe'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_feo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1857,12 +2207,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1885,6 +2234,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1906,12 +2266,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1934,6 +2293,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -1955,12 +2325,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1983,6 +2352,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2004,12 +2384,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2032,6 +2411,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2053,12 +2443,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2081,6 +2470,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2102,12 +2502,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2130,6 +2529,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2151,12 +2561,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2179,6 +2588,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2200,12 +2620,11 @@ observations:
     species:
       formula: MgO
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2228,6 +2647,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_mgo_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2249,12 +2679,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2277,6 +2706,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2298,12 +2738,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2326,6 +2765,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2347,12 +2797,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2375,6 +2824,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2396,12 +2856,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2424,6 +2883,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2445,12 +2915,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2473,6 +2942,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2494,12 +2974,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2522,6 +3001,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2543,12 +3033,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2571,6 +3060,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2592,12 +3092,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'MgO-SiO2_liquid' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2620,6 +3119,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''MgO-SiO2_liquid'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table2_mgo_sio2_sio2_model_rtln_gamma
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -2641,12 +3151,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2714,6 +3223,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - transition_temperature
@@ -2736,12 +3257,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2809,6 +3329,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - transition_temperature
@@ -2831,12 +3363,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2904,6 +3435,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - transition_temperature
@@ -2926,12 +3469,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2999,6 +3541,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - transition_temperature
@@ -3021,12 +3575,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3094,6 +3647,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - transition_temperature
@@ -3116,12 +3681,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3189,6 +3753,18 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_calculated_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities:
     - transition_temperature
@@ -3211,12 +3787,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3281,7 +3856,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33
@@ -3362,12 +3949,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3432,7 +4018,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33
@@ -3513,12 +4111,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3583,7 +4180,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33
@@ -3664,12 +4273,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3734,7 +4342,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33
@@ -3815,12 +4435,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3885,7 +4504,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33
@@ -3966,12 +4597,11 @@ observations:
     species:
       formula: Fe2SiO4
       phase:
-        tag: unknown
-        reason: phase string 'Mg2SiO4-Fe2SiO4_solidus' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4036,7 +4666,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Mg2SiO4-Fe2SiO4_solidus'' is not in the closed automatic map'
+    origin: kems-190-wu-1993::wu_1993_table3_reported_solidus_points
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-190-wu-1993
   locator:
     published_page: 33

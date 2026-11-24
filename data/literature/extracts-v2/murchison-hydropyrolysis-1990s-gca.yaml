@@ -11,12 +11,11 @@ observations:
     species:
       formula: Murchison_CM2
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysate_GCMS' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -41,6 +40,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:figure_only
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysate_GCMS'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_gcms_chromatograms_figure_only
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:figure_only
@@ -70,12 +80,11 @@ observations:
     species:
       formula: Murchison_CM2
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_solvent_extracted_whole_rock_with_Mo_catalyst' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -100,7 +109,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_solvent_extracted_whole_rock_with_Mo_catalyst'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_murchison_h2_pyrolysis_method
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1386
@@ -126,12 +146,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -155,7 +174,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -174,12 +204,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -203,7 +232,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_carbon_wt_percent
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -222,12 +262,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -294,7 +333,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -313,12 +364,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -385,7 +435,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -404,12 +466,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -476,7 +537,19 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - isotope_delta
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_isotopes
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -495,12 +568,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -524,7 +596,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -543,12 +626,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_fractions' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -572,7 +654,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_fractions'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_pyrolysis_nitrogen_wt_percent
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -591,12 +684,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_H2_pyrolysis_mass_balance' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -623,6 +715,17 @@ observations:
     status: admitted
     reason: admission_from_legacy_token:model_output_not_measurement
   notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_H2_pyrolysis_mass_balance'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2_total_pyrolysate_mass_balance
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   - kind: admission_from_legacy_token
     affected_quantities: []
     reason: admission_from_legacy_token:model_output_not_measurement
@@ -652,12 +755,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_HF_HCl_residue_H2O_pyrolysis' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -678,7 +780,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_HF_HCl_residue_H2O_pyrolysis'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -707,12 +820,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_HF_HCl_residue_H2O_pyrolysis' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -733,7 +845,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_HF_HCl_residue_H2O_pyrolysis'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -762,12 +885,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_HF_HCl_residue_H2O_pyrolysis' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -788,7 +910,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_HF_HCl_residue_H2O_pyrolysis'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table1_h2o_pyrolysis_irms
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1389
@@ -817,12 +950,11 @@ observations:
     species:
       formula: Murchison_CM2
       phase:
-        tag: unknown
-        reason: phase string 'Murchison_HF_HCl_residue_combustion_components' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -844,7 +976,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''Murchison_HF_HCl_residue_combustion_components'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table2_component_classification_quoted
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -863,12 +1006,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -894,7 +1036,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -963,12 +1116,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -994,7 +1146,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1063,12 +1226,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1094,7 +1256,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1163,12 +1336,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1194,7 +1366,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1263,12 +1446,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1294,7 +1476,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1363,12 +1556,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1394,7 +1586,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1463,12 +1666,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1494,7 +1696,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1563,12 +1776,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1594,7 +1806,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1663,12 +1886,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1694,7 +1916,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1763,12 +1996,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1794,7 +2026,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1863,12 +2106,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1894,7 +2136,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -1963,12 +2216,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1994,7 +2246,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2063,12 +2326,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2094,7 +2356,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2163,12 +2436,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2194,7 +2466,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2263,12 +2546,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2294,7 +2576,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2363,12 +2656,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2394,7 +2686,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2463,12 +2766,11 @@ observations:
     species:
       formula: C
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2494,7 +2796,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_carbon
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2563,12 +2876,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2591,7 +2903,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2620,12 +2943,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2648,7 +2970,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2677,12 +3010,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2705,7 +3037,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2734,12 +3077,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2762,7 +3104,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2791,12 +3144,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2819,7 +3171,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2848,12 +3211,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2876,7 +3238,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2905,12 +3278,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2933,7 +3305,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -2962,12 +3345,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2990,7 +3372,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -3019,12 +3412,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3047,7 +3439,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -3076,12 +3479,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3104,7 +3506,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390
@@ -3133,12 +3546,11 @@ observations:
     species:
       formula: N
       phase:
-        tag: unknown
-        reason: phase string 'H2_pyrolysis_residue_stepped_combustion' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3161,7 +3573,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''H2_pyrolysis_residue_stepped_combustion'' is not in the closed automatic map'
+    origin: murchison-hydropyrolysis-1990s-gca::sephton_2004_table3_stepped_combustion_nitrogen
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: murchison-hydropyrolysis-1990s-gca
   locator:
     published_page: 1390

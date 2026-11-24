@@ -7,8 +7,17 @@ from unittest.mock import patch
 import yaml
 
 import simulator.battery.migrate as migrate_module
-from simulator.battery.enums import AdmissionStatus, EvidenceClass, Quantity, ValueKind
+from simulator.battery.default_policy import resolve
+from simulator.battery.enums import (
+    AdmissionStatus,
+    EvidenceClass,
+    NoticeKind,
+    Phase,
+    Quantity,
+    ValueKind,
+)
 from simulator.battery.migrate import wt_pct_to_mole_fraction
+from simulator.battery.records import NoticePolicy
 
 
 _ROOT = Path(__file__).resolve().parents[1]
@@ -139,7 +148,14 @@ def test_willenborg_text_activity_values_and_table_row_counts() -> None:
         assert row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert row.derivation is not None
         assert row.derivation.has_located_unprinted_raw_inputs
-        assert row.identity.species.phase.is_unknown
+        assert row.identity.species.phase.is_value
+        assert row.identity.species.phase.value is Phase.UNSPECIFIED
+        phase_notice = next(
+            notice for notice in row.notices
+            if notice.kind is NoticeKind.PHASE_INFERRED
+        )
+        phase_policy = resolve("DP-016", inferred_phase=Phase.UNSPECIFIED.value)
+        assert phase_notice.policy == NoticePolicy(**phase_policy.payload["policy"])
         assert row.identity.temperature_K.value == Decimal("1673.15")
         assert row.identity.composition.is_value
         assert row.identity.composition.value == wt_pct_to_mole_fraction(

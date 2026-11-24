@@ -16707,12 +16707,11 @@ observations:
     species:
       formula: SiO2
       phase:
-        tag: unknown
-        reason: phase string 'binary oxide systems' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -16741,7 +16740,18 @@ observations:
         published_page: 3713
         pdf_page_index: 3
         table: III
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''binary oxide systems'' is not in the closed automatic map'
+    origin: kems-053-stolyarova-1991::stolyarova_1991_gas_speciation_table3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: kems-053-stolyarova-1991
   locator:
     page: 4

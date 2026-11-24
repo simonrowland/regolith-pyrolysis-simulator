@@ -47,29 +47,81 @@ def paper_point(store):
     )
 
 
-@pytest.mark.parametrize("confidence, factor", [
-    ("one_sigma", NORMAL_95_TICKET_MULTIPLIER),
-    ("two_sigma", Decimal(1)),
-    ("ci95", Decimal(1)),
-    ("not_stated", Decimal(1)),
+@pytest.mark.parametrize("declaration, factor, inclusive, outside", [
+    ({"confidence_level": "one_sigma"}, NORMAL_95_TICKET_MULTIPLIER, "MATCH", "MATCH"),
+    # A 1 wt% two-sigma width normalizes to 0.5 wt%, then gets Z95.
+    (
+        {"confidence_level": "two_sigma"},
+        Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
+        "MISMATCH",
+        "MISMATCH",
+    ),
+    ({"confidence_level": "ci95"}, Decimal(1), "MATCH", "MISMATCH"),
+    ({"confidence_level": "not_stated"}, Decimal(1), "MATCH", "MISMATCH"),
+    (
+        {"kind": "two_sigma"},
+        Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
+        "MISMATCH",
+        "MISMATCH",
+    ),
+    ({"k": 2}, Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER, "MISMATCH", "MISMATCH"),
+    (
+        {"k": 2, "note": "standard deviation"},
+        Decimal("0.5") * NORMAL_95_TICKET_MULTIPLIER,
+        "MISMATCH",
+        "MISMATCH",
+    ),
 ])
-def test_shared_scalar_policy(paper_point, confidence, factor):
+def test_shared_scalar_policy(paper_point, declaration, factor, inclusive, outside):
     # Widths are comparator fixtures, never assertions about Hashimoto's errors.
     obs = replace(paper_point, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED,
-        verbatim={"value": "1", "unit": "wt%", "confidence_level": confidence},
+        verbatim={"value": "1", "unit": "wt%", **declaration},
     ))
-    row = compare_point(obs, Decimal("23.74"))
-    assert row["band_refusal"] is None
-    assert row["status"] == "MATCH"
-    assert Decimal(row["band"]["value"]) == factor
-    assert row["native_inside"] is True
-    if confidence == "not_stated":
-        assert row["band"]["rule"].startswith("printed_unstated:")
-    if confidence == "one_sigma":
+    at_boundary = compare_point(obs, Decimal("23.74"))
+    assert at_boundary["band_refusal"] is None
+    assert at_boundary["status"] == inclusive
+    assert Decimal(at_boundary["band"]["value"]) == factor
+    assert at_boundary["native_inside"] is True
+    assert Decimal(at_boundary["native_band"]["value"]) == Decimal(1)
+    just_outside = compare_point(obs, Decimal("23.740001"))
+    assert just_outside["status"] == outside
+    assert just_outside["native_inside"] is False
+    assert Decimal(just_outside["native_band"]["value"]) == Decimal(1)
+    if declaration.get("confidence_level") == "not_stated":
+        assert at_boundary["band"]["rule"].startswith("printed_unstated:")
+    if declaration.get("confidence_level") == "one_sigma":
         wider = compare_point(obs, Decimal("24.24"))
         assert wider["status"] == "MATCH"
         assert wider["native_inside"] is False
+
+
+def test_native_width_survives_nested_standard_pressure_band():
+    from simulator.battery.migrate import REPO_ROOT
+
+    _, _, observations = load_migrated_store(
+        REPO_ROOT, sources=("shornikov-2019-mgo-titania-melts",)
+    )
+    observation = observations[
+        "shornikov-2019-mgo-titania-melts::"
+        "shornikov_2019_mgo_titania_melts_p003_t02_r12_c06"
+    ]
+    observation = replace(
+        observation,
+        uncertainty=replace(
+            observation.uncertainty,
+            value=Decimal("0.25"),
+            verbatim="±0.2 kJ/mol",
+        ),
+    )
+    row = compare_point(observation, observation.value.point + Decimal("0.5"))
+    assert row["band_refusal"] is None
+    assert Decimal(row["band"]["value"]) == (
+        Decimal("0.2") * NORMAL_95_TICKET_MULTIPLIER + Decimal("0.25")
+    )
+    assert Decimal(row["native_band"]["value"]) == Decimal("0.45")
+    assert row["native_inside"] is False
+    assert row["status"] == "MATCH"
 
 
 def test_range_uncertainty_and_no_band(paper_point):
@@ -121,7 +173,12 @@ def test_real_inventory_and_foreign_keys(store, source, count):
         assert len(ids) == len(set(ids))
         assert all(oid in store[2] for oid in ids)
         entries = frozen["entries"]
-        assert all(resolve_path(scope, entry["ref"]) == entry["resolved"] for entry in entries)
+        stale_entries = [
+            (entry["ref"], entry["resolved"], resolved)
+            for entry in entries
+            if (resolved := resolve_path(scope, entry["ref"])) != entry["resolved"]
+        ]
+        assert not stale_entries, (source, run["card_id"], stale_entries)
         for eid in run["experiment_ids"]:
             selected_paths = {tuple(entry["ref"][2:]) for entry in entries
                               if entry["ref"][:2] == ["experiments", eid]}
@@ -191,6 +248,7 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "PASS"
     assert receipt["rms_band"] == "0.00"
+    assert list(receipt["groups"][0]["native_rms"].values()) == ["0"]
     oid, obs = next(iter(args[4].items()))
     args[4][oid] = replace(obs, uncertainty=Uncertainty(
         kind=UncertaintyKind.PRINTED, verbatim={"value": "0", "unit": "wt%"}))
@@ -198,6 +256,13 @@ def test_contract_can_pass_and_zero_width_rms_is_null(complete_contract):
     receipt = evaluate_card(*args)
     assert receipt["verdict"] == "PASS"
     assert receipt["rms_band"] is None
+
+
+def test_zero_rms_receipt_uses_fixed_decimal_precision() -> None:
+    from simulator.battery.reproduction_cards import _band_rms_text, _rms_text
+
+    assert _band_rms_text([Decimal("0")]) == "0.00"
+    assert _rms_text([Decimal("0")]) == "0"
 
 
 @pytest.mark.parametrize("mutation", ["row", "group", "band", "attestation", "assumption",

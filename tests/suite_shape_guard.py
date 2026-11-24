@@ -184,6 +184,10 @@ def _tier_marker_violations() -> list[str]:
         ("tests.test_literature_extracts", "test_coverage_pending_stubs_not_found", True),
         ("tests.test_literature_extracts", "test_pilot_extract_count_exact", False),
         ("tests.test_literature_extracts", "test_coverage_payload_aware", False),
+        ("tests.battery.test_score",
+         "test_full_store_printed_width_band_census_matches_green", True),
+        ("tests.battery.test_score",
+         "test_bonnand_gorojovsky_printed_domain_ids_match_green", False),
     ]
     violations = []
     for module_name, name, should_be_nightly in required:

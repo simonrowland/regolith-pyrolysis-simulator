@@ -5,7 +5,7 @@ from decimal import Decimal
 
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import MethodToken, NoticeKind, Phase, Quantity, ValueKind
 from simulator.battery.migrate import REPO_ROOT
 from tests.battery.factories import migrate_one_extract
 
@@ -39,9 +39,9 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
     assert result.validation is not None
     assert not result.validation.hard_issues
     assert len(result.observations) == 1
-    assert len(result.queue) == 2
+    assert len(result.queue) == 1
     queued = {entry.axes[0]: entry for entry in result.queue}
-    assert set(queued) == {"total_pressure_Pa", "method"}
+    assert set(queued) == {"total_pressure_Pa"}
     assert all(
         entry.observation_id == f"{SOURCE_ID}::takeda_1986_cu2o_melting_point"
         for entry in result.queue
@@ -49,7 +49,6 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
     assert queued["total_pressure_Pa"].why == (
         "source does not state a numeric total_pressure_Pa"
     )
-    assert queued["method"].why == "source does not state method"
     assert len(result.context_by_work) == 1
     assert all(row.identity.quantity.is_value for row in result.observations.values())
     assert all(
@@ -59,6 +58,12 @@ def test_rendered_prose_values_and_isolated_migration_are_pinned() -> None:
     observation = result.observations[
         f"{SOURCE_ID}::takeda_1986_cu2o_melting_point"
     ]
+    experiment = result.experiments[observation.experiment_id]
+    assert experiment.method.is_value
+    assert experiment.method.value is MethodToken.UNSPECIFIED
+    assert any(
+        notice.kind is NoticeKind.METHOD_UNSTATED for notice in observation.notices
+    )
     assert observation.value.kind is ValueKind.POINT
     assert observation.value.point == Decimal("1503")
     assert observation.identity.quantity.value is Quantity.TRANSITION_TEMPERATURE

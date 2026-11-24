@@ -11,12 +11,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'liquid_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -35,7 +34,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_author_regression_liquid_heat_capacity
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 909
@@ -55,13 +76,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'diopside_liquid_to_clinopyroxene_solid_solution_and_wollastonite' is not in the closed automatic
-          map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -79,7 +98,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''diopside_liquid_to_clinopyroxene_solid_solution_and_wollastonite'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_crystallization_repeated_runs
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_crystallization_repeated_runs
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 910
@@ -99,11 +140,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_to_liquid_diopside' is not in the closed automatic map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -122,7 +163,29 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_to_liquid_diopside'' identifies
+      a crystal; original_reason=phase string ''crystalline_diopside_to_liquid_diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_fusion_and_melting_transition
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_fusion_and_melting_transition
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 904
@@ -141,12 +204,11 @@ observations:
     species:
       formula: CaSiO3
       phase:
-        tag: unknown
-        reason: phase string 'wollastonite' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -211,6 +273,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''wollastonite'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_quoted_adamkovicova_wollastonite_fusion
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -241,12 +327,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -311,6 +396,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_quoted_comparator_enthalpy_values
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -341,12 +450,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -411,6 +519,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_quoted_ferrier_diopside_fusion
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -441,12 +573,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -511,6 +642,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - heat_of_fusion
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_diopside_fusion
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - heat_of_fusion
@@ -541,12 +696,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'liquid_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -611,6 +765,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - cp
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_quoted_richet_bottinga_liquid_heat_capacity
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -634,12 +812,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'liquid_diopside' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -704,6 +881,30 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - cp
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''liquid_diopside'' is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_inferred
+    affected_quantities:
+    - cp
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''scanning_calorimetry_constant_cooling''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_quoted_stebbins_1984_liquid_heat_capacity
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - cp
@@ -727,12 +928,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -754,7 +954,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:0
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -773,12 +996,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -800,7 +1022,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:1
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -819,12 +1064,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -846,7 +1090,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:10
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -865,12 +1132,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -892,7 +1158,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:11
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -911,12 +1200,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -938,7 +1226,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:12
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -957,12 +1268,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -984,7 +1294,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:13
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1003,12 +1336,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1030,7 +1362,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:14
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1049,12 +1404,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1076,7 +1430,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:15
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1095,12 +1472,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1122,7 +1498,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:16
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1141,12 +1540,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1168,7 +1566,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:17
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1187,12 +1608,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1214,7 +1634,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:18
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1233,12 +1676,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1260,7 +1702,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:19
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1279,12 +1744,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1306,7 +1770,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:2
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1325,12 +1812,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1352,7 +1838,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:20
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1371,12 +1880,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1398,7 +1906,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:21
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1417,12 +1948,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1444,7 +1974,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:22
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1463,12 +2016,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1490,7 +2042,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:23
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1509,12 +2084,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1536,7 +2110,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:24
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1555,12 +2152,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1582,7 +2178,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:25
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1601,12 +2220,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1628,7 +2246,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:26
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1647,12 +2288,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1674,7 +2314,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:27
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1693,12 +2356,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1720,7 +2382,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:28
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1739,12 +2424,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1766,7 +2450,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:3
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1785,12 +2492,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1812,7 +2518,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:4
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1831,12 +2560,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1858,7 +2586,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:5
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1877,12 +2628,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1904,7 +2654,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:6
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1923,12 +2696,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1950,7 +2722,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:7
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -1969,12 +2764,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -1996,7 +2790,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:8
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908
@@ -2015,12 +2832,11 @@ observations:
     species:
       formula: CaMgSi2O6
       phase:
-        tag: unknown
-        reason: phase string 'crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside' is not in the closed automatic
-          map
+        tag: value
+        value: cr
       polymorph:
         tag: unknown
-        reason: phase unknown; polymorph unresolved
+        reason: source does not state polymorph
         rejection_kind: omitted
       charge:
         tag: value
@@ -2042,7 +2858,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities: []
+    reason: 'phase_inferred: value=cr; evidence=printed phase label ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      identifies a crystal; original_reason=phase string ''crystalline_diopside_crystal_liquid_mixture_and_liquid_diopside''
+      is not in the closed automatic map'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: cr
+      units: phase token
+  - kind: method_inferred
+    affected_quantities: []
+    reason: 'method_inferred: value=calorimetry; evidence=source text names ''calorimetry''; original_reason=regime ''step_scan_calorimetry''
+      is not a closed method token (kems_effusion alone is insufficient)'
+    origin: ammin-76-904::ammin_76_904_table2_step_scan_heat_capacity_enthalpy::point:9
+    policy:
+      id: DP-107
+      version: 1
+      status: proposed
+      value: calorimetry
+      units: method token
   source_id: ammin-76-904
   locator:
     published_page: 908

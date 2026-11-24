@@ -68,6 +68,7 @@ from simulator.battery.enums import (
     Authority,
     CellMaterial,
     CONDENSED_PHASES,
+    DEFAULT_POLICY_NOTICE_KINDS,
     EQUILIBRIUM_FIT_QUANTITIES,
     ELEMENT_WT_PERCENT_BASIS,
     Engine,
@@ -122,7 +123,7 @@ from simulator.battery.identity import (
     identity_equal,
     _identity_equal,
     _same_row_redox_identity_equal,
-    _same_row_knudsen_residue_identity_equal,
+    _same_row_residue_extent_identity_equal,
     log10K_from_delta_fG_kJ_mol,
     melt_activity_log10_pressure_bound,
     profile_for,
@@ -199,6 +200,12 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
+from simulator.battery.uncertainty_conventions import (
+    NORMAL_95_TICKET_MULTIPLIER,
+    UncertaintyConventionConflict,
+    printed_uncertainty_convention,
+    standard_uncertainty_width,
+)
 from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
@@ -216,6 +223,7 @@ from simulator.battery.records import (
     Experiment,
     Located,
     Notice,
+    NoticePolicy,
     Observation,
     Residual,
     ResidualNumeric,
@@ -484,7 +492,6 @@ REVIEW_BLOCKS_USE: frozenset[str] = frozenset({"rejected", "withdrawn", "retired
 # endpoint of the central 95% interval. MAD(N(0,1)) = Φ⁻¹(.75), so the
 # consistency scale is 1/Φ⁻¹(.75) = 1.482602218505602.
 DECISION_BAND_PERCENTILE = 95
-NORMAL_95_TICKET_MULTIPLIER = Decimal("1.959963984540054")
 MAD_NORMAL_SCALE = Decimal("1.482602218505602")
 DECISION_BAND_POLICY_VERSION = "q6-v1"
 DECISION_BAND_RATCHET_RELATIVE_PATH = Path("data/battery/decision-band-ratchet.yaml")
@@ -602,6 +609,8 @@ SCORE_ELIGIBLE_CONJUNCTS: tuple[str, ...] = (
 )
 
 FLAGGED_STRATUM_UNVERIFIED_APPARATUS = "unverified-apparatus"
+FLAGGED_STRATUM_KNOB_DEFAULTED = NoticeKind.KNOB_DEFAULTED.value
+FLAGGED_STRATUM_PROPOSED_POLICY = "proposed-policy"
 FLAGGED_STRATUM_CALIBRATION_NOT_GROUNDED = "calibration-not-grounded"
 FLAGGED_STRATUM_CELL_MATERIAL_INFERRED = "cell-material-inferred"
 FLAGGED_STRATUM_CATALOGUE_COMPOSITION = "catalogue-composition"
@@ -611,6 +620,11 @@ FLAGGED_STRATUM_OXIDE_FROM_ELEMENT_MASS_PERCENT_COMPOSITION = (
 )
 FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT = "source-internally-inconsistent"
 FLAGGED_STRATUM_SOURCE_FLAGGED_LESS_RELIABLE = "source_flagged_less_reliable"
+FLAGGED_STRATUM_D460_MIGRATION = (
+    NoticeKind.METHOD_UNSTATED.value,
+    NoticeKind.METHOD_INFERRED.value,
+    NoticeKind.PHASE_INFERRED.value,
+)
 FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION = "imcc_complex_saturation"
 FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION = "reference_converted_via_fusion"
 FLAGGED_STRATUM_REFERENCE_POLYMORPH_INFERRED = (
@@ -624,6 +638,11 @@ FLAGGED_STRATUM_LIQUIDUS_POSITION_CONTESTED = "liquidus-position-contested"
 FLAGGED_STRATUM_OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
 FLAGGED_STRATUM_OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
 FLAGGED_STRATUM_QUENCH_ALTERED = "quench_altered"
+FLAGGED_STRATUM_RESIDUE_REDOX = "residue-redox"
+FLAGGED_STRATUM_IRON_OXIDE_CONVENTION = "iron-oxide-convention"
+_DEFAULT_POLICY_FLAG_VALUES = frozenset(
+    kind.value for kind in DEFAULT_POLICY_NOTICE_KINDS
+)
 
 
 @dataclass(frozen=True)
@@ -877,7 +896,9 @@ def _static_refusal_summary_key(
         or refusal.detail.get("reason") not in _STATIC_REFUSAL_DETAILS
     ):
         return None
-    rail = residual.rail or rail_for_quantity(request.quantity)
+    rail = residual.rail
+    if rail is None and request.quantity is not None:
+        rail = rail_for_quantity(request.quantity)
     return (
         request.engine.value,
         "unassigned" if rail is None else rail.value,
@@ -918,7 +939,7 @@ def _engine_lacks_quantity_capability(
         return False
     if quantity in FUSION_QUANTITIES:
         return False
-    from simulator.battery.compilation_tier import _engine_thermo_quantities
+    from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
     return quantity not in _engine_thermo_quantities(engine)
 
@@ -1059,6 +1080,8 @@ class _PrintedBandResolution:
     refusal: Mapping[str, object] | None = None
     notice: Notice | None = None
     standard_uncertainty_dex: Decimal | None = None
+    standard_uncertainty: Decimal | None = None
+    standard_uncertainty_unit: str | None = None
     two_sigma_band: DecisionBand | None = None
 
 
@@ -1159,26 +1182,73 @@ def _species_axis_matches_phase(species: Species | None, phase: Phase) -> bool:
     return species is not None and phase_token(species) is phase
 
 
+def _normalize_ascii_adduct_dots(text: str) -> str:
+    normalized: list[str] = []
+    segment_start = 0
+    index = 0
+    while index < len(text):
+        if text[index] == "·":
+            normalized.append(text[index])
+            segment_start = index + 1
+            index += 1
+            continue
+        if text[index] == ".":
+            prefix = text[segment_start:index]
+            suffix = text[index + 1 :]
+            multiplier = re.match(
+                r"(?:\d+(?:\.\d+)?|\d+/\d+)(?=[A-Z\[(])", suffix
+            )
+            multiplier_tail = (
+                suffix[multiplier.end() :]
+                if multiplier is not None
+                else ""
+            )
+            # Fe0.95O must keep its decimal when the tail is a single element;
+            # treating 95O as an adduct corrupts the existing composition.
+            decimal_subscript = (
+                multiplier is not None
+                and re.search(r"[A-Z][a-z]?\d+$", prefix) is not None
+                and re.match(r"[A-Z][a-z]?\d*(?=\.|$)", multiplier_tail)
+                is not None
+            )
+            # The dot in a leading hydrate multiplier such as 6.5H2O is decimal.
+            decimal_multiplier = prefix.isdigit() and suffix[:1].isdigit()
+            starts_with_water = suffix.startswith(("H2O", "H₂O"))
+            if (
+                (multiplier is not None or starts_with_water)
+                and not decimal_subscript
+                and not decimal_multiplier
+            ):
+                normalized.append("·")
+                segment_start = index + 1
+                index += 1
+                continue
+        normalized.append(text[index])
+        index += 1
+    return "".join(normalized)
+
+
 def parse_species_formula(
     formula: str, *, species: Species | None = None
 ) -> tuple[tuple[str, float], ...] | None:
     """Parse explicit stoichiometry; None → unmatched, never string equality.
 
-    The baseline ``formula_composition`` result is returned unchanged. Its
+    The fast-path ``formula_composition`` result is returned unchanged. Its
     source-derived extension accepts element symbols with numeric counts,
-    nested ``()[]{}`` groups, hydrate segments (including fractional or
-    decimal water multipliers) separated by a middle dot, TeX math wrappers /
-    ``\\text{}``, and TeX or Unicode subscripts. Newly normalized terminal
-    phase or polymorph labels require a matching existing species axis, as in
-    ``$AsCl_3(g)$`` and ``$Fe(α)$``. A terminal bracket phase label that the
-    accounting parser would strip, as in ``Fe2O3[s]``, uses that same axis
-    before the fallback. Mineral names, variable compositions, and unverified
-    charge or phase labels remain unmatched.
+    nested ``()[]{}`` groups, hydrate/adduct segments (including fractional or
+    decimal multipliers), TeX math wrappers / ``\\text{}``, and TeX or Unicode
+    subscripts. Newly normalized terminal phase or polymorph labels require a
+    matching existing species axis, as in ``$AsCl_3(g)$`` and ``$Fe(α)$``. A
+    terminal bracket phase label that the accounting parser would strip, as in
+    ``Fe2O3[s]``, uses that same axis before the fallback. The d-420 iron-oxide
+    conventions are normalized without assigning a numerical vacancy value;
+    other names, variable compositions, and unverified charge or phase labels
+    remain unmatched.
     """
 
     if not formula or formula.strip().lower() in {"unknown", "none", "n/a"}:
         return None
-    established = formula_composition(formula)
+    established = formula_composition(_normalize_ascii_adduct_dots(formula))
     if established is not None:
         return established
 
@@ -1188,14 +1258,14 @@ def parse_species_formula(
     if "$" in text:
         return None
     text = re.sub(r"\\(?:text|mathrm)\{([^{}]*)\}", r"\1", text)
-    text = text.replace(r"\cdot", "·").replace(r"\bullet", "·")
+    text = (
+        text.replace(r"\cdot", "·")
+        .replace(r"\bullet", "·")
+        .replace("•", "·")
+        .replace("⋅", "·")
+    )
     text = re.sub(r"_\{(\d+)\}|_(\d+)", lambda m: m.group(1) or m.group(2), text)
     text = fold_subscript_digits(text)
-    # formula_composition reads the ASCII-dot water-adduct separator as a
-    # decimal count. Refuse that normalized form first; raw fast-path results
-    # and explicit middle-dot hydrates stay unchanged.
-    if "·" not in text and re.search(r"\.\d+H2O", text):
-        return None
     phase_labels = {
         "c": Phase.CR,
         "cr": Phase.CR,
@@ -1230,6 +1300,12 @@ def parse_species_formula(
         if annotated_phase is not None:
             text = text[: annotation.start()]
 
+    melt_suffix = re.search(r"_melt$", text, re.IGNORECASE)
+    if melt_suffix is not None:
+        if not _species_axis_matches_phase(species, Phase.L):
+            return None
+        text = text[: melt_suffix.start()]
+
     # Accounting strips these terminal brackets with no species axis. Bare
     # [c] is not in that suffix list and stays unmatched.
     bracket = re.search(r"\[([^\[\]]*)\]$", text)
@@ -1242,6 +1318,17 @@ def parse_species_formula(
                     return None
                 text = text[: bracket.start()]
 
+    # NASA Glenn's E±n suffix carries ionic charge, not another element.
+    # Its charge must agree with the typed species before the suffix is dropped.
+    electron_charge = re.search(r"E([+-])(\d+)$", text)
+    if electron_charge is not None:
+        annotated_charge = int(electron_charge.group(2))
+        if electron_charge.group(1) == "-":
+            annotated_charge = -annotated_charge
+        if species is None or charge_value(species) != annotated_charge:
+            return None
+        text = text[: electron_charge.start()]
+
     charge_annotation = re.search(r"\^\{([+-]+)\}$|\^([+-]+)$|([+-]+)$", text)
     if charge_annotation is not None:
         signs = next(group for group in charge_annotation.groups() if group is not None)
@@ -1251,6 +1338,19 @@ def parse_species_formula(
         if species is None or charge_value(species) != annotated_charge:
             return None
         text = text[: charge_annotation.start()]
+
+    # d-420 treats wüstite's symbolic vacancy fraction as a reference-state
+    # convention, not a measured x to invent. Fe_tO is total iron reported on
+    # an FeO basis; the downstream comparison and typed flags own those bases.
+    if text in {"Fe(1-x)O", "Fe_tO"}:
+        return (("Fe", 1.0), ("O", 1.0))
+
+    # ASCII periods separate formula-unit adducts when another formula follows
+    # (for example 3Al2O3.2SiO2). A terminal period plus digits is instead a
+    # leading-zero decimal subscript, as in Fe.9470. Decimal hydrate multipliers
+    # remain one number for the segment parser.
+    text = _normalize_ascii_adduct_dots(text)
+    text = re.sub(r"(?<=[A-Za-z])\.(\d+)$", r"0.\1", text)
 
     if "·" in text:
         hydrated: defaultdict[str, float] = defaultdict(float)
@@ -2177,7 +2277,7 @@ def _unverified_apparatus_notices(
     experiment: Experiment | None,
     gates: GateOutcome,
 ) -> tuple[Notice, ...]:
-    """Return the narrow predict-and-flag admission for printed KEMS rows."""
+    """Return apparatus notices for KEMS rows."""
 
     if experiment is None:
         return ()
@@ -2216,6 +2316,11 @@ def _unverified_apparatus_notices(
         and isinstance(reference_state.value, StandardState)
         and phase_token(reference_state.value.endmember) in CONDENSED_PHASES
     )
+    figure_only_partial_pressure = (
+        quantity is Quantity.P_PARTIAL
+        and reference.evidence.class_.is_value
+        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
+    )
     unknown_method_activity = (
         experiment.method.is_unknown
         and gates.reason is RefusalReason.METHOD_UNKNOWN
@@ -2244,11 +2349,6 @@ def _unverified_apparatus_notices(
         and author_reported_pressure
         and reference.evidence.class_.is_value
         and reference.evidence.class_.value in MEASURED_EVIDENCE
-    )
-    figure_only_partial_pressure = (
-        quantity is Quantity.P_PARTIAL
-        and reference.evidence.class_.is_value
-        and reference.evidence.class_.value is EvidenceClass.FIGURE_ONLY
     )
     calibration_flagged_partial_pressure = (
         quantity is Quantity.P_PARTIAL
@@ -2356,26 +2456,28 @@ def _unverified_apparatus_notices(
                 )
             )
             continue
+        if fact == "calibration_not_grounded":
+            reason = (
+                f"calibration_not_grounded: "
+                f"{calibration_notice or 'Calibration is not grounded.'}"
+                + (f" ({calibration_reason})" if calibration_reason else "")
+            )
+        elif fact == "method_unknown" and unknown_method_activity:
+            reason = (
+                "method_unknown: published activity has a typed condensed "
+                "reference but its experiment method is not stated"
+            )
+        elif fact == "method_unknown":
+            reason = "method_unknown: " + str(
+                detail.get("reason") or "pressure series method is not stated"
+            )
+        else:
+            reason = f"apparatus_unverified:{fact}"
         notices.append(
             Notice(
                 kind=NoticeKind.UNVERIFIED_APPARATUS,
                 affected_quantities=(quantity,),
-                reason=(
-                "calibration_not_grounded: "
-                f"{calibration_notice or 'Calibration is not grounded.'}"
-                + (
-                    f" ({calibration_reason})"
-                    if calibration_reason
-                    else ""
-                )
-                if fact == "calibration_not_grounded"
-                else (
-                    "method_unknown: published activity has a typed condensed "
-                    "reference but its experiment method is not stated"
-                    if fact == "method_unknown"
-                    else f"apparatus_unverified:{fact}"
-                )
-                ),
+                reason=reason,
                 origin=reference.observation_id,
             )
         )
@@ -2391,6 +2493,7 @@ def _flagged_stratum_notices(
     return union_notices(
         _unverified_apparatus_notices(reference, experiment, gates),
         _cell_apparatus_inference_notices(reference, experiment, bench),
+        (() if (notice := _total_iron_formula_notice(reference)) is None else (notice,)),
         (() if (notice := _catalogue_composition_notice(reference)) is None else (notice,)),
         (
             ()
@@ -2470,16 +2573,58 @@ def _cell_apparatus_inference_notices(
 
 
 def flagged_strata(notices: Sequence[Notice]) -> tuple[str, ...]:
-    return _classify_flagged_notice_facts(
+    strata = _classify_flagged_notice_facts(
         tuple((notice.kind.value, notice.reason) for notice in notices)
     )
+    if (
+        _has_proposed_policy(notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
+
+
+def _has_proposed_policy(
+    notices: Iterable[Notice | Mapping[str, object]],
+) -> bool:
+    for notice in notices:
+        if isinstance(notice, Notice):
+            if notice.policy is not None and notice.policy.status == "proposed":
+                return True
+        elif isinstance(notice, Mapping):
+            policy = notice.get("policy")
+            if isinstance(policy, Mapping) and policy.get("status") == "proposed":
+                return True
+    return False
 
 
 def _classify_flagged_notice_facts(
     notices: Sequence[tuple[str, object]],
 ) -> tuple[str, ...]:
+    from simulator.battery.residue import TRACE_TAIL_BELOW_LOADER_CUTOFF
+    from simulator.vacuum_oxygen_balance import (
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
     strata: list[str] = []
     kinds = {kind for kind, _reason in notices}
+    policy_flags = kinds & _DEFAULT_POLICY_FLAG_VALUES
+    d460_flags = kinds & set(FLAGGED_STRATUM_D460_MIGRATION)
+    classified_policy_flags = policy_flags | d460_flags
+    if classified_policy_flags:
+        strata.extend(
+            FLAGGED_STRATUM_KNOB_DEFAULTED
+            if flag == NoticeKind.KNOB_DEFAULTED.value
+            else flag
+            for flag in sorted(classified_policy_flags)
+        )
+    if (
+        NoticeKind.TOTAL_IRON_REPORTED_AS_FEO.value in kinds
+        or NoticeKind.WUSTITE_REFERENCE_CONVERSION.value in kinds
+    ):
+        strata.append(FLAGGED_STRATUM_IRON_OXIDE_CONVENTION)
     unverified_apparatus = tuple(
         reason
         for kind, reason in notices
@@ -2505,9 +2650,21 @@ def _classify_flagged_notice_facts(
         for kind, reason in notices
     ):
         strata.append(FLAGGED_STRATUM_SOURCE_INTERNALLY_INCONSISTENT)
+    if any(
+        reason == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK
+        or reason == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO
+        or reason == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        for _kind, reason in notices
+    ):
+        strata.append(FLAGGED_STRATUM_RESIDUE_REDOX)
+    if (NoticeKind.ENGINE_MODEL_CAVEAT.value, TRACE_TAIL_BELOW_LOADER_CUTOFF) in notices:
+        strata.append(TRACE_TAIL_BELOW_LOADER_CUTOFF)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
-    if any(_is_fusion_conversion_reason(reason) for _kind, reason in notices):
+    if any(
+        _is_fusion_conversion_reason(reason)
+        for _kind, reason in notices
+    ):
         strata.append(FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION)
     if any(
         isinstance(reason, str)
@@ -2544,6 +2701,84 @@ def _classify_flagged_notice_facts(
     if NoticeKind.QUENCH_ALTERED.value in kinds:
         strata.append(FLAGGED_STRATUM_QUENCH_ALTERED)
     return tuple(strata)
+
+
+def _residue_redox_flag_notices(
+    flags: Sequence[str],
+    *,
+    quantity: Quantity,
+    origin: str,
+    pressure_law_diagnostics: Sequence[Mapping[str, object]] = (),
+) -> tuple[Notice, ...]:
+    """Translate the residue engine's redox flags into scored evidence."""
+
+    from simulator.vacuum_oxygen_balance import (
+        PressureLawChannelDiagnostic,
+        RESIDUE_FE_SPECIATION_KRESS91_FALLBACK,
+        RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO,
+        RESIDUE_PRESSURE_LAW_REDOX_ACTIVE,
+    )
+
+    notices = []
+    detailed_reasons: set[str] = set()
+    for diagnostic in pressure_law_diagnostics:
+        species = diagnostic.get("species")
+        declared = diagnostic.get("declared")
+        observed = diagnostic.get("observed")
+        expected = diagnostic.get("expected")
+        reason = diagnostic.get("reason")
+        if (
+            not isinstance(species, str)
+            or not all(isinstance(value, (int, float)) for value in (
+                declared, observed, expected
+            ))
+            or reason != RESIDUE_PRESSURE_LAW_REDOX_ACTIVE
+        ):
+            continue
+        detailed_reasons.add(str(reason))
+        channel_diagnostic = PressureLawChannelDiagnostic(
+            species=species,
+            declared=float(declared),
+            observed=float(observed),
+            expected=float(expected),
+            reason=str(reason),
+        )
+        arm = diagnostic.get("arm")
+        arm_label = f"arm={arm}; " if isinstance(arm, str) else ""
+        notices.append(
+            Notice(
+                kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+                affected_quantities=(quantity,),
+                reason=str(reason),
+                origin=(
+                    f"{origin}; {arm_label}{channel_diagnostic.evidence_text()}"
+                ),
+            )
+        )
+    for flag in flags:
+        if flag == RESIDUE_FE_SPECIATION_KRESS91_FALLBACK:
+            kind = NoticeKind.FALLBACK
+        elif flag == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO:
+            kind = NoticeKind.FALLBACK
+        elif flag == RESIDUE_PRESSURE_LAW_REDOX_ACTIVE:
+            if flag in detailed_reasons:
+                continue
+            kind = NoticeKind.ENGINE_MODEL_CAVEAT
+        else:
+            continue
+        notices.append(
+            Notice(
+                kind=kind,
+                affected_quantities=(quantity,),
+                reason=flag,
+                origin=(
+                    f"{origin}; default=1 O/Fe"
+                    if flag == RESIDUE_FE_SPECIATION_UNAVAILABLE_STOICHIOMETRIC_FEO
+                    else origin
+                ),
+            )
+        )
+    return tuple(notices)
 
 
 def _is_calibration_not_grounded_reason(reason: object) -> bool:
@@ -3802,6 +4037,7 @@ def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], 
     from simulator.battery.polymorph_dictionary import (
         JANAF_CRYSTAL_DICTIONARY,
         JANAF_CRYSTAL_TABLE_IDS,
+        JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS,
     )
 
     entries = load_manifest().get("entries")
@@ -3812,6 +4048,7 @@ def _janaf_pure_solid_table_index() -> tuple[tuple[str, str, Polymorph | None], 
         for key, table_ids in JANAF_CRYSTAL_TABLE_IDS.items()
         for table_id in table_ids
     }
+    table_polymorphs.update(JANAF_UNQUALIFIED_CRYSTAL_TABLE_POLYMORPHS)
     return tuple(
         (
             str(entry["formula_normalised"]),
@@ -4265,6 +4502,8 @@ def _banya_feto_activity_comparison(
         origin=reference.observation_id,
     )
     notices: tuple[Notice, ...] = (conversion_notice, assumption_notice)
+    if (total_iron_notice := _total_iron_formula_notice(reference)) is not None:
+        notices += (total_iron_notice,)
     row_band = _printed_uncertainty_band(
         quantity,
         reference.uncertainty,
@@ -4279,11 +4518,60 @@ def _banya_feto_activity_comparison(
             identity,
             species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
         )
+    identity = _canonicalize_feox_species_identity(identity)
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),
         value=replace(reference.value, point=converted),
         notices=union_notices(reference.notices, notices),
+    )
+
+
+def _total_iron_formula_notice(reference: Observation) -> Notice | None:
+    identity = reference.identity
+    if not isinstance(identity, Identity) or identity.species is None:
+        return None
+    quantity = quantity_token(identity)
+    if quantity not in {Quantity.ACTIVITY, Quantity.ACTIVITY_COEFFICIENT}:
+        return None
+
+    species_formula = identity.species.formula
+    banya_source = reference.source_id in _BANYA_FETO_ACTIVITY_RELATIONS
+    reference_state = identity.reference_state
+    standard_formula = (
+        reference_state.value.endmember.formula
+        if reference_state is not None
+        and reference_state.is_value
+        and isinstance(reference_state.value, StandardState)
+        else None
+    )
+    has_feto_identity = species_formula == "Fe_tO" or (
+        banya_source
+        and (
+            standard_formula in {_FEO_WUSTITE_FORMULA, "Fe_tO"}
+            or species_formula == _FEO_STOICHIOMETRIC_FORMULA
+        )
+    )
+    if not has_feto_identity:
+        return None
+
+    if banya_source:
+        reason = (
+            "total_iron_basis: Ban-ya a_FetO on a total-iron basis "
+            f"(printed species Fe_tO, stored formula {species_formula}); "
+            "all Fe is counted as FeO; d-420 basis convention"
+        )
+    else:
+        reason = (
+            "total_iron_basis: default=Fe_tO interpreted as total Fe on an "
+            "FeO basis; original_reason=printed species formula Fe_tO; "
+            "d-420 basis convention"
+        )
+    return Notice(
+        kind=NoticeKind.TOTAL_IRON_REPORTED_AS_FEO,
+        affected_quantities=(quantity,),
+        reason=reason,
+        origin=reference.observation_id,
     )
 
 
@@ -4554,6 +4842,17 @@ def _stoichiometric_standard(standard_state: StandardState) -> StandardState:
     )
 
 
+def _canonicalize_feox_species_identity(identity: Identity) -> Identity:
+    """Use the FeO comparison label after typed d-420 wüstite conversion."""
+
+    if identity.species is None or identity.species.formula != "FeOx":
+        return identity
+    return replace(
+        identity,
+        species=replace(identity.species, formula=_FEO_STOICHIOMETRIC_FORMULA),
+    )
+
+
 @lru_cache(maxsize=1)
 def _iron_saturated_feo_calibration() -> tuple[
     _IronSaturatedFeOCalibration, tuple[Decimal, ...]
@@ -4669,8 +4968,14 @@ def _iron_saturated_feo_comparison(
     species_formulas = (
         {_FEO_STOICHIOMETRIC_FORMULA, "Fe_tO"}
         if banya_source_relation
-        else {_FEO_STOICHIOMETRIC_FORMULA}
+        else {_FEO_STOICHIOMETRIC_FORMULA, _FEO_WUSTITE_FORMULA}
     )
+    # FeOx has no exact composition on its own. Accept that label only when
+    # this observation's typed standard state identifies liquid wüstite; the
+    # d-420 conversion below then replaces the label with the FeO comparison
+    # identity without assigning a vacancy fraction.
+    if standard_state.endmember.formula == _FEO_WUSTITE_FORMULA:
+        species_formulas.add("FeOx")
     standard_formulas = (
         {_FEO_WUSTITE_FORMULA, "Fe_tO"}
         if banya_source_relation
@@ -4699,6 +5004,26 @@ def _iron_saturated_feo_comparison(
 
         if engine.value not in MELT_ACTIVITY_ENGINES:
             return None
+    convention_notices = [
+        Notice(
+            kind=NoticeKind.WUSTITE_REFERENCE_CONVERSION,
+            affected_quantities=(quantity,),
+            reason=(
+                "wustite_reference_conversion: mapped=typed Fe(1-x)O reference "
+                "through the existing d-420 iron-saturated path; "
+                f"original_reason=species_formula={identity.species.formula}, "
+                f"standard_formula={standard_state.endmember.formula}, "
+                f"source={reference.source_id}"
+            ),
+            origin=reference.observation_id,
+        )
+    ]
+    if (notice := _total_iron_formula_notice(reference)) is not None:
+        convention_notices.append(notice)
+    reference = replace(
+        reference,
+        notices=union_notices(reference.notices, convention_notices),
+    )
     temperature_K = temperature_of(identity)
     if temperature_K is None:
         if engine is None:
@@ -4825,6 +5150,7 @@ def _iron_saturated_feo_comparison(
     if row_band.notice is not None:
         notices += (row_band.notice,)
     notices += (composition_notice,)
+    identity = _canonicalize_feox_species_identity(identity)
     return replace(
         reference,
         identity=replace(identity, reference_state=State.of(stoichiometric)),
@@ -5660,7 +5986,7 @@ class _ScoringLineageResolver:
                 context.works, context.observations, context.experiments
             )
         self._source_relations: dict[
-            tuple[tuple[str, ...], tuple[str, ...]], SourceRelation
+            tuple[str, tuple[str, ...]], SourceRelation
         ] = {}
 
     def _candidate_lineage(
@@ -5680,7 +6006,8 @@ class _ScoringLineageResolver:
     def for_reference(
         self, reference: Observation, sources: Sequence[str]
     ) -> tuple[bool, SourceRelation]:
-        complete, candidate_lineage = self._candidate_lineage(sources)
+        source_key = tuple(sources)
+        complete, candidate_lineage = self._candidate_lineage(source_key)
         if not complete or candidate_lineage is None:
             return complete, SourceRelation.UNKNOWN
 
@@ -5704,10 +6031,7 @@ class _ScoringLineageResolver:
         ):
             return complete, SourceRelation.UNKNOWN
 
-        relation_key = (
-            tuple(sorted(reference_lineage.ids)),
-            tuple(sorted(candidate_lineage.ids)),
-        )
+        relation_key = (reference.observation_id, source_key)
         relation = self._source_relations.get(relation_key)
         if relation is None:
             relation = _source_relation_from_lineages(
@@ -6721,7 +7045,7 @@ def _textual_printed_confidence_level(
         text = " ".join(
             str(value)
             for key, value in raw.items()
-            if key not in {"confidence_level", "locator", "parent", "k"}
+            if key not in {"confidence_level", "kind", "locator", "parent", "k"}
             and isinstance(value, str)
         )
     elif isinstance(raw, str):
@@ -6756,9 +7080,12 @@ def _stated_printed_confidence_level(
 ) -> str | None:
     raw = uncertainty.verbatim
     if isinstance(raw, Mapping):
-        confidence_level = raw.get("confidence_level", "not_stated")
-        if confidence_level != "not_stated":
-            return str(confidence_level)
+        try:
+            convention = printed_uncertainty_convention(raw)
+        except UncertaintyConventionConflict:
+            return None
+        if convention is not None:
+            return convention[0]
     return _textual_printed_confidence_level(uncertainty)
 
 
@@ -6926,6 +7253,7 @@ def _printed_uncertainty_band(
     method: MethodToken | None = None,
     band_basis: str = "row_printed",
     confidence_level_override: str | None = None,
+    native_width: bool = False,
 ) -> _PrintedBandResolution:
     if uncertainty is None:
         return _PrintedBandResolution()
@@ -6994,6 +7322,7 @@ def _printed_uncertainty_band(
                 method=method,
                 band_basis="row_printed",
                 confidence_level_override=confidence_level_override,
+                native_width=native_width,
             )
             if printed.refusal is not None:
                 return printed
@@ -7046,6 +7375,18 @@ def _printed_uncertainty_band(
         return _PrintedBandResolution()
     if not _uncertainty_scope_covers_cell(uncertainty, source_observation):
         return _PrintedBandResolution()
+    raw_declaration = uncertainty.verbatim
+    convention = None
+    if not native_width and isinstance(raw_declaration, Mapping):
+        try:
+            convention = printed_uncertainty_convention(raw_declaration)
+        except UncertaintyConventionConflict as exc:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "uncertainty_convention_conflict",
+                    "detail": str(exc),
+                }
+            )
     if _is_source_wide_kems_pressure_envelope(
         quantity, method, source_observation
     ):
@@ -7057,14 +7398,29 @@ def _printed_uncertainty_band(
             )
         )
     raw_text = _uncertainty_original(uncertainty)
-    stated_confidence_level = _stated_printed_confidence_level(uncertainty)
+    stated_confidence_level = (
+        convention[0]
+        if convention is not None
+        else None
+        if native_width
+        else _textual_printed_confidence_level(uncertainty)
+    )
     confidence_level = stated_confidence_level or "not_stated"
     if confidence_level == "not_stated" and confidence_level_override is not None:
         confidence_level = confidence_level_override
-    log10_activity_sigma = (
+    if native_width:
+        confidence_level = "not_stated"
+    log10_activity_width = (
         band_basis == "row_printed"
         and quantity is Quantity.ACTIVITY
         and _is_log10_activity_standard_deviation(raw_text)
+    )
+    log10_activity_sigma = (
+        log10_activity_width
+        and not native_width
+        and convention is None
+        and stated_confidence_level is None
+        and confidence_level_override is None
     )
     if log10_activity_sigma:
         confidence_level = "one_sigma"
@@ -7113,7 +7469,7 @@ def _printed_uncertainty_band(
         )
     source_unit = (
         "dex"
-        if log10_activity_sigma
+        if log10_activity_width
         else _uncertainty_unit(
             quantity, uncertainty, source_observation, mapped_unit, source_value, raw_text
         )
@@ -7135,7 +7491,7 @@ def _printed_uncertainty_band(
     if confidence_level == "not_stated":
         if shape == "range" or kind == "printed_range":
             kind = "printed_range"
-        elif _has_printed_plus_minus(uncertainty):
+        elif not native_width and _has_printed_plus_minus(uncertainty):
             confidence_level = "one_sigma"
             kind = "printed_1sigma"
         else:
@@ -7151,6 +7507,14 @@ def _printed_uncertainty_band(
         source_unit,
         source_observation=source_observation,
     )
+    if native_width:
+        effective_convention = None
+    else:
+        effective_convention = convention or printed_uncertainty_convention(
+            raw_declaration, fallback_token=confidence_level
+        )
+    confidence_token, k_print = effective_convention or (None, None)
+    k_ticket = NORMAL_95_TICKET_MULTIPLIER if k_print is not None else Decimal(1)
     if converted is None:
         return _PrintedBandResolution(
             refusal={
@@ -7164,98 +7528,176 @@ def _printed_uncertainty_band(
     fraction_derivation = None
     if quantity is Quantity.FE3_FE2_RATIO and source_observation is not None:
         fraction_derivation = source_observation.derivation
-    if fraction_derivation is not None:
-        relation = fraction_derivation.relation or ""
-        fraction_parameters = [
+    relation = (
+        fraction_derivation.relation or ""
+        if fraction_derivation is not None
+        else ""
+    )
+    fraction_parameters = (
+        [
             parameter
             for name, parameter in fraction_derivation.parameters
             if name.removeprefix("original_") in FERRIC_FRACTION_FIELDS
         ]
-        if FERRIC_FRACTION_RELATION in relation or fraction_parameters:
-            if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_provenance_unmapped",
-                        "quantity": quantity.value,
-                        "relation": relation,
-                    }
-                )
-            fraction_state = getattr(fraction_parameters[0], "state", None)
-            fraction_r = (
-                fraction_state.value
-                if isinstance(fraction_state, State) and fraction_state.is_value
-                else None
+        if fraction_derivation is not None
+        else []
+    )
+    has_ferric_fraction = fraction_derivation is not None and (
+        FERRIC_FRACTION_RELATION in relation
+        or bool(fraction_parameters)
+    )
+    if has_ferric_fraction:
+        if FERRIC_FRACTION_RELATION not in relation or len(fraction_parameters) != 1:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_provenance_unmapped",
+                    "quantity": quantity.value,
+                    "relation": relation,
+                }
             )
-            if not isinstance(fraction_r, Decimal):
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_input_unmapped",
-                        "quantity": quantity.value,
-                        "relation": relation,
-                    }
-                )
-            if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_unit_unmapped",
-                        "quantity": quantity.value,
-                        "source_unit": source_unit,
-                        "converted_unit": converted_unit,
-                    }
-                )
-            if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_value_mismatch",
-                        "quantity": quantity.value,
-                        "fraction": str(fraction_r),
-                        "reference": str(reference),
-                    }
-                )
-            if operation is not MetricOperation.DEX:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": "printed_uncertainty_reduction_metric_unmapped",
-                        "quantity": quantity.value,
-                        "operation": operation.value,
-                    }
-                )
-            confidence_width_scale = (
-                Decimal(2)
-                if confidence_level == "two_sigma"
-                else NORMAL_95_TICKET_MULTIPLIER
-                if confidence_level == "ci95"
-                else Decimal(1)
+        fraction_state = getattr(fraction_parameters[0], "state", None)
+        fraction_r = (
+            fraction_state.value
+            if isinstance(fraction_state, State) and fraction_state.is_value
+            else None
+        )
+        if not isinstance(fraction_r, Decimal):
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_input_unmapped",
+                    "quantity": quantity.value,
+                    "relation": relation,
+                }
             )
-            sigma_r = converted / confidence_width_scale
-            # FE3/Fe2 residuals use log10 distance, so propagate directly to
-            # dex at the reduction owner before the scorer applies its band policy.
-            sigma_log10_r, refusal_reason = (
-                _fe3_fe2_log10_uncertainty_from_ferric_fraction(
-                    fraction_r, sigma_r
-                )
+        if converted_unit not in {"fraction", QUANTITY_UNITS[quantity]}:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_unit_unmapped",
+                    "quantity": quantity.value,
+                    "source_unit": source_unit,
+                    "converted_unit": converted_unit,
+                }
             )
-            if sigma_log10_r is None:
-                return _PrintedBandResolution(
-                    refusal={
-                        "reason": refusal_reason
-                        or "ferric_fraction_uncertainty_propagation_unavailable",
-                        "quantity": quantity.value,
-                        "fraction": str(fraction_r),
-                        "sigma_r": str(sigma_r),
-                        "distance_to_r_one": str(Decimal(1) - fraction_r),
-                    }
-                )
-            converted = sigma_log10_r * confidence_width_scale
-            converted_unit = "dex"
+        if fe3_fe2_ratio_from_ferric_fraction(fraction_r) != reference:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_value_mismatch",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "reference": str(reference),
+                }
+            )
+        if operation is not MetricOperation.DEX:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_reduction_metric_unmapped",
+                    "quantity": quantity.value,
+                    "operation": operation.value,
+                }
+            )
+        standard_width = (
+            standard_uncertainty_width(converted, k_print)
+            if k_print is not None
+            else converted
+        )
+        sigma_r = standard_width
+        # FE3/Fe2 residuals use log10 distance, so propagate directly to
+        # dex at the reduction owner before the scorer applies its band policy.
+        sigma_log10_r, refusal_reason = (
+            _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                fraction_r,
+                sigma_r,
+                printed_half_width=converted,
+            )
+        )
+        if sigma_log10_r is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": refusal_reason
+                    or "ferric_fraction_uncertainty_propagation_unavailable",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "sigma_r": str(sigma_r),
+                    "distance_to_r_one": str(Decimal(1) - fraction_r),
+                }
+            )
+        standard_width = sigma_log10_r
+        two_sigma_r_width = standard_uncertainty_width(converted, Decimal(2))
+        two_sigma_standard_width, refusal_reason = (
+            _fe3_fe2_log10_uncertainty_from_ferric_fraction(
+                fraction_r,
+                two_sigma_r_width,
+                printed_half_width=converted,
+            )
+        )
+        if two_sigma_standard_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": refusal_reason
+                    or "ferric_fraction_uncertainty_propagation_unavailable",
+                    "quantity": quantity.value,
+                    "fraction": str(fraction_r),
+                    "sigma_r": str(two_sigma_r_width),
+                    "distance_to_r_one": str(Decimal(1) - fraction_r),
+                }
+            )
+        converted_unit = "dex"
+    else:
+        printed_interval_metric_width = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            converted,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if printed_interval_metric_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_outside_metric_domain",
+                    "quantity": quantity.value,
+                    "original": raw_text,
+                }
+            )
+        standard_width = (
+            standard_uncertainty_width(converted, k_print)
+            if k_print is not None
+            else converted
+        )
 
-    ticket = _metric_uncertainty_width(
+    metric_standard_width = _metric_uncertainty_width(
         operation,
         quantity,
         reference,
-        converted,
+        standard_width,
         converted_unit or QUANTITY_UNITS[quantity],
     )
+    if (
+        not has_ferric_fraction
+        and metric_standard_width is None
+        and k_print is not None
+    ):
+        # The original printed interval passed the domain gate above, but
+        # dividing its linear-unit width by k can put the standard interval
+        # outside the transform's domain. Keep the admitted original interval
+        # and scale its metric width only for this otherwise-unrepresentable
+        # standard interval.
+        metric_standard_width = standard_uncertainty_width(
+            printed_interval_metric_width, k_print
+        )
+    ticket = metric_standard_width
+    exact_ticket_input = (
+        k_print == k_ticket
+        and fraction_derivation is None
+        and (
+            operation in {MetricOperation.ABSOLUTE, MetricOperation.RELATIVE}
+            or (operation is MetricOperation.DEX and converted_unit == "dex")
+        )
+    )
+    if exact_ticket_input:
+        ticket = printed_interval_metric_width
+    else:
+        if ticket is not None:
+            ticket *= k_ticket
     if ticket is None or ticket < 0 or not ticket.is_finite():
         return _PrintedBandResolution(
             refusal={
@@ -7263,9 +7705,7 @@ def _printed_uncertainty_band(
                 "quantity": quantity.value,
                 "original": raw_text,
             }
-    )
-    if confidence_level == "one_sigma" and kind == "printed_1sigma":
-        ticket *= NORMAL_95_TICKET_MULTIPLIER
+        )
     unit = (
         "dimensionless"
         if operation in {MetricOperation.RELATIVE, MetricOperation.DEX}
@@ -7290,15 +7730,36 @@ def _printed_uncertainty_band(
         ),
     )
     standard_uncertainty_dex = None
-    if operation is MetricOperation.DEX:
-        if confidence_level in {"one_sigma", "ci95"}:
-            standard_uncertainty_dex = ticket / NORMAL_95_TICKET_MULTIPLIER
-        elif confidence_level == "two_sigma":
-            standard_uncertainty_dex = ticket / Decimal(2)
+    standard_uncertainty = None
+    standard_uncertainty_unit = None
+    if k_print is not None and confidence_token != "range_half_width":
+        standard_uncertainty = standard_width
+        standard_uncertainty_unit = converted_unit
+    if operation is MetricOperation.DEX and k_print is not None:
+        standard_uncertainty_dex = metric_standard_width
     two_sigma_band = None
     if notice is not None and notice.reason == "uncertainty_confidence_level_assumed_1sigma":
+        if not has_ferric_fraction:
+            two_sigma_standard_width = standard_uncertainty_width(
+                converted, Decimal(2)
+            )
+        two_sigma_metric_width = _metric_uncertainty_width(
+            operation,
+            quantity,
+            reference,
+            two_sigma_standard_width,
+            converted_unit or QUANTITY_UNITS[quantity],
+        )
+        if two_sigma_metric_width is None:
+            return _PrintedBandResolution(
+                refusal={
+                    "reason": "printed_uncertainty_outside_metric_domain",
+                    "quantity": quantity.value,
+                    "original": raw_text,
+                }
+            )
         two_sigma_band = DecisionBand(
-            ticket / NORMAL_95_TICKET_MULTIPLIER,
+            two_sigma_metric_width * NORMAL_95_TICKET_MULTIPLIER,
             unit,
             f"printed_2sigma_reading: source-printed uncertainty; original={raw_text}",
             band_basis=band_basis,
@@ -7307,6 +7768,8 @@ def _printed_uncertainty_band(
         DecisionBand(ticket, unit, rule, band_basis=band_basis),
         notice=notice,
         standard_uncertainty_dex=standard_uncertainty_dex,
+        standard_uncertainty=standard_uncertainty,
+        standard_uncertainty_unit=standard_uncertainty_unit,
         two_sigma_band=two_sigma_band,
     )
 
@@ -8163,12 +8626,17 @@ def _activity_request_or_contract_refusal(
     )
 
 
-def _assumption_notice(quantity: Quantity, reason: str) -> Notice:
+def _assumption_notice(
+    quantity: Quantity,
+    reason: str,
+    resolved_policy: Any,
+) -> Notice:
     return Notice(
-        kind=NoticeKind.PRESSURE_PROVENANCE_UNKNOWN,
+        kind=resolved_policy.flag,
         affected_quantities=(quantity,),
         reason=reason,
         origin="score:predict_with_engine",
+        policy=NoticePolicy(**resolved_policy.payload["policy"]),
     )
 
 
@@ -8617,6 +9085,7 @@ def _comparison_identity(
     identity: Identity,
     reference: Observation,
     prediction: EnginePrediction,
+    method: MethodToken | None = None,
 ) -> Identity:
     """Comparison identity with conditions used by the numeric prediction.
 
@@ -8721,7 +9190,9 @@ def _comparison_identity(
     ):
         quantity = quantity_token(identity)
         if quantity is not None:
-            bar, _notice, invalid = total_pressure_bar_for_score(identity, quantity)
+            bar, _notice, invalid = total_pressure_bar_for_score(
+                identity, quantity, method=method
+            )
             if invalid is None:
                 updates["total_pressure_Pa"] = State.of(Decimal(str(bar)) * PA_PER_BAR_DEC)
     if not updates:
@@ -10102,14 +10573,16 @@ def _predict_redox(
 def total_pressure_bar_for_score(
     identity: Identity,
     quantity: Quantity,
+    *,
+    method: MethodToken | None = None,
 ) -> tuple[float, Notice | None, str | None]:
-    """Observation pressure in bar, or the 1e-6 bar assumption with a notice.
+    """Observation pressure in bar, or its method-specific policy default.
 
     A present but non-finite or negative pressure is invalid. It is not
-    replaced by the assumption.
+    replaced by the assumption. Langmuir / free evaporation in vacuum takes
+    the method-implied finite vacuum boundary; other methods with no printed
+    total pressure use DP-001.
     """
-
-    from simulator.diagnostic_helpers.binary_pot_battery import _DEFAULT_PRESSURE_BAR
 
     state = identity.total_pressure_Pa
     if state is not None and state.is_value and state.value is not None:
@@ -10120,11 +10593,26 @@ def total_pressure_bar_for_score(
     detail = "observation does not carry total_pressure_Pa"
     if state is not None and state.reason:
         detail = f"{detail} ({state.tag.value}: {state.reason})"
+    policy_id = (
+        "DP-019"
+        if method is MethodToken.LANGMUIR_FREE_EVAPORATION
+        else "DP-001"
+    )
+    from simulator.battery import default_policy
+
+    resolved = default_policy.resolve(policy_id)
+    pressure_pa = Decimal(str(resolved.value))
+    # For a condensed melt, dln(a) ~= V_m * DeltaP / (R*T). Pa*m^3/mol
+    # divided by J/mol is dimensionless; as pressure approaches zero, this
+    # contribution vanishes. Convert the registered Pa default to bar using
+    # P_bar = P_Pa / (Pa/bar), preserving the existing engine input unit.
+    pressure_bar = pressure_pa / Decimal(str(PA_PER_BAR))
     notice = _assumption_notice(
         quantity,
-        f"{detail}; residual assumes {_DEFAULT_PRESSURE_BAR:g} bar",
+        detail,
+        resolved,
     )
-    return float(_DEFAULT_PRESSURE_BAR), notice, None
+    return float(pressure_bar), notice, None
 
 
 _IMPLIED_ALPHA_SCORING_KIND = "implied_alpha_from_alpha_times_Gamma"
@@ -12644,6 +13132,15 @@ def _predict_mass_loss_with_residue(
         if "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
         or flag.startswith(("alpha_extrapolated:", "mass_loss_"))
     ) + omission_notices(result.engine_metadata.get("below_threshold_omissions"))
+    notices += _residue_redox_flag_notices(
+        result.engine_flags,
+        quantity=Quantity.MASS_LOSS_FRACTION,
+        origin=f"engine:{engine.value}",
+        pressure_law_diagnostics=tuple(
+            diagnostic.as_record()
+            for diagnostic in result.pressure_law_diagnostics
+        ),
+    )
     domain_notices = tuple(n for n in notices if n.kind is NoticeKind.OUT_OF_CERTIFIED_BAND)
     return EnginePrediction(
         engine=engine,
@@ -14094,7 +14591,7 @@ def _predict_with_engine(
     identity = observation.identity
     quantity = quantity_token(identity) if isinstance(identity, Identity) else None
     if engine is Engine.NASA_CEA_9 and quantity is not None:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity is not Quantity.FE3_FE2_RATIO
@@ -14234,7 +14731,7 @@ def _predict_with_engine(
     if wall_prediction is not None:
         return wall_prediction
     if quantity not in _ENGINE_CELL_PREDICTED_QUANTITIES:
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         if (
             quantity not in _engine_thermo_quantities(engine)
@@ -14991,8 +15488,15 @@ def _predict_with_engine(
             pressure_bar = _KNUDSEN_TOTAL_PRESSURE_SEED_BAR
             knudsen_seed_pressure_bar = pressure_bar
         else:
+            method = (
+                experiment.method.value
+                if experiment is not None and experiment.method.is_value
+                else None
+            )
             pressure_bar, pressure_notice, pressure_invalid = (
-                total_pressure_bar_for_score(identity, quantity)
+                total_pressure_bar_for_score(
+                    identity, quantity, method=method
+                )
             )
             if pressure_invalid is not None:
                 return _input_refusal(
@@ -16741,6 +17245,20 @@ def _hashimoto_residue_prediction(
             )
         ]
         notices.extend(
+            _residue_redox_flag_notices(
+                tuple(primary_provenance.get("engine_flags") or ()),
+                quantity=reported_quantity,
+                origin=f"engine:{engine.value}",
+                pressure_law_diagnostics=tuple(
+                    diagnostic
+                    for diagnostic in primary_provenance.get(
+                        "pressure_law_diagnostics"
+                    ) or ()
+                    if isinstance(diagnostic, Mapping)
+                ),
+            )
+        )
+        notices.extend(
             _hashimoto_engine_floor_inversion_notices(
                 engine,
                 primary_provenance.get("engine_floor_inversion_diagnostics"),
@@ -16889,7 +17407,9 @@ def _knudsen_residue_prediction(
     reported_quantity = quantity or Quantity.RESIDUE_COMPONENT_COMPOSITION
     from simulator.battery.residue import (
         ResidueEngineNonconvergence, ResidueInventoryRefusal,
+        _KNUDSEN_EXTENT_EVALUATION_LIMIT,
         _element_retention_ratio_from_inventories,
+        _knudsen_trace_tail_notices,
         _printed_fm_definition,
         predict_knudsen_residue_composition,
         _require_element_retention_transport_inputs,
@@ -16992,23 +17512,165 @@ def _knudsen_residue_prediction(
                 "element_unavailable" if is_retention else "channel_missing",
                 reference.identity.species.formula,
             )
+        notices = result["notices"]
+        if result.get("trace_tail"):
+            # The extent cache shares the solve across residue components.
+            # Classify against this row's resolution on a row-local copy.
+            trace_tail = dict(result["trace_tail"])
+            notices += _knudsen_trace_tail_notices(
+                trace_tail, reference, oxide_wt_pct=not is_retention,
+            )
+            provenance["trace_tail"] = trace_tail
         return EnginePrediction(
             engine=engine, channel=ENGINE_CHANNELS[engine],
             execution=Execution(state=ExecutionState.PRODUCED, call_evidence=f"{engine.value}:knudsen_residue_extent"),
             value=Decimal(str(value)), unit=QUANTITY_UNITS[reported_quantity],
             coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            notices=result["notices"], identity=reference.identity,
+            notices=notices, identity=reference.identity,
+            refusal_detail=provenance,
+        )
+    except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
+        attempted = (
+            isinstance(exc, ResidueEngineNonconvergence)
+            or exc.reason == _KNUDSEN_EXTENT_EVALUATION_LIMIT
+        )
+        return EnginePrediction(
+            engine=engine, channel=ENGINE_CHANNELS[engine],
+            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if attempted else ExecutionState.NOT_PROBED),
+            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
+            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if attempted else RefusalReason.UNSUPPORTED,
+            refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
+            notices=getattr(exc, "notices", ()), identity=reference.identity,
+        )
+
+
+def _langmuir_residue_prediction(
+    context,
+    reference,
+    engine,
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] | None = None,
+) -> EnginePrediction:
+    """Translate the per-bead Langmuir extent result to one oxide score."""
+    from simulator.battery.residue import (
+        ResidueEngineNonconvergence,
+        ResidueInventoryRefusal,
+        predict_langmuir_residue_composition,
+    )
+
+    experiment = context.experiments.get(reference.experiment_id)
+    channel = ENGINE_CHANNELS[engine]
+    sources = ENGINE_COEFFICIENT_SOURCES[engine]
+    cache_source_id = (
+        f"langmuir:{reference.source_id}:{reference.experiment_id}:"
+        f"{getattr(reference.locator, 'table', None)}:"
+        f"{getattr(reference.locator, 'note', None)}"
+    )
+    try:
+        result = (
+            None if cache is None else
+            _residue_prediction_cache_entry(cache, cache_source_id, engine)
+        )
+        if result is None:
+            result = predict_langmuir_residue_composition(
+                engine.value, reference, experiment, context.observations.values()
+            )
+            if cache is not None:
+                _residue_prediction_cache_entry(
+                    cache, cache_source_id, engine, value=result
+                )
+        formula = reference.identity.species.formula
+        value = result["composition_wt_pct"].get(formula)
+        if value is None:
+            raise ResidueInventoryRefusal("channel_missing", formula)
+        provenance = {key: item for key, item in result.items() if key != "notices"}
+        return EnginePrediction(
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=ExecutionState.PRODUCED,
+                call_evidence=f"{engine.value}:langmuir_residue_extent",
+            ),
+            value=Decimal(str(value)),
+            unit=QUANTITY_UNITS[Quantity.RESIDUE_COMPONENT_COMPOSITION],
+            coefficient_sources=sources,
+            lineage_complete=False,
+            notices=result["notices"],
+            identity=reference.identity,
             refusal_detail=provenance,
         )
     except (ResidueInventoryRefusal, ResidueEngineNonconvergence) as exc:
         return EnginePrediction(
-            engine=engine, channel=ENGINE_CHANNELS[engine],
-            execution=Execution(state=ExecutionState.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else ExecutionState.NOT_PROBED),
-            coefficient_sources=ENGINE_COEFFICIENT_SOURCES[engine], lineage_complete=False,
-            refusal_reason=RefusalReason.ATTEMPTED_UNAVAILABLE if isinstance(exc, ResidueEngineNonconvergence) else RefusalReason.UNSUPPORTED,
-            refusal_detail={**getattr(exc, "provenance", {}), "reason": exc.reason, "detail": exc.detail},
-            notices=getattr(exc, "notices", ()), identity=reference.identity,
+            engine=engine,
+            channel=channel,
+            execution=Execution(
+                state=(
+                    ExecutionState.ATTEMPTED_UNAVAILABLE
+                    if isinstance(exc, ResidueEngineNonconvergence)
+                    else ExecutionState.NOT_PROBED
+                )
+            ),
+            coefficient_sources=sources,
+            notices=getattr(exc, "notices", ()),
+            lineage_complete=False,
+            refusal_reason=(
+                RefusalReason.ATTEMPTED_UNAVAILABLE
+                if isinstance(exc, ResidueEngineNonconvergence)
+                else RefusalReason.UNSUPPORTED
+            ),
+            refusal_detail={
+                **getattr(exc, "provenance", {}),
+                "reason": exc.reason,
+                "detail": exc.detail,
+            },
+            identity=reference.identity,
         )
+
+
+def _extent_residue_method(reference, experiment, quantity) -> MethodToken | None:
+    """Select a method-specific extent adapter without widening cohort locks."""
+    if (
+        experiment is None or not experiment.method.is_value
+        or quantity is None
+    ):
+        return None
+    if (
+        experiment.method.value is MethodToken.KNUDSEN_EFFUSION
+        and quantity in {
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            Quantity.ELEMENT_RETENTION_RATIO,
+        }
+    ):
+        return MethodToken.KNUDSEN_EFFUSION
+    if (
+        experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
+        and reference.source_id == "mendybaev-2013-fun-cai-evaporation"
+        and _declared_residue_predictor(reference.source_id) is None
+    ):
+        return MethodToken.LANGMUIR_FREE_EVAPORATION
+    return None
+
+
+def _extent_residue_prediction(
+    context,
+    reference,
+    engine,
+    cache: dict[
+        tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
+    ] | None = None,
+) -> EnginePrediction | None:
+    method = _extent_residue_method(
+        reference,
+        context.experiments.get(reference.experiment_id),
+        quantity_token(reference.identity),
+    )
+    if method is MethodToken.KNUDSEN_EFFUSION:
+        return _knudsen_residue_prediction(context, reference, engine, cache)
+    if method is MethodToken.LANGMUIR_FREE_EVAPORATION:
+        return _langmuir_residue_prediction(context, reference, engine, cache)
+    return None
 
 
 def _sossi_residue_prediction(
@@ -17573,7 +18235,7 @@ def _refused_residual(
             if candidate is not None
             else CandidateRequest(
                 reference.experiment_id,
-                quantity or Quantity.P_SAT,
+                quantity,
                 engine,
                 ENGINE_CHANNELS[engine],
             ),
@@ -18058,6 +18720,20 @@ def _compile_residual_with_lineage(
         )
         if pressure_check is not None:
             pressure_detail = pressure_check.detail
+            if gates.reason is RefusalReason.METHOD_UNKNOWN:
+                method_check = next(
+                    (
+                        check
+                        for check in gates.checks
+                        if check.name == "method" and not check.passed
+                    ),
+                    None,
+                )
+                if method_check is not None:
+                    refusal_detail["missing_facts"] = {
+                        "method": method_check.detail.get("reason"),
+                        "in_cell_partial_pressure_sum": pressure_detail.get("reason"),
+                    }
             lower_bound = pressure_detail.get(
                 "printed_partial_pressure_lower_bound_Pa"
             )
@@ -18197,18 +18873,8 @@ def _compile_residual_with_lineage(
         reference,
         reference_present=reference.observation_id in context._observation_ids,
     )
-    if (
-        prediction is None and predict in (None, predict_with_engine)
-        and quantity in {
-            Quantity.RESIDUE_COMPONENT_COMPOSITION,
-            Quantity.ELEMENT_RETENTION_RATIO,
-        }
-        and experiment is not None and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-    ):
-        prediction = _knudsen_residue_prediction(
-            context, reference, engine
-        )
+    if prediction is None and predict in (None, predict_with_engine):
+        prediction = _extent_residue_prediction(context, reference, engine)
     if prediction is None:
         builtin_predictor = (
             predict is _BUILTIN_SCORE_PREDICTOR
@@ -18609,21 +19275,29 @@ def _compile_residual_with_lineage(
         )
 
     candidate = candidate_observation(reference, prediction)
-    knudsen_extent = (
+    extent_call = prediction.execution.call_evidence or ""
+    residue_extent = (
         quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and experiment is not None and experiment.method.is_value
-        and experiment.method.value is MethodToken.KNUDSEN_EFFUSION
-        and prediction.execution.call_evidence == f"{engine.value}:knudsen_residue_extent"
+        and extent_call in {
+            f"{engine.value}:knudsen_residue_extent",
+            f"{engine.value}:langmuir_residue_extent",
+        }
     )
+    langmuir_extent = residue_extent and extent_call == f"{engine.value}:langmuir_residue_extent"
     compared_reference = reference.identity
     compared_candidate = candidate.identity
     source_identity = source_reference.identity
     if isinstance(compared_reference, Identity) and isinstance(compared_candidate, Identity):
+        comparison_method = (
+            experiment.method.value
+            if experiment is not None and experiment.method.is_value
+            else None
+        )
         compared_reference = _comparison_identity(
-            compared_reference, reference, prediction
+            compared_reference, reference, prediction, method=comparison_method
         )
         compared_candidate = _comparison_identity(
-            compared_candidate, reference, prediction
+            compared_candidate, reference, prediction, method=comparison_method
         )
         if (
             point_composition_notice is not None
@@ -18644,9 +19318,11 @@ def _compile_residual_with_lineage(
             source_identity.reference_state.value.endmember.polymorph
         )
     )
-    if knudsen_extent:
-        equal = _same_row_knudsen_residue_identity_equal(
-            compared_reference, compared_candidate
+    if residue_extent:
+        equal = _same_row_residue_extent_identity_equal(
+            compared_reference,
+            compared_candidate,
+            allow_unknown_species_phase=langmuir_extent,
         )
     elif fo2_mode is Fo2Mode.ENGINE_INTRINSIC and quantity in MELT_ACTIVITY_QUANTITIES:
         equal = _identity_equal(
@@ -18901,8 +19577,8 @@ def _compile_residual_with_lineage(
                 )
                 two_sigma_band = printed.two_sigma_band
                 if two_sigma_band is not None:
-                    two_sigma_measurement_dex = (
-                        printed.standard_uncertainty_dex / Decimal(2)
+                    two_sigma_measurement_dex = standard_uncertainty_width(
+                        two_sigma_band.value, NORMAL_95_TICKET_MULTIPLIER
                     )
                     two_sigma_total_dex = (
                         _combine_independent_standard_uncertainties(
@@ -19162,7 +19838,7 @@ def _compile_residual_with_lineage(
     )
     if is_internal_consistency(origin) or compilation:
         conjuncts = replace(conjuncts, reference_measured_evidence=False)
-    if knudsen_extent:
+    if residue_extent:
         # Carry the identity owner's validated comparison into eligibility.
         conjuncts = replace(conjuncts, identity_equal=equal.kind is IdentityEqualKind.EQUAL)
     if is_sf04_workbook(reference):
@@ -19774,6 +20450,16 @@ def residual_to_plain(
 ) -> dict[str, object]:
     payload = to_plain(residual)
     assert isinstance(payload, dict)
+    request = residual.candidate_request
+    request_payload = payload.get("candidate_request")
+    if (
+        request is not None
+        and request.quantity is None
+        and isinstance(request_payload, dict)
+    ):
+        # Null records that the engine request had an unidentified quantity;
+        # omitting the field would make it look like legacy absence.
+        request_payload["quantity"] = None
     if candidate is not None:
         payload["candidate_observation"] = to_plain(candidate)
     return payload
@@ -22960,6 +23646,53 @@ def _optional_decimal(value: Decimal | None) -> str | None:
     return None if value is None else str(value)
 
 
+def _policies_for_stratum(
+    notices: Iterable[Notice | Mapping[str, object]], stratum: str
+) -> tuple[tuple[str | None, str | None], ...]:
+    policies: set[tuple[str, str]] = set()
+    for notice in notices:
+        if isinstance(notice, Notice):
+            policy = notice.policy
+            if policy is None:
+                if notice.kind is NoticeKind.METHOD_INFERRED:
+                    raise ValueError(
+                        "method_inferred notice requires policy metadata"
+                    )
+                continue
+            if (
+                notice.kind.value == stratum
+                or stratum == FLAGGED_STRATUM_PROPOSED_POLICY
+                and policy.status == "proposed"
+            ):
+                policies.add((policy.id, policy.status))
+            continue
+        policy = notice.get("policy")
+        if not isinstance(policy, Mapping):
+            continue
+        policy_id = policy.get("id")
+        policy_status = policy.get("status")
+        matches_stratum = notice.get("kind") == stratum
+        matches_proposed_stratum = (
+            stratum == FLAGGED_STRATUM_PROPOSED_POLICY
+            and policy_status == "proposed"
+        )
+        if matches_stratum or matches_proposed_stratum:
+            if (
+                set(policy) != {"id", "version", "status", "value", "units"}
+                or not isinstance(policy_id, str)
+                or not policy_id.startswith("DP-")
+                or policy_status not in {"canonical", "proposed", "rejected"}
+                or not isinstance(policy.get("version"), (int, str))
+                or not str(policy.get("version"))
+                or not isinstance(policy.get("units"), str)
+                or not policy.get("units")
+                or policy.get("value") is None
+            ):
+                raise ValueError("default-policy notice metadata is malformed")
+            policies.add((policy_id, str(policy_status)))
+    return tuple(sorted(policies)) or ((None, None),)
+
+
 def flagged_stratum_rows(
     residuals: Sequence[Residual],
     *,
@@ -22967,34 +23700,50 @@ def flagged_stratum_rows(
 ) -> list[dict[str, object]]:
     """Summarize numeric flagged diagnostics without a decision band."""
 
-    groups: dict[tuple[str, str, str], list[Residual]] = {}
+    groups: dict[
+        tuple[str, str, str, str | None, str | None], list[Residual]
+    ] = {}
     for residual in residuals:
         if residual.rail is None or residual.numeric is None:
             continue
         engine = _engine_of(residual)
         for stratum in flagged_strata(residual.notices):
-            groups.setdefault((stratum, residual.rail.value, engine), []).append(residual)
+            for policy_id, policy_status in _policies_for_stratum(
+                residual.notices, stratum
+            ):
+                groups.setdefault(
+                    (stratum, residual.rail.value, engine, policy_id, policy_status), []
+                ).append(residual)
     rows: list[dict[str, object]] = []
-    for (stratum, rail, engine), bucket in sorted(groups.items()):
+    for (stratum, rail, engine, policy_id, policy_status), bucket in sorted(
+        groups.items(),
+        key=lambda item: _flagged_census_sort_key(item[0]),
+    ):
         dex_values = [
             residual.numeric.value
             for residual in bucket
             if residual.numeric is not None
             and residual.numeric.operation is MetricOperation.DEX
         ]
-        rows.append(
-            {
-                "stratum": stratum,
-                "rail": rail,
-                "engine": engine,
-                "n": len(bucket),
-                "median_dex": (
-                    None if not dex_values else str(_median(dex_values))
-                ),
-                "rms_dex": None if not dex_values else str(_rms(dex_values)),
-            }
-        )
+        row: dict[str, object] = {
+            "stratum": stratum,
+            "rail": rail,
+            "engine": engine,
+            "n": len(bucket),
+            "median_dex": None if not dex_values else str(_median(dex_values)),
+            "rms_dex": None if not dex_values else str(_rms(dex_values)),
+        }
+        if policy_id is not None:
+            row["policy_id"] = policy_id
+            row["policy_status"] = policy_status
+        rows.append(row)
     return rows
+
+
+def _flagged_census_sort_key(
+    key: tuple[str, str, str, str | None, str | None],
+) -> tuple[str, ...]:
+    return tuple("" if value is None else value for value in key)
 
 
 def headline_records(
@@ -23476,6 +24225,24 @@ def write_headline_summary_json(
     payload["assumed_band"] = _assumed_band_summary(
         (to_plain(row) for row in residuals), context.observations
     )
+    from simulator.battery.engine_capability import (
+        capability_summary,
+        residual_record_stats,
+    )
+
+    n_records, n_scored, n_refused, scored_ids = residual_record_stats(residuals)
+    payload.update(
+        capability_summary(
+            observations=context.observations,
+            origins=context.origins,
+            experiments=context.experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored,
+            n_refused_records=n_refused,
+        )
+    )
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(payload, sort_keys=True, ensure_ascii=False, indent=2) + "\n",
@@ -23675,7 +24442,7 @@ def _residual_engine_observable(row: Mapping[str, object]) -> bool:
             engine_value = Engine(engine)
         except ValueError:
             return True
-        from simulator.battery.compilation_tier import _engine_thermo_quantities
+        from simulator.battery.engine_capability import engine_thermo_quantities as _engine_thermo_quantities
 
         return (
             quantity in _engine_thermo_quantities(engine_value)
@@ -23888,6 +24655,18 @@ def _render_score_report_from_payloads_legacy(
             pending += 1
         elif observation.admission.status is AdmissionStatus.ADMITTED:
             admitted += 1
+    from simulator.battery.engine_capability import capability_summary
+
+    capability = capability_summary(
+        observations=context.observations,
+        origins=context.origins,
+        experiments=context.experiments,
+        engines=engines,
+        scored_observation_ids=aggregate.numeric_observation_ids,
+        n_records=aggregate.count,
+        n_scored_records=aggregate.numeric_count,
+        n_refused_records=aggregate.refused_count,
+    )
     report = render_legacy_score_report_markdown(
         hostname=context.hostname,
         studio_hostname=studio_hostname,
@@ -23902,7 +24681,12 @@ def _render_score_report_from_payloads_legacy(
         eligibility_census=eligibility_census,
         headline_rows=aggregate.headline_records(engines=report_engines),
         e15_lines=_e15_report_lines(aggregate.e15_points, context.observations),
-        flagged_rows=aggregate.flagged_records(),
+        flagged_rows=flagged_stratum_payloads(
+            rows,
+            engines,
+            hulls=aggregate.headline_hulls,
+            observations=context.observations,
+        ),
         condition_lines=aggregate.condition_hull_lines(),
         compilation_lines=aggregate.compilation_lines(engines=engines),
         refusal_counts=aggregate.refusal_counts,
@@ -23917,6 +24701,8 @@ def _render_score_report_from_payloads_legacy(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=capability["coverage"],
+        capability_matrix=capability["capability_matrix"],
     )
     if shard_failures:
         report = (
@@ -23924,7 +24710,8 @@ def _render_score_report_from_payloads_legacy(
             + "\n".join(_score_shard_failure_report_lines(shard_failures))
             + "\n"
         )
-    return format_assumed_band_report(report, aggregate.assumed_bands.payload())
+    report = format_assumed_band_report(report, aggregate.assumed_bands.payload())
+    return report
 
 
 def refusal_census_payloads(rows: Iterable[Mapping[str, object]]) -> dict[str, int]:
@@ -24233,12 +25020,35 @@ def _headline_payload_admits(row: Mapping[str, object], *, tier: str) -> bool:
 
 
 def _flagged_payload_strata(row: Mapping[str, object]) -> tuple[str, ...]:
-    notices = tuple(
-        (str(notice.get("kind") or ""), notice.get("reason"))
+    raw_notices = tuple(
+        notice
         for notice in (row.get("notices") or ())
         if isinstance(notice, Mapping)
     )
-    return _classify_flagged_notice_facts(notices)
+    for notice in raw_notices:
+        if (
+            notice.get("kind") == NoticeKind.METHOD_INFERRED.value
+            and notice.get("policy") is None
+        ):
+            raise ValueError("method_inferred notice requires policy metadata")
+        if (
+            notice.get("policy") is not None
+            and notice.get("kind") not in _DEFAULT_POLICY_FLAG_VALUES
+        ):
+            raise ValueError(
+                "policy-bearing notice kind must name its default-policy flag"
+            )
+    notices = tuple(
+        (str(notice.get("kind") or ""), notice.get("reason"))
+        for notice in raw_notices
+    )
+    strata = _classify_flagged_notice_facts(notices)
+    if (
+        _has_proposed_policy(raw_notices)
+        and FLAGGED_STRATUM_PROPOSED_POLICY not in strata
+    ):
+        return (*strata, FLAGGED_STRATUM_PROPOSED_POLICY)
+    return strata
 
 
 def _has_flagged_decision_notice(residual: Residual) -> bool:
@@ -24648,59 +25458,12 @@ def flagged_stratum_payloads(
     hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
     observations: Mapping[str, Observation] | None = None,
 ) -> list[dict[str, object]]:
-    groups: dict[tuple[str, str, str], list[Decimal]] = {}
-    counts: dict[tuple[str, str, str], int] = {}
-    engine_names = {engine.value for engine in engines}
+    census = _FlaggedStratumAccumulator(
+        engines, hulls=hulls, observations=observations
+    )
     for row in rows:
-        numeric = row.get("numeric")
-        if not isinstance(numeric, Mapping):
-            continue
-        rail = str(row.get("rail") or "")
-        if not rail:
-            continue
-        engine = str(
-            ((row.get("candidate_request") or {}) if isinstance(row.get("candidate_request"), Mapping) else {}).get("engine")
-            or _engine_from_residual_key(row.get("key"))
-        )
-        if engine_names and engine not in engine_names:
-            continue
-        for stratum in _flagged_payload_strata(row):
-            key = (stratum, rail, engine)
-            counts[key] = counts.get(key, 0) + 1
-            if hulls is not None:
-                from simulator.battery.compilation_tier import reference_observation
-
-                reference = str(row.get("reference") or "")
-                hulls.setdefault(
-                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
-                ).add(reference, reference_observation(observations or {}, reference))
-            dex = numeric.get("value") if numeric.get("operation") == MetricOperation.DEX.value else None
-            if dex is None:
-                continue
-            try:
-                value = as_decimal(dex)
-            except (TypeError, ValueError, ArithmeticError):
-                continue
-            groups.setdefault(key, []).append(value)
-    return [
-        {
-            "stratum": stratum,
-            "rail": rail,
-            "engine": engine,
-            "n": counts[(stratum, rail, engine)],
-            "median_dex": (
-                None
-                if not groups.get((stratum, rail, engine))
-                else str(_median(groups[(stratum, rail, engine)]))
-            ),
-            "rms_dex": (
-                None
-                if not groups.get((stratum, rail, engine))
-                else str(_rms(groups[(stratum, rail, engine)]))
-            ),
-        }
-        for stratum, rail, engine in sorted(counts)
-    ]
+        census.add(row)
+    return census.records()
 
 
 def _redox_source_relation_fields(relation: str) -> dict[str, str]:
@@ -24899,6 +25662,105 @@ class _ScorePayloadRowMetadata:
     tier_uncertainty: str
 
 
+class _FlaggedStratumAccumulator:
+    """One owner for flagged residual counts and dex statistics."""
+
+    def __init__(
+        self,
+        engines: Sequence[Engine],
+        *,
+        hulls: dict[tuple[str, str, str], _ConditionHull] | None = None,
+        observations: Mapping[str, Observation] | None = None,
+    ) -> None:
+        self.engine_names = {engine.value for engine in engines}
+        self.hulls = hulls
+        self.observations = observations or {}
+        self.counts: dict[
+            tuple[str, str, str, str | None, str | None], int
+        ] = defaultdict(int)
+        self.dex_values: dict[
+            tuple[str, str, str, str | None, str | None], list[Decimal]
+        ] = defaultdict(list)
+
+    def add(self, row: Mapping[str, object]) -> None:
+        numeric = row.get("numeric")
+        if not isinstance(numeric, Mapping):
+            return
+        rail = str(row.get("rail") or "")
+        if not rail:
+            return
+        engine = _engine_from_payload(row)
+        if self.engine_names and engine not in self.engine_names:
+            return
+        notices = tuple(
+            notice
+            for notice in (row.get("notices") or ())
+            if isinstance(notice, Mapping)
+        )
+        for stratum in _flagged_payload_strata(row):
+            for policy_id, policy_status in _policies_for_stratum(
+                notices, stratum
+            ):
+                key = (stratum, rail, engine, policy_id, policy_status)
+                self.counts[key] += 1
+                if self.hulls is not None:
+                    from simulator.battery.compilation_tier import reference_observation
+
+                    reference = str(row.get("reference") or "")
+                    hull_key = (
+                        f"flagged:{stratum}"
+                        if policy_id is None
+                        else (
+                            f"flagged:{stratum}:policy={policy_id}"
+                            f":status={policy_status}"
+                        )
+                    )
+                    self.hulls.setdefault(
+                        (hull_key, rail, engine), _ConditionHull()
+                    ).add(
+                        reference,
+                        reference_observation(self.observations, reference),
+                    )
+                if numeric.get("operation") != MetricOperation.DEX.value:
+                    continue
+                dex = numeric.get("value")
+                if dex is None:
+                    continue
+                try:
+                    self.dex_values[key].append(as_decimal(dex))
+                except (TypeError, ValueError, ArithmeticError):
+                    continue
+
+    def records(self) -> list[dict[str, object]]:
+        rows: list[dict[str, object]] = []
+        for (
+            stratum,
+            rail,
+            engine,
+            policy_id,
+            policy_status,
+        ), n in sorted(
+            self.counts.items(),
+            key=lambda item: _flagged_census_sort_key(item[0]),
+        ):
+            values = self.dex_values.get(
+                (stratum, rail, engine, policy_id, policy_status), ()
+            )
+            row: dict[str, object] = {
+                "stratum": stratum,
+                "rail": rail,
+                "engine": engine,
+                "n": n,
+                "median_dex": None if not values else str(_median(values)),
+                "rms_dex": None if not values else str(_rms(values)),
+            }
+            if policy_id is not None:
+                row["policy_id"] = policy_id
+                row["policy_status"] = policy_status
+            rows.append(row)
+        return rows
+
+
 class _ScorePayloadAccumulator:
     """Compact report statistics collected in one pass over residual payloads."""
 
@@ -24953,11 +25815,17 @@ class _ScorePayloadAccumulator:
         self.assumed_bands = AssumedBandReport()
         self.e15_points: list[_E15ResidualPoint] = []
         self.headline_hulls: dict[tuple[str, str, str], _ConditionHull] = {}
+        self.flagged_census = _FlaggedStratumAccumulator(
+            self.engines,
+            hulls=self.headline_hulls,
+            observations=context.observations,
+        )
         self.report_engine_names: set[str] = set()
         self.count = 0
         self.scored_count = 0
-        self.flagged_counts: dict[tuple[str, str, str], int] = defaultdict(int)
-        self.flagged_values: dict[tuple[str, str, str], list[Decimal]] = defaultdict(list)
+        self.numeric_count = 0
+        self.refused_count = 0
+        self.numeric_observation_ids: set[str] = set()
         self.compilation_groups: dict[
             tuple[str, str, str, str, str], dict[str, object]
         ] = {}
@@ -25250,6 +26118,14 @@ class _ScorePayloadAccumulator:
             except (TypeError, ValueError, ArithmeticError):
                 pass
         reference = metadata.reference
+        if (
+            isinstance(numeric_payload, Mapping)
+            and numeric_payload.get("value") is not None
+        ):
+            self.numeric_count += 1
+            self.numeric_observation_ids.add(str(reference))
+        if row.get("status") == ResidualStatus.REFUSED.value:
+            self.refused_count += 1
         engine = metadata.engine
         flags = metadata.flags
         flagged = bool(flags)
@@ -25331,26 +26207,7 @@ class _ScorePayloadAccumulator:
                 flagged=flagged,
                 numeric_value=numeric_value,
             )
-        numeric = row.get("numeric")
-        rail = str(row.get("rail") or "")
-        if (
-            isinstance(numeric, Mapping)
-            and rail
-            and (not self.engine_names or engine in self.engine_names)
-        ):
-            dex = (
-                numeric.get("value")
-                if numeric.get("operation") == MetricOperation.DEX.value
-                else None
-            )
-            for stratum in flags:
-                key = (stratum, rail, engine)
-                self.flagged_counts[key] += 1
-                self.headline_hulls.setdefault(
-                    (f"flagged:{stratum}", rail, engine), _ConditionHull()
-                ).add(reference, metadata.observation)
-                if dex is not None and numeric_value is not None:
-                    self.flagged_values[key].append(numeric_value)
+        self.flagged_census.add(row)
         exclusions_tuple = tuple(exclusions or ())
         if "admission_admitted" in exclusions_tuple:
             self.admission_with += 1
@@ -25489,25 +26346,7 @@ class _ScorePayloadAccumulator:
             record["decision_strata"] = strata
 
     def flagged_records(self) -> list[dict[str, object]]:
-        return [
-            {
-                "stratum": stratum,
-                "rail": rail,
-                "engine": engine,
-                "n": self.flagged_counts[(stratum, rail, engine)],
-                "median_dex": (
-                    None
-                    if not self.flagged_values.get((stratum, rail, engine))
-                    else str(_median(self.flagged_values[(stratum, rail, engine)]))
-                ),
-                "rms_dex": (
-                    None
-                    if not self.flagged_values.get((stratum, rail, engine))
-                    else str(_rms(self.flagged_values[(stratum, rail, engine)]))
-                ),
-            }
-            for stratum, rail, engine in sorted(self.flagged_counts)
-        ]
+        return self.flagged_census.records()
 
     def condition_hull_lines(self) -> list[str]:
         return _condition_hull_lines(
@@ -25539,6 +26378,20 @@ class _ScorePayloadAccumulator:
             static_refusals=self.static_refusals,
         )
         payload["assumed_band"] = self.assumed_bands.payload()
+        from simulator.battery.engine_capability import capability_summary
+
+        payload.update(
+            capability_summary(
+                observations=self.context.observations,
+                origins=self.context.origins,
+                experiments=self.context.experiments,
+                engines=self.engines,
+                scored_observation_ids=self.numeric_observation_ids,
+                n_records=self.count,
+                n_scored_records=self.numeric_count,
+                n_refused_records=self.refused_count,
+            )
+        )
         return payload
 
 
@@ -25549,6 +26402,7 @@ def write_headline_summary_from_payloads_json(
     engines: Sequence[Engine],
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
     store_stamp: Mapping[str, object] | None = None,
 ) -> None:
     rows = tuple(rows)
@@ -25562,6 +26416,25 @@ def write_headline_summary_from_payloads_json(
         store_stamp=store_stamp,
     )
     payload["assumed_band"] = _assumed_band_summary(rows, observations)
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored, n_refused, scored_ids = payload_record_stats(rows)
+        payload.update(
+            capability_summary(
+                observations=observations,
+                origins=origins,
+                experiments=experiments,
+                engines=engines,
+                scored_observation_ids=scored_ids,
+                n_records=n_records,
+                n_scored_records=n_scored,
+                n_refused_records=n_refused,
+            )
+        )
     _write_headline_summary_payload_json(payload, path)
 
 
@@ -25648,6 +26521,7 @@ def render_score_report_from_payloads(
     mismatch_warning: str | None = None,
     observations: Mapping[str, Observation] | None = None,
     origins: Mapping[str, str] | None = None,
+    experiments: Mapping[str, object] | None = None,
 ) -> str:
     eligibility_census = eligibility_failure_census(
         rows,
@@ -25726,6 +26600,26 @@ def render_score_report_from_payloads(
         condition_lines: Sequence[str] | None = _condition_hull_lines(hulls)
     else:
         condition_lines = None
+    capability = None
+    if observations is not None:
+        from simulator.battery.engine_capability import (
+            capability_summary,
+            payload_record_stats,
+        )
+
+        n_records, n_scored_records, n_refused_records, scored_ids = payload_record_stats(
+            rows
+        )
+        capability = capability_summary(
+            observations=observations,
+            origins=origins,
+            experiments=experiments,
+            engines=engines,
+            scored_observation_ids=scored_ids,
+            n_records=n_records,
+            n_scored_records=n_scored_records,
+            n_refused_records=n_refused_records,
+        )
     refusal_counts = refusal_census_payloads(measured_rows)
     admit = admission_census_payloads(rows)
     notice_counts = notice_backlog_payloads(rows)
@@ -25761,6 +26655,8 @@ def render_score_report_from_payloads(
         status_diff=status_diff,
         unmapped_legacy_keys=unmapped_legacy_keys,
         circularity_warning=CIRCULARITY_WARNING,
+        coverage=None if capability is None else capability["coverage"],
+        capability_matrix=None if capability is None else capability["capability_matrix"],
     )
     report = format_assumed_band_report(
         report, _assumed_band_summary(rows, observations)
@@ -25771,9 +26667,10 @@ def render_score_report_from_payloads(
     report = _append_quench_pair_diagnostics(
         report, paired_quench_diagnostics(pair_context)
     )
-    return format_element_retention_diagnostics(
+    report = format_element_retention_diagnostics(
         report, element_retention_report_data(rows, observations)
     )
+    return report
 
 
 def _legacy_bucket(row: Mapping[str, object]) -> str:

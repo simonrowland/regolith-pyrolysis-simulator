@@ -1,0 +1,390 @@
+schema_version: 1
+policies:
+  - id: DP-001
+    condition: "total pressure unprinted; method does not fix it"
+    value: 101325
+    units: Pa
+    physical_basis: >-
+      Condensed-phase activities, Fe redox and liquidus vary as V·ΔP/RT. For a
+      melt, V ≈ 2.5e-5 m³/mol, so 1 atm vs vacuum gives ~1e-3 in ln a:
+      negligible
+    bias: "negligible for condensed equilibria; NOT used for vapour-pressure rows, see DP-004"
+    flag: assumed_pressure
+    ruling: "d-451 (liquidus), d-460 (general)"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-002
+    condition: 'total pressure unprinted; method is gas-mixing furnace, wire-loop equilibration, or "in air"'
+    value: 101325
+    units: Pa
+    physical_basis: "these furnaces run at ambient pressure"
+    bias: none known
+    flag: method_implied
+    ruling: "d-460, gap manual"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-003
+    condition: 'pO2 unprinted; experiment "in air"'
+    formula: "pO2 = 0.2095 · P_total"
+    formula_owner: "dry-air O2 mole fraction"
+    units: Pa
+    physical_basis: "dry-air O2 mole fraction 0.2095"
+    bias: "humidity lowers it by < 2 %"
+    flag: method_implied
+    ruling: "gap manual"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-004
+    condition: "Knudsen-cell (KEMS / Knudsen mass loss) row; regime check cannot run"
+    formula: "molecular effusion inside the cell; vacuum outside; P_total(cell) = Σ measured partials. Never 1 atm"
+    formula_owner: "simulator.battery.score._sum_gas_partial_pressures_pa"
+    units: Pa
+    physical_basis: "the method is defined by molecular effusion"
+    bias: "if the regime is transitional, the measured P understates P_eq (the comment says why)"
+    flag: effusion_regime_assumed
+    ruling: d-460
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-005
+    condition: "evaporation coefficient α unsourced (Langmuir / HKL flux)"
+    value: 1
+    units: dimensionless
+    physical_basis: "Hertz–Knudsen–Langmuir maximum flux"
+    bias: "prediction is an UPPER bound on flux (one-sided)"
+    flag: alpha_assumed
+    ruling: d-460
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-006
+    condition: "Clausing factor unprinted; orifice area printed"
+    value: 1
+    units: dimensionless
+    physical_basis: "ideal orifice"
+    bias: "real C < 1, so a pressure derived from mass loss is UNDERestimated"
+    flag: knob_defaulted
+    ruling: "controller 2026-11-22"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-007
+    condition: "evaporating / sample area unprinted (gram-lab rows)"
+    formula: "A = πd²/4; V_melt = mass_kg/ρ; V_total = 1.20V_melt; d = (4V_total/(1.5π))^(1/3), with h = 1.5d"
+    formula_owner: "simulator.equipment.EquipmentDesigner.size_crucible(mass_kg)"
+    units: m²
+    physical_basis: "d-456 apparatus default"
+    bias: "rate ∝ area: one-to-one"
+    flag: knob_defaulted
+    ruling: "d-456, d-461"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-008
+    condition: "any other apparatus knob unprinted"
+    formula: "the simulator's runtime default for that knob, read from its owning constant"
+    formula_owner: "runtime knob owner supplied as context"
+    units: "knob-specific"
+    physical_basis: d-456
+    bias: "knob-specific; stated per knob in the registry"
+    flag: knob_defaulted
+    ruling: d-456
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-009
+    condition: "equivalent-sphere area needs density; density unprinted"
+    formula: "ρ from the simulator melt-density model at the printed composition and T; if unresolvable, use DP-007"
+    formula_owner: "simulator.material_densities.resolve_melt_density_kg_m3"
+    units: kg/m³
+    physical_basis: d-461
+    bias: "~5 % on area"
+    flag: knob_defaulted
+    ruling: d-461
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-010
+    condition: "fO2 unprinted on a redox or activity row"
+    formula: "the oxygen ladder's existing last rung: intrinsic melt fO2 (fo2_tier_notice, tier 4)"
+    formula_owner: "simulator.battery.fo2_ladder.fo2_tier_notice"
+    units: "log10(bar)"
+    physical_basis: "d-460; ladder already implemented"
+    bias: rung-specific
+    flag: assumed_fo2
+    ruling: d-460
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-011
+    condition: "measurement method unprinted"
+    formula: "infer from the printed quantity: equilibrium partial/saturation pressure → equilibrium comparison; flux or mass-loss rate → HKL with DP-005"
+    formula_owner: "printed quantity definition"
+    units: "method token"
+    physical_basis: "the quantity's definition fixes the comparison"
+    bias: "as DP-005 for flux rows"
+    flag: method_assumed
+    ruling: d-460
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-012
+    condition: "KEMS calibration factor absent; row prints a REDUCED quantity (p, p_sat, activity, activity coefficient, partial molar H)"
+    formula: "no calibration needed; use the printed reduced value"
+    formula_owner: "printed reduced observation"
+    units: "printed quantity units"
+    physical_basis: "the authors' calibration is already applied"
+    bias: none added
+    flag: kems_calibration_by_source
+    ruling: "controller 2026-11-22"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-013
+    condition: "basis differs from the engine's"
+    formula: "the source's printed conversion; else the ONE closed transform (mol% = 100·x; wt% ↔ x via oxide molar masses; per-g ↔ per-mol via formula weight; kJ ↔ J)"
+    formula_owner: "source conversion or closed basis-transform functions"
+    units: "engine-required basis"
+    physical_basis: "exact identities"
+    bias: none (exact)
+    flag: basis_converted
+    flag_context: transform_id
+    ruling: "d-432, d-460"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-014
+    condition: "observation printed as a range"
+    formula: "residual = signed distance to the interval (0 inside)"
+    formula_owner: "interval residual calculation"
+    units: "observed quantity units"
+    physical_basis: "no midpoint is implied by a range"
+    bias: none
+    flag: interval_observation
+    ruling: d-461
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-015
+    condition: "calorimetric reference temperature unprinted"
+    value: "298.15"
+    units: K
+    physical_basis: "standard-state convention"
+    bias: "none for modern tables"
+    flag: method_implied
+    ruling: "gap manual"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-016
+    condition: "phase unprinted (migrator)"
+    formula: "inferred from the physics of the row: oxide-melt activity above the printed liquidus → liquid; gas-species partial → gas; labelled table segment → its labelled side; else unspecified"
+    formula_owner: "row quantity and phase inference rules"
+    units: "phase token"
+    physical_basis: "definition of the measured quantity"
+    bias: "wrong-phase risk is flagged, never hidden"
+    flag: phase_inferred
+    ruling: d-460
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-017
+    condition: "run composition missing on a phase-analysis row"
+    formula: "the printed run-start / bulk composition; else the analysed equilibrium liquid, used ONLY to predict OTHER phases (the liquid's own rows stay out under SC-458)"
+    formula_owner: "printed run composition or analysed liquid composition"
+    units: "composition basis of source row"
+    physical_basis: "mass balance / equilibrium"
+    bias: "echo excluded by construction"
+    flag:
+      - composition_from_run_siblings
+      - composition_from_analysed_phase
+    ruling: "controller 2026-11-22"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-018
+    condition: "method printed; a condition it fixes is unprinted"
+    formula: "the gap-manual method table, one row per method, each with its physical reason"
+    formula_owner: "gap-manual method table"
+    units: "method-implied condition units"
+    physical_basis: "the method fixes it"
+    bias: per row
+    flag: method_implied
+    ruling: "gap manual"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: owner
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-019
+    condition: 'vacuum method (Langmuir / free evaporation in vacuum, or "under vacuum") with no printed total pressure'
+    formula: "the existing finite high-vacuum boundary in bar × PA_PER_BAR"
+    formula_owner: "simulator.diagnostic_helpers.binary_pot_battery.DP_019_VACUUM_BOUNDARY_BAR and simulator.physical_constants.PA_PER_BAR"
+    units: Pa
+    physical_basis: "the method states vacuum, and the engine needs a finite pressure"
+    bias: "for condensed equilibria negligible (V·ΔP/RT); for evaporation, the gas-film resistance vanishes, consistent with the vacuum method"
+    flag: method_implied
+    ruling: "controller 2026-11-23 canonization log"
+    version: 1
+    status: canonical
+    proposed_by: null
+    proposed_at: null
+    evidence: null
+    canonized_by: controller
+    canonized_at: "2026-11-23"
+    history: []
+  - id: DP-101
+    condition: "unprinted total pressure (rejected general vacuum fallback proposal)"
+    value: "1e-6"
+    units: bar
+    physical_basis: "rejected: silent vacuum fallback applied regardless of method"
+    bias: "not assessed; rejected as a general default"
+    flag: method_implied
+    ruling: "controller 2026-11-23 canonization log"
+    version: 1
+    status: rejected
+    proposed_by: w1122cvpsat
+    proposed_at: null
+    evidence: "1f9d41322; scorer's existing silent 1e-6 bar fallback"
+    canonized_by: controller
+    canonized_at: "2026-11-23"
+    rejection_reason: "silent vacuum fallback applied regardless of method; superseded by DP-001/DP-019 by method"
+    replaced_by:
+      - DP-001
+      - DP-019
+    history:
+      - status: proposed
+        proposed_by: w1122cvpsat
+        value: "1e-6"
+        units: bar
+        condition: "unprinted total pressure"
+        evidence: "1f9d41322; scorer's existing silent 1e-6 bar fallback"
+  - id: DP-106
+    condition: "source does not state method"
+    value: "unspecified"
+    units: "method token"
+    physical_basis: "No reported technique means an unspecified token makes no apparatus-specific claim and adds no method-dependent premise."
+    bias: "The true method-specific condition may remain unknown; the proposed flag keeps the residual outside the clean tier."
+    flag: method_unstated
+    ruling: null
+    version: 1
+    status: proposed
+    proposed_by: w1122cvmq
+    proposed_at: "2026-11-23T01:39:34.631829+00:00"
+    evidence:
+      - source_id: ohta-suito-1995-mno-activity-slags
+        observation_id: ohta_suito_1995_table2_ac_alumina_activity
+      - source_id: ohta-suito-1995-mno-activity-slags
+        observation_id: ohta_suito_1995_table2_ca_alumina_activity
+    canonized_by: null
+    canonized_at: null
+    history: []
+  - id: DP-107
+    condition: row or experiment method prose identifies a closed technique
+    formula: method token inferred from the printed method prose
+    formula_owner: simulator.battery.migrate._method_inference_from_evidence
+    units: method token
+    physical_basis: The printed technique fixes the measurement regime.
+    bias: Citation text is not evidence for the row's measurement method.
+    flag: method_inferred
+    ruling: null
+    version: 1
+    status: proposed
+    proposed_by: w1123cvmq2
+    proposed_at: '2026-11-22T00:00:00+00:00'
+    evidence:
+    - row-level printed technique resolves to one closed method token
+    canonized_by: null
+    canonized_at: null
+    history: []

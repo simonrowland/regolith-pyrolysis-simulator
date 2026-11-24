@@ -177,6 +177,8 @@ def test_in_domain_shadow_carries_imcc_provenance_and_activity_rows() -> None:
     )
 
 
+# engine_cache_off: evaluate() is still cached after the unavailable-domain fallback, so a warm runner row would bypass the missing-OpenIMCC path the test exists to exercise.
+@pytest.mark.engine_cache_off
 def test_missing_openimcc_is_typed_refusal_and_not_a_run_failure(monkeypatch) -> None:
     import simulator.melt_backend.openimcc_bridge as bridge
 

@@ -86,7 +86,18 @@ observations:
         published_page: 1117
         pdf_page_index: 1
         section: III.1
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - activity_coefficient
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: simeonov-sano-1985-na-bearing-mno-activities::simeonov_sano_1985_gamma_mn_carbon_saturated_iron
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: simeonov-sano-1985-na-bearing-mno-activities
   locator:
     page: 2

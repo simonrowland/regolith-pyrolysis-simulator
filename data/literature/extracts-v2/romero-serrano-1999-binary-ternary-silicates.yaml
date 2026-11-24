@@ -80,7 +80,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: romero-serrano-1999-binary-ternary-silicates::romero_1999_glasser_osborn_invariant_a::T=1753.15:h=b0c04a055d99
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: romero-serrano-1999-binary-ternary-silicates
   locator:
     page: 6
@@ -269,7 +280,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: romero-serrano-1999-binary-ternary-silicates::romero_1999_osborn_muan_invariant_a::T=1743.15:h=bd0b434d88a7
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: romero-serrano-1999-binary-ternary-silicates
   locator:
     page: 8
@@ -452,7 +474,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: romero-serrano-1999-binary-ternary-silicates::romero_1999_osborn_muan_invariant_b::T=1578.15:h=de57b01ec0a3
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: romero-serrano-1999-binary-ternary-silicates
   locator:
     page: 8
@@ -635,7 +668,18 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: romero-serrano-1999-binary-ternary-silicates::romero_1999_riboud_muan_invariant_a::T=1458.15:h=2c203b268ba2
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: romero-serrano-1999-binary-ternary-silicates
   locator:
     page: 7

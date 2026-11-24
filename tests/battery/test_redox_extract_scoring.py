@@ -107,7 +107,7 @@ def _sossi_aithala_redox_context():
     return context, observations
 
 
-def _printed_fraction_sigma_r(observation):
+def _printed_fraction_width(observation):
     uncertainty = observation.uncertainty
     if uncertainty is None:
         return None
@@ -142,8 +142,16 @@ def _printed_fraction_sigma_r(observation):
         score_module.QUANTITY_UNITS[Quantity.FE3_FE2_RATIO],
     }:
         return None
+    return converted
+
+
+def _printed_fraction_sigma_r(observation):
+    width = _printed_fraction_width(observation)
+    if width is None:
+        return None
     confidence_level = (
-        score_module._stated_printed_confidence_level(uncertainty) or "not_stated"
+        score_module._stated_printed_confidence_level(observation.uncertainty)
+        or "not_stated"
     )
     confidence_scale = (
         Decimal(2)
@@ -152,9 +160,11 @@ def _printed_fraction_sigma_r(observation):
         if confidence_level == "ci95"
         else Decimal(1)
     )
-    return converted / confidence_scale
+    return width / confidence_scale
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
@@ -226,6 +236,8 @@ def test_openimcc_sossi_redox_scores_the_public_redox_output(monkeypatch):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_in_domain_redox_flags_become_prediction_notices(monkeypatch):
     pytest.importorskip("openimcc")
     import openimcc
@@ -360,6 +372,8 @@ def _openimcc_row_with_mass_composition(components):
     )
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_redox_with_non_kress_iron_reaches_evaluate_redox(monkeypatch):
     """Fe3O4 is iron for OpenIMCC and not a Kress FeOt component.
 
@@ -440,6 +454,8 @@ def test_openimcc_missing_fo2_without_kress_iron_refuses_printed_oxygen():
     assert prediction.coefficient_sources == ()
 
 
+# engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
+@pytest.mark.engine_cache_off
 def test_openimcc_borisov_row_follows_the_train_redox_path(monkeypatch):
     """Borisov row 4 on OpenIMCC is the train parent's produced ratio.
 
@@ -560,6 +576,30 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
         residual for residual in residuals if residual.reference in sossi_sd_ids
     ]
     assert len(sossi_sd_residuals) == 11
+    expected_statuses = {
+        "aithala_2026_1800_30_xanes": ResidualStatus.MATCH,
+        "aithala_2026_1900_30_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_10_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_120_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2000_30_xanes": ResidualStatus.MISMATCH,
+        "aithala_2026_2100_30_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_1_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_2_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_3_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_6_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_7_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_8_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_9_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_f_o2_10_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_f_o2_11_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_f_o2_12_xanes": ResidualStatus.MATCH,
+        "sossi_2020_per_ts1_xanes": ResidualStatus.MISMATCH,
+        "sossi_2020_per_ts2_xanes": ResidualStatus.MISMATCH,
+    }
+    assert {
+        residual.reference.rsplit("::", 1)[-1]: residual.status
+        for residual in residuals
+    } == expected_statuses
     boundary_refusals = []
     for residual in sossi_sd_residuals:
         assert residual.numeric is not None
@@ -567,17 +607,15 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
         fraction = dict(observation.derivation.parameters)[
             "original_Fe3_over_FeT"
         ].state.value
-        sigma_r = _printed_fraction_sigma_r(observation)
-        assert sigma_r is not None
-        if Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+        printed_width = _printed_fraction_width(observation)
+        assert printed_width is not None
+        if printed_width >= fraction or printed_width >= (
             Decimal(1) - fraction
         ):
             assert residual.numeric.decision_band is None
             assert residual.status is ResidualStatus.NO_BAND
             assert residual.refusal is not None
-            assert residual.refusal.detail["reason"] == (
-                "ferric_fraction_uncertainty_linearization_invalid"
-            )
+            assert residual.refusal.detail["reason"] == "printed_uncertainty_outside_metric_domain"
             boundary_refusals.append(residual.reference)
         else:
             assert residual.refusal is None
@@ -588,9 +626,7 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
             or "two_sigma_reading_verdict=" in (notice.band or "")
             for notice in residual.notices
         )
-    assert len(boundary_refusals) == 2
-    assert any(reference.endswith("sossi_2020_per_f_o2_11_xanes") for reference in boundary_refusals)
-    assert any(reference.endswith("sossi_2020_per_f_o2_12_xanes") for reference in boundary_refusals)
+    assert boundary_refusals == []
     encoded = json.dumps(
         [residual_to_plain(residual) for residual in residuals],
         sort_keys=True,
@@ -618,12 +654,24 @@ def test_internal_analytical_sossi_aithala_redox_payload_pin():
     # d-341 (t-1646) assumes 1 sigma only where neither metadata nor printed
     # text states the level; the Sossi rows' printed SD caption keeps their
     # primary 1-sigma verdicts without the assumption/alternative notices.
-    # t-1646 round 5 refuses the Sossi (11)/(12) two-sigma spans that cross
-    # r=0; the remaining source widths use the transformed log-ratio metric.
-    # The payload now hashes to
-    # 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862.
+    # t-1646 round 5 refused Sossi (11)/(12) because the normalized standard
+    # width crossed r=0. Their original one-sigma intervals are in-domain, so
+    # each now has a printed band and no refusal. Relative to round 10's
+    # 0140d9de... payload, serialization changes each row's status from NO_BAND
+    # to MATCH, numeric.decision_band from None to its printed-width-derived
+    # ticket, and refusal from the typed ferric linearization refusal to None.
+    # Those fields follow directly from the original printed interval passing
+    # the domain gate; the remaining sixteen rows' statuses remain unchanged.
+    # fam13 binds the six Aithala Table S-1 Fe rows to the physical SI PDF
+    # (page 13, SI-7; SHA-256 ab859d250ab0d4f0b1def8c7b894f22604bb132d644d112769c8e1c27ef750fa).
+    # Their printed redox values and decisions are unchanged; the serialized
+    # locator changes from source_path=None to that PDF path. The combined
+    # payload hash therefore moves from 6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862
+    # Round-10 pin 0140d9de1cf1d76f49fcf1a1c1889efb3153a95adb25768a39d901cc175ddb50
+    # is refreshed from the serialized payload to
+    # 3fc087feb0df00013c1632d3a5bf05aea7448739fc17f7e82d18f7bc95dac925.
     assert hashlib.sha256(encoded).hexdigest() == (
-        "6a3fb7b24e11ad8c838ada5e83177719d6463ebc6683b3faccfec9257b865862"
+        "3fc087feb0df00013c1632d3a5bf05aea7448739fc17f7e82d18f7bc95dac925"
     )
 
 
@@ -649,17 +697,16 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
 
         # Independent first-order propagation into the scorer's log10 ratio
         # metric, using only each row's recorded printed r and sigma_r.
+        printed_width = _printed_fraction_width(observation)
+        assert printed_width is not None
         crosses_log_domain = (
-            Decimal(2) * printed_sigma >= fraction
-            or Decimal(2) * printed_sigma >= Decimal(1) - fraction
+            printed_width >= fraction or printed_width >= Decimal(1) - fraction
         )
         if crosses_log_domain:
             assert residual.numeric.decision_band is None
             assert residual.status is ResidualStatus.NO_BAND
             assert residual.refusal is not None
-            assert residual.refusal.detail["reason"] == (
-                "ferric_fraction_uncertainty_linearization_invalid"
-            )
+            assert residual.refusal.detail["reason"] == "printed_uncertainty_outside_metric_domain"
             boundary_refusals.append(reference)
         else:
             assert residual.refusal is None
@@ -671,14 +718,14 @@ def test_real_sossi_aithala_bands_propagate_fraction_uncertainty_to_dex():
             )
             assert abs(residual.numeric.decision_band.value - expected_band) < Decimal("1e-20")
 
-    assert len(boundary_refusals) == 2
-    assert {reference.rsplit("::", 1)[-1] for reference in boundary_refusals} == {
-        "sossi_2020_per_f_o2_11_xanes",
-        "sossi_2020_per_f_o2_12_xanes",
-    }
-    assert sum(row.status is ResidualStatus.MATCH for row in residuals) == 2
-    assert sum(row.status is ResidualStatus.MISMATCH for row in residuals) == 14
-    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 2
+    assert boundary_refusals == []
+    assert sum(row.status is ResidualStatus.NO_BAND for row in residuals) == 0
+    # The owner hold defers the exact MATCH/MISMATCH split for the two rows
+    # whose bands were restored; Studio must refresh the serialized payload pin.
+    assert sum(
+        row.status in {ResidualStatus.MATCH, ResidualStatus.MISMATCH}
+        for row in residuals
+    ) == 18
     aithala_1800_30 = next(
         observation_id
         for observation_id, observation in observations.items()
@@ -729,21 +776,21 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
             observation.value.point,
             source_observation=observation,
         )
-        sigma_r = _printed_fraction_sigma_r(observation)
+        printed_width = _printed_fraction_width(observation)
         if resolution.band is not None:
-            assert sigma_r is not None
-            assert Decimal(2) * sigma_r < fraction
-            assert Decimal(2) * sigma_r < Decimal(1) - fraction
+            assert printed_width is not None
+            assert printed_width < fraction
+            assert printed_width < Decimal(1) - fraction
             band_counts[observation.source_id] = (
                 band_counts.get(observation.source_id, 0) + 1
             )
         elif (
             resolution.refusal is not None
             and resolution.refusal.get("reason")
-            == "ferric_fraction_uncertainty_linearization_invalid"
+            == "printed_uncertainty_outside_metric_domain"
         ):
-            assert sigma_r is not None
-            assert Decimal(2) * sigma_r >= fraction or Decimal(2) * sigma_r >= (
+            assert printed_width is not None
+            assert printed_width >= fraction or printed_width >= (
                 Decimal(1) - fraction
             )
             invalid_rows.append(observation.observation_id)
@@ -751,13 +798,9 @@ def test_fraction_uncertainty_boundaries_cover_all_migrated_source_rows():
     assert band_counts == {
         "aithala-2026-magmatic-iron-redox-to-2100c": 16,
         "cottrell-2009-iron-xanes": 18,
-        "sossi-2020-magma-ocean-redox": 10,
+        "sossi-2020-magma-ocean-redox": 12,
     }
-    assert len(invalid_rows) == 2
-    assert {row.rsplit("::", 1)[-1] for row in invalid_rows} == {
-        "sossi_2020_per_f_o2_11_xanes",
-        "sossi_2020_per_f_o2_12_xanes",
-    }
+    assert invalid_rows == []
 
 
 def _assert_kress91_citation_is_unknown(residuals, observations) -> None:

@@ -74,7 +74,7 @@
         "diagnostic_only": true,
         "has_refusals": true,
         "message": "Per-species condensation refusals / efficiency pass-through outcomes (VR-11 B2/B3).",
-        "n_species": 33,
+        "n_species": 35,
         "status": "ok",
         "tick_view": "compact"
       },
@@ -141,93 +141,6 @@
         "temperature_C": 225.0
       },
       "oxygen_kg": 0.0,
-      "oxygen_reservoir": {
-        "exchange_clamped": false,
-        "exchange_direction": "none:no_melt_redox_capacity",
-        "exchange_o2_mol": 0.0,
-        "exchange_unbacked_o2_mol": 0.0,
-        "liquid_fraction_gate": {
-          "evaporation": {},
-          "liquid_fraction": {
-            "composition_projected_notice": {
-              "authority": "extrapolated",
-              "certified_band": {
-                "bulk_components": [
-                  "SiO2",
-                  "Al2O3",
-                  "CaO",
-                  "MgO",
-                  "FeOt",
-                  "K2O",
-                  "Na2O",
-                  "TiO2",
-                  "O",
-                  "Cr2O3",
-                  "H2O"
-                ],
-                "database": "ig",
-                "engine": "magemin"
-              },
-              "dropped_components": [
-                {
-                  "component": "MnO",
-                  "mass_fraction": 0.0020586721564590836
-                },
-                {
-                  "component": "P2O5",
-                  "mass_fraction": 0.0010293360782295418
-                }
-              ],
-              "kind": "composition_projected",
-              "reason": "composition_projected"
-            },
-            "liquid_fraction": 0.0,
-            "liquidus_T_C": 1370.3125,
-            "solidus_T_C": 918.75,
-            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
-            "status": "ok"
-          },
-          "provider": "magemin",
-          "redox": {
-            "composition_projected_notice": {
-              "authority": "extrapolated",
-              "certified_band": {
-                "bulk_components": [
-                  "SiO2",
-                  "Al2O3",
-                  "CaO",
-                  "MgO",
-                  "FeOt",
-                  "K2O",
-                  "Na2O",
-                  "TiO2",
-                  "O",
-                  "Cr2O3",
-                  "H2O"
-                ],
-                "database": "ig",
-                "engine": "magemin"
-              },
-              "dropped_components": [
-                {
-                  "component": "MnO",
-                  "mass_fraction": 0.0020586721564590836
-                },
-                {
-                  "component": "P2O5",
-                  "mass_fraction": 0.0010293360782295418
-                }
-              ],
-              "kind": "composition_projected",
-              "reason": "composition_projected"
-            },
-            "liquidus_T_C": 1370.3125,
-            "solidus_T_C": 918.75,
-            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
-            "status": "ok"
-          }
-        }
-      },
       "pO2_mbar": 9.0,
       "p_total_mbar": 9.0,
       "payload_version": 4,
@@ -239,23 +152,12 @@
         "P_total_bar": 0.001,
         "T_C": 225.0,
         "campaign": "C0",
-        "energy_cumulative_breakdown_kWh": {
-          "dissociation": 0.0,
-          "electrical": 0.0,
-          "electrical_plus_evaporation": 0.0,
-          "evaporation_thermal": 0.0,
-          "latent": 0.0
-        },
+        "energy_cumulative_breakdown_kWh": {},
         "energy_dissociation_kWh": 0.0,
         "energy_electrical_kWh": 0.0,
         "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
         "energy_electrical_plus_evaporation_kWh": 0.0,
-        "energy_evaporation_breakdown_kWh": {
-          "evaporation_enthalpy_sink": 0,
-          "net_unallocated": 0.0,
-          "product_vapor_enthalpy_sink": 0,
-          "reaction_disproportionation_enthalpy_sink": 0
-        },
+        "energy_evaporation_breakdown_kWh": {},
         "energy_evaporation_thermal_kWh": 0.0,
         "energy_latent_kWh": 0.0,
         "energy_scope": "electrical_plus_known_evaporation_enthalpy",
@@ -404,7 +306,7 @@
             "warning_threshold_abs": 0.05,
             "warning_threshold_ferric_fraction_abs": 0.05
           },
-          "net_mol_o2_equiv": 0,
+          "net_mol_o2_equiv": 0.0,
           "skipped_terms_mol_o2_equiv_by_label": {},
           "source_campaign": "C0",
           "source_campaign_hour": 1,
@@ -680,13 +582,13 @@
           "n_species": 44,
           "schema": "condensation_authority.v1",
           "status_counts": {
-            "refused": 11,
-            "status_bearing": 33
+            "refused": 9,
+            "status_bearing": 35
           }
         },
         "condensation_refusals": {
           "has_refusals": true,
-          "n_species": 33,
+          "n_species": 35,
           "schema": "condensation_refusals.v1"
         },
         "diagnostic_only": true,
@@ -697,8 +599,8 @@
         "message": "Exact-key vapour channel answers and advisory diagnostics; not flux-authoritative until an R-family flip.",
         "n_channel_species": 44,
         "n_flux_active": 23,
-        "n_refused": 11,
-        "n_refused_species": 11,
+        "n_refused": 9,
+        "n_refused_species": 9,
         "n_requested": 44,
         "shadow_equal": false,
         "shadow_outcome": "missing_keys",
@@ -728,23 +630,12 @@
       "P_total_bar": 0.001,
       "T_C": 225.0,
       "campaign": "C0",
-      "energy_cumulative_breakdown_kWh": {
-        "dissociation": 0.0,
-        "electrical": 0.0,
-        "electrical_plus_evaporation": 0.0,
-        "evaporation_thermal": 0.0,
-        "latent": 0.0
-      },
+      "energy_cumulative_breakdown_kWh": {},
       "energy_dissociation_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
       "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
       "energy_electrical_plus_evaporation_kWh": 0.0,
-      "energy_evaporation_breakdown_kWh": {
-        "evaporation_enthalpy_sink": 0,
-        "net_unallocated": 0.0,
-        "product_vapor_enthalpy_sink": 0,
-        "reaction_disproportionation_enthalpy_sink": 0
-      },
+      "energy_evaporation_breakdown_kWh": {},
       "energy_evaporation_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
@@ -893,7 +784,7 @@
           "warning_threshold_abs": 0.05,
           "warning_threshold_ferric_fraction_abs": 0.05
         },
-        "net_mol_o2_equiv": 0,
+        "net_mol_o2_equiv": 0.0,
         "skipped_terms_mol_o2_equiv_by_label": {},
         "source_campaign": "C0",
         "source_campaign_hour": 1,
@@ -922,7 +813,7 @@
     "payload": {
       "O2_kg": 0.0,
       "c0_exit": {
-        "C_evac_kg_hr": 4.794582587158566,
+        "C_evac_kg_hr": 4.794586116633707,
         "C_evac_temperature_C": 950.0,
         "M_C0_gas_kg": 0.0,
         "Na_plus_K_feed_loss_fraction": 6.3923327179535005e-06,
@@ -1140,93 +1031,6 @@
         "temperature_C": 255.0
       },
       "oxygen_kg": 0.0,
-      "oxygen_reservoir": {
-        "exchange_clamped": false,
-        "exchange_direction": "none:no_melt_redox_capacity",
-        "exchange_o2_mol": 0.0,
-        "exchange_unbacked_o2_mol": 0.0,
-        "liquid_fraction_gate": {
-          "evaporation": {},
-          "liquid_fraction": {
-            "composition_projected_notice": {
-              "authority": "extrapolated",
-              "certified_band": {
-                "bulk_components": [
-                  "SiO2",
-                  "Al2O3",
-                  "CaO",
-                  "MgO",
-                  "FeOt",
-                  "K2O",
-                  "Na2O",
-                  "TiO2",
-                  "O",
-                  "Cr2O3",
-                  "H2O"
-                ],
-                "database": "ig",
-                "engine": "magemin"
-              },
-              "dropped_components": [
-                {
-                  "component": "MnO",
-                  "mass_fraction": 0.0020586721564590836
-                },
-                {
-                  "component": "P2O5",
-                  "mass_fraction": 0.0010293360782295418
-                }
-              ],
-              "kind": "composition_projected",
-              "reason": "composition_projected"
-            },
-            "liquid_fraction": 0.0,
-            "liquidus_T_C": 1370.3125,
-            "solidus_T_C": 918.75,
-            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
-            "status": "ok"
-          },
-          "provider": "magemin",
-          "redox": {
-            "composition_projected_notice": {
-              "authority": "extrapolated",
-              "certified_band": {
-                "bulk_components": [
-                  "SiO2",
-                  "Al2O3",
-                  "CaO",
-                  "MgO",
-                  "FeOt",
-                  "K2O",
-                  "Na2O",
-                  "TiO2",
-                  "O",
-                  "Cr2O3",
-                  "H2O"
-                ],
-                "database": "ig",
-                "engine": "magemin"
-              },
-              "dropped_components": [
-                {
-                  "component": "MnO",
-                  "mass_fraction": 0.0020586721564590836
-                },
-                {
-                  "component": "P2O5",
-                  "mass_fraction": 0.0010293360782295418
-                }
-              ],
-              "kind": "composition_projected",
-              "reason": "composition_projected"
-            },
-            "liquidus_T_C": 1370.3125,
-            "solidus_T_C": 918.75,
-            "source": "gate_liquid_fraction:fallback:magemin-shadow:composition_projected",
-            "status": "ok"
-          }
-        }
-      },
       "pO2_mbar": 9.0,
       "p_total_mbar": 9.0,
       "payload_version": 4,
@@ -1238,23 +1042,12 @@
         "P_total_bar": 0.009000000000000001,
         "T_C": 255.0,
         "campaign": "C0B",
-        "energy_cumulative_breakdown_kWh": {
-          "dissociation": 0.0,
-          "electrical": 0.0,
-          "electrical_plus_evaporation": 0.0,
-          "evaporation_thermal": 0.0,
-          "latent": 0.0
-        },
+        "energy_cumulative_breakdown_kWh": {},
         "energy_dissociation_kWh": 0.0,
         "energy_electrical_kWh": 0.0,
         "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
         "energy_electrical_plus_evaporation_kWh": 0.0,
-        "energy_evaporation_breakdown_kWh": {
-          "evaporation_enthalpy_sink": 0,
-          "net_unallocated": 0.0,
-          "product_vapor_enthalpy_sink": 0,
-          "reaction_disproportionation_enthalpy_sink": 0
-        },
+        "energy_evaporation_breakdown_kWh": {},
         "energy_evaporation_thermal_kWh": 0.0,
         "energy_latent_kWh": 0.0,
         "energy_scope": "electrical_plus_known_evaporation_enthalpy",
@@ -1403,7 +1196,7 @@
             "warning_threshold_abs": 0.05,
             "warning_threshold_ferric_fraction_abs": 0.05
           },
-          "net_mol_o2_equiv": 0,
+          "net_mol_o2_equiv": 0.0,
           "skipped_terms_mol_o2_equiv_by_label": {},
           "source_campaign": "C0B",
           "source_campaign_hour": 1,
@@ -1727,23 +1520,12 @@
       "P_total_bar": 0.009000000000000001,
       "T_C": 255.0,
       "campaign": "C0B",
-      "energy_cumulative_breakdown_kWh": {
-        "dissociation": 0.0,
-        "electrical": 0.0,
-        "electrical_plus_evaporation": 0.0,
-        "evaporation_thermal": 0.0,
-        "latent": 0.0
-      },
+      "energy_cumulative_breakdown_kWh": {},
       "energy_dissociation_kWh": 0.0,
       "energy_electrical_kWh": 0.0,
       "energy_electrical_plus_evaporation_cumulative_kWh": 0.0,
       "energy_electrical_plus_evaporation_kWh": 0.0,
-      "energy_evaporation_breakdown_kWh": {
-        "evaporation_enthalpy_sink": 0,
-        "net_unallocated": 0.0,
-        "product_vapor_enthalpy_sink": 0,
-        "reaction_disproportionation_enthalpy_sink": 0
-      },
+      "energy_evaporation_breakdown_kWh": {},
       "energy_evaporation_thermal_kWh": 0.0,
       "energy_latent_kWh": 0.0,
       "energy_scope": "electrical_plus_known_evaporation_enthalpy",
@@ -1892,7 +1674,7 @@
           "warning_threshold_abs": 0.05,
           "warning_threshold_ferric_fraction_abs": 0.05
         },
-        "net_mol_o2_equiv": 0,
+        "net_mol_o2_equiv": 0.0,
         "skipped_terms_mol_o2_equiv_by_label": {},
         "source_campaign": "C0B",
         "source_campaign_hour": 1,

@@ -77,7 +77,30 @@ observations:
   admission:
     status: pending
     reason: no observation admission_status mapped from source
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - p_sat
+    reason: 'phase_inferred: value=g; evidence=species.phase=gas declared by source standard_state Na(g); original_reason=phase
+      string ''liquid_Na_to_Na_g'' is not in the closed automatic map'
+    origin: ref-032-na::anchor_Na_pure_Psat
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: g
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: ref-032-na::anchor_Na_pure_Psat
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   source_id: ref-032-na
   locator:
     note: Alcock, Itkin & Horrigan (1984) Can. Metall. Q. 23:309 (REF-032) sodium vapor-pressure equations (298–2500 K evaluated

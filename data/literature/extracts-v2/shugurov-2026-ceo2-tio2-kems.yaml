@@ -11,12 +11,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -89,6 +88,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample1_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample1_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -163,12 +185,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -241,6 +262,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample1_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample1_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -315,12 +359,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -393,6 +436,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample2_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample2_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -467,12 +533,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -545,6 +610,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample2_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample2_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -619,12 +707,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -697,6 +784,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample3_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample3_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -771,12 +881,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -849,6 +958,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample3_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample3_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -923,12 +1055,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1001,6 +1132,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample4_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample4_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1075,12 +1229,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1153,6 +1306,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample4_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample4_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1227,12 +1403,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1305,6 +1480,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample5_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample5_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1379,12 +1577,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1457,6 +1654,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample5_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample5_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1531,12 +1751,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1609,6 +1828,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample6_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample6_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1683,12 +1925,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1761,6 +2002,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample6_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample6_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1835,12 +2099,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -1913,6 +2176,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample7_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample7_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -1987,12 +2273,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2065,6 +2350,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample7_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample7_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2139,12 +2447,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2217,6 +2524,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample8_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample8_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2291,12 +2621,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2369,6 +2698,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample8_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample8_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2443,12 +2795,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2521,6 +2872,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample9_completion
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample9_completion
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2595,12 +2969,11 @@ observations:
     species:
       formula: unknown
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2673,6 +3046,29 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - transition_temperature
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample9_onset
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
+  - kind: method_unstated
+    affected_quantities:
+    - transition_temperature
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table2_sample9_onset
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - transition_temperature
@@ -2747,12 +3143,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2833,7 +3228,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.1; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -2900,12 +3307,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -2986,7 +3392,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.2; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3053,12 +3471,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3139,7 +3556,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.3; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3206,12 +3635,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3292,7 +3720,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.4; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3359,12 +3799,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3445,7 +3884,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.5; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3512,12 +3963,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3598,7 +4048,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.6; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3665,12 +4127,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3751,7 +4212,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.7; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3818,12 +4291,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -3901,7 +4373,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.8; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -3968,12 +4452,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4051,7 +4534,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.9; column=activity(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_activity_x0p9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -4118,12 +4613,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4204,7 +4698,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.1; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -4266,12 +4772,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4352,7 +4857,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.2; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -4414,12 +4931,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4500,7 +5016,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.3; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -4562,12 +5090,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4648,7 +5175,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.4; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -4710,12 +5249,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4796,7 +5334,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.5; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -4858,12 +5408,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -4944,7 +5493,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.6; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5006,12 +5567,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5092,7 +5652,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.7; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5154,12 +5726,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5237,7 +5808,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.8; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p8
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5299,12 +5882,11 @@ observations:
     species:
       formula: CeO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5382,7 +5964,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.9; column=gamma(CeO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_ceo2_gamma_x0p9
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5444,12 +6038,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5531,7 +6124,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.1; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5598,12 +6203,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5685,7 +6289,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.2; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5752,12 +6368,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5839,7 +6454,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.3; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -5906,12 +6533,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -5993,7 +6619,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.4; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6060,12 +6698,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6147,7 +6784,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.5; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6214,12 +6863,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6301,7 +6949,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.6; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6368,12 +7028,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6455,7 +7114,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.7; column=activity(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_activity_x0p7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6522,12 +7193,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6609,7 +7279,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.1; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p1
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6671,12 +7353,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6758,7 +7439,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.2; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p2
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6820,12 +7513,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -6907,7 +7599,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.3; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p3
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -6969,12 +7673,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7056,7 +7759,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.4; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p4
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -7118,12 +7833,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7205,7 +7919,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.5; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p5
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -7267,12 +7993,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7354,7 +8079,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.6; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p6
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5
@@ -7416,12 +8153,11 @@ observations:
     species:
       formula: TiO2
       phase:
-        tag: unknown
-        reason: phase string 'unknown' is not in the closed automatic map
+        tag: value
+        value: unspecified
       polymorph:
-        tag: unknown
-        reason: phase unknown; polymorph unresolved
-        rejection_kind: omitted
+        tag: not_applicable
+        reason: not crystal
       charge:
         tag: value
         value: 0
@@ -7503,7 +8239,19 @@ observations:
         pdf_page_index: 4
         table: '3'
         note: row=x(CeO2)=0.7; column=gamma(TiO2)
-  notices: []
+  notices:
+  - kind: phase_inferred
+    affected_quantities:
+    - activity_coefficient
+    reason: 'phase_inferred: value=unspecified; evidence=row physics does not identify one phase; original_reason=phase string
+      ''unknown'' is not in the closed automatic map'
+    origin: shugurov-2026-ceo2-tio2-kems::shugurov-2026-ceo2-tio2-kems_table3_tio2_gamma_x0p7
+    policy:
+      id: DP-016
+      version: 1
+      status: canonical
+      value: unspecified
+      units: phase token
   source_id: shugurov-2026-ceo2-tio2-kems
   locator:
     page: 5

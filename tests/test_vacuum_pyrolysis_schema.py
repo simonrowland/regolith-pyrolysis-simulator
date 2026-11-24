@@ -29,6 +29,7 @@ ROBINOT_PRESSURE_MBAR = pytest.approx(13.0)
 ROBINOT_FLOW_NL_MIN = pytest.approx(0.3)
 ROBINOT_SAMPLE_MASS_G = pytest.approx(3.38)
 ROBINOT_DURATION_H = pytest.approx(1.0)
+ROBINOT_RUN_DURATION_H = pytest.approx(59.0 / 60.0)
 ROBINOT_PEAK_TEMPERATURE_C = pytest.approx(1800.0)
 ROBINOT_O2_RELEASED_MG = pytest.approx(35.0)
 ROBINOT_GLASSY_LUMP_G = pytest.approx(1.82)
@@ -447,8 +448,8 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
     assert sample["exposed_melt_area_source_ref"] == (
         "robinot_2026_methods:Section 3.2"
     )
-    assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_DURATION_H
-    assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_DURATION_H
+    assert preset["pair"]["faithful"]["duration_h"] == ROBINOT_RUN_DURATION_H
+    assert preset["pair"]["remediation"]["duration_h"] == ROBINOT_RUN_DURATION_H
     assert preset["pair"]["faithful"]["kinetics_caveat"] == "none"
     assert preset["pair"]["remediation"]["kinetics_caveat"] in KINETICS_CAVEATS
     assert preset["comparison_contract"]["model_evidence_class"] == "builtin_process_model"
@@ -1031,6 +1032,13 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     assert sample["crucible_material"] == "alumina"
     assert sample["exposed_melt_area_m2"] is None
     assert sample["crucible_opening_area_m2"] is None
+    pressure_digest = next(
+        row["digest"]
+        for row in preset["source_notes"]
+        if row["digest"].startswith("The reported exposure pressure range")
+    )
+    assert "parser-floor point" in pressure_digest
+    assert "runtime floor" in pressure_digest
 
     schedule = preset["lab_schedule"]
     assert schedule["melt_temperature_C"][0]["value"] == SESKO_TEMP_MIN_C
@@ -1080,8 +1088,20 @@ def test_sesko_preset_captures_uhv_conditions_and_geometry_sources() -> None:
     ]
     assert certification_block["status"] == "blocked"
     assert certification_block["code"] == (
-        "reported_dynamic_pressure_crosses_runtime_floor"
+        "pressure_trace_and_pump_throughput_unreported"
     )
+    assert "reported_pressure_range_does_not_establish_time_series" in certification_block[
+        "reasons"
+    ]
+    assert "runtime_schedule_clamps_values_below_1e-3_mbar" in certification_block[
+        "reasons"
+    ]
+    assert "unclamped_time_resolved_pressure_trace" in certification_block[
+        "required_evidence"
+    ]
+    assert "pump_throughput_and_pressure_trace_are_not_reported" in certification_block[
+        "reasons"
+    ]
     assert "molecular_flow_transport_reproduction" in certification_block[
         "blocked_observables"
     ]

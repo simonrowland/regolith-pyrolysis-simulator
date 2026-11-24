@@ -1,4 +1,7 @@
 study_id: kems-012-sossi-2019
+# Table 2 outcomes omit starting-powder ppm and per-run uncertainty. Before, snapshots
+# copied Table 1 Mn 690.2 ppm / 3.8 ppm into each outcome; now the outcome field is absent
+# and uncertainty is none. Table 1 remains parent series context.
 reviewed_revision: be76d28ad8b73d0563ee34fddf452ec77b3d6de5
 reviewer: Codex w1113phaseA selected-page review
 source_asset: {path: raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf, sha256: fcf005d7380c2487eb97a24e0ab0aee05acc97d522428c87b6c4c765720020a4}
@@ -454,15 +457,7 @@ runs:
               duration_s: {tag: value, value: '900'}
           sample_mass_kg: &id050 {tag: value, value: '0.000025'}
         value: {kind: point, point: '1276', approximate: false}
-        uncertainty: &id103
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '25.2'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                Gd | 1063.3 | 1060.6 | 25.2', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id103 {kind: none}
         evidence: &id051
           class: {tag: value, value: measured_direct}
           original_method_class: measured_direct
@@ -482,10 +477,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id104
-            state: {tag: value, value: '1060.6'}
-            locator: &id054 {page: 53, table: '1', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml,
-              source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
+          starting_component_ppm: &sossi_starting_component_1 {"state":{"tag":"value","value":"1060.6"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: &id055
             state: *id033
             locator: *id034
@@ -591,15 +583,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '1113.8', approximate: false}
-        uncertainty: &id113
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '21.2'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                La | 1038.9 | 969.8 | 21.2', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id113 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -611,9 +595,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id114
-            state: {tag: value, value: '969.8'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_2 {"state":{"tag":"value","value":"969.8"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -653,15 +635,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '759.6', approximate: false}
-        uncertainty: &id122
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '3.8'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                Mn | 992.4 | 690.2 | 3.8', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id122 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -673,9 +647,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id123
-            state: {tag: value, value: '690.2'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_3 {"state":{"tag":"value","value":"690.2"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -720,15 +692,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '1085.4', approximate: false}
-        uncertainty: &id127
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '28.9'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                Sc | 970.8 | 850.8 | 28.9', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id127 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -740,9 +704,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id128
-            state: {tag: value, value: '850.8'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_4 {"state":{"tag":"value","value":"850.8"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -782,15 +744,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '1312.4', approximate: false}
-        uncertainty: &id132
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '46.6'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                Ti | 1008.0 | 1045.0 | 46.6', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id132 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -802,9 +756,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id133
-            state: {tag: value, value: '1045'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_5 {"state":{"tag":"value","value":"1045"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -844,15 +796,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '1098.9', approximate: false}
-        uncertainty: &id137
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '32.4'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                V | 1019.7 | 1024.6 | 32.4', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id137 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -864,9 +808,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id138
-            state: {tag: value, value: '1024.6'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_6 {"state":{"tag":"value","value":"1024.6"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -906,15 +848,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '1273.7', approximate: false}
-        uncertainty: &id142
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '26.4'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                Yb | 1036.2 | 1111.0 | 26.4', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id142 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -926,9 +860,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id143
-            state: {tag: value, value: '1111'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_7 {"state":{"tag":"value","value":"1111"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -968,15 +900,7 @@ runs:
           exposure: *id049
           sample_mass_kg: *id050
         value: {kind: point, point: '1088.1', approximate: false}
-        uncertainty: &id147
-          kind: printed
-          verbatim:
-            note: Table 1 St. Dev.; Table 2 prints no per-run uncertainty. Concentrations versus run time, not flux or inferred evaporation rate.
-            starting_measured_stdev_ppm: '34.8'
-            locator: {source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf, page: 53, table: '1', quote: 'Element | Calculated
-                | Measured | St. Dev.
-
-                Zr | 991.9 | 1118.1 | 34.8', note: Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml}
+        uncertainty: &id147 {kind: none}
         evidence: *id051
         admission: *id052
         notices:
@@ -988,9 +912,7 @@ runs:
         locator: *id034
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: &id148
-            state: {tag: value, value: '1118.1'}
-            locator: *id054
+          starting_component_ppm: &sossi_starting_component_8 {"state":{"tag":"value","value":"1118.1"},"locator":{"page":53,"table":"1","note":"Physical PDF page numbering; table CSV and caption/footnotes in corpus tables/kems-012-sossi-2019/t1.provenance.yaml; measured trace column solution ICP-MS (N=2); calculated column intentionally remains only in table transcription.","source_path":"raw/kems-012-sossi-2019/kems-012-sossi-2019.pdf"}}
           temperature_K: *id055
           fO2_log: *id056
           starting_composition: *id035
@@ -1340,7 +1262,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id115
             state: *id033
             locator: *id105
@@ -1408,7 +1330,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -1453,7 +1375,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -1498,7 +1420,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -1543,7 +1465,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -1588,7 +1510,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -1633,7 +1555,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -1678,7 +1600,7 @@ runs:
         locator: *id105
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id115
           fO2_log: *id116
           starting_composition: *id035
@@ -2025,7 +1947,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id175
             state: *id033
             locator: *id172
@@ -2093,7 +2015,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2138,7 +2060,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2183,7 +2105,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2228,7 +2150,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2273,7 +2195,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2318,7 +2240,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2363,7 +2285,7 @@ runs:
         locator: *id172
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id175
           fO2_log: *id176
           starting_composition: *id035
@@ -2710,7 +2632,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id210
             state: *id033
             locator: *id207
@@ -2778,7 +2700,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -2823,7 +2745,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -2868,7 +2790,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -2913,7 +2835,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -2958,7 +2880,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -3003,7 +2925,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -3048,7 +2970,7 @@ runs:
         locator: *id207
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id210
           fO2_log: *id211
           starting_composition: *id035
@@ -3642,7 +3564,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id269
             state: *id033
             locator: *id265
@@ -3710,7 +3632,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -3755,7 +3677,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -3800,7 +3722,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -3845,7 +3767,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -3890,7 +3812,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -3935,7 +3857,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -3980,7 +3902,7 @@ runs:
         locator: *id265
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id269
           fO2_log: *id270
           starting_composition: *id035
@@ -4318,7 +4240,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id304
             state: *id033
             locator: *id301
@@ -4377,7 +4299,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4413,7 +4335,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4449,7 +4371,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4485,7 +4407,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4521,7 +4443,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4557,7 +4479,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4593,7 +4515,7 @@ runs:
         locator: *id301
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id304
           fO2_log: *id305
           starting_composition: *id035
@@ -4940,7 +4862,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id343
             state: *id033
             locator: *id340
@@ -5008,7 +4930,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5053,7 +4975,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5098,7 +5020,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5143,7 +5065,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5188,7 +5110,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5233,7 +5155,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5278,7 +5200,7 @@ runs:
         locator: *id340
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id343
           fO2_log: *id344
           starting_composition: *id035
@@ -5625,7 +5547,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id376
             state: *id033
             locator: *id373
@@ -5693,7 +5615,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -5738,7 +5660,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -5783,7 +5705,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -5828,7 +5750,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -5873,7 +5795,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -5918,7 +5840,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -5963,7 +5885,7 @@ runs:
         locator: *id373
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id376
           fO2_log: *id377
           starting_composition: *id035
@@ -6331,7 +6253,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id414
             state: *id033
             locator: *id409
@@ -6399,7 +6321,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -6444,7 +6366,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -6489,7 +6411,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -6534,7 +6456,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -6579,7 +6501,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -6624,7 +6546,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -6669,7 +6591,7 @@ runs:
         locator: *id409
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id414
           fO2_log: *id415
           starting_composition: *id035
@@ -7016,7 +6938,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id447
             state: *id033
             locator: *id445
@@ -7084,7 +7006,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7129,7 +7051,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7174,7 +7096,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7219,7 +7141,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7264,7 +7186,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7309,7 +7231,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7354,7 +7276,7 @@ runs:
         locator: *id445
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id447
           fO2_log: *id448
           starting_composition: *id035
@@ -7725,7 +7647,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id482
             state: *id033
             locator: *id479
@@ -7793,7 +7715,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -7838,7 +7760,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -7883,7 +7805,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -7928,7 +7850,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -7973,7 +7895,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -8018,7 +7940,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -8063,7 +7985,7 @@ runs:
         locator: *id479
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id482
           fO2_log: *id483
           starting_composition: *id035
@@ -8412,7 +8334,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id516
             state: *id512
             locator: *id513
@@ -8480,7 +8402,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -8525,7 +8447,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -8570,7 +8492,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -8615,7 +8537,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -8660,7 +8582,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -8705,7 +8627,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -8750,7 +8672,7 @@ runs:
         locator: *id513
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id516
           fO2_log: *id517
           starting_composition: *id035
@@ -9097,7 +9019,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id551
             state: *id512
             locator: *id547
@@ -9165,7 +9087,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9210,7 +9132,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9255,7 +9177,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9300,7 +9222,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9345,7 +9267,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9390,7 +9312,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9435,7 +9357,7 @@ runs:
         locator: *id547
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id551
           fO2_log: *id552
           starting_composition: *id035
@@ -9806,7 +9728,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id588
             state: *id512
             locator: *id585
@@ -9874,7 +9796,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -9919,7 +9841,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -9964,7 +9886,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -10009,7 +9931,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -10054,7 +9976,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -10099,7 +10021,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -10144,7 +10066,7 @@ runs:
         locator: *id585
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id588
           fO2_log: *id589
           starting_composition: *id035
@@ -10491,7 +10413,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id621
             state: *id512
             locator: *id618
@@ -10559,7 +10481,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -10604,7 +10526,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -10649,7 +10571,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -10694,7 +10616,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -10739,7 +10661,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -10784,7 +10706,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -10829,7 +10751,7 @@ runs:
         locator: *id618
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id621
           fO2_log: *id622
           starting_composition: *id035
@@ -11167,7 +11089,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id658
             state: *id512
             locator: *id654
@@ -11226,7 +11148,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11262,7 +11184,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11298,7 +11220,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11334,7 +11256,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11370,7 +11292,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11406,7 +11328,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11442,7 +11364,7 @@ runs:
         locator: *id654
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id658
           fO2_log: *id659
           starting_composition: *id035
@@ -11813,7 +11735,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id699
             state: *id512
             locator: *id696
@@ -11881,7 +11803,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -11926,7 +11848,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -11971,7 +11893,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -12016,7 +11938,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -12061,7 +11983,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -12106,7 +12028,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -12151,7 +12073,7 @@ runs:
         locator: *id696
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id699
           fO2_log: *id700
           starting_composition: *id035
@@ -12498,7 +12420,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id731
             state: *id512
             locator: *id729
@@ -12566,7 +12488,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -12611,7 +12533,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -12656,7 +12578,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -12701,7 +12623,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -12746,7 +12668,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -12791,7 +12713,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -12836,7 +12758,7 @@ runs:
         locator: *id729
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id731
           fO2_log: *id732
           starting_composition: *id035
@@ -13198,7 +13120,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id767
             state: *id512
             locator: *id764
@@ -13257,7 +13179,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13293,7 +13215,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13329,7 +13251,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13365,7 +13287,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13401,7 +13323,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13437,7 +13359,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13473,7 +13395,7 @@ runs:
         locator: *id764
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id767
           fO2_log: *id768
           starting_composition: *id035
@@ -13820,7 +13742,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id808
             state: *id512
             locator: *id805
@@ -13888,7 +13810,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -13933,7 +13855,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -13978,7 +13900,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -14023,7 +13945,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -14068,7 +13990,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -14113,7 +14035,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -14158,7 +14080,7 @@ runs:
         locator: *id805
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id808
           fO2_log: *id809
           starting_composition: *id035
@@ -14496,7 +14418,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id842
             state: *id512
             locator: *id839
@@ -14555,7 +14477,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -14591,7 +14513,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -14627,7 +14549,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -14663,7 +14585,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -14699,7 +14621,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -14735,7 +14657,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -14771,7 +14693,7 @@ runs:
         locator: *id839
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id842
           fO2_log: *id843
           starting_composition: *id035
@@ -15142,7 +15064,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id883
             state: *id512
             locator: *id880
@@ -15210,7 +15132,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15255,7 +15177,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15300,7 +15222,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15345,7 +15267,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15390,7 +15312,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15435,7 +15357,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15480,7 +15402,7 @@ runs:
         locator: *id880
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id883
           fO2_log: *id884
           starting_composition: *id035
@@ -15827,7 +15749,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id917
             state: *id512
             locator: *id914
@@ -15895,7 +15817,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -15940,7 +15862,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -15985,7 +15907,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -16030,7 +15952,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -16075,7 +15997,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -16120,7 +16042,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -16165,7 +16087,7 @@ runs:
         locator: *id914
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id917
           fO2_log: *id918
           starting_composition: *id035
@@ -16512,7 +16434,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id950
             state: *id512
             locator: *id947
@@ -16580,7 +16502,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -16625,7 +16547,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -16670,7 +16592,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -16715,7 +16637,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -16760,7 +16682,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -16805,7 +16727,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -16850,7 +16772,7 @@ runs:
         locator: *id947
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id950
           fO2_log: *id951
           starting_composition: *id035
@@ -17221,7 +17143,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id989
             state: *id512
             locator: *id986
@@ -17289,7 +17211,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17334,7 +17256,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17379,7 +17301,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17424,7 +17346,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17469,7 +17391,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17514,7 +17436,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17559,7 +17481,7 @@ runs:
         locator: *id986
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id989
           fO2_log: *id990
           starting_composition: *id035
@@ -17906,7 +17828,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1021
             state: *id512
             locator: *id1019
@@ -17974,7 +17896,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18019,7 +17941,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18064,7 +17986,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18109,7 +18031,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18154,7 +18076,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18199,7 +18121,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18244,7 +18166,7 @@ runs:
         locator: *id1019
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1021
           fO2_log: *id1022
           starting_composition: *id035
@@ -18591,7 +18513,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1056
             state: *id512
             locator: *id1053
@@ -18659,7 +18581,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -18704,7 +18626,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -18749,7 +18671,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -18794,7 +18716,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -18839,7 +18761,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -18884,7 +18806,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -18929,7 +18851,7 @@ runs:
         locator: *id1053
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1056
           fO2_log: *id1057
           starting_composition: *id035
@@ -19300,7 +19222,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1091
             state: *id512
             locator: *id1089
@@ -19368,7 +19290,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -19413,7 +19335,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -19458,7 +19380,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -19503,7 +19425,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -19548,7 +19470,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -19593,7 +19515,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -19638,7 +19560,7 @@ runs:
         locator: *id1089
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1091
           fO2_log: *id1092
           starting_composition: *id035
@@ -20006,7 +19928,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1126
             state: *id512
             locator: *id1122
@@ -20074,7 +19996,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20119,7 +20041,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20164,7 +20086,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20209,7 +20131,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20254,7 +20176,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20299,7 +20221,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20344,7 +20266,7 @@ runs:
         locator: *id1122
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1126
           fO2_log: *id1127
           starting_composition: *id035
@@ -20747,7 +20669,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1164
             state: *id512
             locator: *id1160
@@ -20815,7 +20737,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -20860,7 +20782,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -20905,7 +20827,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -20950,7 +20872,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -20995,7 +20917,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -21040,7 +20962,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -21085,7 +21007,7 @@ runs:
         locator: *id1160
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1164
           fO2_log: *id1165
           starting_composition: *id035
@@ -21434,7 +21356,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1199
             state: *id1196
             locator: *id1197
@@ -21502,7 +21424,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -21547,7 +21469,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -21592,7 +21514,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -21637,7 +21559,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -21682,7 +21604,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -21727,7 +21649,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -21772,7 +21694,7 @@ runs:
         locator: *id1197
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1199
           fO2_log: *id1200
           starting_composition: *id035
@@ -22119,7 +22041,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1234
             state: *id1196
             locator: *id1230
@@ -22187,7 +22109,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22232,7 +22154,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22277,7 +22199,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22322,7 +22244,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22367,7 +22289,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22412,7 +22334,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22457,7 +22379,7 @@ runs:
         locator: *id1230
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1234
           fO2_log: *id1235
           starting_composition: *id035
@@ -22804,7 +22726,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1270
             state: *id1196
             locator: *id1267
@@ -22872,7 +22794,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -22917,7 +22839,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -22962,7 +22884,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -23007,7 +22929,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -23052,7 +22974,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -23097,7 +23019,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -23142,7 +23064,7 @@ runs:
         locator: *id1267
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1270
           fO2_log: *id1271
           starting_composition: *id035
@@ -23513,7 +23435,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1304
             state: *id1196
             locator: *id1302
@@ -23581,7 +23503,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -23626,7 +23548,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -23671,7 +23593,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -23716,7 +23638,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -23761,7 +23683,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -23806,7 +23728,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -23851,7 +23773,7 @@ runs:
         locator: *id1302
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1304
           fO2_log: *id1305
           starting_composition: *id035
@@ -24198,7 +24120,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1336
             state: *id1196
             locator: *id1334
@@ -24266,7 +24188,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24311,7 +24233,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24356,7 +24278,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24401,7 +24323,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24446,7 +24368,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24491,7 +24413,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24536,7 +24458,7 @@ runs:
         locator: *id1334
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1336
           fO2_log: *id1337
           starting_composition: *id035
@@ -24907,7 +24829,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1373
             state: *id1196
             locator: *id1370
@@ -24975,7 +24897,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25020,7 +24942,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25065,7 +24987,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25110,7 +25032,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25155,7 +25077,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25200,7 +25122,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25245,7 +25167,7 @@ runs:
         locator: *id1370
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1373
           fO2_log: *id1374
           starting_composition: *id035
@@ -25616,7 +25538,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1407
             state: *id1196
             locator: *id1405
@@ -25684,7 +25606,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -25729,7 +25651,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -25774,7 +25696,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -25819,7 +25741,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -25864,7 +25786,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -25909,7 +25831,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -25954,7 +25876,7 @@ runs:
         locator: *id1405
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1407
           fO2_log: *id1408
           starting_composition: *id035
@@ -26325,7 +26247,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1442
             state: *id1196
             locator: *id1440
@@ -26393,7 +26315,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -26438,7 +26360,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -26483,7 +26405,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -26528,7 +26450,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -26573,7 +26495,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -26618,7 +26540,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -26663,7 +26585,7 @@ runs:
         locator: *id1440
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1442
           fO2_log: *id1443
           starting_composition: *id035
@@ -27012,7 +26934,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1475
             state: *id1472
             locator: *id1473
@@ -27080,7 +27002,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27125,7 +27047,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27170,7 +27092,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27215,7 +27137,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27260,7 +27182,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27305,7 +27227,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27350,7 +27272,7 @@ runs:
         locator: *id1473
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1475
           fO2_log: *id1476
           starting_composition: *id035
@@ -27697,7 +27619,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1510
             state: *id1472
             locator: *id1506
@@ -27765,7 +27687,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -27810,7 +27732,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -27855,7 +27777,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -27900,7 +27822,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -27945,7 +27867,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -27990,7 +27912,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -28035,7 +27957,7 @@ runs:
         locator: *id1506
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1510
           fO2_log: *id1511
           starting_composition: *id035
@@ -28382,7 +28304,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1544
             state: *id1472
             locator: *id1541
@@ -28450,7 +28372,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -28495,7 +28417,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -28540,7 +28462,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -28585,7 +28507,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -28630,7 +28552,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -28675,7 +28597,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -28720,7 +28642,7 @@ runs:
         locator: *id1541
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1544
           fO2_log: *id1545
           starting_composition: *id035
@@ -29102,7 +29024,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1579
             state: *id1472
             locator: *id1576
@@ -29170,7 +29092,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29215,7 +29137,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29260,7 +29182,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29305,7 +29227,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29350,7 +29272,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29395,7 +29317,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29440,7 +29362,7 @@ runs:
         locator: *id1576
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1579
           fO2_log: *id1580
           starting_composition: *id035
@@ -29787,7 +29709,7 @@ runs:
           source_path: docs/references/pdfs/99-kems-langmuir/kems-012-sossi-2019.pdf}
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id104
+          starting_component_ppm: *sossi_starting_component_1
           temperature_K: &id1614
             state: *id1472
             locator: *id1611
@@ -29855,7 +29777,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id114
+          starting_component_ppm: *sossi_starting_component_2
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035
@@ -29900,7 +29822,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id123
+          starting_component_ppm: *sossi_starting_component_3
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035
@@ -29945,7 +29867,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id128
+          starting_component_ppm: *sossi_starting_component_4
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035
@@ -29990,7 +29912,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id133
+          starting_component_ppm: *sossi_starting_component_5
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035
@@ -30035,7 +29957,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id138
+          starting_component_ppm: *sossi_starting_component_6
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035
@@ -30080,7 +30002,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id143
+          starting_component_ppm: *sossi_starting_component_7
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035
@@ -30125,7 +30047,7 @@ runs:
         locator: *id1611
         read_from: pdf:kems-012-sossi-2019
         point_conditions:
-          starting_component_ppm: *id148
+          starting_component_ppm: *sossi_starting_component_8
           temperature_K: *id1614
           fO2_log: *id1615
           starting_composition: *id035

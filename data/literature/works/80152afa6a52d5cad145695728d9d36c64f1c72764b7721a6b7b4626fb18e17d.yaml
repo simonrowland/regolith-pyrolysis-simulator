@@ -33,9 +33,8 @@ experiments:
 - experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shilov-1998-fig1d
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'Cited Knudsen effusion mass spectrometry at 1300 K on the Sn2P2O7-Zn2P2O7 join. Not a measurement of this
-      article.' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:
@@ -68,9 +67,8 @@ experiments:
 - experiment_id: 80152afa6a52d5cad145695728d9d36c64f1c72764b7721a6b7b4626fb18e17d::experiment::shornikov-2000-fig1c
   kind: literature
   method:
-    tag: unknown
-    reason: regime 'Knudsen effusion mass spectrometry, this study, 1100 K, along the Na4P2O7-Zn2P2O7 join. Molybdenum cell,
-      MI 1201T, 25.0 ± 0.1 eV.' is not a closed method token (kems_effusion alone is insufficient)
+    tag: value
+    value: knudsen_effusion
   sample: {}
   conditions:
     temperature_K:

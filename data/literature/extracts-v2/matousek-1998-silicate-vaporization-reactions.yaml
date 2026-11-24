@@ -80,6 +80,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: matousek-1998-silicate-vaporization-reactions::matousek_1998_koh_quoted_vapor_pressure::T=1600.15:h=ca971e8e0ef0
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
@@ -247,6 +258,17 @@ observations:
     status: admitted
     reason: 'admission_defaulted: no observation admission_status mapped from source; owner ruling d-056; not a reviewer decision'
   notices:
+  - kind: method_unstated
+    affected_quantities:
+    - p_sat
+    reason: 'method_unstated: default=unspecified; original_reason=source does not state method'
+    origin: matousek-1998-silicate-vaporization-reactions::matousek_1998_naoh_quoted_vapor_pressure::T=1651.15:h=d336c40f26a8
+    policy:
+      id: DP-106
+      version: 1
+      status: proposed
+      value: unspecified
+      units: method token
   - kind: admission_defaulted
     affected_quantities:
     - p_sat
