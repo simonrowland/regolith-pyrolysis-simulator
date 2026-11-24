@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 from typing import Mapping
 
@@ -70,14 +71,33 @@ def assert_residue_score_cache_equivalence(
         assert f'"reason":"{required_refusal_reason}"'.encode() in off
     if source == "kems-012-sossi-2019":
         rows = off.splitlines()
+        payloads = [json.loads(row) for row in rows]
         typed_missing = [
-            row
-            for row in rows
-            if b'"reason":"starting_component_ppm_missing"' in row
+            payload
+            for payload in payloads
+            if (payload.get("refusal") or {}).get("reason")
+            == "starting_component_ppm_missing"
+            and payload.get("reference") in context.observations
+            and context.observations[payload["reference"]].identity.species is not None
+            and context.observations[payload["reference"]].identity.species.formula
+            == "Mn"
         ]
         assert typed_missing, "Sossi missing starting ppm must be a typed refusal"
-        assert len(typed_missing) < len(rows), (
-            "a missing starting ppm for one species must not suppress other Sossi rows"
+        missing_experiments = {
+            context.observations[payload["reference"]].experiment_id
+            for payload in typed_missing
+        }
+        assert any(
+            payload.get("numeric") is not None
+            and payload.get("reference") in context.observations
+            and context.observations[payload["reference"]].experiment_id
+            in missing_experiments
+            and context.observations[payload["reference"]].identity.species is not None
+            and context.observations[payload["reference"]].identity.species.formula
+            == "Ti"
+            for payload in payloads
+        ), (
+            "a missing Mn starting ppm must not suppress the same Sossi cohort's Ti row"
         )
     _assert_runs_match_off(
         off,
