@@ -54,6 +54,7 @@ from simulator.optimize.evaluate import (
     _is_stale_profile_refusal,
     _stale_profile_result,
     evaluate,
+    neighbour_use_from_carrier,
 )
 from simulator.optimize.evalspec import (
     EvalSpec,
@@ -1038,7 +1039,9 @@ def run(
             "all candidates failed with non_finite_payload; "
             f"failure_counts={dict(failure_counts)}"
         )
-    if explore_selection.winner is None:
+    # An empty front is the old no-winner path. A front whose rows all used a
+    # neighbour still ranks, and two-phase still runs. The recipe stays exact.
+    if not explore_selection.ranked:
         if _no_feasible_config_failure(failure_counts, len(records)):
             _write_empty_artifacts(
                 out,
@@ -1143,6 +1146,9 @@ def run(
         leaderboard = explore_leaderboard
         pareto = explore_selection.published
         winner = explore_selection.winner
+        if winner is None:
+            result_status = COMPLETED_NO_FEASIBLE_WINNER_STATUS
+            result_reason = COMPLETED_NO_FEASIBLE_WINNER_STATUS
 
     artifacts = _write_artifacts(
         out,
@@ -2247,6 +2253,8 @@ def _scored_result_journal_payload(scored: ScoredResult) -> Mapping[str, Any]:
         "run_reference": _serialize_run_reference(scored.run_reference),
         "result_blob": _result_blob(scored),
         "notes": list(scored.notes),
+        "neighbour_hits": scored.neighbour_hits,
+        "neighbour_preset": scored.neighbour_preset,
     }
 
 
@@ -2268,6 +2276,9 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
     objectives = _deserialize_objectives(
         _sequence_of_mappings(payload.get("objectives", ()))
     )
+    hits, preset = neighbour_use_from_carrier(payload)
+    if hits == 0:
+        hits, preset = neighbour_use_from_carrier(payload.get("result_blob"))
     return ScoredResult(
         candidate_id=(
             str(payload["candidate_id"]) if payload.get("candidate_id") is not None else None
@@ -2292,6 +2303,8 @@ def _scored_result_from_journal_payload(payload: Mapping[str, Any]) -> ScoredRes
             payload.get("result_blob"),
         ),
         notes=tuple(str(item) for item in payload.get("notes", ())),
+        neighbour_hits=hits,
+        neighbour_preset=preset,
     )
 
 
@@ -2820,7 +2833,7 @@ def _run_exact_certification(
     if selection.winner is None:
         return _CertificationPassResult(
             leaderboard=leaderboard,
-            pareto=(),
+            pareto=selection.published,
             winner=None,
             artifact=artifact,
             status=COMPLETED_NO_FEASIBLE_WINNER_STATUS,
@@ -3940,6 +3953,53 @@ def _cached_extraction_completion_feasible(
     )
 
 
+def neighbour_scored_result_reusable(
+    scored: ScoredResult,
+    *,
+    requested: str | None = None,
+) -> bool:
+    """A neighbour score may replay only for the coarse preset that made it.
+
+    ``requested`` is the quantization token of the lookup, not of the stored
+    spec. Hits are unknown until the run returns, so they are not part of
+    the pre-run cache key. A fine request must not reuse the row even when
+    a key collision hands it back.
+    """
+
+    if scored.neighbour_hits <= 0:
+        return True
+    if requested is None and scored.eval_spec is not None:
+        requested = scored.eval_spec.control_quantization
+    from simulator.reduced_real_determinism import optimizer_neighbour_preset
+
+    preset = optimizer_neighbour_preset({"control_quantization": requested or ""})
+    return preset is not None and preset == scored.neighbour_preset
+
+
+def _record_neighbour_hits(record: StudyRecord) -> int:
+    hits, _preset = neighbour_use_from_carrier(record.trace_summary)
+    if hits:
+        return hits
+    hits, _preset = neighbour_use_from_carrier(record.result_blob)
+    return hits
+
+
+def _exact_recipe_winner(
+    ranked: Sequence[StudyRecord],
+) -> StudyRecord | None:
+    """The published recipe is the best ranked row that did not use a neighbour.
+
+    Coarse neighbour rows stay on the front and may be ranked against each
+    other. They are not the final recipe. A run with no neighbour hits is
+    unchanged: the first ranked row still wins.
+    """
+
+    for record in ranked:
+        if _record_neighbour_hits(record) == 0:
+            return record
+    return None
+
+
 def _lookup_cached(
     candidate: Candidate,
     profile: Mapping[str, Any],
@@ -3970,6 +4030,11 @@ def _lookup_cached(
         return None
     cached = store.lookup(spec)
     if cached is None:
+        return None
+    if not neighbour_scored_result_reusable(
+        cached,
+        requested=spec.control_quantization,
+    ):
         return None
     if not _cached_extraction_completion_feasible(
         cached,
@@ -4481,6 +4546,8 @@ def _light_backend_status_trace(scored: ScoredResult) -> Mapping[str, Any] | Non
             "evidence_rank",
             "proof_rank",
             "proof_grade",
+            "neighbour_hits",
+            "neighbour_preset",
             "neighbor_disagreement",
             "reduced_real_cache",
             "per_hour_summary",
@@ -4797,6 +4864,8 @@ def _light_backend_status_trace_for_reference(
             "kernel_fallback_used",
             "knob_saturation",
             "interpolation_feasibility_verdict",
+            "neighbour_hits",
+            "neighbour_preset",
         ):
             if key in reference.trace:
                 payload[key] = _jsonable_value(reference.trace[key])
@@ -5156,8 +5225,8 @@ def _publish_pareto(members: Sequence[StudyRecord]) -> tuple[StudyRecord, ...]:
     (``_sampling_order_key``). That covers ``StudyResult.pareto``,
     ``StudyReplayResult.pareto``, and ``pareto.json`` rows from the study
     loop, replay, certify, two-phase certification, and the aborted-cache
-    writer. The winner is the ``_rank_key`` minimum of the same set, chosen
-    separately. Objective rank, completion order, ``trial_number``,
+    writer. The winner is the best ranked row of that set that did not use a
+    neighbour, chosen separately. Objective rank, completion order, ``trial_number``,
     ``candidate_id``, and ``cache_key`` do not reorder a sequence whose
     records carry ``ask_ordinal``.
     """
@@ -5169,8 +5238,9 @@ def _publish_pareto(members: Sequence[StudyRecord]) -> tuple[StudyRecord, ...]:
 class _ParetoSelection:
     """One front shared by every study path.
 
-    ``published`` is sampling order. ``ranked`` and ``winner`` use
-    ``_rank_key``. Certification-pool truncation is selection, so it
+    ``published`` is sampling order. ``ranked`` uses ``_rank_key``. The
+    winner is the first ranked row with no neighbour hits. Certification-pool
+    truncation is selection, so it
     consumes ``ranked``. Publication consumes ``published``.
     """
 
@@ -5200,7 +5270,7 @@ def _select_pareto(
     return _ParetoSelection(
         published=_publish_pareto(front),
         ranked=ranked,
-        winner=ranked[0] if ranked else None,
+        winner=_exact_recipe_winner(ranked),
     )
 
 
@@ -5874,7 +5944,11 @@ def _summary_products_source(
 ) -> tuple[StudyRecord | None, str]:
     if winner is not None:
         return winner, "winner"
-    if leaderboard and leaderboard[0].feasible:
+    if (
+        leaderboard
+        and leaderboard[0].feasible
+        and _record_neighbour_hits(leaderboard[0]) == 0
+    ):
         return leaderboard[0], "rank_1_leaderboard"
     return None, "none"
 

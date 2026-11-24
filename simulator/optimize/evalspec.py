@@ -102,6 +102,10 @@ class EvalSpec:
         default_factory=default_cost_parameters_block,
         kw_only=True,
     )
+    # Empty when the run has no control preset. fine and coarse are different
+    # tokens, so a coarse score cannot replay as a fine run with the same
+    # profile_id. Omitted from the canonical key when empty.
+    control_quantization: str = field(default="", kw_only=True)
 
     def __post_init__(self) -> None:
         for field_name in (
@@ -125,6 +129,7 @@ class EvalSpec:
             "bounds_digest",
             "conditional_subspace_digest",
             "resolved_engine_identity",
+            "control_quantization",
         ):
             if not isinstance(getattr(self, field_name), str):
                 raise TypeError(f"{field_name} must be a string")
@@ -278,6 +283,7 @@ class EvalSpec:
                 _thaw_value(self.cost_parameters),
                 self.conditional_subspace_digest,
                 self.resolved_engine_identity,
+                self.control_quantization,
             ),
         )
 
@@ -351,6 +357,7 @@ class PrefixEvalSpec(EvalSpec):
                 _thaw_value(self.cost_parameters),
                 self.conditional_subspace_digest,
                 self.resolved_engine_identity,
+                self.control_quantization,
             ),
         )
 
@@ -389,6 +396,17 @@ def _with_default_redox_and_bubbler_reduce_args(
 
 
 def _rebuild_eval_spec(*args: Any) -> EvalSpec:
+    if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 7:
+        return EvalSpec(
+            *args[:-7],
+            allowlist_version=args[-7],
+            bounds_digest=args[-6],
+            stop_at_stage0_exit=args[-5],
+            cost_parameters=args[-4],
+            conditional_subspace_digest=args[-3],
+            resolved_engine_identity=args[-2],
+            control_quantization=args[-1],
+        )
     if len(args) == _EVALSPEC_REDUCE_ARG_COUNT + 6:
         return EvalSpec(
             *args[:-6],
@@ -464,6 +482,17 @@ def _rebuild_eval_spec(*args: Any) -> EvalSpec:
 
 
 def _rebuild_prefix_eval_spec(*args: Any) -> PrefixEvalSpec:
+    if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 7:
+        return PrefixEvalSpec(
+            *args[:-7],
+            allowlist_version=args[-7],
+            bounds_digest=args[-6],
+            stop_at_stage0_exit=args[-5],
+            cost_parameters=args[-4],
+            conditional_subspace_digest=args[-3],
+            resolved_engine_identity=args[-2],
+            control_quantization=args[-1],
+        )
     if len(args) == _PREFIX_EVALSPEC_REDUCE_ARG_COUNT + 6:
         return PrefixEvalSpec(
             *args[:-6],
@@ -586,6 +615,8 @@ def canonical_evalspec_json(spec: EvalSpec) -> bytes:
     physics_constraints = spec.data_digests.get("physics_constraints")
     if physics_constraints:
         payload["physics_constraints"] = physics_constraints
+    if spec.control_quantization:
+        payload["control_quantization"] = spec.control_quantization
     if spec.stop_at_stage0_exit:
         payload["stop_at_stage0_exit"] = spec.stop_at_stage0_exit
     if spec.stage0_redox_oxidant_kg:
