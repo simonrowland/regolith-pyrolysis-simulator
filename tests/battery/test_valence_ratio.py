@@ -1576,7 +1576,7 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
                         "temperature_condition_locator",
                         "temperature_K" in row.point_conditions
                         and row.point_conditions["temperature_K"].locator is not None
-                        and row.point_conditions["temperature_K"].locator.pdf_page_index == 1
+                        and row.point_conditions["temperature_K"].locator.page == 2
                         and row.point_conditions["temperature_K"].locator.published_page == 1598,
                     ),
                     (
@@ -1588,7 +1588,7 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
                         "fO2_condition_locator",
                         "fO2_log" in row.point_conditions
                         and row.point_conditions["fO2_log"].locator is not None
-                        and row.point_conditions["fO2_log"].locator.pdf_page_index == 1
+                        and row.point_conditions["fO2_log"].locator.page == 2
                         and row.point_conditions["fO2_log"].locator.published_page == 1598,
                     ),
                 )
@@ -1605,11 +1605,11 @@ def test_jayasuriya_2004_mossbauer_cells_and_conditions_migrate():
             and isinstance(row.identity.composition.value, Composition)
             and row.point_conditions["temperature_K"].state.is_value
             and row.point_conditions["temperature_K"].locator is not None
-            and row.point_conditions["temperature_K"].locator.pdf_page_index == 1
+            and row.point_conditions["temperature_K"].locator.page == 2
             and row.point_conditions["temperature_K"].locator.published_page == 1598
             and row.point_conditions["fO2_log"].state.is_value
             and row.point_conditions["fO2_log"].locator is not None
-            and row.point_conditions["fO2_log"].locator.pdf_page_index == 1
+            and row.point_conditions["fO2_log"].locator.page == 2
             and row.point_conditions["fO2_log"].locator.published_page == 1598
             and row.point_conditions["temperature_K"].state.value
             == row.identity.temperature_K.value
