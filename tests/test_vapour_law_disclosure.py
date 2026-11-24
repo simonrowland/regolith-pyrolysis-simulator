@@ -1,7 +1,7 @@
 """Guard the disclosure cache inventory against production cache-site drift."""
 
-from pathlib import Path
 import json
+from pathlib import Path
 
 import pytest
 
@@ -21,6 +21,7 @@ def test_cache_inventory_matches_the_production_scan() -> None:
         "CACHE_SITE_SCAN=" + json.dumps(scanned, sort_keys=True),
         flush=True,
     )
+    pytest.fail("CACHE_SITE_SCAN=" + json.dumps(scanned, sort_keys=True))
     unregistered = sorted(set(scanned) - set(CACHE_SITES))
     stale = sorted(set(CACHE_SITES) - set(scanned))
     assert not unregistered and not stale, {

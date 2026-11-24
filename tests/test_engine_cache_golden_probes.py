@@ -557,6 +557,12 @@ def test_live_engine_numeric_probe_matches_version(
         f"digest={result['digest']} openimcc_import={result['openimcc_import']}",
         flush=True,
     )
+    if engine_name in {"openimcc", "internal-analytical", "alphamelts"}:
+        pytest.fail(
+            f"ENGINE_GOLDEN_MEASURED engine={engine_name} "
+            f"version={result['version']} digest={result['digest']} "
+            f"openimcc_import={result['openimcc_import']}"
+        )
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
     probe_request = result["request"]
     assert isinstance(probe_request, Mapping), (
@@ -610,6 +616,10 @@ def test_internal_analytical_out_of_band_numeric_probe_matches_version(
         "ENGINE_GOLDEN_MEASURED engine=internal-analytical-out-of-band "
         f"version={result['version']} digest={result['digest']}",
         flush=True,
+    )
+    pytest.fail(
+        "ENGINE_GOLDEN_MEASURED engine=internal-analytical-out-of-band "
+        f"version={result['version']} digest={result['digest']}"
     )
     expected_version, expected_digest = INTERNAL_ANALYTICAL_OUT_OF_BAND_GOLDEN
     assert result["version"] == expected_version
