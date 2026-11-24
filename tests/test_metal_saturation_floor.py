@@ -15,8 +15,14 @@ from pathlib import Path
 import pytest
 import yaml
 
-from engines.antoine import _antoine_log10_pressure
-from engines.builtin.vapor_pressure import BuiltinVaporPressureProvider
+from engines.antoine import (
+    _antoine_log10_pressure,
+    _read_antoine_coefficients,
+)
+from engines.builtin.vapor_pressure import (
+    BuiltinVaporPressureProvider,
+    wall_condensation_antoine_coefficients,
+)
 from simulator.chemistry.ellingham_thermo import (
     ellingham_delta_g_kj_per_mol_o2,
 )
@@ -118,6 +124,18 @@ def _crystal_si_saturation_pa(temperature_K: float) -> float:
     return 10.0 ** log10_p_pa
 
 
+def _si_saturation_pa_from_owner(
+    species_row: dict,
+    temperature_K: float,
+) -> float:
+    coefficients, _owner = wall_condensation_antoine_coefficients(
+        species_row,
+        temperature_K,
+    )
+    A, B, C = _read_antoine_coefficients(coefficients)
+    return 10.0 ** _antoine_log10_pressure(A, B, C, temperature_K)
+
+
 def test_post_shuttle_si_pressure_stays_under_pure_si_saturation() -> None:
     raw = yaml.safe_load(_DATA.read_text())
     provider = BuiltinVaporPressureProvider(raw)
@@ -169,7 +187,7 @@ def test_post_shuttle_si_pressure_stays_under_pure_si_saturation() -> None:
     p_si_pa = result.diagnostic["vapor_pressures_Pa"]["Si"]
     p_sat_pa = _crystal_si_saturation_pa(_T_K)
     assert p_si_pa < 1.0
-    assert p_si_pa / p_sat_pa < 10.0
+    assert p_si_pa / p_sat_pa < 1.51
     flag = result.diagnostic[
         "vapour_metal_saturation_certification_flags"
     ]["Si"]
@@ -186,4 +204,44 @@ def test_post_shuttle_si_pressure_stays_under_pure_si_saturation() -> None:
     assert any(
         str(warning).startswith("melt_fO2_metal_saturation_floor:Si")
         for warning in result.warnings
+    )
+
+
+def test_si_saturation_ratio_across_furnace_band() -> None:
+    raw = yaml.safe_load(_DATA.read_text())
+    legacy = vapor_pressure_legacy_view(raw)
+    provider = BuiltinVaporPressureProvider(raw)
+    account_view = ProviderAccountView(
+        accounts={"process.cleaned_melt": dict(_SHUTTLE_MOL)},
+        species_formula_registry={},
+    )
+    ratios: list[tuple[float, float]] = []
+    for temperature_K in range(1300, 2001):
+        result = provider.dispatch(IntentRequest(
+            intent=ChemistryIntent.VAPOR_PRESSURE,
+            account_view=account_view,
+            temperature_C=temperature_K - 273.15,
+            pressure_bar=1.0e-6,
+            control_inputs={
+                "pO2_bar": 1.0e-8,
+                "intrinsic_fO2_log": -40.0,
+                "high_t_melt_activity": "constant_gamma",
+            },
+        ))
+        assert str(result.status) == "ok"
+        notice = result.diagnostic["melt_metal_saturation_floor_notice"]
+        assert notice["metal"] == "Si"
+        p_si_pa = result.diagnostic["vapor_pressures_Pa"]["Si"]
+        p_sat_pa = _si_saturation_pa_from_owner(
+            legacy["metals"]["Si"],
+            float(temperature_K),
+        )
+        ratios.append((p_si_pa / p_sat_pa, float(temperature_K)))
+
+    max_ratio, max_temperature_K = max(ratios, key=lambda row: row[0])
+    # Premise: the sweep max is 1.47903388 at 1300 K. A 2% margin is
+    # 1.47903388 * 1.02 = 1.50861456, rounded upward to 1.51; the ratio
+    # is dimensionless (Pa/Pa), and the measured limiting point stays below it.
+    assert max_ratio < 1.51, (
+        f"max P_Si/P_sat={max_ratio:.8f} at {max_temperature_K:g} K"
     )
