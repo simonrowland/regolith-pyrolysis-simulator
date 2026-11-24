@@ -393,7 +393,9 @@ def test_oxide_engines_refuse_the_metal_without_calling_the_assemblage(
         )
         prediction = predict_with_engine(engine, observation)
         assert prediction.value is None
-        assert prediction.refusal_reason is RefusalReason.ENGINE_CANNOT_ACCEPT_METAL
+        assert prediction.refusal_reason is RefusalReason.ENGINE_CANNOT_ACCEPT_METAL, (
+            "slag-metal charge refusal must precede alloy capability refusal"
+        )
         assert "Mn" in prediction.refusal_detail["metal_components"]
         assert "SiO2" not in prediction.refusal_detail["metal_components"]
         assert "MnO" not in prediction.refusal_detail["metal_components"]
@@ -442,7 +444,11 @@ def test_engines_without_a_phase_assemblage_keep_their_typed_refusal(
         Quantity.EQUILIBRIUM_PHASE_COMPOSITION,
         role=PhaseRole.METAL,
         counter=None,
-        composition=_van_ende_charge(),
+        composition=Composition(
+            basis="printed_phase_composition",
+            components=(("Fe", Decimal("50")), ("Ni", Decimal("50"))),
+            amount_basis=AmountBasis.MASS_PERCENT,
+        ),
     )
     observation = F.observation(
         "charge-row",

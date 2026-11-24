@@ -509,7 +509,7 @@ def test_henao_tables_migrate_as_typed_compositions_with_conditions(
     assert unrelated_prediction.refusal_detail == {
         "reason": "missing_input",
         "input": "composition",
-    }
+    }, "printed composition locator must match the observation row"
     a1_metal = by_id["henao_2001_t1_A-1_alloy_Ni"]
     assert a1_metal.identity.composition.is_value
     composition = a1_metal.identity.composition.value

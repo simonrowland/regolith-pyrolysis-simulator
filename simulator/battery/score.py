@@ -12428,20 +12428,6 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
-    if role is PhaseRole.METAL:
-        from simulator.melt_backend.base import battery_adapter_class
-
-        adapter = battery_adapter_class(engine.value)
-        if adapter is None or not adapter().capabilities().get("metal_alloy", False):
-            return refused(
-                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
-                {
-                    "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
-                    "engine": engine.value,
-                    "phase_role": role.value,
-                    "detail": "adapter does not declare metal-alloy phase support",
-                },
-            )
     if (
         role is PhaseRole.METAL
         and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -12462,6 +12448,20 @@ def _predict_phase_row(
     if metal_charge is not None:
         reason, detail = metal_charge
         return refused(reason, detail)
+    if role is PhaseRole.METAL:
+        from simulator.melt_backend.base import battery_adapter_class
+
+        adapter = battery_adapter_class(engine.value)
+        if adapter is None or not adapter().capabilities().get("metal_alloy", False):
+            return refused(
+                RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION,
+                {
+                    "reason": RefusalReason.ENGINE_DOES_NOT_REPORT_PHASE_COMPOSITION.value,
+                    "engine": engine.value,
+                    "phase_role": role.value,
+                    "detail": "adapter does not declare metal-alloy phase support",
+                },
+            )
     if (
         quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT

@@ -26,6 +26,7 @@ LI_TEST = ROOT / "tests/test_li_2005_na_al_dephos_extract.py"
 TANIGUCHI_TEST = ROOT / "tests/test_taniguchi_1997_feo_cas_extract.py"
 PHASE_ROWS_TEST = ROOT / "tests/battery/test_phase_composition_rows.py"
 MASS_PERCENT_ORDER_TEST = ROOT / "tests/battery/test_t1969_malformed_mass_percent_order.py"
+CHARGE_TEST = ROOT / "tests/battery/test_slag_metal_charge.py"
 
 TESTS_BY_MUTATION = {
     "phase-label": (ABDEYAZDAN_TEST,),
@@ -33,6 +34,7 @@ TESTS_BY_MUTATION = {
     "phase-role": (HENAO_TEST,),
     "basis-before-conversion": (PHASE_ROWS_TEST,),
     "alloy-capability": (HENAO_TEST,),
+    "charge-precedence": (CHARGE_TEST,),
     "malformed-metal-mass-percent": (MASS_PERCENT_ORDER_TEST,),
     "role-provenance": (HENAO_TEST,),
     "test-local": (HENAO_TEST,),
@@ -81,6 +83,12 @@ EXPECTED_FAILURES = {
             "usable alloy map must reach the adapter capability refusal",
         ),
     ),
+    "charge-precedence": (
+        (
+            "test_oxide_engines_refuse_the_metal_without_calling_the_assemblage",
+            "slag-metal charge refusal must precede alloy capability refusal",
+        ),
+    ),
     "malformed-metal-mass-percent": (
         (
             "test_malformed_metal_mass_percent_keeps_basis_refusal",
@@ -102,7 +110,7 @@ EXPECTED_FAILURES = {
     "locator-row": (
         (
             "test_henao_tables_migrate_as_typed_compositions_with_conditions",
-            "AttributeError: 'Locator' object has no attribute 'row'",
+            "printed composition locator must match the observation row",
         ),
     ),
 }
@@ -180,6 +188,28 @@ def restore(mutation: str) -> None:
             "    ):\n"
             "        from simulator.melt_backend.base import battery_adapter_class\n",
         )
+    elif mutation == "charge-precedence":
+        capability_gate = (
+            "    if role is PhaseRole.METAL:\n"
+            "        from simulator.melt_backend.base import battery_adapter_class\n"
+        )
+        capability_end = (
+            "                    \"detail\": \"adapter does not declare metal-alloy phase support\",\n"
+            "                },\n"
+            "            )\n"
+        )
+        if SCORE.read_text().count(capability_gate) != 1:
+            raise RuntimeError("expected one alloy capability gate")
+        source = SCORE.read_text()
+        start = source.index(capability_gate)
+        end = source.index(capability_end, start) + len(capability_end)
+        block = source[start:end]
+        replace_once(SCORE, block, "")
+        replace_once(
+            SCORE,
+            "    metal_charge = _unaccepted_metal_charge(engine, composition)\n",
+            block + "    metal_charge = _unaccepted_metal_charge(engine, composition)\n",
+        )
     elif mutation == "malformed-metal-mass-percent":
         validation = (
             "        valid_mass_percent_components = (\n"
@@ -242,8 +272,8 @@ def restore(mutation: str) -> None:
     elif mutation == "locator-row":
         replace_once(
             PROVENANCE,
-            '        "table",\n    )\n',
-            '        "table",\n        "row",\n    )\n',
+            "if row_key is None or row_key != locator_row_identity(map_locator):",
+            "if row_key is None:",
         )
     else:
         raise ValueError(mutation)
@@ -262,6 +292,7 @@ def main() -> int:
         "phase-role": (MIGRATE,),
         "basis-before-conversion": (SCORE,),
         "alloy-capability": (SCORE,),
+        "charge-precedence": (SCORE,),
         "malformed-metal-mass-percent": (SCORE,),
         "role-provenance": (MIGRATE,),
         "test-local": (HENAO_TEST,),
