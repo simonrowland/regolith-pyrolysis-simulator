@@ -776,34 +776,20 @@ def _kress_pressure_bar(
             if pascal is not None and pascal.is_finite() and pascal > 0:
                 return float(pascal) / PA_PER_BAR, "identity.total_pressure_Pa"
     if experiment is not None and bench is not None:
-        from simulator.battery.waypoints import (
-            _prediction_pressure_waypoint,
-            pressure_boundary,
-        )
+        from simulator.battery.waypoints import eligible_prediction_pressure
 
-        boundary = _prediction_pressure_waypoint(
-            pressure_boundary(experiment, bench, observation),
-            experiment.method,
-        )
-        if boundary is not None:
-            log_bar = _pascal_point_to_bar(boundary.value)
-            if log_bar is not None:
-                return log_bar, boundary.route
+        selected = eligible_prediction_pressure(experiment, bench, observation)
+        if selected is not None:
+            state, route = selected
+            amount = nominal_pressure_pa(state)
+            if amount is not None and amount > 0:
+                try:
+                    bar = float(amount) / PA_PER_BAR
+                except (TypeError, ValueError, ArithmeticError):
+                    bar = None
+                if bar is not None and math.isfinite(bar) and bar > 0.0:
+                    return bar, route
     return 1.0, "kress_reference_1_bar"
-
-
-def _pascal_point_to_bar(value: object) -> float | None:
-    if not isinstance(value, Value) or value.kind is not ValueKind.POINT:
-        return None
-    if value.point is None or value.point <= 0:
-        return None
-    try:
-        bar = float(value.point) / PA_PER_BAR
-    except (TypeError, ValueError, ArithmeticError):
-        return None
-    if not math.isfinite(bar) or bar <= 0.0:
-        return None
-    return bar
 
 
 def _gas_ratio_fo2(

@@ -16,6 +16,7 @@ from simulator.battery.enums import (
     AmountBasis,
     Authority,
     Engine,
+    FO2Channel,
     MetricOperation,
     MethodToken,
     NoticeKind,
@@ -25,6 +26,7 @@ from simulator.battery.enums import (
     Rail,
     RefusalReason,
     ResidualStatus,
+    ValueKind,
 )
 from simulator.battery.identity import parse_valence_basis
 from simulator.battery.migrate import (
@@ -48,12 +50,14 @@ from simulator.battery.records import (
     BenchIdentity,
     BenchIdentityBasis,
     Composition,
+    FO2Control,
     Located,
     Locator,
     Species,
     State,
     Value,
 )
+from simulator.battery.waypoints import oxygen_condition
 from simulator.battery.score import headline_payload_records, residual_to_plain
 from tests.battery import factories as F
 from tests.battery.factories import migrate_one_extract
@@ -1843,79 +1847,200 @@ def _borisov_score_context(*, vacuum=False, named_valence=False):
     return context, row, experiment, bench
 
 
-def test_redox_dispatcher_uses_reachable_control_and_preserves_bench():
-    context, row, experiment, bench = _borisov_score_context()
-    residuals, _ = score_store(
+# 1200 °C is the inclusive IW upper bound and the inclusive Kress floor.
+_IN_DOMAIN_BUFFER_K = Decimal("1473.15")
+_ONE_ATM_PA = Decimal("101325")
+
+
+def _eligible_oxide_composition() -> Composition:
+    """Complete oxide weights. Borisov Table 1 omits TiO2 and P2O5."""
+
+    return Composition(
+        basis="oxide",
+        components=(
+            ("SiO2", Decimal("50")),
+            ("Al2O3", Decimal("15")),
+            ("FeO", Decimal("10")),
+            ("Fe2O3", Decimal("5")),
+            ("MgO", Decimal("10")),
+            ("CaO", Decimal("10")),
+        ),
+        amount_basis=AmountBasis.MASS_PERCENT,
+    )
+
+
+def _in_domain_buffer_context(*, named_valence=False):
+    """Borisov row held at an in-domain IW control, with no other caveat.
+
+    The printed row is 1349 °C, outside IW, so both bench states fell through
+    to intrinsic fO2. This row is otherwise eligible: clean oxide weights, no
+    observation notices, and a point temperature inside both domains.
+    """
+
+    context, row, experiment, bench = _borisov_score_context(
+        named_valence=named_valence
+    )
+    composition = _eligible_oxide_composition()
+    row = replace(
+        row,
+        notices=(),
+        point_conditions={
+            "temperature_K": F.located(_IN_DOMAIN_BUFFER_K),
+            "total_pressure_Pa": F.located(_ONE_ATM_PA),
+        },
+        identity=replace(
+            row.identity,
+            temperature_K=State.of(_IN_DOMAIN_BUFFER_K),
+            total_pressure_Pa=State.of(_ONE_ATM_PA),
+            composition=State.of(composition),
+            fO2_Pa=None,
+        ),
+    )
+    experiment = replace(
+        experiment,
+        fO2_control=FO2Control(
+            channel=State.of(FO2Channel.BUFFER),
+            buffer=F.located("IW"),
+        ),
+    )
+    context = replace(
+        context,
+        experiments={experiment.experiment_id: experiment},
+        observations={row.observation_id: row},
+    )
+    return context, row, experiment, bench
+
+
+def _redox_score(context, row):
+    residuals, candidates = score_store(
         context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
     )
     residual = next(item for item in residuals if item.reference == row.observation_id)
+    notice = next(item for item in residual.notices if item.origin == "fo2_ladder")
+    assert residual.candidate in candidates
+    return residual, notice, candidates[residual.candidate]
+
+
+def _command_log(candidate) -> float:
+    return math.log10(float(candidate.identity.fO2_Pa.value) / 1e5)
+
+
+def _assert_flagged_default(residual, context):
+    others = tuple(
+        notice for notice in residual.notices if notice.origin != "fo2_ladder"
+    )
+    assert score_module.flagged_strata(others) == ()
+    assert "out_of_certified_band" in score_module.flagged_strata(residual.notices)
+    headline = headline_payload_records(
+        [residual_to_plain(residual)],
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        observations=context.observations,
+        origins=context.origins,
+    )
+    measured = next(
+        item
+        for item in headline
+        if item["tier"] == "measured" and item["rail"] == Rail.REDOX.value
+    )
+    assert measured["n_scored"] == 0
+
+
+def _assert_buffer_control(context, row, experiment, bench, quantity):
+    residual, notice, candidate = _redox_score(context, row)
+    selected = oxygen_condition(experiment, bench, row).selected
+    assert selected is not None
+    assert selected.route == "buffer_relation"
     assert residual.numeric is not None and residual.numeric.value.is_finite()
-    oxygen = [notice for notice in residual.notices if notice.origin == "fo2_ladder"]
-    assert len(oxygen) == 1
-    assert "route=intrinsic_melt_fO2" in oxygen[0].reason
-    assert "selected_fO2_Pa=" in oxygen[0].reason
-    assert oxygen[0].kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert notice.affected_quantities == (quantity,)
+    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert "route=buffer_relation" in notice.reason
+    assert "selected_fO2_Pa=" in notice.reason
+    assert "source does not print fO2 for this run" in notice.reason
+    assert _command_log(candidate) == pytest.approx(float(selected.value.point))
+    condition = candidate.provenance["selected_oxygen_condition"]
+    assert condition["route"] == "buffer_relation"
+    assert condition["fo2_tier"] == 3
+    assert "selected_fO2_Pa" not in condition["route"]
+    assert "original_reason" not in condition["route"]
+    assert "borrowed" not in condition["route"]
+    _assert_flagged_default(residual, context)
+    return residual, candidate
+
+
+def test_redox_dispatcher_uses_reachable_control_and_preserves_bench():
+    context, row, experiment, bench = _in_domain_buffer_context()
     assert context.benches[experiment.bench_id] is bench
+    with_bench, with_candidate = _assert_buffer_control(
+        context, row, experiment, bench, Quantity.FE3_FE2_RATIO
+    )
 
     without_bench = replace(context, benches={})
-    fallback, _ = score_store(
-        without_bench, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
-    )
-    fallback_row = next(item for item in fallback if item.reference == row.observation_id)
-    fallback_notice = next(
-        notice for notice in fallback_row.notices if notice.origin == "fo2_ladder"
-    )
-    assert "route=intrinsic_melt_fO2" in fallback_notice.reason
+    fallback, fallback_notice, fallback_candidate = _redox_score(without_bench, row)
+    assert fallback.numeric is not None and fallback.numeric.value.is_finite()
+    assert fallback_notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
     assert fallback_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
+    assert "route=intrinsic_melt_fO2" in fallback_notice.reason
+    assert "route=buffer_relation" not in fallback_notice.reason
+    assert "selected_fO2_Pa=" in fallback_notice.reason
+    assert (
+        fallback_candidate.provenance["selected_oxygen_condition"]["route"]
+        == "intrinsic_melt_fO2"
+    )
+    assert fallback.numeric.value != with_bench.numeric.value
+    assert _command_log(fallback_candidate) != pytest.approx(
+        _command_log(with_candidate)
+    )
+    _assert_flagged_default(fallback, without_bench)
 
 
 def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
-    context, row, _experiment, _bench = _borisov_score_context(
-        named_valence=True
+    context, row, experiment, bench = _in_domain_buffer_context(named_valence=True)
+    with_bench, with_candidate = _assert_buffer_control(
+        context, row, experiment, bench, Quantity.VALENCE_RATIO
     )
-    residuals, _ = score_store(
-        context, engines=(Engine.INTERNAL_ANALYTICAL,), rail=Rail.REDOX
-    )
-    residual = next(item for item in residuals if item.reference == row.observation_id)
-    assert residual.numeric is not None and residual.numeric.value.is_finite()
-    notice = next(item for item in residual.notices if item.origin == "fo2_ladder")
-    assert notice.affected_quantities == (Quantity.VALENCE_RATIO,)
-    assert notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
-    assert "route=intrinsic_melt_fO2" in notice.reason
-    assert "selected_fO2_Pa=" in notice.reason
 
     borrowed_context = replace(context, benches={})
-    borrowed_residuals, _ = score_store(
-        borrowed_context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        rail=Rail.REDOX,
+    borrowed, borrowed_notice, borrowed_candidate = _redox_score(
+        borrowed_context, row
     )
-    borrowed_residual = next(
-        item for item in borrowed_residuals if item.reference == row.observation_id
-    )
-    borrowed_notice = next(
-        item for item in borrowed_residual.notices if item.origin == "fo2_ladder"
-    )
+    assert borrowed.numeric is not None and borrowed.numeric.value.is_finite()
     assert borrowed_notice.affected_quantities == (Quantity.VALENCE_RATIO,)
     assert borrowed_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     assert "route=intrinsic_melt_fO2" in borrowed_notice.reason
-    borrowed_headline = headline_payload_records(
-        [residual_to_plain(borrowed_residual)],
-        engines=(Engine.INTERNAL_ANALYTICAL,),
-        observations=borrowed_context.observations,
-        origins=borrowed_context.origins,
+    assert "route=buffer_relation" not in borrowed_notice.reason
+    assert (
+        borrowed_candidate.provenance["selected_oxygen_condition"]["route"]
+        == "intrinsic_melt_fO2"
     )
-    measured_redox = next(
-        item
-        for item in borrowed_headline
-        if item["tier"] == "measured" and item["rail"] == Rail.REDOX.value
+    assert borrowed.numeric.value != with_bench.numeric.value
+    assert _command_log(borrowed_candidate) != pytest.approx(
+        _command_log(with_candidate)
     )
-    assert measured_redox["n_scored"] == 0
+    _assert_flagged_default(borrowed, borrowed_context)
 
-    vacuum_context, vacuum_row, _experiment, _bench = _borisov_score_context(
-        vacuum=True
+    vacuum_context, vacuum_row, vacuum_experiment, vacuum_bench = (
+        _borisov_score_context(vacuum=True)
     )
-    vacuum_residuals, _ = score_store(
+    # Table 1 prints no complete oxide list, so the scorer refuses composition
+    # before oxygen. The vacuum pressure stays on the experiment.
+    vacuum_temperature = vacuum_row.identity.temperature_K
+    assert vacuum_temperature is not None and vacuum_temperature.is_value
+    vacuum_row = replace(
+        vacuum_row,
+        notices=(),
+        point_conditions={"temperature_K": F.located(vacuum_temperature.value)},
+        identity=replace(
+            vacuum_row.identity,
+            composition=State.of(_eligible_oxide_composition()),
+            fO2_Pa=None,
+            total_pressure_Pa=None,
+        ),
+    )
+    vacuum_context = replace(
+        vacuum_context,
+        observations={vacuum_row.observation_id: vacuum_row},
+    )
+    vacuum_residuals, vacuum_candidates = score_store(
         vacuum_context,
         engines=(Engine.INTERNAL_ANALYTICAL,),
         rail=Rail.REDOX,
@@ -1925,34 +2050,162 @@ def test_redox_dispatcher_types_named_valence_and_vacuum_substitution():
         for item in vacuum_residuals
         if item.reference == vacuum_row.observation_id
     )
-    vacuum_notice = next(
+    oxygen_notices = [
         item for item in vacuum_residual.notices if item.origin == "fo2_ladder"
+    ]
+    assert oxygen_notices, (
+        vacuum_residual.refusal,
+        [(item.origin, item.kind) for item in vacuum_residual.notices],
     )
+    vacuum_notice = oxygen_notices[0]
+    assert vacuum_residual.numeric is not None
+    assert vacuum_residual.numeric.value.is_finite()
     assert vacuum_notice.affected_quantities == (Quantity.FE3_FE2_RATIO,)
     assert vacuum_notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
     assert vacuum_notice.authority is Authority.EXTRAPOLATED
     assert "Dalton pO2 <= Ptotal" in vacuum_notice.reason
     assert "selected_fO2_Pa=" in vacuum_notice.reason
     assert "selected_fO2_Pa=0.0001" in vacuum_notice.reason
+    assert "source does not print fO2 for this run" in vacuum_notice.reason
     pressure_bar, selected_pressure = score_module._fe_redox_pressure(
         vacuum_row,
         vacuum_row.identity,
-        vacuum_context.experiments[vacuum_row.experiment_id],
+        vacuum_experiment,
     )
     assert pressure_bar == pytest.approx(1e-9)
+    assert isinstance(selected_pressure.value, Decimal)
     assert selected_pressure.value == Decimal("0.0001")
-    measured_headline = headline_payload_records(
+    assert vacuum_residual.candidate in vacuum_candidates
+    candidate = vacuum_candidates[vacuum_residual.candidate]
+    assert candidate.identity.total_pressure_Pa.value == Decimal("0.0001")
+    assert candidate.identity.fO2_Pa.value == Decimal("0.0001")
+    condition = candidate.provenance["selected_oxygen_condition"]
+    assert condition["route"] == "vacuum_total_pressure_upper_bound"
+    assert "selected_fO2_Pa" not in condition["route"]
+    assert "original_reason" not in condition["route"]
+    assert "Dalton" not in condition["route"]
+    assert Decimal(condition["value_Pa"]) == Decimal("0.0001")
+    assert "out_of_certified_band" in score_module.flagged_strata(
+        vacuum_residual.notices
+    )
+    vacuum_headline = headline_payload_records(
         [residual_to_plain(vacuum_residual)],
         engines=(Engine.INTERNAL_ANALYTICAL,),
         observations=vacuum_context.observations,
         origins=vacuum_context.origins,
     )
-    measured_redox = next(
+    vacuum_measured = next(
         item
-        for item in measured_headline
+        for item in vacuum_headline
         if item["tier"] == "measured" and item["rail"] == Rail.REDOX.value
     )
-    assert measured_redox["n_scored"] == 0
+    assert vacuum_measured["n_scored"] == 0
+    oxygen = oxygen_condition(vacuum_experiment, vacuum_bench, vacuum_row)
+    assert any(
+        route.route == "vacuum_total_pressure_upper_bound" for route in oxygen.routes
+    )
+
+    bound_experiment = replace(
+        vacuum_experiment,
+        pressure_environment=replace(
+            vacuum_experiment.pressure_environment,
+            total_pressure_Pa=F.located(
+                Value(
+                    ValueKind.BOUND,
+                    bound_operator="<=",
+                    bound_value=Decimal("1e-4"),
+                ),
+                note="printed vacuum during run",
+            ),
+        ),
+    )
+    bound_bar, bound_pressure = score_module._fe_redox_pressure(
+        vacuum_row,
+        vacuum_row.identity,
+        bound_experiment,
+    )
+    assert bound_bar == pytest.approx(1e-9)
+    assert bound_pressure.value == Decimal("0.0001")
+    bound_oxygen = oxygen_condition(bound_experiment, vacuum_bench, vacuum_row)
+    assert any(
+        route.route == "vacuum_total_pressure_upper_bound"
+        for route in bound_oxygen.routes
+    )
+
+    knudsen = replace(
+        vacuum_experiment, method=State.of(MethodToken.KNUDSEN_EFFUSION)
+    )
+    knudsen_bar, knudsen_pressure = score_module._fe_redox_pressure(
+        vacuum_row,
+        vacuum_row.identity,
+        knudsen,
+    )
+    assert knudsen_bar == pytest.approx(1.01325)
+    assert knudsen_pressure.value == Decimal(101325)
+
+    gauge = replace(
+        vacuum_experiment,
+        pressure_environment=replace(
+            vacuum_experiment.pressure_environment,
+            total_pressure_Pa=F.located(
+                Value(
+                    ValueKind.BOUND,
+                    bound_operator="<=",
+                    bound_value=Decimal("101325"),
+                ),
+                note="upper limit of the gauge",
+            ),
+        ),
+    )
+    refused = score_module._fe_redox_pressure(
+        vacuum_row, vacuum_row.identity, gauge
+    )
+    assert not isinstance(refused, tuple)
+    assert refused.reason is RefusalReason.INVALID_IDENTITY
+    assert refused.detail["input"] == "total_pressure_Pa"
+
+
+def test_shared_ladder_vacuum_notice_keeps_its_route():
+    """The ladder's vacuum clauses are not the route, with or without a caller suffix."""
+
+    from simulator.battery.fo2_ladder import ResolvedFo2, fo2_tier_notice
+
+    notice = fo2_tier_notice(
+        Quantity.P_PARTIAL,
+        ResolvedFo2(
+            -9.0,
+            3,
+            "vacuum_total_pressure_upper_bound",
+            False,
+            po2_bar=1e-9,
+        ),
+    )
+    assert "original_reason=" not in notice.reason
+    assert "Dalton pO2 <= Ptotal" in notice.reason
+    assert "selected_fO2_Pa=0.0001" in notice.reason
+    shared = score_module._ladder_route_text(notice.reason)
+    assert shared is not None
+    assert shared.group(3) == "vacuum_total_pressure_upper_bound"
+    redox = score_module._ladder_route_text(
+        notice.reason + "; original_reason=source does not print fO2 for this run"
+    )
+    assert redox is not None
+    assert redox.group(3) == "vacuum_total_pressure_upper_bound"
+    borrowed = score_module._ladder_route_text(
+        "fo2_tier=4; route=intrinsic_melt_fO2; borrowed; "
+        "selected_fO2_Pa=1; original_reason=source does not print fO2 for this run"
+    )
+    assert borrowed is not None
+    assert borrowed.group(3) == "intrinsic_melt_fO2; borrowed"
+    effusion = score_module._ladder_route_text(
+        "fo2_tier=3; physics_rung=3:congruent_effusion_balance; "
+        "route=effusion_oxygen_balance; effusion closure borrowed from internal-analytical; "
+        "borrowed"
+    )
+    assert effusion is not None
+    assert effusion.group(3) == (
+        "effusion_oxygen_balance; effusion closure borrowed from internal-analytical; borrowed"
+    )
 
 
 def _patch_melts_cell(monkeypatch, cell_for):

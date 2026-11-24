@@ -230,6 +230,7 @@ from simulator.battery.records import (
     ApproxPressure,
     approximate_pressure_band_reason,
     as_decimal,
+    identity_pressure_state,
     nominal_pressure_pa,
     charge_value,
     phase_token,
@@ -8744,20 +8745,30 @@ def _comparison_identity(
     return replace(identity, **updates)
 
 
-_SHARED_LADDER_QUALIFICATION = re.compile(
-    r"; selected_fO2_Pa=(?P<pa>[^;]*); original_reason=(?P<why>.*)\Z"
+# Clauses the ladder owns. They are qualification, not the route name.
+# ``original_reason`` is a caller suffix and may follow any of them.
+_LADDER_OWNED_CLAUSE = re.compile(
+    r"; (?:selected_fO2_Pa=[^;]*"
+    r"|Dalton pO2 <= Ptotal"
+    r"|the upper bound was substituted as a point)"
 )
+_LADDER_ORIGINAL_REASON = re.compile(r"; original_reason=.*\Z")
 _SHARED_LADDER_REASON = re.compile(
     r"fo2_tier=(\d+);(?: physics_rung=(\d+):[^;]+;)? route=(.+)"
 )
 
 
 def _ladder_route_text(reason: str) -> re.Match[str] | None:
-    """Route text with the scorer's pressure qualification removed."""
+    """Route text with ladder-owned qualification removed.
 
-    return _SHARED_LADDER_REASON.fullmatch(
-        _SHARED_LADDER_QUALIFICATION.sub("", reason)
-    )
+    Vacuum places the Dalton sentence between the selected pressure and the
+    caller's missing-input reason. A shared caller may omit that reason.
+    Route suffixes the ladder does not own, including a borrowed marker and
+    an effusion-closure note, stay on the route.
+    """
+
+    stripped = _LADDER_ORIGINAL_REASON.sub("", _LADDER_OWNED_CLAUSE.sub("", reason))
+    return _SHARED_LADDER_REASON.fullmatch(stripped)
 
 
 def _selected_shared_ladder_oxygen(
@@ -9259,47 +9270,83 @@ def _printed_fe_redox_fo2_log(
 
 
 def _fe_redox_pressure(
-    observation: Observation, identity: Identity, experiment: Experiment | None
+    observation: Observation,
+    identity: Identity,
+    experiment: Experiment | None,
+    bench: Bench | None = None,
 ) -> tuple[float, State[Any]] | _FeRedoxRefusal:
-    pressure_pa = identity.total_pressure_Pa
-    point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
-    if (
-        (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
-        and point_pressure is not None
-    ):
-        pressure_pa = State.of(point_pressure)
-    if (
-        (pressure_pa is None or not pressure_pa.is_value or pressure_pa.value is None)
-        and experiment is not None
-    ):
-        pressure_pa = experiment.pressure_environment.total_pressure_Pa.state
-    if (
-        pressure_pa is not None
-        and pressure_pa.is_value
-        and pressure_pa.value is not None
-    ):
-        pressure_amount = nominal_pressure_pa(pressure_pa)
-        if pressure_amount is None:
-            return _FeRedoxRefusal(
-                RefusalReason.INVALID_IDENTITY,
-                {"reason": "invalid_input", "input": "total_pressure_Pa"},
-            )
-        pressure_bar = float(pressure_amount) / PA_PER_BAR
-    elif observation.source_id == "borisov-2018-compilation":
-        # The cited compilation is explicitly a 1-atm dataset.
-        pressure_bar = 1.01325
-        pressure_pa = State.of(ATM_PA_DECIMAL)
-    else:
-        return _FeRedoxRefusal(
-            RefusalReason.IDENTITY_INCOMPLETE,
-            {"reason": "missing_input", "input": "total_pressure_Pa"},
-        )
-    if pressure_bar < 0.0 or not math.isfinite(pressure_bar):
+    """Physical pressure for a redox command, as a typed identity state.
+
+    A typed identity point wins. Otherwise one eligible prediction pressure
+    supplies the amount: the shared waypoint, including a printed vacuum
+    upper bound and excluding Knudsen chamber background. A bound that is
+    not that vacuum evidence stays an invalid input. The returned state is
+    never a ``Value`` wrapper.
+    """
+
+    def invalid() -> _FeRedoxRefusal:
         return _FeRedoxRefusal(
             RefusalReason.INVALID_IDENTITY,
             {"reason": "invalid_input", "input": "total_pressure_Pa"},
         )
-    assert pressure_pa is not None
+
+    pressure_bar: float | None = None
+    pressure_pa: State[Any] | None = None
+    identity_pressure = identity.total_pressure_Pa
+    if (
+        identity_pressure is not None
+        and identity_pressure.is_value
+        and identity_pressure.value is not None
+    ):
+        typed = identity_pressure_state(identity_pressure)
+        amount = None if typed is None else nominal_pressure_pa(typed)
+        if typed is None or amount is None:
+            return invalid()
+        pressure_bar = float(amount) / PA_PER_BAR
+        pressure_pa = typed
+    else:
+        point_pressure = _printed_condition_decimal(observation, "total_pressure_Pa")
+        if point_pressure is not None:
+            pressure_bar = float(point_pressure) / PA_PER_BAR
+            pressure_pa = State.of(point_pressure)
+        elif experiment is not None:
+            from simulator.battery.waypoints import (
+                _prediction_pressure_waypoint,
+                eligible_prediction_pressure,
+                pressure_boundary,
+            )
+
+            selected = eligible_prediction_pressure(experiment, bench, observation)
+            if selected is not None:
+                typed, _route = selected
+                amount = nominal_pressure_pa(typed)
+                if amount is None:
+                    return invalid()
+                pressure_bar = float(amount) / PA_PER_BAR
+                pressure_pa = typed
+            else:
+                boundary = _prediction_pressure_waypoint(
+                    pressure_boundary(experiment, bench, observation),
+                    experiment.method,
+                )
+                if boundary is not None:
+                    return invalid()
+        if pressure_pa is None and observation.source_id == "borisov-2018-compilation":
+            # The cited compilation is explicitly a 1-atm dataset.
+            pressure_bar = 1.01325
+            pressure_pa = State.of(ATM_PA_DECIMAL)
+        elif pressure_pa is None:
+            return _FeRedoxRefusal(
+                RefusalReason.IDENTITY_INCOMPLETE,
+                {"reason": "missing_input", "input": "total_pressure_Pa"},
+            )
+    if (
+        pressure_bar is None
+        or pressure_pa is None
+        or pressure_bar < 0.0
+        or not math.isfinite(pressure_bar)
+    ):
+        return invalid()
     return pressure_bar, pressure_pa
 
 
@@ -9645,13 +9692,33 @@ def _unprinted_redox_oxygen(
         else log10_fo2_to_pa(Decimal(str(fo2_log)))
     )
     notice = fo2_tier_notice(quantity, resolved)
-    qualified = replace(
-        notice,
-        reason=(
-            f"{notice.reason}; original_reason=source does not print fO2 for this run"
-        ),
+    reason = notice.reason
+    if "selected_fO2_Pa=" not in reason:
+        selected_bar = (
+            resolved.po2_bar
+            if resolved.po2_bar is not None
+            else 10.0 ** resolved.log10_fO2_bar
+        )
+        reason = (
+            f"{reason}; selected_fO2_Pa={selected_bar * float(PA_PER_BAR):g}"
+        )
+    reason = (
+        f"{reason}; original_reason=source does not print fO2 for this run"
     )
-    return fo2_log, commanded, qualified
+    # A non-borrowed ladder default is SOURCE_DISAGREEMENT, which the headline
+    # still treats as measured. The redox fallback is a stated default, so it
+    # joins the flagged tier. Vacuum and borrowed routes already name a band.
+    if notice.kind is NoticeKind.SOURCE_DISAGREEMENT:
+        notice = replace(
+            notice,
+            kind=NoticeKind.OUT_OF_CERTIFIED_BAND,
+            band=notice.band or f"defaulted fO2: {resolved.route}",
+            authority=notice.authority or Authority.BRIDGE,
+            reason=reason,
+        )
+    else:
+        notice = replace(notice, reason=reason)
+    return fo2_log, commanded, notice
 
 
 def _predict_redox(
@@ -9943,7 +10010,7 @@ def _predict_redox(
             ),
         )
 
-    pressure = _fe_redox_pressure(observation, identity, experiment)
+    pressure = _fe_redox_pressure(observation, identity, experiment, bench)
     if isinstance(pressure, _FeRedoxRefusal):
         return refused(pressure.reason, pressure.detail)
     pressure_bar, pressure_pa = pressure
