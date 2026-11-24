@@ -701,7 +701,9 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 ((1018.75, 0.0), (1320.3125, 1.0)),
             ),
         ],
-        # Executable capture: 12 hours, six hour-local curve reads per hour.
+        # The CI floor is an uncacheable numerical hold. Each of the 12
+        # hours records that floor once; a later read in the same hour
+        # returns the hold and does not enter the recorder again.
         'ci_carbonaceous_chondrite_C2B_12h': [
             (
                 'C2B',
@@ -710,7 +712,7 @@ def test_shipped_runner_freeze_gate_curve_outputs_are_pinned(monkeypatch):
                 1200.000001,
                 ((1200.0, 0.0), (1200.000001, 1.0)),
             ),
-        ] * 72,
+        ] * 12,
     }
     observed: dict[str, list[tuple]] = {}
     rebuild_counts: dict[str, int] = {}
