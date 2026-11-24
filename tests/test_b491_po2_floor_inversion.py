@@ -284,10 +284,10 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
         _request(pO2_bar=1e-30, intrinsic_fO2_log=-400.0)
     ).diagnostic["vapor_pressures_Pa"]
 
-    # At 1700 K, the ceiling binds Si (P_sat ≈ 0.068309497634 Pa) and Mg
-    # (P_sat ≈ 9.21479e5 Pa); Na remains below its pure-metal saturation.
-    # The uncapped Si floor value is ~7.13e9 Pa, and the Mg and Na baselines
-    # retain their mass-action ratios unless the same ceiling lowers them.
+    # At 1700 K, the ceiling binds Si (P_sat ≈ 0.068309497634 Pa), Mg
+    # (P_sat ≈ 9.21479e5 Pa), and Na (P_sat ≈ 2.82775e6 Pa). The uncapped Si
+    # floor value is ~7.13e9 Pa; the resolver-derived binding set below checks
+    # that the Mg and Na mass-action extrapolations also exceed their ceilings.
     from simulator.chemistry import ellingham_graph
 
     uncapped_floor_pressure_ratio = {
@@ -316,7 +316,7 @@ def test_si_mg_na_mass_action_ratio_at_floor_vs_1e9(monkeypatch) -> None:
         species
         for species, pressure_pa in uncapped_floor_pressure_pa.items()
         if pure_saturation_pressure_pa[species] < pressure_pa
-    } == {"Si", "Mg"}
+    } == {"Si", "Mg", "Na"}
 
     for species, expected_pressure_pa in capped_floor_pressure_pa.items():
         assert at_floor[species] == pytest.approx(expected_pressure_pa)
