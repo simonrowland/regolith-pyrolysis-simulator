@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+import copy
 import json
 import math
 from dataclasses import asdict, replace
+from functools import lru_cache
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -65,8 +67,26 @@ T_FOR_1000_PA_PER_MOL = 1000.0 / GAS_CONSTANT
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
 
 
-def _load_yaml(name: str) -> dict:
+@lru_cache(maxsize=None)
+def _yaml_template(name: str) -> dict:
     return yaml.safe_load((DATA_DIR / name).read_text())
+
+
+def _load_yaml(name: str) -> dict:
+    return copy.deepcopy(_yaml_template(name))
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _yaml_templates_remain_unchanged():
+    names = (
+        "vapor_pressures.yaml",
+        "feedstocks.yaml",
+        "setpoints.yaml",
+        "thermal_train_params.yaml",
+    )
+    before = {name: copy.deepcopy(_yaml_template(name)) for name in names}
+    yield
+    assert {name: _yaml_template(name) for name in names} == before
 
 
 def _real_capacity_sim():
