@@ -1229,6 +1229,33 @@ def _evaluate_request_vector(
     }
 
 
+def _gas_table_request_vector(table: Any) -> dict[str, Any]:
+    """Expose the gas solver's table cells as exact engine-cache inputs."""
+
+    records = table.reset_index().to_dict(orient="records")
+
+    def cache_cell(value: Any) -> Any:
+        if hasattr(value, "item"):
+            value = value.item()
+        if isinstance(value, float) and not math.isfinite(value):
+            if math.isnan(value):
+                return None
+            return {
+                "non_finite_float": (
+                    "positive_infinity" if value > 0.0 else "negative_infinity"
+                )
+            }
+        return value
+
+    return {
+        "columns": tuple(str(column) for column in table.reset_index().columns),
+        "rows": tuple(
+            tuple((str(name), cache_cell(value)) for name, value in row.items())
+            for row in records
+        ),
+    }
+
+
 @contextmanager
 def _with_solve_timeout(timeout_s: float | None):
     token = _EVALUATE_SOLVE_TIMEOUT_S.set(timeout_s)
@@ -1425,6 +1452,10 @@ def evaluate_gas(
         "parent_oxide_activities": dict(parent_oxide_activities),
         "temperature_K": temperature_K,
         "pressure_bar": pressure_bar,
+        "gas_pack": {
+            "gas_table": _gas_table_request_vector(gas_pack.gas_df),
+            "condensate_table": _gas_table_request_vector(gas_pack.oxide_df),
+        },
         "gas_pack_selection": gas_pack_selection,
         "parent_oxides": None if parent_oxides is None else tuple(parent_oxides),
         "allow_extrapolation": allow_extrapolation,
