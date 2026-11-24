@@ -56,7 +56,7 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     assert preset.step_count == 59
     sample = preset.lab_geometry["sample"]
     assert sample["exposed_melt_area_m2"] == pytest.approx(
-        1.327e-4
+        0.00013273228961416876
     )
     assert sample["exposed_melt_area_basis"] == (
         "assumed_from_printed_pellet_diameter"
@@ -98,14 +98,14 @@ def test_robinot_faithful_loaded_steps_bracket_power_trace_and_complete() -> Non
     assert first_step.per_hour_summary["t_s"] == 60.0
     notice = run._lab_area_bridge()["notices"][0]
     assert session.simulator.melt.melt_surface_area_m2 == pytest.approx(
-        1.327e-4
+        0.00013273228961416876
     )
     assert session.simulator.campaign_mgr._power_temperature_for_step[
         "time_s"
     ] == 60.0
     assert notice["code"] == "knob_assumed"
     assert notice["knob"] == "exposed_melt_area_m2"
-    assert notice["value"] == pytest.approx(1.327e-4)
+    assert notice["value"] == pytest.approx(0.00013273228961416876)
     assert notice["unit"] == "m2"
     assert notice["basis"] == "assumed_from_printed_pellet_diameter"
     assert notice["derivation"] == "pi*(D/2)^2"
@@ -583,7 +583,7 @@ def test_c0_start_installs_printed_area_before_the_bridge(
     declared_area_m2 = robinot["lab_geometry"]["sample"][
         "exposed_melt_area_m2"
     ]
-    assert declared_area_m2 == pytest.approx(1.327e-4)
+    assert declared_area_m2 == pytest.approx(0.00013273228961416876)
     forecast_areas: list[float] = []
     predict = PyrolysisSimulator._predict_c0_exit
 

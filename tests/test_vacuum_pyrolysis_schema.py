@@ -441,7 +441,9 @@ def test_robinot_preset_carries_required_external_anchors() -> None:
 
     assert sample["mass_g"] == ROBINOT_SAMPLE_MASS_G
     assert "sample_mass_g" not in sample["named_missing_fields"]
-    assert sample["exposed_melt_area_m2"] == pytest.approx(1.327e-4)
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        0.00013273228961416876
+    )
     assert sample["exposed_melt_area_basis"] == (
         "assumed_from_printed_pellet_diameter"
     )
@@ -474,7 +476,7 @@ def test_robinot_assumed_area_is_reported_by_preset_resolver(
     notice = area_notices[0]
     assert notice["code"] == "knob_assumed"
     assert notice["knob"] == "exposed_melt_area_m2"
-    assert notice["value"] == pytest.approx(1.327e-4)
+    assert notice["value"] == pytest.approx(0.00013273228961416876)
     assert notice["basis"] == "assumed_from_printed_pellet_diameter"
     assert notice["derivation"] == "pi*(D/2)^2"
     assert notice["locator"] == "robinot_2026_methods:Section 3.2"
