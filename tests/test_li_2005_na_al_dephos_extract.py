@@ -73,10 +73,25 @@ def test_li_2005_tables_render_values_and_migrated_conditions():
         if isinstance(observation.get("phase"), dict)
         and observation["phase"].get("tag") == "unknown"
     ]
-    assert len(explicitly_unknown) == 245
+    phase_bearing_unknown = [
+        observation
+        for observation in explicitly_unknown
+        if observation.get("values", {}).get("phase_label") in {"slag", "metal"}
+    ]
+    roleless_unknown = [
+        observation
+        for observation in explicitly_unknown
+        if observation.get("values", {}).get("phase_label") is None
+    ]
+    assert len(phase_bearing_unknown) == 245
     assert Counter(
-        observation["values"]["phase_label"] for observation in explicitly_unknown
+        observation["values"]["phase_label"] for observation in phase_bearing_unknown
     ) == {"slag": 195, "metal": 50}
+    assert len(roleless_unknown) == 25
+    assert all(
+        observation["values"].get("quantity") == "valence_ratio"
+        for observation in roleless_unknown
+    )
     migrated_by_id = {
         item.observation_id.rsplit("::", 1)[-1]: item
         for item in result.observations.values()

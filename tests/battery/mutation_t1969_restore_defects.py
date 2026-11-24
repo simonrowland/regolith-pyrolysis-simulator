@@ -25,6 +25,7 @@ ABDEYAZDAN_TEST = (
 LI_TEST = ROOT / "tests/test_li_2005_na_al_dephos_extract.py"
 TANIGUCHI_TEST = ROOT / "tests/test_taniguchi_1997_feo_cas_extract.py"
 PHASE_ROWS_TEST = ROOT / "tests/battery/test_phase_composition_rows.py"
+MASS_PERCENT_ORDER_TEST = ROOT / "tests/battery/test_t1969_malformed_mass_percent_order.py"
 
 TESTS_BY_MUTATION = {
     "phase-label": (ABDEYAZDAN_TEST,),
@@ -32,7 +33,7 @@ TESTS_BY_MUTATION = {
     "phase-role": (HENAO_TEST,),
     "basis-before-conversion": (PHASE_ROWS_TEST,),
     "alloy-capability": (HENAO_TEST,),
-    "malformed-metal-mass-percent": (PHASE_ROWS_TEST,),
+    "malformed-metal-mass-percent": (MASS_PERCENT_ORDER_TEST,),
     "role-provenance": (HENAO_TEST,),
     "test-local": (HENAO_TEST,),
     "locator-row": (HENAO_TEST,),
@@ -83,7 +84,7 @@ EXPECTED_FAILURES = {
     "malformed-metal-mass-percent": (
         (
             "test_malformed_metal_mass_percent_keeps_basis_refusal",
-            "malformed metal mass-percent map must keep the basis rejection",
+            "mass-percent validation must not call composition_wt_pct",
         ),
     ),
     "role-provenance": (
@@ -180,22 +181,20 @@ def restore(mutation: str) -> None:
             "        from simulator.melt_backend.base import battery_adapter_class\n",
         )
     elif mutation == "malformed-metal-mass-percent":
-        preflight = (
-            "    if (\n"
-            "        role is PhaseRole.METAL\n"
-            "        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION\n"
-            "        and composition.amount_basis is AmountBasis.MASS_PERCENT\n"
-            "    ):\n"
-            "        from simulator.accounting.exceptions import UnparseableCompositionComponent\n"
-            "\n"
-            "        try:\n"
-            "            well_formed_mass_percent_map = composition_wt_pct(composition) is not None\n"
-            "        except UnparseableCompositionComponent:\n"
-            "            well_formed_mass_percent_map = False\n"
-            "        if not well_formed_mass_percent_map:\n"
-            "            return mass_percent_basis_refusal()\n"
+        validation = (
+            "        valid_mass_percent_components = (\n"
+            "            sum((amount for _name, amount in composition.components), Decimal(0)) > 0\n"
+            "            and all(\n"
+            "                parse_species_formula(name) is not None\n"
+            "                for name, _ in composition.components\n"
+            "            )\n"
+            "        )\n"
         )
-        replace_once(SCORE, preflight, "")
+        replace_once(
+            SCORE,
+            validation,
+            "        valid_mass_percent_components = composition_wt_pct(composition) is not None\n",
+        )
     elif mutation == "role-provenance":
         replace_once(
             MIGRATE,

@@ -12428,25 +12428,6 @@ def _predict_phase_row(
             {"reason": "missing_input", "input": "composition"},
             execution=ExecutionState.NOT_PROBED,
         )
-    if (
-        role is PhaseRole.METAL
-        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
-        and composition.amount_basis is AmountBasis.MASS_PERCENT
-    ):
-        # Do not let the adapter capability result hide green's basis refusal
-        # for an empty or unparseable mass-percent map.
-        from simulator.accounting.exceptions import UnparseableCompositionComponent
-
-        try:
-            well_formed_mass_percent_map = composition_wt_pct(composition) is not None
-        except UnparseableCompositionComponent:
-            well_formed_mass_percent_map = False
-        if not well_formed_mass_percent_map:
-            return mass_percent_basis_refusal()
-    metal_charge = _unaccepted_metal_charge(engine, composition_state.value)
-    if metal_charge is not None:
-        reason, detail = metal_charge
-        return refused(reason, detail)
     if role is PhaseRole.METAL:
         from simulator.melt_backend.base import battery_adapter_class
 
@@ -12461,6 +12442,26 @@ def _predict_phase_row(
                     "detail": "adapter does not declare metal-alloy phase support",
                 },
             )
+    if (
+        role is PhaseRole.METAL
+        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        and composition.amount_basis is AmountBasis.MASS_PERCENT
+    ):
+        # Validate printed mass components without treating their weights as
+        # mole amounts. The basis refusal below remains the typed outcome.
+        valid_mass_percent_components = (
+            sum((amount for _name, amount in composition.components), Decimal(0)) > 0
+            and all(
+                parse_species_formula(name) is not None
+                for name, _ in composition.components
+            )
+        )
+        if not valid_mass_percent_components:
+            return mass_percent_basis_refusal()
+    metal_charge = _unaccepted_metal_charge(engine, composition)
+    if metal_charge is not None:
+        reason, detail = metal_charge
+        return refused(reason, detail)
     if (
         quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
         and composition_state.value.amount_basis is AmountBasis.MASS_PERCENT
