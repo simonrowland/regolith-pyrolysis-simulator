@@ -844,6 +844,45 @@ def _composition(proxy_flag: str | None) -> Composition:
     )
 
 
+def test_resolver_terminal_point_precedes_every_later_assay() -> None:
+    point = composition_roles.AssayCandidate(
+        State.unknown("unsupported component: XxO"),
+        source="point",
+        terminal=True,
+    )
+    declared = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="declared"
+    )
+    parent = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="parent"
+    )
+    identity = composition_roles.AssayCandidate(
+        State.of(_composition(None)), source="identity"
+    )
+
+    resolved = composition_roles.resolve_point_composition(
+        {"composition_role": DATUM_STATE},
+        {"composition_role": INITIAL_CHARGE_ONLY},
+        (point, declared, parent, identity),
+    )
+
+    assert resolved.composition.is_unknown
+    assert resolved.composition.reason == "unsupported component: XxO"
+
+
+def test_ignoring_terminal_candidate_breaks_its_pin(monkeypatch) -> None:
+    test_resolver_terminal_point_precedes_every_later_assay()
+
+    real = composition_roles._choose_assay
+
+    def skip_terminal(candidates):
+        return real(tuple(candidate for candidate in candidates if not candidate.terminal))
+
+    monkeypatch.setattr(composition_roles, "_choose_assay", skip_terminal)
+    with pytest.raises(AssertionError):
+        test_resolver_terminal_point_precedes_every_later_assay()
+
+
 def test_catalogue_notice_is_specific_to_the_catalogue_token() -> None:
     experiment = F.kems_experiment()
     for flag, expect_notice in (
