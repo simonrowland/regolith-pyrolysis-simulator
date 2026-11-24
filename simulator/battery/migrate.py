@@ -24342,6 +24342,23 @@ def _quoted_atmosphere_values(
                         for formula, value in mole_percent.items()
                     )
                 )
+    # Located air or pure O2 has no ratio colon. Forward that printed
+    # label; the bare-log owner applies the printed total pressure.
+    # Unrecognised labels stay out, so they are not an unsupported gas.
+    if isinstance(mixture, Mapping):
+        state = mixture.get("state")
+        mixture_locator = mixture.get("locator")
+        raw_label = state.get("value") if isinstance(state, Mapping) else None
+        if (
+            isinstance(state, Mapping)
+            and str(state.get("tag") or "value") == "value"
+            and isinstance(mixture_locator, Mapping)
+            and mixture_locator
+            and isinstance(raw_label, str)
+            and raw_label.strip()
+            and _atmosphere_kind(raw_label.strip()) is not None
+        ):
+            candidates.append(raw_label.strip())
     return tuple(dict.fromkeys(candidates))
 
 

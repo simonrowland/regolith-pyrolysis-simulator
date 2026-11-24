@@ -656,7 +656,10 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
     assert all(item.refusal_reason is None for item in predictions)
     assert all(
         any(
-            notice.origin == "fo2_ladder" and "borrowed" in notice.reason
+            notice.policy is not None
+            and notice.policy.id == "DP-010"
+            and "fo2_tier=4" in notice.reason
+            and "borrowed" in notice.reason
             for notice in item.notices
         )
         for item in predictions
@@ -671,8 +674,12 @@ def test_previously_refused_engines_now_predict(monkeypatch) -> None:
     assert internal.value is not None
     assert internal.refusal_reason is None
     assert any(
-        notice.origin == "fo2_ladder"
-        and notice.reason.startswith("fo2_tier=4;")
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.reason.startswith("DP-010 physics_rung=4:")
+        and "commanded_default_log10_bar=" in notice.reason
+        and "original_missing_evidence=" in notice.reason
+        and "fo2_tier=4" in notice.reason
         and "borrowed" in notice.reason
         for notice in internal.notices
     )
@@ -710,8 +717,12 @@ def test_tier_notice_reaches_the_residual() -> None:
         prediction=prediction,
     )
     assert any(
-        notice.origin == "fo2_ladder"
-        and notice.reason.startswith("fo2_tier=4;")
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.reason.startswith("DP-010 physics_rung=4:")
+        and "commanded_default_log10_bar=" in notice.reason
+        and "original_missing_evidence=" in notice.reason
+        and "fo2_tier=4" in notice.reason
         and "borrowed" in notice.reason
         for notice in residual.notices
     )
@@ -1147,7 +1158,10 @@ def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
         _cell,
     )
     observation, _knudsen = _kems_partial(cell_material=None)
-    carrier = F.tabulation_experiment(total_P=Decimal("100000"))
+    carrier = F.tabulation_experiment(
+        experiment_id=observation.experiment_id,
+        total_P=Decimal("100000"),
+    )
     experiment = replace(
         carrier,
         pressure_environment=replace(
@@ -1183,7 +1197,13 @@ def test_carrier_gas_row_borrows_one_intrinsic_fo2(monkeypatch) -> None:
     assert next(iter(seen.values())) == 10.0 ** log
     assert all(
         any(
-            notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+            notice.policy is not None
+            and notice.policy.id == "DP-010"
+            and notice.reason.startswith("DP-010 physics_rung=4:")
+            and "commanded_default_log10_bar=" in notice.reason
+            and "original_missing_evidence=" in notice.reason
+            and "fo2_tier=4" in notice.reason
+            and "borrowed" in notice.reason
             for notice in prediction.notices
         )
         for prediction in predictions[:-1]

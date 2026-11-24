@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.battery.engine_capability import engine_covers_quantity
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -1626,11 +1627,22 @@ def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
         rail=Rail.REDOX,
     )
 
-    assert len(residuals) == 2 * len(SCORE_ENGINE_SET)
+    covered = _engines_covering(Quantity.VALENCE_RATIO)
+    omitted = tuple(
+        engine for engine in SCORE_ENGINE_SET if engine not in covered
+    )
+    assert Engine.NASA_CEA_9 in omitted
+    assert Engine.CATALOG_EVALUATOR in omitted
+    assert len(residuals) == 2 * len(covered)
     assert len({residual.reference for residual in residuals}) == 2
     assert all(
         sum(residual.key.endswith(engine.value) for residual in residuals) == 2
-        for engine in SCORE_ENGINE_SET
+        for engine in covered
+    )
+    assert not any(
+        residual.key.endswith(engine.value)
+        for residual in residuals
+        for engine in omitted
     )
     for residual in residuals:
         assert residual.rail is Rail.REDOX
@@ -1663,7 +1675,18 @@ def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
         rail=Rail.REDOX,
     )
 
-    assert len(residuals) == len(rows) * len(SCORE_ENGINE_SET)
+    covered = _engines_covering(Quantity.VALENCE_RATIO)
+    omitted = tuple(
+        engine for engine in SCORE_ENGINE_SET if engine not in covered
+    )
+    assert Engine.NASA_CEA_9 in omitted
+    assert Engine.CATALOG_EVALUATOR in omitted
+    assert len(residuals) == len(rows) * len(covered)
+    assert not any(
+        residual.key.endswith(engine.value)
+        for residual in residuals
+        for engine in omitted
+    )
     for residual in residuals:
         assert residual.numeric is None
         assert residual.refusal is not None
@@ -1686,6 +1709,14 @@ def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
     ]
     assert sum(row["n_candidates"] for row in redox_headline) == len(residuals)
     assert sum(row["n_refused"] for row in redox_headline) == len(residuals)
+
+
+def _engines_covering(quantity):
+    return tuple(
+        engine
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, quantity)
+    )
 
 
 def _valence_template(result):

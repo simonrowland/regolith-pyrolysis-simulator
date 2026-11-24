@@ -211,7 +211,14 @@ def test_vapour_row_without_printed_fo2_commands_borrowed_ladder_fo2(
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
     assert prediction.refusal_detail.get("reason") != "engine_default"
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.reason.startswith("DP-010 physics_rung=4:")
+        and "commanded_default_log10_bar=" in notice.reason
+        and "original_missing_evidence=" in notice.reason
+        and "fo2_tier=4" in notice.reason
+        and "borrowed" in notice.reason
         for notice in prediction.notices
     )
 
@@ -228,7 +235,14 @@ def test_multivalent_melt_without_printed_fo2_commands_borrowed_ladder_fo2(
     assert seen["mode"] != PO2_ENGINE_DEFAULT
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.reason.startswith("DP-010 physics_rung=4:")
+        and "commanded_default_log10_bar=" in notice.reason
+        and "original_missing_evidence=" in notice.reason
+        and "fo2_tier=4" in notice.reason
+        and "borrowed" in notice.reason
         for notice in prediction.notices
     )
 
@@ -274,7 +288,14 @@ def test_zero_iron_does_not_hide_another_multivalent_oxide(monkeypatch) -> None:
     assert seen["mode"] == PO2_COMMANDED
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.reason.startswith("DP-010 physics_rung=4:")
+        and "commanded_default_log10_bar=" in notice.reason
+        and "original_missing_evidence=" in notice.reason
+        and "fo2_tier=4" in notice.reason
+        and "borrowed" in notice.reason
         for notice in prediction.notices
     )
 
@@ -292,7 +313,14 @@ def test_measured_gallium_requires_oxygen_when_the_bulk_is_cmas(monkeypatch) -> 
     assert seen["mode"] == PO2_COMMANDED
     assert prediction.refusal_detail.get("reason") != "missing_fO2"
     assert any(
-        notice.reason.startswith("fo2_tier=4;") and "borrowed" in notice.reason
+        notice.policy is not None
+        and notice.policy.id == "DP-010"
+        and notice.kind is NoticeKind.ASSUMED_FO2
+        and notice.reason.startswith("DP-010 physics_rung=4:")
+        and "commanded_default_log10_bar=" in notice.reason
+        and "original_missing_evidence=" in notice.reason
+        and "fo2_tier=4" in notice.reason
+        and "borrowed" in notice.reason
         for notice in prediction.notices
     )
 
@@ -314,6 +342,10 @@ def test_melt_without_a_multivalent_element_omits_oxygen(monkeypatch) -> None:
     reasons = [notice.reason for notice in prediction.notices if notice.kind is NoticeKind.INPUT_OMITTED]
     assert any("no multivalent element" in reason and "omitted" in reason for reason in reasons)
     assert not any(notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in prediction.notices)
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-101"
+        for notice in prediction.notices
+    )
 
 
 def test_printed_oxygen_is_commanded(monkeypatch) -> None:
@@ -901,6 +933,10 @@ def test_printed_total_pressure_is_passed_without_an_assumption(monkeypatch) -> 
     assert seen["pressure_bar"] == pytest.approx(2500 / 1.0e5)
     assert not any(
         notice.kind is NoticeKind.ASSUMED_PRESSURE for notice in prediction.notices
+    )
+    assert not any(
+        notice.policy is not None and notice.policy.id == "DP-101"
+        for notice in prediction.notices
     )
 
 

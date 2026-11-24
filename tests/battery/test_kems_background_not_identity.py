@@ -627,7 +627,14 @@ def test_non_knudsen_vacuum_bound_and_knudsen_row_oxygen_controls() -> None:
     selected_k = oxygen_condition(knudsen, bench_k, obs_k).selected
     assert selected_k is not None
     assert selected_k.route == "observation_fO2_log"
-    melt_k = melt_activity_requests(collect_consumer_inputs(knudsen, bench_k, obs_k))
+    # The printed log is tier 1 only once the row identity's absolute frame
+    # is visible. Consumer inputs carry the waypoint, not that frame.
+    melt_k = melt_activity_requests(
+        collect_consumer_inputs(knudsen, bench_k, obs_k),
+        experiment=knudsen,
+        bench=bench_k,
+        observation=obs_k,
+    )
     applicable_k = [
         item for item in melt_k
         if item.readiness.status is not ReadinessStatus.NOT_APPLICABLE

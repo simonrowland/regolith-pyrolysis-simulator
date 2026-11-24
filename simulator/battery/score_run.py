@@ -421,6 +421,7 @@ def _score_store_with_decisions(
         _prepare_score_run,
         _source_alignment_group_key,
         _sossi_residue_prediction,
+        _subtype_text,
         _validated_score_engines,
         is_compilation_source,
         is_internal_consistency,
@@ -468,7 +469,7 @@ def _score_store_with_decisions(
         _iter_compilation_series_cells,
         is_compilation_evidence,
     )
-    from simulator.battery.engine_capability import engine_covers_quantity
+    from simulator.battery.engine_capability import observation_route_covered
     from simulator.battery.validate import _bound_work_inputs
 
     provided_handles = dict(handles or {})
@@ -587,10 +588,17 @@ def _score_store_with_decisions(
                             if quantity is None
                             else _scoring_quantity(point, quantity)
                         )
+                        phase_basis = (
+                            _subtype_text(point.identity)
+                            if isinstance(point.identity, Identity)
+                            else None
+                        )
                         if (
                             predict is None
                             and offered_quantity is not None
-                            and not engine_covers_quantity(engine, offered_quantity)
+                            and not observation_route_covered(
+                                engine, offered_quantity, phase_basis
+                            )
                             and not _residue_adapter_binds(
                                 point, engine, experiment, quantity
                             )
@@ -1186,6 +1194,7 @@ def _materialize_failed_score_shard(
         _ResidualJsonlStream,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        parse_residual_order_entry,
     )
     if result.failure is None:
         return result
@@ -1225,27 +1234,24 @@ def _materialize_failed_score_shard(
                         if (
                             not isinstance(payload, Mapping)
                             or is_store_stamp_payload(payload)
-                            or not isinstance(order_value, list)
-                            or len(order_value) != 4
-                            or not isinstance(order_value[0], str)
-                            or any(
-                                type(value) is not int for value in order_value[1:]
-                            )
                         ):
                             continue
-                        stable_order = (
-                            order_value[0],
-                            order_value[1],
-                            order_value[2],
-                            order_value[3],
-                        )
-                        if stable_order in completed_orders:
+                        entry = parse_residual_order_entry(order_value)
+                        if entry is None or entry.sort_order in completed_orders:
                             continue
-                        recovered_stream.append_payload_line(
-                            line,
-                            sort_order=stable_order,
-                        )
-                        completed_orders.add(stable_order)
+                        if entry.exact:
+                            recovered_stream.append_payload_line(
+                                line,
+                                sort_order=entry.sort_order,
+                                numeric_value=entry.numeric_value,
+                                band_value=entry.band_value,
+                            )
+                        else:
+                            recovered_stream.append_payload_line(
+                                line,
+                                sort_order=entry.sort_order,
+                            )
+                        completed_orders.add(entry.sort_order)
         _score_store_with_decisions(
             prepared.context,
             _prepared=prepared,
@@ -1295,6 +1301,8 @@ def _score_store_to_jsonl(
         _prepare_score_run,
         _score_store_with_decisions,
         is_store_stamp_payload,
+        order_sidecar_index_text,
+        parse_residual_order_entry,
         supervised_process_map,
     )
 
@@ -1485,26 +1493,19 @@ def _score_store_to_jsonl(
                                 ):
                                     continue
                                 order_value = json.loads(order_file.readline())
-                                if (
-                                    not isinstance(order_value, list)
-                                    or len(order_value) != 4
-                                    or not isinstance(order_value[0], str)
-                                    or any(
-                                        type(value) is not int
-                                        for value in order_value[1:]
-                                    )
-                                ):
+                                entry = parse_residual_order_entry(order_value)
+                                if entry is None:
                                     raise ValueError(
                                         "score shard has an invalid serial-order entry"
                                     )
+                                numeric_value, band_value = order_sidecar_index_text(
+                                    order_value, entry, payload
+                                )
                                 stream.append_payload_line(
                                     line,
-                                    sort_order=(
-                                        order_value[0],
-                                        order_value[1],
-                                        order_value[2],
-                                        order_value[3],
-                                    ),
+                                    sort_order=entry.sort_order,
+                                    numeric_value=numeric_value,
+                                    band_value=band_value,
                                 )
                             if order_file.read(1):
                                 raise ValueError(
