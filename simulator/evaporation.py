@@ -1700,6 +1700,27 @@ class EvaporationMixin:
             campaign_name=campaign,
         )
 
+    def _furnace_ledger_fe3_over_sum_fe(self) -> float | None:
+        """Ledger Fe3+/ΣFe for the furnace Langmuir closure.
+
+        d-463: this q is the atom ledger on ``process.cleaned_melt``.
+        It is not the gram-lab engine speciation and not the Kress91
+        fallback. A missing ledger keeps the fixed-activity FeO demand.
+        An invalid amount raises from ``iron_oxide_values`` rather than
+        being read as q = 0.
+        """
+
+        ledger = getattr(self, "atom_ledger", None)
+        project = getattr(ledger, "project_account_mol", None)
+        if not callable(project):
+            return None
+        melt = project("process.cleaned_melt")
+        if not isinstance(melt, Mapping):
+            return None
+        from simulator.feedstock_composition import ledger_fe3_over_sum_fe
+
+        return ledger_fe3_over_sum_fe(melt)
+
     def _closed_langmuir_pressures_for_partials(
         self,
         publication_Pa: Mapping[str, float],
@@ -1753,6 +1774,9 @@ class EvaporationMixin:
             ),
             allow_unmeasured_alpha_fallback=allow_fallback,
             unmeasured_alpha_fallback_species_allowlist=fallback_species,
+            fe3_over_sum_fe=EvaporationMixin._furnace_ledger_fe3_over_sum_fe(
+                self
+            ),
         )
 
     def _reclose_langmuir_pressures(

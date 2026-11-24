@@ -5,6 +5,10 @@
 # instead of the constant-C_m tangent. The gas ceiling is the effervescence
 # bound and bounds oxidizing terms only. Rows that walked to the uncapped
 # -19.74 landing, and Robinot hours pinned at log10(P_total), are not reusable.
+# 2026-11-23 b-1293: furnace Langmuir elemental Fe demand is the ledger mean
+# oxygen, o_bar = 1 + q/2, when the congruent gate is open. Open-gate hours
+# with ledger q > 0 book more O2 per Fe and a higher surface pO2, so those
+# optimizer rows are not reusable.
 # 2026-11-23 b-1288: the power-driven and furnace-power temperature is the quasi-steady
 # root of the coupled balance (radiation + conduction + argon + the evaporative
 # enthalpy sink at the same T; two-node pellet). Booked T and evaporation move on
@@ -14,8 +18,9 @@
 # code/data/provider fingerprints. This changes identity shape, not physics.
 # Prior corpus rows are intentionally non-interoperable so old and new key
 # shapes cannot collide after fingerprints become provenance-only.
-corpus_version: "analytical-corpus-2026-11-23-coupled-evaporative-balance-v2"
+corpus_version: "analytical-corpus-2026-11-23-furnace-langmuir-fe-obar-v1"
 interoperable_versions:
+  - "analytical-corpus-2026-11-23-furnace-langmuir-fe-obar-v1"
   - "analytical-corpus-2026-11-23-coupled-evaporative-balance-v2"
   - "analytical-corpus-2026-11-23-ferric-ledger-fo2-v1"
   - "analytical-corpus-2026-11-19-c2a-staged-pressure-v1"
