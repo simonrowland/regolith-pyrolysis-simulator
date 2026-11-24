@@ -532,7 +532,7 @@ def _format_store_delta_report(
     def source_group(source_id: str) -> dict[str, object]:
         return grouped.setdefault(source_id, {
             "observation_paths": set(), "work_paths": set(), "score_rows": set(),
-            "fields": set(), "value_fields": set(),
+            "fields": set(), "value_fields": set(), "out_of_scope": False,
         })
 
     for path, record in observations.items():
@@ -547,6 +547,11 @@ def _format_store_delta_report(
                 group["fields"].add(field)
                 if field.endswith((".value", ".point")):
                     group["value_fields"].add(field)
+                if not _field_is_fold22_scope(
+                    str(change["field"]), change, str(row["source_id"]),
+                    str(row["id"]), row.get("changes", []),
+                ):
+                    group["out_of_scope"] = True
         if not record.get("rows"):
             for source_id in record.get("source_ids", [Path(path).stem]):
                 source_group(str(source_id))["observation_paths"].add(path)
@@ -559,6 +564,8 @@ def _format_store_delta_report(
             for field in record.get("fields", []):
                 if isinstance(field, str):
                     group["fields"].add(field)
+            if record.get("changes"):
+                group["out_of_scope"] = True
     for record in other:
         assert isinstance(record, dict)
         source_group("__store_global__").setdefault("other_paths", set()).add(str(record["path"]))
@@ -568,35 +575,20 @@ def _format_store_delta_report(
             "STORE DELTA SUMMARY: score rows are changed observation IDs; value-field count is distinct changed leaves ending .value or .point."
         ]
         for source_id in sorted(grouped):
+            if source_filter and not _source_in_report_filter(source_id, source_filter):
+                continue
             group = grouped[source_id]
             output.append(" | ".join((
                 source_id,
                 "observation_paths=" + ",".join(sorted(group["observation_paths"])),
                 "work_metadata_paths=" + ",".join(sorted(group["work_paths"])),
                 "other_paths=" + ",".join(sorted(group.get("other_paths", set()))),
-                "score_rows=" + json.dumps(_compact_observation_ids(sorted(group["score_rows"])), separators=(",", ":")),
+                "changed_score_rows=" + str(len(group["score_rows"])),
                 "changed_value_fields=" + str(len(group["value_fields"])),
+                "out_of_scope=" + str(bool(group["out_of_scope"])).lower(),
             )))
         unique_paths = set(observations) | {str(item["path"]) for item in work + other}
         output.append(f"TOTAL changed_store_paths={len(unique_paths)}")
-        out_of_scope_sources = set()
-        for record in observations.values():
-            assert isinstance(record, dict)
-            for row in record.get("rows", []):
-                for change in row.get("changes", []):
-                    if not _field_is_fold22_scope(
-                        str(change["field"]), change, str(row["source_id"]),
-                        str(row["id"]), row.get("changes", []),
-                    ):
-                        out_of_scope_sources.add(str(row["source_id"]))
-        for record in work:
-            assert isinstance(record, dict)
-            for change in record.get("changes", []):
-                if not _field_is_fold22_scope(
-                    str(change["field"]), change, str((record.get("source_ids") or [""])[0])
-                ):
-                    out_of_scope_sources.update(map(str, record.get("source_ids", [])))
-        output.append("OUT_OF_SCOPE_SOURCE_IDS=" + ",".join(sorted(out_of_scope_sources)))
         return "\n".join(output)
 
     decoded: list[str] = []
@@ -605,7 +597,9 @@ def _format_store_delta_report(
         for row in record.get("rows", []):
             assert isinstance(row, dict)
             source_id = str(row["source_id"])
-            if mode in {"source", "scope"} and source_filter and source_id not in source_filter:
+            if mode == "source" and source_filter and source_id not in source_filter:
+                continue
+            if mode == "scope" and source_filter and not _source_in_report_filter(source_id, source_filter):
                 continue
             source_row = _source_extract_row(source_id, str(row["id"]))
             for change in row.get("changes", []):
@@ -632,7 +626,11 @@ def _format_store_delta_report(
     for record in work:
         assert isinstance(record, dict)
         source_ids = list(map(str, record.get("source_ids", [])))
-        if mode in {"source", "scope"} and source_filter and not (source_filter & set(source_ids)):
+        if mode == "source" and source_filter and not (source_filter & set(source_ids)):
+            continue
+        if mode == "scope" and source_filter and not any(
+            _source_in_report_filter(source_id, source_filter) for source_id in source_ids
+        ):
             continue
         source_id = next(iter(sorted(source_filter & set(source_ids))), source_ids[0] if source_ids else "__work_without_source_id__")
         source_bytes = REPO_ROOT / str(record["path"])
@@ -695,6 +693,21 @@ def _field_is_fold22_scope(
         if any(token in text for token in scoped_notice_tokens):
             if normalized.startswith(("notices", "identity.fO2_Pa", "value.point")):
                 return True
+    return False
+
+
+def _source_in_report_filter(source_id: str, source_filter: set[str]) -> bool:
+    for group in source_filter:
+        if group == "A-M":
+            first = source_id[:1].upper()
+            if first and ("A" <= first <= "M" or not first.isalpha()):
+                return True
+        elif group == "N-Z":
+            first = source_id[:1].upper()
+            if first and "N" <= first <= "Z":
+                return True
+        elif source_id == group:
+            return True
     return False
 
 
