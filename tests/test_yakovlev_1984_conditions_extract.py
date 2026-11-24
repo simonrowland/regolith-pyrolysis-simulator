@@ -1,11 +1,13 @@
 """Condition, table-cell, and figure-label pins for Yakovlev et al. (1984)."""
 
 from copy import deepcopy
+from decimal import Decimal
 from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ValueKind
+from simulator.battery.enums import Engine, Phase, Quantity, RefusalReason, ValueKind
+from simulator.battery.score import predict_with_engine
 from tests.battery.factories import migrate_one_extract
 from tools.validate_literature_extracts import check_all_fidelity_samples_match
 
@@ -158,6 +160,28 @@ def test_conditions_reach_every_numeric_vapor_row_without_filling_unknown_axes()
         assert row.identity.composition.is_unknown
         assert row.identity.total_pressure_Pa.is_unknown
         assert row.identity.fO2_Pa.is_unknown
+
+    natural_sio = next(
+        row
+        for row in numeric_vapor_rows
+        if row.identity.species.formula == "SiO"
+        and row.identity.temperature_K.value == Decimal("1838.15")
+    )
+    charge = natural_sio.point_conditions["composition"]
+    assert charge.state.is_unknown
+    assert charge.state.reason == "numerical_bulk_composition_not_published"
+    assert charge.locator.figure == "1"
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        natural_sio,
+        experiment=migrator.result.experiments[natural_sio.experiment_id],
+        isolated=False,
+    )
+    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
+    assert (
+        prediction.refusal_detail["reason"]
+        == "composition_not_stated_pure_reservoir"
+    )
 
     for observation_id in numeric_alkali:
         # Gate green c4a5fb34e keeps phase gas (6cef33a04, b-1080). The melt
