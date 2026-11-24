@@ -22,31 +22,15 @@ from simulator.reduced_real_determinism import (  # noqa: E402
     PT1_METADATA_TABLE,
     PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
-    PT1PersistentEquilibriumStore,
-    _decode_payload_for_admission,
+    _PT1CacheMergeCollision,
     canonical_json_bytes,
-    monotonic_repair_notices_json,
+    _copy_pt1_equilibrium_rows,
     validate_reduced_real_equilibrium_record_key,
     validate_repair_notices_json,
 )
 
 
 PAYLOAD_TABLE = PT1_EQUILIBRIUM_TABLE
-_ROW_IDENTITY_FIELDS = (
-    "artifact",
-    "store_schema_version",
-    "request_schema_version",
-    "key_sha256",
-    "payload_sha256",
-    "key_bytes",
-    "payload_bytes",
-    "code_version",
-    "corpus_version",
-    "engine_version",
-    "data_digests_json",
-    "created_at",
-    "git_dirty",
-)
 _REQUIRED_TEXT_FIELDS = (
     "key_hash",
     "artifact",
@@ -68,8 +52,7 @@ class CacheSourceRowInvalid(ValueError):
     """Source row bytes, hashes, or provenance do not match its canonical key."""
 
 
-class CacheMergeCollision(RuntimeError):
-    """A cache key resolves to conflicting payload or provenance fields."""
+CacheMergeCollision = _PT1CacheMergeCollision
 
 
 def _format_schema_mismatch(source: Path, field: str, found: Any) -> str:
@@ -168,55 +151,14 @@ def _source_payload_rows(source: Path) -> list[dict[str, Any]]:
         ).fetchone()
         if exists is None:
             return []
-        columns = {
-            str(row["name"]) for row in con.execute(f"PRAGMA table_info({PAYLOAD_TABLE})")
-        }
-        corpus_column = (
-            "corpus_version"
-            if "corpus_version" in columns
-            else "NULL AS corpus_version"
-        )
-        repair_notices_column = (
-            "repair_notices_json"
-            if "repair_notices_json" in columns
-            else "NULL AS repair_notices_json"
-        )
-        payload_codec_version_column = (
-            "payload_codec_version"
-            if "payload_codec_version" in columns
-            else "NULL AS payload_codec_version"
-        )
-        return [
-            dict(row)
-            for row in con.execute(
-                f"""
-                SELECT
-                    key_hash,
-                    artifact,
-                    store_schema_version,
-                    request_schema_version,
-                    key_sha256,
-                    payload_sha256,
-                    key_bytes,
-                    payload_bytes,
-                    code_version,
-                    {corpus_column},
-                    engine_version,
-                    data_digests_json,
-                    {repair_notices_column},
-                    {payload_codec_version_column},
-                    created_at,
-                    git_dirty
-                FROM {PAYLOAD_TABLE}
-                """
-            )
-        ]
+        rows = [dict(row) for row in con.execute(f"SELECT * FROM {PAYLOAD_TABLE}")]
+        for row in rows:
+            row.setdefault("corpus_version", None)
+            row.setdefault("repair_notices_json", None)
+            row.setdefault("payload_codec_version", None)
+        return rows
     finally:
         con.close()
-
-
-def _row_identity(row: Mapping[str, Any]) -> tuple[Any, ...]:
-    return tuple(row[field] for field in _ROW_IDENTITY_FIELDS)
 
 
 def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
@@ -321,134 +263,31 @@ def validate_cache_source_rows(source: Path) -> list[dict[str, Any]]:
     return rows
 
 
-def validate_merge_plan(
-    target: Path,
-    sources: Iterable[tuple[Path, list[dict[str, Any]]]],
-) -> None:
-    identities: dict[str, tuple[Any, ...]] = {}
-    planned = list(sources)
-    if target.exists():
-        planned.insert(0, (target, validate_cache_source_rows(target)))
-    for source, rows in planned:
-        for row in rows:
-            key_hash = str(row["key_hash"])
-            identity = _row_identity(row)
-            existing = identities.setdefault(key_hash, identity)
-            if existing != identity:
-                raise CacheMergeCollision(
-                    f"PT-1 cache collision while preflighting {source}:{key_hash}"
-                )
-
-
 def merge_cache_source(
     source: Path,
     target: Path,
     *,
     validated_rows: list[dict[str, Any]] | None = None,
 ) -> dict[str, Any]:
-    rows = validated_rows if validated_rows is not None else validate_cache_source_rows(source)
-    target_store = PT1PersistentEquilibriumStore(target)
-    inserted_rows = 0
-    with target_store._connect() as conn:
-        target_store._initialize(conn)
-        for row in rows:
-            artifact = str(row["artifact"])
-            key_hash = str(row["key_hash"])
-            key_bytes = bytes(row["key_bytes"])
-            payload_bytes = bytes(row["payload_bytes"])
-            payload_hash = str(row["payload_sha256"])
-            existing = conn.execute(
-                f"""
-                SELECT artifact, store_schema_version, request_schema_version,
-                       key_sha256, payload_sha256, key_bytes, payload_bytes,
-                       payload_codec_version, code_version, corpus_version, engine_version,
-                       data_digests_json, repair_notices_json,
-                       created_at, git_dirty
-                FROM {PAYLOAD_TABLE}
-                WHERE key_hash = ?
-                """,
-                (key_hash,),
-            ).fetchone()
-            if existing is not None:
-                if _row_identity(existing) != _row_identity(row):
-                    raise CacheMergeCollision(
-                        f"PT-1 cache collision while merging {key_hash}"
-                    )
-                existing_admitted = _decode_payload_for_admission(
-                    artifact,
-                    row["validated_payload"],
-                    payload_codec_version=existing["payload_codec_version"],
-                    keys=(row["validated_key"],),
-                )
-                incoming_admitted = _decode_payload_for_admission(
-                    artifact,
-                    row["validated_payload"],
-                    payload_codec_version=row["payload_codec_version"],
-                    keys=(row["validated_key"],),
-                )
-                if existing_admitted is None and incoming_admitted is not None:
-                    conn.execute(
-                        f"UPDATE {PAYLOAD_TABLE} "
-                        "SET payload_codec_version = ? WHERE key_hash = ?",
-                        (row["payload_codec_version"], key_hash),
-                    )
-                merged_notices = monotonic_repair_notices_json(
-                    existing["repair_notices_json"],
-                    row["repair_notices_json"],
-                )
-                if merged_notices != existing["repair_notices_json"]:
-                    conn.execute(
-                        f"UPDATE {PAYLOAD_TABLE} "
-                        "SET repair_notices_json = ? WHERE key_hash = ?",
-                        (merged_notices, key_hash),
-                    )
-                continue
-            conn.execute(
-                f"""
-                INSERT INTO {PAYLOAD_TABLE} (
-                    key_hash,
-                    artifact,
-                    store_schema_version,
-                    request_schema_version,
-                    key_sha256,
-                    payload_sha256,
-                    key_bytes,
-                    payload_bytes,
-                    payload_codec_version,
-                    code_version,
-                    corpus_version,
-                    engine_version,
-                    data_digests_json,
-                    repair_notices_json,
-                    created_at,
-                    git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    key_hash,
-                    artifact,
-                    str(row["store_schema_version"]),
-                    str(row["request_schema_version"]),
-                    str(row["key_sha256"]),
-                    payload_hash,
-                    sqlite3.Binary(key_bytes),
-                    sqlite3.Binary(payload_bytes),
-                    row["payload_codec_version"],
-                    str(row["code_version"]),
-                    row.get("corpus_version"),
-                    row["engine_version"],
-                    str(row["data_digests_json"]),
-                    row["repair_notices_json"],
-                    str(row["created_at"]),
-                    int(row["git_dirty"]),
-                ),
-            )
-            inserted_rows += 1
+    rows = (
+        validated_rows
+        if validated_rows is not None
+        else validate_cache_source_rows(source)
+    )
+    if source.resolve() == target.resolve():
+        return {
+            "merged": True,
+            "source": str(source),
+            "rows": len(rows),
+            "inserted_rows": 0,
+        }
+    result = _copy_pt1_equilibrium_rows([source], target)
+    source_result = result["sources"][0]
     return {
         "merged": True,
         "source": str(source),
         "rows": len(rows),
-        "inserted_rows": inserted_rows,
+        "inserted_rows": int(source_result["inserted_rows"]),
     }
 
 
@@ -489,13 +328,19 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
     for source in discovered:
         if source.resolve() != target_resolved:
             validated_sources.append((source, validate_cache_source_rows(source)))
-    validate_merge_plan(target, validated_sources)
-
-    PT1PersistentEquilibriumStore(target)
+    validated_by_source = {
+        source.resolve(): rows for source, rows in validated_sources
+    }
     before = payload_count(target)
     source_summaries: list[dict[str, Any]] = []
-    total_inserted = 0
-    validated_by_source = {source.resolve(): rows for source, rows in validated_sources}
+    merged = _copy_pt1_equilibrium_rows(
+        [source for source, _rows in validated_sources],
+        target,
+    )
+    merge_by_source = {
+        Path(summary["source"]).resolve(): summary
+        for summary in merged["sources"]
+    }
     for source in discovered:
         if source.resolve() == target_resolved:
             source_summaries.append(
@@ -509,14 +354,12 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
             continue
         rows = validated_by_source[source.resolve()]
         source_rows = len(rows)
-        result = merge_cache_source(source, target, validated_rows=rows)
-        inserted = int(result.get("inserted_rows", 0))
-        total_inserted += inserted
+        result = merge_by_source[source.resolve()]
         source_summaries.append(
             {
                 "source": str(source),
                 "source_rows": source_rows,
-                "inserted_rows": inserted,
+                "inserted_rows": int(result["inserted_rows"]),
             }
         )
 
@@ -525,7 +368,7 @@ def seed_cache(target: Path, sources: Iterable[Path]) -> dict[str, Any]:
         "target": str(target),
         "rows_before": before,
         "rows_after": after,
-        "inserted_rows": total_inserted,
+        "inserted_rows": int(merged["inserted_rows"]),
         "sources": source_summaries,
     }
 

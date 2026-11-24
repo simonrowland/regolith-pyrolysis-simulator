@@ -42,19 +42,15 @@ from simulator.evaporation import EvaporationFluxRefusal
 from simulator.melt_backend.magemin import MAGEMinBackend
 from simulator.reduced_real_determinism import (
     ControlQuantization,
-    PHYSICS_BUCKET_SCHEMA_VERSION,
     PT0DeterminismStore,
     PT0NonFinitePayload,
     PT1_EQUILIBRIUM_TABLE,
-    PT1_STORE_SCHEMA_VERSION,
     PT1_SUPPORTED_STORE_SCHEMA_VERSIONS,
     PT1PersistentEquilibriumStore,
-    _decode_payload_for_admission,
     _physics_ladder_values_from_replay_key,
-    _replay_scope_hash,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
-    monotonic_repair_notices_json,
+    _copy_pt1_equilibrium_rows,
     validate_reduced_real_equilibrium_record_key,
     validate_repair_notices_json,
 )
@@ -668,69 +664,15 @@ def _cache_payload_rows(db_path: Path) -> list[dict[str, Any]]:
         ).fetchone()
         if table is None:
             return []
-        columns = {
-            str(row["name"])
-            for row in conn.execute(f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})")
-        }
-        corpus_column = (
-            "corpus_version"
-            if "corpus_version" in columns
-            else "NULL AS corpus_version"
-        )
-        repair_notices_column = (
-            "repair_notices_json"
-            if "repair_notices_json" in columns
-            else "NULL AS repair_notices_json"
-        )
-        payload_codec_version_column = (
-            "payload_codec_version"
-            if "payload_codec_version" in columns
-            else "NULL AS payload_codec_version"
-        )
-        identity_columns = (
-            "physics_bucket_schema_version",
-            "physics_bucket_sha256",
-            "replay_scope_sha256",
-            "physics_key_bytes",
-            "physics_bucket_h40_sha256",
-            "physics_bucket_h40_distance",
-            "physics_bucket_h30_sha256",
-            "physics_bucket_h30_distance",
-            "physics_bucket_h40c_sha256",
-            "physics_bucket_h40c_distance",
-            "physics_bucket_h30c_sha256",
-            "physics_bucket_h30c_distance",
-        )
-        identity_selects = ",\n                    ".join(
-            name if name in columns else f"NULL AS {name}"
-            for name in identity_columns
-        )
-        return [
+        rows = [
             dict(row)
-            for row in conn.execute(
-                f"""
-                SELECT
-                    key_hash,
-                    artifact,
-                    store_schema_version,
-                    request_schema_version,
-                    key_sha256,
-                    payload_sha256,
-                    key_bytes,
-                    payload_bytes,
-                    code_version,
-                    {corpus_column},
-                    engine_version,
-                    data_digests_json,
-                    {repair_notices_column},
-                    {payload_codec_version_column},
-                    {identity_selects},
-                    created_at,
-                    git_dirty
-                FROM {PT1_EQUILIBRIUM_TABLE}
-                """
-            )
+            for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}")
         ]
+        for row in rows:
+            row.setdefault("corpus_version", None)
+            row.setdefault("repair_notices_json", None)
+            row.setdefault("payload_codec_version", None)
+        return rows
 
 
 def _validated_cache_payload_row(row: Mapping[str, Any]) -> dict[str, Any]:
@@ -868,143 +810,14 @@ def _magemin_key_hashes(db_path: Path) -> set[str]:
 
 def _merge_cache_shard(shard_path: Path, target_path: Path) -> dict[str, Any]:
     rows = _cache_payload_rows(shard_path)
-    validated_rows = [_validated_cache_payload_row(row) for row in rows]
-    target_store = PT1PersistentEquilibriumStore(target_path)
-    inserted_rows = 0
-    with target_store._connect() as conn:
-        target_store._initialize(conn)
-        for row, validated in zip(rows, validated_rows, strict=True):
-            artifact = validated["artifact"]
-            key = validated["key"]
-            key_hash = validated["key_hash"]
-            key_bytes = validated["key_bytes"]
-            payload = validated["payload"]
-            payload_bytes = validated["payload_bytes"]
-            payload_hash = validated["payload_hash"]
-            physics_bucket_key = validated["physics_bucket_key"]
-            physics_bucket_bytes = validated["physics_bucket_bytes"]
-            physics_bucket_hash = validated["physics_bucket_hash"]
-            ladder_values = validated["ladder_values"]
-            existing = target_store._fetch(conn, key_hash)
-            if existing is not None:
-                entry = target_store._entry_from_row(
-                    existing,
-                    artifact=artifact,
-                    key=key,
-                    key_bytes=key_bytes,
-                    key_hash=key_hash,
-                )
-                if entry["payload_hash"] != payload_hash or (
-                    canonical_json_bytes(entry["payload"]) != payload_bytes
-                ):
-                    raise RuntimeError(f"PT-1 cache collision while merging {key_hash}")
-                existing_admitted = _decode_payload_for_admission(
-                    artifact,
-                    entry["payload"],
-                    payload_codec_version=entry.get("payload_codec_version"),
-                    keys=(key,),
-                )
-                incoming_admitted = _decode_payload_for_admission(
-                    artifact,
-                    validated["payload"],
-                    payload_codec_version=validated["payload_codec_version"],
-                    keys=(key,),
-                )
-                if existing_admitted is None and incoming_admitted is not None:
-                    conn.execute(
-                        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                        "SET payload_codec_version = ? WHERE key_hash = ?",
-                        (validated["payload_codec_version"], key_hash),
-                    )
-                merged_notices = monotonic_repair_notices_json(
-                    entry.get("repair_notices_json"),
-                    validated["repair_notices_json"],
-                )
-                if merged_notices != entry.get("repair_notices_json"):
-                    conn.execute(
-                        f"UPDATE {PT1_EQUILIBRIUM_TABLE} "
-                        "SET repair_notices_json = ? WHERE key_hash = ?",
-                        (merged_notices, key_hash),
-                    )
-                target_store._update_physics_bucket_columns(
-                    conn,
-                    key_hash=key_hash,
-                    physics_bucket_key=physics_bucket_key,
-                    physics_bucket_bytes=physics_bucket_bytes,
-                    physics_bucket_hash=physics_bucket_hash,
-                    ladder_values=ladder_values,
-                )
-                continue
-            conn.execute(
-                f"""
-                INSERT INTO {PT1_EQUILIBRIUM_TABLE} (
-                    key_hash,
-                    artifact,
-                    store_schema_version,
-                    request_schema_version,
-                    key_sha256,
-                    payload_sha256,
-                    key_bytes,
-                    payload_bytes,
-                    code_version,
-                    corpus_version,
-                    engine_version,
-                    data_digests_json,
-                    repair_notices_json,
-                    payload_codec_version,
-                    physics_bucket_schema_version,
-                    physics_bucket_sha256,
-                    replay_scope_sha256,
-                    physics_key_bytes,
-                    physics_bucket_h40_sha256,
-                    physics_bucket_h40_distance,
-                    physics_bucket_h30_sha256,
-                    physics_bucket_h30_distance,
-                    physics_bucket_h40c_sha256,
-                    physics_bucket_h40c_distance,
-                    physics_bucket_h30c_sha256,
-                    physics_bucket_h30c_distance,
-                    created_at,
-                    git_dirty
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """,
-                (
-                    key_hash,
-                    artifact,
-                    PT1_STORE_SCHEMA_VERSION,
-                    str(key.get("schema_version")),
-                    key_hash,
-                    payload_hash,
-                    sqlite3.Binary(key_bytes),
-                    sqlite3.Binary(payload_bytes),
-                    str(row["code_version"]),
-                    row.get("corpus_version"),
-                    row.get("engine_version"),
-                    validated["data_digests_json"],
-                    validated["repair_notices_json"],
-                    validated["payload_codec_version"],
-                    PHYSICS_BUCKET_SCHEMA_VERSION,
-                    physics_bucket_hash,
-                    _replay_scope_hash(physics_bucket_key),
-                    sqlite3.Binary(physics_bucket_bytes),
-                    ladder_values["h40"]["sha256"],
-                    ladder_values["h40"]["distance"],
-                    ladder_values["h30"]["sha256"],
-                    ladder_values["h30"]["distance"],
-                    ladder_values["h40c"]["sha256"],
-                    ladder_values["h40c"]["distance"],
-                    ladder_values["h30c"]["sha256"],
-                    ladder_values["h30c"]["distance"],
-                    str(row["created_at"]),
-                    int(row["git_dirty"]),
-                ),
-            )
-            inserted_rows += 1
+    for row in rows:
+        _validated_cache_payload_row(row)
+    result = _copy_pt1_equilibrium_rows([shard_path], target_path)
     return {
         "merged": True,
         "source": "temporary_shard",
         "rows": len(rows),
-        "inserted_rows": inserted_rows,
+        "inserted_rows": int(result["inserted_rows"]),
         "magemin_unique_keys": len(_magemin_key_hashes(shard_path)),
     }
 

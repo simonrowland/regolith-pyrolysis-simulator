@@ -74,6 +74,7 @@ from simulator.reduced_real_determinism import (
     ControlQuantization,
     PT1_EQUILIBRIUM_TABLE,
     PT1PersistentEquilibriumStore,
+    _copy_pt1_equilibrium_rows,
 )
 from simulator.interpolation_uncertainty import (
     DEFAULT_RANK_LIMIT as DEFAULT_INTERPOLATION_RANK_LIMIT,
@@ -1010,6 +1011,8 @@ def seed_job_cache(
     del seed_fn
     _remove_sqlite_file_set(shard_db)
     shard_db.parent.mkdir(parents=True, exist_ok=True)
+    if base_cache.exists():
+        PT1PersistentEquilibriumStore(base_cache)
     PT1PersistentEquilibriumStore(
         shard_db,
         read_only_base_db_path=base_cache if base_cache.exists() else None,
@@ -1064,26 +1067,16 @@ def _seed_cache_rows_from_base(
             f"ATTACH DATABASE ? AS {_SEED_BASE_ALIAS}",
             (f"{base_cache.resolve().as_uri()}?mode=ro",),
         )
-        _ensure_seed_source_table(conn)
         columns = _pt1_payload_columns(conn, PT1_EQUILIBRIUM_TABLE)
         source_columns = _pt1_payload_columns(
             conn,
             f"{_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}",
         )
-        optional_columns = {"repair_notices_json", "payload_codec_version"}
-        target_required_columns = set(columns) - optional_columns
-        source_required_columns = set(source_columns) - optional_columns
-        if target_required_columns != source_required_columns:
+        if set(columns) != set(source_columns):
             raise ValueError(
                 "acquisition seed source schema mismatch: "
                 f"{base_cache} does not match {shard_db}"
             )
-        select_columns = [
-            name
-            if name in source_columns
-            else f"NULL AS {name}"
-            for name in columns
-        ]
         placeholders = ",".join("?" for _ in point_ids)
         rows = conn.execute(
             f"""
@@ -1118,19 +1111,17 @@ def _seed_cache_rows_from_base(
                 continue
             seeded_sources.append(point)
         seed_ids = [str(point["point_id"]) for point in seeded_sources]
-        quoted_columns = ", ".join(columns)
-        selected_columns = ", ".join(select_columns)
-        if seed_ids:
-            seed_placeholders = ",".join("?" for _ in seed_ids)
-            conn.execute(
-                f"""
-                INSERT OR IGNORE INTO {PT1_EQUILIBRIUM_TABLE} ({quoted_columns})
-                SELECT {selected_columns}
-                FROM {_SEED_BASE_ALIAS}.{PT1_EQUILIBRIUM_TABLE}
-                WHERE key_hash IN ({seed_placeholders})
-                """,
-                tuple(seed_ids),
-            )
+    finally:
+        conn.close()
+
+    _copy_pt1_equilibrium_rows(
+        [base_cache],
+        shard_db,
+        key_hashes=seed_ids,
+    )
+    conn = sqlite3.connect(shard_db)
+    try:
+        _ensure_seed_source_table(conn)
         created_at = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
         for index, point in enumerate(seeded_sources):
             conn.execute(

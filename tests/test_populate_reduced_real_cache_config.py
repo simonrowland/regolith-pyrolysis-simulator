@@ -386,6 +386,11 @@ def test_populate_merge_refreshes_stale_stamp_for_identical_row(tmp_path):
     key = _pt1_key("codec-refresh")
     key["artifact"] = "freeze_gate_curve"
     payload = {
+        "authority": {
+            "vapor_pressure": _pt1_payload("populate-codec")["authority"][
+                "vapor_pressure"
+            ]
+        },
         "curve": {
             "source": "unit-test:populate-codec",
             "status": "ok",
@@ -481,7 +486,6 @@ def test_populate_accepts_v2_source_and_copies_missing_notices_as_null(
             f"ALTER TABLE {driver.PT1_EQUILIBRIUM_TABLE} "
             "DROP COLUMN repair_notices_json"
         )
-    source_sha256 = hashlib.sha256(shard_db.read_bytes()).hexdigest()
 
     summary = driver._merge_cache_shard(shard_db, target_db)
 
@@ -499,7 +503,28 @@ def test_populate_accepts_v2_source_and_copies_missing_notices_as_null(
         payload_bytes,
         None,
     )
-    assert hashlib.sha256(shard_db.read_bytes()).hexdigest() == source_sha256
+    with sqlite3.connect(shard_db) as conn:
+        source_columns = {
+            str(row[1])
+            for row in conn.execute(
+                f"PRAGMA table_info({driver.PT1_EQUILIBRIUM_TABLE})"
+            )
+        }
+        source = conn.execute(
+            f"SELECT store_schema_version, key_bytes, payload_bytes, "
+            f"repair_notices_json FROM {driver.PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert {"payload_codec_version", "law_disclosures_json", "repair_notices_json"} <= (
+        source_columns
+    )
+    assert source == (
+        rrd.PT1_STORE_SCHEMA_VERSION,
+        key_bytes,
+        payload_bytes,
+        None,
+    )
 
 
 def test_merge_cache_shard_rejects_stored_payload_hash_drift(tmp_path):

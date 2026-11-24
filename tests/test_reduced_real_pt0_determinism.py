@@ -132,7 +132,7 @@ def _capture_pt0_gate_curve(
     solidus_T_C: float,
     law_disclosures: Any = (),
 ) -> tuple[PT0DeterminismStore, Any, float, dict[str, Any]]:
-    store = PT0DeterminismStore("capture", db_path=db_path)
+    store = PT0DeterminismStore("capture")
     sim = _build_pt0_sim(store)
     sim.start_campaign(CampaignPhase.C2A_STAGED)
     register_synthetic_gate_curve_producer(sim)
@@ -150,6 +150,27 @@ def _capture_pt0_gate_curve(
         curve=curve,
         repair_notices=[],
         law_disclosures=law_disclosures,
+    )
+    key_hash = str(store.capture_sequence[-1]["hash"])
+    entry = store._entries[key_hash]
+    payload = copy.deepcopy(entry["payload"])
+    assert entry["key"].get("vapor_pressure_provider_selection") == (
+        "builtin-vapor-pressure"
+    )
+    payload["authority"] = {
+        "vapor_pressure": _alphamelts_record_authority()["vapor_pressure"]
+    }
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(db_path).put(
+        artifact="freeze_gate_curve",
+        key=entry["key"],
+        key_bytes=str(entry["key_bytes"]).encode("utf-8"),
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        repair_notices_json=entry["repair_notices_json"],
+        law_disclosures=entry["law_disclosures"],
     )
     return store, sim, fO2_log, curve
 
@@ -3341,7 +3362,7 @@ def test_pt0_exact_route_refuses_dependency_vector_mismatch(
     monkeypatch.setattr(
         capture,
         "_entry_for_key",
-        lambda *_args, **_kwargs: source_entry,
+        lambda *_args, **_kwargs: (source_entry, None),
     )
 
     with pytest.raises(PT0CacheMiss):
@@ -4384,7 +4405,7 @@ def test_pt1_assembly_transports_measured_gate_disclosures_and_hits(
         fO2_log=replay_sim._compute_intrinsic_melt_fO2(),
     ) == curve
     assert replay.hits == 1
-    assert replay._accepted_hit_disclosures == disclosures
+    assert replay._accepted_hit_disclosures == list(disclosures)
 
 
 def test_pt1_exact_replay_reuses_persistent_admission_decode(
@@ -4430,14 +4451,31 @@ def test_pt1_assembly_replaces_stale_equilibrium_payload_bytes(
 
     shard_db = tmp_path / "fresh-equilibrium-shard.sqlite"
     target_db = tmp_path / "stale-equilibrium-target.sqlite"
-    capture = PT0DeterminismStore("capture", db_path=shard_db)
+    capture = PT0DeterminismStore("capture")
     sim, result = _pt0_equilibrium_capture_context(capture)
+    sim._last_vapor_pressures_source = {"SiO": "builtin_authoritative"}
+    result.vapor_pressures_source = {"SiO": "builtin_authoritative"}
     key = capture._equilibrium_key(sim)
     payload = rrd.canonical_replay_output_projection(
         "equilibrium_post_record", sim, result
     )
+    assert key["vapor_pressure_provider_selection"] == "builtin-vapor-pressure"
+    payload["authority"]["vapor_pressure"] = _alphamelts_record_authority()[
+        "vapor_pressure"
+    ]
     capture._store("equilibrium_post_record", key, payload, law_disclosures=[])
     key_hash = hashlib.sha256(canonical_json_bytes(key)).hexdigest()
+    payload_bytes = canonical_json_bytes(payload)
+    PT1PersistentEquilibriumStore(shard_db).put(
+        artifact="equilibrium_post_record",
+        key=key,
+        key_bytes=canonical_json_bytes(key),
+        key_hash=key_hash,
+        payload=payload,
+        payload_bytes=payload_bytes,
+        payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+        law_disclosures=[],
+    )
 
     with sqlite3.connect(shard_db) as conn:
         (fresh_payload_bytes,) = conn.execute(
@@ -4481,6 +4519,7 @@ def test_pt1_assembly_replaces_stale_equilibrium_payload_bytes(
             (key_hash,),
         ).fetchone()
     assert bytes(stored_payload_bytes) == bytes(fresh_payload_bytes)
+
 
     replay = PT0DeterminismStore("replay", db_path=target_db)
     assert replay._lookup("equilibrium_post_record", key) is not None

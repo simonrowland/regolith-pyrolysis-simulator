@@ -16,7 +16,7 @@ import os
 import sqlite3
 import subprocess
 from collections import Counter
-from collections.abc import Iterator, Mapping, Sequence
+from collections.abc import Iterable, Iterator, Mapping, Sequence
 from datetime import datetime
 from datetime import timezone
 from decimal import Decimal
@@ -411,6 +411,10 @@ class PT0CacheCollision(RuntimeError):
 
 class PT1PersistentStoreCorrupt(PT0CacheCollision):
     """Persistent PT-1 row failed verify-on-hit integrity checks."""
+
+
+class _PT1CacheMergeCollision(RuntimeError):
+    """Two current PT-1 rows share a key but have different payload bytes."""
 
 
 class PT0InvalidControls(RuntimeError):
@@ -1379,18 +1383,26 @@ class PT0DeterminismStore:
             key_bytes = canonical_json_bytes(key)
             key_hash = _sha256(key_bytes)
             checked.append((key, key_bytes, key_hash))
-            entry = self._entry_for_key(artifact, key, key_bytes, key_hash)
+            entry, admission_decoded = self._entry_for_key(
+                artifact,
+                key,
+                key_bytes,
+                key_hash,
+                return_decoded=True,
+            )
             if entry is None or not replay_dependency_vectors_match(
                 key,
                 entry.get("key", {}),
             ):
                 continue
-            decoded = _decode_payload_for_admission(
-                artifact,
-                entry.get("payload"),
-                payload_codec_version=entry.get("payload_codec_version"),
-                keys=(key,),
-            )
+            decoded = admission_decoded
+            if decoded is None:
+                decoded = _decode_payload_for_admission(
+                    artifact,
+                    entry.get("payload"),
+                    payload_codec_version=entry.get("payload_codec_version"),
+                    keys=(key,),
+                )
             if decoded is None:
                 continue
             if not _disclosures_known(entry):
@@ -1461,17 +1473,20 @@ class PT0DeterminismStore:
         for candidate_key in _compatible_replay_keys(key):
             key_bytes = canonical_json_bytes(candidate_key)
             key_hash = _sha256(key_bytes)
-            entry = self._entry_for_key(artifact, candidate_key, key_bytes, key_hash)
-            decoded = (
-                _decode_payload_for_admission(
+            entry, decoded = self._entry_for_key(
+                artifact,
+                candidate_key,
+                key_bytes,
+                key_hash,
+                return_decoded=True,
+            )
+            if entry is not None and decoded is None:
+                decoded = _decode_payload_for_admission(
                     artifact,
                     entry.get("payload"),
                     payload_codec_version=entry.get("payload_codec_version"),
                     keys=(candidate_key,),
                 )
-                if entry is not None
-                else None
-            )
             if entry is not None and decoded is None:
                 entry = None
             cache_state = "cached_exact"
@@ -1608,20 +1623,25 @@ class PT0DeterminismStore:
         key: Mapping[str, Any],
         key_bytes: bytes,
         key_hash: str,
-    ) -> dict[str, Any] | None:
+        *,
+        return_decoded: bool = False,
+    ) -> Any | None:
         entry = self._entries.get(key_hash)
+        decoded = None
         if entry is None and self.persistent_store is not None:
-            entry = self.persistent_store.get(
+            fetched = self.persistent_store._get_with_decoded(
                 artifact=artifact,
                 key=key,
                 key_bytes=key_bytes,
                 key_hash=key_hash,
             )
+            if fetched is not None:
+                entry, decoded = fetched
             if entry is not None:
                 self._entries[key_hash] = copy.deepcopy(entry)
         if entry is not None:
             self._verify_entry(artifact, key, key_bytes, key_hash, entry)
-        return entry
+        return (entry, decoded) if return_decoded else entry
 
     def _entry_for_physics_bucket(
         self,
@@ -2229,6 +2249,22 @@ class PT1PersistentEquilibriumStore:
         key_bytes: bytes,
         key_hash: str,
     ) -> dict[str, Any] | None:
+        admitted = self._get_with_decoded(
+            artifact=artifact,
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+        )
+        return None if admitted is None else admitted[0]
+
+    def _get_with_decoded(
+        self,
+        *,
+        artifact: str,
+        key: Mapping[str, Any],
+        key_bytes: bytes,
+        key_hash: str,
+    ) -> tuple[dict[str, Any], Any] | None:
         with self._connect() as conn:
             self._initialize(conn)
             for row in self._fetch_candidates(conn, key_hash):
@@ -2239,14 +2275,15 @@ class PT1PersistentEquilibriumStore:
                     key_bytes=key_bytes,
                     key_hash=key_hash,
                 )
-                if _decode_payload_for_admission(
+                decoded = _decode_payload_for_admission(
                     artifact,
                     entry.get("payload"),
                     payload_codec_version=entry.get("payload_codec_version"),
                     keys=(key,),
-                ) is None:
+                )
+                if decoded is None:
                     continue
-                return entry
+                return entry, decoded
         return None
 
     def get_by_physics_bucket(
@@ -3009,6 +3046,221 @@ class PT1PersistentEquilibriumStore:
             key_bytes=row_key_bytes,
             key_hash=str(row["key_hash"]),
         )
+
+
+def _pt1_row_admission(
+    row: Mapping[str, Any],
+) -> tuple[bool, bytes]:
+    """Return current-codec admission and the stored payload bytes."""
+
+    payload_bytes = b""
+    try:
+        key_hash = str(row["key_hash"])
+        key_bytes = _sqlite_bytes(row["key_bytes"])
+        payload_bytes = _sqlite_bytes(row["payload_bytes"])
+        key = json.loads(key_bytes.decode("utf-8"))
+        payload = json.loads(payload_bytes.decode("utf-8"))
+        canonical_key_bytes = canonical_json_bytes(key)
+        canonical_payload_bytes = canonical_json_bytes(payload)
+    except (KeyError, TypeError, ValueError, UnicodeDecodeError, OverflowError):
+        return False, payload_bytes
+    if (
+        not isinstance(key, Mapping)
+        or not isinstance(payload, Mapping)
+        or canonical_key_bytes != key_bytes
+        or canonical_payload_bytes != payload_bytes
+        or _sha256(key_bytes) != key_hash
+        or row["key_sha256"] != key_hash
+        or _sha256(payload_bytes) != row["payload_sha256"]
+    ):
+        return False, payload_bytes
+    return (
+        _decode_payload_for_admission(
+            str(row["artifact"]),
+            payload,
+            payload_codec_version=row["payload_codec_version"],
+            keys=(key,),
+        )
+        is not None,
+        payload_bytes,
+    )
+
+
+def _copy_pt1_equilibrium_rows(
+    source_paths: Iterable[Path],
+    target_path: Path,
+    *,
+    key_hashes: Iterable[str] | None = None,
+) -> dict[str, Any]:
+    """Migrate and merge PT-1 rows using the current codec and full schema."""
+
+    target_path = Path(target_path).expanduser()
+    target_resolved = target_path.resolve()
+    target_store = PT1PersistentEquilibriumStore(target_path)
+    sources: list[tuple[Path, PT1PersistentEquilibriumStore]] = []
+    for source_path in source_paths:
+        source_path = Path(source_path).expanduser()
+        if source_path.resolve() == target_resolved:
+            continue
+        if not source_path.exists():
+            raise FileNotFoundError(f"PT-1 cache source does not exist: {source_path}")
+        sources.append(
+            (source_path, PT1PersistentEquilibriumStore(source_path))
+        )
+
+    with target_store._connect() as conn:
+        target_columns = tuple(
+            str(row["name"])
+            for row in conn.execute(
+                f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+            )
+        )
+        original_target_rows = {
+            str(row["key_hash"]): dict(row)
+            for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}")
+        }
+    source_columns: dict[Path, tuple[str, ...]] = {}
+    for source_path, source_store in sources:
+        with source_store._connect() as conn:
+            source_columns[source_path] = tuple(
+                str(row["name"])
+                for row in conn.execute(
+                    f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+                )
+            )
+    for source_path, columns in source_columns.items():
+        if set(columns) != set(target_columns):
+            raise ValueError(
+                "PT-1 cache source schema mismatch after migration: "
+                f"{source_path} does not match {target_path}"
+            )
+
+    selected_hashes = None if key_hashes is None else {str(item) for item in key_hashes}
+    planned_rows = dict(original_target_rows)
+    planned_admission = {
+        key_hash: _pt1_row_admission(row)
+        for key_hash, row in original_target_rows.items()
+    }
+    changed_rows: dict[str, dict[str, Any]] = {}
+    source_summaries: list[dict[str, Any]] = []
+
+    for source_path, source_store in sources:
+        source_conn = source_store._connect()
+        try:
+            if selected_hashes is None:
+                source_rows = source_conn.execute(
+                    f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
+                ).fetchall()
+            elif not selected_hashes:
+                source_rows = []
+            else:
+                source_rows = []
+                selected_list = sorted(selected_hashes)
+                for start in range(0, len(selected_list), 900):
+                    batch = selected_list[start : start + 900]
+                    placeholders = ",".join("?" for _ in batch)
+                    source_rows.extend(
+                        source_conn.execute(
+                            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
+                            f"WHERE key_hash IN ({placeholders})",
+                            tuple(batch),
+                        ).fetchall()
+                    )
+        finally:
+            source_conn.close()
+
+        inserted = 0
+        replaced = 0
+        for source_row in source_rows:
+            key_hash = str(source_row["key_hash"])
+            incoming_row = {
+                column: source_row[column] for column in target_columns
+            }
+            incoming_admitted, incoming_payload_bytes = _pt1_row_admission(
+                incoming_row
+            )
+            existing_row = planned_rows.get(key_hash)
+            if existing_row is None:
+                planned_rows[key_hash] = incoming_row
+                planned_admission[key_hash] = (
+                    incoming_admitted,
+                    incoming_payload_bytes,
+                )
+                changed_rows[key_hash] = incoming_row
+                inserted += 1
+                continue
+
+            existing_admitted, existing_payload_bytes = planned_admission[key_hash]
+            if existing_admitted and incoming_admitted:
+                if existing_payload_bytes != incoming_payload_bytes:
+                    raise _PT1CacheMergeCollision(
+                        f"PT-1 cache collision while merging {key_hash}"
+                    )
+                merged_row = dict(incoming_row)
+                merged_row["repair_notices_json"] = monotonic_repair_notices_json(
+                    existing_row.get("repair_notices_json"),
+                    incoming_row.get("repair_notices_json"),
+                )
+                merged_disclosures = _prefer_law_disclosures(
+                    existing_row.get("law_disclosures_json"),
+                    incoming_row.get("law_disclosures_json"),
+                )
+                merged_row["law_disclosures_json"] = _law_disclosures_json(
+                    merged_disclosures
+                )
+                planned_rows[key_hash] = merged_row
+                planned_admission[key_hash] = (
+                    True,
+                    incoming_payload_bytes,
+                )
+                if merged_row != existing_row:
+                    changed_rows[key_hash] = merged_row
+            elif existing_admitted:
+                continue
+            else:
+                planned_rows[key_hash] = incoming_row
+                planned_admission[key_hash] = (
+                    incoming_admitted,
+                    incoming_payload_bytes,
+                )
+                changed_rows[key_hash] = incoming_row
+                if key_hash in original_target_rows:
+                    replaced += 1
+
+        source_summaries.append(
+            {
+                "source": str(source_path),
+                "rows": len(source_rows),
+                "inserted_rows": inserted,
+                "replaced_rows": replaced,
+            }
+        )
+
+    if changed_rows:
+        quoted_columns = ", ".join(f'"{column}"' for column in target_columns)
+        placeholders = ", ".join("?" for _ in target_columns)
+        statement = (
+            f"INSERT OR REPLACE INTO {PT1_EQUILIBRIUM_TABLE} "
+            f"({quoted_columns}) VALUES ({placeholders})"
+        )
+        with target_store._connect() as conn:
+            conn.executemany(
+                statement,
+                [
+                    tuple(row[column] for column in target_columns)
+                    for row in changed_rows.values()
+                ],
+            )
+
+    return {
+        "sources": source_summaries,
+        "inserted_rows": sum(
+            int(summary["inserted_rows"]) for summary in source_summaries
+        ),
+        "replaced_rows": sum(
+            int(summary["replaced_rows"]) for summary in source_summaries
+        ),
+    }
 
 
 def _engine_result_namespace_id(
