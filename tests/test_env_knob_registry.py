@@ -29,8 +29,9 @@ OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # simulator/melt_backend/alphamelts.py gate_cooling_path. The ambient helper's
 # environment = os.environ token, and its .get("ALPHAMELTS_CALC_MODE"), were
 # already in the 95. The .get call is not itself an environ/getenv token.
-# 95 + 1 = 96.
-ENV_ACCESS_TOKEN_CEILING = 96
+# 95 + 1 for the AlphaMELTS copied environment = 96; default-policy audit
+# metadata reads the internal dispatch id once, so 96 + 1 = 97.
+ENV_ACCESS_TOKEN_CEILING = 97
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
 # Internal means a probe, diagnostic, debug switch, or harness control. Keep
@@ -43,6 +44,7 @@ KNOWN_INTERNAL_ENV = {
     "FIDELITY_SKIP_PROFILE_CONSTRAINTS": "Disables profile constraints in the fidelity DOE harness.",
     "DISPLAY": "Removed from MAGEMin subprocess environments to prevent display discovery.",
     "GOALFLIGHT_HOSTNAME": "Supplies a host label to an internal battery diagnostic.",
+    "GOALFLIGHT_DISPATCH_ID": "Labels the proposer in a default-policy audit record.",
     "HOSTNAME": "Fallback host label for an internal battery diagnostic.",
     "MAGEMIN_PROBE_BINARY": "Selects the binary for a targeted MAGEMin hang probe.",
     "MAGEMIN_PROBE_OUTPUT_DIR": "Routes output from a targeted MAGEMin hang probe.",

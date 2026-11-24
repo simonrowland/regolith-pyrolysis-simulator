@@ -8,6 +8,7 @@ from types import SimpleNamespace
 import pytest
 import yaml
 
+from simulator.battery.engine_capability import engine_covers_quantity
 from simulator.battery.enums import (
     AdmissionStatus,
     AmountBasis,
@@ -1626,12 +1627,20 @@ def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
         rail=Rail.REDOX,
     )
 
-    assert len(residuals) == 2 * len(SCORE_ENGINE_SET)
+    callable_engines = tuple(
+        engine
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, Quantity.VALENCE_RATIO)
+    )
+    assert len(residuals) == 2 * len(callable_engines)
     assert len({residual.reference for residual in residuals}) == 2
     assert all(
         sum(residual.key.endswith(engine.value) for residual in residuals) == 2
-        for engine in SCORE_ENGINE_SET
+        for engine in callable_engines
     )
+    assert {
+        residual.key.rsplit("::", 1)[-1] for residual in residuals
+    } == {engine.value for engine in callable_engines}
     for residual in residuals:
         assert residual.rail is Rail.REDOX
         assert residual.numeric is None
@@ -1663,7 +1672,15 @@ def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
         rail=Rail.REDOX,
     )
 
-    assert len(residuals) == len(rows) * len(SCORE_ENGINE_SET)
+    callable_engines = tuple(
+        engine
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, Quantity.VALENCE_RATIO)
+    )
+    assert len(residuals) == len(rows) * len(callable_engines)
+    assert {
+        residual.key.rsplit("::", 1)[-1] for residual in residuals
+    } == {engine.value for engine in callable_engines}
     for residual in residuals:
         assert residual.numeric is None
         assert residual.refusal is not None

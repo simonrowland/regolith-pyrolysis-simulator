@@ -24383,7 +24383,6 @@ def _render_score_report_from_payloads_legacy(
         flagged_rows=flagged_stratum_payloads(
             rows,
             engines,
-            hulls=aggregate.headline_hulls,
             observations=context.observations,
         ),
         condition_lines=aggregate.condition_hull_lines(),
