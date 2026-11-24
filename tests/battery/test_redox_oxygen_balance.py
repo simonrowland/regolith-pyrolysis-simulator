@@ -75,6 +75,17 @@ def _balance(*, q: float | None, activity_slope: float = 0.0, iron_exponent: flo
     )
 
 
+def _closed_form_pressure_root_bar(*, q: float, activity_slope: float = 0.0) -> float:
+    terms = {term.source.species: term for term in _channel_terms(_channels())}
+    molar_mass_fe = terms["Fe"].molar_mass_kg_mol
+    molar_mass_o2 = terms["O2"].molar_mass_kg_mol
+    oxygen_demand = _valence_oxygen_per_iron(q)
+    rhs = oxygen_demand * math.sqrt(molar_mass_o2) / (
+        2.0e5 * math.sqrt(molar_mass_fe)
+    )
+    return rhs ** (1.0 / (1.5 - activity_slope))
+
+
 def _fe_diagnostic(balance):
     rows = [row for row in balance.pressure_law_diagnostics if row.species == "Fe"]
     assert len(rows) == 1
@@ -411,14 +422,36 @@ def test_q_positive_demand_is_the_valence_mean_and_moves_the_root() -> None:
     # Same pressure law as q = 0. Only the oxygen demand can move this root.
     redox = _balance(q=q)
     stoichiometric = _balance(q=0.0)
+    sloped = _balance(q=q, activity_slope=-0.098)
+    closed_redox = _closed_form_pressure_root_bar(q=q)
+    closed_stoichiometric = _closed_form_pressure_root_bar(q=0.0)
+    closed_sloped = _closed_form_pressure_root_bar(q=q, activity_slope=-0.098)
     assert redox.parent_oxygen_demand_at_root["Fe"] == expected_oxygen
-    assert redox.pO2_bar.hex() == "0x1.45f6bce8ef4d2p-21"
-    assert stoichiometric.pO2_bar.hex() == "0x1.18e83802627cap-21"
+
+    # Premise: p=pO2 in bar, a=10^(s*log10(p))=p^s, P_Fe=a*p^-1/2 Pa,
+    # and P_O2=1e5 Pa/bar*p. HK fluxes proportional to P/sqrt(M) give
+    # o_bar*P_Fe/sqrt(M_Fe)=2*P_O2/sqrt(M_O2), hence p^(3/2-s)=
+    # o_bar*sqrt(M_O2)/(2e5*sqrt(M_Fe)), with o_bar=1+q/2. Production channel
+    # masses are kg/mol, so their ratio cancels and the result p is in bar.
+    # Sanity: q=0 -> 2.4286e-4 bar; q=0.5 -> 2.81816353508933e-4 bar;
+    # their root ratio is 1.25^(2/3).
+    assert redox.pO2_bar.hex() == "0x1.2781805949bdfp-12"
+    assert redox.pO2_bar == pytest.approx(closed_redox, rel=1e-12)
+
+    # Premise: q=0 gives o_bar=1; for p=pO2 in bar, a=p^s, P_Fe=a*p^-1/2
+    # Pa, and P_O2=1e5 Pa/bar*p. HK balance gives p^(3/2-s)=
+    # sqrt(M_O2)/(2e5*sqrt(M_Fe)); channel masses are kg/mol and p is in bar.
+    # Sanity: q=0 -> 2.4286e-4 bar; q=0.5 -> 2.81816353508933e-4 bar;
+    # their root ratio is 1.25^(2/3).
+    assert stoichiometric.pO2_bar.hex() == "0x1.fd51872bfec17p-13"
+    assert stoichiometric.pO2_bar == pytest.approx(closed_stoichiometric, rel=1e-12)
     assert not math.isclose(
         redox.pO2_bar, stoichiometric.pO2_bar, rel_tol=1.0e-4, abs_tol=0.0
     )
-    sloped = _balance(q=q, activity_slope=-0.098)
     fe = _fe_diagnostic(sloped)
+    # With slope s=-0.098 the Fe pressure exponent is -1/2+s, so the root
+    # exponent is 3/2-s; pO2 remains in bar after the Pa/bar conversion.
+    assert sloped.pO2_bar == pytest.approx(closed_sloped, rel=1e-12)
     assert fe.declared == -0.5
     assert fe.expected == pytest.approx(-0.598, abs=1.0e-9)
     assert fe.observed == pytest.approx(fe.expected, abs=1.0e-8)
