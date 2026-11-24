@@ -176,14 +176,15 @@ def test_formula_accounting_entrypoint_owns_delimited_decimals_and_d2o_refusal()
     assert atoms_parse_formula_else_janaf("D2O(l)") == (("D", 2.0), ("O", 1.0))
 
 
-def test_all_or_nothing_dot_split_refuses_mixed_decimal_adduct(monkeypatch) -> None:
+def test_ascii_adduct_split_mutation_changes_mixed_decimal_result(monkeypatch) -> None:
     from simulator.accounting import formulas as formula_owner
 
-    assert dict(parse_formula("Fe0.947O.2H2O").elements) == {
+    expected = {
         "Fe": 0.947,
         "H": 4.0,
         "O": 3.0,
     }
+    assert dict(parse_formula("Fe0.947O.2H2O").elements) == expected
     real_parts = formula_owner._ascii_adduct_parts
 
     def reject_decimal_head(text: str):
@@ -194,7 +195,9 @@ def test_all_or_nothing_dot_split_refuses_mixed_decimal_adduct(monkeypatch) -> N
 
     monkeypatch.setattr(formula_owner, "_ascii_adduct_parts", reject_decimal_head)
     try:
-        parse_formula("Fe0.947O.2H2O")
+        mutated = dict(parse_formula("Fe0.947O.2H2O").elements)
     except UnknownSpeciesError:
+        # Rejecting the split is also a regression: the printed hydrate is
+        # valid and its decimal iron subscript must stay attached to Fe.
         return
-    raise AssertionError("all-or-nothing split still accepted Fe0.947O.2H2O")
+    assert mutated != expected, "the split mutation did not break the consumer"

@@ -320,23 +320,6 @@ def _live_engine_probe(
             f"cell status={cell.status}, refusal={cell.refusal_reason}, "
             f"engine status={cell.engine_status}, reason={cell.engine_reason}"
         )
-        openimcc_import = None
-        if engine_name == "openimcc":
-            import openimcc
-
-            module_file = Path(openimcc.__file__).resolve()
-            source_files = sorted(module_file.parent.rglob("*.py"))
-            source_hash_input = b"".join(
-                hashlib.sha1(path.read_bytes()).hexdigest().encode()
-                + b"  ./"
-                + path.relative_to(module_file.parent).as_posix().encode()
-                + b"\n"
-                for path in source_files
-            )
-            openimcc_import = {
-                "module_file": str(module_file),
-                "source_tree_hash": hashlib.sha1(source_hash_input).hexdigest()[:12],
-            }
         return {
             "pid": os.getpid(),
             "version": engine_cache.ENGINE_CHEMISTRY_VERSION[engine_name],
@@ -348,7 +331,6 @@ def _live_engine_probe(
             "vapor_pressure_species": _cached_vapor_pressure_species(
                 engine_name, cached_values[-1]
             ),
-            "openimcc_import": openimcc_import,
         }
     finally:
         close_battery_engine_handle(handle)
@@ -549,17 +531,6 @@ def test_live_engine_numeric_probe_matches_version(
     engine_name, request, tmp_path
 ) -> None:
     result = _run_probe(engine_name, request, tmp_path)
-    print(
-        f"ENGINE_GOLDEN_MEASURED engine={engine_name} version={result['version']} "
-        f"digest={result['digest']} openimcc_import={result['openimcc_import']}",
-        flush=True,
-    )
-    if engine_name in {"openimcc", "internal-analytical", "alphamelts"}:
-        pytest.fail(
-            f"ENGINE_GOLDEN_MEASURED engine={engine_name} "
-            f"version={result['version']} digest={result['digest']} "
-            f"openimcc_import={result['openimcc_import']}"
-        )
     _assert_probe_matches_golden(engine_name, result["version"], result["digest"])
     probe_request = result["request"]
     assert isinstance(probe_request, Mapping), (
@@ -608,15 +579,6 @@ def test_internal_analytical_out_of_band_numeric_probe_matches_version(
         request,
         tmp_path,
         temperature_K=1605.0 + 273.15,
-    )
-    print(
-        "ENGINE_GOLDEN_MEASURED engine=internal-analytical-out-of-band "
-        f"version={result['version']} digest={result['digest']}",
-        flush=True,
-    )
-    pytest.fail(
-        "ENGINE_GOLDEN_MEASURED engine=internal-analytical-out-of-band "
-        f"version={result['version']} digest={result['digest']}"
     )
     expected_version, expected_digest = INTERNAL_ANALYTICAL_OUT_OF_BAND_GOLDEN
     assert result["version"] == expected_version
