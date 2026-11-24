@@ -135,6 +135,11 @@ def test_bonnickson_calcium_ferrite_rows_match_render_and_migrate() -> None:
     }
     assert len(phase_unspecified) == 2
     assert all("tablei_cafe2o4_unknown_a_heat_content" in row for row in phase_unspecified)
+    assert not {
+        row.observation_id
+        for row in rows
+        if row.identity.species.phase.is_unknown
+    }
     refused_migrated = [row for row in rows if row.observation_id in phase_unspecified]
     refused_by_temperature = {row.identity.temperature_K.value: row for row in refused_migrated}
     assert set(refused_by_temperature) == {Decimal("1504.6"), Decimal("1529.7")}
@@ -153,6 +158,7 @@ def test_bonnickson_calcium_ferrite_rows_match_render_and_migrate() -> None:
         == {NoticeKind.PHASE_INFERRED, NoticeKind.METHOD_UNSTATED}
         for row in refused_migrated
     )
+    assert all(len(row.notices) == 2 for row in refused_migrated)
     refused_rows = [
         observation
         for observation in extract["species"]["CaFe2O4"]["observations"]

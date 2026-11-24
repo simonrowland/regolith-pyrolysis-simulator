@@ -90,11 +90,15 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
             NoticeKind.INPUT_OMITTED,
             NoticeKind.METHOD_UNSTATED,
         }
-        assert row.notices[0].kind is NoticeKind.INPUT_OMITTED
-        assert row.notices[0].reason == (
+        assert len(row.notices) == 2
+        input_notice = next(
+            notice for notice in row.notices
+            if notice.kind is NoticeKind.INPUT_OMITTED
+        )
+        assert input_notice.reason == (
             "missing input: printed air fO2 requires stated total pressure"
         )
-        assert row.notices[0].origin == row.observation_id
+        assert input_notice.origin == row.observation_id
 
     s75_point = next(row for row in rows if row.value.point == Decimal("0.577"))
     printed_composition = {

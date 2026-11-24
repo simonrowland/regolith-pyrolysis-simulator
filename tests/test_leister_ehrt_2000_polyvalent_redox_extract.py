@@ -216,6 +216,7 @@ def test_migrated_fe_values_species_temperature_atmosphere_and_composition():
                 NoticeKind.INPUT_OMITTED,
                 NoticeKind.METHOD_UNSTATED,
             }
+            assert len(observation.notices) == 2
             input_notice = next(
                 notice for notice in observation.notices
                 if notice.kind is NoticeKind.INPUT_OMITTED

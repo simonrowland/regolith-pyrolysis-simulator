@@ -231,11 +231,17 @@ def test_validator_and_isolated_migration() -> None:
     ]
     assert len(melting_range_rows) == 7
     assert unspecified_phases == {row.observation_id for row in melting_range_rows}
+    assert not [
+        observation
+        for observation in migrator.result.observations.values()
+        if observation.identity.species.phase.is_unknown
+    ]
     assert all(
         {notice.kind for notice in row.notices}
         == {NoticeKind.PHASE_INFERRED, NoticeKind.METHOD_UNSTATED}
         for row in melting_range_rows
     )
+    assert all(len(row.notices) == 2 for row in melting_range_rows)
     assert {
         float(row.identity.temperature_K.value)
         for row in melting_range_rows

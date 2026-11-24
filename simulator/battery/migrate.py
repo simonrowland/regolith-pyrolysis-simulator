@@ -25899,7 +25899,7 @@ class Migrator:
             )
             if printed_method is not None:
                 original_reason = (
-                    f"{original_reason}; printed analytical method: {printed_method}"
+                    f"{original_reason}; printed source evidence: {printed_method}"
                 )
             policy_resolution = resolve_default_policy("DP-106")
             method = State.of(MethodToken(str(policy_resolution.value)))

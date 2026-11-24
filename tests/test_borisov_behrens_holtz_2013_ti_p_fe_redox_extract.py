@@ -283,7 +283,7 @@ def _assert_unstated_method_rows(result, document: dict) -> None:
         method_notice = method_notices[0]
         assert method_notice.policy == method_policy
         printed_method = source_rows[local_id]["values"]["method_as_printed"]
-        assert f"printed analytical method: {printed_method}" in method_notice.reason
+        assert f"printed source evidence: {printed_method}" in method_notice.reason
 
 
 def test_migration_types_every_quantity_and_keeps_conditions_and_quench() -> None:

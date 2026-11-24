@@ -150,6 +150,7 @@ def test_ehrt_redox_values_migrate_as_points_with_printed_conditions():
                 NoticeKind.INPUT_OMITTED,
                 NoticeKind.METHOD_UNSTATED,
             }
+            assert len(observation.notices) == 2
             input_notice = next(
                 notice for notice in observation.notices
                 if notice.kind is NoticeKind.INPUT_OMITTED

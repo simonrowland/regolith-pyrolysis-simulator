@@ -108,7 +108,9 @@ def _source_file(source_path: str, roots: list[Path], source_id: str | None = No
     return None
 
 
-def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
+def _citation_matches(
+    locator: dict, text: str, cited_values=(), source_context: str | None = None
+) -> bool | None:
     normalized = " ".join(text.split()).casefold()
     normalized = re.sub(
         r"(\d+(?:\.\d+)?)\s*(?:\\times|×)\s*10\s*\$?\s*\^\s*\$?\s*\{\s*([-+]?\d+)\s*\}",
@@ -120,6 +122,10 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
     normalized = re.sub(r"e([+-])0+(\d+)", r"e\1\2", normalized)
     has_direct_anchor = False
     has_table_or_figure = False
+    roman_tables = {
+        "1": "i", "2": "ii", "3": "iii", "4": "iv", "5": "v",
+        "6": "vi", "7": "vii", "8": "viii", "9": "ix", "10": "x",
+    }
     for kind in ("table", "figure", "equation"):
         label = locator.get(kind)
         if label is None:
@@ -134,7 +140,8 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
             "equation": r"(?:equation|eqn\.?)",
         }[kind]
         if re.search(r"\b" + label_kind + r"\s*" + re.escape(label) + r"\b", normalized, re.I):
-            return True
+            if not (kind == "table" and locator.get("row")):
+                return True
         if kind == "equation" and re.search(r"\\tag\s*(?:\{\s*)?" + re.escape(label) + r"\b", normalized, re.I):
             return True
         if kind == "figure" and not label.isdigit():
@@ -144,14 +151,63 @@ def _citation_matches(locator: dict, text: str, cited_values=()) -> bool | None:
                 if phrase in normalized:
                     return True
         if label.isdigit():
-            roman = {"1": "i", "2": "ii", "3": "iii", "4": "iv", "5": "v", "6": "vi", "7": "vii", "8": "viii", "9": "ix", "10": "x"}.get(label)
+            roman = roman_tables.get(label)
             if roman and re.search(r"\b" + label_kind + r"\s*" + roman + r"\b", normalized, re.I):
-                return True
+                if not (kind == "table" and locator.get("row")):
+                    return True
 
     row_label = locator.get("row")
     if isinstance(row_label, str) and row_label.strip():
         row_pattern = rf"^\s*{re.escape(row_label.strip())}(?=\s|$)"
-        if re.search(row_pattern, text, re.I | re.M):
+        row_match = re.search(row_pattern, text, re.I | re.M)
+        if row_match and locator.get("table") is not None:
+            table_number = str(locator["table"]).strip()
+            context = text if source_context is None else source_context
+            source_row_matches = list(re.finditer(row_pattern, context, re.I | re.M))
+            line_range = locator.get("line_range")
+            expected_lines = _line_ranges(line_range) if line_range else []
+            context_row = next(
+                (
+                    match for match in source_row_matches
+                    if not expected_lines
+                    or any(
+                        start
+                        <= context.count("\n", 0, match.start()) + 1
+                        <= end
+                        for start, end in expected_lines
+                    )
+                ),
+                None,
+            )
+            if context_row is None:
+                return False
+            captions = list(
+                re.finditer(
+                    r"^\s*table\s+([A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*)",
+                    context,
+                    re.I | re.M,
+                )
+            )
+            enclosing_caption = next(
+                (
+                    caption
+                    for caption in reversed(captions)
+                    if caption.start() < context_row.start()
+                ),
+                None,
+            )
+            return (
+                enclosing_caption is not None
+                and (
+                    enclosing_caption.group(1).casefold() == table_number.casefold()
+                    or roman_tables.get(table_number, table_number.casefold())
+                    == roman_tables.get(
+                        enclosing_caption.group(1),
+                        enclosing_caption.group(1).casefold(),
+                    )
+                )
+            )
+        if row_match:
             return True
 
     # Numeric data elsewhere in the cited range cannot stand in for a missing
@@ -260,7 +316,12 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     assert _citation_matches(table_8, "Table 8 sample 12065 results.") is True
 
     table_row = {"table": "1", "row": "FUN1-3"}
-    assert _citation_matches(table_row, "FUN1-3 0 0.0161 0.0148") is True
+    table_row_text = "Table 1. Residue analyses\nFUN1-3 0 0.0161 0.0148\nTable 2. Volatiles"
+    assert _citation_matches(table_row, table_row_text) is True
+    assert _citation_matches({**table_row, "table": "2"}, table_row_text) is False
+    assert _citation_matches(
+        {"row": "FUN1-3"}, "FUN1-3 0 0.0161 0.0148"
+    ) is True
     assert _citation_matches(table_row, "FUN1-4 0 0.0161 0.0148") is False
 
     text_only = {"paragraph": "Sample 12065 was heated to 2360 K."}
@@ -271,6 +332,34 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     richter_locator = {"paragraph": "2.5 and 6 mm samples"}
     unrelated_richter_range = "Temperature 4.6; evaporation fluxes -6.6 and -6.7."
     assert _citation_matches(richter_locator, unrelated_richter_range, [[2.5, 6.0]]) is False
+
+
+def test_mendybaev_table_one_row_cannot_be_relabelled_as_table_two() -> None:
+    extract = EXTRACTS_DIR / "mendybaev-2013-fun-cai-evaporation.yaml"
+    document = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    locator = next(
+        locator
+        for locator, _ in _walk(document)
+        if locator.get("row") == "FUN1-3"
+        and locator.get("line_range") == "268-268"
+    )
+    roots = [
+        Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS_ROOT)),
+        LEGACY_CORPUS_ROOT,
+    ]
+    source = _source_file(locator["source_path"], roots, document.get("source_id"))
+    if source is None:
+        pytest.skip("Mendybaev line-source text unavailable")
+    lines = source.read_text(encoding="utf-8").splitlines()
+    cited_text = "\n".join(
+        "\n".join(lines[start - 1 : end])
+        for start, end in _line_ranges(locator["line_range"])
+    )
+    context = "\n".join(lines)
+    assert _citation_matches(locator, cited_text, source_context=context) is True
+    assert _citation_matches(
+        {**locator, "table": "2"}, cited_text, source_context=context
+    ) is False
 
 
 def test_extract_discovery_matches_migrator() -> None:
@@ -381,7 +470,12 @@ def test_extract_locators_resolve_to_corpus_sources(
                         for key in ("value", "quote")
                         if key in ancestor and ancestor is not locator
                     ]
-                    if _citation_matches(locator, cited_text, cited_values) is False:
+                    if _citation_matches(
+                        locator,
+                        cited_text,
+                        cited_values,
+                        source_context="\n".join(lines),
+                    ) is False:
                         failures.append((
                             "missing citation anchor",
                             repr(locator),
