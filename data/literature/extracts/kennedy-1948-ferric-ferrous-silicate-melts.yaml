@@ -69,7 +69,7 @@ species:
           note: Temperature uncertainty is printed as ± 3°, but the convention is not stated. No row-specific uncertainty is printed for FeO or Fe2O3; Fe2O3 is obtained by difference from total iron as FeO.
           composition_units: wt% oxides, as printed in Table I
           temperature_units: °C, as printed
-          temperature_uncertainty_as_printed: '± 3'
+          temperature_uncertainty_as_printed: '+/- 3 C'
           composition_column_locators:
             SiO2: {published_page: 532, pdf_page_index: 3, table: 'I', record: 'NM-5 recomputed, column 2', column: SiO2}
             TiO2: {published_page: 532, pdf_page_index: 3, table: 'I', record: 'NM-5 recomputed, column 2', column: TiO2}
@@ -90,13 +90,13 @@ species:
           rows:
             - {T_C: '1430', duration_h: '23', FeO_wt_pct: '3.32', Fe2O3_wt_pct: '8.88', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {T_C: {state: {tag: value, value: '1430'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '23'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Wt. % Fe2O3'}}}
             - {T_C: '1400', duration_h: '10', FeO_wt_pct: '3.20', Fe2O3_wt_pct: '9.02', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, T_C: {state: {tag: value, value: '1400'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '10'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '2', FeO_wt_pct: '5.40', Fe2O3_wt_pct: '6.56', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'transient; equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '2'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '4', FeO_wt_pct: '3.71', Fe2O3_wt_pct: '8.44', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'transient; equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '4'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '8', FeO_wt_pct: '2.88', Fe2O3_wt_pct: '9.37', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'transient; equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '8'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '16', FeO_wt_pct: '2.42', Fe2O3_wt_pct: '9.89', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '16'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '24', FeO_wt_pct: '2.41', Fe2O3_wt_pct: '9.90', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '24'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '48', FeO_wt_pct: '2.34', Fe2O3_wt_pct: '9.98', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '48'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Wt. % Fe2O3'}}}
-            - {T_C: '1300', duration_h: '48', FeO_wt_pct: '2.37', Fe2O3_wt_pct: '9.95', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '48'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '2', FeO_wt_pct: '5.40', Fe2O3_wt_pct: '6.56', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'transient; equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '2'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '4', FeO_wt_pct: '3.71', Fe2O3_wt_pct: '8.44', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'transient; equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '4'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '8', FeO_wt_pct: '2.88', Fe2O3_wt_pct: '9.37', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'transient; equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '8'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '16', FeO_wt_pct: '2.42', Fe2O3_wt_pct: '9.89', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '16'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '24', FeO_wt_pct: '2.41', Fe2O3_wt_pct: '9.90', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '24'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '48', FeO_wt_pct: '2.34', Fe2O3_wt_pct: '9.98', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '48'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Wt. % Fe2O3'}}}
+            - {T_C: '1300', duration_h: '48', FeO_wt_pct: '2.37', Fe2O3_wt_pct: '9.95', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Observed values of the ratio of iron oxides, experimentally determined in NM-5 at 1200°C, are in extremely close agreement with values calculated for that temperature based on measurements at 1300°C and 1400°C, where the specimen was entirely fluid."}}, regime_as_printed: {state: {tag: value, value: 'equilibrium was reached in essentially 16 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂."}}, T_C: {state: {tag: value, value: '1300'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '48'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Wt. % Fe2O3'}}}
             - {T_C: '1200', duration_h: '2', FeO_wt_pct: '6.50', Fe2O3_wt_pct: '5.32', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt containing magnetite and calcium feldspar'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Several percent of magnetite are present in the melt at 1200°C, at which temperature calcium feldspar appears."}}, regime_as_printed: {state: {tag: value, value: 'transient before equilibrium was attained in approximately 40 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "At 1200°C equilibrium was attained in approximately 40 hours."}}, T_C: {state: {tag: value, value: '1200'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '2'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Wt. % Fe2O3'}}}
             - {T_C: '1200', duration_h: '7', FeO_wt_pct: '4.32', Fe2O3_wt_pct: '7.76', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt containing magnetite and calcium feldspar'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Several percent of magnetite are present in the melt at 1200°C, at which temperature calcium feldspar appears."}}, regime_as_printed: {state: {tag: value, value: 'transient before equilibrium was attained in approximately 40 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "At 1200°C equilibrium was attained in approximately 40 hours."}}, T_C: {state: {tag: value, value: '1200'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '7'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Wt. % Fe2O3'}}}
             - {T_C: '1200', duration_h: '16', FeO_wt_pct: '2.52', Fe2O3_wt_pct: '9.77', oxide_wt_percent: {SiO2: '50.87', TiO2: '.79', Al2O3: '17.62', Fe2O3: '1.60', FeO: '9.94', MnO: '.08', MgO: '6.25', CaO: '9.32', Na2O: '2.94', K2O: '.59'}, point_conditions: {phase_as_printed: {state: {tag: value, value: 'melt containing magnetite and calcium feldspar'}, locator: {published_page: 541, pdf_page_index: 12, section: "Use of Equilibrium Constant, KpO₂, in Experimental Geology", note: "Several percent of magnetite are present in the melt at 1200°C, at which temperature calcium feldspar appears."}}, regime_as_printed: {state: {tag: value, value: 'transient before equilibrium was attained in approximately 40 hours'}, locator: {published_page: 534, pdf_page_index: 5, section: "Experimental Method and Results", note: "At 1200°C equilibrium was attained in approximately 40 hours."}}, T_C: {state: {tag: value, value: '1200'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12'}}, fO2_control: {state: {tag: value, value: '1/5 atmosphere of oxygen'}, locator: {published_page: 532, pdf_page_index: 3, section: Experimental Method and Results}}, duration_h: {state: {tag: value, value: '16'}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12'}}}, locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12'}, cell_locators: {T_C: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Temperature C.° ± 3°'}, duration_h: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Time in hours'}, FeO_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Wt. % FeO'}, Fe2O3_wt_pct: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Wt. % Fe2O3'}}}
@@ -124,450 +124,450 @@ species:
             - {T_C: '1200', FeO_wt_pct: '1.59', Fe2O3_wt_pct: '10.82', locator: {published_page: 536, pdf_page_index: 7, table: 'III', record: '1200°C row'}}
 fidelity_samples:
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.temperature_uncertainty_as_printed
-    value: '± 3'
+    value: '+/- 3 C'
     reviewed_by: w1124t1963f17
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'table temperature header', column: 'Temperature C. +/- 3 C', line_range: 16, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'table temperature header', column: 'Temperature C. +/- 3 C', line_range: 16, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].T_C
     value: '1430'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Temperature C.° ± 3°', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 1', column: 'Temperature C.° ± 3°', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].duration_h
     value: '23'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Time in hours', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 1', column: 'Time in hours', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].FeO_wt_pct
     value: '3.32'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Wt. % FeO', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 1', column: 'Wt. % FeO', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].Fe2O3_wt_pct
     value: '8.88'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Wt. % Fe2O3', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 1', column: 'Wt. % Fe2O3', line_range: 17, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[1].T_C
     value: '1400'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Temperature C.° ± 3°', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 2', column: 'Temperature C.° ± 3°', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[1].duration_h
     value: '10'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Time in hours', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 2', column: 'Time in hours', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[1].FeO_wt_pct
     value: '3.20'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Wt. % FeO', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 2', column: 'Wt. % FeO', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[1].Fe2O3_wt_pct
     value: '9.02'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Wt. % Fe2O3', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 2', column: 'Wt. % Fe2O3', line_range: 18, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Temperature C.° ± 3°', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 3', column: 'Temperature C.° ± 3°', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].duration_h
     value: '2'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Time in hours', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 3', column: 'Time in hours', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].FeO_wt_pct
     value: '5.40'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Wt. % FeO', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 3', column: 'Wt. % FeO', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].Fe2O3_wt_pct
     value: '6.56'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Wt. % Fe2O3', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 3', column: 'Wt. % Fe2O3', line_range: 19, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Temperature C.° ± 3°', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 4', column: 'Temperature C.° ± 3°', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].duration_h
     value: '4'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Time in hours', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 4', column: 'Time in hours', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].FeO_wt_pct
     value: '3.71'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Wt. % FeO', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 4', column: 'Wt. % FeO', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].Fe2O3_wt_pct
     value: '8.44'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Wt. % Fe2O3', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 4', column: 'Wt. % Fe2O3', line_range: 20, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Temperature C.° ± 3°', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 5', column: 'Temperature C.° ± 3°', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].duration_h
     value: '8'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Time in hours', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 5', column: 'Time in hours', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].FeO_wt_pct
     value: '2.88'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Wt. % FeO', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 5', column: 'Wt. % FeO', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].Fe2O3_wt_pct
     value: '9.37'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Wt. % Fe2O3', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 5', column: 'Wt. % Fe2O3', line_range: 21, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Temperature C.° ± 3°', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 6', column: 'Temperature C.° ± 3°', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].duration_h
     value: '16'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Time in hours', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 6', column: 'Time in hours', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].FeO_wt_pct
     value: '2.42'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Wt. % FeO', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 6', column: 'Wt. % FeO', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].Fe2O3_wt_pct
     value: '9.89'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Wt. % Fe2O3', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 6', column: 'Wt. % Fe2O3', line_range: 22, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Temperature C.° ± 3°', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 7', column: 'Temperature C.° ± 3°', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].duration_h
     value: '24'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Time in hours', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 7', column: 'Time in hours', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].FeO_wt_pct
     value: '2.41'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Wt. % FeO', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 7', column: 'Wt. % FeO', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].Fe2O3_wt_pct
     value: '9.90'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Wt. % Fe2O3', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 7', column: 'Wt. % Fe2O3', line_range: 23, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Temperature C.° ± 3°', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 8', column: 'Temperature C.° ± 3°', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].duration_h
     value: '48'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Time in hours', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 8', column: 'Time in hours', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].FeO_wt_pct
     value: '2.34'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Wt. % FeO', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 8', column: 'Wt. % FeO', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].Fe2O3_wt_pct
     value: '9.98'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Wt. % Fe2O3', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 8', column: 'Wt. % Fe2O3', line_range: 24, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].T_C
     value: '1300'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Temperature C.° ± 3°', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 9', column: 'Temperature C.° ± 3°', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].duration_h
     value: '48'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Time in hours', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 9', column: 'Time in hours', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].FeO_wt_pct
     value: '2.37'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Wt. % FeO', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 9', column: 'Wt. % FeO', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].Fe2O3_wt_pct
     value: '9.95'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Wt. % Fe2O3', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 9', column: 'Wt. % Fe2O3', line_range: 25, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[9].T_C
     value: '1200'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Temperature C.° ± 3°', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 10', column: 'Temperature C.° ± 3°', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[9].duration_h
     value: '2'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Time in hours', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 10', column: 'Time in hours', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[9].FeO_wt_pct
     value: '6.50'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Wt. % FeO', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 10', column: 'Wt. % FeO', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[9].Fe2O3_wt_pct
     value: '5.32'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Wt. % Fe2O3', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 10', column: 'Wt. % Fe2O3', line_range: 26, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[10].T_C
     value: '1200'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Temperature C.° ± 3°', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 11', column: 'Temperature C.° ± 3°', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[10].duration_h
     value: '7'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Time in hours', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 11', column: 'Time in hours', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[10].FeO_wt_pct
     value: '4.32'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Wt. % FeO', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 11', column: 'Wt. % FeO', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[10].Fe2O3_wt_pct
     value: '7.76'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Wt. % Fe2O3', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 11', column: 'Wt. % Fe2O3', line_range: 27, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[11].T_C
     value: '1200'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Temperature C.° ± 3°', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 12', column: 'Temperature C.° ± 3°', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[11].duration_h
     value: '16'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Time in hours', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 12', column: 'Time in hours', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[11].FeO_wt_pct
     value: '2.52'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Wt. % FeO', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 12', column: 'Wt. % FeO', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[11].Fe2O3_wt_pct
     value: '9.77'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Wt. % Fe2O3', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 12', column: 'Wt. % Fe2O3', line_range: 28, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[12].T_C
     value: '1200'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 13', column: 'Temperature C.° ± 3°', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 13', column: 'Temperature C.° ± 3°', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[12].duration_h
     value: '24'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 13', column: 'Time in hours', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 13', column: 'Time in hours', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[12].FeO_wt_pct
     value: '1.92'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 13', column: 'Wt. % FeO', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 13', column: 'Wt. % FeO', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[12].Fe2O3_wt_pct
     value: '10.27'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 13', column: 'Wt. % Fe2O3', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 13', column: 'Wt. % Fe2O3', line_range: 29, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[13].T_C
     value: '1200'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 14', column: 'Temperature C.° ± 3°', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 14', column: 'Temperature C.° ± 3°', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[13].duration_h
     value: '37'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 14', column: 'Time in hours', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 14', column: 'Time in hours', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[13].FeO_wt_pct
     value: '1.65'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 14', column: 'Wt. % FeO', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 14', column: 'Wt. % FeO', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[13].Fe2O3_wt_pct
     value: '10.75'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 14', column: 'Wt. % Fe2O3', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 14', column: 'Wt. % Fe2O3', line_range: 30, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[14].T_C
     value: '1200'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 15', column: 'Temperature C.° ± 3°', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 15', column: 'Temperature C.° ± 3°', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[14].duration_h
     value: '49'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 15', column: 'Time in hours', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 15', column: 'Time in hours', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[14].FeO_wt_pct
     value: '1.59'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 15', column: 'Wt. % FeO', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 15', column: 'Wt. % FeO', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[14].Fe2O3_wt_pct
     value: '10.82'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 15', column: 'Wt. % Fe2O3', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 15', column: 'Wt. % Fe2O3', line_range: 31, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[15].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 16', column: 'Temperature C.° ± 3°', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 16', column: 'Temperature C.° ± 3°', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[15].duration_h
     value: '2'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 16', column: 'Time in hours', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 16', column: 'Time in hours', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[15].FeO_wt_pct
     value: '7.75'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 16', column: 'Wt. % FeO', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 16', column: 'Wt. % FeO', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[15].Fe2O3_wt_pct
     value: '3.92'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 16', column: 'Wt. % Fe2O3', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 16', column: 'Wt. % Fe2O3', line_range: 32, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[16].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 17', column: 'Temperature C.° ± 3°', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 17', column: 'Temperature C.° ± 3°', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[16].duration_h
     value: '6'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 17', column: 'Time in hours', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 17', column: 'Time in hours', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[16].FeO_wt_pct
     value: '5.80'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 17', column: 'Wt. % FeO', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 17', column: 'Wt. % FeO', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[16].Fe2O3_wt_pct
     value: '6.11'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 17', column: 'Wt. % Fe2O3', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 17', column: 'Wt. % Fe2O3', line_range: 33, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[17].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 18', column: 'Temperature C.° ± 3°', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 18', column: 'Temperature C.° ± 3°', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[17].duration_h
     value: '13'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 18', column: 'Time in hours', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 18', column: 'Time in hours', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[17].FeO_wt_pct
     value: '4.86'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 18', column: 'Wt. % FeO', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 18', column: 'Wt. % FeO', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[17].Fe2O3_wt_pct
     value: '7.21'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 18', column: 'Wt. % Fe2O3', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 18', column: 'Wt. % Fe2O3', line_range: 34, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[18].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 19', column: 'Temperature C.° ± 3°', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 19', column: 'Temperature C.° ± 3°', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[18].duration_h
     value: '19'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 19', column: 'Time in hours', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 19', column: 'Time in hours', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[18].FeO_wt_pct
     value: '4.15'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 19', column: 'Wt. % FeO', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 19', column: 'Wt. % FeO', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[18].Fe2O3_wt_pct
     value: '7.95'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 19', column: 'Wt. % Fe2O3', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 19', column: 'Wt. % Fe2O3', line_range: 35, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[19].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 20', column: 'Temperature C.° ± 3°', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 20', column: 'Temperature C.° ± 3°', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[19].duration_h
     value: '32.5'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 20', column: 'Time in hours', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 20', column: 'Time in hours', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[19].FeO_wt_pct
     value: '3.70'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 20', column: 'Wt. % FeO', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 20', column: 'Wt. % FeO', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[19].Fe2O3_wt_pct
     value: '8.46'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 20', column: 'Wt. % Fe2O3', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 20', column: 'Wt. % Fe2O3', line_range: 36, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[20].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 21', column: 'Temperature C.° ± 3°', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 21', column: 'Temperature C.° ± 3°', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[20].duration_h
     value: '48'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 21', column: 'Time in hours', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 21', column: 'Time in hours', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[20].FeO_wt_pct
     value: '2.43'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 21', column: 'Wt. % FeO', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 21', column: 'Wt. % FeO', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[20].Fe2O3_wt_pct
     value: '9.88'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 21', column: 'Wt. % Fe2O3', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 21', column: 'Wt. % Fe2O3', line_range: 37, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[21].T_C
     value: '1100'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 22', column: 'Temperature C.° ± 3°', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 22', column: 'Temperature C.° ± 3°', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[21].duration_h
     value: '240'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 22', column: 'Time in hours', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 22', column: 'Time in hours', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[21].FeO_wt_pct
     value: '.98'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 22', column: 'Wt. % FeO', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 22', column: 'Wt. % FeO', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[21].Fe2O3_wt_pct
     value: '11.50'
     reviewed_by: w1124t1963f14
     reviewed_on: '2026-11-23'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 22', column: 'Wt. % Fe2O3', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 22', column: 'Wt. % Fe2O3', line_range: 38, source_path: 'tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt', source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -587,12 +587,12 @@ fidelity_samples:
     value: '1430'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Temperature C.° ± 3°', line_range: '17', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 1', column: 'Temperature C.° ± 3°', line_range: '17', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].point_conditions.duration_h.state.value
     value: '23'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 1', column: 'Time in hours', line_range: '17', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 1', column: 'Time in hours', line_range: '17', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[1].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -612,12 +612,12 @@ fidelity_samples:
     value: '1400'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Temperature C.° ± 3°', line_range: '18', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 2', column: 'Temperature C.° ± 3°', line_range: '18', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[1].point_conditions.duration_h.state.value
     value: '10'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 2', column: 'Time in hours', line_range: '18', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 2', column: 'Time in hours', line_range: '18', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -637,12 +637,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Temperature C.° ± 3°', line_range: '19', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 3', column: 'Temperature C.° ± 3°', line_range: '19', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].point_conditions.duration_h.state.value
     value: '2'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 3', column: 'Time in hours', line_range: '19', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 3', column: 'Time in hours', line_range: '19', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -662,12 +662,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Temperature C.° ± 3°', line_range: '20', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 4', column: 'Temperature C.° ± 3°', line_range: '20', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].point_conditions.duration_h.state.value
     value: '4'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 4', column: 'Time in hours', line_range: '20', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 4', column: 'Time in hours', line_range: '20', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -687,12 +687,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Temperature C.° ± 3°', line_range: '21', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 5', column: 'Temperature C.° ± 3°', line_range: '21', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].point_conditions.duration_h.state.value
     value: '8'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 5', column: 'Time in hours', line_range: '21', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 5', column: 'Time in hours', line_range: '21', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -712,12 +712,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Temperature C.° ± 3°', line_range: '22', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 6', column: 'Temperature C.° ± 3°', line_range: '22', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].point_conditions.duration_h.state.value
     value: '16'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 6', column: 'Time in hours', line_range: '22', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 6', column: 'Time in hours', line_range: '22', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -737,12 +737,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Temperature C.° ± 3°', line_range: '23', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 7', column: 'Temperature C.° ± 3°', line_range: '23', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].point_conditions.duration_h.state.value
     value: '24'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 7', column: 'Time in hours', line_range: '23', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 7', column: 'Time in hours', line_range: '23', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -762,12 +762,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Temperature C.° ± 3°', line_range: '24', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 8', column: 'Temperature C.° ± 3°', line_range: '24', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].point_conditions.duration_h.state.value
     value: '48'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 8', column: 'Time in hours', line_range: '24', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 8', column: 'Time in hours', line_range: '24', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -787,12 +787,12 @@ fidelity_samples:
     value: '1300'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Temperature C.° ± 3°', line_range: '25', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 9', column: 'Temperature C.° ± 3°', line_range: '25', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].point_conditions.duration_h.state.value
     value: '48'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 9', column: 'Time in hours', line_range: '25', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 9', column: 'Time in hours', line_range: '25', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[9].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -812,12 +812,12 @@ fidelity_samples:
     value: '1200'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Temperature C.° ± 3°', line_range: '26', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 10', column: 'Temperature C.° ± 3°', line_range: '26', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[9].point_conditions.duration_h.state.value
     value: '2'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 10', column: 'Time in hours', line_range: '26', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 10', column: 'Time in hours', line_range: '26', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[10].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -837,12 +837,12 @@ fidelity_samples:
     value: '1200'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Temperature C.° ± 3°', line_range: '27', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 11', column: 'Temperature C.° ± 3°', line_range: '27', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[10].point_conditions.duration_h.state.value
     value: '7'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 11', column: 'Time in hours', line_range: '27', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 11', column: 'Time in hours', line_range: '27', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[11].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -862,12 +862,12 @@ fidelity_samples:
     value: '1200'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Temperature C.° ± 3°', line_range: '28', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 12', column: 'Temperature C.° ± 3°', line_range: '28', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[11].point_conditions.duration_h.state.value
     value: '16'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 12', column: 'Time in hours', line_range: '28', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 12', column: 'Time in hours', line_range: '28', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[12].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -887,12 +887,12 @@ fidelity_samples:
     value: '1200'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 13', column: 'Temperature C.° ± 3°', line_range: '29', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 13', column: 'Temperature C.° ± 3°', line_range: '29', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[12].point_conditions.duration_h.state.value
     value: '24'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 13', column: 'Time in hours', line_range: '29', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 13', column: 'Time in hours', line_range: '29', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[13].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -912,12 +912,12 @@ fidelity_samples:
     value: '1200'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 14', column: 'Temperature C.° ± 3°', line_range: '30', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 14', column: 'Temperature C.° ± 3°', line_range: '30', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[13].point_conditions.duration_h.state.value
     value: '37'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 14', column: 'Time in hours', line_range: '30', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 14', column: 'Time in hours', line_range: '30', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[14].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -937,12 +937,12 @@ fidelity_samples:
     value: '1200'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 15', column: 'Temperature C.° ± 3°', line_range: '31', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 15', column: 'Temperature C.° ± 3°', line_range: '31', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[14].point_conditions.duration_h.state.value
     value: '49'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 15', column: 'Time in hours', line_range: '31', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 15', column: 'Time in hours', line_range: '31', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[15].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -962,12 +962,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 16', column: 'Temperature C.° ± 3°', line_range: '32', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 16', column: 'Temperature C.° ± 3°', line_range: '32', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[15].point_conditions.duration_h.state.value
     value: '2'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 16', column: 'Time in hours', line_range: '32', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 16', column: 'Time in hours', line_range: '32', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[16].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -987,12 +987,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 17', column: 'Temperature C.° ± 3°', line_range: '33', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 17', column: 'Temperature C.° ± 3°', line_range: '33', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[16].point_conditions.duration_h.state.value
     value: '6'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 17', column: 'Time in hours', line_range: '33', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 17', column: 'Time in hours', line_range: '33', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[17].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -1012,12 +1012,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 18', column: 'Temperature C.° ± 3°', line_range: '34', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 18', column: 'Temperature C.° ± 3°', line_range: '34', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[17].point_conditions.duration_h.state.value
     value: '13'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 18', column: 'Time in hours', line_range: '34', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 18', column: 'Time in hours', line_range: '34', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[18].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -1037,12 +1037,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 19', column: 'Temperature C.° ± 3°', line_range: '35', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 19', column: 'Temperature C.° ± 3°', line_range: '35', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[18].point_conditions.duration_h.state.value
     value: '19'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 19', column: 'Time in hours', line_range: '35', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 19', column: 'Time in hours', line_range: '35', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[19].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -1062,12 +1062,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 20', column: 'Temperature C.° ± 3°', line_range: '36', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 20', column: 'Temperature C.° ± 3°', line_range: '36', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[19].point_conditions.duration_h.state.value
     value: '32.5'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 20', column: 'Time in hours', line_range: '36', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 20', column: 'Time in hours', line_range: '36', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[20].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -1087,12 +1087,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 21', column: 'Temperature C.° ± 3°', line_range: '37', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 21', column: 'Temperature C.° ± 3°', line_range: '37', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[20].point_conditions.duration_h.state.value
     value: '48'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 21', column: 'Time in hours', line_range: '37', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 21', column: 'Time in hours', line_range: '37', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[21].oxide_wt_percent
     value:
       SiO2: '50.87'
@@ -1112,12 +1112,12 @@ fidelity_samples:
     value: '1100'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 22', column: 'Temperature C.° ± 3°', line_range: '38', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 22', column: 'Temperature C.° ± 3°', line_range: '38', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[21].point_conditions.duration_h.state.value
     value: '240'
     reviewed_by: w1124t1963f15
     reviewed_on: '2026-11-24'
-    locator: {published_page: 534, pdf_page_index: 5, table: 'II', record: 'Table II row 22', column: 'Time in hours', line_range: '38', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
+    locator: {published_page: 534, pdf_page_index: 5, record: 'Table II row 22', column: 'Time in hours', line_range: '38', source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt, source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148}
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[0].point_conditions.fO2_control.state.value
     value: 1/5 atmosphere of oxygen
     reviewed_by: w1124t1963f16
@@ -1167,7 +1167,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[2].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:
@@ -1203,7 +1203,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[3].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:
@@ -1239,7 +1239,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[4].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:
@@ -1275,7 +1275,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[5].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:
@@ -1311,7 +1311,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[6].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:
@@ -1347,7 +1347,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[7].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:
@@ -1383,7 +1383,7 @@ fidelity_samples:
       source_path: tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt
       source_sha256: 17fc27c8d52d571985978d880c4a60574b51d42042d7be99aba23830d8b42148
   - path: species.Fe.observations[kennedy_1948_table2_run_series].values.rows[8].point_conditions.regime_as_printed.locator.note
-    value: It is apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
+    value: Is it apparent from the values in Table II that equilibrium was reached at 1300°C. in essentially 16 hours for the reaction 2Fe₂O₃ ⇌ 4FeO+O₂.
     reviewed_by: w1124t1963f16
     reviewed_on: '2026-11-24'
     locator:

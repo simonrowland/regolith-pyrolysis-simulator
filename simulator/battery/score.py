@@ -204,7 +204,10 @@ from simulator.battery.migrate import (
     HK_RATIO_ALPHA_DEFINITION,
     evaporation_alpha_family_key,
 )
-from simulator.battery.redox_fields import FERRIC_FRACTION_FIELDS
+from simulator.battery.redox_fields import (
+    FERRIC_FRACTION_FIELDS,
+    SCORED_REDOX_QUANTITIES,
+)
 from simulator.battery.method_class_bands import select_method_class_band
 from simulator.battery.records import (
     INITIAL_CHARGE_ONLY_PROXY_FLAG,
@@ -13019,8 +13022,13 @@ def predict_with_engine(
         )
     identity = observation.identity if isinstance(observation.identity, Identity) else None
     quantity = quantity_token(identity) if identity is not None else None
+    selected_redox_quantity = (
+        quantity
+        if quantity in SCORED_REDOX_QUANTITIES
+        else None
+    )
     pressure_selection = None
-    if quantity in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
+    if selected_redox_quantity is not None:
         from simulator.battery.waypoints import redox_prediction_pressure
 
         pressure_selection = redox_prediction_pressure(
@@ -13040,7 +13048,7 @@ def predict_with_engine(
             pressure_selection=pressure_selection,
         )
         return _with_pressure_qualification(
-            prediction, pressure_selection
+            prediction, pressure_selection, selected_redox_quantity
         )
 
     provided_handles = handles or {}
@@ -13059,7 +13067,7 @@ def predict_with_engine(
             pressure_selection=pressure_selection,
         )
         return _with_pressure_qualification(
-            prediction, pressure_selection
+            prediction, pressure_selection, selected_redox_quantity
         )
     finally:
         from simulator.diagnostic_helpers.binary_pot_battery import (
@@ -13076,14 +13084,17 @@ def predict_with_engine(
 def _with_pressure_qualification(
     prediction: EnginePrediction,
     pressure_selection: PredictionPressure | None,
+    selected_redox_quantity: Quantity | None,
 ) -> EnginePrediction:
-    """Report the selected pressure without re-running the waypoint selector."""
+    """Report the selected pressure without re-deciding redox eligibility."""
 
-    if pressure_selection is None or pressure_selection.qualification is None:
+    if (
+        pressure_selection is None
+        or pressure_selection.qualification is None
+        or selected_redox_quantity is None
+    ):
         return prediction
-    quantity = quantity_token(prediction.identity)
-    if quantity not in {Quantity.FE3_FE2_RATIO, Quantity.VALENCE_RATIO}:
-        return prediction
+    quantity = selected_redox_quantity
     from simulator.battery.fo2_ladder import (
         Fo2LadderNotice,
         PredictionPressureNotice,

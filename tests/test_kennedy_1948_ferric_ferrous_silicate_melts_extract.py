@@ -4,6 +4,7 @@ from copy import deepcopy
 from dataclasses import replace
 from decimal import Decimal
 from math import isclose, log, log10
+import os
 from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import patch
@@ -52,6 +53,12 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
     source_text = EXTRACT.read_text(encoding="utf-8")
     source = yaml.safe_load(source_text)
     assert yaml_mapping_source_issues(source_text) == []
+    assert all(
+        "Is it apparent from the values in Table II" in row["point_conditions"][
+            "regime_as_printed"
+        ]["locator"]["note"]
+        for row in source["species"]["Fe"]["observations"][2:9]
+    )
 
     result = _migrate_extract()
     assert len(result.observations) == 22
@@ -613,7 +620,9 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         )
         and sample.get("path", "").split("].values.rows[", 1)[-1].split("].", 1)[-1]
         in {"T_C", "duration_h", "FeO_wt_pct", "Fe2O3_wt_pct"}
-        and sample.get("locator", {}).get("table") == "II"
+        and sample.get("locator", {}).get("record", "").startswith("Table II row ")
+        and sample.get("locator", {}).get("source_path")
+        == "tables/kennedy-1948-ferric-ferrous-silicate-melts/table-text.txt"
     ]
     assert len(table2_pins) == 88
     assert {
@@ -636,6 +645,11 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
         sample["locator"]["source_sha256"] == expected_table_digest
         for sample in table2_pins
     )
+    assert all("table" not in sample["locator"] for sample in table2_pins)
+    assert all(
+        sample.get("reviewed_by") and sample.get("reviewed_on")
+        for sample in table2_pins
+    )
     repeated_condition_pins = [
         sample
         for sample in source["fidelity_samples"]
@@ -647,9 +661,10 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
             "point_conditions.T_C.state.value",
             "point_conditions.duration_h.state.value",
         }
-        and sample.get("locator", {}).get("table") == "II"
+        and sample.get("locator", {}).get("record", "").startswith("Table II row ")
     ]
     assert len(repeated_condition_pins) == 44
+    assert all("table" not in sample["locator"] for sample in repeated_condition_pins)
     table1_composition_pins = [
         sample
         for sample in source["fidelity_samples"]
@@ -719,6 +734,36 @@ def test_kennedy_table2_fidelity_pin_covers_the_observation():
     assert not coverage_warnings, (
         f"Kennedy fidelity pin coverage failed: {sorted(coverage_warnings)}"
     )
+
+
+def test_kennedy_uncertainty_pin_opens_exact_digest_artifact_and_rejects_mutation():
+    source = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
+    pin = next(
+        sample
+        for sample in source["fidelity_samples"]
+        if sample.get("path", "").endswith(
+            ".values.temperature_uncertainty_as_printed"
+        )
+    )
+    corpus_root = Path(
+        os.environ.get(
+            "REGOLITH_CORPUS_ROOT", str(Path.home() / "Repos" / "regolith-corpus")
+        )
+    )
+    reason = vle._locator_source_blind_reason(
+        pin, artifact_root=ROOT, corpus_root=corpus_root, doc=source
+    )
+    assert reason is None, None if reason is None else reason.detail
+
+    mutated = deepcopy(source)
+    mutated["species"]["Fe"]["observations"][0]["values"][
+        "temperature_uncertainty_as_printed"
+    ] = "± 3"
+    reason = vle._locator_source_blind_reason(
+        pin, artifact_root=ROOT, corpus_root=corpus_root, doc=mutated
+    )
+    assert reason is not None
+    assert "cited_token_absent" in reason.reason_codes
 
 
 def test_kennedy_oxygen_fidelity_pin_mutation_probe(monkeypatch):

@@ -263,6 +263,27 @@ def test_locator_citation_requires_the_cited_anchor() -> None:
     assert _citation_matches(richter_locator, unrelated_richter_range, [[2.5, 6.0]]) is False
 
 
+def test_kennedy_table2_row_locator_uses_its_exact_numeric_span():
+    extract = REPO_ROOT / "data/literature/extracts/kennedy-1948-ferric-ferrous-silicate-melts.yaml"
+    document = yaml.safe_load(extract.read_text(encoding="utf-8"))
+    sample = next(
+        sample
+        for sample in document["fidelity_samples"]
+        if sample.get("path", "").endswith("values.rows[0].FeO_wt_pct")
+    )
+    locator = sample["locator"]
+    assert "table" not in locator
+    corpus_root = Path(os.environ.get("REGOLITH_CORPUS_ROOT", DEFAULT_CORPUS_ROOT))
+    source = corpus_root / locator["source_path"]
+    lines = source.read_text(encoding="utf-8").splitlines()
+    start, end = _line_ranges(locator["line_range"])[0]
+    cited_text = "\n".join(lines[start - 1 : end])
+    assert _citation_matches(locator, cited_text, [sample["value"]]) is True
+
+    restored_defect = {**locator, "table": "II"}
+    assert _citation_matches(restored_defect, cited_text, [sample["value"]]) is False
+
+
 def test_extract_discovery_matches_migrator() -> None:
     extracts = _all_extracts()
     # The extract count is pinned once, by name, in tests/manifests/literature_extract_source_ids.jsonl

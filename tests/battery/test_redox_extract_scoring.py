@@ -2285,10 +2285,27 @@ def test_pressure_qualification_mutation_probe_removes_persisted_flag(monkeypatc
     monkeypatch.setattr(
         score_module,
         "_with_pressure_qualification",
-        lambda prediction, _selection: prediction,
+        lambda prediction, _selection, _selected_quantity: prediction,
     )
     with pytest.raises(StopIteration):
         test_vacuum_pressure_qualification_survives_printed_oxygen(monkeypatch)
+
+
+def test_redox_eligibility_mutation_consumes_selected_quantity(monkeypatch):
+    original = score_module._with_pressure_qualification
+
+    def stale_identity_after_selection(prediction, selection, selected_quantity):
+        identity = replace(prediction.identity, quantity=Quantity.P_PARTIAL)
+        return original(
+            replace(prediction, identity=identity), selection, selected_quantity
+        )
+
+    monkeypatch.setattr(
+        score_module,
+        "_with_pressure_qualification",
+        stale_identity_after_selection,
+    )
+    test_vacuum_pressure_qualification_survives_printed_oxygen(monkeypatch)
 
 
 def test_missing_pressure_uses_flagged_one_atmosphere_default():

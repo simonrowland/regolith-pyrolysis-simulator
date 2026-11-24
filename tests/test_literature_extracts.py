@@ -6244,6 +6244,19 @@ def test_scored_evidence_walk_excludes_extract_metadata_and_locator_coordinates(
     ]
 
 
+def _classifier_value_mappings(values):
+    rows = values.get("rows", ())
+    if not isinstance(rows, (list, tuple)):
+        rows = ()
+    mappings = [(values, ("values",))]
+    mappings.extend(
+        (row, ("values", "rows", index))
+        for index, row in enumerate(rows)
+        if isinstance(row, dict)
+    )
+    return rows, mappings
+
+
 def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
     provenance_fields = frozenset(
         {
@@ -6282,15 +6295,7 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
                     continue
 
                 measured, _non_finite = vle._scored_evidence_leaves(observation)
-                rows = values.get("rows", (values,))
-                if not isinstance(rows, (list, tuple)):
-                    rows = ()
-                value_mappings = [(values, ("values",))]
-                value_mappings.extend(
-                    (row, ("values", "rows", index))
-                    for index, row in enumerate(rows)
-                    if isinstance(row, dict)
-                )
+                rows, value_mappings = _classifier_value_mappings(values)
                 for field in ("cell_locators", "composition_column_locators"):
                     if field in values:
                         seen[field] += 1
@@ -6336,6 +6341,37 @@ def test_scored_leaf_classifier_excludes_metadata_across_current_extracts():
     assert seen["temperature_uncertainty_as_printed"] > 0
     assert seen["uncertainty_as_published"] > 0
     assert seen["regime_as_printed.state.value"] > 0
+
+
+def test_classifier_address_mutation_reintroduces_synthetic_row(monkeypatch):
+    import sys
+
+    test_scored_leaf_classifier_excludes_metadata_across_current_extracts()
+    original = _classifier_value_mappings
+
+    def synthetic_row_fallback(values):
+        rows, mappings = original(values)
+        if not rows:
+            mappings.append((values, ("values", "rows", 0)))
+        return rows, mappings
+
+    monkeypatch.setattr(
+        sys.modules[__name__], "_classifier_value_mappings", synthetic_row_fallback
+    )
+    with pytest.raises(AssertionError):
+        test_scored_leaf_classifier_excludes_metadata_across_current_extracts()
+
+
+def test_digit_backstop_uses_the_measured_walk_provenance_skip_set(monkeypatch):
+    observation = {
+        "values": {
+            "source_sha256": "abc123",
+        }
+    }
+    assert not vle._observation_has_digit_bearing_string(observation)
+    monkeypatch.setattr(vle, "_VALUE_PROVENANCE_KEYS", frozenset())
+    with pytest.raises(AssertionError):
+        assert not vle._observation_has_digit_bearing_string(observation)
 
 
 def test_scored_leaf_classifier_reversion_mutation_probe(monkeypatch):

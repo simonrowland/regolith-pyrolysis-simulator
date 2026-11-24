@@ -2710,7 +2710,7 @@ def _observation_has_digit_bearing_string(observation: Mapping[str, Any]) -> boo
         return False
 
     if "values" in observation and contains(
-        observation.get("values"), ("values",), frozenset()
+        observation.get("values"), ("values",), _VALUE_PROVENANCE_KEYS
     ):
         return True
     for key in _SCORED_NUMERIC_CONDITIONS:
