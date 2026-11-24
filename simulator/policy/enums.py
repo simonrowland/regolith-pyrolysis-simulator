@@ -4,12 +4,16 @@ from __future__ import annotations
 
 from enum import StrEnum
 
+from simulator.lab_schedule import _SCCM_REFERENCE_STATE_UNREPORTED
+
 
 class NoticeKind(StrEnum):
     FLOOR_INVERSION = "floor_inversion"
     FALLBACK = "fallback"
     OUT_OF_GAMMA_DOMAIN = "out_of_gamma_domain"
     OUT_OF_CERTIFIED_BAND = "out_of_certified_band"
+    SOSSI_GAS_BOUNDARY_UNVERIFIED = "sossi_gas_boundary_unverified"
+    SCCM_REFERENCE_STATE_UNREPORTED = _SCCM_REFERENCE_STATE_UNREPORTED
     DERIVATION_USES_COMPILATION = "derivation_uses_compilation"
     COMPOSITION_PROJECTED = "composition_projected"
     COMPOSITION_BINARY_COMPLEMENT = "composition_binary_complement"

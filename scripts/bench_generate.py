@@ -12,7 +12,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from simulator.battery.migrate import load_migrated_store, load_migrated_benches, to_plain
-from simulator.battery.consumer_inputs import collect_consumer_inputs
+from simulator.battery.consumer_inputs import (
+    _sossi_table2_flow_observation,
+    collect_consumer_inputs,
+)
 from simulator.battery.generators import (
     engine_point_requests,
     kems_case,
@@ -58,7 +61,13 @@ def main(argv=None):
             reasons["bench"] += 1
             manifest.append({"experiment_id": experiment.experiment_id, "status": "refused", "missing": ["bench"]})
             continue
-        contexts = [None] if args.consumer == "rps" else by_experiment.get(experiment.experiment_id, [None])
+        if args.consumer == "rps":
+            rps_observation = _sossi_table2_flow_observation(
+                experiment, by_experiment.get(experiment.experiment_id, ())
+            )
+            contexts = [rps_observation]
+        else:
+            contexts = by_experiment.get(experiment.experiment_id, [None])
         for observation in contexts:
             inputs = collect_consumer_inputs(experiment, bench, observation)
             if args.consumer == "engine_point":

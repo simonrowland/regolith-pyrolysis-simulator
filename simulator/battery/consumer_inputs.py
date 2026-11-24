@@ -4,8 +4,17 @@ from dataclasses import dataclass, fields, is_dataclass
 from collections.abc import Mapping
 from decimal import Decimal
 
-from simulator.battery.records import Located, StandardState, Value
+from simulator.battery.records import (
+    Located,
+    StandardState,
+    Value,
+)
 from simulator.battery.enums import ValueKind
+from simulator.source_ids import SOSSI_SOURCE_ID
+from simulator.battery.oxygen_identity import (
+    _sossi_experiment_run_id,
+    sossi_table2_gas_boundary as _sossi_table2_gas_boundary,
+)
 from simulator.battery.waypoints import (
     Waypoint, WaypointResult, WaypointAuthority, SpeciesWaypoints,
     ConsumerReadiness, _AUTHORITY_RANK, _result, charge_moles_by_species, thermal_path,
@@ -29,6 +38,65 @@ REQUIREMENTS = {
              "measurement_selectors"),
     "rps": ("run_charge_moles_by_species", "run_mass_kg", "thermal_path", "run_pressure_boundary", "surfaces", "gas_boundary"),
 }
+
+
+def _sossi_table2_run_id(experiment):
+    locator = experiment.locator
+    return _sossi_experiment_run_id(
+        {
+            "locator": (
+                {
+                    "note": locator.note,
+                    "table": locator.table,
+                    "page": locator.page,
+                }
+                if locator is not None
+                else None
+            )
+        }
+    )
+
+
+def _sossi_table2_flow_observation(experiment, observations):
+    try:
+        run_id = _sossi_table2_run_id(experiment)
+    except ValueError:
+        return None
+    fallback_mn = None
+    fallback_any = None
+    located_mn = None
+    located_any = None
+    for observation in observations:
+        species = getattr(observation.identity, "species", None)
+        if (
+            observation.source_id != SOSSI_SOURCE_ID
+            or observation.experiment_id != experiment.experiment_id
+            or observation.admission.status.value != "admitted"
+        ):
+            continue
+        temperature = (observation.point_conditions or {}).get("temperature_K")
+        has_located_temperature = (
+            isinstance(temperature, Located)
+            and temperature.state.is_value
+            and temperature.locator is not None
+        )
+        if getattr(species, "formula", None) != "Mn":
+            fallback_any = fallback_any or observation
+            if has_located_temperature:
+                located_any = located_any or observation
+            continue
+        boundary = _sossi_table2_gas_boundary(
+            experiment, observation, expected_run_id=run_id
+        )
+        if boundary is not None:
+            if "component_flows" in boundary or boundary["imposed_flow"].get(
+                "reason", ""
+            ).startswith("The source leaves both CO and CO2 flow columns blank"):
+                return observation
+        fallback_mn = fallback_mn or observation
+        if has_located_temperature:
+            located_mn = located_mn or observation
+    return located_mn or located_any or fallback_mn or fallback_any
 
 
 @dataclass(frozen=True)
@@ -126,7 +194,11 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
             temperature = _result("temperature_K", [], ("observation.point_conditions.temperature_K",))
     waypoints = {
         "normalized_composition": normalized_composition(experiment, bench, observation),
-        "thermal_path": thermal_path(experiment, bench),
+        "thermal_path": (
+            thermal
+            if observation is not None and observation.source_id == SOSSI_SOURCE_ID
+            else thermal_path(experiment, bench)
+        ),
         "temperature_K": temperature,
         "pressure_boundary": pressure_boundary(experiment, bench, observation),
         "run_pressure_boundary": pressure_boundary(experiment, bench),
@@ -136,6 +208,31 @@ def collect_consumer_inputs(experiment, bench, observation=None) -> ConsumerInpu
     for name in ("mass_kg", "post_mass_kg", "purity_fraction", "temperature_program",
                  "temperature_uncertainty_K", "repeat_count", "hold_duration_s",
                  "measurement_selectors", "pressure_calibration", "temperature_calibration", "surfaces", "surface_temperature_C", "gas_boundary"):
+        if name == "gas_boundary":
+            source_boundary = _sossi_table2_gas_boundary(experiment, observation)
+            if source_boundary is not None:
+                route_path = (
+                    f"observation[{observation.observation_id}]"
+                    ".point_conditions.temperature_K"
+                    if observation is not None
+                    else "experiment.pressure_environment.sweep_gas"
+                )
+                route = Waypoint(
+                    name,
+                    source_boundary,
+                    route_path,
+                    (
+                        WaypointAuthority.EXTRAPOLATED
+                        if "reported_total_flow" in source_boundary
+                        else WaypointAuthority.PRINTED
+                    ),
+                    (
+                        route_path,
+                        "experiment.pressure_environment.total_pressure_Pa",
+                    ),
+                )
+                waypoints[name] = WaypointResult(name, route, (route,))
+                continue
         candidates = []
         if name == "mass_kg":
             candidates.append(("experiment.sample.mass_kg", experiment.sample.mass_kg))

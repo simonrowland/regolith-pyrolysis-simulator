@@ -247,6 +247,7 @@ def test_residue_cohort_caches_are_scoped_by_selected_experiments(
     from simulator.battery.enums import Engine, EvidenceClass, ExecutionState, Phase, Quantity
     from simulator.battery.identity import Identity
     from simulator.battery.records import Species
+    from simulator.battery.oxygen_identity import SossiGasEquilibriumCheck
     from . import factories as F
 
     hashimoto_source = score._HASHIMOTO_SOURCE_ID
@@ -310,10 +311,40 @@ def test_residue_cohort_caches_are_scoped_by_selected_experiments(
                 ]
             }
         if sossi_source in str(path):
-            return {"experiments": sossi_experiments}
+            return {
+                "experiments": sossi_experiments,
+                "species": {
+                    "Mn": {
+                        "observations": [
+                            {
+                                "observation_id": "sossi_2019_mn_table2_open_furnace_residue_ppm_quoted_20260906",
+                                "values": {"series": [{"validation_stub": True}]},
+                            }
+                        ]
+                    }
+                },
+            }
         return {}
 
     monkeypatch.setattr(score, "load_yaml", load_yaml)
+
+    def sossi_gas_validation_stub(experiments, _series):
+        return {
+            experiment["experiment_id"]: SossiGasEquilibriumCheck(
+                experiment["experiment_id"],
+                experiment["experiment_id"],
+                "validation_stub",
+                Decimal("-10"),
+                Decimal("-10"),
+                Decimal(0),
+                Decimal("-10"),
+            )
+            for experiment in experiments
+        }
+
+    monkeypatch.setattr(
+        score, "check_sossi_table2_gas_equilibrium", sossi_gas_validation_stub
+    )
     monkeypatch.setattr(
         score.subprocess,
         "run",
