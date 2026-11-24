@@ -2553,7 +2553,7 @@ def test_openimcc_cache_settings_use_selected_opener_pack() -> None:
     )
 
 
-def test_openimcc_gas_cache_key_tracks_pack_contents_and_selection(
+def test_openimcc_gas_cache_key_tracks_pack_selection_only(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -2573,7 +2573,7 @@ def test_openimcc_gas_cache_key_tracks_pack_contents_and_selection(
     ) -> dict[str, float]:
         nonlocal calls
         calls += 1
-        return {"CO(g)": float(gas_pack.gas_df.iloc[0, 0])}
+        return {"CO(g)": {"gas-a.csv": 1.0, "gas-b.csv": 2.0}[gas_pack.gas_path.name]}
 
     monkeypatch.setitem(
         sys.modules,
@@ -2581,36 +2581,25 @@ def test_openimcc_gas_cache_key_tracks_pack_contents_and_selection(
         SimpleNamespace(evaluate_gas=fake_evaluate_gas),
     )
     common = ({"SiO2": 0.5}, 1700.0, 1.0e-6)
-    import pandas as pd
-
-    first_pack = SimpleNamespace(
-        gas_df=pd.DataFrame({"coefficient": [1.0]}),
-        oxide_df=pd.DataFrame({"coefficient": [0.0]}),
-    )
-    second_pack = SimpleNamespace(
-        gas_df=pd.DataFrame({"coefficient": [2.0]}),
-        oxide_df=pd.DataFrame({"coefficient": [0.0]}),
-    )
+    oxide_path = Path("condensate.csv")
+    first_pack = SimpleNamespace(gas_path=Path("gas-a.csv"), oxide_path=oxide_path)
+    second_pack = SimpleNamespace(gas_path=Path("gas-b.csv"), oxide_path=oxide_path)
 
     first = evaluate_gas(*common, first_pack, gas_pack_selection="published-core")
-    changed_pack = evaluate_gas(
-        *common, second_pack, gas_pack_selection="published-core"
-    )
-    same_pack = evaluate_gas(
+    same_selection = evaluate_gas(
         *common, second_pack, gas_pack_selection="published-core"
     )
     other_selection = evaluate_gas(
         *common, second_pack, gas_pack_selection="published-ext"
     )
 
-    assert first["CO(g)"] != changed_pack["CO(g)"]
-    assert changed_pack == same_pack
-    assert changed_pack["CO(g)"] == other_selection["CO(g)"]
-    assert calls == 3
+    assert first == same_selection
+    assert first["CO(g)"] != other_selection["CO(g)"]
+    assert calls == 2
     assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
         "hits": 1,
-        "misses": 3,
-        "stores": 3,
+        "misses": 2,
+        "stores": 2,
         "store_error": 0,
         "read_error": 0,
         "conflicts": 0,
