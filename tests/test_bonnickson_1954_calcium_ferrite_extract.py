@@ -5,7 +5,7 @@ from pathlib import Path
 
 import yaml
 
-from simulator.battery.enums import Quantity
+from simulator.battery.enums import NoticeKind, Phase, Quantity
 from simulator.battery.migrate import Migrator
 
 
@@ -127,14 +127,20 @@ def test_bonnickson_calcium_ferrite_rows_match_render_and_migrate() -> None:
             temperature_fragment.removeprefix("T=")
         )
 
-    phase_unknown = {
+    phase_unspecified = {
+        row.observation_id
+        for row in rows
+        if row.identity.species.phase.is_value
+        and row.identity.species.phase.value is Phase.UNSPECIFIED
+    }
+    assert len(phase_unspecified) == 2
+    assert all("tablei_cafe2o4_unknown_a_heat_content" in row for row in phase_unspecified)
+    assert not {
         row.observation_id
         for row in rows
         if row.identity.species.phase.is_unknown
     }
-    assert len(phase_unknown) == 2
-    assert all("tablei_cafe2o4_unknown_a_heat_content" in row for row in phase_unknown)
-    refused_migrated = [row for row in rows if row.observation_id in phase_unknown]
+    refused_migrated = [row for row in rows if row.observation_id in phase_unspecified]
     refused_by_temperature = {row.identity.temperature_K.value: row for row in refused_migrated}
     assert set(refused_by_temperature) == {Decimal("1504.6"), Decimal("1529.7")}
     assert {
@@ -147,6 +153,12 @@ def test_bonnickson_calcium_ferrite_rows_match_render_and_migrate() -> None:
     incongruent_reason = "The printed measurement lies in the source-stated incongruent-melting interval"
     assert all(incongruent_reason in row.admission.reason for row in refused_migrated)
     assert all(row.admission.status.value == "rejected" for row in refused_migrated)
+    assert all(
+        {notice.kind for notice in row.notices}
+        == {NoticeKind.PHASE_INFERRED, NoticeKind.METHOD_UNSTATED}
+        for row in refused_migrated
+    )
+    assert all(len(row.notices) == 2 for row in refused_migrated)
     refused_rows = [
         observation
         for observation in extract["species"]["CaFe2O4"]["observations"]

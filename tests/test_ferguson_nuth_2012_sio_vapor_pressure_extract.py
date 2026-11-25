@@ -7,6 +7,7 @@ import yaml
 from simulator.battery.enums import (
     EvidenceClass,
     MethodToken,
+    NoticeKind,
     Quantity,
     StateTag,
     ValueKind,
@@ -136,4 +137,9 @@ def test_removing_alpha_experiment_method_returns_to_typed_unknown(
         for row in result.observations.values()
         if row.observation_id.endswith("ferguson_nuth_2012_alpha_T1433")
     )
-    assert result.experiments[migrated.experiment_id].method.is_unknown
+    method = result.experiments[migrated.experiment_id].method
+    assert method.is_value and method.value is MethodToken.UNSPECIFIED
+    assert {notice.kind for notice in migrated.notices} == {
+        NoticeKind.METHOD_UNSTATED,
+        NoticeKind.ADMISSION_DEFAULTED,
+    }

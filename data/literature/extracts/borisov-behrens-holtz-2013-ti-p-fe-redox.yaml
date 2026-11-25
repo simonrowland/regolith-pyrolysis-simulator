@@ -5600,6 +5600,7 @@ species:
           locator: *id001
       quench_statement: *id004
     - observation_id: borisov_2013_pu3_wet_chemistry_session_1
+      experiment: borisov_2013_pu3_wet_chemistry_session_1
       type: concentration_series
       phase: glass
       units: dimensionless Fe3+/Fe2+ ratio
@@ -5662,6 +5663,7 @@ species:
         quench_direction: not_stated
         locator: *id005
     - observation_id: borisov_2013_pu3_wet_chemistry_session_2
+      experiment: borisov_2013_pu3_wet_chemistry_session_2
       type: concentration_series
       phase: glass
       units: dimensionless Fe3+/Fe2+ ratio
@@ -5719,6 +5721,7 @@ species:
         quench_direction: not_stated
         locator: *id005
     - observation_id: borisov_2013_pu3_wet_chemistry_session_3
+      experiment: borisov_2013_pu3_wet_chemistry_session_3
       type: concentration_series
       phase: glass
       units: dimensionless Fe3+/Fe2+ ratio
@@ -5776,15 +5779,11 @@ species:
         quench_direction: not_stated
         locator: *id005
     - observation_id: borisov_2013_pu3_schuessler_2008_quoted_mean
+      experiment: borisov_2013_pu3_schuessler_2008_quoted_mean
       type: concentration_series
       phase: glass
       units: dimensionless Fe3+/Fe2+ ratio
-      locator:
-        page: 3
-        published_page: 1579
-        pdf_page_index: 2
-        section: Experimental procedure
-        note: Published PU-3 average cited by the authors.
+      locator: *id005
       uncertainty:
         value: '0.11'
         units: dimensionless
@@ -5831,6 +5830,7 @@ species:
             value: not_stated
           locator: *id005
     - observation_id: borisov_2013_morb_christie_1986_quoted
+      experiment: borisov_2013_morb_christie_1986_quoted
       type: concentration_series
       phase: glass
       units: fraction of total Fe (Fe3+/Fet)
@@ -5892,6 +5892,7 @@ species:
         quench_direction: not_stated
         locator: *id006
     - observation_id: borisov_2013_morb_cottrell_kelley_2011_quoted
+      experiment: borisov_2013_morb_cottrell_kelley_2011_quoted
       type: concentration_series
       phase: glass
       units: fraction of total Fe (Fe3+/Fet)
@@ -6103,6 +6104,7 @@ species:
         - name: panel b, DAFSP08
           marker_count: 3
         digitisation: deferred to a figure pass
+
         point_conditions:
           atmosphere:
             state:
@@ -8578,3 +8580,17 @@ species:
                 reason: The IW buffer is named, but a numerical log fO2 is not printed.
               locator: *id030
         digitisation: deferred to a figure pass
+
+experiments:
+- experiment_id: borisov_2013_pu3_wet_chemistry_session_1
+  locator: *id005
+- experiment_id: borisov_2013_pu3_wet_chemistry_session_2
+  locator: *id005
+- experiment_id: borisov_2013_pu3_wet_chemistry_session_3
+  locator: *id005
+- experiment_id: borisov_2013_pu3_schuessler_2008_quoted_mean
+  locator: *id005
+- experiment_id: borisov_2013_morb_christie_1986_quoted
+  locator: *id006
+- experiment_id: borisov_2013_morb_cottrell_kelley_2011_quoted
+  locator: *id006

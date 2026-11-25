@@ -5,6 +5,7 @@ from pathlib import Path
 
 import yaml
 
+from simulator.battery.enums import NoticeKind
 from tests.battery.factories import migrate_one_extract
 
 
@@ -132,7 +133,9 @@ def test_table_4_render_grid_migrates_all_components_and_conditions() -> None:
                     assert Decimal(str(observation.value.point)) == Decimal(amount)
                     assert Decimal(str(raw["uncertainty"]["sigma"])) == Decimal(sigma)
                     assert sigma not in {"0", "0.0"}
-                    assert not observation.notices
+                    assert tuple(notice.kind for notice in observation.notices) == (
+                        NoticeKind.PHASE_INFERRED,
+                    )
     assert points == 43
     assert unavailable == 8
 

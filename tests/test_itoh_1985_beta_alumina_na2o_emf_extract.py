@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 import yaml
 
-from simulator.battery.enums import Phase, Quantity, ReferenceStateConvention, ValueKind
+from simulator.battery.enums import NoticeKind, Phase, Quantity, ReferenceStateConvention, ValueKind
 from simulator.battery.migrate import Migrator
 
 
@@ -99,7 +99,9 @@ def test_every_typed_activity_migrates_as_the_printed_na2o_point() -> None:
         assert observation.identity.species.formula == "Na2O"
         assert observation.identity.quantity.value is Quantity.ACTIVITY
         assert observation.value.kind is ValueKind.POINT
-        assert observation.notices == ()
+        assert tuple(notice.kind for notice in observation.notices) == (
+            NoticeKind.METHOD_UNSTATED,
+        )
         assert observation.identity.temperature_K.value == Decimal("1000")
         assert observation.identity.composition.is_unknown
         assert not observation.identity.reference_state.is_unknown
