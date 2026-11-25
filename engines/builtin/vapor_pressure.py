@@ -4273,15 +4273,7 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                     continue
                 if oxide_activity.warning:
                     warnings.append(oxide_activity.warning)
-                # A zero-exponent compiled path does not consume source_activity.
-                # In particular, FeO_association_gas is formed from its pure-Fe
-                # saturation base at a_Fe=1; melt FeO activity is not the parent
-                # activity used by that association path.
-                if (
-                    compiled_evaluator is None
-                    or compiled_evaluator.activity_exponent != 0.0
-                ):
-                    activities[name] = reported_activity
+                activities[name] = reported_activity
                 if compiled_evaluator is not None:
                     # The compiled source reaction owns its declared activity
                     # power.  Premise: for q A_cond -> nu V + ..., mass action
