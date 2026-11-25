@@ -773,18 +773,42 @@ def openimcc_binding_selected_by_inputs(
     quantity_class: str = "activity",
     phase_basis: str | None = None,
 ) -> bool:
+    """Return whether this quantity uses OpenIMCC.
+
+    Explicit role pins use ``resolve_role_engines``. With no pin, this adapter
+    retains its phase-aware vapour default because the resolver has no phase
+    basis input. The activity-domain loader runs only when the resolver needs
+    the activity gate.
+    """
+
     if quantity_class not in {"activity", "vapour"}:
         raise ValueError(f"Unknown OpenIMCC quantity class: {quantity_class!r}")
-    mode = normalize_high_t_melt_activity(
-        controls.get("high_t_melt_activity", "openimcc")
+    from simulator.chemistry.role_engines import resolve_role_engines
+
+    override = controls.get("role_engine_override")
+    role_override = override if isinstance(override, Mapping) else None
+    decision = resolve_role_engines(
+        backend_name=None,
+        high_t_melt_activity=controls.get("high_t_melt_activity", "openimcc"),
+        temperature_K=temperature_K,
+        intrinsic_fO2_supplied=controls.get("intrinsic_fO2_log") is not None,
+        vapour_openimcc_above_K=BUILTIN_VAPOUR_CHANNEL_SWITCH_K,
+        role_override=role_override,
+        surface="run",
+        evaluate=quantity_class,
+        load_activity_domain_low_K=lambda: openimcc_bridge._temperature_domain_K()[0],
     )
-    if mode != "openimcc":
-        return False
     if quantity_class == "vapour":
         if phase_basis not in {None, "liquid", "solid_bearing", "missing", "invalid"}:
             raise ValueError(f"Unknown OpenIMCC vapour phase basis: {phase_basis!r}")
+        if role_override:
+            return decision.vapour == "openimcc"
+        if normalize_high_t_melt_activity(
+            controls.get("high_t_melt_activity", "openimcc")
+        ) != "openimcc":
+            return False
         return _openimcc_vapour_selected(temperature_K, phase_basis)
-    return temperature_K >= openimcc_bridge._temperature_domain_K()[0]
+    return decision.melt_activity == "openimcc"
 
 
 def _openimcc_vapour_phase_basis(liquid_fraction: Any) -> str:

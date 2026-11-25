@@ -674,7 +674,7 @@ ENGINE_CHEMISTRY_VERSION_IDENTITY_AT = {
         "date": "2026-11-23",
     },
     "internal-analytical": {
-        "identity": "source-sha256:49c874a931e4e5becf1245f20d7edb4ed1bdd7f470221e6e94d5bfdcddabb11a",
+        "identity": "source-sha256:1a755a13b3e0e2b0572d6fd95f79d9975cc5f196215b88d48727856f02ec861a",
         "date": "2026-11-25",
     },
     "vaporock": {

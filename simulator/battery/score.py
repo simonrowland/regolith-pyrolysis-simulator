@@ -18541,10 +18541,21 @@ def _residue_prediction_cache_entry(
     selected_experiment_ids: frozenset[str] | None = None,
     *,
     value: Mapping[str, object] | None = None,
+    role_override: Mapping[str, str] | None = None,
 ) -> Mapping[str, object] | None:
-    """Read or store the residue cache entry for one selection scope."""
+    """Read or store the residue cache entry for one selection scope.
 
-    key = (source_id, engine, selected_experiment_ids)
+    An absent override keeps the historical three-part key. A pin is part of
+    the key so a pinned cohort cannot be served as the unpinned one.
+    """
+
+    key: tuple = (source_id, engine, selected_experiment_ids)
+    if role_override:
+        key = key + (
+            tuple(sorted(
+                (str(role), str(name)) for role, name in role_override.items()
+            )),
+        )
     if value is not None:
         cache[key] = value
     return cache.get(key)
@@ -18576,6 +18587,26 @@ def _hashimoto_engine_floor_inversion_notices(
     return tuple(notices)
 
 
+def _with_role_engine_decision(
+    detail: dict[str, object],
+    exc: BaseException,
+    row_provenance: object,
+) -> dict[str, object]:
+    """Copy a decision the row or the exception already has. Absent stays absent."""
+
+    carried = getattr(exc, "provenance", None)
+    decision = (
+        carried.get("role_engine_decision")
+        if isinstance(carried, Mapping)
+        else None
+    )
+    if decision is None and isinstance(row_provenance, Mapping):
+        decision = row_provenance.get("role_engine_decision")
+    if isinstance(decision, Mapping) and decision:
+        detail["role_engine_decision"] = dict(decision)
+    return detail
+
+
 def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -18586,6 +18617,7 @@ def _hashimoto_residue_prediction(
     *,
     selected_experiment_ids: frozenset[str] | None = None,
     test_experiment_ids: frozenset[str] | None = None,
+    role_override: Mapping[str, str] | None = None,
 ) -> EnginePrediction:
     """Predict a Hashimoto vector once per engine, then project by physical run."""
     channel = ENGINE_CHANNELS[engine]
@@ -18597,8 +18629,10 @@ def _hashimoto_residue_prediction(
         selected_experiment_ids, test_experiment_ids
     )
     rows_by_key = _residue_prediction_cache_entry(
-        cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
+        cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection,
+        role_override=role_override,
     )
+    primary_provenance = None
     try:
         if engine not in {Engine.INTERNAL_ANALYTICAL, Engine.OPENIMCC}:
             raise ValueError("engine_not_supported_for_hashimoto_residue")
@@ -18665,6 +18699,7 @@ def _hashimoto_residue_prediction(
                 engine=engine.value,
                 _allow_partial_cohort_for_test=test_experiment_ids is not None,
                 selected_experiment_ids=cohort_selection,
+                role_override=role_override,
             )
             rows_by_key = {
                 row.experiment_id + "::" + row.alpha_arm: row for row in rows
@@ -18675,6 +18710,7 @@ def _hashimoto_residue_prediction(
                 engine,
                 cohort_selection,
                 value=rows_by_key,
+                role_override=role_override,
             )
         if "__cohort_error__" in rows_by_key:
             raise ValueError(str(rows_by_key["__cohort_error__"]))
@@ -18919,7 +18955,8 @@ def _hashimoto_residue_prediction(
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
         if (
             _residue_prediction_cache_entry(
-                cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection
+                cache, _HASHIMOTO_SOURCE_ID, engine, cohort_selection,
+                role_override=role_override,
             )
             is None
             and not infrastructure_failure
@@ -18930,6 +18967,7 @@ def _hashimoto_residue_prediction(
                 engine,
                 cohort_selection,
                 value={"__cohort_error__": str(reason)},
+                role_override=role_override,
             )
         detail: dict[str, object] = {
             "reason": str(reason),
@@ -18939,6 +18977,11 @@ def _hashimoto_residue_prediction(
         }
         if getattr(exc, "detail", None):
             detail["detail"] = str(exc.detail)
+        # The cohort already stored the decision on the row, and a refusal
+        # raised from that row drops the row. An incompatible pin carries the
+        # chosen tokens on the exception instead, because no row exists yet.
+        # Unpinned rows have no decision, so the detail keys stay as they were.
+        detail = _with_role_engine_decision(detail, exc, primary_provenance)
         engine_floor_diagnostics: object = ()
         if getattr(exc, "reason", None) == "hashimoto_internal_analytical_channels_missing":
             try:
@@ -18983,6 +19026,8 @@ def _knudsen_residue_prediction(
     cache: dict[
         tuple[str, Engine, frozenset[str] | None], Mapping[str, object]
     ] | None = None,
+    *,
+    role_override: Mapping[str, str] | None = None,
 ) -> EnginePrediction:
     """Translate the residue owner's extent result to the scoring contract."""
     quantity = quantity_token(reference.identity)
@@ -19004,6 +19049,11 @@ def _knudsen_residue_prediction(
             f"knudsen:{reference.experiment_id}:{reference.identity.temperature_K}:"
             f"{printed_source_pressure(reference)}"
         )
+        if role_override:
+            pin = ",".join(
+                f"{role}={name}" for role, name in sorted(role_override.items())
+            )
+            cache_source_id = f"{cache_source_id}|{pin}"
         cached_result = (
             None
             if cache is None
@@ -19015,6 +19065,7 @@ def _knudsen_residue_prediction(
             result = predict_knudsen_residue_composition(
                 engine.value, reference, experiment, context.observations.values(),
                 _bench_for_score(experiment, context.benches) if experiment is not None else None,
+                role_override=role_override,
             )
             if cache is not None:
                 _residue_prediction_cache_entry(
@@ -19276,6 +19327,7 @@ def _sossi_residue_prediction(
     *,
     selected_experiment_ids: frozenset[str] | None = None,
     test_experiment_ids: frozenset[str] | None = None,
+    role_override: Mapping[str, str] | None = None,
 ) -> EnginePrediction:
     """Predict one Sossi Mn/Ti cell from the shared per-run inventory result."""
     channel = ENGINE_CHANNELS[engine]
@@ -19312,8 +19364,10 @@ def _sossi_residue_prediction(
             identity=reference.identity,
         )
     cohort = _residue_prediction_cache_entry(
-        cache, _SOSSI_SOURCE_ID, engine, cohort_selection
+        cache, _SOSSI_SOURCE_ID, engine, cohort_selection,
+        role_override=role_override,
     )
+    sossi_row_provenance = None
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
@@ -19558,6 +19612,7 @@ def _sossi_residue_prediction(
                     buffered_fO2_log_by_experiment=buffered_fO2_by_experiment,
                     engine=engine.value,
                     selected_experiment_ids=selected_valid_ids,
+                    role_override=role_override,
                 )
                 for row in rows:
                     assessment = run_assessments.get(row.experiment_id)
@@ -19572,6 +19627,7 @@ def _sossi_residue_prediction(
                 engine,
                 cohort_selection,
                 value=cohort,
+                role_override=role_override,
             )
         if "__cohort_error__" in cohort:
             raise ValueError(str(cohort["__cohort_error__"]))
@@ -19606,6 +19662,9 @@ def _sossi_residue_prediction(
                 },
                 identity=reference.identity,
             )
+        row_provenance = getattr(prediction, "provenance", None)
+        if isinstance(row_provenance, Mapping):
+            sossi_row_provenance = row_provenance
         run_refusal = prediction.provenance.get("run_refusal")
         if isinstance(run_refusal, Mapping):
             raise ResidueInventoryRefusal(
@@ -19784,7 +19843,8 @@ def _sossi_residue_prediction(
         infrastructure_failure = _is_residue_worker_infrastructure_failure(reason)
         if (
             _residue_prediction_cache_entry(
-                cache, _SOSSI_SOURCE_ID, engine, cohort_selection
+                cache, _SOSSI_SOURCE_ID, engine, cohort_selection,
+                role_override=role_override,
             )
             is None
             and not infrastructure_failure
@@ -19795,6 +19855,7 @@ def _sossi_residue_prediction(
                 engine,
                 cohort_selection,
                 value={"__cohort_error__": str(reason)},
+                role_override=role_override,
             )
         if infrastructure_failure:
             refusal = RefusalReason.ATTEMPTED_UNAVAILABLE
@@ -19818,13 +19879,17 @@ def _sossi_residue_prediction(
             ),
             coefficient_sources=sources,
             refusal_reason=refusal,
-            refusal_detail={
-                "reason": str(reason),
-                "engine": engine.value,
-                "source_id": reference.source_id,
-                "experiment_id": reference.experiment_id,
-                "detail": str(getattr(exc, "detail", "")),
-            },
+            refusal_detail=_with_role_engine_decision(
+                {
+                    "reason": str(reason),
+                    "engine": engine.value,
+                    "source_id": reference.source_id,
+                    "experiment_id": reference.experiment_id,
+                    "detail": str(getattr(exc, "detail", "")),
+                },
+                exc,
+                sossi_row_provenance,
+            ),
             identity=reference.identity,
         )
 
