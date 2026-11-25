@@ -7473,6 +7473,7 @@ def _capture_recursive_equilibrium_row(
     store: PT0DeterminismStore,
     *,
     temperature_K: float | None = None,
+    commanded_pO2_bar: float | None = None,
 ) -> tuple[Any, EquilibriumResult, dict[str, Any], dict[str, Any]]:
     sim, _fixture_result = _pt0_equilibrium_capture_context(store)
     capture_temperature_K = (
@@ -7481,19 +7482,31 @@ def _capture_recursive_equilibrium_row(
     sim.melt.temperature_C = (
         capture_temperature_K - CELSIUS_TO_KELVIN_OFFSET
     )
+    if commanded_pO2_bar is not None:
+        sim._commanded_pO2_bar = lambda: float(commanded_pO2_bar)
+        sim._vapor_pressure_dispatch_pO2_bar = lambda: float(
+            commanded_pO2_bar
+        )
     sim.melt.fO2_log = -9.0
     if hasattr(sim.melt, "melt_fO2_log"):
         sim.melt.melt_fO2_log = -9.0
     _fixture_result.temperature_C = float(sim.melt.temperature_C)
     _fixture_result.pressure_bar = float(sim.melt.p_total_mbar) / 1000.0
     _fixture_result.fO2_log = sim._current_melt_redox_fO2_log()
-    result = sim._record_equilibrium_status(
-        _fixture_result,
-        run_post_equilibrium_sulfsat=False,
-    )
-    assert store.capture_sequence[-1]["artifact"] == "equilibrium_post_record"
-    key = store._equilibrium_key(sim)
-    payload = copy.deepcopy(store._entries[_key_hash(key)]["payload"])
+    with pytest.MonkeyPatch.context() as monkeypatch:
+        _configure_recursive_gate_sim(sim, monkeypatch)
+        result = sim._record_equilibrium_status(
+            _fixture_result,
+            run_post_equilibrium_sulfsat=False,
+        )
+        assert (
+            store.capture_sequence[-1]["artifact"]
+            == "equilibrium_post_record"
+        )
+        key = store._equilibrium_key(sim)
+        payload = copy.deepcopy(store._entries[_key_hash(key)]["payload"])
+        sim._freeze_gate_curve()
+    assert store.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
     return sim, result, key, payload
 
 
@@ -7851,6 +7864,7 @@ def _exercise_cache_payload_replay(
     if artifact == "equilibrium_post_record":
         if sim is not None:
             sim.configure_pt0_determinism_store(store)
+            sim._freeze_gate_liquid_fraction_cache = None
         return _exercise_equilibrium_replay_consumers(store, sim)
     if sim is None:
         sim = _build_pt0_sim(store)
@@ -8094,10 +8108,15 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
                         f"{type(exc).__name__}: {exc}"
                     )
                     continue
-                if reader.hits != 1:
+                target_hits = sum(
+                    replay.get("artifact") == artifact
+                    for replay in reader.replay_sequence
+                )
+                if target_hits != 1:
                     failures.append(
                         f"{path_name} {mutation}: admitted replay recorded "
-                        f"{reader.hits} hits"
+                        f"{target_hits} {artifact} hits across "
+                        f"{reader.hits} total cache hits"
                     )
             if reader.hits == 0 and (
                 _accepted_hit_disclosures_for_test(reader) != before_disclosures
@@ -8166,15 +8185,29 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         "capture",
         db_path=db_path if persistent else None,
     )
-    _capture_recursive_equilibrium_row(capture, temperature_K=1599.0)
-    _capture_recursive_equilibrium_row(capture, temperature_K=1601.0)
+    interpolation_pO2_bar = 1.0e-8
+    _capture_recursive_equilibrium_row(
+        capture,
+        temperature_K=1599.0,
+        commanded_pO2_bar=interpolation_pO2_bar,
+    )
+    _capture_recursive_equilibrium_row(
+        capture,
+        temperature_K=1601.0,
+        commanded_pO2_bar=interpolation_pO2_bar,
+    )
     production_attempt = interpolation.attempt_cached_interpolation
     query_sim, _ = _pt0_equilibrium_capture_context(capture)
     query_sim.melt.temperature_C = 1600.0 - CELSIUS_TO_KELVIN_OFFSET
+    query_sim._commanded_pO2_bar = lambda: interpolation_pO2_bar
+    query_sim._vapor_pressure_dispatch_pO2_bar = lambda: interpolation_pO2_bar
     query_sim.melt.fO2_log = -9.0
     if hasattr(query_sim.melt, "melt_fO2_log"):
         query_sim.melt.melt_fO2_log = -9.0
+    _configure_recursive_gate_sim(query_sim, monkeypatch)
     query_key = capture._equilibrium_key(query_sim)
+    query_sim._freeze_gate_curve()
+    assert capture._equilibrium_key(query_sim) == query_key
     if persistent:
         assert capture.persistent_store is not None
         candidates = capture.persistent_store._list_interpolation_candidates(
