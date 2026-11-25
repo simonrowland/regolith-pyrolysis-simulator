@@ -331,6 +331,29 @@ def build_yield_disposition(
     origin_unattributed_input = _element_mol_atoms(
         ledger.initial_unattributed_atom_moles()
     )
+    # Premise: disposition closure admits at most `_CLOSURE_LIMIT_FRACTION`
+    # (5e-14, or 5e-12%) of charged atoms as a per-element residual. Algebra:
+    # for charged scale C, the limit is max(the existing 2e-18 floor, C*5e-14).
+    # Units: mol-atoms times a dimensionless fraction gives mol-atoms. Sanity:
+    # at C=1 mol-atoms, 6.9e-18 is dust while 1e-12 exceeds the 5e-14 limit.
+    closure_tolerance_by_element = {
+        element: max(
+            _ATOM_EPS,
+            _CLOSURE_LIMIT_FRACTION
+            * math.fsum(
+                (
+                    float(feedstock_input.get(element, 0.0)),
+                    float(reagent_input.get(element, 0.0)),
+                    float(origin_unattributed_input.get(element, 0.0)),
+                )
+            ),
+        )
+        for element in (
+            set(feedstock_input)
+            | set(reagent_input)
+            | set(origin_unattributed_input)
+        )
+    }
     origin_dust_mol_atoms = _origin_dust_tolerance(
         ledger,
         feedstock_input,
@@ -352,7 +375,12 @@ def build_yield_disposition(
         streams,
         projected_unattributed_by_account,
     ) = _terminal_portions(
-        ledger, terminal, registry, snapshots, origin_dust_mol_atoms
+        ledger,
+        terminal,
+        registry,
+        snapshots,
+        origin_dust_mol_atoms,
+        closure_tolerance_by_element,
     )
     origin_unattributed_by_account = {
         str(account): dict(elements)
@@ -588,6 +616,7 @@ def _terminal_portions(
     registry: Mapping[str, Any],
     snapshots: tuple[Mapping[str, Any], ...],
     origin_dust_mol_atoms: float,
+    closure_tolerance_by_element: Mapping[str, float],
 ) -> tuple[
     list[_Portion],
     dict[str, float],
@@ -629,7 +658,9 @@ def _terminal_portions(
                 feedstock == 0.0
                 and reagent == 0.0
                 and unresolved == 0.0
-                and 0.0 < physical <= _ATOM_EPS
+                and 0.0
+                < physical
+                <= closure_tolerance_by_element.get(element, _ATOM_EPS)
             ):
                 unresolved = float(physical)
                 projected_unattributed_by_account[account][element] += unresolved

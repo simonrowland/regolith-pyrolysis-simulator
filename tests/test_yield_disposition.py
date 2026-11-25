@@ -1962,3 +1962,47 @@ def test_terminal_origin_dust_streams_and_summary_agree() -> None:
         row["origin_scope"] == "origin_unattributed"
         for row in overhead_streams
     )
+
+
+def _ledger_with_untracked_terminal_k(residual_mol_atoms: float) -> AtomLedger:
+    ledger = AtomLedger()
+    ledger.load_external_mol(
+        "process.cleaned_melt",
+        {"K": 1.0},
+        material_origin="feedstock",
+    )
+    k_molar_mass = resolve_species_formula(
+        "K", ledger.registry
+    ).molar_mass_kg_per_mol()
+    ledger.move(
+        "move_terminal_k_residual",
+        "process.cleaned_melt",
+        "process.condensation_train",
+        {"K": residual_mol_atoms * k_molar_mass},
+    )
+    # Model a physical remainder left after the typed-origin pool cancels.
+    ledger._origin_atom_moles.pop("process.condensation_train", None)
+    ledger._origin_attribution_methods.pop("process.condensation_train", None)
+    return ledger
+
+
+def test_terminal_potassium_residual_6_9e_18_is_reported_as_unattributed() -> None:
+    residual_mol_atoms = 6.9e-18
+    ledger = _ledger_with_untracked_terminal_k(residual_mol_atoms)
+
+    payload = build_yield_disposition(_sim(ledger))
+
+    assert _row(payload, "K")["feedstock_input_mol_atoms"] == pytest.approx(1.0)
+    assert payload["origin_unattributed"]["terminal_mol_atoms_by_account"][
+        "process.condensation_train"
+    ]["K"] == pytest.approx(residual_mol_atoms, rel=1e-12, abs=1e-30)
+
+
+def test_terminal_potassium_residual_above_closure_tolerance_still_raises() -> None:
+    ledger = _ledger_with_untracked_terminal_k(1.0e-12)
+
+    with pytest.raises(
+        OriginUnresolvedError,
+        match=r"typed origin does not close for process\.condensation_train\.K",
+    ):
+        build_yield_disposition(_sim(ledger))
