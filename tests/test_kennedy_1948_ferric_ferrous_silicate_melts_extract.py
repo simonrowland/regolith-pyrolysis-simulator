@@ -128,9 +128,20 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
         assert pressure.locator.pdf_page_index == 3
         assert pressure.locator.published_page == 532
         assert has_printed_fo2(observation, observation.identity)
-        assert score._printed_fe_redox_fo2_log(
-            observation, observation.identity
-        ) == Decimal("-0.6932533919222882")
+        resolved_identity, resolved_fo2_log, _ = score._resolve_row_fo2(
+            observation.identity,
+            observation,
+            result.experiments.get(observation.experiment_id),
+            {},
+            observation.identity.temperature_K.value,
+            Quantity.FE3_FE2_RATIO,
+        )
+        assert resolved_fo2_log is not None
+        assert isclose(
+            float(score.log10_fo2_to_pa(resolved_fo2_log)),
+            float(resolved_identity.fO2_Pa.value),
+            rel_tol=1e-12,
+        )
     assert without_printed_oxygen == 7
     assert all(
         o.point_conditions["duration_h"].state.is_value

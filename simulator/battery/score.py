@@ -2537,6 +2537,13 @@ def _classify_flagged_notice_facts(
         for kind, reason in notices
     ):
         strata.append(NON_EQUILIBRIUM_RUN_CAVEAT)
+    if any(
+        kind == NoticeKind.ENGINE_MODEL_CAVEAT.value
+        and isinstance(reason, str)
+        and reason.startswith(f"{CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT}:")
+        for kind, reason in notices
+    ):
+        strata.append(CRYSTAL_BEARING_BULK_COMPOSITION_CAVEAT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(
