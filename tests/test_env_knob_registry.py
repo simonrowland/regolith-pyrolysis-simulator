@@ -526,11 +526,33 @@ def _scratch_scan(
 def test_production_environment_reads_are_registered():
     reads = _production_env_reads()
     operator_names, harness_names = _environment_registry()
+    operator_names = set(operator_names)
     overlap, unregistered, stale = _unregistered(reads, operator_names, harness_names)
     assert not overlap, f"environment names are both operator and internal: {sorted(overlap)}"
     assert not unregistered, f"undocumented environment reads: {sorted(unregistered)}"
     assert not stale, f"stale environment registry entries: {sorted(stale)}"
     assert all(reason.strip() for reason in harness_names.values())
+
+
+def test_registry_detects_an_unregistered_live_read_mutation(monkeypatch):
+    target = ROOT / _production_python_paths()[0]
+    original_read_text = Path.read_text
+
+    def read_with_new_environment_read(path, *args, **kwargs):
+        source = original_read_text(path, *args, **kwargs)
+        if path == target:
+            source += '\nimport os\nos.getenv("MUTATED_UNREGISTERED_ENV")\n'
+        return source
+
+    monkeypatch.setattr(Path, "read_text", read_with_new_environment_read)
+    reads = _production_env_reads()
+    operator_names, harness_names = _environment_registry()
+    overlap, unregistered, _ = _unregistered(
+        reads, set(operator_names), harness_names
+    )
+
+    assert not overlap
+    assert "MUTATED_UNREGISTERED_ENV" in unregistered
 
 
 def test_environment_access_token_backstop():
