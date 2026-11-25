@@ -7505,8 +7505,6 @@ def _capture_recursive_equilibrium_row(
         )
         key = store._equilibrium_key(sim)
         payload = copy.deepcopy(store._entries[_key_hash(key)]["payload"])
-        _capture_recursive_gate_curve_in_context(store, sim)
-    assert store.capture_sequence[-1]["artifact"] == "freeze_gate_curve"
     return sim, result, key, payload
 
 
@@ -7958,6 +7956,17 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
         persistent=persistent,
         db_path=db_path,
     )
+    if artifact == "equilibrium_post_record":
+        # Keep the nested gate identity separate from the mutated equilibrium
+        # row. The curve itself comes from the real gate capture path; gate
+        # payload admission is exercised by its own memory/PT1 sweep below.
+        gate_curve = _capture_recursive_gate_row(
+            tmp_path / "recursive-consumer-gate.sqlite",
+            persistent=False,
+        )[2]
+        reader.replay_gate_curve = lambda *_args, **_kwargs: copy.deepcopy(
+            gate_curve
+        )
     replay_sim.configure_pt0_determinism_store(reader)
     _exercise_cache_payload_replay(reader, artifact, sim=replay_sim)
     if payload_kind == "equilibrium" and persistent:
@@ -8214,7 +8223,6 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
         query_sim.melt.melt_fO2_log = -9.0
     _configure_recursive_gate_sim(query_sim, monkeypatch)
     query_key = capture._equilibrium_key(query_sim)
-    _capture_recursive_gate_curve_in_context(capture, query_sim)
     assert capture._equilibrium_key(query_sim) == query_key
     if persistent:
         assert capture.persistent_store is not None
