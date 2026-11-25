@@ -507,6 +507,13 @@ def test_internal_analytical_scores_feo_with_ideal_fallback_notice() -> None:
     )
     assert notice.authority is Authority.BRIDGE
     assert notice.reason == expected.warning
+    assert notice.source == "no measured parent-oxide activity"
+    assert notice.destination == "Raoultian gamma=1 ideal-activity convention"
+    from simulator.battery.validate import _check_notice
+
+    issues = []
+    _check_notice("internal-analytical-ideal-activity", notice, issues)
+    assert issues == []
 
 
 def test_internal_analytical_types_unsupported_activity_species() -> None:
