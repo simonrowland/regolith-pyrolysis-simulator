@@ -8184,13 +8184,6 @@ def _resolve_source_declared_composition(
                 ),
                 locator=projection_locator,
             )
-        if published_analytical_total is None:
-            return Located(
-                State.unknown(
-                    "elemental run composition has no published analytical total"
-                ),
-                locator=projection_locator,
-            )
         parameters.extend(
             (
                 (
@@ -8213,10 +8206,19 @@ def _resolve_source_declared_composition(
             (
                 "original_analytical_total_wt_pct",
                 Located(
-                    State.of(published_analytical_total),
+                    State.of(published_analytical_total)
+                    if published_analytical_total is not None
+                    else State.unknown(
+                        "published analytical total is not printed for this source row"
+                    ),
                     locator=published_total_locator or projection_locator,
                 ),
             )
+        )
+        analytical_total_assumption = (
+            "published analytical total is recorded with its source locator"
+            if published_analytical_total is not None
+            else "published analytical total is not printed for this source row; no total was inferred"
         )
         assumptions = (
             f"source basis: {rule.source_basis}",
@@ -8227,7 +8229,7 @@ def _resolve_source_declared_composition(
             "not projected into the composition",
             "oxygen balance residual = measured O wt% - stoichiometric O wt% "
             "implied by projected components",
-            "original analytical total is the published analytical total, including its source locator",
+            analytical_total_assumption,
             "printed Cl/CO2/H2O are retained; absent components are not filled",
             "weight-percent renormalized: false",
             "formula-unit mole fractions are normalized to their sum",
@@ -28870,7 +28872,16 @@ class Migrator:
             )
         )
         if source_projection is not None:
-            ident_kwargs["composition"] = source_projection.state
+            # The projected glass is run context for other observations. A
+            # glass-composition observation must not receive that same glass
+            # as its own identity composition; the existing echo guard below
+            # supplies the typed refusal while point_conditions retains the
+            # located projection for downstream run linking.
+            if (
+                q_token is not Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+                or not source_projection.state.is_value
+            ):
+                ident_kwargs["composition"] = source_projection.state
         elif explicit_composition is not None:
             ident_kwargs["composition"] = explicit_composition.state
         elif explicit_composition_refusal is not None:

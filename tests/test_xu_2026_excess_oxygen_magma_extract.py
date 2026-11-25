@@ -435,6 +435,17 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     assert projection_parameters[
         "original_analytical_total_wt_pct"
     ].state.value == Decimal("98.9")
+    lvp12 = observations["xu_2026_table1_lvp_12_si"]
+    lvp12_projection = lvp12.point_conditions["composition"]
+    assert lvp12.point_conditions["composition"].state.is_value
+    assert lvp12_projection.inference is not None
+    lvp12_total = dict(lvp12_projection.inference.parameters)[
+        "original_analytical_total_wt_pct"
+    ]
+    assert lvp12_total.state.is_unknown
+    assert lvp12_total.state.reason == (
+        "published analytical total is not printed for this source row"
+    )
     assert dict(
         lvp1_composition.point_conditions["composition"].state.value.components
     ) == {
@@ -555,8 +566,14 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         for observation in unguarded_migrator.result.observations.values()
         if observation.observation_id.endswith("::xu_2026_table1_lvp_1_si")
     )
+    unguarded_identity_composition = unguarded_lvp1.identity.composition
     with pytest.raises(AssertionError):
-        assert unguarded_lvp1.identity.composition.is_unknown
+        assert (
+            unguarded_identity_composition is not None
+            and unguarded_identity_composition.is_unknown
+            and unguarded_identity_composition.reason
+            == "input_composition_is_scored_phase_analysis"
+        )
 
     figures = [
         record
