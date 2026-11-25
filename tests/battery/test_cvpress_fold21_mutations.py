@@ -417,6 +417,8 @@ def test_buffer_with_sibling_scalar_and_no_bench_uses_the_default(monkeypatch):
 
 
 def test_buffer_channel_guard_detects_restored_sibling_scalar_route(monkeypatch):
+    """The real scorer fails if the old oxygen-condition route is restored."""
+
     target = Locator(page=3, table="2", record="run 1", note="column=assay")
     row, run = _row("12", target, fo2=None)
     run = replace(run, fO2_control=FO2Control(
@@ -429,10 +431,19 @@ def test_buffer_channel_guard_detects_restored_sibling_scalar_route(monkeypatch)
     ))
     seen = _install_spy(monkeypatch)
 
-    # Mutating the production guard back to its old unconditional route
+    original = waypoints.oxygen_condition
+
+    def old_oxygen_condition(experiment, bench, observation=None):
+        with monkeypatch.context() as old_guard:
+            old_guard.setattr(
+                waypoints, "FO2Channel", SimpleNamespace(BUFFER=object())
+            )
+            return original(experiment, bench, observation)
+
+    # Mutating the production owner back to its old unconditional route
     # admits this scalar as tier 1 and bypasses DP-010.
-    with monkeypatch.context() as old_guard:
-        old_guard.setattr(waypoints, "FO2Channel", SimpleNamespace(BUFFER=object()))
+    with monkeypatch.context() as old_behavior:
+        old_behavior.setattr(waypoints, "oxygen_condition", old_oxygen_condition)
         with pytest.raises(AssertionError):
             assert _po2(seen, row, run, bench=None) == pytest.approx(DP010_BAR)
         assert seen["po2"] == pytest.approx(0.1)
