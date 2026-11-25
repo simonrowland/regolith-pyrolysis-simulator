@@ -1451,6 +1451,15 @@ def _extra_cache_line(
         return _classification_of(
             "attr:simulator/evaporation.py:_freeze_gate_shared_curve_cache"
         )
+    if (
+        path == "simulator/reduced_real_determinism.py"
+        and "_PT1_CACHE_MERGE_IDENTITY_FIELDS" in stripped
+    ):
+        return (
+            "inert",
+            "PT-1 merge row identity fields used for collision checks. This tuple does not store cached results.",
+            None,
+        )
     if path == "simulator/accounting/queries.py" and stripped == "cache = {}":
         return (
             "inert",
