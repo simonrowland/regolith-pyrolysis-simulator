@@ -12949,7 +12949,9 @@ def test_candidate_census_splits_admitted_from_pending() -> None:
 def test_predict_success_path_does_not_hardcode_lineage_complete_false() -> None:
     from simulator.battery import score as score_mod
 
-    tree = ast.parse(inspect.getsource(score_mod._predict_with_engine))
+    tree = ast.parse(
+        inspect.getsource(score_mod._predict_engine_from_supplied_inputs)
+    )
     produced_with_value = 0
     for node in ast.walk(tree):
         if not isinstance(node, ast.Call):
@@ -20330,7 +20332,7 @@ def test_score_store_attempts_all_owned_handle_closes(
     reference = F.observation(
         "fd-close-reference",
         experiment.experiment_id,
-        F.psat_identity("Na"),
+        F.activity_identity(),
         Decimal("0.1"),
         evidence=EvidenceClass.MEASURED_DIRECT,
         source_id="work-1",

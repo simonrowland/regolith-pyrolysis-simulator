@@ -9114,7 +9114,19 @@ def _comparison_identity(
             or not identity.total_pressure_Pa.is_value
         )
     ):
-        if isinstance(prediction.identity, Identity):
+        predicted_pressure_notice = next(
+            (
+                notice
+                for notice in prediction.notices
+                if notice.origin == "score:total_pressure"
+                and notice.policy is not None
+                and notice.policy.id == "DP-108"
+            ),
+            None,
+        )
+        if predicted_pressure_notice is not None and isinstance(
+            prediction.identity, Identity
+        ):
             predicted_pressure = prediction.identity.total_pressure_Pa
             if predicted_pressure is not None and predicted_pressure.is_value:
                 pressure_state = predicted_pressure

@@ -83,7 +83,7 @@ from __future__ import annotations
 
 import math
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from fractions import Fraction
 from typing import Any, Callable
@@ -2159,8 +2159,14 @@ def _identity_equal(
         if left_q_state.is_unknown or right_q_state.is_unknown:
             return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_UNKNOWN, ("quantity",))
         return IdentityEqualOutcome(IdentityEqualKind.IDENTITY_MISMATCH, ("quantity",))
-    left_profile = validate_quantity_profile(left)
-    right_profile = validate_quantity_profile(right)
+    validation_left = (
+        replace(left, total_pressure_Pa=None) if ignore_total_pressure else left
+    )
+    validation_right = (
+        replace(right, total_pressure_Pa=None) if ignore_total_pressure else right
+    )
+    left_profile = validate_quantity_profile(validation_left)
+    right_profile = validate_quantity_profile(validation_right)
     if left_profile.kind is IdentityEqualKind.INVALID_IDENTITY:
         return left_profile
     if right_profile.kind is IdentityEqualKind.INVALID_IDENTITY:
