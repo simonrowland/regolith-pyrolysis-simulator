@@ -25,7 +25,7 @@ def test_dropping_pressure_contract_fails_wang_residue_prediction(monkeypatch):
     )
     with pytest.raises(residue_module.ResidueInventoryRefusal) as caught:
         residue_module.predict_langmuir_residue_composition(
-            Engine.OPENIMCC.value,
+            Engine.INTERNAL_ANALYTICAL.value,
             reference,
             experiment,
             (reference, anchor),
