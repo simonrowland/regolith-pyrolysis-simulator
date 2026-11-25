@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import defaultdict
 from copy import deepcopy
 import re
 import subprocess
@@ -12,6 +13,7 @@ from openpyxl import load_workbook
 import pytest
 import yaml
 
+import simulator.battery.migrate as migrate_module
 from simulator.battery.enums import (
     AmountBasis,
     Engine,
@@ -27,7 +29,6 @@ from simulator.battery.composition import (
     excluded_component_notice_reason,
     partition_engine_components,
 )
-from simulator.battery.migrate import _mass_percent_composition_located
 from simulator.battery.score import (
     _COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
     _engine_bulk_component_names,
@@ -209,18 +210,12 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
     assert changed_projection["SiO2"] < base_projection["SiO2"]
 
 
-def test_row6_projection_components_match_current_mass_percent_resolver(
+def test_row6_projection_matches_hand_computed_mole_fractions(
     tmp_path: Path,
 ) -> None:
-    """Keep the source projection numerically aligned with the shared resolver."""
+    """Pin row 6 from printed wt% divided by formula masses, then normalized."""
 
     doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
-    source = next(
-        observation
-        for container in doc["species"].values()
-        for observation in container.get("observations", [])
-        if observation["observation_id"] == "rusiecka_2026_data_row6_sio2"
-    )
     result = _migrate_real_extract(
         tmp_path / "row6-projection-baseline", EXTRACT_NAME, extract_doc=doc
     )
@@ -229,22 +224,36 @@ def test_row6_projection_components_match_current_mass_percent_resolver(
         for observation in result.observations.values()
         if observation.observation_id.endswith("::rusiecka_2026_data_row6_sio2")
     )
-    values = source["values"]
-    printed = values["composition_wt_pct"]
-    expected = _mass_percent_composition_located(
-        {name: Decimal(amount) for name, amount in printed.items()},
-        basis="printed_phase_composition",
-        locator=row.point_conditions["composition"].locator,
-        closure_context=values,
-        declared_component_map=printed,
-    )
-    assert dict(row.point_conditions["composition"].state.value.components) == dict(
-        expected.state.value.components
-    )
+    # Independent hand calculation from row 6's printed weights and the
+    # formula molar masses: n_i = w_i / M_i, then x_i = n_i / sum(n).
+    # The values below use explicit CIAAW atomic weights, not the migration
+    # resolver, and include the printed Cl, I2O, and Ag2O components.
+    expected = {
+        "SiO2": Decimal("0.6299420114700907528690568465"),
+        "TiO2": Decimal("0.0003275685475863767273736460907"),
+        "Al2O3": Decimal("0.1018636052524306449933674460"),
+        "FeO": Decimal("0"),
+        "MnO": Decimal("0.0007375909842813855432627343490"),
+        "MgO": Decimal("0.03943272801009572555827081396"),
+        "CaO": Decimal("0.1345921519033909528005129856"),
+        "Na2O": Decimal("0.08325960985601342370014547715"),
+        "K2O": Decimal("0.0004860334091265989104636355500"),
+        "Cl": Decimal("0.008486728169515902378406398249"),
+        "I2O": Decimal("0.0005332939471367035207500911489"),
+        "Ag2O": Decimal("0.0003386784503315329983899254715"),
+        "Re": Decimal("0"),
+        "P2O5": Decimal("0"),
+        "Cr2O3": Decimal("0"),
+        "NiO": Decimal("0"),
+    }
+    actual = dict(row.point_conditions["composition"].state.value.components)
+    assert actual.keys() == expected.keys()
+    for name, expected_value in expected.items():
+        assert abs(actual[name] - expected_value) < Decimal("1e-12"), name
 
 
 def test_row97_links_located_component_rows_and_flags_cl_without_filling_s_or_f(
-    tmp_path: Path,
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     """Rebuild an omitted duplicate vector from its complete located row."""
 
@@ -263,9 +272,34 @@ def test_row97_links_located_component_rows_and_flags_cl_without_filling_s_or_f(
         formula: Decimal(source["values"]["component_amount"])
         for formula, source in row_sources
     }
+    resolution_calls: defaultdict[str, int] = defaultdict(int)
+    original_resolver = migrate_module._resolve_source_declared_composition
+
+    def count_row_resolutions(source_id, obs, **kwargs):
+        if (
+            source_id == SOURCE_ID
+            and kwargs.get("quantity") is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        ):
+            resolution_calls[str(obs.get("experiment"))] += 1
+        return original_resolver(source_id, obs, **kwargs)
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_resolve_source_declared_composition",
+        count_row_resolutions,
+    )
     result = _migrate_real_extract(
         tmp_path / "row97-linked-projection", EXTRACT_NAME, extract_doc=doc
     )
+    expected_experiments = {
+        str(source["experiment"])
+        for container in doc["species"].values()
+        for source in container.get("observations", [])
+        if source.get("values", {}).get("quantity")
+        == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+    }
+    assert set(resolution_calls) == expected_experiments
+    assert set(resolution_calls.values()) == {1}
     row = next(
         observation
         for observation in result.observations.values()
@@ -329,6 +363,12 @@ def test_rusiecka_refuses_when_required_silica_observation_is_missing(
         if observation.observation_id.endswith("::rusiecka_2026_data_row97_al2o3")
     )
     assert row.identity.composition.is_unknown
+    point_composition = row.point_conditions["composition"]
+    assert point_composition.state.is_unknown
+    assert point_composition.state.reason == (
+        "source run composition is incomplete; required printed component(s) "
+        "missing or invalid: SiO2"
+    )
 
 
 def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:

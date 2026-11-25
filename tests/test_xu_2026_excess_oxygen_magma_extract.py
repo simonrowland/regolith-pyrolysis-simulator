@@ -1,8 +1,10 @@
 from __future__ import annotations
 
+from collections import defaultdict
 from copy import deepcopy
 from decimal import Decimal
 from pathlib import Path
+import re
 
 import pytest
 import yaml
@@ -132,6 +134,44 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     s2 = _fixture(S2_GRID)
     document = yaml.safe_load(EXTRACT.read_text(encoding="utf-8"))
     experiments = {row["experiment_id"]: row for row in document["experiments"]}
+
+    def source_row_key(observation: dict) -> tuple[str, str, str, str, str]:
+        locator = observation.get("locator") or {}
+        row = locator.get("row")
+        if row is None:
+            match = re.search(
+                r"\bcell\s+[A-Z]+(\d+)\b",
+                str(locator.get("record") or ""),
+                re.IGNORECASE,
+            )
+            row = match.group(1) if match is not None else ""
+        values = observation.get("values") or {}
+        return (
+            str(observation.get("experiment") or ""),
+            str(locator.get("table") or ""),
+            str(row),
+            str(values.get("sample_id_as_published") or ""),
+            str(values.get("analysis_id_as_published") or ""),
+        )
+
+    resolution_calls: defaultdict[tuple[str, str, str, str, str], int] = (
+        defaultdict(int)
+    )
+    original_resolver = migrate_module._resolve_source_declared_composition
+
+    def count_source_row_resolutions(source_id, observation, **kwargs):
+        if (
+            source_id == "xu-2026-excess-oxygen-magma"
+            and kwargs.get("quantity") is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+        ):
+            resolution_calls[source_row_key(observation)] += 1
+        return original_resolver(source_id, observation, **kwargs)
+
+    monkeypatch.setattr(
+        migrate_module,
+        "_resolve_source_declared_composition",
+        count_source_row_resolutions,
+    )
     migrator = migrate_one_extract(ROOT, EXTRACT, index={}, aliases={})
     migrator.finalize()
     assert not migrator.result.validation.hard_issues
@@ -145,6 +185,14 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         for species in document["species"].values()
         for observation in species.get("observations", [])
     }
+    expected_projection_rows = {
+        source_row_key(observation)
+        for observation in raw_observations.values()
+        if observation.get("values", {}).get("quantity")
+        == Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+    }
+    assert set(resolution_calls) == expected_projection_rows
+    assert set(resolution_calls.values()) == {1}
     assert len(observations) == len(table1) + len(s2) + 1
 
     contexts = {
@@ -353,6 +401,14 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     lvp1_composition = observations[table1_lvp1[0]["observation_id"].split("::", 1)[-1]]
     projection_derivation = lvp1_composition.point_conditions["composition"].inference
     projection_parameters = dict(projection_derivation.parameters)
+    published_lvp1_total = projection_parameters[
+        "original_analytical_total_wt_pct"
+    ]
+    assert published_lvp1_total.state.value == Decimal("98.9")
+    assert published_lvp1_total.locator is not None
+    assert published_lvp1_total.locator.page == 3
+    assert published_lvp1_total.locator.table == "1"
+    assert "LVP-1" in (published_lvp1_total.locator.record or "")
     assert projection_derivation.relation == "source_composition_projection"
     assert projection_derivation.method is not None
     assert projection_derivation.method.state.value == "elemental wt %"
@@ -378,9 +434,7 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     )
     assert projection_parameters[
         "original_analytical_total_wt_pct"
-    ].state.value == sum(
-        (Decimal(amount) for amount in elemental_wt_percent.values()), Decimal("0")
-    )
+    ].state.value == Decimal("98.9")
     assert dict(
         lvp1_composition.point_conditions["composition"].state.value.components
     ) == {
@@ -436,16 +490,33 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         .point_conditions["composition"]
         .inference.parameters
     )
+    published_s2_total = s2_row_100_parameters[
+        "original_analytical_total_wt_pct"
+    ]
+    assert published_s2_total.state.value == Decimal("99.57")
+    assert published_s2_total.locator is not None
+    assert published_s2_total.locator.table == "S2"
+    assert (published_s2_total.locator.record or "").endswith("row 100")
     assert s2_row_100_parameters[
         "original_analytical_total_wt_pct"
-    ].state.value == sum(
-        (
-            Decimal(row["component_amount_as_published"])
-            for row in s2
-            if row["source_cell"].endswith("100")
-        ),
-        Decimal("0"),
-    )
+    ].state.value == Decimal("99.57")
+    assert dict(
+        s2_row_100.point_conditions["composition"].state.value.components
+    ) == {
+        "SiO2": Decimal("0.5564739584423422805482899035"),
+        "TiO2": Decimal("0.01280391798259080036653744582"),
+        "Al2O3": Decimal("0.09555106258002106035960942278"),
+        "MgO": Decimal("0.1140220830846365115052100276"),
+        "CaO": Decimal("0.1504297743247867273588969897"),
+        "Na2O": Decimal("0.02665903840130551502189968559"),
+        "K2O": Decimal("0.003833680441525691105263105007"),
+        "PtO2": Decimal("0.00003414834134285263522742532755"),
+        "Fe2O3": Decimal("0.009185392008859125951910507300"),
+        "Cl": Decimal("0.03100694439258943514715548741"),
+    }
+    assert s2_row_100_parameters[
+        "oxygen_balance_residual_wt_percent"
+    ].state.value == Decimal("6.79527703078753007001670922")
     oxygen_changed = dict(elemental_wt_percent)
     oxygen_changed["O"] = str(Decimal(oxygen_changed["O"]) + 1)
     oxygen_check_only = _element_wt_percent_stoichiometric_oxide_projection(
