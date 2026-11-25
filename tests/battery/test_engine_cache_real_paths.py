@@ -839,6 +839,7 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
     from simulator.diagnostic_helpers import binary_pot_battery as battery
     from simulator.diagnostic_helpers.binary_pot_battery import (
         BinaryPot,
+        DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
         Po2Request,
         close_battery_engine_handle,
         equilibrate_cell,
@@ -871,6 +872,7 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
             handle,
             pot,
             temperature_K=1878.15,
+            physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
             po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
             isolated=isolated,
         )
@@ -879,6 +881,7 @@ def test_alphamelts_builtin_fe_notice_survives_binary_cell_cache_round_trip(
             handle,
             pot,
             temperature_K=1878.15,
+            physical_pressure_bar=DIAGNOSTIC_ARM_BOUNDARY_PRESSURE_BAR,
             po2=Po2Request(mode="commanded", po2_bar=1.0e-8),
             isolated=isolated,
         )
