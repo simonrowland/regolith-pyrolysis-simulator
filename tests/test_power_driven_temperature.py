@@ -17,6 +17,7 @@ from engines.builtin.vapor_pressure import BUILTIN_VAPOR_BELOW_400K_LIMIT_K
 from simulator.campaigns import CampaignManager
 from simulator.equipment import EquipmentDesigner
 from simulator.lab_schedule import lab_schedule_digests
+import simulator.runner as runner
 from simulator.runner import _load_preset_run_spec
 from simulator.state import (
     BatchRecord,
@@ -218,6 +219,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert ramp == pytest.approx(abs(target - previous))
     knobs = {notice["knob"]: notice for notice in record["notices"]}
     assert set(knobs) == {
+        "focal_spot_diameter_m",
         "melt_emissivity",
         "solar_absorptance",
         "window_transmittance",
@@ -225,6 +227,11 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
         "cold_boundary_K",
         "two_node_geometry",
     }
+    assert knobs["focal_spot_diameter_m"]["kind"] == "typed_unknown"
+    assert knobs["focal_spot_diameter_m"]["qualifier"] == "approximate"
+    assert knobs["focal_spot_diameter_m"]["reason"] == (
+        "focal_spot_diameter_approximate"
+    )
     assert knobs["melt_emissivity"]["kind"] == "knob_defaulted"
     assert knobs["solar_absorptance"]["kind"] == "knob_defaulted"
     assert knobs["window_transmittance"]["kind"] == "typed_unknown"
@@ -247,6 +254,7 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert knobs["solar_absorptance"]["band_high"] == pytest.approx(0.906)
     for _target, _ramp, step_record, _previous in rows:
         assert {(notice["kind"], notice["knob"]) for notice in step_record["notices"]} == {
+            ("typed_unknown", "focal_spot_diameter_m"),
             ("knob_defaulted", "melt_emissivity"),
             ("knob_defaulted", "solar_absorptance"),
             ("typed_unknown", "window_transmittance"),
@@ -276,6 +284,29 @@ def test_robinot_power_trace_steps_at_one_minute_and_flags_the_prediction():
     assert observed[0]["source_class"] == "literature_sidecar"
     assert observed[0]["qualifier"] == "approximate_peak"
     assert reported_temperature_observations((record,)) == ()
+
+
+def test_dropping_focal_spot_qualifier_from_driver_breaks_the_notice_contract(
+    monkeypatch,
+):
+    original = runner.furnace_power_driver_payload
+
+    def omit_focal_spot_qualifier(*args, **kwargs):
+        kwargs.pop("focal_spot_diameter_qualifier", None)
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(
+        runner,
+        "furnace_power_driver_payload",
+        omit_focal_spot_qualifier,
+    )
+    record = _series(_robinot_schedule())[0][2]
+
+    with pytest.raises(AssertionError, match="focal_spot_diameter_m"):
+        assert any(
+            notice.get("knob") == "focal_spot_diameter_m"
+            for notice in record["notices"]
+        ), "focal_spot_diameter_m notice missing"
 
 
 def test_doubled_robinot_power_raises_the_predicted_temperature():

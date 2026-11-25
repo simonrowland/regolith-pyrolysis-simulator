@@ -1131,6 +1131,8 @@ class HourSnapshot:
 
     # Melt
     temperature_C: float = 25.0
+    power_temperature_diagnostic: Dict[str, Any] = field(default_factory=dict)
+    # Full power-balance prediction and its typed inputs for this snapshot.
     melt_mass_kg: float = 0.0
     composition_wt_pct: Dict[str, float] = field(default_factory=dict)
     inventory: ProcessInventory = field(default_factory=ProcessInventory)

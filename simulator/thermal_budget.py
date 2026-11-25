@@ -1473,6 +1473,7 @@ def furnace_power_driver_payload(
     pellet_diameter_m: float | None = None,
     pellet_height_m: float | None = None,
     focal_spot_diameter_m: float | None = None,
+    focal_spot_diameter_qualifier: str | None = None,
     radiating_face_set: str | None = None,
     solar_absorptance: float | None = None,
     window_transmittance: float | None = None,
@@ -1482,10 +1483,11 @@ def furnace_power_driver_payload(
 
     The loader does not invent an emissivity. ``None`` tells the solver
     to take ``EquipmentDesigner.MELT_EMISSIVITY`` and notice it. A focal
-    spot is booked only when the deck declares both diameters. Absorptance,
-    window transmittance, and pellet conductivity stay unset so the solver
-    notices its own defaults. This function does not multiply the trace
-    and does not carry a holder temperature.
+    spot is booked only when the deck declares both diameters. Its source
+    qualifier is carried so the step owner can publish the notice.
+    Absorptance, window transmittance, and pellet conductivity stay unset
+    so the solver notices its own defaults. This function does not multiply
+    the trace and does not carry a holder temperature.
     """
 
     if not isinstance(trace, Mapping):
@@ -1493,7 +1495,7 @@ def furnace_power_driver_payload(
             "furnace_power_trace_malformed",
             "trace must be a mapping",
         )
-    return {
+    payload = {
         "trace": copy.deepcopy(trace),
         "mass_kg": mass_kg,
         "exposed_area_m2": exposed_area_m2,
@@ -1506,6 +1508,9 @@ def furnace_power_driver_payload(
         "window_transmittance": window_transmittance,
         "conductivity_W_m_K": conductivity_W_m_K,
     }
+    if focal_spot_diameter_qualifier is not None:
+        payload["focal_spot_diameter_qualifier"] = focal_spot_diameter_qualifier
+    return payload
 
 
 def declared_benchtop_lengths_m(
@@ -2341,6 +2346,17 @@ def _optional_positive_length(
     return number
 
 
+def furnace_power_trace_last_sample_s(trace: Mapping[str, Any]) -> float:
+    """Seconds of the last measured power sample.
+
+    The runner stops at the last sample it can bracket. It does not
+    hold the final wattage past the trace.
+    """
+
+    curve = _power_trace_curve_s(trace)
+    return float(curve[-1][0])
+
+
 def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
     """Watts at ``time_s`` from the existing bracketing interpolator.
 
@@ -2881,6 +2897,19 @@ def melt_temperature_from_furnace_power(
         missing="power_trace_does_not_bracket",
         invalid="power_trace_does_not_bracket",
     )
+    focal_qualifier = str(
+        driver.get("focal_spot_diameter_qualifier") or ""
+    ).strip()
+    if focal_qualifier:
+        record["notices"] = tuple(record["notices"]) + ({
+            "kind": TYPED_UNKNOWN,
+            "knob": "focal_spot_diameter_m",
+            "value": driver.get("focal_spot_diameter_m"),
+            "unit": "m",
+            "qualifier": focal_qualifier,
+            "reason": "focal_spot_diameter_approximate",
+            "source": "furnace_power_driver.focal_spot_diameter_qualifier",
+        },)
     return record
 
 

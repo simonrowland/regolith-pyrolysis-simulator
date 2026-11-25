@@ -119,7 +119,9 @@ Rates are fluxes times `dt`. The one-hour branch keeps the current source expres
 - C7's one-shot keeps the configured `hold_time_h` at every dt. The applied flag already refuses a second pass, so a short step must not shrink that integral to `process_dt_hr()`. A configured hold other than 1 h is existing hourly behavior and is not reinterpreted.
 - Energy is computed exactly as today, then scaled by `dt_h` only when `dt_h != 1.0`. `mre_kWh` is not scaled: Faraday already integrated the step.
 
-`HourSnapshot` does not grow a dataclass field. A field would change `asdict` and equality on every hourly snapshot. After construction, a shorter step sets the extra attribute `snapshot.t_s = step_index * dt_s`. `asdict` ignores it. `build_per_hour_summary` adds `"t_s"` only when the attribute is set. Hourly summaries do not gain the key. Callers that only have an hourly row use `t_s = hour * 3600`.
+`HourSnapshot` does not grow a field for the clock. A `t_s` field would change `asdict` and equality on every hourly snapshot. After construction, a shorter step sets the extra attribute `snapshot.t_s = step_index * dt_s`. `asdict` ignores it. `build_per_hour_summary` adds `"t_s"` only when the attribute is set. Hourly summaries do not gain the key. Callers that only have an hourly row use `t_s = hour * 3600`.
+
+The power-temperature diagnostic is a declared `HourSnapshot` field. It is the step's power-balance record, copied at snapshot time, and it is empty when that step did not run the power driver. It is not a clock and not `t_s`. Hourly `asdict` gains the empty mapping. `build_per_hour_summary` does not.
 
 Campaign counters that mean elapsed hours (`mre_low_current_hours`, `_mre_hold_hours`, the endpoint, C2A stage elapsed and stage start, C4 process elapsed, the campaign summary, `total_hours`) add `dt_h` on a shorter step and add the literal 1 or 1.0 on the hour. Shuttle `+= 1` counts cycles, not hours, and is not scaled.
 

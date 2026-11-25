@@ -49,6 +49,7 @@ from simulator.campaigns import (
     CampaignManager,
     CampaignSubhourHourClockRefusal,
 )
+from simulator.core import PyrolysisSimulator
 from simulator.thermal_train import ThermalTrainSubhourRefusal
 from simulator.state import (
     BatchRecord,
@@ -76,6 +77,43 @@ def _loaded_sim():
         _load_yaml("feedstocks.yaml"),
         _load_yaml("setpoints.yaml"),
     )
+
+
+def test_power_temperature_diagnostic_survives_snapshot_mutation_probe(monkeypatch):
+    sim = _loaded_sim()
+    preset_path = (
+        Path(__file__).resolve().parents[1]
+        / "data/presets/vacuum_pyrolysis/robinot_2026.yaml"
+    )
+    preset = _load_vacuum_preset_run_spec(preset_path, "faithful")
+    sim.campaign_mgr.overrides["C2A"] = {
+        "lab_schedule": preset.lab_schedule,
+    }
+    sim.campaign_mgr._process_dt_h = preset.process_dt_s / PROCESS_HOUR_S
+    sim.campaign_mgr.get_temp_target(CampaignPhase.C2A, 0, sim.melt)
+    expected = dict(sim.campaign_mgr._power_temperature_for_step)
+
+    def assert_snapshot_keeps_temperature_diagnostic():
+        snapshot = sim._make_snapshot()
+        assert snapshot.power_temperature_diagnostic == expected
+
+    assert expected["scored_as_observed_temperature"] is False
+    assert_snapshot_keeps_temperature_diagnostic()
+
+    original_make_snapshot = PyrolysisSimulator._make_snapshot
+
+    def old_snapshot_without_power_temperature_diagnostic(self):
+        snapshot = original_make_snapshot(self)
+        snapshot.power_temperature_diagnostic = {}
+        return snapshot
+
+    monkeypatch.setattr(
+        PyrolysisSimulator,
+        "_make_snapshot",
+        old_snapshot_without_power_temperature_diagnostic,
+    )
+    with pytest.raises(AssertionError):
+        assert_snapshot_keeps_temperature_diagnostic()
 
 
 def _species_data(sim, species: str) -> dict:

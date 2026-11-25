@@ -19280,6 +19280,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             ),
             campaign=self.melt.campaign,
             temperature_C=self.melt.temperature_C,
+            power_temperature_diagnostic=copy.deepcopy(
+                getattr(
+                    self.campaign_mgr,
+                    '_power_temperature_for_step',
+                    {},
+                ) or {}
+            ),
             melt_mass_kg=self.melt.total_mass_kg,
             composition_wt_pct=self.melt.composition_wt_pct(),
             inventory=self.inventory.copy(),

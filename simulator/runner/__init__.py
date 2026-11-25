@@ -40,7 +40,7 @@ import weakref
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Optional
+from typing import Any, Iterable, Mapping, Optional, Sequence
 
 import yaml
 
@@ -146,14 +146,22 @@ from simulator.lab_geometry import LabGeometryError, parse_lab_geometry
 from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LabScheduleValidationError,
+    interpolate_schedule_points,
     normalize_lab_schedule,
+)
+from simulator.gas_phase_o2 import (
+    gas_phase_o2_trajectory,
+    step_records_from_snapshots,
 )
 from simulator.thermal_budget import (
     FURNACE_POWER_DRIVER_KEY,
+    TYPED_UNKNOWN,
     PowerTemperatureRefusal,
     declared_benchtop_lengths_m,
     furnace_power_driver_payload,
+    furnace_power_trace_last_sample_s,
     measured_furnace_power_trace,
+    sample_furnace_power_W,
 )
 from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
@@ -342,6 +350,75 @@ class MREPresetRunSpec:
     observations: Mapping[str, Any]
     observation_sidecar_path: Path
     program: MREReproductionProgram
+
+
+def _gas_phase_o2_trajectory_for_run(
+    schedule: Mapping[str, Any],
+    snapshots: Any,
+) -> dict[str, Any]:
+    """Pass located schedule facts into ``gas_phase_o2_trajectory``.
+
+    This does not compute a mole fraction. The first snapshot is the
+    end of the first step. Fig. 4a also prints the baseline at t = 0,
+    so a pre-step anchor of explicit zero brackets that point. The
+    paper subtracts the stabilized residual, and the anchor is that
+    excess-oxygen baseline.
+    """
+
+    flow = schedule.get("gas_boundary")
+    imposed: Mapping[str, Any] = {}
+    if isinstance(flow, Mapping):
+        raw_imposed = flow.get("imposed_flow")
+        if isinstance(raw_imposed, Mapping):
+            imposed = raw_imposed
+    carrier = imposed.get("value") if imposed else None
+    pressures = schedule.get("chamber_pressure_mbar")
+    chamber_mbar = None
+    if (
+        isinstance(pressures, Sequence)
+        and not isinstance(pressures, (str, bytes))
+        and len(pressures) > 0
+    ):
+        last = pressures[-1]
+        if isinstance(last, Mapping) and "value" in last:
+            chamber_mbar = last["value"]
+    response = schedule.get("analyzer_response")
+    tau = None
+    notice = None
+    if isinstance(response, Mapping):
+        tau = response.get("tau_s")
+        raw_notice = response.get("notice")
+        if isinstance(raw_notice, Mapping):
+            notice = dict(raw_notice)
+    records = step_records_from_snapshots(snapshots)
+    if records and float(records[0]["time_s"]) > 0.0:
+        records.insert(
+            0,
+            {
+                "time_s": 0.0,
+                "dt_s": records[0]["dt_s"],
+                "o2_release_mol_min": 0.0,
+                "melt_offgas_o2_step_mol": 0.0,
+                "anchor": "pre_step_baseline",
+            },
+        )
+    if (
+        isinstance(pressures, Sequence)
+        and not isinstance(pressures, (str, bytes))
+        and len(pressures) > 0
+    ):
+        for record in records:
+            record["chamber_pressure_mbar"] = interpolate_schedule_points(
+                pressures,
+                float(record["time_s"]) / float(PROCESS_HOUR_S),
+            )
+    return gas_phase_o2_trajectory(
+        records,
+        carrier_flow_nl_min=carrier,
+        chamber_pressure_mbar=chamber_mbar,
+        analyzer_tau_s=tau,
+        analyzer_notice=notice,
+    )
 
 
 def _load_preset_run_spec(
@@ -683,8 +760,58 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
             pellet_diameter_m=lengths.get("pellet_diameter_m"),
             pellet_height_m=lengths.get("pellet_height_m"),
             focal_spot_diameter_m=lengths.get("focal_spot_diameter_m"),
+            focal_spot_diameter_qualifier=(
+                sample.get("focal_spot_diameter_qualifier")
+                if isinstance(sample, Mapping)
+                else None
+            ),
             radiating_face_set=radiating_face_set,
         )
+        if not timestep.is_one_hour:
+            trace_end_s = furnace_power_trace_last_sample_s(power_trace)
+            requested_steps = hours
+            trace_limited_steps = min(
+                requested_steps,
+                math.floor(trace_end_s / timestep.dt_s),
+            )
+            if trace_limited_steps < 1:
+                raise PresetRunnerError(
+                    "measured_power_trace_cannot_bracket_first_process_step",
+                    provenance=provenance,
+                )
+            for sample_s in {
+                timestep.dt_s,
+                trace_limited_steps * timestep.dt_s,
+            }:
+                try:
+                    sample_furnace_power_W(power_trace, sample_s)
+                except PowerTemperatureRefusal as exc:
+                    raise PresetRunnerError(
+                        f"malformed_preset: {exc.reason}: measured power window",
+                        provenance=provenance,
+                    ) from exc
+            if trace_limited_steps < requested_steps:
+                declared_duration_s = duration_h * float(PROCESS_HOUR_S)
+                executed_duration_s = trace_limited_steps * timestep.dt_s
+                provenance["power_window_notice"] = {
+                    "kind": TYPED_UNKNOWN,
+                    "reason": "measured_power_trace_ends_before_declared_duration",
+                    "declared_duration_s": declared_duration_s,
+                    "trace_last_sample_s": trace_end_s,
+                    "uncovered_tail_s": declared_duration_s - trace_end_s,
+                    "executed_duration_s": executed_duration_s,
+                    "executed_step_count": trace_limited_steps,
+                    "source": (
+                        "The measured power trace ends before the declared "
+                        "run duration; no power is extrapolated."
+                    ),
+                }
+                provenance["executed_duration_h"] = (
+                    executed_duration_s / float(PROCESS_HOUR_S)
+                )
+                hours = trace_limited_steps
+                provenance["step_count"] = trace_limited_steps
+                spec_step_count = trace_limited_steps
     return PresetRunSpec(
         feedstock_id=feedstock_id,
         hours=hours,
@@ -2054,6 +2181,22 @@ class PyrolysisRun:
                 section="run_metadata.organics_evolved_gas",
             )
             run_metadata["organics_source"] = organics_source
+        schedule = self.lab_schedule
+        if (
+            isinstance(schedule, Mapping)
+            and isinstance(schedule.get("analyzer_response"), Mapping)
+        ):
+            trajectory = _safe_failure_value(
+                lambda: _json_safe(
+                    _gas_phase_o2_trajectory_for_run(
+                        schedule,
+                        getattr(execution, "snapshots", ()),
+                    )
+                ),
+                section="gas_phase_o2_trajectory",
+            )
+            if trajectory:
+                payload["gas_phase_o2_trajectory"] = trajectory
         return payload
 
     def _engines_used(self, sim: PyrolysisSimulator) -> dict[str, object]:

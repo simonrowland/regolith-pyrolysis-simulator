@@ -5,9 +5,11 @@ measurement_id: robinot_2026_deposit_measurements
 preset_kind: faithful_with_remediation_twin
 extraction_status: comparison_ready_assumed_inputs_named
 
-# Run 59 one-minute steps instead of the printed 60 minutes: the solar-power
-# trace ends at 59.5 minutes, and a step-end sample at 60.0 has no trace power.
-process_dt_s: 60
+# Fig. 4a is a 0.5 min grid through 59.5 min. A 60 s step never ends
+# on 59.5 min, so the last printed point would have no bracketing
+# sample. 30 s ends on that grid. The measured power trace also ends
+# at 59.5 min. The declared duration stays 1.0 h.
+process_dt_s: 30
 
 source_notes:
   - citation_id: robinot_2026
@@ -73,6 +75,26 @@ lab_schedule:
       citation_id: robinot_2026
       extraction_note: "pressure_control_mode_not_reported_flow_through_runtime_assumption. pressure_driver is imposed because the pump speed and the conductance path are not printed."
       digest: "The reported achieved chamber pressure drives runtime because pressure_driver is imposed. Flow-through control topology is assumed only to express the boundary. No pump speed is inferred or used to generate pressure. The apparatus is not fully specified."
+  analyzer_response:
+    kind: first_order_lag
+    tau_s: 30
+    notice:
+      kind: typed_unknown
+      knob: analyzer_time_constant_s
+      value: 30
+      unit: s
+      band_low_s: 5
+      band_high_s: 120
+      authority: stated_default
+      reason: analyzer_response_time_not_printed
+      derivation: >-
+        Section 3.1 prints a Systech analyzer, 0.1 ppm to 1 percent,
+        precision plus or minus 2 percent of reading, and one-second
+        Beckhoff acquisition. No response time, dead volume, or
+        sample-line delay is printed. The stand-in is a first-order
+        lag with tau 30 s and a band of 5 s to 120 s. The paper
+        subtracts the stabilized residual baseline, so the model
+        series is excess O2.
   surface_temperature_C:
     holder:
       - {t_h: 0.0, value: 25, unit: C, source_class: assumption_with_sensitivity_marker, citation_id: robinot_2026, extraction_note: holder_temperature_not_reported}
@@ -132,7 +154,7 @@ lab_geometry:
       basis: assumed_pellet_top_face_from_reported_diameter
       ruling_ref: t-1892_2026-11-22
       derivation: "pi*(D/2)^2 from the reported D=13 mm"
-      reason: liquid_footprint_not_printed
+      reason: exposed_melt_area_not_printed
       source: "Robinot section 3.2 reports the 13 mm pellet diameter; its top face is assumed as the evaporating area."
     crucible_opening_area_m2: null
     crucible_opening_area_reason: not_printed
@@ -226,7 +248,7 @@ pair:
     feedstock_id: lunar_eac_1a
     schedule_id: robinot_2026_schedule
     geometry_id: robinot_2026_geometry
-    duration_h: 0.9833333333333333
+    duration_h: 1.0
     transport_model: auto_named_regime
     mitigation: none
     kinetics_caveat: none
@@ -235,7 +257,7 @@ pair:
     feedstock_id: lunar_eac_1a
     schedule_id: robinot_2026_schedule
     geometry_id: robinot_2026_geometry
-    duration_h: 0.9833333333333333
+    duration_h: 1.0
     transport_model: auto_named_regime
     mitigation:
       pO2_cover:
