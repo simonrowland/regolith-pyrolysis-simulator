@@ -29022,6 +29022,9 @@ class Migrator:
         if (
             q_token is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
             and source_composition_located is None
+            # A source projection already passed the scored-phase echo guard
+            # above; this fallback must not undo that identity decision.
+            and source_projection is None
             and _composition_axis_is_required(
                 q_token, ident_kwargs.get("subtype")
             )
