@@ -3002,6 +3002,26 @@ def build_per_hour_summary(
                 summary_high_t_activity.pop(
                     "selected_parent_activities_standard_state", None
                 )
+            selected_provenance = summary_high_t_activity.get(
+                "selected_parent_activity_provenance"
+            )
+            if isinstance(selected_provenance, Mapping):
+                # The runner artifact keeps its historical parent-oxide basis
+                # label; the vapor diagnostic carries the precise per-parent
+                # basis introduced by d-474.
+                legacy_provenance = dict(selected_provenance)
+                for parent, activity_provenance in selected_provenance.items():
+                    if (
+                        isinstance(activity_provenance, Mapping)
+                        and activity_provenance.get("component_basis") == "FeO"
+                    ):
+                        legacy_provenance[parent] = {
+                            **activity_provenance,
+                            "component_basis": "parent_oxide_formula",
+                        }
+                summary_high_t_activity[
+                    "selected_parent_activity_provenance"
+                ] = legacy_provenance
         summary["high_t_melt_activity"] = _json_safe(summary_high_t_activity)
     capture_ledger_snapshot(sim, snapshot)
     return _json_safe(summary)
