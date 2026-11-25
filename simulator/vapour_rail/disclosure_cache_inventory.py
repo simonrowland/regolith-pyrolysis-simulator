@@ -665,14 +665,6 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
         "carries_disclosure": False,
         "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
     },
-    'lru:simulator/melt_backend/openimcc_bridge.py:_load_gas_pack': {
-        "path": 'simulator/melt_backend/openimcc_bridge.py',
-        "line": 1155,
-        "kind": 'lru',
-        "name": '_load_gas_pack',
-        "carries_disclosure": False,
-        "how": 'Pure loader or identity digest. It never evaluates a vapour law, so a cached value cannot carry a disclosure.',
-    },
     'lru:simulator/melt_backend/pure_phase_janaf_score.py:bands_for_table_id': {
         "path": 'simulator/melt_backend/pure_phase_janaf_score.py',
         "line": 306,

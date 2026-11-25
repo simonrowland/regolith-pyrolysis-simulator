@@ -1151,7 +1151,6 @@ def _load_pack(pack_name: str) -> Any:
         return package.load_datapack(path)
 
 
-@lru_cache(maxsize=1)
 def _load_gas_pack(selection: str) -> Any:
     """Resolve the supported gas pack for bridge callers."""
 
