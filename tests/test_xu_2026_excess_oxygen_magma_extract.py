@@ -330,6 +330,24 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
     projection_parameters = dict(projection_derivation.parameters)
     assert "source_formula_valence_Fe" not in projection_parameters
     assert projection_parameters["assumed_valence_Fe"].state.value == 3
+    assert dict(lvp1_composition.identity.composition.value.components) == {
+        "SiO2": Decimal("0.5531183156263053760382113461"),
+        "TiO2": Decimal("0.008043932072763917401742288490"),
+        "Al2O3": Decimal("0.09288099447174100359886515809"),
+        "MgO": Decimal("0.1209998163861960873534286038"),
+        "CaO": Decimal("0.1336731259807518788600345212"),
+        "Na2O": Decimal("0.02916509339105920910266158605"),
+        "K2O": Decimal("0.001697925910911332657241372798"),
+        "Fe2O3": Decimal("0.04844176162924739410026465963"),
+        "Cl": Decimal("0.01161053041421789160288423891"),
+        "H2O": Decimal("0.0003685041168059092846662246242"),
+    }
+    assert (
+        projection_parameters[
+            "oxygen_closure_residual_wt_percent"
+        ].state.value
+        == Decimal("-0.22587040322009958874924728")
+    )
     valences = {
         name.removeprefix("source_formula_valence_"): int(parameter.state.value)
         for name, parameter in projection_derivation.parameters
