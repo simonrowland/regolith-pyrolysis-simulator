@@ -3133,13 +3133,21 @@ def predict_langmuir_residue_composition(
             )
         )
     if reference.source_id == WANG_2001_SOURCE_ID:
+        aggregate_ln2o3 = (experiment.conditions or {}).get(
+            "starting_aggregate_ln2o3_wt_pct"
+        )
+        aggregate_text = (
+            f"ΣLn2O3={aggregate_ln2o3.state.value} wt%"
+            if aggregate_ln2o3 is not None and aggregate_ln2o3.state.is_value
+            else "ΣLn2O3 aggregate unavailable"
+        )
         notices.append(
             Notice(
                 kind=NoticeKind.INPUT_OMITTED,
                 affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
                 reason=(
                     "starting inventory uses the six named major oxides; the printed "
-                    "ΣLn2O3=0.142 wt% and La–Lu ppm are not oxide-speciated, and WO3 "
+                    f"{aggregate_text} and La–Lu ppm are not oxide-speciated, and WO3 "
                     "is blank, so these components are omitted rather than assigned zero."
                 ),
                 origin="Wang 2001 starting composition",

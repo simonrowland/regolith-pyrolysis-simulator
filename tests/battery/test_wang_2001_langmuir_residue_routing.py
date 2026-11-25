@@ -395,8 +395,6 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
 def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
     from decimal import Decimal
 
-    from simulator.battery.residue import _langmuir_residue_row_id
-
     context, observations = wang_context()
     references = wang_residue_rows(observations)
     imp_reference = next(
@@ -442,6 +440,55 @@ def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
         notice.reason.startswith("wang_imp_closure_basis:")
         for notice in emp_notices
     )
+
+
+def test_wang_starting_aggregate_notice_tracks_located_extract_cell(monkeypatch):
+    from dataclasses import replace
+    from decimal import Decimal
+
+    from simulator.battery.records import State
+
+    context, observations = wang_context()
+    references = wang_residue_rows(observations)
+    reference = next(
+        row
+        for row in references.values()
+        if row.identity.species.formula == "SiO2"
+        and _langmuir_residue_row_id(row.locator) == "sc12"
+    )
+    experiment = context.experiments[reference.experiment_id]
+    located_aggregate = experiment.conditions["starting_aggregate_ln2o3_wt_pct"]
+    assert located_aggregate.state.value == Decimal("0.142")
+    assert located_aggregate.locator is not None
+    assert (
+        located_aggregate.locator.page,
+        located_aggregate.locator.published_page,
+        located_aggregate.locator.table,
+        located_aggregate.locator.row,
+        located_aggregate.locator.column,
+    ) == (4, 482, "1", "Starting comp.", "b")
+    changed_aggregate = replace(
+        located_aggregate, state=State.of(Decimal("0.143"))
+    )
+    mutated_experiment = replace(
+        experiment,
+        conditions={
+            **experiment.conditions,
+            "starting_aggregate_ln2o3_wt_pct": changed_aggregate,
+        },
+    )
+
+    notices = _owner_notices_before_pressure_model(
+        monkeypatch, reference, mutated_experiment, observations.values()
+    )
+    aggregate_notice = next(
+        notice
+        for notice in notices
+        if notice.kind is NoticeKind.INPUT_OMITTED
+        and "starting inventory uses the six named major oxides" in notice.reason
+    )
+    assert "ΣLn2O3=0.143 wt%" in aggregate_notice.reason
+    assert "ΣLn2O3=0.142 wt%" not in aggregate_notice.reason
 
 
 def test_wang_ce_eu_refusals_name_absent_channel_without_selecting_valence(
