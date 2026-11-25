@@ -1583,16 +1583,22 @@ def _make_residue_pressure_model(
                 raise ResidueInventoryRefusal(exc.code, str(exc)) from exc
             pressures: dict[str, float] = {}
             parent_activities: dict[str, float] = {}
-            vapor_diagnostic = response.diagnostics.get(
-                "vapor_pressure_diagnostic"
+            response_diagnostics = getattr(response, "diagnostics", None)
+            vapor_diagnostic = (
+                response_diagnostics.get("vapor_pressure_diagnostic")
+                if isinstance(response_diagnostics, Mapping)
+                else None
             )
             # Read the same dispatch's reported activities; never replay an
-            # activity resolver at the secant probe points.
+            # activity resolver at the secant probe points. The equilibrium
+            # cache carries these per-channel values on activity_coefficients;
+            # use that value side when diagnostics are not served from cache.
             reported_activities = (
                 vapor_diagnostic.get("activities")
                 if isinstance(vapor_diagnostic, Mapping)
                 else None
             )
+            cached_activities = getattr(response, "activity_coefficients", None)
             for channel, pressure in response.vapor_pressures_Pa.items():
                 try:
                     formula = _gas_formula_for_oxygen_balance(channel)
@@ -1601,10 +1607,15 @@ def _make_residue_pressure_model(
                 if formula in pressures:
                     raise ResidueInventoryRefusal("residue_pressure_channels_ambiguous", formula)
                 pressures[formula] = float(pressure)
-                if isinstance(reported_activities, Mapping):
-                    activity = reported_activities.get(channel)
-                    if activity is not None:
-                        parent_activities[formula] = float(activity)
+                activity = (
+                    reported_activities.get(channel)
+                    if isinstance(reported_activities, Mapping)
+                    else None
+                )
+                if activity is None and isinstance(cached_activities, Mapping):
+                    activity = cached_activities.get(channel)
+                if activity is not None:
+                    parent_activities[formula] = float(activity)
             required = {str(species) for species, _reaction in gas_channels}
             pO2_bar = 10.0**float(log10_pO2_bar)
             if "O2" in required and "O2" not in pressures:
