@@ -211,7 +211,8 @@ def test_serial_scoring_fixture_has_stable_canonical_rows(tmp_path: Path) -> Non
     )
     canonical_rows = b"\n".join(rows.splitlines()[1:])
     assert hashlib.sha256(canonical_rows).hexdigest() == (
-        "d0be8fc51724d79f41e6df08c43f628c7d3de860ba9f6bfff89423a264c94de3"
+        # Additive source_id attribution changes serialized bytes only.
+        "06dcf54b2894061372423e7ce8d95faa34d0e325b6cbd0f7909383d3306e3f7d"
     )
 
 

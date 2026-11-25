@@ -1960,6 +1960,7 @@ class Residual:
     fo2_mode: Fo2Mode | None = None
     assumed_band: bool | None = None
     assumed_band_details: Mapping[str, Any] | None = None
+    source_id: str | None = None
 
     def __post_init__(self) -> None:
         if not self.key:

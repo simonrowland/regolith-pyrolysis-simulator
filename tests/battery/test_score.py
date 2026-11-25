@@ -20815,6 +20815,38 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
     records_by_reference = Counter(row.reference for row in residuals)
     assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
     assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
+    refused_figure_rows = [
+        row
+        for row in residuals
+        if row.reference == figure.observation_id
+        and row.status is ResidualStatus.REFUSED
+    ]
+    assert refused_figure_rows
+    assert all(row.source_id == work.work_id for row in refused_figure_rows)
+    assert all(
+        residual_to_plain(row)["source_id"] == work.work_id
+        for row in refused_figure_rows
+    )
+
+
+def test_residual_source_payload_contract_detects_dropped_source_id(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    source_id = "mutation-source"
+    residual = replace(
+        F.residual("mutation-key", "mutation-reference"), source_id=source_id
+    )
+    original_to_plain = score_mod.to_plain
+
+    def to_plain_without_source(obj: object) -> object:
+        payload = original_to_plain(obj)
+        if isinstance(obj, Residual) and isinstance(payload, dict):
+            payload.pop("source_id", None)
+        return payload
+
+    monkeypatch.setattr(score_mod, "to_plain", to_plain_without_source)
+    with pytest.raises(AssertionError):
+        assert score_mod.residual_to_plain(residual).get("source_id") == source_id
 
 
 def test_transition_temperature_refuses_before_generic_engine_pot(

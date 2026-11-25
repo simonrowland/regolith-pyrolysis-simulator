@@ -17563,6 +17563,7 @@ def _refused_residual(
         Residual(
             key=_key_for_fo2_mode(key, result_mode),
             reference=reference.observation_id,
+            source_id=reference.source_id,
             execution=execution,
             rail=rail,
             status=ResidualStatus.REFUSED,
@@ -19219,6 +19220,7 @@ def _compile_residual_with_lineage(
         Residual(
             key=_key_for_fo2_mode(key, result_mode),
             reference=reference.observation_id,
+            source_id=reference.source_id,
             execution=prediction.execution,
             rail=rail,
             status=status,
