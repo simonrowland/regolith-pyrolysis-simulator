@@ -20756,7 +20756,9 @@ def test_score_store_refuses_rejected_unavailable_stolyarova_rows_by_state() -> 
         }
 
 
-def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:
+def _source_attribution_fixture() -> tuple[
+    ScoreContext, str, Observation, Observation
+]:
     work = F.work("score-drop-fixture")
     experiment = F.tabulation_experiment(
         "score-drop-fixture-experiment", work.work_id
@@ -20800,8 +20802,12 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
             categorical="bound_not_point_ordering",
         ),
     )
-    context = _context(work, experiment, activity, figure)
+    return _context(work, experiment, activity, figure), work.work_id, activity, figure
 
+
+def _assert_refused_source_contract(
+    context: ScoreContext, figure: Observation, source_id: str
+) -> tuple[Residual, ...]:
     def no_prediction(*args, **kwargs):
         pytest.fail("fixture observations must refuse before prediction")
 
@@ -20812,9 +20818,6 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
         predict=no_prediction,
     )
 
-    records_by_reference = Counter(row.reference for row in residuals)
-    assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
-    assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
     refused_figure_rows = [
         row
         for row in residuals
@@ -20822,31 +20825,38 @@ def test_score_store_records_each_in_scope_observation_in_small_fixture() -> Non
         and row.status is ResidualStatus.REFUSED
     ]
     assert refused_figure_rows
-    assert all(row.source_id == work.work_id for row in refused_figure_rows)
+    assert all(row.source_id == source_id for row in refused_figure_rows)
     assert all(
-        residual_to_plain(row)["source_id"] == work.work_id
+        residual_to_plain(row)["source_id"] == source_id
         for row in refused_figure_rows
     )
+    return residuals
+
+
+def test_score_store_records_each_in_scope_observation_in_small_fixture() -> None:
+    context, source_id, activity, figure = _source_attribution_fixture()
+    residuals = _assert_refused_source_contract(context, figure, source_id)
+    records_by_reference = Counter(row.reference for row in residuals)
+    assert records_by_reference.keys() == {activity.observation_id, figure.observation_id}
+    assert all(records_by_reference[obs.observation_id] >= 1 for obs in (activity, figure))
 
 
 def test_residual_source_payload_contract_detects_dropped_source_id(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    source_id = "mutation-source"
-    residual = replace(
-        F.residual("mutation-key", "mutation-reference"), source_id=source_id
+    context, source_id, _activity, figure = _source_attribution_fixture()
+    _assert_refused_source_contract(context, figure, source_id)
+    original_refused_residual = score_mod._refused_residual
+
+    def refused_residual_without_source(*args, **kwargs):
+        residual, candidate = original_refused_residual(*args, **kwargs)
+        return replace(residual, source_id=None), candidate
+
+    monkeypatch.setattr(
+        score_mod, "_refused_residual", refused_residual_without_source
     )
-    original_to_plain = score_mod.to_plain
-
-    def to_plain_without_source(obj: object) -> object:
-        payload = original_to_plain(obj)
-        if isinstance(obj, Residual) and isinstance(payload, dict):
-            payload.pop("source_id", None)
-        return payload
-
-    monkeypatch.setattr(score_mod, "to_plain", to_plain_without_source)
     with pytest.raises(AssertionError):
-        assert score_mod.residual_to_plain(residual).get("source_id") == source_id
+        _assert_refused_source_contract(context, figure, source_id)
 
 
 def test_transition_temperature_refuses_before_generic_engine_pot(
