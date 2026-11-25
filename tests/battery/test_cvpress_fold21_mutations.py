@@ -9,11 +9,13 @@ from __future__ import annotations
 
 from dataclasses import replace
 from decimal import Decimal
+from types import SimpleNamespace
 
 import pytest
 
 from simulator.battery import redox_fields as provenance
 from simulator.battery import score as score_module
+from simulator.battery import waypoints
 from simulator.battery.enums import (
     AmountBasis,
     BenchIdentityBasis,
@@ -412,6 +414,28 @@ def test_buffer_with_sibling_scalar_and_no_bench_uses_the_default(monkeypatch):
         notice.policy is not None and notice.policy.id == "DP-010"
         for notice in seen["input_notices"]
     )
+
+
+def test_buffer_channel_guard_detects_restored_sibling_scalar_route(monkeypatch):
+    target = Locator(page=3, table="2", record="run 1", note="column=assay")
+    row, run = _row("12", target, fo2=None)
+    run = replace(run, fO2_control=FO2Control(
+        State.of(FO2Channel.BUFFER),
+        oxygen_partial_pressure_Pa=Located(
+            State.of(Value.point_of(Decimal("10000"))),
+            Locator(page=9, record="sibling scalar"),
+        ),
+        buffer=Located(State.of("QFM"), Locator(page=9, record="buffer")),
+    ))
+    seen = _install_spy(monkeypatch)
+
+    # Mutating the production guard back to its old unconditional route
+    # admits this scalar as tier 1 and bypasses DP-010.
+    with monkeypatch.context() as old_guard:
+        old_guard.setattr(waypoints, "FO2Channel", SimpleNamespace(BUFFER=object()))
+        with pytest.raises(AssertionError):
+            assert _po2(seen, row, run, bench=None) == pytest.approx(DP010_BAR)
+        assert seen["po2"] == pytest.approx(0.1)
 
 
 def test_unsourced_identity_equal_to_the_target_is_commanded(monkeypatch):
