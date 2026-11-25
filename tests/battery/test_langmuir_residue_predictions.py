@@ -205,7 +205,8 @@ def test_score_store_emits_all_mendybaev_langmuir_residue_rows(
     context, _rows = mendybaev_context
     residuals, _ = score_store(
         context,
-        engines=(Engine.INTERNAL_ANALYTICAL,),
+        # The reported headline RMS values are from the pinned OpenIMCC run.
+        engines=(Engine.OPENIMCC,),
         rail=Rail.RESIDUE_COMPOSITION,
     )
     assert len(residuals) == 96
