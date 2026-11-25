@@ -102,14 +102,14 @@ def _assert_langmuir_notices(notices):
         and "melt_well_mixed_assumed" in notice.reason
         and "R^2/D" in notice.reason
         and "1e-10 to 1e-9 m2/s" in notice.reason
-        and "2.5 mm loop" in notice.reason
-        and "radius, which is unprinted" in notice.reason
+        and "reported pellet/loop geometry" in notice.reason
+        and "melted bead radius, which is unprinted" in notice.reason
         for notice in notices
     )
     assert any(
         notice.kind is NoticeKind.OUT_OF_CERTIFIED_BAND
         and "xi includes the furnace ramp" in notice.reason
-        and "isothermal at 1900 C" in notice.reason
+        and "isothermal step at the printed run temperature" in notice.reason
         for notice in notices
     )
     assert any(

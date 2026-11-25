@@ -65,6 +65,7 @@ from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID as _HASHIMOTO_SOURCE_ID,
     SF04_WORKBOOK_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
+    WANG_2001_SOURCE_ID as _WANG_2001_SOURCE_ID,
 )
 from simulator.battery.enums import (
     QUANTITY_UNITS,
@@ -17921,16 +17922,26 @@ def _langmuir_residue_prediction(
     from simulator.battery.residue import (
         ResidueEngineNonconvergence,
         ResidueInventoryRefusal,
+        _langmuir_residue_row_id,
         predict_langmuir_residue_composition,
     )
 
     experiment = context.experiments.get(reference.experiment_id)
     channel = ENGINE_CHANNELS[engine]
     sources = ENGINE_COEFFICIENT_SOURCES[engine]
-    cache_source_id = (
-        f"langmuir:{reference.source_id}:{reference.experiment_id}:"
+    cache_locator = (
         f"{getattr(reference.locator, 'table', None)}:"
         f"{getattr(reference.locator, 'note', None)}"
+    )
+    if reference.source_id == _WANG_2001_SOURCE_ID:
+        run_row = _langmuir_residue_row_id(reference.locator)
+        if run_row is not None:
+            # The shared residue owner reads one temperature, pressure, starting
+            # inventory and Table 2 extent per Wang run row; analyte-series
+            # locators for that row therefore share one computed composition.
+            cache_locator = f"run-row:{run_row}"
+    cache_source_id = (
+        f"langmuir:{reference.source_id}:{reference.experiment_id}:{cache_locator}"
     )
     try:
         result = (
@@ -18011,7 +18022,10 @@ def _extent_residue_method(reference, experiment, quantity) -> MethodToken | Non
     if (
         experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
         and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and reference.source_id == "mendybaev-2013-fun-cai-evaporation"
+        and reference.source_id in {
+            "mendybaev-2013-fun-cai-evaporation",
+            _WANG_2001_SOURCE_ID,
+        }
         and _declared_residue_predictor(reference.source_id) is None
     ):
         return MethodToken.LANGMUIR_FREE_EVAPORATION

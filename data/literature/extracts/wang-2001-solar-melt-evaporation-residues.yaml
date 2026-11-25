@@ -16,6 +16,49 @@ extraction:
   worker: codex-fam22-1020
   provenance_path: raw/wang-2001-solar-melt-evaporation-residues/
 review_status: draft
+experiments:
+- experiment_id: wang-2001-langmuir-residue-series
+  method: langmuir_free_evaporation
+  locator:
+    page: 3
+    published_page: 481
+    pdf_page_index: 2
+    section: 2.2
+    note: Vacuum evaporation method for the Table 1 residue and Table 2 run series.
+  sample:
+    printed_composition:
+      state:
+        tag: value
+        value: &wang_starting_major_oxides
+          MgO: '24.8'
+          Al2O3: '2.46'
+          SiO2: '33.8'
+          CaO: '2.04'
+          TiO2: '0.110'
+          FeO: '36.7'
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: Starting comp.
+        column: b
+        note: Table 1 starting composition calculated from reagent amounts weighed.
+    initial_composition:
+      state:
+        tag: value
+        value:
+          basis: printed_oxides
+          amount_basis: mass_percent
+          components: *wang_starting_major_oxides
+      locator:
+        page: 4
+        published_page: 482
+        pdf_page_index: 3
+        table: '1'
+        row: Starting comp.
+        column: b
+        note: Table 1 starting composition calculated from reagent amounts weighed.
 notes:
 - The title on the PDF is Chemical and isotopic fractionation during the evaporation of the FeO-MgO-SiO2-CaO-Al2O3-TiO2
   rare earth element melt system; GCA volume 65, issue 3, pages 479–494; DOI 10.1016/S0016-7037(00)00529-9. This
@@ -89,6 +132,7 @@ species:
   SiO2:
     observations:
     - observation_id: wang_2001_table1_electron_microprobe_residue_compositions
+      experiment: wang-2001-langmuir-residue-series
       type: composition_series
       locator:
         page: 4
@@ -206,7 +250,7 @@ species:
                 published_page: 481
                 pdf_page_index: 2
                 section: 2.2. Evaporation Procedure
-                note: About 10^-6 torr in the main furnace chamber; converted to pascals.
+                note: About 10^-6 torr in the main furnace chamber; 10^-6 torr × 133.32236842105 Pa/torr converted to pascals.
           MgO_wt_pct: '24.4'
           standard_errors:
             MgO: '0.3'
@@ -1263,6 +1307,7 @@ species:
           TiO2_wt_pct: '1.57'
           FeO_wt_pct: '0.003'
     - observation_id: wang_2001_table1_ion_microprobe_residue_compositions
+      experiment: wang-2001-langmuir-residue-series
       type: composition_series
       locator:
         page: 4
@@ -2477,6 +2522,7 @@ species:
           FeO_wt_pct: '0.066'
           WO3_wt_pct: '0.061'
     - observation_id: wang_2001_table2_sc1_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -2604,6 +2650,7 @@ species:
             row: SC1
             note: 'Table 2 prints 57.29 wt%; mass ratio from the printed masses is 57.35027223230490018148820327 wt%; Table 1 reports 57.35 wt%; the source does not reconcile the Table 2 discrepancy. Cross-reference locator: physical PDF page 4, published page 482, Table 1, row SC1.'
     - observation_id: wang_2001_table2_sc2_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -2716,6 +2763,7 @@ species:
             row: SC2
             note: row=SC2
     - observation_id: wang_2001_table2_sc3_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -2828,6 +2876,7 @@ species:
             row: SC3
             note: row=SC3
     - observation_id: wang_2001_table2_sc4_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -2940,6 +2989,7 @@ species:
             row: SC4
             note: row=SC4
     - observation_id: wang_2001_table2_sc5_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3052,6 +3102,7 @@ species:
             row: SC5
             note: row=SC5
     - observation_id: wang_2001_table2_sc6_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3164,6 +3215,7 @@ species:
             row: SC6
             note: row=SC6
     - observation_id: wang_2001_table2_sc7_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3276,6 +3328,7 @@ species:
             row: SC7
             note: row=SC7
     - observation_id: wang_2001_table2_sc8_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3388,6 +3441,7 @@ species:
             row: SC8
             note: row=SC8
     - observation_id: wang_2001_table2_sc9_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3500,6 +3554,7 @@ species:
             row: SC9
             note: row=SC9
     - observation_id: wang_2001_table2_sc10_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3612,6 +3667,7 @@ species:
             row: SC10
             note: row=SC10
     - observation_id: wang_2001_table2_sc11_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3724,6 +3780,7 @@ species:
             row: SC11
             note: row=SC11
     - observation_id: wang_2001_table2_sc12_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3836,6 +3893,7 @@ species:
             row: SC12
             note: row=SC12
     - observation_id: wang_2001_table2_sc13_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -3948,6 +4006,7 @@ species:
             row: SC13
             note: row=SC13
     - observation_id: wang_2001_table2_sc14_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -4060,6 +4119,7 @@ species:
             row: SC14
             note: row=SC14
     - observation_id: wang_2001_table2_sc15_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -4172,6 +4232,7 @@ species:
             row: SC15
             note: row=SC15
     - observation_id: wang_2001_table2_sc16_mass_loss
+      experiment: wang-2001-langmuir-residue-series
       type: rate_series
       locator:
         page: 6
@@ -5121,6 +5182,7 @@ species:
   La:
     observations:
     - observation_id: wang_2001_table1_la_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -6052,6 +6114,7 @@ species:
   Ce:
     observations:
     - observation_id: wang_2001_table1_ce_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -6983,6 +7046,7 @@ species:
   Pr:
     observations:
     - observation_id: wang_2001_table1_pr_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -7914,6 +7978,7 @@ species:
   Nd:
     observations:
     - observation_id: wang_2001_table1_nd_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -8844,6 +8909,7 @@ species:
   Sm:
     observations:
     - observation_id: wang_2001_table1_sm_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -9775,6 +9841,7 @@ species:
   Eu:
     observations:
     - observation_id: wang_2001_table1_eu_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -10706,6 +10773,7 @@ species:
   Gd:
     observations:
     - observation_id: wang_2001_table1_gd_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -11636,6 +11704,7 @@ species:
   Tb:
     observations:
     - observation_id: wang_2001_table1_tb_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -12567,6 +12636,7 @@ species:
   Dy:
     observations:
     - observation_id: wang_2001_table1_dy_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -13498,6 +13568,7 @@ species:
   Ho:
     observations:
     - observation_id: wang_2001_table1_ho_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -14429,6 +14500,7 @@ species:
   Er:
     observations:
     - observation_id: wang_2001_table1_er_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -15359,6 +15431,7 @@ species:
   Tm:
     observations:
     - observation_id: wang_2001_table1_tm_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -16290,6 +16363,7 @@ species:
   Yb:
     observations:
     - observation_id: wang_2001_table1_yb_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
@@ -17221,6 +17295,7 @@ species:
   Lu:
     observations:
     - observation_id: wang_2001_table1_lu_residue_concentration
+      experiment: wang-2001-langmuir-residue-series
       type: concentration_series
       locator:
         page: 4
