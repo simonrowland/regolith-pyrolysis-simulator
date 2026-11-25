@@ -567,6 +567,10 @@ def test_completed_c6_no_filters_budget_flag_at_zero_hour_export():
 
     session.decide("no")
     assert session.is_complete()
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in pending_execution.run_flags
+    )
 
     completed_execution = RunExecutor().execute_session(session, hours=0)
 
@@ -597,7 +601,17 @@ def test_budget_flag_uses_live_campaign_adjustment():
         if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
     )
     assert flag["detail"]["configured_limits"]["max_hours_override"] == 23
-    assert not hasattr(session, "_finite_budget_intent")
+    assert session._last_drive_stop == "hour_budget"
+
+
+def test_unstarted_finite_driver_iterator_does_not_write_stop_state():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+
+    steps = drive_auto_apply(session, 1)
+
+    assert session._last_drive_stop is None
+    steps.close()
+    assert session._last_drive_stop is None
 
 
 def test_hour_budget_flag_stops_before_repeated_c2a_after_decision():
@@ -727,6 +741,10 @@ def test_resumed_terminal_execution_does_not_export_prior_budget_flag():
     assert session.is_complete()
     assert not any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in truncated_execution.run_flags
+    )
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in completed_execution.run_flags
     )
     artifact = build_run_artifact(
@@ -751,16 +769,19 @@ def test_driver_replaces_budget_flag_after_each_advancing_call():
 
     list(drive_auto_apply(session, 1))
     assert not session.is_complete()
+    assert session._last_drive_stop == "hour_budget"
+    first_execution = RunExecutor().execute_session(session, hours=0)
     assert any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-        for flag in session._run_flags
+        for flag in first_execution.run_flags
     )
 
     list(drive_auto_apply(session, 1))
     assert session.is_complete()
+    assert session._last_drive_stop == "campaign_complete"
     assert not any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-        for flag in session._run_flags
+        for flag in first_execution.run_flags
     )
 
     projected_execution = RunExecutor().execute_session(session, hours=0)
@@ -786,7 +807,7 @@ def test_zero_hour_campaign_completion_exports_only_new_run_flags():
     assert not session.is_complete()
     assert any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-        for flag in session._run_flags
+        for flag in RunExecutor().execute_session(session, hours=0).run_flags
     )
 
     completed_execution = RunExecutor().execute_session(session, hours=0)

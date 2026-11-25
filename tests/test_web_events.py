@@ -4319,31 +4319,29 @@ def test_unbudgeted_web_pacing_slice_does_not_emit_run_flags(monkeypatch):
         ))
 
         assert len(results) == 1
-        assert session._run_flags == []
+        projection = runner_module.RunExecutor().execute_session(session, hours=0)
+        assert not any(
+            flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+            for flag in projection.run_flags
+        )
     finally:
         client.disconnect()
         for sid in set(_simulations) - before:
             _clear_simulation_state(sid)
 
 
-def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
+def test_web_artifact_projection_preserves_campaign_stop_flags():
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
         campaign="C0",
         hours=0,
     )
     session = run._start_session()
-    run_flag = {
-        "kind": "run_diagnostic",
-        "code": "already_recorded_run_flag",
-        "detail": {"source": "session record", "value": float("nan")},
-    }
     campaign_flag = {
         "kind": "campaign_stop",
         "code": "already_recorded_campaign_flag",
         "detail": {"campaign": "C0", "value": float("inf")},
     }
-    session._run_flags.append(run_flag)
     step = session.advance()
     session._step_results[-1] = SimpleNamespace(
         campaign_summary={
@@ -4366,10 +4364,10 @@ def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
     )
 
     metadata = artifact["terminal"]["run_metadata"]
-    assert metadata["run_flags"] == [{
-        **run_flag,
-        "detail": {"source": "session record", "value": None},
-    }]
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in metadata.get("run_flags", ())
+    )
     assert metadata["campaign_stops"][0]["flags"] == [{
         **campaign_flag,
         "detail": {"campaign": "C0", "value": None},
@@ -4384,8 +4382,55 @@ def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
         refusal_diagnostic=None,
     )
     fallback_metadata = fallback_payload["run_metadata"]
-    assert fallback_metadata["run_flags"] == metadata["run_flags"]
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in fallback_metadata.get("run_flags", ())
+    )
     assert fallback_metadata["campaign_stops"] == metadata["campaign_stops"]
+
+
+def test_web_projection_preserves_recorded_flags_without_live_session():
+    run_flag = {
+        "kind": "run_diagnostic",
+        "code": "already_recorded_run_flag",
+        "detail": {"source": "stored artifact", "value": float("nan")},
+    }
+    recorded = _terminal_runner_document("ok")
+    recorded["run_metadata"]["run_flags"] = [run_flag]
+    session_without_live_simulator = SimpleNamespace(
+        result_document=lambda: recorded
+    )
+    run = PyrolysisRun(feedstock_id="lunar_mare_low_ti", hours=0)
+
+    payload = web_events._full_runner_payload(
+        session_without_live_simulator,
+        projector=run,
+        status="ok",
+    )
+
+    assert payload["run_metadata"]["run_flags"] == [{
+        **run_flag,
+        "detail": {"source": "stored artifact", "value": None},
+    }]
+
+    fallback = web_events._available_runner_payload(
+        SimpleNamespace(
+            _config=None,
+            simulator=None,
+            per_hour_summaries=lambda: [],
+        ),
+        projector=SimpleNamespace(
+            run_metadata_overrides={"run_flags": [run_flag]}
+        ),
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic=None,
+    )
+
+    assert fallback["run_metadata"]["run_flags"] == payload[
+        "run_metadata"
+    ]["run_flags"]
 
 
 def test_recorded_web_projection_drops_budget_flag_after_c6_no():
@@ -4416,6 +4461,10 @@ def test_recorded_web_projection_drops_budget_flag_after_c6_no():
 
     session.decide("no")
     assert session.is_complete()
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in session.result_document()["run_metadata"].get("run_flags", ())
+    )
 
     projected_payload = web_events._full_runner_payload(
         session,
