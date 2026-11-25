@@ -27,8 +27,8 @@ def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
         "pdf_page_index": 1,
         "section": "Experimental details",
         "column": "left",
-        "source_path": "tables/borisov-borisovskiy-2024-ti-zircon-starting-recipe.tsv",
-        "line_range": "2-9",
+        "source_path": "raw/borisov-borisovskiy-2024-ti-zircon/borisov-borisovskiy-2024-ti-zircon.pdf",
+        "source_sha256": "dc1a232b026b35ea7373fe881b46ac0d6d152324138d4b8cd6b84d287a6daa43",
     }
     assert recipe["values"]["components_as_printed"] == {
         "SiO2": "56.9",
@@ -45,39 +45,39 @@ def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
     expected_fidelity_pins = {
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.SiO2": (
             "56.9",
-            "2",
+            "column left; printed starting-mixture SiO2 wt.% cell",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.Al2O3": (
             "10.1",
-            "3",
+            "column left; printed starting-mixture Al2O3 wt.% cell",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.MgO": (
             "9.4",
-            "4",
+            "column left; printed starting-mixture MgO wt.% cell",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.CaO": (
             "10.1",
-            "5",
+            "column left; printed starting-mixture CaO wt.% cell",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.components_as_printed.ZrO2": (
             "13.5",
-            "6",
+            "column left; printed starting-mixture ZrO2 wt.% cell",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T8.value": (
             "8",
-            "7",
+            "column left; approximate starting-mixture TiO2 target for T8",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T15.value": (
             "15",
-            "8",
+            "column left; approximate starting-mixture TiO2 target for T15",
         ),
         f"species.TiO2.context[{RECIPE_ID}].values.TiO2_target_wt_percent_as_printed.T25.value": (
             "25",
-            "9",
+            "column left; approximate starting-mixture TiO2 target for T25",
         ),
     }
     recipe_pins = {
-        sample["path"]: (sample["value"], sample["locator"]["line_range"])
+        sample["path"]: (sample["value"], sample["locator"]["note"])
         for sample in document["fidelity_samples"]
         if sample.get("path", "").startswith(
             f"species.TiO2.context[{RECIPE_ID}]."
@@ -86,9 +86,11 @@ def test_printed_recipe_is_pinned_but_measured_glass_is_not_run_input() -> None:
     assert recipe_pins == expected_fidelity_pins
     assert all(
         sample["locator"]["source_path"] == recipe["locator"]["source_path"]
+        and sample["locator"]["source_sha256"] == recipe["locator"]["source_sha256"]
         and sample["locator"]["page"] == 2
         and sample["locator"]["published_page"] == 498
         and sample["locator"]["pdf_page_index"] == 1
+        and sample["locator"]["section"] == "Experimental details"
         for sample in document["fidelity_samples"]
         if sample.get("path", "").startswith(
             f"species.TiO2.context[{RECIPE_ID}]."
