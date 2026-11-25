@@ -32,7 +32,7 @@ from simulator.vacuum_oxygen_balance import (
     PressureLawExponentMismatch,
     iron_mean_oxygen_per_atom,
 )
-from simulator.battery.records import Observation, nominal_pressure_pa
+from simulator.battery.records import nominal_pressure_pa
 from simulator.source_ids import (
     HASHIMOTO_SOURCE_ID,
     SOSSI_SOURCE_ID as _SOSSI_SOURCE_ID,
@@ -67,7 +67,7 @@ _HASHIMOTO_GEOMETRIES = (
 )
 
 
-def _is_wang_imp_residue_series(reference: Observation) -> bool:
+def _is_wang_imp_residue_series(reference: Any) -> bool:
     """Identify the Wang IMP series whose closure notice differs by assay."""
     if reference.source_id != WANG_2001_SOURCE_ID:
         return False
