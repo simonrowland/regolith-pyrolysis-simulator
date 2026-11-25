@@ -700,6 +700,25 @@ def test_non_default_gas_table_change_is_not_hidden_by_cache(
     )
 
 
+def test_unexpected_packaged_gas_signature_error_propagates(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    openimcc = _openimcc_or_skip()
+    import openimcc.gas as openimcc_gas
+    import simulator.melt_backend.openimcc_bridge as bridge
+
+    gas_pack = openimcc.load_gas_datapack()
+
+    def fail_signature_read() -> tuple[str, str, frozenset, frozenset]:
+        raise RuntimeError("unexpected packaged signature failure")
+
+    monkeypatch.setattr(
+        openimcc_gas, "_packaged_pressure_signatures", fail_signature_read
+    )
+    with pytest.raises(RuntimeError, match="unexpected packaged signature failure"):
+        bridge._openimcc_cache_decision({}, gas_pack=gas_pack)
+
+
 def test_pack_digest_preserves_the_published_binding_value() -> None:
     _openimcc_or_skip()
     expected = "ae979b68295f6e653fb1c37d6b381f06cb0be8d4c5b421e673420a6e4596357c"

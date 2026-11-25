@@ -114,11 +114,14 @@ def _openimcc_cache_decision(
         ):
             return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
     if gas_pack is not None:
-        try:
-            from openimcc.gas import _packaged_pressure_signatures
+        from openimcc.gas import (
+            ImccGasDataUnavailableError,
+            _packaged_pressure_signatures,
+        )
 
+        try:
             gas_digest, oxide_digest, *_ = _packaged_pressure_signatures()
-        except Exception:
+        except (ImccGasDataUnavailableError, OSError):
             return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
         if (
             getattr(gas_pack, "gas_table_digest", None) != gas_digest
