@@ -607,6 +607,18 @@ def _non_absolute_redox_state_kwargs(
     return {'redox_state': redox_state}
 
 
+def redox_state_cache_identity_matches(
+    requested: RedoxState | None,
+    stored: RedoxState | None,
+) -> bool:
+    """Compare the non-absolute redox control carried by a cached value."""
+    requested_identity = (
+        requested.cache_identity() if requested is not None else None
+    )
+    stored_identity = stored.cache_identity() if stored is not None else None
+    return requested_identity == stored_identity
+
+
 def normalize_redox_state(
     fO2_log: float | None,
     redox_state: RedoxState | None = None,

@@ -334,7 +334,7 @@ def _freeze_gate_curve_with_outcome(
 def _freeze_gate_curve_fixture(sim, curve):
     """Give valid fixture bounds the production builder's endpoint path."""
     curve = dict(curve)
-    if 'path' in curve:
+    if curve.get('path'):
         return curve
     solidus_T_C = sim._optional_float(curve.get('solidus_T_C'))
     liquidus_T_C = sim._optional_float(curve.get('liquidus_T_C'))
@@ -3248,6 +3248,12 @@ def test_held_path_runner_payload_outcome_is_a_json_string(
         setpoints_data,
         enabled=True,
     )
+    sim._freeze_gate_cache_key_and_domain(
+        pressure_bar=float(sim.melt.p_total_mbar) / 1000.0,
+        fO2_log=sim._freeze_gate_redox_key_fO2_log(
+            fO2_log=float(sim._current_melt_redox_fO2_log()),
+        ),
+    )
     sim._remember_freeze_gate_provider_curve({
         'source': 'gate_liquid_fraction',
         'solidus_T_C': 1100.0,
@@ -5117,6 +5123,110 @@ def test_same_hour_held_magemin_curve_is_bound_to_its_domain_verdict(
     assert recomputed['curve'].get('gate_provider_refusal', {}).get(
         'qualification'
     ) != 'held_last_good_curve'
+
+
+def test_same_hour_held_magemin_curve_is_bound_to_redox_control(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    trace = _install_magemin_subprocess_gate(sim, monkeypatch)
+    state_a, state_b = _freeze_gate_redox_state_pair(
+        distinct_buffers=True,
+        monkeypatch=monkeypatch,
+    )
+    assert state_a.log_fO2_at(REDOX_STATE_REFERENCE_T_K) == (
+        state_b.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+
+    _set_freeze_gate_redox_state(sim, state_a)
+    successful_record = sim._freeze_gate_curve_record(redox_state=state_a)
+    assert successful_record['curve'].get('authority') is None
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+
+    trace['fail'] = True
+    held_record = sim._freeze_gate_curve_record(redox_state=state_a)
+    assert held_record['curve']['gate_provider_refusal'][
+        'qualification'
+    ] == 'held_last_good_curve'
+    assert sim._freeze_gate_held_curve_record['redox_state_identity'] == state_a
+
+    sim._freeze_gate_liquid_fraction_cache = None
+    sim._freeze_gate_liquid_fraction_curve_memo.clear()
+    previous_dispatches = len(trace['provider_diagnostics'])
+    other_control_record = sim._freeze_gate_curve_record(redox_state=state_b)
+
+    assert len(trace['provider_diagnostics']) == previous_dispatches + 1
+    assert other_control_record['curve'].get('gate_provider_refusal', {}).get(
+        'qualification'
+    ) != 'held_last_good_curve'
+
+
+def test_same_hour_floor_pin_is_bound_to_redox_control(
+    monkeypatch,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.melt_backend.magemin import MAGEMinDomainIdentity
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+        liquid_fraction_provider='magemin',
+    )
+    state_a, state_b = _freeze_gate_redox_state_pair(
+        distinct_buffers=True,
+        monkeypatch=monkeypatch,
+    )
+    assert state_a.log_fO2_at(REDOX_STATE_REFERENCE_T_K) == (
+        state_b.log_fO2_at(REDOX_STATE_REFERENCE_T_K)
+    )
+    domain_identity = MAGEMinDomainIdentity(
+        'in_band',
+        'clear',
+        None,
+        None,
+    )
+    monkeypatch.setattr(
+        sim,
+        '_melt_redox_gate_current_pin_verdict',
+        lambda: (domain_identity, True),
+    )
+    fallback = sim._melt_redox_liquidus_floor_fallback(
+        source='none:liquidus_unavailable',
+        reason='test timeout',
+        liquidus_status='unavailable',
+        redox_state=state_a,
+    )
+    sim._melt_redox_gate_authority_this_tick = fallback
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._melt_redox_gate_authority_tick_verdict_identity = domain_identity
+
+    same_control = sim._melt_redox_gate_current_hour_pin(
+        redox_state=state_a,
+    )
+    assert same_control == (True, fallback, False)
+
+    sim._melt_redox_gate_authority_this_tick = fallback
+    sim._melt_redox_gate_authority_tick_hour = int(sim.melt.hour)
+    sim._melt_redox_gate_authority_tick_verdict_identity = domain_identity
+    other_control = sim._melt_redox_gate_current_hour_pin(
+        redox_state=state_b,
+    )
+    assert other_control == (False, None, True)
+    assert sim._melt_redox_gate_authority_this_tick is not fallback
 
 
 def test_worker_timeout_last_good_matches_current_evaluated_silica_verdict(
@@ -7419,7 +7529,7 @@ def test_cold_magemin_version_failures_do_not_store_or_reuse_gate_memos(
         'value': None,
         'reason': 'version getter failed: ValueError',
     }
-    assert not admission.gate_curve_memo_eligibility(sim, curve)
+    assert admission.gate_curve_memo_eligibility(sim, curve)
     assert any(
         notice['reason'] == 'MAGEMin runtime version unknown'
         for notice in sim._engine_binding_admission_notices
@@ -8554,6 +8664,108 @@ def test_gate_memo_origin_unproven_is_miss_and_noticed(
             }
         ]
     }
+
+
+def test_gate_memo_unproven_primary_with_admitted_binding_is_recomputed(
+    monkeypatch,
+    tmp_path,
+    vapor_pressure_data,
+    feedstocks_data,
+    setpoints_data,
+):
+    from simulator.engine_binding_admission import (
+        BindingIdentity,
+        gate_curve_memo_evidence,
+        gate_curve_memo_origin_matches,
+        gate_curve_memo_reuse_eligible,
+    )
+    from simulator.reduced_real_determinism import GateCurveProviderOutcome
+
+    sim = _build_freeze_gate_sim(
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+        enabled=True,
+    )
+    identity = BindingIdentity(
+        'magemin', 'ig', 'magemin-ig-r1', 'subprocess'
+    )
+    provenance = {
+        'binding_provenance_verifiable': True,
+        'runtime_version': {
+            'tag': 'value',
+            'value': 'MAGEMin fixture runtime',
+            'reason': None,
+        },
+        'runtime_artifacts': {
+            'magemin_selected_binary': {'sha256': 'a' * 64},
+        },
+    }
+    monkeypatch.setattr(
+        admission_module,
+        'selected_binding_identities',
+        lambda *_args, **_kwargs: (identity,),
+    )
+    monkeypatch.setattr(
+        admission_module,
+        'selected_binding_provenance',
+        lambda *_args, **_kwargs: dict(provenance),
+    )
+    _write_gate_receipt_for_test(
+        monkeypatch,
+        tmp_path,
+        identity,
+        provenance,
+    )
+    sim.backend = SimpleNamespace(name='unregistered-gate-backend')
+    curve = {
+        'source': 'unit-test',
+        'solidus_T_C': 1000.0,
+        'liquidus_T_C': 1300.0,
+    }
+    evidence = gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    assert evidence.producer_evidence == 'unproven'
+    assert evidence.eligible
+    record = engine_binding_admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+        evidence=evidence,
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    assert not gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        record['origin'],
+        fresh_evidence=False,
+    )
+    assert not gate_curve_memo_reuse_eligible(
+        sim,
+        curve,
+        record['origin'],
+        fresh_evidence=False,
+        evidence=evidence,
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        'key': _freeze_gate_key_for_current_state(sim),
+        **record,
+        'law_disclosures': [],
+    }
+    producer_calls = []
+
+    def recompute(*_args, **_kwargs):
+        producer_calls.append(None)
+        return _freeze_gate_curve_with_outcome(sim, curve)
+
+    sim._freeze_gate_curve_from_gate_dispatch = recompute
+    result = sim._freeze_gate_curve_record()
+
+    assert result['curve'] == _freeze_gate_curve_fixture(sim, curve)
+    assert result['disposition'] == 'live'
+    assert len(producer_calls) == 1
 
 
 @pytest.mark.parametrize(

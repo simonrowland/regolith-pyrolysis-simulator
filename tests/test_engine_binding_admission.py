@@ -24,7 +24,10 @@ from simulator.engine_binding_admission import (
     live_cache_eligibility,
     version_getter_provenance,
 )
-from simulator.reduced_real_determinism import PT0DeterminismStore
+from simulator.reduced_real_determinism import (
+    GateCurveProviderOutcome,
+    PT0DeterminismStore,
+)
 
 
 FIXTURES = Path(__file__).parent / "fixtures"
@@ -1373,8 +1376,26 @@ def test_gate_curve_memo_is_ineligible_without_verifiable_producer_provenance(
     )
     sim = SimpleNamespace()
 
-    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
-    assert not admission.gate_curve_memo_eligibility(sim, SYNTHETIC_CURVE)
+    evidence = admission.gate_curve_memo_evidence(
+        sim,
+        SYNTHETIC_CURVE,
+        include_selected_bindings=True,
+    )
+    assert evidence.producer_evidence == "unproven"
+    assert not evidence.eligible
+    record = admission.write_gate_curve_memo_record(
+        sim,
+        SYNTHETIC_CURVE,
+        evidence=evidence,
+        provider_outcome=GateCurveProviderOutcome.PRODUCED,
+    )
+    assert not admission.gate_curve_memo_reuse_eligible(
+        sim,
+        SYNTHETIC_CURVE,
+        record["origin"],
+        fresh_evidence=False,
+        evidence=evidence,
+    )
 
 
 def test_gate_curve_memo_malformed_configuration_raises_typed_error() -> None:

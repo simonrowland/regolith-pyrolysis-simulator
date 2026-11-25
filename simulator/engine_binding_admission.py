@@ -1038,20 +1038,6 @@ def gate_curve_memo_origin_matches(
         return False
     producer_evidence = origin.get("producer_evidence")
     provider_role = _gate_curve_provider_role(curve)
-    if producer_evidence == "unproven":
-        current = evidence or gate_curve_memo_evidence(
-            sim,
-            curve,
-            include_selected_bindings=True,
-        )
-        return (
-            _gate_curve_memo_evidence_is_locally_reusable(
-                sim,
-                current,
-                provider_role=provider_role,
-            )
-            and current.producer_evidence == producer_evidence
-        )
     if not _gate_curve_memo_evidence_can_support_reuse(
         sim,
         producer_evidence,
@@ -1087,7 +1073,7 @@ def gate_curve_memo_reuse_eligible(
         return False
     provider_role = _gate_curve_provider_role(curve)
     producer_evidence = origin.get("producer_evidence")
-    if producer_evidence != "unproven" and not (
+    if not (
         _gate_curve_memo_evidence_can_support_reuse(
             sim,
             producer_evidence,
@@ -1097,7 +1083,7 @@ def gate_curve_memo_reuse_eligible(
         return False
 
     current = evidence
-    if fresh_evidence or producer_evidence == "unproven":
+    if fresh_evidence:
         current = current or gate_curve_memo_evidence(
             sim,
             curve,
@@ -1160,39 +1146,28 @@ def _gate_curve_memo_evidence_is_locally_reusable(
 ) -> bool:
     return (
         _gate_curve_evidence_has_known_magemin_version(evidence)
-        and (
-            (
-                evidence.producer_evidence == "unproven"
-                and evidence.eligible
-            )
-            or _gate_curve_memo_evidence_can_support_reuse(
-                sim,
-                evidence.producer_evidence,
-                provider_role=provider_role,
-            )
+        and _gate_curve_memo_evidence_can_support_reuse(
+            sim,
+            evidence.producer_evidence,
+            provider_role=provider_role,
         )
     )
 
 
 def gate_curve_memo_eligibility(sim: Any, curve: Mapping[str, Any]) -> bool:
-    """Check whether fresh producer evidence can support a local memo."""
+    """Record producer evidence before admitting a cacheable local curve."""
     from simulator.reduced_real_determinism import (
-        _gate_curve_provider_role,
         _is_cacheable_gate_curve,
     )
 
     if not _is_cacheable_gate_curve(curve):
         return False
-    evidence = gate_curve_memo_evidence(
+    gate_curve_memo_evidence(
         sim,
         curve,
         include_selected_bindings=True,
     )
-    return _gate_curve_memo_evidence_is_locally_reusable(
-        sim,
-        evidence,
-        provider_role=_gate_curve_provider_role(curve),
-    )
+    return True
 
 
 def authorize_cached_real_replay(

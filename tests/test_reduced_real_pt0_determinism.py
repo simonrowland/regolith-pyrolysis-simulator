@@ -254,8 +254,13 @@ def _repair_notice_test_record() -> tuple[dict[str, str], dict[str, object]]:
         },
         {
             "curve": {
-                "status": "in_range",
-                "tag": "notice-recapture",
+                "source": "gate_liquid_fraction",
+                "solidus_T_C": 1000.0,
+                "liquidus_T_C": 1200.0,
+                "path": [
+                    {"temperature_C": 1000.0, "liquid_fraction": 0.0},
+                    {"temperature_C": 1200.0, "liquid_fraction": 1.0},
+                ],
                 "is_liquidus_floor": False,
             },
         },
@@ -2563,6 +2568,7 @@ def test_pt0_gate_replay_separates_buffers_at_same_scalar_fO2(
         "status": "ok",
         "solidus_T_C": 1210.0,
         "liquidus_T_C": 1320.0,
+        "path": ((1210.0, 0.0), (1320.0, 1.0)),
     }
     record = write_gate_curve_memo_record(
         capture_sim,
@@ -4829,6 +4835,147 @@ def test_pt1_concurrent_first_open_upgrades_legacy_schema_once(
     assert "repair_notices_json" in columns
 
 
+def test_pt1_concurrent_row_copy_checks_and_writes_atomically(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    capture = PT0DeterminismStore("capture")
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    entry = next(iter(capture._entries.values()))
+    key = entry["key"]
+    key_hash = entry["key_hash"]
+    key_bytes = entry["key_bytes"].encode("utf-8")
+    first_payload = copy.deepcopy(entry["payload"])
+    second_payload = copy.deepcopy(first_payload)
+    second_payload["equilibrium_result"]["vapor_pressures_Pa"]["SiO"] = 2.0
+    assert canonical_json_bytes(first_payload) != canonical_json_bytes(
+        second_payload
+    )
+
+    source_paths = (tmp_path / "first-source.sqlite", tmp_path / "second-source.sqlite")
+    for source_path, payload in zip(
+        source_paths,
+        (first_payload, second_payload),
+    ):
+        payload_bytes = canonical_json_bytes(payload)
+        PT1PersistentEquilibriumStore(source_path).put(
+            artifact="equilibrium_post_record",
+            key=key,
+            key_bytes=key_bytes,
+            key_hash=key_hash,
+            payload=payload,
+            payload_bytes=payload_bytes,
+            payload_hash=hashlib.sha256(payload_bytes).hexdigest(),
+            repair_notices_json=entry["repair_notices_json"],
+            law_disclosures=entry["law_disclosures"],
+        )
+
+    target_path = tmp_path / "atomic-row-copy-target.sqlite"
+    PT1PersistentEquilibriumStore(target_path)
+    admission_barrier = threading.Barrier(2)
+    original_admission = rrd._pt1_row_admission
+
+    def synchronized_admission(row):
+        try:
+            admission_barrier.wait(timeout=1.0)
+        except threading.BrokenBarrierError:
+            pass
+        return original_admission(row)
+
+    monkeypatch.setattr(rrd, "_pt1_row_admission", synchronized_admission)
+
+    def copy_source(source_path: Path) -> str:
+        try:
+            result = rrd._copy_pt1_equilibrium_rows(
+                (source_path,),
+                target_path,
+                require_capture_epoch_match=False,
+            )
+        except rrd._PT1CacheMergeCollision:
+            return "collision"
+        return "copied" if result["inserted_rows"] == 1 else "unchanged"
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        outcomes = list(executor.map(copy_source, source_paths))
+
+    assert sorted(outcomes) == ["collision", "copied"]
+    with sqlite3.connect(target_path) as conn:
+        row = conn.execute(
+            f"SELECT payload_bytes FROM {PT1_EQUILIBRIUM_TABLE} "
+            "WHERE key_hash = ?",
+            (key_hash,),
+        ).fetchone()
+    assert row is not None
+    assert bytes(row[0]) in {
+        canonical_json_bytes(first_payload),
+        canonical_json_bytes(second_payload),
+    }
+
+
+def test_pt1_capture_rejects_unproven_primary_with_admitted_binding(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    from simulator import engine_binding_admission as admission
+    from simulator.engine_binding_admission import GateCurveEvidence
+
+    db_path = tmp_path / "unproven-gate-producer.sqlite"
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim = _build_pt0_sim(capture)
+    sim.start_campaign(CampaignPhase.C2A_STAGED)
+    sim._liquid_fraction_provider = "magemin"
+    register_synthetic_gate_curve_producer(sim)
+    _select_synthetic_gate_curve_binding(tmp_path, monkeypatch)
+    curve = {
+        "source": "gate_liquid_fraction:fallback:magemin-shadow",
+        "solidus_T_C": 1200.0,
+        "liquidus_T_C": 1600.0,
+        "path": ((1200.0, 0.0), (1600.0, 1.0)),
+    }
+
+    selected_binding_evidence = admission.gate_curve_memo_evidence(
+        sim,
+        curve,
+        include_selected_bindings=True,
+    )
+    assert selected_binding_evidence.eligible
+    unproven_record = admission.write_gate_curve_memo_record(
+        sim,
+        curve,
+        evidence=GateCurveEvidence("unproven", True),
+        provider_outcome=rrd.GateCurveProviderOutcome.PRODUCED,
+    )
+    assert unproven_record["origin"]["producer_evidence"] == "unproven"
+    assert not admission.gate_curve_memo_origin_matches(
+        sim,
+        curve,
+        unproven_record["origin"],
+        fresh_evidence=False,
+    )
+    assert not admission.gate_curve_memo_reuse_eligible(
+        sim,
+        curve,
+        unproven_record["origin"],
+        fresh_evidence=False,
+        evidence=selected_binding_evidence,
+    )
+    sim._freeze_gate_liquid_fraction_cache = {
+        **unproven_record,
+        "law_disclosures": [],
+    }
+
+    capture.capture_gate_curve(
+        sim,
+        fO2_log=sim._compute_intrinsic_melt_fO2(),
+        curve=curve,
+        law_disclosures=[],
+    )
+
+    assert capture.capture_sequence == []
+    assert _persistent_artifact_count(db_path, "freeze_gate_curve") == 0
+
+
 def test_pt1_projected_gate_notice_replays_into_run_metadata(tmp_path: Path) -> None:
     db_path = tmp_path / "pt1-projected-notice.db"
     notice = {
@@ -4940,6 +5087,31 @@ def _store_raw_replay_payload(
         payload_hash=rrd._sha256(payload_bytes),
         law_disclosures=law_disclosures,
     )
+
+
+def _store_unadmitted_test_payload(
+    store: PT0DeterminismStore,
+    artifact: str,
+    key: dict,
+    payload: dict,
+    *,
+    law_disclosures=(),
+) -> None:
+    if store.persistent_store is None:
+        store._store(
+            artifact,
+            key,
+            payload,
+            law_disclosures=law_disclosures,
+        )
+    else:
+        _store_raw_replay_payload(
+            store,
+            artifact,
+            key,
+            payload,
+            law_disclosures=law_disclosures,
+        )
 
 
 def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
@@ -5085,7 +5257,8 @@ def test_markerless_gate_curve_row_is_a_miss_and_can_be_replaced(
         },
     }
 
-    store._store(
+    _store_unadmitted_test_payload(
+        store,
         "freeze_gate_curve",
         key,
         legacy_payload,
@@ -5195,7 +5368,8 @@ def test_extrapolated_gate_rows_that_miss_d447_are_replaceable(
         **stale_curve,
         "certified_band": {"sio2_wt_pct": [30.0, 80.0]},
     }
-    store._store(
+    _store_unadmitted_test_payload(
+        store,
         "freeze_gate_curve",
         key,
         {"curve": stale_curve},
@@ -5291,7 +5465,8 @@ def test_legacy_magemin_gate_curve_replays_with_d447_feo_flag(
     legacy_curve = legacy_payload["curve"]
     legacy_curve["is_liquidus_floor"] = False
     legacy_curve["gate_provider_step_down"].pop("magemin_sourced")
-    store._store(
+    _store_unadmitted_test_payload(
+        store,
         "freeze_gate_curve",
         key,
         legacy_payload,
@@ -5413,7 +5588,8 @@ def test_projected_magemin_step_down_replay_keeps_d447_feo_flag(
     legacy_step_down = legacy_payload["curve"]["gate_provider_step_down"]
     assert legacy_step_down["realized_provider"] is None
     legacy_step_down.pop("magemin_sourced")
-    store._store(
+    _store_unadmitted_test_payload(
+        store,
         "freeze_gate_curve",
         key,
         legacy_payload,
@@ -5477,7 +5653,8 @@ def test_decoder_unreadable_gate_row_misses_before_hit_and_is_replaceable(
     }
     unreadable_payload = copy.deepcopy(current_payload)
     unreadable_payload["curve"].pop("liquidus_T_C")
-    capture._store(
+    _store_unadmitted_test_payload(
+        capture,
         "freeze_gate_curve",
         key,
         unreadable_payload,
@@ -5529,7 +5706,8 @@ def test_empty_gate_curve_path_misses_and_is_replaceable(
     }
     empty_path_payload = copy.deepcopy(current_payload)
     empty_path_payload["curve"]["path"] = []
-    capture._store(
+    _store_unadmitted_test_payload(
+        capture,
         "freeze_gate_curve",
         key,
         empty_path_payload,
@@ -5780,7 +5958,8 @@ def test_unreadable_equilibrium_replay_side_row_misses_and_is_replaceable(
     )
     unreadable_payload = copy.deepcopy(current_payload)
     unreadable_payload["last_vapor_pressure_diagnostic"] = 7
-    capture._store(
+    _store_unadmitted_test_payload(
+        capture,
         "equilibrium_post_record",
         key,
         unreadable_payload,
@@ -5821,7 +6000,8 @@ def test_unreadable_equilibrium_result_field_misses_and_is_replaceable(
     )
     unreadable_payload = copy.deepcopy(current_payload)
     unreadable_payload["equilibrium_result"][field] = bad_value
-    capture._store(
+    _store_unadmitted_test_payload(
+        capture,
         "equilibrium_post_record",
         key,
         unreadable_payload,
@@ -5902,7 +6082,8 @@ def test_pt1_stale_replacement_publishes_fresh_measured_disclosure(
     )
     stale_payload = copy.deepcopy(payload)
     stale_payload["last_vapor_pressure_diagnostic"] = 7
-    capture._store(
+    _store_unadmitted_test_payload(
+        capture,
         "equilibrium_post_record",
         key,
         stale_payload,
@@ -5916,7 +6097,7 @@ def test_pt1_stale_replacement_publishes_fresh_measured_disclosure(
             1.0e-9,
             vapor_pressure_data=_load_yaml("vapor_pressures.yaml"),
         )
-        fresh_disclosures = measured.snapshot()
+        fresh_disclosures = list(measured.snapshot())
     assert fresh_disclosures
 
     capture._store(
@@ -5998,7 +6179,8 @@ def test_in_band_legacy_step_down_without_source_marker_is_replaceable(
     current_payload["curve"]["gate_provider_step_down"][
         "magemin_sourced"
     ] = True
-    capture._store(
+    _store_unadmitted_test_payload(
+        capture,
         "freeze_gate_curve",
         key,
         legacy_payload,

@@ -40,6 +40,7 @@ from simulator.fe_redox import (
     KRESS91_LIQUID_CALIBRATION_MIN_T_C,
     RedoxState,
     _non_absolute_redox_state_kwargs,
+    redox_state_cache_identity_matches,
     _kress91_gate_key_referenced_log_fO2,
     kress91_temperature_band_case,
     normalize_redox_state,
@@ -3575,6 +3576,8 @@ class EvaporationMixin:
     def _remember_freeze_gate_provider_curve(
         self,
         curve: dict[str, Any],
+        *,
+        redox_state: RedoxState | None = None,
     ) -> dict[str, Any]:
         from simulator.reduced_real_determinism import _identity_gate_curve
 
@@ -3593,6 +3596,7 @@ class EvaporationMixin:
 
             'computed_hour': int(self.melt.hour),
             'composition_wt_pct': self.melt.composition_wt_pct(),
+            'redox_state_identity': redox_state,
             'magemin_domain_identity': magemin_domain_identity,
             'domain_identity': (
                 curve.get('authority'),
@@ -3621,11 +3625,17 @@ class EvaporationMixin:
         failure: Mapping[str, Any],
         *,
         timeout_reason: str | None = None,
+        redox_state: RedoxState | None = None,
     ) -> dict[str, Any] | None:
         from simulator.reduced_real_determinism import _identity_gate_curve
 
         previous = self._freeze_gate_last_good_curve
         if previous is None or previous['provider'] != self._liquid_fraction_provider:
+            return None
+        if not redox_state_cache_identity_matches(
+            redox_state,
+            previous.get('redox_state_identity'),
+        ):
             return None
         diagnostic = failure['provider_diagnostic']
         realized_provider = previous.get('realized_provider')
@@ -3781,6 +3791,10 @@ class EvaporationMixin:
                 isinstance(held, Mapping)
                 and held.get('hour') == int(self.melt.hour)
                 and held.get('provider') == self._liquid_fraction_provider
+                and redox_state_cache_identity_matches(
+                    redox_state,
+                    held.get('redox_state_identity'),
+                )
                 and (
                     (
                         magemin_domain_identity is not None
@@ -4037,6 +4051,7 @@ class EvaporationMixin:
                         'hour': int(self.melt.hour),
                         'provider': self._liquid_fraction_provider,
                         'domain_identity': magemin_domain_identity,
+                        'redox_state_identity': redox_state,
                         'record': copy.deepcopy(record),
                     }
                     return _gate_curve_live_publication(record, curve)
@@ -4869,6 +4884,7 @@ class EvaporationMixin:
                 held = self._hold_freeze_gate_provider_curve(
                     failure,
                     timeout_reason=timeout_reason,
+                    redox_state=redox_state,
                 )
                 if held is not None:
                     if 'gate_provider_step_down' in notices:
@@ -4969,6 +4985,7 @@ class EvaporationMixin:
                 projected.update(notices)
                 return self._remember_freeze_gate_provider_curve(
                     projected,
+                    redox_state=redox_state,
                 )
             invalid_notice = getattr(
                 self, '_invalid_projected_liquidus_notice', None,
@@ -4976,15 +4993,20 @@ class EvaporationMixin:
             if isinstance(invalid_notice, Mapping) and str(
                 invalid_notice.get('reason')
             ).startswith('composition_projected_over_threshold:'):
-                held = self._hold_freeze_gate_provider_curve({
-                    'provider': self._liquid_fraction_provider,
-                    'status': status,
-                    'outcome': gate_curve_provider_outcome_token(status_outcome),
-                    'provider_diagnostic': {
-                        **diagnostic,
-                        'backend_status_reason': invalid_notice['reason'],
+                held = self._hold_freeze_gate_provider_curve(
+                    {
+                        'provider': self._liquid_fraction_provider,
+                        'status': status,
+                        'outcome': gate_curve_provider_outcome_token(
+                            status_outcome
+                        ),
+                        'provider_diagnostic': {
+                            **diagnostic,
+                            'backend_status_reason': invalid_notice['reason'],
+                        },
                     },
-                })
+                    redox_state=redox_state,
+                )
                 if held is not None:
                     held['composition_projected_notice'] = (
                         self._invalid_projection_bounds_notice(
@@ -5050,6 +5072,7 @@ class EvaporationMixin:
                 )
                 return self._remember_freeze_gate_provider_curve(
                     curve,
+                    redox_state=redox_state,
                 )
             if _liquidus_fraction_inconsistent_since(reasons, reason_mark):
                 return None
@@ -5068,6 +5091,7 @@ class EvaporationMixin:
             )
             return self._remember_freeze_gate_provider_curve(
                 curve,
+                redox_state=redox_state,
             )
         record_gate_curve_provider_outcome(
             self,

@@ -57,9 +57,8 @@
       "rate_unit": "work_units_per_cpu_second"
     },
     "optimizer_60h_eval": {
-      "hot_path": "PyrolysisSimulator.step during optimizer evaluate",
-      "ratchet_rate": 3.212723412786125,
-      "rate_unit": "work_units_per_cpu_second"
+      "reason": "optimizer_60h_eval needs rebaseline on the reference machine after b-080 full-chain workload; owner action",
+      "status": "needs_rebaseline"
     },
     "runner_fixture_replay": {
       "hot_path": "simulator.runner.main -> PyrolysisSimulator.step",
