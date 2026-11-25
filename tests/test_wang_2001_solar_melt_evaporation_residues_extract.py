@@ -274,17 +274,25 @@ def test_rendered_table_grids_and_cell_mutations() -> None:
 def test_wo3_condition_series_uses_the_paper_tungsten_attribution() -> None:
     extract = yaml.safe_load(EXTRACT.read_text())
     observation = extract["species"]["W"]["observations"][0]
-    attribution = (
-        "derived from either the heating element in the furnace or the heat "
-        "shields surrounding the sample and heating element"
+    paper_sentence = (
+        "The presence of tungsten in the residues (Table 1), derived from either "
+        "the heating element in the furnace or the heat shields surrounding the "
+        "sample and heating element, shows that reprecipitation of evaporated "
+        "material occurs."
     )
 
     assert observation["observation_id"] == (
         "wang_2001_table1_ion_microprobe_wo3_conditions"
     )
     assert observation["admission_status"] == "typed_refusal"
-    assert attribution in observation["locator"]["note"]
-    assert attribution in observation["refusal_reason"]
+    assert "container_contamination_not_evaporation_observable" not in (
+        observation["refusal_reason"]
+    )
+    assert observation["refusal_reason"].startswith(
+        "tungsten_attributed_to_heating_element_or_heat_shields:"
+    )
+    assert paper_sentence in observation["locator"]["note"]
+    assert paper_sentence in observation["refusal_reason"]
 
 
 def test_table2_and_table4_rendered_rows_are_bound_to_samples() -> None:

@@ -172,6 +172,20 @@ def _owner_notices_before_pressure_model(
     raise AssertionError("expected the owner to stop before pressure integration")
 
 
+def _assert_wang_imp_basis_notice(notices, *, expected):
+    basis_notices = [
+        notice for notice in notices
+        if notice.reason.startswith("wang_imp_closure_basis:")
+    ]
+    assert len(basis_notices) == (1 if expected else 0)
+    if expected:
+        notice = basis_notices[0]
+        assert notice.kind is NoticeKind.ENGINE_MODEL_CAVEAT
+        assert "model basis is six-oxide wt% summing to 100" in notice.reason
+        assert "printed basis is total ion-microprobe wt%" in notice.reason
+        assert "including ΣLn2O3 and WO3" in notice.reason
+
+
 def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     import simulator.battery.residue as residue_module
     import simulator.battery.score as score_module
@@ -189,11 +203,17 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     assert all(
         row.identity.species.formula == "WO3"
         and row.admission.status.value == "rejected"
-        and row.admission.reason.startswith(
+        and not row.admission.reason.startswith(
             "container_contamination_not_evaporation_observable"
+        )
+        and row.admission.reason.startswith(
+            "tungsten_attributed_to_heating_element_or_heat_shields:"
         )
         and "derived from either the heating element in the furnace or the heat shields "
         "surrounding the sample and heating element" in row.admission.reason
+        and "The presence of tungsten in the residues (Table 1)" in (
+            row.admission.reason
+        )
         for row in condition_rows.values()
     )
     experiment_ids = {reference.experiment_id for reference in all_references.values()}
@@ -371,25 +391,15 @@ def test_wang_residue_cells_emit_one_production_score_event_each(monkeypatch):
     )
     for residual in numeric:
         reference = references[residual.reference]
-        basis_notices = [
-            notice for notice in residual.notices
-            if notice.reason.startswith("wang_imp_closure_basis:")
-        ]
-        is_imp = reference.observation_id.rsplit("::", maxsplit=1)[-1] == (
+        series_id = reference.observation_id.split("::", maxsplit=2)[1]
+        is_imp = series_id == (
             "wang_2001_table1_ion_microprobe_residue_compositions"
         )
-        assert len(basis_notices) == (1 if is_imp else 0)
-        if is_imp:
-            assert basis_notices[0].kind is NoticeKind.ENGINE_MODEL_CAVEAT
-            assert (
-                "model basis is six-oxide wt% summing to 100"
-                in basis_notices[0].reason
-            )
-            assert (
-                "printed basis is total ion-microprobe wt%"
-                in basis_notices[0].reason
-            )
-            assert "including ΣLn2O3 and WO3" in basis_notices[0].reason
+        is_emp = series_id == (
+            "wang_2001_table1_electron_microprobe_residue_compositions"
+        )
+        assert is_imp or is_emp
+        _assert_wang_imp_basis_notice(residual.notices, expected=is_imp)
 
 
 def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
@@ -401,7 +411,7 @@ def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
         reference
         for reference in references.values()
         if reference.identity.species.formula == "SiO2"
-        and reference.observation_id.rsplit("::", maxsplit=1)[-1]
+        and reference.observation_id.split("::", maxsplit=2)[1]
         == "wang_2001_table1_ion_microprobe_residue_compositions"
         and _langmuir_residue_row_id(reference.locator) == "sc12"
     )
@@ -409,7 +419,7 @@ def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
         reference
         for reference in references.values()
         if reference.identity.species.formula == "SiO2"
-        and reference.observation_id.rsplit("::", maxsplit=1)[-1]
+        and reference.observation_id.split("::", maxsplit=2)[1]
         == "wang_2001_table1_electron_microprobe_residue_compositions"
         and _langmuir_residue_row_id(reference.locator) == "sc12"
     )
@@ -418,15 +428,11 @@ def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
     imp_notices = _owner_notices_before_pressure_model(
         monkeypatch, imp_reference, experiment, observations.values()
     )
+    _assert_wang_imp_basis_notice(imp_notices, expected=True)
     imp_flag = next(
-        notice
-        for notice in imp_notices
+        notice for notice in imp_notices
         if notice.reason.startswith("wang_imp_closure_basis:")
     )
-    assert imp_flag.kind is NoticeKind.ENGINE_MODEL_CAVEAT
-    assert "model basis is six-oxide wt% summing to 100" in imp_flag.reason
-    assert "printed basis is total ion-microprobe wt%" in imp_flag.reason
-    assert "including ΣLn2O3 and WO3" in imp_flag.reason
     assert "without renormalization" in imp_flag.reason
     assert imp_reference.value.point == Decimal("35.1")
 
@@ -436,10 +442,44 @@ def test_wang_imp_closure_notice_preserves_printed_wt_percent(monkeypatch):
         context.experiments[emp_reference.experiment_id],
         observations.values(),
     )
-    assert not any(
-        notice.reason.startswith("wang_imp_closure_basis:")
-        for notice in emp_notices
+    _assert_wang_imp_basis_notice(emp_notices, expected=False)
+
+
+def test_wang_imp_series_key_mutation_is_detected(monkeypatch):
+    import simulator.battery.residue as residue_module
+
+    context, observations = wang_context()
+    reference = next(
+        row
+        for row in wang_residue_rows(observations).values()
+        if row.identity.species.formula == "SiO2"
+        and row.observation_id.split("::", maxsplit=2)[1]
+        == "wang_2001_table1_ion_microprobe_residue_compositions"
+        and _langmuir_residue_row_id(row.locator) == "sc12"
     )
+    experiment = context.experiments[reference.experiment_id]
+    notices = _owner_notices_before_pressure_model(
+        monkeypatch, reference, experiment, observations.values()
+    )
+    _assert_wang_imp_basis_notice(notices, expected=True)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            residue_module,
+            "_WANG_IMP_RESIDUE_SERIES_ID",
+            "wang_2001_table1_electron_microprobe_residue_compositions",
+        )
+        mutated_notices = _owner_notices_before_pressure_model(
+            monkeypatch, reference, experiment, observations.values()
+        )
+        try:
+            _assert_wang_imp_basis_notice(mutated_notices, expected=True)
+        except AssertionError:
+            pass
+        else:
+            raise AssertionError(
+                "changing the selected series key must remove the IMP flag"
+            )
 
 
 def test_wang_starting_aggregate_notice_tracks_located_extract_cell(monkeypatch):

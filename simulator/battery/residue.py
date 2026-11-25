@@ -55,6 +55,9 @@ _KNUDSEN_MAX_LINEAR_RHS_EVALUATIONS = 512
 _KNUDSEN_EXTENT_EVALUATION_LIMIT = "knudsen_extent_evaluation_limit"
 TRACE_TAIL_BELOW_LOADER_CUTOFF = "trace_tail_below_loader_cutoff"
 _OXIDE_WT_PERCENT_REFERENCE_MASS_KG = 1.0
+_WANG_IMP_RESIDUE_SERIES_ID = (
+    "wang_2001_table1_ion_microprobe_residue_compositions"
+)
 _HASHIMOTO_PRIMARY_ALPHA_ARM = "alpha_common_unity_sensitivity"
 _HASHIMOTO_PRIMARY_GEOMETRY = "sphere_shrinking"
 _HASHIMOTO_GEOMETRIES = (
@@ -3114,10 +3117,11 @@ def predict_langmuir_residue_composition(
             origin="Langmuir residue pressure",
         ),
     ]
+    observation_id_parts = reference.observation_id.split("::", maxsplit=2)
     if (
         reference.source_id == WANG_2001_SOURCE_ID
-        and reference.observation_id.rsplit("::", maxsplit=1)[-1]
-        == "wang_2001_table1_ion_microprobe_residue_compositions"
+        and len(observation_id_parts) > 1
+        and observation_id_parts[1] == _WANG_IMP_RESIDUE_SERIES_ID
     ):
         notices.append(
             Notice(
