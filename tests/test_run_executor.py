@@ -28,7 +28,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     StepResult,
-    _hour_budget_exhausted_flag,
+    _run_flags_for_export,
     drive_auto_apply,
     drive_session,
 )
@@ -61,6 +61,15 @@ def _started_internal_session(run: PyrolysisRun) -> SimSession:
     session = SimSession()
     session.start(run._session_config(), backend=backend)
     return session
+
+
+def _live_budget_flag(session: SimSession) -> dict:
+    session._last_drive_stop = "hour_budget"
+    flags = _run_flags_for_export(session)
+    return next(
+        flag for flag in flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
 
 
 def test_run_executor_returns_structured_execution():
@@ -669,7 +678,7 @@ def test_hour_budget_flag_follows_live_manager_c5_route_exactly():
     session.simulator.campaign_mgr.c5_enabled = True
     session.simulator.melt.c5_enabled = False
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     assert flag["detail"]["successors_not_reached"] == [
         "C5",
@@ -696,7 +705,7 @@ def test_hour_budget_flag_stops_at_live_pending_decision(recommendation):
     )
     sim.paused_for_decision = True
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     detail = flag["detail"]
     assert detail["pending_decision"]["recommendation"] == recommendation
@@ -834,7 +843,7 @@ def test_zero_hour_campaign_completion_exports_only_new_run_flags():
     assert not session.is_complete()
     assert any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-        for flag in RunExecutor().execute_session(session, hours=0).run_flags
+        for flag in _run_flags_for_export(session)
     )
 
     completed_execution = RunExecutor().execute_session(session, hours=0)
@@ -861,6 +870,44 @@ def test_zero_hour_campaign_completion_exports_only_new_run_flags():
     )
 
 
+def test_result_document_factory_computes_live_flag_without_caching_it():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    list(drive_auto_apply(session, 1))
+    session._config = replace(
+        session._config,
+        result_document_factory=lambda _active: {"status": "ok"},
+    )
+
+    document = session.result_document()
+
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in document["run_metadata"]["run_flags"]
+    )
+    assert session._result_document is None
+
+
+def test_run_flag_export_preserves_legacy_entries_when_eligibility_fails(monkeypatch):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session._last_drive_stop = "hour_budget"
+
+    def fail_is_complete():
+        raise RuntimeError("completion check failed")
+
+    monkeypatch.setattr(session.simulator, "is_complete", fail_is_complete)
+    metadata = {"run_flags": ["legacy notice"]}
+    from simulator.runner import _attach_execution_diagnostics
+
+    _attach_execution_diagnostics(metadata, session=session)
+
+    assert metadata["run_flags"][0] == "legacy notice"
+    assert metadata["run_flags"][1] == {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"unresolved": True, "error_type": "RuntimeError"},
+    }
+
+
 def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     cyclic_limit = []
@@ -869,7 +916,7 @@ def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
         session.simulator.melt.campaign
     )["max_hold_hr"] = cyclic_limit
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     assert flag["detail"] == {
         "unresolved": True,
@@ -944,7 +991,7 @@ def test_budget_flag_records_pending_decision_before_chain_lookahead(monkeypatch
     )
     record_path = session.simulator.record.path
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     assert calls[:2] == ["pending_decision", "chain_walk"]
     assert flag["detail"]["pending_decision"]["type"] == "PATH_AB"
@@ -974,7 +1021,7 @@ def test_budget_flag_exception_is_typed_without_exception_text(monkeypatch):
 
     monkeypatch.setattr(session_module, "_configured_campaign_walk", fail_walk)
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     assert flag["code"] == "run_hour_budget_exhausted_mid_campaign"
     assert flag["detail"] == {
@@ -1004,7 +1051,7 @@ def test_budget_flag_does_not_catch_base_exception(monkeypatch):
     monkeypatch.setattr(session_module, "_configured_campaign_walk", abort_walk)
 
     with pytest.raises(FatalDiagnostic):
-        _hour_budget_exhausted_flag(session)
+        _live_budget_flag(session)
 
 
 def test_budget_flag_reports_configured_campaign_cycle_as_unresolved(monkeypatch):
@@ -1015,7 +1062,7 @@ def test_budget_flag_reports_configured_campaign_cycle_as_unresolved(monkeypatch
         lambda current, _record: current,
     )
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     assert flag["detail"] == {
         "unresolved": True,
@@ -1039,7 +1086,7 @@ def test_budget_flag_bounds_nonrepeating_configured_walk(monkeypatch):
         keep_routing,
     )
 
-    flag = _hour_budget_exhausted_flag(session)
+    flag = _live_budget_flag(session)
 
     assert calls == len(CampaignPhase) * 2
     assert flag["detail"] == {

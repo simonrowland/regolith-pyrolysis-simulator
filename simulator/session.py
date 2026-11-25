@@ -813,17 +813,23 @@ class SimSession:
             return document
         payload = dict(document)
         run_metadata = payload.get("run_metadata")
+        recorded_flags = (
+            run_metadata.get("run_flags", ())
+            if isinstance(run_metadata, Mapping)
+            else None
+        )
+        run_flags = _run_flags_for_export(self, recorded_flags)
         if isinstance(run_metadata, Mapping):
             run_metadata = dict(run_metadata)
-            run_flags = _run_flags_for_export(
-                self,
-                run_metadata.get("run_flags", ()),
-            )
-            if run_flags:
-                run_metadata["run_flags"] = list(run_flags)
-            else:
-                run_metadata.pop("run_flags", None)
-            payload["run_metadata"] = run_metadata
+        elif run_flags:
+            run_metadata = {}
+        else:
+            return payload
+        if run_flags:
+            run_metadata["run_flags"] = list(run_flags)
+        else:
+            run_metadata.pop("run_flags", None)
+        payload["run_metadata"] = run_metadata
         return payload
 
     def per_hour_summaries(self) -> list[dict[str, Any]]:
@@ -836,7 +842,22 @@ class SimSession:
         self._operator_decisions.append(event)
 
     def _set_result_document(self, document: Mapping[str, Any]) -> None:
-        self._result_document = document
+        if self._sim is None or not isinstance(document, Mapping):
+            self._result_document = document
+            return
+        payload = dict(document)
+        run_metadata = payload.get("run_metadata")
+        if isinstance(run_metadata, Mapping):
+            run_metadata = dict(run_metadata)
+            run_flags = _recorded_run_flags_without_budget(
+                run_metadata.get("run_flags", ())
+            )
+            if run_flags:
+                run_metadata["run_flags"] = list(run_flags)
+            else:
+                run_metadata.pop("run_flags", None)
+            payload["run_metadata"] = run_metadata
+        self._result_document = payload
 
     def _require_sim(self) -> PyrolysisSimulator:
         if self._sim is None:
@@ -876,28 +897,107 @@ class SimSession:
 
 def _run_flags_for_export(
     session: Any,
-    recorded_flags: Iterable[Mapping[str, Any]] | None = None,
-) -> tuple[dict[str, Any], ...]:
+    recorded_flags: Iterable[Any] | None = None,
+) -> tuple[Any, ...]:
     """Preserve offline records and derive the live budget flag on read."""
 
     run_flags = tuple(recorded_flags or ())
     sim = getattr(session, "_sim", None)
     if sim is None:
         return run_flags
-    run_flags = tuple(
+    run_flags = _recorded_run_flags_without_budget(run_flags)
+    pending_decision: dict[str, Any] | None = None
+    try:
+        if (
+            getattr(session, "_last_drive_stop", None) != "hour_budget"
+            or sim.is_complete()
+        ):
+            return run_flags
+
+        pending = session.pending_decision()
+        pending_decision = _decision_event(pending) if pending is not None else None
+        detail: dict[str, Any] = {}
+        if pending_decision is not None:
+            detail["pending_decision"] = pending_decision
+
+        campaign = sim.melt.campaign
+        campaign_name = campaign.name
+        step_results = tuple(getattr(session, "_step_results", ()))
+        last_summary = (
+            getattr(step_results[-1], "campaign_summary", None)
+            if step_results
+            else None
+        )
+        just_completed_campaign = (
+            str(last_summary.get("campaign") or "")
+            if isinstance(last_summary, Mapping)
+            else None
+        )
+        at_campaign_boundary = just_completed_campaign is not None
+
+        phases, decision_dependent = _configured_campaign_walk(
+            sim.campaign_mgr,
+            campaign,
+            sim.record,
+            live_pending_decision=pending,
+        )
+        if not at_campaign_boundary or just_completed_campaign == campaign_name:
+            phases = phases[1:]
+
+        manager = sim.campaign_mgr
+        campaign_config = manager._campaign_config(campaign)
+        campaign_overrides = manager._campaign_overrides(campaign)
+        configured_limits: dict[str, Any] = {}
+        if "max_hold_hr" in campaign_config:
+            configured_limits["setpoint_max_hold_hr"] = copy.deepcopy(
+                campaign_config["max_hold_hr"]
+            )
+        if "max_hours" in campaign_overrides:
+            configured_limits["max_hours_override"] = copy.deepcopy(
+                campaign_overrides["max_hours"]
+            )
+        configured_limits = _json_safe(configured_limits)
+
+        detail.update({
+            "campaign": campaign_name,
+            "hours_run_in_campaign": int(sim.melt.campaign_hour),
+            "at_campaign_boundary": at_campaign_boundary,
+            "just_completed_campaign": just_completed_campaign,
+            "successors_not_reached": [phase.name for phase in phases],
+            "configured_limits": configured_limits,
+        })
+        if decision_dependent is not None:
+            detail["decision_dependent"] = decision_dependent
+        return (*run_flags, {
+            "kind": "run_diagnostic",
+            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
+            "detail": detail,
+        })
+    except Exception as exc:
+        unresolved_detail: dict[str, Any] = {
+            "unresolved": True,
+            "error_type": type(exc).__name__,
+        }
+        if pending_decision is not None:
+            unresolved_detail["pending_decision"] = pending_decision
+        return (*run_flags, {
+            "kind": "run_diagnostic",
+            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
+            "detail": unresolved_detail,
+        })
+
+
+def _recorded_run_flags_without_budget(
+    recorded_flags: Iterable[Any] | None,
+) -> tuple[Any, ...]:
+    return tuple(
         flag
-        for flag in run_flags
-        if flag.get("code") != _RUN_HOUR_BUDGET_FLAG_CODE
+        for flag in (recorded_flags or ())
+        if not (
+            isinstance(flag, Mapping)
+            and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+        )
     )
-    if (
-        sim.is_complete()
-        or getattr(session, "_last_drive_stop", None) != "hour_budget"
-    ):
-        return run_flags
-    run_flag = _hour_budget_exhausted_flag(session)
-    if run_flag is None:
-        return run_flags
-    return (*run_flags, run_flag)
 
 
 def drive_auto_apply(
@@ -1132,84 +1232,3 @@ def _configured_campaign_walk(
             "configured campaign walk exceeded its phase bound"
         )
     return tuple(phases), decision_dependent
-
-
-def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
-    """Describe an incomplete finite run without changing simulator state."""
-
-    pending_decision: dict[str, Any] | None = None
-    try:
-        pending = session.pending_decision()
-        pending_decision = _decision_event(pending) if pending is not None else None
-        detail: dict[str, Any] = {}
-        if pending_decision is not None:
-            detail["pending_decision"] = pending_decision
-        sim = session.simulator
-        if sim.is_complete():
-            return None
-
-        campaign = sim.melt.campaign
-        campaign_name = campaign.name
-        step_results = tuple(getattr(session, "_step_results", ()))
-        last_summary = (
-            getattr(step_results[-1], "campaign_summary", None)
-            if step_results
-            else None
-        )
-        just_completed_campaign = (
-            str(last_summary.get("campaign") or "")
-            if isinstance(last_summary, Mapping)
-            else None
-        )
-        at_campaign_boundary = just_completed_campaign is not None
-
-        phases, decision_dependent = _configured_campaign_walk(
-            sim.campaign_mgr,
-            campaign,
-            sim.record,
-            live_pending_decision=pending,
-        )
-        if not at_campaign_boundary or just_completed_campaign == campaign_name:
-            phases = phases[1:]
-
-        manager = sim.campaign_mgr
-        campaign_config = manager._campaign_config(campaign)
-        campaign_overrides = manager._campaign_overrides(campaign)
-        configured_limits: dict[str, Any] = {}
-        if "max_hold_hr" in campaign_config:
-            configured_limits["setpoint_max_hold_hr"] = copy.deepcopy(
-                campaign_config["max_hold_hr"]
-            )
-        if "max_hours" in campaign_overrides:
-            configured_limits["max_hours_override"] = copy.deepcopy(
-                campaign_overrides["max_hours"]
-            )
-        configured_limits = _json_safe(configured_limits)
-
-        detail.update({
-            "campaign": campaign_name,
-            "hours_run_in_campaign": int(sim.melt.campaign_hour),
-            "at_campaign_boundary": at_campaign_boundary,
-            "just_completed_campaign": just_completed_campaign,
-            "successors_not_reached": [phase.name for phase in phases],
-            "configured_limits": configured_limits,
-        })
-        if decision_dependent is not None:
-            detail["decision_dependent"] = decision_dependent
-        return {
-            "kind": "run_diagnostic",
-            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
-            "detail": detail,
-        }
-    except Exception as exc:
-        unresolved_detail: dict[str, Any] = {
-            "unresolved": True,
-            "error_type": type(exc).__name__,
-        }
-        if pending_decision is not None:
-            unresolved_detail["pending_decision"] = pending_decision
-        return {
-            "kind": "run_diagnostic",
-            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
-            "detail": unresolved_detail,
-        }

@@ -131,7 +131,7 @@ class RunExecution:
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
 
     @property
-    def run_flags(self) -> tuple[Mapping[str, Any], ...]:
+    def run_flags(self) -> tuple[Any, ...]:
         return _run_flags_for_export(self.session)
 
 

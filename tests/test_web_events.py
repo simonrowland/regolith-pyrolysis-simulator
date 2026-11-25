@@ -4433,6 +4433,38 @@ def test_web_projection_preserves_recorded_flags_without_live_session():
     ]["run_flags"]
 
 
+def test_recorded_web_projection_adds_live_flag_without_recorded_metadata(
+    monkeypatch,
+):
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+    execution = runner_module.RunExecutor().execute_session(session, hours=1)
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in execution.run_flags
+    )
+    monkeypatch.setattr(session, "result_document", lambda: {"status": "ok"})
+
+    payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in payload["run_metadata"]["run_flags"]
+    )
+
+
 def test_recorded_web_projection_drops_budget_flag_after_c6_no():
     run = PyrolysisRun(
         feedstock_id="lunar_mare_low_ti",
@@ -4451,6 +4483,10 @@ def test_recorded_web_projection_drops_budget_flag_after_c6_no():
     )
     recorded_payload = run._build_output(pending_execution)
     session._set_result_document(recorded_payload)
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in session._result_document["run_metadata"].get("run_flags", ())
+    )
 
     assert sim.pending_decision is not None
     assert sim.pending_decision.decision_type is DecisionType.C6_PROCEED

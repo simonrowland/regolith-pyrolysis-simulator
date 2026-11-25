@@ -5881,7 +5881,7 @@ def _attach_execution_diagnostics(
     execution: RunExecution | None = None,
     *,
     session: SimSession | None = None,
-    run_flags: Sequence[Mapping[str, Any]] | None = None,
+    run_flags: Sequence[Any] | None = None,
     campaign_stops: Sequence[Mapping[str, Any]] | None = None,
 ) -> None:
     if execution is not None:
