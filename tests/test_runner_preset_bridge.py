@@ -46,7 +46,8 @@ def _assert_subhour_preset_refuses(preset_path: Path) -> None:
         message = str(exc)
         assert message.startswith("malformed_preset:")
         assert "duration_h=0.25" in message
-        assert "1-hour simulator timestep" in message
+        assert "timestep_does_not_divide_duration" in message
+        assert "process_dt_s=3600.0" in message
     else:
         raise AssertionError("sub-hour preset was accepted by the hourly runner")
 
