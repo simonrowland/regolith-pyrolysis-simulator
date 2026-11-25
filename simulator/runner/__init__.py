@@ -107,6 +107,7 @@ from simulator.process_timestep import (
 from simulator.condensation import (
     KNUDSEN_REFUSAL_REASON,
     gram_lab_exposed_melt_area_bridge,
+    read_gram_lab_exposed_melt_area,
     stage_purity_report,
 )
 from simulator.cost_ledger import build_cost_rollup_diagnostic
@@ -146,6 +147,12 @@ from simulator.lab_schedule import (
     LAB_SCHEDULE_OVERRIDE_KEY,
     LabScheduleValidationError,
     normalize_lab_schedule,
+)
+from simulator.thermal_budget import (
+    FURNACE_POWER_DRIVER_KEY,
+    PowerTemperatureRefusal,
+    furnace_power_driver_payload,
+    measured_furnace_power_trace,
 )
 from simulator.recipe import C3_ALKALI_DOSING_ZERO_LEVEL_KG_BY_SPECIES
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
@@ -636,6 +643,25 @@ def _load_vacuum_preset_run_spec(path: Path, leg: str) -> PresetRunSpec:
         }
     )
     provenance.update(gram_lab_exposed_melt_area_bridge(geometry))
+    try:
+        power_trace = measured_furnace_power_trace(preset)
+    except PowerTemperatureRefusal as exc:
+        raise PresetRunnerError(
+            f"malformed_preset: {exc.reason}: {exc}",
+            provenance=provenance,
+        ) from exc
+    if power_trace is not None:
+        try:
+            exposed_area_m2 = read_gram_lab_exposed_melt_area(geometry)
+        except LabGeometryError as exc:
+            if exc.code != "exposed_melt_area_not_printed":
+                raise
+            exposed_area_m2 = None
+        schedule[FURNACE_POWER_DRIVER_KEY] = furnace_power_driver_payload(
+            power_trace,
+            mass_kg=mass_kg,
+            exposed_area_m2=exposed_area_m2,
+        )
     return PresetRunSpec(
         feedstock_id=feedstock_id,
         hours=hours,
