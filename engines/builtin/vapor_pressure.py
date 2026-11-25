@@ -43,6 +43,7 @@ spec §7).
 from __future__ import annotations
 
 import math
+import re
 import warnings as runtime_warnings
 from collections.abc import Mapping
 from dataclasses import replace
@@ -425,6 +426,46 @@ def _validate_activity_basis_k_consistency(
             f"applied_activity_exponent={applied_activity_exponent}; "
             f"expected_activity_exponent={expected_exponent}"
         )
+
+
+def _standard_reaction_k_activity_exponent_on_parent_formula(
+    *,
+    species: str,
+    parent_oxide: str,
+    reaction: Mapping[str, Any],
+    single_cation_component: str,
+    activity_exponent: float,
+) -> float:
+    """Express the standard-reaction K exponent per parent-oxide formula."""
+
+    from simulator.chemistry.melt_activity import MELT_OXIDE_CATIONS_PER_FORMULA
+
+    reaction_formula = str(reaction.get("formula") or "")
+    reactant_formula = reaction_formula.partition("->")[0]
+    reactant_formula = re.sub(r"\([^)]*\)", "", reactant_formula)
+    reactant_formula = re.sub(r"\s+", "", reactant_formula)
+    if "->" not in reaction_formula:
+        reactant_formula = ""
+    cations_per_parent_formula = float(
+        MELT_OXIDE_CATIONS_PER_FORMULA.get(parent_oxide, 0.0)
+    )
+    if cations_per_parent_formula <= 0.0:
+        reactant_basis = ""
+    elif reactant_formula == single_cation_component:
+        # A K for one single-cation oxide formula is 1/N of the parent-oxide
+        # formula exponent, where N is the number of cations in the parent.
+        return float(activity_exponent) / cations_per_parent_formula
+    elif reactant_formula == parent_oxide:
+        return float(activity_exponent)
+    else:
+        reactant_basis = reactant_formula or "missing_reaction_formula"
+    raise _VaporPressureActivityBasisMismatch(
+        "vapor_pressure_activity_basis_k_mismatch: "
+        f"species={species}; parent_oxide={parent_oxide}; "
+        f"K_reactant_formula={reactant_basis}; "
+        f"activity_component={single_cation_component}; "
+        f"activity_exponent={activity_exponent}"
+    )
 
 
 class VaporPressureRangeError(VaporPressureComputationError):
@@ -3492,6 +3533,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activity_exponent = float(
                     liquid_rxn.get("oxide_activity_exponent", 1.0) or 1.0
                 )
+                activity_standard_state = _activity_standard_state(
+                    "single_cation"
+                )
+                if activity_standard_state is not None:
+                    activity_standard_states[species] = activity_standard_state
+                _validate_activity_basis_k_consistency(
+                    species=species,
+                    parent_oxide=parent_oxide,
+                    component_basis="single_cation",
+                    k_formula_activity_exponent=(
+                        _standard_reaction_k_activity_exponent_on_parent_formula(
+                            species=species,
+                            parent_oxide=parent_oxide,
+                            reaction=liquid_rxn,
+                            single_cation_component=(
+                                oxide_activity.single_cation_component
+                            ),
+                            activity_exponent=activity_exponent,
+                        )
+                    ),
+                    applied_activity_exponent=activity_exponent,
+                )
                 pO2_exponent = float(
                     liquid_rxn.get("pO2_exponent", 0.0) or 0.0
                 )
@@ -3655,6 +3718,28 @@ class BuiltinVaporPressureProvider(ChemistryProvider):
                 activities[species] = oxide_activity.activity
                 activity_exponent = float(
                     gas_rail_rxn.get("oxide_activity_exponent", 1.0) or 1.0
+                )
+                activity_standard_state = _activity_standard_state(
+                    "single_cation"
+                )
+                if activity_standard_state is not None:
+                    activity_standard_states[species] = activity_standard_state
+                _validate_activity_basis_k_consistency(
+                    species=species,
+                    parent_oxide=parent_oxide,
+                    component_basis="single_cation",
+                    k_formula_activity_exponent=(
+                        _standard_reaction_k_activity_exponent_on_parent_formula(
+                            species=species,
+                            parent_oxide=parent_oxide,
+                            reaction=gas_rail_rxn,
+                            single_cation_component=(
+                                oxide_activity.single_cation_component
+                            ),
+                            activity_exponent=activity_exponent,
+                        )
+                    ),
+                    applied_activity_exponent=activity_exponent,
                 )
                 pO2_exponent = float(
                     gas_rail_rxn.get("pO2_exponent", 0.0) or 0.0

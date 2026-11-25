@@ -659,6 +659,9 @@ def test_residue_two_channel_hkl_and_parent_stoichiometric_anchors() -> None:
         duration_s=duration_s,
         area_evolution_m2=(area_m2,),
     )
+    diagnostics = result.pressure_law_exponent_diagnostics[0]
+    assert diagnostics["Fe"]["raw_total_slope"] == pytest.approx(-0.5)
+    assert diagnostics["O2"]["raw_total_slope"] == pytest.approx(1.0)
     alpha, _source = _residue_catalog_alpha("Fe")
     fe_molar_mass = parse_formula("Fe").molar_mass_kg_per_mol()
     root_bar = result.pO2_bar_by_step[0]

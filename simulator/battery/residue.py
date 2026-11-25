@@ -456,6 +456,9 @@ class ResidueInventoryResult:
     pO2_balance_floor_pO2_bar: float | None
     atom_closure_mol: Mapping[str, float]
     buffer_oxygen_exchange_mol: float = 0.0
+    pressure_law_exponent_diagnostics: tuple[
+        Mapping[str, Mapping[str, object]], ...
+    ] = ()
 
 
 @dataclass(frozen=True)
@@ -915,6 +918,9 @@ def integrate_residue_inventory(
     evaporated: defaultdict[str, float] = defaultdict(float)
     pO2_steps: list[float | None] = []
     bracket_boundary_steps: list[OxygenBalanceBracketBoundary | None] = []
+    pressure_law_exponent_diagnostics: list[
+        Mapping[str, Mapping[str, object]]
+    ] = []
     buffer_oxygen_exchange_mol = 0.0
 
     # Supplied channels define the supported pressure bundle. Root metadata
@@ -930,6 +936,7 @@ def integrate_residue_inventory(
         if not active_parent_terms:
             pO2_steps.append(None)
             bracket_boundary_steps.append(None)
+            pressure_law_exponent_diagnostics.append({})
             continue
 
         def pressure_at(log10_pO2_bar: float) -> Mapping[str, float]:
@@ -970,12 +977,16 @@ def integrate_residue_inventory(
                 ):
                     pO2_steps.append(None)
                     bracket_boundary_steps.append(None)
+                    pressure_law_exponent_diagnostics.append({})
                     continue
                 raise ResidueInventoryRefusal(
                     "residue_oxygen_balance_failed", str(exc)
                 ) from exc
             pO2_steps.append(balance.pO2_bar)
             bracket_boundary_steps.append(balance.bracket_boundary)
+            pressure_law_exponent_diagnostics.append(
+                dict(balance.pressure_law_exponent_diagnostics)
+            )
             pressures = balance.pressures_Pa
         else:
             pressures = pressure_at(buffered_logp)
@@ -992,6 +1003,7 @@ def integrate_residue_inventory(
                     )
             pO2_steps.append(10.0**buffered_logp)
             bracket_boundary_steps.append(None)
+            pressure_law_exponent_diagnostics.append({})
 
         requested_rates_kg_s = _finite_step_fluxes(
             terms,
@@ -1111,6 +1123,9 @@ def integrate_residue_inventory(
         ),
         atom_closure_mol=closure,
         buffer_oxygen_exchange_mol=buffer_oxygen_exchange_mol,
+        pressure_law_exponent_diagnostics=tuple(
+            pressure_law_exponent_diagnostics
+        ),
     )
 
 
