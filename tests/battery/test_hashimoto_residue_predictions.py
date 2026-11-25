@@ -828,11 +828,33 @@ def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
     _assert_hashimoto_oxygen_balance(residue, setup, integration)
     # The integrator clears the step when the call returns. A later direct
     # call is not "depleted by the integration", so Fe stays a typed refusal.
+    # That refusal is still made with diagnostic shadows off, and it does not
+    # keep floor-inversion diagnostics from the vapour probe.
     depleted = dict(setup.initial_inventory_mol)
     depleted["FeO"] = 0.0
-    with pytest.raises(residue.ResidueInventoryRefusal) as caught:
-        setup.pressure_model(depleted, -6.0)
+    diagnostic_calls: list[dict] = []
+    freevars = setup.pressure_model.__code__.co_freevars
+    cells = setup.pressure_model.__closure__
+    vapor_index = freevars.index("internal_analytical_residue_vapor_pressure")
+    original_vapor = cells[vapor_index].cell_contents
+
+    def recording_vapor(*args, **kwargs):
+        diagnostic_calls.append(kwargs)
+        return original_vapor(*args, **kwargs)
+
+    cells[vapor_index].cell_contents = recording_vapor
+    try:
+        with pytest.raises(residue.ResidueInventoryRefusal) as caught:
+            setup.pressure_model(depleted, -6.0)
+    finally:
+        cells[vapor_index].cell_contents = original_vapor
     assert caught.value.reason == "hashimoto_internal_analytical_channels_missing"
+    assert diagnostic_calls
+    assert all(
+        call["include_diagnostic_shadows"] is False for call in diagnostic_calls
+    )
+    refusal_detail = json.loads(caught.value.detail)
+    assert refusal_detail["engine_floor_inversion_diagnostics"] == []
 
     # 17d2 is long enough that printed FeO is exhausted before the last step.
     # Later steps publish 0 Pa and a typed notice. 20b6 reaches FeO = 0 only
