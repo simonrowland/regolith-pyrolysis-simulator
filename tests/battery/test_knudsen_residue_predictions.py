@@ -426,7 +426,7 @@ def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
     )
     gas_channels = (
         ("Fe", ("FeO", 1.0, 0.5)),
-        ("FeO_association_gas", ("FeO", 1.0, -0.5)),
+        ("FeO", ("FeO", 1.0, -0.5)),
         ("O2", (None, 1.0, -1.0)),
     )
     activity_source = ["fresh"]
@@ -436,13 +436,20 @@ def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
         stale_activity = pO2_bar**0.1
         response = {
             "status": "ok",
+            "vapor_pressures_source": {
+                "Fe": "builtin_authoritative:gas_standard_fugacity",
+                "FeO_association_gas": (
+                    "builtin_extrapolation_limited:standard_reaction_term"
+                ),
+            },
             "vapor_pressures_Pa": {
                 "Fe": 1.0e-8 * pO2_bar**-0.5,
                 "FeO_association_gas": 1.0e-9 * pO2_bar**0.5,
             },
         }
         if activity_source[0] == "cached":
-            # Pre-d-474 cache rows retained this legacy channel activity.
+            # Green-era cache rows retain the diagnostic activity even though
+            # the compiled pressure path has activity_exponent 0.
             response["activity_coefficients"] = {
                 "FeO_association_gas": stale_activity
             }
@@ -451,12 +458,24 @@ def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
                 "vapor_pressure_diagnostic": {
                     "activities": {
                         "FeO_association_gas": stale_activity
-                    }
+                    },
+                    "vapor_pressure_numerator_provenance": {
+                        "FeO_association_gas": {
+                            "P_reference_model_Pa": 1.0,
+                        }
+                    },
                 }
             }
         else:
             response["diagnostics"] = {
-                "vapor_pressure_diagnostic": {"activities": {}}
+                "vapor_pressure_diagnostic": {
+                    "activities": {},
+                    "vapor_pressure_numerator_provenance": {
+                        "FeO_association_gas": {
+                            "P_reference_model_Pa": 1.0,
+                        }
+                    },
+                }
             }
             response["activity_coefficients"] = {}
         return SimpleNamespace(**response)
@@ -488,7 +507,10 @@ def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
         activity_source[0] = source
         with pytest.raises(ResidueInventoryRefusal) as refusal:
             _residue_oxygen_balance(
-                terms, {"FeO": 1.0}, pressure_model, 1905.15
+                terms,
+                {"FeO": 1.0},
+                lambda logp: pressure_model({"FeO": 1.0}, logp),
+                1905.15,
             )
         return refusal.value.reason, refusal.value.detail
 

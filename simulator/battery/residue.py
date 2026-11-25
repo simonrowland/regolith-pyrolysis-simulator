@@ -1546,20 +1546,7 @@ def _make_residue_pressure_model(
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
-        compiled_species = getattr(
-            getattr(analytical_core, "vapour_rail_catalog", None), "species", {}
-        )
-        compiled_activity_exponents: dict[str, float] = {}
-        if isinstance(compiled_species, Mapping):
-            for species, compiled in compiled_species.items():
-                evaluator = getattr(compiled, "evaluator", None)
-                activity_exponent = getattr(
-                    evaluator, "activity_exponent", None
-                )
-                if activity_exponent is not None:
-                    compiled_activity_exponents[str(species)] = float(
-                        activity_exponent
-                    )
+        compiled_catalog = getattr(analytical_core, "vapour_rail_catalog", None)
         accepted_diagnostics_by_logp: dict[
             float, tuple[dict[str, object], ...]
         ] = {}
@@ -1603,6 +1590,16 @@ def _make_residue_pressure_model(
                 if isinstance(response_diagnostics, Mapping)
                 else None
             )
+            vapor_provenance = (
+                vapor_diagnostic.get("vapor_pressure_numerator_provenance")
+                if isinstance(vapor_diagnostic, Mapping)
+                else None
+            )
+            vapor_sources = getattr(response, "vapor_pressures_source", None)
+            if not isinstance(vapor_sources, Mapping) and isinstance(
+                vapor_diagnostic, Mapping
+            ):
+                vapor_sources = vapor_diagnostic.get("vapor_pressures_source")
             # Read the same dispatch's reported activities; never replay an
             # activity resolver at the secant probe points. The equilibrium
             # cache carries these per-channel values on activity_coefficients;
@@ -1621,10 +1618,43 @@ def _make_residue_pressure_model(
                 if formula in pressures:
                     raise ResidueInventoryRefusal("residue_pressure_channels_ambiguous", formula)
                 pressures[formula] = float(pressure)
-                # A zero-exponent compiled carrier consumes no parent
-                # activity. Ignore legacy diagnostic and cache fields alike.
+                # Only suppress activity when this response says the pressure
+                # came from the compiled evaluator. The catalog also contains
+                # metal channels evaluated through Ellingham, so a species-only
+                # catalog lookup would incorrectly discard Fe's parent.
                 activity = None
-                if compiled_activity_exponents.get(str(channel)) != 0.0:
+                channel_provenance = (
+                    vapor_provenance.get(channel)
+                    if isinstance(vapor_provenance, Mapping)
+                    else None
+                )
+                source_label = (
+                    vapor_sources.get(channel)
+                    if isinstance(vapor_sources, Mapping)
+                    else None
+                )
+                compiled_pressure = (
+                    isinstance(channel_provenance, Mapping)
+                    and "P_reference_model_Pa" in channel_provenance
+                )
+                # Older cache values predate per-species pressure provenance;
+                # their source label identifies compiled standard-reaction rows,
+                # while the Ellingham metal rows have a different source label.
+                if not compiled_pressure and isinstance(source_label, str):
+                    compiled_pressure = (
+                        "standard_reaction_term" in source_label.split(":")
+                    )
+                activity_exponent = None
+                if compiled_pressure and compiled_catalog is not None:
+                    try:
+                        activity_exponent = float(
+                            compiled_catalog.evaluator_for(
+                                str(channel)
+                            ).activity_exponent
+                        )
+                    except (KeyError, ValueError):
+                        activity_exponent = None
+                if activity_exponent != 0.0:
                     activity = (
                         reported_activities.get(channel)
                         if isinstance(reported_activities, Mapping)
