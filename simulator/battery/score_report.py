@@ -21,6 +21,26 @@ from simulator.battery.score_report_data import (
 
 
 REPORT_HEADING = "# Battery score report (schema v2.1)"
+STATUS_DIFF_REPORT_LIMIT = 200
+
+
+def _status_diff_report_lines(
+    status_diff: Sequence[Mapping[str, object]], *, limit: int | None = None
+) -> list[str]:
+    """Format status differences and disclose any report-only truncation."""
+
+    lines = ["| old key | old | new | axis |", "|---|---|---|---|"]
+    visible = status_diff if limit is None else status_diff[:limit]
+    for row in visible:
+        lines.append(
+            f"| `{row.get('old_key')}` | {row.get('old')} | {row.get('new')} | "
+            f"{row.get('axis')} |"
+        )
+    if limit is not None and len(status_diff) > limit:
+        lines.append(
+            f"| … | {len(status_diff) - limit} more status changes omitted | | |"
+        )
+    return lines
 
 
 def format_assumed_band_report(report: str, data: Mapping[str, object]) -> str:
@@ -714,12 +734,7 @@ def render_legacy_score_report_markdown(
     elif not status_diff:
         lines.append("No mapped outcome changes.")
     else:
-        lines.extend(["| old key | old | new | axis |", "|---|---|---|---|"])
-        for row in status_diff:
-            lines.append(
-                f"| `{row.get('old_key')}` | {row.get('old')} | {row.get('new')} | "
-                f"{row.get('axis')} |"
-            )
+        lines.extend(_status_diff_report_lines(status_diff))
     if unmapped_legacy_keys:
         lines.extend(
             ["", f"Unmapped legacy keys: {len(unmapped_legacy_keys)}. Old ledgers retained."]
@@ -935,13 +950,9 @@ def render_payload_score_report_markdown(
     if not status_diff:
         lines.append("No mapped outcome changes.")
     else:
-        lines.append("| old key | old | new | axis |")
-        lines.append("|---|---|---|---|")
-        for row in status_diff[:200]:
-            lines.append(
-                f"| `{row.get('old_key')}` | {row.get('old')} | {row.get('new')} | "
-                f"{row.get('axis')} |"
-            )
+        lines.extend(
+            _status_diff_report_lines(status_diff, limit=STATUS_DIFF_REPORT_LIMIT)
+        )
     if unmapped_legacy_keys:
         lines.extend(
             [

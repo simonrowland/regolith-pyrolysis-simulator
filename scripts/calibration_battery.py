@@ -987,6 +987,10 @@ def v21_view_section(old_rows):
     if not residuals_path.is_file():
         return None
     from simulator.battery.score import load_residuals_jsonl, status_diff_rows
+    from simulator.battery.score_report import (
+        STATUS_DIFF_REPORT_LIMIT,
+        _status_diff_report_lines,
+    )
 
     new_rows = list(load_residuals_jsonl(residuals_path))
     key_map = {}
@@ -1002,11 +1006,9 @@ def v21_view_section(old_rows):
     else:
         lines.append("All old keys mapped; residual file is the scoring view.")
     if diffs:
-        lines.extend(["", "| old key | old | new | axis |", "|---|---|---|---|"])
-        for row in diffs[:200]:
-            lines.append(
-                f"| `{row['old_key']}` | {row['old']} | {row['new']} | {row['axis']} |"
-            )
+        lines.extend(
+            ["", *_status_diff_report_lines(diffs, limit=STATUS_DIFF_REPORT_LIMIT)]
+        )
     else:
         lines.append("No scored/refused/excluded or match/mismatch changes on mapped keys.")
     return "\n".join(lines)
