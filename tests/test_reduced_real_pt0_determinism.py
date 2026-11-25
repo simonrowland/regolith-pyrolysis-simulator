@@ -7816,6 +7816,20 @@ def test_projected_floor_cache_notice_requires_full_producer_certified_band(
         persistent=persistent,
     )
     _, projection_notice = _lunar_composition_projected_diagnostic(sim)
+    ordinary_band = projection_notice["certified_band"]
+    assert {
+        "engine",
+        "database",
+        "bulk_components",
+    }.issubset(ordinary_band)
+    assert isinstance(ordinary_band["engine"], str)
+    assert isinstance(ordinary_band["database"], str)
+    assert isinstance(ordinary_band["bulk_components"], (list, tuple))
+    assert all(
+        isinstance(item, str)
+        for item in ordinary_band["bulk_components"]
+    )
+    assert "projection_certified_band" not in projection_notice
     floor_curve = sim._freeze_gate_kress_floor_curve(projection_notice, [])
     assert floor_curve is not None
     floor_notice = floor_curve["composition_projected_notice"]
@@ -7826,10 +7840,23 @@ def test_projected_floor_cache_notice_requires_full_producer_certified_band(
         "source",
     }.issubset(floor_notice["certified_band"])
 
+    valid_notice = (
+        projection_notice
+        if missing_field == "null-projection-band"
+        else floor_notice
+    )
     valid_payload = copy.deepcopy(baseline)
     valid_payload["curve"]["composition_projected_notice"] = copy.deepcopy(
-        floor_notice
+        valid_notice
     )
+    key_hash = _key_hash(key)
+    capture_entry = capture._entries[key_hash]
+    assert rrd._decode_payload_for_admission(
+        "freeze_gate_curve",
+        valid_payload,
+        payload_codec_version=capture_entry.get("payload_codec_version"),
+        keys=(key,),
+    ) is not None
     malformed_payload = copy.deepcopy(valid_payload)
     certified_band = malformed_payload["curve"][
         "composition_projected_notice"
@@ -7847,7 +7874,6 @@ def test_projected_floor_cache_notice_requires_full_producer_certified_band(
     else:
         del certified_band[missing_field]
 
-    key_hash = _key_hash(key)
     capture._entries[key_hash]["payload"] = copy.deepcopy(malformed_payload)
     capture._entries[key_hash]["payload_hash"] = rrd._sha256(
         canonical_json_bytes(malformed_payload)
@@ -8124,7 +8150,27 @@ def _exercise_sio_yield_report_diagnostic(sim: Any) -> None:
     assert isinstance(report, Mapping)
     assert isinstance(diagnostics, Mapping)
     for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
-        assert isinstance(diagnostics.get(field_name, {}), Mapping)
+        if field_name in diagnostics:
+            assert isinstance(diagnostics[field_name], Mapping)
+    source_diagnostic = getattr(
+        sim,
+        "_last_vapor_pressure_diagnostic",
+        {},
+    ) or {}
+    source_speciation = source_diagnostic.get("vaporock_full_speciation_Pa")
+    vaporock_speciation = diagnostics.get("vaporock_full_speciation_Pa")
+    if isinstance(vaporock_speciation, Mapping):
+        assert isinstance(source_speciation, Mapping)
+        assert vaporock_speciation == dict(source_speciation)
+        assert all(
+            isinstance(pressure, (int, float))
+            and not isinstance(pressure, bool)
+            and math.isfinite(float(pressure))
+            for pressure in vaporock_speciation.values()
+        )
+        if "SiO" in vaporock_speciation:
+            assert vaporock_speciation["SiO"] == source_speciation["SiO"]
+            assert math.isfinite(float(vaporock_speciation["SiO"]))
 
 
 def _is_sio_report_diagnostic_path(path: tuple[Any, ...]) -> bool:
@@ -8133,6 +8179,23 @@ def _is_sio_report_diagnostic_path(path: tuple[Any, ...]) -> bool:
         and path[0] == "last_vapor_pressure_diagnostic"
         and path[1] in _SIO_REPORT_DIAGNOSTIC_FIELDS
     )
+
+
+def _sio_report_diagnostic_mutation_sources(
+    payload: dict[str, Any],
+) -> list[tuple[str, dict[str, Any]]]:
+    sources = []
+    for field_name, value in (
+        (
+            "high_t_melt_activity",
+            {"provider": "openimcc", "temperature_K": 1600.0},
+        ),
+        ("vaporock_full_speciation_Pa", {"SiO": 1.0}),
+    ):
+        mutation_payload = copy.deepcopy(payload)
+        mutation_payload["last_vapor_pressure_diagnostic"][field_name] = value
+        sources.append((f"injected-{field_name}", mutation_payload))
+    return sources
 
 
 def _recursive_capture_for_kind(
@@ -8174,9 +8237,6 @@ def _recursive_capture_for_kind(
             and isinstance(value, Mapping)
             for path, value in _recursive_payload_paths(baseline)
         )
-        replay_diagnostic = baseline["last_vapor_pressure_diagnostic"]
-        for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
-            assert isinstance(replay_diagnostic.get(field_name), Mapping)
     return capture, artifact, key, baseline, db_path, sim
 
 
@@ -8238,6 +8298,10 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     cases_expected = 0
     outcomes: dict[str, str] = {}
     mutation_sources = [("encoded-row", copy.deepcopy(baseline))]
+    if artifact == "equilibrium_post_record":
+        mutation_sources.extend(
+            _sio_report_diagnostic_mutation_sources(baseline)
+        )
     if artifact == "freeze_gate_curve":
         tuple_path_view = copy.deepcopy(baseline)
         tuple_path_view["curve"]["path"] = tuple(
@@ -8455,11 +8519,17 @@ def test_real_cache_payload_recursive_mutations_miss_or_replay_identically(
     if artifact == "equilibrium_post_record":
         for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
             root_path = (
-                "encoded-row: root.last_vapor_pressure_diagnostic."
+                f"injected-{field_name}: root.last_vapor_pressure_diagnostic."
                 f"{field_name}"
             )
             for mutation in ("wrong-scalar", "none", "scalar-map"):
                 assert outcomes[f"{root_path} {mutation}"] == "miss"
+        vaporock_inner_path = (
+            "injected-vaporock_full_speciation_Pa: "
+            "root.last_vapor_pressure_diagnostic."
+            "vaporock_full_speciation_Pa.SiO wrong-scalar"
+        )
+        assert outcomes[vaporock_inner_path] == "miss"
 
 
 class _MemoryInterpolationCandidates:
@@ -8575,9 +8645,6 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             f"weight_info={weight_info}"
         )
     baseline = copy.deepcopy(attempt["payload"])
-    baseline_diagnostic = baseline["last_vapor_pressure_diagnostic"]
-    for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
-        assert isinstance(baseline_diagnostic.get(field_name), Mapping)
 
     if not persistent:
         capture.persistent_store = _MemoryInterpolationCandidates(capture)
@@ -8628,8 +8695,16 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     failures: list[str] = []
     cases_expected = 0
     outcomes: dict[str, str] = {}
-    mutation_baseline = copy.deepcopy(baseline)
-    for path, value in _recursive_payload_paths(mutation_baseline):
+    mutation_sources = [("synthesized-row", copy.deepcopy(baseline))]
+    mutation_sources.extend(
+        _sio_report_diagnostic_mutation_sources(baseline)
+    )
+    mutation_paths = [
+        (source_name, mutation_baseline, path, value)
+        for source_name, mutation_baseline in mutation_sources
+        for path, value in _recursive_payload_paths(mutation_baseline)
+    ]
+    for source_name, mutation_baseline, path, value in mutation_paths:
         mutations: list[tuple[str, Any]] = []
         if path:
             mutations.append(("delete", None))
@@ -8643,7 +8718,7 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
             mutations.append(("scalar-map", 7))
         for mutation, replacement in mutations:
             cases_expected += 1
-            path_name = _recursive_path_label(path)
+            path_name = f"{source_name}: {_recursive_path_label(path)}"
             case_name = f"{path_name} {mutation}"
             outcomes[case_name] = "error"
             mutated = _mutate_recursive_payload(
@@ -8779,7 +8854,16 @@ def test_real_interpolated_payload_recursive_mutations_use_admission_and_replay(
     assert "miss" in outcomes.values()
     assert "admitted" in outcomes.values()
     for field_name in _SIO_REPORT_DIAGNOSTIC_FIELDS:
-        root_path = f"root.last_vapor_pressure_diagnostic.{field_name}"
+        root_path = (
+            f"injected-{field_name}: root.last_vapor_pressure_diagnostic."
+            f"{field_name}"
+        )
         for mutation in ("wrong-scalar", "none", "scalar-map"):
             assert outcomes[f"{root_path} {mutation}"] == "miss"
+    vaporock_inner_path = (
+        "injected-vaporock_full_speciation_Pa: "
+        "root.last_vapor_pressure_diagnostic."
+        "vaporock_full_speciation_Pa.SiO wrong-scalar"
+    )
+    assert outcomes[vaporock_inner_path] == "miss"
     assert not failures, "\n".join(failures)

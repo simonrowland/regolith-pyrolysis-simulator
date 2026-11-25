@@ -423,9 +423,6 @@ def _decode_payload_for_admission(
         curve_payload = payload.get("curve")
         if not isinstance(curve_payload, Mapping):
             return None
-        curve_path = curve_payload.get("path")
-        if not isinstance(curve_path, (list, tuple)) or not curve_path:
-            return None
         try:
             curve = _curve_from_payload(curve_payload)
         except Exception:
@@ -621,14 +618,24 @@ def _decode_payload_for_admission(
                 return False
 
         for diagnostic in provenance_diagnostics:
-            for mapping_field in (
-                "high_t_melt_activity",
-                "vaporock_full_speciation_Pa",
+            high_t_activity = diagnostic.get("high_t_melt_activity")
+            if "high_t_melt_activity" in diagnostic and not isinstance(
+                high_t_activity, Mapping
             ):
-                if mapping_field in diagnostic and not isinstance(
-                    diagnostic[mapping_field], Mapping
-                ):
-                    return None
+                return None
+            # VapoRock writes this field as species-to-pressure data; the
+            # SiO report publishes its values directly as pressures.
+            vaporock_speciation = diagnostic.get(
+                "vaporock_full_speciation_Pa"
+            )
+            if "vaporock_full_speciation_Pa" in diagnostic and (
+                not isinstance(vaporock_speciation, Mapping)
+                or any(
+                    not is_finite_number(pressure)
+                    for pressure in vaporock_speciation.values()
+                )
+            ):
+                return None
             backend_pressures = diagnostic.get("backend_vapor_pressures_Pa")
             if "backend_vapor_pressures_Pa" in diagnostic and (
                 not isinstance(backend_pressures, Mapping)
