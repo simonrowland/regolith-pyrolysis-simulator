@@ -16516,6 +16516,8 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 self.pending_decision = None
                 self.paused_for_decision = False
             else:
+                # d-471: endpoint stops, including time_cap, retain the
+                # configured successor; typed C4 refusal is the terminal path.
                 next_campaign = self.campaign_mgr.get_next_campaign(
                     self.melt.campaign, self.record)
                 if next_campaign == CampaignPhase.COMPLETE:
@@ -16525,6 +16527,51 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     # Decision needed before proceeding
                     pending_decision = self.campaign_mgr.get_decision(
                         self.melt.campaign, self.record)
+
+            # Record the completion warning after resolving the successor;
+            # a cap on the terminal campaign is still a normal end.
+            if self._last_campaign_summary.get('stop_reason') == 'time_cap':
+                successor = (
+                    next_campaign.name
+                    if next_campaign is not None
+                    else None
+                )
+                flags: list[dict[str, Any]] = [{
+                    'kind': 'campaign_stop',
+                    'code': 'campaign_time_cap_unconverged',
+                    'detail': {
+                        'campaign': finishing_campaign,
+                        'stop_detail': self._last_campaign_summary.get(
+                            'stop_detail'
+                        ),
+                        'successor': successor,
+                        'ruling': 'd-471',
+                    },
+                }]
+                if finishing_campaign == CampaignPhase.C4.name:
+                    termination = self._last_campaign_summary.get(
+                        'c4_termination'
+                    )
+                    termination = (
+                        termination if isinstance(termination, Mapping) else {}
+                    )
+                    residual = termination.get('residual_melt')
+                    residual = residual if isinstance(residual, Mapping) else {}
+                    flags.append({
+                        'kind': 'campaign_stop',
+                        'code': 'c4_time_capped_without_na_endpoint',
+                        'detail': {
+                            'residual_Na_kg': residual.get('Na_kg'),
+                            'na_endpoint_threshold_atom_mol': termination.get(
+                                'na_endpoint_threshold_atom_mol'
+                            ),
+                            'feed_na_atom_mol': termination.get(
+                                'feed_na_atom_mol'
+                            ),
+                            'ruling': 'd-471',
+                        },
+                    })
+                self._last_campaign_summary['flags'] = flags
 
         backend_transition = getattr(equilibrium, 'ledger_transition', None)
         backend_controls_metal_phase = (

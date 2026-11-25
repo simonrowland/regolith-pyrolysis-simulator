@@ -8644,6 +8644,27 @@ def test_ranking_artifact_keeps_time_cap_after_continuation() -> None:
     """
 
     execution = _execution()
+    cap_flags = [
+        {
+            "kind": "campaign_stop",
+            "code": "campaign_time_cap_unconverged",
+            "detail": {
+                "campaign": "C4",
+                "stop_detail": "max_hold_no_signal",
+                "successor": "C2A",
+                "ruling": "d-471",
+            },
+        },
+        {
+            "kind": "campaign_stop",
+            "code": "c4_time_capped_without_na_endpoint",
+            "detail": {
+                "residual_Na_kg": 0.25,
+                "na_endpoint_threshold_atom_mol": 0.01,
+                "ruling": "d-471",
+            },
+        },
+    ]
     execution.campaign_stops = (
         {
             "campaign": "C0",
@@ -8656,6 +8677,7 @@ def test_ranking_artifact_keeps_time_cap_after_continuation() -> None:
             "stop_reason": "time_cap",
             "duration_h": 62,
             "detail": "max_hold_no_signal",
+            "flags": cap_flags,
         },
         {
             "campaign": "C2A_continuous",
@@ -8704,6 +8726,7 @@ def test_ranking_artifact_keeps_time_cap_after_continuation() -> None:
         assert _stop_reasons(carrier) == expected_reasons
         assert carrier[1]["campaign"] == "C4"
         assert carrier[1]["detail"] == "max_hold_no_signal"
+        assert carrier[1]["flags"] == cap_flags
         assert carrier[2]["campaign"] == "C2A_continuous"
 
 

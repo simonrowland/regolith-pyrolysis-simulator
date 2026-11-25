@@ -124,7 +124,7 @@ class RunExecution:
         default=None, compare=False, repr=False
     )
     # One record per completed campaign: campaign, stop_reason, duration_h,
-    # and the cap or refusal name when the endpoint recorded one.
+    # detail, and typed flags when the endpoint recorded them.
     campaign_stops: tuple[Mapping[str, Any], ...] = ()
 
 
@@ -157,6 +157,11 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
     detail = summary.get("stop_detail", summary.get("detail"))
     if detail:
         record["detail"] = str(detail)
+    flags = summary.get("flags")
+    if isinstance(flags, (list, tuple)):
+        record["flags"] = [
+            dict(flag) for flag in flags if isinstance(flag, Mapping)
+        ]
     return record
 
 

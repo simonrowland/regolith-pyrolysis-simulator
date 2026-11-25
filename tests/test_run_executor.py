@@ -416,7 +416,67 @@ def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel
     assert sim._c4_campaign_refused is False
     assert sim.campaign_endpoint_refused() is False
     assert sim.melt.campaign == CampaignPhase.C2A
+    assert sim.atom_ledger.atom_moles_by_account(
+        "process.cleaned_melt"
+    ).get("Na", 0.0) > 0.0
     assert sim._last_c6_refusal_diagnostic == {}
+    c4_stop = next(
+        stop for stop in execution.campaign_stops if stop["campaign"] == "C4"
+    )
+    cap_flag = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == "campaign_time_cap_unconverged"
+    )
+    assert cap_flag["kind"] == "campaign_stop"
+    assert cap_flag["detail"]["successor"] == "C2A"
+    assert cap_flag["detail"]["ruling"] == "d-471"
+    na_flag = next(
+        flag for flag in c4_stop["flags"]
+        if flag["code"] == "c4_time_capped_without_na_endpoint"
+    )
+    assert na_flag["detail"]["residual_Na_kg"] == residual["Na_kg"]
+    assert na_flag["detail"]["na_endpoint_threshold_atom_mol"] == (
+        sim.campaign_mgr.last_c4_termination[
+            "na_endpoint_threshold_atom_mol"
+        ]
+    )
+
+
+def test_auto_apply_c4_time_cap_runs_c2a_and_c6_then_flags_terminal_cap():
+    config = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+        until_campaign_complete=True,
+        runtime_campaign_overrides={"C6": {"max_hours": 1}},
+    )._session_config()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session = SimSession()
+    session.start(config, backend=backend)
+    session.simulator.record.branch = "two"
+    session.simulator.campaign_mgr.campaigns["C4"][
+        "max_target_acquisition_hr"
+    ] = 1.0
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    stop_by_campaign = {
+        stop["campaign"]: stop for stop in execution.campaign_stops
+    }
+    assert {"C4", "C2A", "C6"}.issubset(stop_by_campaign)
+    assert session.simulator.melt.campaign is CampaignPhase.COMPLETE
+    assert stop_by_campaign["C4"]["stop_reason"] == "time_cap"
+    assert stop_by_campaign["C6"]["stop_reason"] == "time_cap"
+    terminal_flag = next(
+        flag for flag in stop_by_campaign["C6"]["flags"]
+        if flag["code"] == "campaign_time_cap_unconverged"
+    )
+    assert terminal_flag["kind"] == "campaign_stop"
+    assert terminal_flag["detail"]["successor"] is None
+    assert terminal_flag["detail"]["ruling"] == "d-471"
 
 
 def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:

@@ -1078,6 +1078,18 @@ def test_furnace_material_catalog_failure_is_reported():
     )
 
 
+def test_campaign_summary_renders_typed_stop_flags_as_text():
+    controls = _SIMULATOR_CONTROLS_JS.read_text(encoding="utf-8")
+
+    assert (
+        "const flags = Array.isArray(summary.flags) ? summary.flags : [];"
+        in controls
+    )
+    assert "flagValue.textContent = flags.map((flag) => {" in controls
+    assert "String(flag?.code || 'campaign_stop')" in controls
+    assert "JSON.stringify(flag.detail)" in controls
+
+
 def test_duplicate_pending_starts_accept_only_latest_generation():
     sequence = [
         {"event": "start_click", "payload": {}},

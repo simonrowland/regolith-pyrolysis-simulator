@@ -1111,6 +1111,24 @@ socket.on('campaign_complete_summary', (summary) => {
         table.appendChild(specRow);
     }
 
+    const flags = Array.isArray(summary.flags) ? summary.flags : [];
+    if (flags.length > 0) {
+        const flagRow = document.createElement('tr');
+        const flagLabel = document.createElement('td');
+        flagLabel.textContent = 'Campaign Flags';
+        const flagValue = document.createElement('td');
+        flagValue.textContent = flags.map((flag) => {
+            const code = String(flag?.code || 'campaign_stop');
+            const detail = flag?.detail && typeof flag.detail === 'object'
+                ? JSON.stringify(flag.detail)
+                : '';
+            return detail ? `${code}: ${detail}` : code;
+        }).join('; ');
+        flagRow.appendChild(flagLabel);
+        flagRow.appendChild(flagValue);
+        table.appendChild(flagRow);
+    }
+
     div.appendChild(table);
     details.appendChild(div);
     container.appendChild(details);
