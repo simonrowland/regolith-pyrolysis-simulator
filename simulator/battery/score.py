@@ -13498,8 +13498,6 @@ def _predict_phase_row(
             experiment=experiment,
             bench=bench,
             handles=handles,
-            experiment=experiment,
-            bench=bench,
             refused=refused,
         )
     identity, gate_refusal, gate_detail, rewrite = _gate_input_composition(
