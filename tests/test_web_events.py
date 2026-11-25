@@ -4344,15 +4344,16 @@ def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
         "detail": {"campaign": "C0", "value": float("inf")},
     }
     session._run_flags.append(run_flag)
-    session._step_results.append(SimpleNamespace(
+    step = session.advance()
+    session._step_results[-1] = SimpleNamespace(
         campaign_summary={
             "campaign": "C0",
             "stop_reason": "time_cap",
             "duration_h": 1,
             "flags": [campaign_flag],
         },
-        per_hour_summary={},
-    ))
+        per_hour_summary=step.per_hour_summary,
+    )
 
     payload = web_events._full_runner_payload(
         session,
