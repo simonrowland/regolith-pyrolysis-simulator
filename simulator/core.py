@@ -3352,12 +3352,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         # choose the account. The apply step divides this source by C_m.
         # Algebra: source = overhead_debit - buffer_debit - overhead_credit.
         # Unit: mol O2. Limit: a posting inside the noop is not a source.
-        # Sanity: Na/K credit the buffer and keep the metal-loss branch.
-        # TiO2(g) posts no O2 and has no source. A buffer credit is not
-        # this debit. A buffer debit of 1 mol at 1 mol/ln lowers fO2 by 1 ln.
-        # On this base, evaporation credits the buffer and does not debit
-        # it, so the buffer term is idle until an oxidative vapour posts
-        # one. The headspace overdraw refusal is a different owner.
+        # Sanity: TiO2(g) posts no O2 and has no source. A buffer credit is
+        # not this debit. A buffer debit of 1 mol at 1 mol/ln lowers fO2
+        # by 1 ln. Congruent evaporation posts its O2 to overhead, not the
+        # buffer, so this buffer term stays idle for those carriers.
         net_posted_o2_mol = (
             overhead_o2_credit_mol
             - overhead_o2_debit_mol
@@ -3369,30 +3367,14 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             }
         if vapor_oxygen_atoms > 0.0:
             return {}
-
-        # Elemental vapor classes (Na/K/Fe/Mg/Ca in current data) are
-        # ledger-balanced as parent oxide -> metal vapor + O2.  The metal
-        # loss leaves the debited oxide oxygen behind in the melt redox
-        # couple, so the fO2 source is positive and derives from the actual
-        # cleaned-melt debit.  If a future provider debits a reduced metal
-        # species directly, this term naturally falls to zero.
-        cleaned_melt_debit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
-            transition,
-            side='debits',
-            account='process.cleaned_melt',
-        )
-        cleaned_melt_credit_o2_equiv_mol = self._transition_account_o2_equiv_mol(
-            transition,
-            side='credits',
-            account='process.cleaned_melt',
-        )
-        metal_loss_o2_equiv_mol = (
-            cleaned_melt_debit_o2_equiv_mol
-            - cleaned_melt_credit_o2_equiv_mol
-        )
-        if abs(metal_loss_o2_equiv_mol) <= OXYGEN_RESERVOIR_NOOP_MOL:
-            return {}
-        return {'redox_source:evaporative_metal_loss': metal_loss_o2_equiv_mol}
+        # Oxide oxygen the proposal did not credit to the gas is not a melt
+        # oxidant. Congruent evaporation posts that O2 to overhead, and the
+        # branch above already returned the reducing oxygen-loss term. A
+        # positive metal-loss term here booked the same oxygen a second time
+        # and ratcheted melt fO2 to log10(P_total) under an inert sweep.
+        # Limiting case: net overhead O2 ≈ 0 returns nothing — there is no
+        # ferric to invent from a vapor that took its oxygen with it.
+        return {}
 
     def _apply_evaporative_redox_source_terms(
         self,
@@ -3435,12 +3417,12 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             or reservoir.melt_redox_capacity_mol_per_ln_fO2 <= OXYGEN_RESERVOIR_NOOP_MOL
         )
         if saturated:
-            # The evaporation transition already credited its O2 to the buffer.
-            # At saturation, solve the finite Fe split BEFORE moving the remainder:
+            # This branch runs only when a positive evaporative_metal_loss
+            # term has already incremented internal capacity. Evaporation no
+            # longer emits that term: its O2 is overhead gas. Injected
+            # diagnostics that set the capacity still settle here.
             # 2 FeO + 1/2 O2 = Fe2O3, so uptake is Δn(Fe2O3)/2 mol O2.
             # Its ledger debit, not C_m * Δln(fO2), owns the absorbed atoms.
-            # At zero Fe uptake all the credited O2 leaves to overhead; no second
-            # source or parallel redox inventory is introduced.
             diagnostic = self._apply_fe_redox_respeciation(
                 oxygen_source=FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS,
                 fO2_log_override=self._melt_redox_fO2_upper_bound_log(),
@@ -7766,6 +7748,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         self._fe_redox_internal_o2_consumed_mol_this_hr = 0.0
         # Hour record only. The exhaustion flag survives this reset.
         self._ferric_tangent_reasons_this_hr = []
+        self._evaporation_coproduct_o2_mol_this_hr = 0.0
 
     def _ledger_ferric_fraction_diagnostic(self) -> Dict[str, Any]:
         melt_mol = self.atom_ledger.project_account_mol('process.cleaned_melt')
@@ -7985,6 +7968,19 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
             'oxygen_source': oxygen_source,
             'internal_o2_capacity_mol': buffer_capacity_mol,
         }
+        if oxygen_source == FE_REDOX_OXYGEN_SOURCE_OVERHEAD:
+            # Only the overhead-funded split can see this hour's evaporation
+            # coproduct. A nonzero exchange already switched the source to
+            # fo2_buffer above; that path draws the real oxidant and must
+            # not be told to ignore gas. The bubbler calls this method with
+            # an explicit buffer source and never enters this branch.
+            coproduct_o2_mol = max(
+                0.0,
+                float(getattr(
+                    self, '_evaporation_coproduct_o2_mol_this_hr', 0.0,
+                ) or 0.0),
+            )
+            control_inputs['evaporation_coproduct_o2_mol'] = coproduct_o2_mol
         result = self._dispatch_only(
             ChemistryIntent.FE_REDOX_RESPECIATION,
             control_inputs=control_inputs,
@@ -10180,9 +10176,18 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         ) + float(
             vapor_route.get('native_fe_overhead_o2_mol', 0.0) or 0.0
         )
+        # Fe(g) coproduct now shares process.overhead_gas with the tap
+        # split's O2. Only the tap split is the closed-system oxidant:
+        # FeO → Fe(tap) + ½O2 keeps the metal, FeO → Fe(g) + ½O2 leaves.
+        # Algebra: oxidant = emitted − vapor_O2 = tap_O2. Unit mol.
+        # Limiting case: no vapor route leaves oxidant = emitted.
+        vapor_coproduct_o2_mol = float(
+            vapor_route.get('native_fe_overhead_o2_mol', 0.0) or 0.0
+        )
+        oxidant_o2_mol = max(0.0, emitted_o2_mol - vapor_coproduct_o2_mol)
         self._apply_oxygen_reservoir_redox_source_terms(
             {'redox_source:native_fe_saturation_split': min(
-                emitted_o2_mol,
+                oxidant_o2_mol,
                 needed_o2_equiv_mol,
             )},
             exchange_direction='redox_source:native_fe_saturation_split',

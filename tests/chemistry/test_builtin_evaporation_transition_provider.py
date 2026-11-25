@@ -8,7 +8,7 @@ Covers:
   ``EVAPORATION_TRANSITION`` and declares the accounts the
   legacy transition touches (``process.cleaned_melt``,
   ``process.overhead_gas``, ``process.condensation_train``,
-  ``reservoir.fo2_buffer``).
+  coproduced O2 on overhead, not a melt redox buffer).
 * Account filter: the kernel filter scopes the provider's view to those
   declared accounts only -- a metal-phase seed must NOT cross the boundary.
 * Atom-balance gate: a malformed proposal that does NOT conserve atoms
@@ -144,14 +144,13 @@ def test_provider_declares_only_evaporation_transition_intent():
 
 
 @pytest.mark.xdist_group("serial")
-def test_provider_declares_four_evaporation_accounts():
+def test_provider_declares_evaporation_accounts():
     provider = BuiltinEvaporationTransitionProvider()
     profile = provider.capability_profile()
     assert profile.declared_accounts == frozenset({
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
-        "reservoir.fo2_buffer",
     })
 
 
@@ -165,7 +164,7 @@ def test_kernel_filters_provider_to_declared_accounts_only(
     vapor_pressure_data, feedstocks_data, setpoints_data
 ):
     """When other accounts hold material, the provider must see ONLY the
-    three declared evaporation accounts. The kernel account filter is the
+    declared evaporation accounts. The kernel account filter is the
     enforcer (binding spec §7)."""
 
     sim = _build_sim(
@@ -214,7 +213,6 @@ def test_kernel_filters_provider_to_declared_accounts_only(
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
-        "reservoir.fo2_buffer",
     })
     for accounts in seen_accounts:
         assert accounts == expected, (
@@ -335,7 +333,8 @@ def test_provider_emits_expected_proposal_for_known_inputs(
 
     * the proposal debits ``process.cleaned_melt`` for parent oxide,
     * the proposal credits ``process.condensation_train`` for vapor,
-    * the proposal credits ``reservoir.fo2_buffer`` for the internal O2 carrier,
+    * the proposal credits ``process.overhead_gas`` for the O2 coproduct
+      even when the metal vapor itself all condenses,
     * the atom-balance proof is element-by-element zero (within
       tolerance).
     """
@@ -415,15 +414,17 @@ def test_provider_emits_expected_proposal_for_known_inputs(
         expected_oxide_kg / mw_na2o, rel=1e-12
     )
 
-    # Credit side: condensation_train with vapor + internal fO2 buffer with O2.
+    # Credit side: condensation_train with vapor, overhead with the O2
+    # coproduct. The metal condensed; the oxygen still leaves as gas.
     assert set(proposal.credits) == {
         "process.condensation_train",
-        "reservoir.fo2_buffer",
+        "process.overhead_gas",
     }
     cond_train_credit = dict(proposal.credits["process.condensation_train"])
-    buffer_credit = dict(proposal.credits["reservoir.fo2_buffer"])
+    overhead_credit = dict(proposal.credits["process.overhead_gas"])
     assert cond_train_credit["Na"] == pytest.approx(rate_kg_hr / mw_na, rel=1e-12)
-    assert buffer_credit["O2"] == pytest.approx(expected_o2_kg / mw_o2, rel=1e-12)
+    assert overhead_credit["O2"] == pytest.approx(expected_o2_kg / mw_o2, rel=1e-12)
+    assert "Na" not in overhead_credit
 
     # Atom-balance proof: every element should net to ~0
     for element, net in dict(proposal.atom_balance_proof).items():
@@ -546,8 +547,7 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
     * debit: ``process.cleaned_melt`` with the parent oxide,
     * credit: ``process.condensation_train`` with the condensed vapor
       (or vapor disproportionation products),
-    * credit: ``process.overhead_gas`` with uncondensed vapor / oxide-vapor O2,
-    * credit: ``reservoir.fo2_buffer`` with elemental-metal parent-oxide O.
+    * credit: ``process.overhead_gas`` with uncondensed vapor and O2.
 
     Note: this test runs the simulator -- which uses the kernel path --
     so the assertion is that the committed transitions take the same
@@ -604,7 +604,6 @@ def test_provider_matches_legacy_credit_evaporation_transition_pattern(
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
-        "reservoir.fo2_buffer",
     }
     for trans in evap_transitions:
         for lot in trans.debits:
@@ -758,12 +757,11 @@ def test_evaporation_transition_does_not_apply_per_species_scale(
     expected_o2_kg = rate_kg_hr * O2_per_product_kg
 
     overhead_credit = dict(proposal.credits["process.overhead_gas"])
-    buffer_credit = dict(proposal.credits["reservoir.fo2_buffer"])
+    assert "reservoir.fo2_buffer" not in proposal.credits
     assert overhead_credit["Na"] == pytest.approx(
         expected_vapor_kg / mw_na, rel=1e-12
     )
-    assert "O2" not in overhead_credit
-    assert buffer_credit["O2"] == pytest.approx(
+    assert overhead_credit["O2"] == pytest.approx(
         expected_o2_kg / mw_o2, rel=1e-12
     )
 
@@ -772,3 +770,43 @@ def test_evaporation_transition_does_not_apply_per_species_scale(
     diag = dict(result.diagnostic or {})
     assert diag.get("credited_condensed_kg") == pytest.approx(0.0, abs=1e-12)
     assert diag.get("applied_scale") == pytest.approx(1.0, rel=1e-12)
+
+
+@pytest.mark.xdist_group("serial")
+def test_buffer_oxygen_destination_is_unsupported(
+    vapor_pressure_data, feedstocks_data, setpoints_data
+):
+    """reservoir.fo2_buffer is a melt redox tank, not an evaporation sink."""
+
+    sim = _build_sim(
+        "lunar_mare_low_ti",
+        vapor_pressure_data,
+        feedstocks_data,
+        setpoints_data,
+    )
+    result = BuiltinEvaporationTransitionProvider().dispatch(IntentRequest(
+        intent=ChemistryIntent.EVAPORATION_TRANSITION,
+        account_view=ProviderAccountView(
+            accounts={"process.cleaned_melt": {"Na2O": 100.0}},
+            species_formula_registry=sim.species_formula_registry,
+        ),
+        temperature_C=1500.0,
+        pressure_bar=1e-6,
+        control_inputs={
+            "species": "Na",
+            "stoich": {
+                "parent_oxide": "Na2O",
+                "oxide_per_product_kg": 2.0,
+                "O2_per_product_kg": 0.347,
+            },
+            "sp_data": {"oxygen_destination": "reservoir.fo2_buffer"},
+            "rate_kg_hr": 1.0,
+            "remaining_kg_hr": 1.0,
+            "dt_hr": 1.0,
+            "available_kg": 10.0,
+        },
+    ))
+
+    assert result.status == "unsupported"
+    assert result.transition is None
+    assert "reservoir.fo2_buffer" in result.diagnostic["reason"]

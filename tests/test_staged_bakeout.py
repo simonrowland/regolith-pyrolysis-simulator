@@ -301,13 +301,27 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     assert pins["staged_product_sio_kg"] == pytest.approx(0.0)
 
 
-def test_c2a_staged_respeciates_evaporative_metal_loss_internal_o():
+def test_c2a_staged_does_not_ferricize_from_evaporation():
     sim = _run_staged()
 
-    melt_kg = sim.atom_ledger.kg_by_account("process.cleaned_melt")
     divergence = sim.melt.oxygen_reservoir.ferric_divergence
 
-    assert melt_kg.get("Fe2O3", 0.0) > 0.0
+    # Evaporation coproduct is overhead gas the sweep removes. A credit
+    # of that O2 to reservoir.fo2_buffer is the inert-sweep oxidation
+    # bug. Native-Fe tap O2 can still fund a metal-line ferric; that
+    # inventory is closed-system saturation, not this posting, so the
+    # Fe2O3 mass is not pinned here.
+    for transition in sim.atom_ledger.transitions:
+        if not str(transition.name).startswith("evaporate_"):
+            continue
+        for lot in transition.credits:
+            assert lot.account != "reservoir.fo2_buffer"
+    cap = sim._melt_redox_fO2_upper_bound_log()
+    fo2 = float(sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log)
+    # The bug pinned melt fO2 on the effervescence cap, log10(P_total).
+    # One dex under that cap is the same separation the hour invariant
+    # uses against headspace fugacity. It is not a measured yield.
+    assert fo2 <= cap - 1.0
     assert (
         divergence["delta_abs"] <= FERRIC_DIVERGENCE_WARNING_THRESHOLD
         or divergence.get("attribution") in {

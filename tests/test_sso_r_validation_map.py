@@ -401,15 +401,21 @@ def test_exact_full_dose_oxidizing_pn2_row_skips_c3_reduction_without_capacity()
         grid_scope_label=validation_map.GRID_SCOPE_FULL,
     )
 
+    loss = "redox_source:evaporative_oxygen_loss"
+    terms = row["redox_source_terms_mol_o2_equiv_by_label"]
+    applied = row["redox_source_applied_terms_mol_o2_equiv_by_label"]
+    skipped = row["redox_source_skipped_terms_mol_o2_equiv_by_label"]
     assert math.isfinite(row["post_exchange_fO2_log_diagnostic"])
     assert math.isfinite(row["redox_source_delta_ln_fO2"])
-    assert row["redox_source_skip_reason"] == "no_melt_redox_capacity"
-    assert row["redox_source_applied_terms_mol_o2_equiv_by_label"][
-        "redox_source:evaporative_metal_loss"
-    ] > 0.0
-    assert row["redox_source_skipped_terms_mol_o2_equiv_by_label"][
-        "redox_source:c3_na_shuttle_reduction"
-    ] < 0.0
+    assert "redox_source:evaporative_metal_loss" not in terms
+    assert terms[loss] < 0.0
+    assert (loss in applied) != (loss in skipped)
+    if loss in skipped:
+        assert row["redox_source_skipped_reasons_by_label"][loss] in {
+            "no_melt_redox_capacity",
+            "redox_capacity_saturation_refusal",
+        }
+    assert skipped["redox_source:c3_na_shuttle_reduction"] < 0.0
     assert row["redox_source_skipped_reasons_by_label"][
         "redox_source:c3_na_shuttle_reduction"
     ] == "no_melt_redox_capacity"
@@ -457,7 +463,7 @@ def test_axis_covering_validation_rows_never_emit_nonfinite_fo2():
         assert math.isfinite(row["redox_source_delta_ln_fO2"])
 
 
-def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
+def test_run_row_books_evaporation_as_oxygen_loss_not_internal_o(
     monkeypatch,
 ):
     setpoints, feedstocks, vapor_pressures = validation_map._load_data()
@@ -492,11 +498,11 @@ def test_run_row_uses_internal_o_branch_when_metal_loss_capacity_remains(
         grid_scope_label=validation_map.GRID_SCOPE_SMOKE,
     )
 
-    assert row["redox_source_terms_mol_o2_equiv_by_label"][
-        "redox_source:evaporative_metal_loss"
-    ] > 0.0
-    assert available_internal_o2_mol[-1] > 0.0
-    assert calls[-1] == FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
+    terms = row["redox_source_terms_mol_o2_equiv_by_label"]
+    assert "redox_source:evaporative_metal_loss" not in terms
+    assert terms["redox_source:evaporative_oxygen_loss"] < 0.0
+    assert available_internal_o2_mol[-1] == pytest.approx(0.0)
+    assert calls[-1] != FE_REDOX_OXYGEN_SOURCE_EVAPORATIVE_METAL_LOSS
 
 
 def test_run_row_establishes_one_production_authority_pin(monkeypatch):

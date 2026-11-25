@@ -114,6 +114,17 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
             raise ValueError("internal_o2_capacity_mol must be finite") from exc
         if not math.isfinite(internal_o2_capacity_mol):
             raise ValueError("internal_o2_capacity_mol must be finite")
+        try:
+            evaporation_coproduct_o2_mol = max(
+                0.0,
+                float(controls.get("evaporation_coproduct_o2_mol", 0.0) or 0.0),
+            )
+        except (TypeError, ValueError) as exc:
+            raise ValueError(
+                "evaporation_coproduct_o2_mol must be finite"
+            ) from exc
+        if not math.isfinite(evaporation_coproduct_o2_mol):
+            raise ValueError("evaporation_coproduct_o2_mol must be finite")
         o2_account = (
             FO2_BUFFER_ACCOUNT
             if oxygen_source in BUFFER_BACKED_OXYGEN_SOURCES
@@ -251,7 +262,7 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                     fe2o3_mol_for_ferric_o2(available_o2_mol),
                 )
             else:
-                available_o2_mol = max(
+                ledger_overhead_o2_mol = max(
                     0.0,
                     float(
                         (accounts.get(OXYGEN_ACCOUNT, {}) or {}).get(
@@ -260,6 +271,20 @@ class BuiltinFeRedoxRespeciationProvider(ChemistryProvider):
                         )
                         or 0.0
                     ),
+                )
+                # Coproduced O2 is gas the sweep removes. It is not headspace
+                # oxidant for the Fe couple. Premise: congruent evaporation
+                # posts n_O2 to process.overhead_gas, and the bleed after this
+                # split carries that gas out. Drawing it into Fe2O3 first
+                # re-oxidizes the melt with oxygen that came from the melt.
+                # Algebra: available = max(0, ledger_overhead_O2 − coproduct).
+                # Unit mol. Limiting case: excluded 0 leaves the ledger check;
+                # excluded ≥ ledger refuses oxidation, so the coproduct alone
+                # cannot make ferric. Buffer-backed sources do not use this
+                # subtraction: a bubbler load is a real oxidant.
+                available_o2_mol = max(
+                    0.0,
+                    ledger_overhead_o2_mol - evaporation_coproduct_o2_mol,
                 )
                 applied_delta_fe2o3_mol = delta_fe2o3_mol
             feo_debit_mol = 2.0 * applied_delta_fe2o3_mol

@@ -274,6 +274,63 @@ def test_oxidizing_respeciation_can_consume_fo2_buffer_carrier(
     assert result.diagnostic["oxygen_source"] == "fo2_buffer"
 
 
+def test_overhead_oxidation_does_not_consume_evaporation_coproduct_o2(
+    formula_registry,
+):
+    """The same overhead O2 oxidizes when it is headspace gas, and is
+    refused when that inventory is this hour's evaporation coproduct."""
+
+    accounts = {
+        "process.cleaned_melt": {"FeO": 10.0, "SiO2": 20.0},
+        "process.overhead_gas": {"O2": 10.0},
+    }
+    funded = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(formula_registry, accounts, fO2_log=-3.0)
+    )
+    excluded = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            accounts,
+            fO2_log=-3.0,
+            control_inputs={"evaporation_coproduct_o2_mol": 10.0},
+        )
+    )
+
+    assert funded.status == "ok"
+    assert funded.transition is not None
+    assert funded.transition.credits["process.cleaned_melt"]["Fe2O3"] > 0.0
+    assert excluded.status == "refused"
+    assert excluded.transition is None
+    assert excluded.diagnostic["reason"] == "fe_redox_respeciation_o2_unavailable"
+    assert excluded.diagnostic["available_o2_mol"] == pytest.approx(0.0)
+
+
+def test_fo2_buffer_oxidation_ignores_evaporation_coproduct_exclusion(
+    formula_registry,
+):
+    result = BuiltinFeRedoxRespeciationProvider().dispatch(
+        _request(
+            formula_registry,
+            {
+                "process.cleaned_melt": {"FeO": 10.0, "SiO2": 20.0},
+                "process.overhead_gas": {},
+                "reservoir.fo2_buffer": {},
+            },
+            fO2_log=-3.0,
+            control_inputs={
+                "oxygen_source": "fo2_buffer",
+                "internal_o2_capacity_mol": 10.0,
+                "evaporation_coproduct_o2_mol": 10.0,
+            },
+        )
+    )
+
+    assert result.status == "ok"
+    assert result.transition is not None
+    assert result.transition.debits["reservoir.fo2_buffer"]["O2"] > 0.0
+    assert result.diagnostic["oxygen_source"] == "fo2_buffer"
+
+
 def test_reducing_respeciation_credits_explicit_o2_and_matches_kress91(
     formula_registry,
 ):

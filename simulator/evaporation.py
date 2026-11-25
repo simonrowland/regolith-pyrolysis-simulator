@@ -17,6 +17,7 @@ from simulator.alpha_kinetics import (
 from simulator.accounting import AccountingError, resolve_species_formula
 from simulator.account_ids import (
     CHROMIUM_CONDENSED_OXIDE_ACCOUNT,
+    OXYGEN_SPECIES,
     SPENT_REDUCTANT_RESIDUE_ACCOUNT,
 )
 
@@ -294,14 +295,14 @@ def _project_evaporation_overhead_source_mol_hr(
         oxygen_destination = str(
             stoich.get('oxygen_destination') or ''
         )
-        vapor_oxygen_atoms = float(
-            formula.elements.get('O', 0.0) or 0.0
-        )
+        # Forecast of BuiltinEvaporationTransitionProvider's overhead O2
+        # credit. Elemental metals (no oxygen_destination) post the same
+        # coproduct as oxide vapors. The rejected buffer token posts nothing
+        # because the provider refuses that carrier. No shared helper: a
+        # provider must not import this module (engines/builtin/__init__.py).
         if (
-            o2_kg_hr < 0.0
-            or (oxygen_destination != 'reservoir.fo2_buffer'
-                and (vapor_oxygen_atoms > 0.0
-                     or oxygen_destination == 'process.overhead_gas'))
+            o2_kg_hr != 0.0
+            and oxygen_destination != 'reservoir.fo2_buffer'
         ):
             source_mol_hr['O2'] = (
                 source_mol_hr.get('O2', 0.0)
@@ -5804,9 +5805,10 @@ class EvaporationMixin:
         Species condense preferentially in stages where the stage
         temperature is well below the species' condensation temperature.
 
-        For elemental-metal evaporation from a parent oxide, the oxygen
-        coproduct is credited to ``reservoir.fo2_buffer``. That redox buffer is
-        not a terminal stored-oxygen product account.
+        For every evaporation stoich, the oxygen coproduct is credited to
+        ``process.overhead_gas``. The sweep's bleed, not the melt Fe couple,
+        removes it. ``reservoir.fo2_buffer`` is the bubbler and passive-exchange
+        holding account, not an evaporation destination.
 
         CONDENSATION_ROUTE intent -- kernel-authoritative.
 
@@ -5820,9 +5822,8 @@ class EvaporationMixin:
         committed through the kernel. The flow per species is:
 
         1. EVAPORATION_TRANSITION dispatched with ``remaining=rate`` --
-           ALL vapor routed to ``process.overhead_gas``; elemental-metal
-           parent-oxide oxygen stays in ``reservoir.fo2_buffer``. No
-           condensation_train credit from that intent.
+           ALL vapor and its O2 coproduct routed to ``process.overhead_gas``.
+           No condensation_train credit from that intent.
         2. CONDENSATION_ROUTE dispatched with the analytically smoothed
            per-species condensed_kg derived from
            ``route_result.remaining_by_species`` -- debits
@@ -6698,6 +6699,22 @@ class EvaporationMixin:
         # Branch: every evaporation credit declares the Na headspace
         # well-mixed; partial gas withdrawals attribute pro rata.
         self._mark_overhead_na_origin_pool()
+        # Overhead O2 credited by this transition is coproduct the sweep
+        # removes. The same-hour Fe split must not draw it as oxidant.
+        # Debits (CrO2/CrO3 consuming O2) are not coproduct and stay out.
+        overhead_o2_credit_mol = self._transition_species_mol(
+            transition,
+            side='credits',
+            account='process.overhead_gas',
+            species=OXYGEN_SPECIES,
+        )
+        if overhead_o2_credit_mol > 0.0:
+            self._evaporation_coproduct_o2_mol_this_hr = (
+                float(getattr(
+                    self, '_evaporation_coproduct_o2_mol_this_hr', 0.0,
+                ) or 0.0)
+                + overhead_o2_credit_mol
+            )
         # Green: K and Mg are the same source-mixed overhead pool,
         # declared when that cation is the credited species.
         if species in ('K', 'Mg'):

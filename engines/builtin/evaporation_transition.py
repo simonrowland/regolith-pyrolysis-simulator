@@ -7,10 +7,9 @@ exactly -- this is a refactor of where the LedgerTransition is built, not
 a re-derivation of the stoich math (which still routes through
 ``_evaporation_stoich`` at the caller). The provider:
 
-- reads ``process.cleaned_melt``, ``process.overhead_gas``,
-  ``process.condensation_train``, and ``reservoir.fo2_buffer`` from the
-  account view -- the accounts the evaporation transition touches (see
-  "Account declaration" below for the rationale),
+- reads ``process.cleaned_melt``, ``process.overhead_gas``, and
+  ``process.condensation_train`` from the account view -- the accounts
+  the evaporation transition touches (see "Account declaration" below),
 - reads T from ``request.temperature_C``,
 - reads the per-species flux + condensation outcome from
   ``request.control_inputs``:
@@ -49,18 +48,13 @@ validation runs both at dispatch time (in ``validate_atom_balance``) and
 again at commit time (re-validated by ``commit_batch``).
 
 Account declaration: ``process.cleaned_melt``, ``process.overhead_gas``,
-``process.condensation_train``, ``reservoir.fo2_buffer``. The legacy
-:meth:`_credit_evaporation_transition` builds a single
-:class:`LedgerTransition` with these accounts on its debit/credit
-sides; the provider must declare every account the proposal touches
-(``validate_proposal_accounts`` enforces this with
+``process.condensation_train``. The provider must declare every account
+the proposal touches (``validate_proposal_accounts`` enforces this with
 :class:`AccountFilterViolation`). The cleaned-melt is the debit; the
-condensation_train is credited with the condensed fraction (in mol if
-the species disproportionates, in kg otherwise -- the kernel's
-proposal layer is mol-native, so the provider converts); the overhead_gas
-is credited with uncondensed vapor and oxide-vapor O2; elemental metal
-evaporation parks parent-oxide oxygen in ``reservoir.fo2_buffer`` for the
-same-tick Fe redox re-speciation chain.
+condensation_train is credited with the condensed fraction (mol-native);
+the overhead_gas is credited with uncondensed vapor and with the O2
+coproduced or consumed by the evaporation stoich. That O2 is gas the
+sweep removes. It is not a melt redox buffer.
 """
 
 from __future__ import annotations
@@ -105,7 +99,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         "process.cleaned_melt",
         "process.overhead_gas",
         "process.condensation_train",
-        "reservoir.fo2_buffer",
     })
 
     def capability_profile(self) -> CapabilityProfile:
@@ -182,10 +175,12 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         sp_data = dict(controls.get("sp_data") or {})
         available_kg = float(controls.get("available_kg") or 0.0)
         oxygen_destination = str(sp_data.get("oxygen_destination") or "")
-        if oxygen_destination and oxygen_destination not in {
-            "process.overhead_gas",
-            "reservoir.fo2_buffer",
-        }:
+        # Empty and process.overhead_gas both post coproduct O2 to the gas.
+        # reservoir.fo2_buffer is refused: that account is a melt redox
+        # holding tank (bubbler, passive exchange), not a headspace, and
+        # parking evaporation O2 there re-oxidized the melt up to
+        # log10(P_total) under an inert sweep.
+        if oxygen_destination and oxygen_destination != "process.overhead_gas":
             return IntentResult(
                 intent=ChemistryIntent.EVAPORATION_TRANSITION,
                 status="unsupported",
@@ -268,7 +263,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         registry = request.account_view.species_formula_registry
 
         vapor_formula = resolve_species_formula(species, registry)
-        vapor_oxygen_atoms = float(vapor_formula.elements.get("O", 0.0) or 0.0)
         condensed_product_mol = self._condensed_product_mol(
             species, condensed_kg, sp_data, registry,
             resolve_species_formula,
@@ -311,7 +305,6 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         #   debits:  process.cleaned_melt -> {parent_oxide: mol}
         #   credits: process.condensation_train -> {product: mol, ...}
         #            process.overhead_gas        -> {species: mol, O2: mol}
-        #            reservoir.fo2_buffer        -> {O2: mol}
         # ------------------------------------------------------------------
         debits: dict[str, dict[str, float]] = {}
         credits: dict[str, dict[str, float]] = {}
@@ -335,16 +328,21 @@ class BuiltinEvaporationTransitionProvider(ChemistryProvider):
         if O2_kg > 0.0:
             o2_formula = resolve_species_formula("O2", registry)
             o2_mol = O2_kg / o2_formula.molar_mass_kg_per_mol()
-            if (
-                oxygen_destination == "reservoir.fo2_buffer"
-                or (
-                    not oxygen_destination
-                    and vapor_oxygen_atoms <= 0.0
-                )
-            ):
-                credits["reservoir.fo2_buffer"] = {"O2": o2_mol}
-            else:
-                overhead_credit["O2"] = o2_mol
+            # Coproduced O2 is gas the sweep removes, not melt ferric.
+            # Premise: Na2O(l) → 2 Na(g) + ½ O2(g), FeO(l) → Fe(g) + ½ O2(g),
+            # SiO2(l) → SiO(g) + ½ O2(g). Those oxygen atoms leave with the
+            # vapor. Under PN2_SWEEP or a pumped headspace that O2 does not
+            # re-enter the Fe couple. Posting it to reservoir.fo2_buffer made
+            # the same-tick Fe split consume it as Fe2O3 and the redox
+            # integral pin melt fO2 at log10(P_total).
+            # Algebra: n_O2 = m_O2 / M_O2, the mol the atom proof already
+            # requires (parent-oxide O = vapor O + 2 n_O2).
+            # Unit check: kg / (kg/mol) = mol. Limiting case: m_O2 = 0
+            # credits nothing; a negative stoich (an oxide vapor that
+            # consumes O2) still debits overhead below. A fully condensed
+            # metal vapor (remaining_kg = 0) still credits this O2 here;
+            # the metal itself goes to the condensation train.
+            overhead_credit["O2"] = overhead_credit.get("O2", 0.0) + o2_mol
         if overhead_credit:
             credits["process.overhead_gas"] = overhead_credit
         if O2_kg < 0.0:

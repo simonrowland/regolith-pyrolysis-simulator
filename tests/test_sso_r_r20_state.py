@@ -254,17 +254,21 @@ def test_collapsing_ferric_capacity_routes_evaporative_o2_to_gas(monkeypatch, li
     )
     sim._settle_evaporative_redox_after_batch()
 
-    if liquid:
-        assert sim._current_melt_redox_fO2_log() <= math.log10(2e-4)
-    else:
-        assert sim._current_melt_redox_fO2_log() == 78.0  # Last liquid reference.
+    # The coproduct is overhead gas. It must not raise the planted fO2.
+    # A reducing integral may lower a liquid state; a solid hour holds.
+    assert sim._current_melt_redox_fO2_log() <= 78.0
+    if not liquid:
+        assert sim._current_melt_redox_fO2_log() == 78.0
     evaporation = sim.atom_ledger.transitions[transitions_before]
     emitted_o2 = _transition_account_species_mol(
+        sim, evaporation, side="credits", account="process.overhead_gas", species="O2",
+    )
+    buffer_credit = _transition_account_species_mol(
         sim, evaporation, side="credits", account="reservoir.fo2_buffer", species="O2",
     )
     assert emitted_o2 > 0.0
+    assert buffer_credit == pytest.approx(0.0)
     assert sim.atom_ledger.mol_by_account("process.overhead_gas")["O2"] >= emitted_o2
-    assert "EXCESS_OXYGEN_TO_GAS" in sim._last_fe_redox_respeciation_diagnostic["flags"]
     for transition in sim.atom_ledger.transitions[transitions_before:]:
         transition.validate_conservation(sim.species_formula_registry)
         if transition.name == "oxygen_reservoir_exchange":
@@ -2433,7 +2437,7 @@ def test_sio_evaporative_o_loss_source_term_from_committed_transition() -> None:
 
 
 @pytest.mark.parametrize("species", ["Na", "K", "Fe", "Mg"])
-def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
+def test_elemental_evaporation_coproduct_o2_does_not_oxidize_melt(
     species,
 ) -> None:
     sim = _make_sim()
@@ -2457,7 +2461,7 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
     sim._credit_evaporation_transition(species, rate_kg_hr, rate_kg_hr, sp_data)
 
     transition = sim.atom_ledger.transitions[-1]
-    label = "redox_source:evaporative_metal_loss"
+    label = "redox_source:evaporative_oxygen_loss"
     parent_oxide_o2_equiv_mol = _transition_account_o2_equiv_mol(
         sim,
         transition,
@@ -2484,12 +2488,12 @@ def test_elemental_evaporation_metal_loss_oxidizes_from_committed_oxide_debit(
     assert rate_kg_hr > 0.0
     assert transition.name == f"evaporate_{species}"
     assert parent_oxide_o2_equiv_mol > 0.0
-    assert overhead_o2_mol == pytest.approx(0.0)
-    assert buffer_o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
+    assert overhead_o2_mol == pytest.approx(parent_oxide_o2_equiv_mol)
+    assert buffer_o2_mol == pytest.approx(0.0)
     assert breakdown["terms_mol_o2_equiv_by_label"][label] == pytest.approx(
-        parent_oxide_o2_equiv_mol
+        -parent_oxide_o2_equiv_mol
     )
-    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log > before_fO2
+    assert sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log <= before_fO2
 
 
 def test_isochemical_temperature_ramp_references_fO2_on_kress91_curve() -> None:

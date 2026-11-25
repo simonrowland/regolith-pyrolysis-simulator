@@ -53,8 +53,8 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
             reference_T_K=2173.15,
         )
         # A fixed tangent isolates batch integration from the capacity model.
-        # TiO releases gas O2 (negative source); Fe/Mg leave oxide oxygen in
-        # the buffer (positive sources). The first case crosses the ceiling.
+        # TiO, Fe and Mg all release gas O2, so every source is reducing.
+        # None of them may credit reservoir.fo2_buffer or cross the ceiling.
         monkeypatch.setattr(
             sim, "_melt_redox_source_capacity_mol_per_ln_fO2",
             lambda **kwargs: 1.0,
@@ -121,11 +121,13 @@ def test_evaporation_batch_redox_is_independent_of_carrier_commit_order(
         else:
             sim._route_to_condensation(flux)
             assert set(sim._ledger_committed_evap_flux_this_tick.species_kg_hr) == set(flux.species_kg_hr)
-        assert tuple(committed) == (
-            ("TiO", "Mg", "Fe") if mode == "producer_first" else canonical_order
-        )
+        # Fe and Mg now credit overhead O2 too, so the Stage-3 oxygen-source
+        # reorder no longer pulls TiO ahead of them. Stable sort keeps the
+        # canonical wall order for every mode.
+        assert tuple(committed) == canonical_order
+        assert "redox_source:evaporative_metal_loss" not in sim._redox_source_terms_this_hr
         assert sim._redox_source_terms_this_hr["redox_source:evaporative_oxygen_loss"] < 0.0
-        assert sim._redox_source_terms_this_hr["redox_source:evaporative_metal_loss"] > 0.0
+        assert sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0) == pytest.approx(0.0, abs=1e-12)
         results.append((
             sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log,
             sim.atom_ledger.mol_by_account("reservoir.fo2_buffer").get("O2", 0.0),
