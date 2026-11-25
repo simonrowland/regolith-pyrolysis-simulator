@@ -110,6 +110,7 @@ from simulator.reduced_real_determinism import (
     PT0DeterminismStore,
     PT1PersistentEquilibriumStore,
     PT1_EQUILIBRIUM_TABLE,
+    _curve_payload,
     canonical_json_bytes,
     canonical_physics_bucket_key_from_replay_key,
 )
@@ -335,24 +336,23 @@ def test_register_executed_law_has_one_production_call() -> None:
 
 
 def _cache_key() -> tuple[dict, dict]:
-    return (
-        {
-            "artifact": "freeze_gate_curve",
-            "schema_version": "test",
-            "tag": "law-disclosure",
-            "namespace_id": "test:law-disclosure",
-            "vapor_pressure_provider_selection": "test-vapor-provider",
-            "sulfur_side": {},
-            "model": {},
-        },
-        {
-            "curve": {
-                "status": "in_range",
-                "tag": "law-disclosure",
-                "is_liquidus_floor": False,
-            },
-        },
-    )
+    key = {
+        "artifact": "freeze_gate_curve",
+        "schema_version": "test",
+        "tag": "law-disclosure",
+        "namespace_id": "test:law-disclosure",
+        "vapor_pressure_provider_selection": "test-vapor-provider",
+        "sulfur_side": {},
+        "model": {},
+    }
+    curve = {
+        "source": "gate_liquid_fraction:authoritative:test-vapor-provider",
+        "solidus_T_C": 1000.0,
+        "liquidus_T_C": 1300.0,
+        "path": ((1000.0, 0.0), (1300.0, 1.0)),
+        "is_liquidus_floor": False,
+    }
+    return key, {"curve": _curve_payload(curve)}
 
 
 def test_pt0_cache_hit_reregisters_without_executing(tmp_path: Path) -> None:
@@ -714,17 +714,8 @@ def test_plural_notice_key_reaches_diagnostics() -> None:
 
 
 def _tagged_curve(tag: str) -> tuple[dict, dict]:
-    key, _payload = _cache_key()
-    return (
-        {**key, "tag": tag},
-        {
-            "curve": {
-                "status": "in_range",
-                "tag": tag,
-                "is_liquidus_floor": False,
-            },
-        },
-    )
+    key, payload = _cache_key()
+    return {**key, "tag": tag}, payload
 
 
 def _key_hash(key: dict) -> str:
