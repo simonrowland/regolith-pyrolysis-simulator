@@ -6,6 +6,8 @@ import runpy
 import time
 import warnings
 
+import pytest
+
 
 def _process_cpu_seconds() -> float:
     children = resource.getrusage(resource.RUSAGE_CHILDREN)
@@ -27,6 +29,7 @@ def _measure(label, operation) -> float:
     return cpu_seconds
 
 
+@pytest.mark.timeout(0)
 def test_sc09_full_score_process_cpu_sample() -> None:
     from simulator.battery.score import load_score_context, score_store
 
