@@ -230,6 +230,30 @@ def test_mendybaev_uses_general_geometry_and_temperature_notices(
     assert all("1900 C" not in notice.reason for notice in notices)
 
 
+def test_mendybaev_langmuir_store_emits_all_96_residue_rows(
+    mendybaev_context,
+):
+    context, rows = mendybaev_context
+    residue_ids = {
+        row.observation_id
+        for row in rows.values()
+        if row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    }
+    assert len(residue_ids) == 96
+
+    residuals, _ = score_store(
+        context,
+        engines=(Engine.INTERNAL_ANALYTICAL,),
+        rail=Rail.RESIDUE_COMPOSITION,
+    )
+    mendybaev_residuals = [
+        residual for residual in residuals if residual.reference in residue_ids
+    ]
+    assert {residual.reference for residual in mendybaev_residuals} == residue_ids
+    assert len(mendybaev_residuals) == 96
+    assert all(residual.numeric is not None for residual in mendybaev_residuals)
+
+
 def test_nonunit_alpha_keeps_the_shared_extent_integrator_refusal():
     with pytest.raises(ResidueInventoryRefusal) as caught:
         integrate_knudsen_residue_inventory(
