@@ -3130,7 +3130,7 @@ def _copy_pt1_equilibrium_rows(
     require_capture_epoch_match: bool,
     key_hashes: Iterable[str] | None = None,
 ) -> dict[str, Any]:
-    """Migrate the target, then merge source rows by destination column names."""
+    """Migrate the target, then atomically merge source rows by column name."""
 
     target_path = Path(target_path).expanduser()
     target_resolved = target_path.resolve()
@@ -3144,138 +3144,148 @@ def _copy_pt1_equilibrium_rows(
             raise FileNotFoundError(f"PT-1 cache source does not exist: {source_path}")
         sources.append(source_path)
 
-    with target_store._connect() as conn:
+    selected_hashes = None if key_hashes is None else {str(item) for item in key_hashes}
+    with target_store._connect() as target_conn:
+        target_conn.execute("BEGIN IMMEDIATE")
         target_columns = tuple(
             str(row["name"])
-            for row in conn.execute(
+            for row in target_conn.execute(
                 f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
             )
         )
         original_target_rows = {
             str(row["key_hash"]): dict(row)
-            for row in conn.execute(f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}")
-        }
-    selected_hashes = None if key_hashes is None else {str(item) for item in key_hashes}
-    planned_rows = dict(original_target_rows)
-    planned_admission = {
-        key_hash: _pt1_row_admission(row)
-        for key_hash, row in original_target_rows.items()
-    }
-    changed_rows: dict[str, dict[str, Any]] = {}
-    source_summaries: list[dict[str, Any]] = []
-
-    for source_path in sources:
-        source_uri = f"{source_path.resolve().as_uri()}?mode=ro"
-        source_conn = sqlite3.connect(source_uri, uri=True)
-        source_conn.row_factory = sqlite3.Row
-        try:
-            source_columns = {
-                str(row["name"])
-                for row in source_conn.execute(
-                    f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
-                )
-            }
-            if selected_hashes is None:
-                source_rows = source_conn.execute(
-                    f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
-                ).fetchall()
-            elif not selected_hashes:
-                source_rows = []
-            else:
-                source_rows = []
-                selected_list = sorted(selected_hashes)
-                for start in range(0, len(selected_list), 900):
-                    batch = selected_list[start : start + 900]
-                    placeholders = ",".join("?" for _ in batch)
-                    source_rows.extend(
-                        source_conn.execute(
-                            f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
-                            f"WHERE key_hash IN ({placeholders})",
-                            tuple(batch),
-                        ).fetchall()
-                    )
-        finally:
-            source_conn.close()
-
-        inserted = 0
-        replaced = 0
-        for source_row in source_rows:
-            key_hash = str(source_row["key_hash"])
-            incoming_row = {
-                column: source_row[column] if column in source_columns else None
-                for column in target_columns
-            }
-            incoming_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
-            incoming_admitted = _pt1_row_admission(incoming_row)
-            existing_row = planned_rows.get(key_hash)
-            if existing_row is None:
-                planned_rows[key_hash] = incoming_row
-                planned_admission[key_hash] = incoming_admitted
-                changed_rows[key_hash] = incoming_row
-                inserted += 1
-                continue
-
-            existing_admitted = planned_admission[key_hash]
-            if existing_admitted and incoming_admitted:
-                if _pt1_cache_merge_identity(
-                    existing_row,
-                    require_capture_epoch_match=require_capture_epoch_match,
-                ) != _pt1_cache_merge_identity(
-                    incoming_row,
-                    require_capture_epoch_match=require_capture_epoch_match,
-                ):
-                    raise _PT1CacheMergeCollision(
-                        f"PT-1 cache collision while merging {key_hash}"
-                    )
-                merged_row = dict(incoming_row)
-                merged_row["repair_notices_json"] = monotonic_repair_notices_json(
-                    existing_row.get("repair_notices_json"),
-                    incoming_row.get("repair_notices_json"),
-                )
-                merged_disclosures = _prefer_law_disclosures(
-                    existing_row.get("law_disclosures_json"),
-                    incoming_row.get("law_disclosures_json"),
-                )
-                merged_row["law_disclosures_json"] = _law_disclosures_json(
-                    merged_disclosures
-                )
-                planned_rows[key_hash] = merged_row
-                planned_admission[key_hash] = True
-                if merged_row != existing_row:
-                    changed_rows[key_hash] = merged_row
-            elif existing_admitted:
-                continue
-            else:
-                planned_rows[key_hash] = incoming_row
-                planned_admission[key_hash] = incoming_admitted
-                changed_rows[key_hash] = incoming_row
-                if key_hash in original_target_rows:
-                    replaced += 1
-
-        source_summaries.append(
-            {
-                "source": str(source_path),
-                "rows": len(source_rows),
-                "inserted_rows": inserted,
-                "replaced_rows": replaced,
-            }
-        )
-
-    if changed_rows:
-        quoted_columns = ", ".join(f'"{column}"' for column in target_columns)
-        placeholders = ", ".join("?" for _ in target_columns)
-        statement = (
-            f"INSERT OR REPLACE INTO {PT1_EQUILIBRIUM_TABLE} "
-            f"({quoted_columns}) VALUES ({placeholders})"
-        )
-        with target_store._connect() as conn:
-            conn.executemany(
-                statement,
-                [
-                    tuple(row[column] for column in target_columns)
-                    for row in changed_rows.values()
-                ],
+            for row in target_conn.execute(
+                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
             )
+        }
+        planned_rows = dict(original_target_rows)
+        planned_admission = {
+            key_hash: _pt1_row_admission(row)
+            for key_hash, row in original_target_rows.items()
+        }
+        changed_rows: dict[str, dict[str, Any]] = {}
+        source_summaries: list[dict[str, Any]] = []
+
+        for source_path in sources:
+            source_uri = f"{source_path.resolve().as_uri()}?mode=ro"
+            source_conn = sqlite3.connect(source_uri, uri=True)
+            source_conn.row_factory = sqlite3.Row
+            try:
+                source_columns = {
+                    str(row["name"])
+                    for row in source_conn.execute(
+                        f"PRAGMA table_info({PT1_EQUILIBRIUM_TABLE})"
+                    )
+                }
+                if selected_hashes is None:
+                    source_rows = source_conn.execute(
+                        f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE}"
+                    ).fetchall()
+                elif not selected_hashes:
+                    source_rows = []
+                else:
+                    source_rows = []
+                    selected_list = sorted(selected_hashes)
+                    for start in range(0, len(selected_list), 900):
+                        batch = selected_list[start : start + 900]
+                        placeholders = ",".join("?" for _ in batch)
+                        source_rows.extend(
+                            source_conn.execute(
+                                f"SELECT * FROM {PT1_EQUILIBRIUM_TABLE} "
+                                f"WHERE key_hash IN ({placeholders})",
+                                tuple(batch),
+                            ).fetchall()
+                        )
+            finally:
+                source_conn.close()
+
+            inserted = 0
+            replaced = 0
+            for source_row in source_rows:
+                key_hash = str(source_row["key_hash"])
+                incoming_row = {
+                    column: source_row[column] if column in source_columns else None
+                    for column in target_columns
+                }
+                incoming_row["store_schema_version"] = PT1_STORE_SCHEMA_VERSION
+                incoming_admitted = _pt1_row_admission(incoming_row)
+                existing_row = planned_rows.get(key_hash)
+                if existing_row is None:
+                    planned_rows[key_hash] = incoming_row
+                    planned_admission[key_hash] = incoming_admitted
+                    changed_rows[key_hash] = incoming_row
+                    inserted += 1
+                    continue
+
+                existing_admitted = planned_admission[key_hash]
+                if existing_admitted and incoming_admitted:
+                    if _pt1_cache_merge_identity(
+                        existing_row,
+                        require_capture_epoch_match=require_capture_epoch_match,
+                    ) != _pt1_cache_merge_identity(
+                        incoming_row,
+                        require_capture_epoch_match=require_capture_epoch_match,
+                    ):
+                        raise _PT1CacheMergeCollision(
+                            f"PT-1 cache collision while merging {key_hash}"
+                        )
+                    merged_row = dict(incoming_row)
+                    merged_row["repair_notices_json"] = monotonic_repair_notices_json(
+                        existing_row.get("repair_notices_json"),
+                        incoming_row.get("repair_notices_json"),
+                    )
+                    merged_disclosures = _prefer_law_disclosures(
+                        existing_row.get("law_disclosures_json"),
+                        incoming_row.get("law_disclosures_json"),
+                    )
+                    merged_row["law_disclosures_json"] = _law_disclosures_json(
+                        merged_disclosures
+                    )
+                    planned_rows[key_hash] = merged_row
+                    planned_admission[key_hash] = True
+                    if merged_row != existing_row:
+                        changed_rows[key_hash] = merged_row
+                elif existing_admitted:
+                    continue
+                else:
+                    planned_rows[key_hash] = incoming_row
+                    planned_admission[key_hash] = incoming_admitted
+                    changed_rows[key_hash] = incoming_row
+                    if key_hash in original_target_rows:
+                        replaced += 1
+
+            source_summaries.append(
+                {
+                    "source": str(source_path),
+                    "rows": len(source_rows),
+                    "inserted_rows": inserted,
+                    "replaced_rows": replaced,
+                }
+            )
+
+        if changed_rows:
+            quoted_columns = ", ".join(
+                f'"{column}"' for column in target_columns
+            )
+            placeholders = ", ".join("?" for _ in target_columns)
+            insert_statement = (
+                f"INSERT INTO {PT1_EQUILIBRIUM_TABLE} "
+                f"({quoted_columns}) VALUES ({placeholders})"
+            )
+            update_assignments = ", ".join(
+                f'"{column}" = ?' for column in target_columns
+            )
+            update_statement = (
+                f"UPDATE {PT1_EQUILIBRIUM_TABLE} SET {update_assignments} "
+                'WHERE "key_hash" = ?'
+            )
+            for key_hash, row in changed_rows.items():
+                values = tuple(row[column] for column in target_columns)
+                if key_hash in original_target_rows:
+                    target_conn.execute(update_statement, (*values, key_hash))
+                else:
+                    target_conn.execute(insert_statement, values)
 
     return {
         "sources": source_summaries,

@@ -646,6 +646,7 @@ from simulator.fe_redox import (
     LiquidFeODomain,
     RedoxState,
     _non_absolute_redox_state_kwargs,
+    redox_state_cache_identity_matches,
     _reanchor_redox_state,
     calphad_ferrous_feo_activity_diagnostic,
     feot_equivalent_wt_pct,
@@ -876,6 +877,11 @@ class _MeltRedoxLiquidusFloorFallback:
     reason: str
     liquidus_status: _MeltRedoxLiquidusStatus
     verdict_identity: MAGEMinDomainIdentity | None = field(
+        default=None,
+        compare=False,
+        repr=False,
+    )
+    redox_state_identity: RedoxState | None = field(
         default=None,
         compare=False,
         repr=False,
@@ -5019,11 +5025,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
         source: str,
         reason: str,
         liquidus_status: _MeltRedoxLiquidusStatus,
+        redox_state: RedoxState | None,
     ) -> _MeltRedoxLiquidusFloorFallback:
         fallback = _MeltRedoxLiquidusFloorFallback(
             source=source,
             reason=reason,
             liquidus_status=liquidus_status,
+            redox_state_identity=redox_state,
             verdict_identity=(
                 getattr(
                     self,
@@ -5269,9 +5277,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     **redox_state_kwargs,
                 )
             if self._liquid_fraction_provider == 'magemin':
-                verdict, _ = (
-                    self._melt_redox_gate_current_pin_verdict()
-                )
+                verdict, _ = self._melt_redox_gate_current_pin_verdict()
                 if not self._melt_redox_gate_pin_verdicts_match(
                     verdict,
                     gate_authority.verdict_identity,
@@ -5279,6 +5285,13 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     return self._establish_melt_redox_gate_authority_for_current_hour(
                         **redox_state_kwargs,
                     )
+            if not redox_state_cache_identity_matches(
+                redox_state,
+                gate_authority.redox_state_identity,
+            ):
+                return self._establish_melt_redox_gate_authority_for_current_hour(
+                    **redox_state_kwargs,
+                )
             return gate_authority
         if isinstance(gate_authority, Mapping):
             pinned_authority = getattr(
@@ -5417,7 +5430,10 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                 )
             )
         else:
-            authority_is_reusable = True
+            authority_is_reusable = redox_state_cache_identity_matches(
+                redox_state,
+                pinned_authority.redox_state_identity,
+            )
         if verdict_matches and authority_is_reusable:
             return True, pinned_authority, False
 
@@ -5779,6 +5795,7 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     source=f'none:liquidus_{liquidus_status}',
                     reason=reason,
                     liquidus_status=liquidus_status,
+                    redox_state=redox_state,
                 )
 
         try:
