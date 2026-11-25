@@ -28,7 +28,7 @@ from simulator.config import load_config_bundle
 from simulator.melt_backend.base import InternalAnalyticalBackend
 from simulator.recipe_io import load_recipe_patch, read_recipe_metadata, write_recipe_patch
 from simulator.runner import PyrolysisRun, build_per_hour_summary
-from simulator.session import drive_auto_apply
+from simulator.session import SimSession, drive_auto_apply
 from simulator.state import CampaignPhase, DecisionPoint, DecisionType, EvaporationFlux
 from web.events import (
     BackendUnavailableError,
@@ -4480,6 +4480,99 @@ def test_reduced_projection_reads_recorded_flags_when_overrides_omit_them():
     assert run_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
 
 
+def test_recorded_web_projections_keep_equal_budget_flag_order():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+    execution = runner_module.RunExecutor().execute_session(session, hours=1)
+    current_budget_flag = next(
+        flag for flag in execution.run_flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    stored_flags = [current_budget_flag, "legacy notice"]
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": stored_flags},
+    })
+
+    full_payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+    reduced_payload = web_events._available_runner_payload(
+        session,
+        projector=SimpleNamespace(run_metadata_overrides={}),
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic=None,
+    )
+
+    assert full_payload["run_metadata"]["run_flags"] == stored_flags
+    assert reduced_payload["run_metadata"]["run_flags"] == stored_flags
+
+
+def test_recorded_web_projections_keep_c4_flags_without_live_history():
+    recorded_stops = [{
+        "campaign": "C4",
+        "stop_reason": "time_cap",
+        "duration_h": 67,
+        "flags": [
+            {
+                "kind": "campaign_stop",
+                "code": "campaign_time_cap_unconverged",
+                "detail": {"successor": "C2A"},
+            },
+            {
+                "kind": "campaign_stop",
+                "code": "c4_time_capped_without_na_endpoint",
+                "detail": {
+                    "residual_Na_kg": 0.125,
+                    "na_endpoint_threshold_atom_mol": 0.25,
+                },
+            },
+        ],
+    }]
+    recorded = _terminal_runner_document("ok")
+    recorded["run_metadata"]["campaign_stops"] = recorded_stops
+    session_without_live_history = SimSession()
+    session_without_live_history._set_result_document(recorded)
+
+    payload = web_events._available_runner_payload(
+        session_without_live_history,
+        projector=SimpleNamespace(run_metadata_overrides={}),
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic=None,
+    )
+    full_payload = web_events._full_runner_payload(
+        session_without_live_history,
+        projector=PyrolysisRun(feedstock_id="lunar_mare_low_ti", hours=0),
+        status="ok",
+    )
+
+    assert {
+        flag["code"]
+        for stop in payload["run_metadata"]["campaign_stops"]
+        for flag in stop["flags"]
+    } == {
+        "campaign_time_cap_unconverged",
+        "c4_time_capped_without_na_endpoint",
+    }
+    assert full_payload["run_metadata"]["campaign_stops"] == (
+        payload["run_metadata"]["campaign_stops"]
+    )
+
+
 def test_recorded_web_projection_adds_live_flag_without_recorded_metadata(
     monkeypatch,
 ):
@@ -4564,7 +4657,10 @@ def test_recorded_web_projection_drops_budget_flag_after_c6_no():
     )
     recorded_payload = run._build_output(pending_execution)
     session._set_result_document(recorded_payload)
-    assert not any(
+    assert session._result_document["run_metadata"]["run_flags"] is (
+        recorded_payload["run_metadata"]["run_flags"]
+    )
+    assert any(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in session._result_document["run_metadata"].get("run_flags", ())
     )

@@ -845,13 +845,7 @@ class SimSession:
         payload = dict(document)
         run_metadata = payload.get("run_metadata")
         if isinstance(run_metadata, Mapping):
-            run_metadata = dict(run_metadata)
-            if "run_flags" in run_metadata:
-                recorded_flags = run_metadata["run_flags"]
-                run_flags = _recorded_run_flags_without_budget(recorded_flags)
-                if run_flags is not recorded_flags:
-                    run_metadata["run_flags"] = run_flags
-            payload["run_metadata"] = run_metadata
+            payload["run_metadata"] = dict(run_metadata)
         self._result_document = payload
 
     def _require_sim(self) -> PyrolysisSimulator:
@@ -890,134 +884,130 @@ class SimSession:
         return build_per_hour_summary(sim, snapshot)
 
 
+def _merge_run_flags(
+    stored_flags: Any,
+    live_budget_flag: Mapping[str, Any] | None,
+) -> Any:
+    """Merge the derived d-473 flag without rewriting unrelated stored data."""
+
+    if not isinstance(stored_flags, list):
+        if live_budget_flag is None or stored_flags == live_budget_flag:
+            return stored_flags
+        return [stored_flags, live_budget_flag]
+
+    merged: list[Any] = []
+    saw_budget_flag = False
+    for flag in stored_flags:
+        if (
+            isinstance(flag, Mapping)
+            and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+        ):
+            if not saw_budget_flag:
+                if live_budget_flag is not None:
+                    merged.append(live_budget_flag)
+                saw_budget_flag = True
+            continue
+        merged.append(flag)
+    if not saw_budget_flag and live_budget_flag is not None:
+        merged.append(live_budget_flag)
+    if merged == stored_flags:
+        return stored_flags
+    return merged
+
+
 def _run_flags_for_export(
     session: Any,
     recorded_flags: Any = _UNSET_RUN_FLAGS,
 ) -> Any:
-    """Preserve offline records and derive the live budget flag on read."""
+    """Merge recorded run flags with the live d-473 fact at read time."""
 
     if recorded_flags is _UNSET_RUN_FLAGS:
         recorded_flags = []
-    run_flags = recorded_flags
     sim = getattr(session, "_sim", None)
     pending_decision: dict[str, Any] | None = None
     should_add_budget_flag = False
+    budget_flag: dict[str, Any] | None = None
     try:
-        if sim is None:
-            return run_flags
-        should_add_budget_flag = (
-            getattr(session, "_last_drive_stop", None) == "hour_budget"
-        )
-        if not should_add_budget_flag or sim.is_complete():
-            return _recorded_run_flags_without_budget(run_flags)
-
-        pending = session.pending_decision()
-        pending_decision = _decision_event(pending) if pending is not None else None
-        detail: dict[str, Any] = {}
-        if pending_decision is not None:
-            detail["pending_decision"] = pending_decision
-
-        campaign = sim.melt.campaign
-        campaign_name = campaign.name
-        step_results = tuple(getattr(session, "_step_results", ()))
-        last_summary = (
-            getattr(step_results[-1], "campaign_summary", None)
-            if step_results
-            else None
-        )
-        just_completed_campaign = (
-            str(last_summary.get("campaign") or "")
-            if isinstance(last_summary, Mapping)
-            else None
-        )
-        at_campaign_boundary = just_completed_campaign is not None
-
-        phases, decision_dependent = _configured_campaign_walk(
-            sim.campaign_mgr,
-            campaign,
-            sim.record,
-            live_pending_decision=pending,
-        )
-        if not at_campaign_boundary or just_completed_campaign == campaign_name:
-            phases = phases[1:]
-
-        manager = sim.campaign_mgr
-        campaign_config = manager._campaign_config(campaign)
-        campaign_overrides = manager._campaign_overrides(campaign)
-        configured_limits: dict[str, Any] = {}
-        if "max_hold_hr" in campaign_config:
-            configured_limits["setpoint_max_hold_hr"] = copy.deepcopy(
-                campaign_config["max_hold_hr"]
+        if sim is not None:
+            should_add_budget_flag = (
+                getattr(session, "_last_drive_stop", None) == "hour_budget"
             )
-        if "max_hours" in campaign_overrides:
-            configured_limits["max_hours_override"] = copy.deepcopy(
-                campaign_overrides["max_hours"]
-            )
-        configured_limits = _json_safe(configured_limits)
+            if should_add_budget_flag and not sim.is_complete():
+                pending = session.pending_decision()
+                pending_decision = (
+                    _decision_event(pending) if pending is not None else None
+                )
+                detail: dict[str, Any] = {}
+                if pending_decision is not None:
+                    detail["pending_decision"] = pending_decision
 
-        detail.update({
-            "campaign": campaign_name,
-            "hours_run_in_campaign": int(sim.melt.campaign_hour),
-            "at_campaign_boundary": at_campaign_boundary,
-            "just_completed_campaign": just_completed_campaign,
-            "successors_not_reached": [phase.name for phase in phases],
-            "configured_limits": configured_limits,
-        })
-        if decision_dependent is not None:
-            detail["decision_dependent"] = decision_dependent
-        budget_flag = {
-            "kind": "run_diagnostic",
-            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
-            "detail": detail,
-        }
+                campaign = sim.melt.campaign
+                campaign_name = campaign.name
+                step_results = tuple(getattr(session, "_step_results", ()))
+                last_summary = (
+                    getattr(step_results[-1], "campaign_summary", None)
+                    if step_results
+                    else None
+                )
+                just_completed_campaign = (
+                    str(last_summary.get("campaign") or "")
+                    if isinstance(last_summary, Mapping)
+                    else None
+                )
+                at_campaign_boundary = just_completed_campaign is not None
+
+                phases, decision_dependent = _configured_campaign_walk(
+                    sim.campaign_mgr,
+                    campaign,
+                    sim.record,
+                    live_pending_decision=pending,
+                )
+                if not at_campaign_boundary or just_completed_campaign == campaign_name:
+                    phases = phases[1:]
+
+                manager = sim.campaign_mgr
+                campaign_config = manager._campaign_config(campaign)
+                campaign_overrides = manager._campaign_overrides(campaign)
+                configured_limits: dict[str, Any] = {}
+                if "max_hold_hr" in campaign_config:
+                    configured_limits["setpoint_max_hold_hr"] = copy.deepcopy(
+                        campaign_config["max_hold_hr"]
+                    )
+                if "max_hours" in campaign_overrides:
+                    configured_limits["max_hours_override"] = copy.deepcopy(
+                        campaign_overrides["max_hours"]
+                    )
+                configured_limits = _json_safe(configured_limits)
+
+                detail.update({
+                    "campaign": campaign_name,
+                    "hours_run_in_campaign": int(sim.melt.campaign_hour),
+                    "at_campaign_boundary": at_campaign_boundary,
+                    "just_completed_campaign": just_completed_campaign,
+                    "successors_not_reached": [phase.name for phase in phases],
+                    "configured_limits": configured_limits,
+                })
+                if decision_dependent is not None:
+                    detail["decision_dependent"] = decision_dependent
+                budget_flag = {
+                    "kind": "run_diagnostic",
+                    "code": _RUN_HOUR_BUDGET_FLAG_CODE,
+                    "detail": detail,
+                }
     except Exception as exc:
-        if not should_add_budget_flag:
-            return _recorded_run_flags_without_budget(run_flags)
-        unresolved_detail: dict[str, Any] = {
-            "unresolved": True,
-            "error_type": type(exc).__name__,
-        }
-        if pending_decision is not None:
-            unresolved_detail["pending_decision"] = pending_decision
-        budget_flag = {
-            "kind": "run_diagnostic",
-            "code": _RUN_HOUR_BUDGET_FLAG_CODE,
-            "detail": unresolved_detail,
-        }
-    if isinstance(run_flags, list):
-        for index, recorded_flag in enumerate(run_flags):
-            if (
-                isinstance(recorded_flag, Mapping)
-                and recorded_flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
-            ):
-                if recorded_flag == budget_flag:
-                    return run_flags
-                updated_flags = list(run_flags)
-                updated_flags[index] = budget_flag
-                return updated_flags
-        return [*run_flags, budget_flag]
-    return [run_flags, budget_flag]
-
-
-def _recorded_run_flags_without_budget(
-    recorded_flags: Any,
-) -> Any:
-    if not isinstance(recorded_flags, list):
-        return recorded_flags
-    if not any(
-        isinstance(flag, Mapping)
-        and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
-        for flag in recorded_flags
-    ):
-        return recorded_flags
-    return [
-        flag
-        for flag in recorded_flags
-        if not (
-            isinstance(flag, Mapping)
-            and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
-        )
-    ]
+        if should_add_budget_flag:
+            unresolved_detail: dict[str, Any] = {
+                "unresolved": True,
+                "error_type": type(exc).__name__,
+            }
+            if pending_decision is not None:
+                unresolved_detail["pending_decision"] = pending_decision
+            budget_flag = {
+                "kind": "run_diagnostic",
+                "code": _RUN_HOUR_BUDGET_FLAG_CODE,
+                "detail": unresolved_detail,
+            }
+    return _merge_run_flags(recorded_flags, budget_flag)
 
 
 def _write_run_flags_to_metadata(

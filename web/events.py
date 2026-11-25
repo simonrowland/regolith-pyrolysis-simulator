@@ -2833,10 +2833,14 @@ def _full_runner_payload(
         run_metadata = payload.get('run_metadata')
         had_run_metadata = isinstance(run_metadata, Mapping)
         run_metadata = dict(run_metadata) if had_run_metadata else {}
+        recorded_campaign_stops = run_metadata.get('campaign_stops')
         _attach_execution_diagnostics(
             run_metadata,
             session=session,
-            campaign_stops=_campaign_stops_for_trace(session),
+            campaign_stops=_campaign_stops_for_trace(
+                session,
+                recorded_campaign_stops=recorded_campaign_stops,
+            ),
         )
         if had_run_metadata or run_metadata:
             payload['run_metadata'] = run_metadata
@@ -2912,31 +2916,39 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
+    recorded_document_getter = getattr(session, 'result_document', None)
+    try:
+        recorded_document = (
+            recorded_document_getter()
+            if callable(recorded_document_getter)
+            else None
+        )
+    except Exception:
+        recorded_document = None
+    recorded_metadata = (
+        recorded_document.get('run_metadata')
+        if isinstance(recorded_document, Mapping)
+        else None
+    )
     if (
         isinstance(metadata_overrides, Mapping)
         and 'run_flags' in metadata_overrides
     ):
         metadata['run_flags'] = copy.deepcopy(metadata_overrides['run_flags'])
-    else:
-        recorded_document_getter = getattr(session, 'result_document', None)
-        if callable(recorded_document_getter):
-            try:
-                recorded_document = recorded_document_getter()
-            except Exception:
-                recorded_document = None
-            recorded_metadata = (
-                recorded_document.get('run_metadata')
-                if isinstance(recorded_document, Mapping)
-                else None
-            )
-            if (
-                isinstance(recorded_metadata, Mapping)
-                and 'run_flags' in recorded_metadata
-            ):
-                metadata['run_flags'] = copy.deepcopy(
-                    recorded_metadata['run_flags']
-                )
-    campaign_stops = _campaign_stops_for_trace(session)
+    elif (
+        isinstance(recorded_metadata, Mapping)
+        and 'run_flags' in recorded_metadata
+    ):
+        metadata['run_flags'] = copy.deepcopy(recorded_metadata['run_flags'])
+    recorded_campaign_stops = (
+        recorded_metadata.get('campaign_stops')
+        if isinstance(recorded_metadata, Mapping)
+        else None
+    )
+    campaign_stops = _campaign_stops_for_trace(
+        session,
+        recorded_campaign_stops=recorded_campaign_stops,
+    )
     _attach_execution_diagnostics(
         metadata,
         session=session,

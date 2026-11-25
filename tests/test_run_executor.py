@@ -28,6 +28,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     StepResult,
+    _merge_run_flags,
     _run_flags_for_export,
     drive_auto_apply,
     drive_session,
@@ -948,11 +949,129 @@ def test_equal_budget_flag_keeps_its_recorded_position():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     current_budget_flag = _live_budget_flag(session)
     stored_flags = [current_budget_flag, "legacy notice"]
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": stored_flags},
+    })
 
-    exported_flags = _run_flags_for_export(session, stored_flags)
+    exported_flags = session.result_document()["run_metadata"]["run_flags"]
 
     assert exported_flags is stored_flags
     assert exported_flags == [current_budget_flag, "legacy notice"]
+
+
+def test_result_document_keeps_equal_non_list_budget_flag_unchanged():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    current_budget_flag = _live_budget_flag(session)
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": current_budget_flag},
+    })
+
+    exported_flags = session.result_document()["run_metadata"]["run_flags"]
+
+    assert exported_flags is current_budget_flag
+
+
+def test_result_document_collapses_stale_budget_flags_at_first_position():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    current_budget_flag = _live_budget_flag(session)
+    stale_budget_flag = {
+        **current_budget_flag,
+        "detail": {**current_budget_flag["detail"], "hours_run_in_campaign": 9},
+    }
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {
+            "run_flags": [
+                current_budget_flag,
+                "legacy",
+                stale_budget_flag,
+            ],
+        },
+    })
+
+    assert session.result_document()["run_metadata"]["run_flags"] == [
+        current_budget_flag,
+        "legacy",
+    ]
+
+
+@pytest.mark.parametrize("stored", [None, {"legacy": True}])
+def test_merge_run_flags_returns_non_list_unchanged_without_live_flag(stored):
+    merged = _merge_run_flags(stored, None)
+
+    assert merged is stored
+
+
+def test_merge_run_flags_keeps_scalar_before_live_flag():
+    live = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+    }
+
+    assert _merge_run_flags("legacy", live) == ["legacy", live]
+
+
+def test_merge_run_flags_keeps_equal_non_list_budget_value_unchanged():
+    live = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"campaign": "C2A"},
+    }
+    stored = dict(live)
+
+    assert _merge_run_flags(stored, live) is stored
+
+
+def test_merge_run_flags_returns_list_unchanged_without_budget_or_live_flag():
+    stored = ["legacy"]
+
+    assert _merge_run_flags(stored, None) is stored
+
+
+def test_merge_run_flags_appends_live_flag_when_list_has_none():
+    stored = ["legacy"]
+    live = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+    }
+
+    merged = _merge_run_flags(stored, live)
+
+    assert merged == ["legacy", live]
+    assert merged is not stored
+
+
+def test_merge_run_flags_drops_all_budget_flags_without_live_flag():
+    first = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+    }
+    stale = {**first, "detail": {"stale": True}}
+
+    assert _merge_run_flags([first, "legacy", stale], None) == ["legacy"]
+
+
+def test_merge_run_flags_collapses_budget_flags_at_first_position():
+    first = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+    }
+    stale = {**first, "detail": {"stale": True}}
+    live = {**first, "detail": {"current": True}}
+
+    assert _merge_run_flags([first, "legacy", stale], live) == [live, "legacy"]
+
+
+def test_merge_run_flags_returns_same_list_when_result_is_unchanged():
+    live = {
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+    }
+    stored = [live, "legacy"]
+
+    assert _merge_run_flags(stored, live) is stored
 
 
 @pytest.mark.parametrize("legacy_flags", [[], None])

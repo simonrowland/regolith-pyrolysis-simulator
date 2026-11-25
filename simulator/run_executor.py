@@ -172,17 +172,22 @@ def campaign_stop_record(summary: Mapping[str, Any] | None) -> dict[str, Any] | 
     return record
 
 
-def _campaign_stops_for_trace(run_execution: Any) -> tuple[dict[str, Any], ...]:
-    """Completed-step stop records stored on the ranking trace.
+def _campaign_stops_for_trace(
+    run_execution: Any,
+    *,
+    recorded_campaign_stops: Any = None,
+) -> tuple[dict[str, Any], ...]:
+    """Project stop records from live session history or its recorded artifact."""
 
-    Prefer records accumulated by one execution. A carrier that did not copy
-    them still yields the same records from its session step list. A summary
-    with no stop token is omitted. It is not stored as ``endpoint_met``.
-    """
-
-    stored = getattr(run_execution, "campaign_stops", None)
-    if not stored:
-        session = getattr(run_execution, "session", run_execution)
+    session = getattr(run_execution, "session", run_execution)
+    has_live_session = getattr(session, "_sim", None) is not None
+    if has_live_session:
+        stored = None
+    elif recorded_campaign_stops is not None:
+        stored = recorded_campaign_stops
+    else:
+        stored = getattr(run_execution, "campaign_stops", None)
+    if stored is None or (recorded_campaign_stops is None and not stored):
         stored = []
         for result in getattr(session, "_step_results", ()) or ():
             record = campaign_stop_record(getattr(result, "campaign_summary", None))
