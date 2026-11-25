@@ -8,9 +8,10 @@ absent.
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
-from contextlib import contextmanager
+from contextlib import contextmanager, nullcontext
 from contextvars import ContextVar
 from dataclasses import dataclass, field
+from enum import Enum
 from functools import lru_cache
 from importlib import metadata
 from importlib import resources
@@ -75,6 +76,79 @@ OPENIMCC_RECORDED_PIN = (
     "@66ec4a3d8fd4c0741ca2fdf9cf0569d4daec7d84"
 )
 DEFAULT_GAS_PACK_SELECTION = "default"
+
+
+class _OpenImccCacheDecision(Enum):
+    CACHE_DEFAULT_PACK = "cache_default_pack"
+    BYPASS_NON_DEFAULT_PACK = "bypass_non_default_pack"
+
+
+def _openimcc_cache_decision(
+    request: Mapping[str, Any],
+    *,
+    gas_pack: Any | None = None,
+) -> _OpenImccCacheDecision:
+    """Decide cache eligibility from every selected OpenIMCC pack."""
+
+    if not isinstance(request, Mapping):
+        return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+    if request.get("pack", DEFAULT_BACKEND_PACK_NAME) != DEFAULT_BACKEND_PACK_NAME:
+        return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+    if (
+        request.get("gas_pack_selection", DEFAULT_GAS_PACK_SELECTION)
+        != DEFAULT_GAS_PACK_SELECTION
+    ):
+        return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+    engine_settings = request.get("engine_settings")
+    if engine_settings is not None:
+        if not isinstance(engine_settings, Mapping):
+            return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+        if (
+            engine_settings.get("melt_pack", DEFAULT_BACKEND_PACK_NAME)
+            != DEFAULT_BACKEND_PACK_NAME
+        ):
+            return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+        if (
+            engine_settings.get("gas_pack", DEFAULT_GAS_PACK_SELECTION)
+            != DEFAULT_GAS_PACK_SELECTION
+        ):
+            return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+    if gas_pack is not None:
+        try:
+            from openimcc.gas import _packaged_pressure_signatures
+
+            gas_digest, oxide_digest, *_ = _packaged_pressure_signatures()
+        except Exception:
+            return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+        if (
+            getattr(gas_pack, "gas_table_digest", None) != gas_digest
+            or getattr(gas_pack, "condensate_table_digest", None) != oxide_digest
+        ):
+            return _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+    return _OpenImccCacheDecision.CACHE_DEFAULT_PACK
+
+
+def _cached_openimcc_call(
+    request: Mapping[str, Any],
+    solve: Any,
+    *,
+    gas_pack: Any | None = None,
+) -> Any:
+    """Run through the shared cache only for the packaged OpenIMCC packs."""
+
+    from simulator.engine_cache import (
+        _without_engine_cache,
+        cached_engine_call,
+    )
+
+    decision = _openimcc_cache_decision(request, gas_pack=gas_pack)
+    cache_scope = (
+        _without_engine_cache()
+        if decision is _OpenImccCacheDecision.BYPASS_NON_DEFAULT_PACK
+        else nullcontext()
+    )
+    with cache_scope:
+        return cached_engine_call("openimcc", request, solve)
 
 
 def imported_openimcc_commit() -> str | None:
@@ -1344,7 +1418,7 @@ def _evaluate_with_timeout(
     allow_out_of_envelope: bool = False,
     solve_timeout_s: float | None = None,
 ) -> OpenImccBridgeResult:
-    from simulator.engine_cache import cached_engine_call, record_engine_open
+    from simulator.engine_cache import record_engine_open
 
     record_engine_open("openimcc")
 
@@ -1372,8 +1446,7 @@ def _evaluate_with_timeout(
                 raise
             return payload
 
-    payload = cached_engine_call(
-        "openimcc",
+    payload = _cached_openimcc_call(
         request,
         (
             solve
@@ -1416,7 +1489,7 @@ def evaluate_gas(
     gas_pack_selection: str = DEFAULT_GAS_PACK_SELECTION,
 ) -> dict[str, float]:
     from openimcc import evaluate_gas as openimcc_evaluate_gas
-    from simulator.engine_cache import cached_engine_call, record_engine_open
+    from simulator.engine_cache import record_engine_open
 
     record_engine_open("openimcc")
 
@@ -1445,7 +1518,7 @@ def evaluate_gas(
                 raise
             return payload
 
-    payload = cached_engine_call("openimcc", request, solve)
+    payload = _cached_openimcc_call(request, solve, gas_pack=gas_pack)
     _reraise_cached_openimcc_refusal(payload)
     return payload
 
@@ -1460,7 +1533,7 @@ def evaluate_redox(
     redox_pack_path: str | Path | None = None,
 ) -> Any:
     import openimcc
-    from simulator.engine_cache import cached_engine_call, record_engine_open
+    from simulator.engine_cache import record_engine_open
 
     record_engine_open("openimcc")
 
@@ -1507,7 +1580,7 @@ def evaluate_redox(
                 raise
             return payload
 
-    payload = cached_engine_call("openimcc", request, solve)
+    payload = _cached_openimcc_call(request, solve)
     _reraise_cached_openimcc_refusal(payload)
     return OpenImccRedoxResult.from_hot(payload)
 

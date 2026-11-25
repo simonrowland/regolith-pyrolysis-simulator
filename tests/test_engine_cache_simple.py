@@ -758,6 +758,112 @@ def test_openimcc_chemistry_version_change_with_same_pack_name_is_a_miss(
     assert calls == 2
 
 
+def test_read_path_does_not_serve_a_row_with_stale_chemistry_metadata(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    database = tmp_path / "engine-cache.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(database))
+    monkeypatch.setitem(engine_cache.ENGINE_CHEMISTRY_VERSION, "openimcc", 2)
+    request = {"call": "metadata-mismatch"}
+
+    original_insert = engine_cache._insert_cache_row_if_absent
+
+    def insert_stale_metadata(
+        connection: sqlite3.Connection,
+        digest: bytes,
+        value: bytes,
+        engine: str,
+        chem_version: str,
+        source_box: str,
+        row_seq: int | None = None,
+        *,
+        provenance: bytes = b"",
+        species: frozenset[str] | None = None,
+    ) -> tuple[bool, bool]:
+        return original_insert(
+            connection,
+            digest,
+            value,
+            engine,
+            "1" if engine == "openimcc" else chem_version,
+            source_box,
+            row_seq,
+            provenance=provenance,
+            species=species,
+        )
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            engine_cache, "_insert_cache_row_if_absent", insert_stale_metadata
+        )
+        assert engine_cache.cached_engine_call(
+            "openimcc", request, lambda: {"answer": 1}
+        ) == {"answer": 1}
+    engine_cache._close_connections()
+    with sqlite3.connect(database) as connection:
+        row = connection.execute(
+            "SELECT chem_version FROM engine_outputs WHERE engine='openimcc'"
+        ).fetchone()
+    assert row == ("1",)
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+
+    calls = 0
+
+    def solve() -> dict[str, int]:
+        nonlocal calls
+        calls += 1
+        return {"answer": 2}
+
+    fresh = engine_cache.cached_engine_call("openimcc", request, solve)
+    assert fresh == {"answer": 2}
+    assert fresh["answer"] - 1 == 1
+    assert calls == 1
+    assert engine_cache.engine_cache_counters()["openimcc"]["hits"] == 0
+
+
+@pytest.mark.parametrize(
+    "cache_request",
+    (
+        pytest.param({"pack": "published-ext"}, id="melt-pack"),
+        pytest.param(
+            {"gas_pack_selection": "published-core"}, id="gas-pack-selection"
+        ),
+        pytest.param(
+            {"engine_settings": {"melt_pack": "published-ext"}},
+            id="opener-melt-pack",
+        ),
+        pytest.param(
+            {"engine_settings": {"gas_pack": "published-core"}},
+            id="opener-gas-pack",
+        ),
+    ),
+)
+def test_non_default_openimcc_pack_results_are_not_reused(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    cache_request: dict[str, Any],
+) -> None:
+    from simulator.melt_backend.openimcc_bridge import _cached_openimcc_call
+
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "engine-cache.sqlite"))
+    calls = 0
+
+    def solve() -> dict[str, int]:
+        nonlocal calls
+        calls += 1
+        return {"answer": calls}
+
+    assert _cached_openimcc_call(cache_request, solve) == {
+        "answer": 1
+    }
+    assert _cached_openimcc_call(cache_request, solve) == {
+        "answer": 2
+    }
+    assert calls == 2
+
+
 def test_alphamelts_parent_environment_does_not_change_adapter_request_key(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,

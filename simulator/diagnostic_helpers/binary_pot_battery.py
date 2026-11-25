@@ -4733,7 +4733,12 @@ class _IsolatedCellWorker:
         request["engine_settings"] = engine_cache_settings(
             self.engine, normalize_engine_settings(self.engine, self.engine_settings),
         )
-        result = cached_engine_call(self.engine, request, solve)
+        if self.engine == "openimcc":
+            from simulator.melt_backend.openimcc_bridge import _cached_openimcc_call
+
+            result = _cached_openimcc_call(request, solve)
+        else:
+            result = cached_engine_call(self.engine, request, solve)
         if isinstance(result, list) or (isinstance(result, Mapping) and ("refusal_cell" in result or "cell" in result)):
             result = EquilibrateCell.from_hot(result).as_payload()
         if not isinstance(result, dict):
