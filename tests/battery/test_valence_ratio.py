@@ -1725,23 +1725,30 @@ def test_valence_ratio_scores_redox_and_counts_each_engine_refusal():
         rail=Rail.REDOX,
     )
 
-    covered = _engines_covering(Quantity.VALENCE_RATIO)
+    callable_engines = tuple(
+        engine
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, Quantity.VALENCE_RATIO)
+    )
     omitted = tuple(
-        engine for engine in SCORE_ENGINE_SET if engine not in covered
+        engine for engine in SCORE_ENGINE_SET if engine not in callable_engines
     )
     assert Engine.NASA_CEA_9 in omitted
     assert Engine.CATALOG_EVALUATOR in omitted
-    assert len(residuals) == 2 * len(covered)
+    assert len(residuals) == 2 * len(callable_engines)
     assert len({residual.reference for residual in residuals}) == 2
     assert all(
         sum(residual.key.endswith(engine.value) for residual in residuals) == 2
-        for engine in covered
+        for engine in callable_engines
     )
     assert not any(
         residual.key.endswith(engine.value)
         for residual in residuals
         for engine in omitted
     )
+    assert {
+        residual.key.rsplit("::", 1)[-1] for residual in residuals
+    } == {engine.value for engine in callable_engines}
     for residual in residuals:
         assert residual.rail is Rail.REDOX
         assert residual.numeric is None
@@ -1773,18 +1780,25 @@ def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
         rail=Rail.REDOX,
     )
 
-    covered = _engines_covering(Quantity.VALENCE_RATIO)
+    callable_engines = tuple(
+        engine
+        for engine in SCORE_ENGINE_SET
+        if engine_covers_quantity(engine, Quantity.VALENCE_RATIO)
+    )
     omitted = tuple(
-        engine for engine in SCORE_ENGINE_SET if engine not in covered
+        engine for engine in SCORE_ENGINE_SET if engine not in callable_engines
     )
     assert Engine.NASA_CEA_9 in omitted
     assert Engine.CATALOG_EVALUATOR in omitted
-    assert len(residuals) == len(rows) * len(covered)
+    assert len(residuals) == len(rows) * len(callable_engines)
     assert not any(
         residual.key.endswith(engine.value)
         for residual in residuals
         for engine in omitted
     )
+    assert {
+        residual.key.rsplit("::", 1)[-1] for residual in residuals
+    } == {engine.value for engine in callable_engines}
     for residual in residuals:
         assert residual.numeric is None
         assert residual.refusal is not None
@@ -1807,14 +1821,6 @@ def test_glass_valence_rows_keep_quench_labels_on_counted_refusals():
     ]
     assert sum(row["n_candidates"] for row in redox_headline) == len(residuals)
     assert sum(row["n_refused"] for row in redox_headline) == len(residuals)
-
-
-def _engines_covering(quantity):
-    return tuple(
-        engine
-        for engine in SCORE_ENGINE_SET
-        if engine_covers_quantity(engine, quantity)
-    )
 
 
 def _valence_template(result):

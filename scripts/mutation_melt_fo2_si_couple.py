@@ -50,7 +50,6 @@ def main() -> int:
                 REGRESSION,
             ],
             cwd=ROOT,
-            env={**os.environ, "PYTHONPATH": str(ROOT)},
             text=True,
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,

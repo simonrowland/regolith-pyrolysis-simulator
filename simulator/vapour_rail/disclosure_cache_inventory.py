@@ -243,7 +243,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'lru:simulator/policy/default_policy.py:_load_policy_table': {
         "path": 'simulator/policy/default_policy.py',
-        "line": 70,
+        "line": 69,
         "kind": 'lru',
         "name": '_load_policy_table',
         "carries_disclosure": False,
@@ -915,7 +915,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_held_curve_record': {
         "path": 'simulator/core.py',
-        "line": 1512,
+        "line": 1513,
         "kind": 'store',
         "name": '_freeze_gate_held_curve_record',
         "carries_disclosure": True,
@@ -923,7 +923,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_cache': {
         "path": 'simulator/core.py',
-        "line": 1510,
+        "line": 1511,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_cache',
         "carries_disclosure": True,
@@ -931,7 +931,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:_freeze_gate_liquid_fraction_curve_memo': {
         "path": 'simulator/core.py',
-        "line": 1513,
+        "line": 1514,
         "kind": 'store',
         "name": '_freeze_gate_liquid_fraction_curve_memo',
         "carries_disclosure": True,
@@ -947,7 +947,7 @@ CACHE_SITES: dict[str, dict[str, Any]] = {
     },
     'store:simulator/core.py:rates_cache': {
         "path": 'simulator/core.py',
-        "line": 8807,
+        "line": 8843,
         "kind": 'store',
         "name": 'rates_cache',
         "carries_disclosure": False,

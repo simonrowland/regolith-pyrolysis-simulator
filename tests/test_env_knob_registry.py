@@ -22,10 +22,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
 OPERATOR_DOC = ROOT / "docs" / "configuration.md"
-# b271f's ceiling is 96 (t-1747, the YAML-cache removal, and the b265
-# cooling-path token). The pin car removes one token in
-# scripts/grid_pregrind.py and moves the process-group handoff token from
-# simulator/optimize/pool.py to simulator/engine_pool.py. 96 - 1 + 0 = 95.
+# The combined b274m census changes and pin-car process-group cleanup leave
+# 95 literal environ/getenv sites in the merged production tree.
 ENV_ACCESS_TOKEN_CEILING = 95
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
 
