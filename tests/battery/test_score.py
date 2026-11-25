@@ -20360,13 +20360,15 @@ def test_score_store_attempts_all_owned_handle_closes(
         "comparison_candidates",
         lambda _context: (reference,),
     )
-    # The scorer converts the backend's primary error to a refusal and records
-    # cleanup errors on it; this probe is about closing every owned handle.
-    score_store(
-        context,
-        engines=(Engine.VAPOROCK, Engine.THERMOENGINE),
-        include_diagnostics=False,
-    )
+    # The scorer converts the backend error to a refusal. With no active
+    # exception left at cleanup, the first close error is raised after all
+    # owned handles have been closed.
+    with pytest.raises(RuntimeError, match="close probe"):
+        score_store(
+            context,
+            engines=(Engine.VAPOROCK, Engine.THERMOENGINE),
+            include_diagnostics=False,
+        )
 
     assert len(opened) == 2
     assert all(backend.closed for backend in opened)
