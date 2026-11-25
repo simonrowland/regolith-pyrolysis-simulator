@@ -408,10 +408,10 @@ policies:
     history: []
   - id: DP-116
     condition: "Langmuir residue prediction has unprinted sample size or area"
-    formula: "Assume a sphere; derive radius from printed mass, or if mass is also unprinted use a 2 mm diameter sphere; rho from melt-density resolver or 2800 kg/m3; A/m = 3/(rho_melt*r)"
+    formula: "Read rho from melt_density_fallback_kg_m3 through the melt-density resolver (2700 kg/m3); with printed mass derive r=(3m/(4*pi*rho))^(1/3); otherwise assume a 2 mm radius; A/m = 3/(rho*r)"
     formula_owner: "simulator.battery.residue._langmuir_default_geometry"
     units: "m2/kg"
-    physical_basis: "Conventional stated geometry; with printed mass, solve the sphere volume equation for radius; otherwise use the approved 2 mm sphere."
+    physical_basis: "Conventional stated geometry at the resolver's 2700 kg/m3 melt-density fallback; with printed mass, solve the sphere volume equation for radius; otherwise use the approved 2 mm radius."
     authority: convention
     notices: [sample_mass_not_printed, exposed_area_not_printed]
     sensitivity: [0.5, 2.0]

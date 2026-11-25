@@ -142,7 +142,10 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
             )
             assert "unprinted sample size or area" in entry["condition"]
             assert "printed mass" in entry["formula"]
-            assert "2 mm diameter sphere" in entry["formula"]
+            assert "melt_density_fallback_kg_m3" in entry["formula"]
+            assert "2700 kg/m3" in entry["formula"]
+            assert "2 mm radius" in entry["formula"]
+            assert "2800" not in entry["formula"]
             assert entry["authority"] == "convention"
             assert entry["notices"] == [
                 "sample_mass_not_printed",

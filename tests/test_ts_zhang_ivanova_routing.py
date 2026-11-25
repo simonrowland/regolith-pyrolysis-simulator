@@ -14,9 +14,12 @@ from simulator.battery.residue import (
     ResidueInventoryRefusal,
     ResidueChannel,
     _hashimoto_integrate_geometry,
+    _langmuir_default_geometry,
+    _time_forward_extent_notices,
     _time_forward_thermal_segments,
     predict_mass_loss_fraction,
 )
+from simulator.material_densities import resolve_melt_density_kg_m3
 from simulator.battery.score import ScoreContext, score_store
 
 
@@ -120,6 +123,34 @@ def test_zhang_zero_time_path_applies_the_printed_hold_only_at_1200c() -> None:
     assert not any(seconds >= 300.0 for _at_K, seconds in path_1400)
     assert round(path_1400[-1][0] - 273.15, 6) == 1400.0
     assert path_1400[-1][1] == 0.0
+
+
+def test_dp116_notice_uses_the_melt_density_fallback_owner() -> None:
+    density_kg_m3, _density_source = resolve_melt_density_kg_m3(None)
+    geometry = _langmuir_default_geometry()
+    assert density_kg_m3 == 2700.0
+    assert geometry["density_kg_m3"] == density_kg_m3
+    assert geometry["area_to_mass_m2_per_kg"] == pytest.approx(
+        3.0 / (density_kg_m3 * 0.002)
+    )
+
+    notices = _time_forward_extent_notices(
+        "ivanova-2018-spinel-rich-cai-evaporation",
+        (),
+        {"DP-116": json.dumps(geometry)},
+        Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        "test-dp116-density",
+    )
+    geometry_notices = [
+        notice for notice in notices
+        if notice.policy is not None and notice.policy.id == "DP-116"
+    ]
+    assert {notice.reason.split(":", 1)[0] for notice in geometry_notices} == {
+        "sample_mass_not_printed",
+        "exposed_area_not_printed",
+    }
+    assert all("2700 kg/m³" in notice.reason for notice in geometry_notices)
+    assert all("2 mm radius" in notice.reason for notice in geometry_notices)
 
 
 def test_zhang_area_endpoints_use_linear_time_interpolation() -> None:

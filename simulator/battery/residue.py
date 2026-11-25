@@ -2153,19 +2153,16 @@ def _sphere_area_m2(radius_m: float) -> float:
 def _langmuir_default_geometry(
     sample_mass_kg: float | None = None,
 ) -> dict[str, float | str | tuple[str, ...]]:
-    """Resolve DP-116 sphere geometry from printed mass or a 2 mm default."""
-    try:
-        from simulator.material_densities import resolve_melt_density_kg_m3
-    except ImportError:
-        density_kg_m3, density_source = 2_800.0, "DP-116 fallback"
-    else:
-        density_kg_m3, density_source = resolve_melt_density_kg_m3(None)
+    """Resolve DP-116 sphere geometry from printed mass or a 2 mm radius."""
+    from simulator.material_densities import resolve_melt_density_kg_m3
+
+    density_kg_m3, density_source = resolve_melt_density_kg_m3(None)
     missing_inputs: list[str] = ["exposed_area_not_printed"]
     if sample_mass_kg is None:
-        radius_m = 0.001
-        # For an unprinted mass and size, DP-116 uses a 2 mm sphere. For a
+        radius_m = 0.002
+        # For an unprinted mass and size, DP-116 uses a 2 mm radius. For a
         # sphere, m=(4/3)πr³ρ [kg] and A=4πr² [m²], hence A/m=3/(ρr).
-        # With r=1 mm and the resolved 2700 kg/m³ density, A/m is 1.111111...
+        # With r=2 mm and the resolver's 2700 kg/m³ fallback, A/m is 0.555556.
         sample_mass_kg = (4.0 / 3.0) * math.pi * radius_m**3 * density_kg_m3
         area_m2 = _sphere_area_m2(radius_m)
         missing_inputs.insert(0, "sample_mass_not_printed")
@@ -2223,6 +2220,11 @@ def _time_forward_extent_notices(
         resolved = resolve_default_policy(
             "DP-116", formula_result=geometry["area_to_mass_m2_per_kg"]
         )
+        density = float(geometry["density_kg_m3"])
+        size_rule = (
+            "an unprinted mass uses a 2 mm radius; a printed mass determines "
+            "radius from sphere volume"
+        )
         for reason in geometry["missing_inputs"]:
             notices.append(
                 Notice(
@@ -2230,7 +2232,8 @@ def _time_forward_extent_notices(
                     affected_quantities=(quantity,),
                     reason=(
                         f"{reason}: DP-116 uses spherical geometry and "
-                        "the repository melt-density resolver."
+                        "melt_density_fallback_kg_m3 = "
+                        f"{density:g} kg/m³; {size_rule}."
                     ),
                     origin=origin,
                     authority=Authority.CONVENTION,
