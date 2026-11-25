@@ -121,8 +121,8 @@ SCENARIO_FLUX_LEDGER_PINS = {
         # 9666fc129 plus the de32c69ca runner regen). The runner regen script
         # does not update these pins. Lunar full runs diverge between the
         # laptop and studio-3, so these digests are not a laptop re-run.
-        "flux_maps_sha256": "993481553b6d3b40ec02e96b71d2dab6da00fbfcefee6b941ad9317be3351b48",
-        "ledger_sha256": "cda1eea40d9d4db96977292d92cba28ca03885abd17616fd5a573d06d249f394",
+        "flux_maps_sha256": "518f88459675251c630ad0bdb2160f59d42cd5408835a3f4a85195315feeaf0a",
+        "ledger_sha256": "ed165fc22a3450c78f471dbc424601b5cc93023545b1304f20686924e085da2f",
     },
     "mars_basalt_C2A_12h": {
         # d137p: ledger_sha256 is the studio-3 actual (pins2 log, tree
@@ -830,11 +830,18 @@ def test_per_hour_alkali_series_separate_cumulative_condensate_from_live_product
 
     assert rows[8]["product_ledger_kg_at_hour"] == rows[8]["metal_yields_kg"]
     # d-137 splits the old 350 C Stage 4 into a 250 C Na/Mg collector and a
-    # 40 C K trap. Preserve a06a92246's absolute live-product pin across
-    # the replay; the per-row identities independently verify separation
+    # 40 C K trap; the per-row identities independently verify separation
     # of cumulative condensate, reagent transfers, and live product.
+    # Absolute pin re-derived on b274 (d7ae29ab3b, two independent studio
+    # passes byte-identical): Na 1.83319525042925e-3 + K 9.951519585373801e-5.
+    # It moved x2.51 from the old 7.693708697396846e-4 because melt fO2 is now
+    # the d-463 ledger value (Kress inverse of q) rather than the pre-ledger
+    # tangent: hour 7 publishes -9.44, and Na p_eq scales as fO2^(-1/4)
+    # (Na2O(melt) -> 2 Na(g) + 1/2 O2), so a melt held reduced over hours 1-8
+    # evaporates more Na. Hour 8 (1750 C) then publishes -5.90 after the
+    # d-469 precipitation root (h8ceil). Expected to move again with d-472.
     assert alkali_total(rows[7], "product_ledger_kg_at_hour") == pytest.approx(
-        7.693708697396846e-4, rel=1e-12, abs=1e-15
+        1.932710446282988e-3, rel=1e-12, abs=1e-15
     )
     assert alkali_total(rows[8], "product_ledger_kg_at_hour") == 0.0
     for key in (
