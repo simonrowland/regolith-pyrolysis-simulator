@@ -1866,13 +1866,42 @@ def test_declared_experiment_method_conflicts_split_and_reject_legacy_sharing(
         row.experiment_id for row in shared_method_rows
     )
 
-    shared_experiment_id = next(
+    experiment_ids = {
+        row.experiment_id for row in (*row_method_rows, *shared_method_rows)
+    }
+    staying = {
         experiment_id
-        for experiment_id in {
-            row.experiment_id for row in (*row_method_rows, *shared_method_rows)
-        }
+        for experiment_id in experiment_ids
         if "::declared:" not in experiment_id
-    )
+    }
+    if filename == "mysen-1985-cmas-redox.yaml":
+        # The registry experiment declares no method. Every typed row method
+        # is split onto its own declared-method id, so neither group keeps
+        # the bare experiment id (the pre-37ad375 "first method stays" shape).
+        assert not staying
+        declared_ids = set()
+        for experiment_id in experiment_ids:
+            marker = "::declared:"
+            start = experiment_id.index(marker) + len(marker)
+            end = experiment_id.index("::method:", start)
+            declared_ids.add(experiment_id[start:end])
+        assert len(declared_ids) == 1
+        shared_experiment_id = next(iter(declared_ids))
+        assert shared_experiment_id.endswith(
+            "::experiment::mysen_1985_table1_method_comparison_samples"
+        )
+        assert {row.experiment_id for row in row_method_rows} == {
+            experiment_id
+            for experiment_id in experiment_ids
+            if experiment_id.endswith(f"::method:{row_method.value}")
+        }
+        assert {row.experiment_id for row in shared_method_rows} == {
+            experiment_id
+            for experiment_id in experiment_ids
+            if experiment_id.endswith(f"::method:{shared_method.value}")
+        }
+    else:
+        shared_experiment_id = next(iter(staying))
     original = Migrator._experiment_id
 
     def legacy_shared_experiment(
