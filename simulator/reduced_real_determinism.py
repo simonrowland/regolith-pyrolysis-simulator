@@ -324,11 +324,11 @@ def _decode_payload_for_admission(
         certified_band = value["certified_band"]
         if not isinstance(certified_band, Mapping):
             return False
-        projection_band = value.get("projection_certified_band")
-        if projection_band is None:
+        if "projection_certified_band" not in value:
             if not valid_projection_band(certified_band):
                 return False
         else:
+            projection_band = value["projection_certified_band"]
             if not valid_projection_band(projection_band):
                 return False
             if any(
@@ -621,6 +621,16 @@ def _decode_payload_for_admission(
                 return False
 
         for diagnostic in provenance_diagnostics:
+            backend_pressures = diagnostic.get("backend_vapor_pressures_Pa")
+            if "backend_vapor_pressures_Pa" in diagnostic and (
+                not isinstance(backend_pressures, Mapping)
+                or any(
+                    not is_finite_number(pressure)
+                    for pressure in backend_pressures.values()
+                )
+            ):
+                return None
+            # Evaporation's shadow comparison refuses non-finite entries.
             activities = diagnostic.get("activities")
             if "activities" in diagnostic and (
                 not isinstance(activities, Mapping)
