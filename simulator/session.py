@@ -1030,19 +1030,20 @@ def _configured_campaign_walk(
     campaign: CampaignPhase,
     record: Any,
     *,
-    c5_enabled: bool,
-) -> tuple[CampaignPhase, ...]:
+    decision_c5_enabled: bool,
+    first_decision: DecisionPoint | None = None,
+) -> tuple[tuple[CampaignPhase, ...], dict[str, Any] | None]:
     """Walk configured AUTO_APPLY successors without touching live state."""
 
     manager = copy.deepcopy(campaign_manager)
-    manager.c5_enabled = c5_enabled
     walk_record = copy.deepcopy(record)
     phases: list[CampaignPhase] = []
+    decision_dependent_successor: dict[str, Any] | None = None
     seen: set[tuple[CampaignPhase, str, str, str]] = set()
     current: CampaignPhase | None = campaign
     for _ in range(len(CampaignPhase) * 2):
         if current is None or current is CampaignPhase.COMPLETE:
-            return tuple(phases)
+            return tuple(phases), decision_dependent_successor
         route_state = (
             current,
             str(walk_record.track),
@@ -1057,27 +1058,41 @@ def _configured_campaign_walk(
         phases.append(current)
         next_campaign = manager.get_next_campaign(current, walk_record)
         if next_campaign is None:
-            decision = manager.get_decision(current, walk_record)
+            uses_first_decision = current == campaign and first_decision is not None
+            decision = (
+                first_decision
+                if uses_first_decision
+                else manager.get_decision(current, walk_record)
+            )
             choice = decision.recommendation or (
                 decision.options[0] if decision.options else ""
             )
             next_campaign, updates, complete = decision_successor(
                 decision.decision_type,
                 choice,
-                c5_enabled=c5_enabled,
+                c5_enabled=decision_c5_enabled,
             )
+            if uses_first_decision:
+                decision_dependent_successor = {
+                    "kind": "decision_dependent",
+                    "decision_type": decision.decision_type.name,
+                    "recommendation": choice,
+                    "successor": (
+                        next_campaign.name if next_campaign is not None else None
+                    ),
+                }
             for field_name, field_value in updates.items():
                 setattr(walk_record, field_name, field_value)
             if complete or next_campaign is None:
                 break
         if next_campaign is CampaignPhase.COMPLETE:
-            return tuple(phases)
+            return tuple(phases), decision_dependent_successor
         current = next_campaign
     if current is not None and current is not CampaignPhase.COMPLETE:
         raise _ConfiguredCampaignWalkCycle(
             "configured campaign walk exceeded its phase bound"
         )
-    return tuple(phases)
+    return tuple(phases), decision_dependent_successor
 
 
 def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
@@ -1109,11 +1124,12 @@ def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
         )
         at_campaign_boundary = just_completed_campaign is not None
 
-        phases = _configured_campaign_walk(
+        phases, decision_dependent_successor = _configured_campaign_walk(
             sim.campaign_mgr,
             campaign,
             sim.record,
-            c5_enabled=bool(sim.melt.c5_enabled),
+            decision_c5_enabled=bool(sim.melt.c5_enabled),
+            first_decision=pending,
         )
         if not at_campaign_boundary or just_completed_campaign == campaign_name:
             phases = phases[1:]
@@ -1139,6 +1155,10 @@ def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
             "successors_not_reached": [phase.name for phase in phases],
             "configured_limits": configured_limits,
         })
+        if decision_dependent_successor is not None:
+            detail["decision_dependent_successor"] = (
+                decision_dependent_successor
+            )
         return {
             "kind": "run_diagnostic",
             "code": "run_hour_budget_exhausted_mid_campaign",

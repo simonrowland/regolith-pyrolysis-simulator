@@ -16532,17 +16532,22 @@ class PyrolysisSimulator(EquilibriumMixin, EvaporationMixin, ExtractionMixin):
                     if next_campaign is not None
                     else None
                 )
+                stop_flag_detail = {
+                    'campaign': finishing_campaign,
+                    'stop_detail': self._last_campaign_summary.get(
+                        'stop_detail'
+                    ),
+                    'successor': successor,
+                    'ruling': 'd-471',
+                }
+                if pending_decision is not None:
+                    stop_flag_detail['pending_decision'] = (
+                        pending_decision.decision_type.name
+                    )
                 flags: list[dict[str, object]] = [{
                     'kind': 'campaign_stop',
                     'code': 'campaign_time_cap_unconverged',
-                    'detail': {
-                        'campaign': finishing_campaign,
-                        'stop_detail': self._last_campaign_summary.get(
-                            'stop_detail'
-                        ),
-                        'successor': successor,
-                        'ruling': 'd-471',
-                    },
+                    'detail': stop_flag_detail,
                 }]
                 if finishing_campaign == CampaignPhase.C4.name:
                     termination = self._last_campaign_summary.get(

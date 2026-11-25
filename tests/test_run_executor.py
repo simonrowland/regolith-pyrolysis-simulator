@@ -513,6 +513,28 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
     assert artifact["terminal"]["run_metadata"]["campaign_stops"]
 
 
+def test_campaign_time_cap_flag_identifies_pending_successor_decision():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A"]["max_hold_hr"] = 1
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert sim.pending_decision is not None
+    assert sim.pending_decision.decision_type is DecisionType.C6_PROCEED
+    stop = next(
+        stop for stop in execution.campaign_stops if stop["campaign"] == "C2A"
+    )
+    cap_flag = next(
+        flag for flag in stop["flags"]
+        if flag["code"] == "campaign_time_cap_unconverged"
+    )
+    assert cap_flag["detail"]["successor"] is None
+    assert cap_flag["detail"]["pending_decision"] == "C6_PROCEED"
+
+
 def test_budget_flag_uses_live_campaign_adjustment():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     session.adjust(
@@ -549,6 +571,56 @@ def test_hour_budget_flag_keeps_repeated_configured_successors():
     assert successors.count("C2A") == 1
     assert successors[-1] == "C6"
     assert execution.status == "ok"
+
+
+def test_hour_budget_flag_follows_live_manager_c5_route_exactly():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session.simulator.record.path = "A"
+    session.simulator.record.branch = "two"
+    session.simulator.campaign_mgr.c5_enabled = True
+    session.simulator.melt.c5_enabled = False
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    assert flag["detail"]["successors_not_reached"] == [
+        "C3_K",
+        "C3_NA",
+        "C4",
+        "C5",
+        "C6",
+    ]
+
+
+@pytest.mark.parametrize(
+    ("recommendation", "successors", "expected_successor"),
+    [("yes", ["C6"], "C6"), ("no", [], None)],
+)
+def test_hour_budget_flag_uses_live_pending_decision_route(
+    recommendation, successors, expected_successor
+):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.pending_decision = SimpleNamespace(
+        decision_type=DecisionType.C6_PROCEED,
+        options=("yes", "no"),
+        recommendation=recommendation,
+        context="live C6 recommendation",
+    )
+    sim.paused_for_decision = True
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    detail = flag["detail"]
+    assert detail["pending_decision"]["recommendation"] == recommendation
+    assert detail["successors_not_reached"] == successors
+    assert detail["decision_dependent_successor"] == {
+        "kind": "decision_dependent",
+        "decision_type": "C6_PROCEED",
+        "recommendation": recommendation,
+        "successor": expected_successor,
+    }
 
 
 def test_terminal_campaign_completion_does_not_emit_hour_budget_flag():
