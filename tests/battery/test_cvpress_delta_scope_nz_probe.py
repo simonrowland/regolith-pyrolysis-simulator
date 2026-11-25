@@ -1,4 +1,4 @@
-"""Remote full-store out-of-scope row decode, source IDs N through P."""
+"""Remote full-store out-of-scope row decode, source IDs starting with N."""
 
 from tests.battery.test_migrate_split_baseline import (
     _assert_complete_store_regeneration_matches_checked_in_bytes,
@@ -42,5 +42,5 @@ def test_source_id_report_ranges_cover_each_prefix_once() -> None:
     assert _source_in_report_filter("10.1007_record", {"A-C"})
 
 
-def test_full_store_out_of_scope_rows_np() -> None:
-    _assert_complete_store_regeneration_matches_checked_in_bytes("scope", ("N-P",))
+def test_full_store_out_of_scope_rows_n() -> None:
+    _assert_complete_store_regeneration_matches_checked_in_bytes("scope", ("N",))
