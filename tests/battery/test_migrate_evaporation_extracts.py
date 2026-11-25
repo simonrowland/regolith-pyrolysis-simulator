@@ -24,6 +24,8 @@ HASHIMOTO_SID = "kems-015-hashimoto-1983"
 HASHIMOTO_EXTRACT = f"{HASHIMOTO_SID}.yaml"
 RICHTER07_SID = "kems-010-richter-2007"
 RICHTER07_EXTRACT = f"{RICHTER07_SID}.yaml"
+RICHTER11_SID = "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation"
+RICHTER11_EXTRACT = f"{RICHTER11_SID}.yaml"
 ROOT = Path(__file__).resolve().parents[2]
 TABLE2_RUNS = {
     "sossi-2019-run-2m-16-07-16e": Decimal("848.9"),
@@ -430,6 +432,39 @@ def _assert_richter07_pins(result) -> None:
 def test_richter07_table1_mass_loss_and_context_keep_conditions(tmp_path: Path) -> None:
     result = _migrate_real_extract(tmp_path, RICHTER07_EXTRACT)
     _assert_richter07_pins(result)
+
+
+def test_richter11_residue_rows_migrate_temperature_and_time_conditions(
+    tmp_path: Path,
+) -> None:
+    result = _migrate_real_extract(tmp_path, RICHTER11_EXTRACT)
+    residues = [
+        row
+        for row in result.observations.values()
+        if row.source_id == RICHTER11_SID
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    assert residues
+    for row in residues:
+        assert row.value.kind is ValueKind.POINT
+        temperature = row.point_conditions.get("temperature_K")
+        assert temperature is not None
+        assert temperature.locator is not None
+        identity_temperature = row.identity.temperature_K
+        if identity_temperature is not None and identity_temperature.is_value:
+            assert temperature.state.is_value
+            assert temperature.state.value == identity_temperature.value
+        else:
+            assert temperature.state.is_unknown
+
+        run_time = row.point_conditions.get("time_min")
+        assert run_time is not None
+        assert run_time.locator is not None
+        assert all(
+            condition.locator is not None
+            for condition in row.point_conditions.values()
+        )
 
 
 def test_richter02_type_b_melt_phase_is_canonical(tmp_path: Path) -> None:
