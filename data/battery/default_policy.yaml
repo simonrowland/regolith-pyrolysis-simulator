@@ -408,21 +408,21 @@ policies:
     history: []
   - id: DP-116
     condition: "Langmuir residue prediction has unprinted sample size or area"
-    formula: "Read rho from melt_density_fallback_kg_m3 through the melt-density resolver (2700 kg/m3); with printed mass derive r=(3m/(4*pi*rho))^(1/3); otherwise assume a 2 mm radius; A/m = 3/(rho*r)"
+    formula: "Read rho from melt_density_fallback_kg_m3 through the melt-density resolver (2700 kg/m3); with printed mass derive r=(3m/(4*pi*rho))^(1/3); otherwise assume a 2 mm diameter sphere (1 mm radius); A/m = 3/(rho*r)"
     formula_owner: "simulator.battery.residue._langmuir_default_geometry"
     units: "m2/kg"
-    physical_basis: "Conventional stated geometry at the resolver's 2700 kg/m3 melt-density fallback; with printed mass, solve the sphere volume equation for radius; otherwise use the approved 2 mm radius."
+    physical_basis: "Conventional stated geometry at the resolver's 2700 kg/m3 melt-density fallback; with printed mass, solve the sphere volume equation for radius; otherwise use the approved 2 mm diameter sphere (1 mm radius)."
     authority: convention
     notices: [sample_mass_not_printed, exposed_area_not_printed]
     sensitivity: [0.5, 2.0]
-    bias: "The default diameter controls the predicted extent; the declared x0.5 and x2 A/m sensitivity exposes its effect."
+    bias: "The default 2 mm sphere diameter controls the predicted extent; the declared x0.5 and x2 A/m sensitivity exposes its effect."
     flag: knob_defaulted
     ruling: "w1125tszi2 controller ruling, 2026-11-25"
     version: 1
     status: proposed
     proposed_by: w1125tszi2
     proposed_at: "2026-11-25"
-    evidence: "Ivanova 2018 pp. 1-2: no sample mass, bead/droplet/loop dimension, or sample size printed; 2 mm sphere approved by controller."
+    evidence: "Ivanova 2018 pp. 1-2: no sample mass, bead/droplet/loop dimension, or sample size printed; 2 mm diameter sphere approved by controller."
     canonized_by: null
     canonized_at: null
     history: []

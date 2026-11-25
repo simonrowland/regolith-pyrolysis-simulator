@@ -258,7 +258,7 @@ def test_dp116_notice_uses_the_melt_density_fallback_owner() -> None:
     assert density_kg_m3 == 2700.0
     assert geometry["density_kg_m3"] == density_kg_m3
     assert geometry["area_to_mass_m2_per_kg"] == pytest.approx(
-        3.0 / (density_kg_m3 * 0.002)
+        1.111111, rel=0.0, abs=1.12e-7
     )
 
     notices = _time_forward_extent_notices(
@@ -277,7 +277,8 @@ def test_dp116_notice_uses_the_melt_density_fallback_owner() -> None:
         "exposed_area_not_printed",
     }
     assert all("2700 kg/m³" in notice.reason for notice in geometry_notices)
-    assert all("2 mm radius" in notice.reason for notice in geometry_notices)
+    assert all("2 mm diameter sphere" in notice.reason for notice in geometry_notices)
+    assert all("1 mm radius" in notice.reason for notice in geometry_notices)
 
 
 def test_zhang_area_endpoints_use_linear_time_interpolation() -> None:

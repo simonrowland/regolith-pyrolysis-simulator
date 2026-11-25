@@ -144,7 +144,10 @@ def test_every_entry_loads_with_closed_flags_and_trace_fields() -> None:
             assert "printed mass" in entry["formula"]
             assert "melt_density_fallback_kg_m3" in entry["formula"]
             assert "2700 kg/m3" in entry["formula"]
-            assert "2 mm radius" in entry["formula"]
+            assert "2 mm diameter sphere (1 mm radius)" in entry["formula"]
+            assert "2 mm diameter sphere (1 mm radius)" in entry["physical_basis"]
+            assert "2 mm diameter sphere" in entry["evidence"]
+            assert "2 mm sphere diameter" in entry["bias"]
             assert "2800" not in entry["formula"]
             assert entry["authority"] == "convention"
             assert entry["notices"] == [
