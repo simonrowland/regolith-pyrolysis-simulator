@@ -903,13 +903,16 @@ def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
             ResidueChannel("O2", "O2", None, 1.0, "regression"),
         )
     )
+    pressure_at = _preserve_pressure_contract(
+        pressure_model, lambda logp: pressure_model({"FeO": 1.0}, logp),
+    )
 
     def check_result(source: str):
         activity_source[0] = source
         return _residue_oxygen_balance(
             terms,
             {"FeO": 1.0},
-            lambda logp: pressure_model({"FeO": 1.0}, logp),
+            pressure_at,
             1905.15,
         )
 

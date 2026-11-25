@@ -459,11 +459,12 @@ def _solve_vacuum_oxygen_balance(
                 "corrected_fixed_parent_activity_slope": corrected_slope,
                 "parent_activity_reported": parent_activity_reported,
             }
-            # d-474 corrects the slope when this vapour path reports the
-            # parent activity it used. Without that value, fixed or undeclared
-            # laws keep b274's raw hard check; for non-fixed redox laws, b274's
-            # Kress slope lives only inside P, so diagnose and flag it instead
-            # of treating that slope as a stoichiometric exponent failure.
+            # d-474 applies its hard fixed-activity check whenever the vapour
+            # path reports the activity it used. Without that value, fixed or
+            # undeclared laws keep b274's raw hard check. For non-fixed redox
+            # laws, retain b274's diagnostic: when no activity is reported,
+            # the Kress slope lives only inside P and must be flagged instead
+            # of treated as a stoichiometric exponent failure.
             if parent_activity_reported:
                 if abs(corrected_slope - channel.pO2_exponent) > 1.0e-6:
                     raise PressureLawExponentMismatch(
@@ -479,7 +480,7 @@ def _solve_vacuum_oxygen_balance(
                         f"declared {channel.pO2_exponent}, "
                         f"observed {raw_total_slope}"
                     )
-            else:
+            if redox_active and not fixed_activities:
                 expected_exponent = channel.pO2_exponent
                 if channel.oxygen_per_metal_atom is not None and root_q is not None:
                     from simulator.fe_redox import KRESS91_LN_FO2_COEFFICIENT
