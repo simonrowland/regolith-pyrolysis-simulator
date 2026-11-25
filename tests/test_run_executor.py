@@ -661,6 +661,40 @@ def test_terminal_campaign_completion_does_not_emit_hour_budget_flag():
     )
 
 
+def test_resumed_terminal_execution_does_not_export_prior_budget_flag():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C7_CA_ALUMINOTHERMIC",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C7": {"max_hours": 2}},
+    )
+    session = _started_internal_session(run)
+
+    truncated_execution = RunExecutor().execute_session(session, hours=1)
+    assert not session.is_complete()
+    assert any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in truncated_execution.run_flags
+    )
+
+    completed_execution = RunExecutor().execute_session(session, hours=1)
+
+    assert session.is_complete()
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in completed_execution.run_flags
+    )
+    artifact = build_run_artifact(
+        run._build_output(completed_execution),
+        run_id="resumed-terminal-run",
+    )
+    assert not any(
+        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+        for flag in artifact["terminal"]["run_metadata"].get("run_flags", ())
+    )
+
+
 def test_budget_flag_records_pending_decision_before_chain_lookahead(monkeypatch):
     session = _started_internal_session(_run(campaign="C0", hours=1))
     calls = []
@@ -683,14 +717,31 @@ def test_budget_flag_records_pending_decision_before_chain_lookahead(monkeypatch
         calls.append("chain_walk")
         return real_walk(*args, **kwargs)
 
+    lookup_calls = []
+
+    def would_return_c0b(current, _record):
+        lookup_calls.append(current)
+        return CampaignPhase.C0B
+
     monkeypatch.setattr(session, "pending_decision", pending_decision)
     monkeypatch.setattr(session_module, "_configured_campaign_walk", checked_walk)
+    monkeypatch.setattr(
+        session.simulator.campaign_mgr,
+        "get_next_campaign",
+        would_return_c0b,
+    )
     record_path = session.simulator.record.path
 
     flag = _hour_budget_exhausted_flag(session)
 
     assert calls[:2] == ["pending_decision", "chain_walk"]
     assert flag["detail"]["pending_decision"]["type"] == "PATH_AB"
+    assert lookup_calls == []
+    assert flag["detail"]["successors_not_reached"] == []
+    assert flag["detail"]["decision_dependent"] == {
+        "decision_type": "PATH_AB",
+        "recommendation": "A_staged",
+    }
     assert session.simulator.record.path == record_path
 
 

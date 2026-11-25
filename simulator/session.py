@@ -1034,6 +1034,12 @@ def _configured_campaign_walk(
 ) -> tuple[tuple[CampaignPhase, ...], dict[str, Any] | None]:
     """Walk deterministic successors up to the first decision point."""
 
+    if live_pending_decision is not None:
+        return (), {
+            "decision_type": live_pending_decision.decision_type.name,
+            "recommendation": live_pending_decision.recommendation,
+        }
+
     manager = copy.deepcopy(campaign_manager)
     walk_record = copy.deepcopy(record)
     phases: list[CampaignPhase] = []
@@ -1057,18 +1063,10 @@ def _configured_campaign_walk(
         phases.append(current)
         next_campaign = manager.get_next_campaign(current, walk_record)
         if next_campaign is None:
-            decision = (
-                live_pending_decision
-                if current == campaign and live_pending_decision is not None
-                else manager.get_decision(current, walk_record)
-            )
+            decision = manager.get_decision(current, walk_record)
             decision_dependent = {
                 "decision_type": decision.decision_type.name,
             }
-            if current == campaign and live_pending_decision is not None:
-                decision_dependent["recommendation"] = (
-                    live_pending_decision.recommendation
-                )
             return tuple(phases), decision_dependent
         if next_campaign is CampaignPhase.COMPLETE:
             return tuple(phases), decision_dependent

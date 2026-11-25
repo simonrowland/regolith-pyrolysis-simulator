@@ -4336,12 +4336,12 @@ def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
     run_flag = {
         "kind": "run_diagnostic",
         "code": "already_recorded_run_flag",
-        "detail": {"source": "session record"},
+        "detail": {"source": "session record", "value": float("nan")},
     }
     campaign_flag = {
         "kind": "campaign_stop",
         "code": "already_recorded_campaign_flag",
-        "detail": {"campaign": "C0"},
+        "detail": {"campaign": "C0", "value": float("inf")},
     }
     session._run_flags.append(run_flag)
     session._step_results.append(SimpleNamespace(
@@ -4365,8 +4365,26 @@ def test_web_artifact_projection_preserves_existing_run_and_campaign_flags():
     )
 
     metadata = artifact["terminal"]["run_metadata"]
-    assert metadata["run_flags"] == [run_flag]
-    assert metadata["campaign_stops"][0]["flags"] == [campaign_flag]
+    assert metadata["run_flags"] == [{
+        **run_flag,
+        "detail": {"source": "session record", "value": None},
+    }]
+    assert metadata["campaign_stops"][0]["flags"] == [{
+        **campaign_flag,
+        "detail": {"campaign": "C0", "value": None},
+    }]
+
+    fallback_payload = web_events._available_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic=None,
+    )
+    fallback_metadata = fallback_payload["run_metadata"]
+    assert fallback_metadata["run_flags"] == metadata["run_flags"]
+    assert fallback_metadata["campaign_stops"] == metadata["campaign_stops"]
 
 
 def test_real_web_session_failure_persists_non_sparse_terminal(tmp_path, monkeypatch):

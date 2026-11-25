@@ -40,7 +40,7 @@ import weakref
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Iterable, Mapping, Optional
+from typing import Any, Iterable, Mapping, Optional, Sequence
 
 import yaml
 
@@ -5877,14 +5877,18 @@ def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
 
 def _attach_execution_diagnostics(
     run_metadata: dict[str, Any],
-    execution: RunExecution | None,
+    execution: RunExecution | None = None,
+    *,
+    run_flags: Sequence[Mapping[str, Any]] | None = None,
+    campaign_stops: Sequence[Mapping[str, Any]] | None = None,
 ) -> None:
-    if execution is None:
-        return
-    run_flags = list(getattr(execution, "run_flags", ()) or ())
+    if execution is not None:
+        run_flags = getattr(execution, "run_flags", ())
+        campaign_stops = getattr(execution, "campaign_stops", ())
+    run_flags = list(run_flags or ())
     if run_flags:
         run_metadata["run_flags"] = _json_safe(run_flags)
-    campaign_stops = list(getattr(execution, "campaign_stops", ()) or ())
+    campaign_stops = list(campaign_stops or ())
     if any(
         isinstance(stop, Mapping) and stop.get("flags")
         for stop in campaign_stops

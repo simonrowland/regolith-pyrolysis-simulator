@@ -334,6 +334,12 @@ class RunExecutor:
         )
         failure_exc: Exception | None = None
         hours = _coerce_nonnegative_hours(hours)
+        run_flags_start = len(tuple(getattr(session, "_run_flags", ()) or ()))
+
+        def execution_run_flags() -> tuple[dict[str, Any], ...]:
+            run_flags = tuple(getattr(session, "_run_flags", ()) or ())
+            return run_flags if hours == 0 else run_flags[run_flags_start:]
+
         snapshot_start = len(
             tuple(getattr(getattr(sim, "record", None), "snapshots", ()))
         )
@@ -631,7 +637,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
+                run_flags=execution_run_flags(),
                 campaign_stops=tuple(campaign_stops),
             )
         except Exception as envelope_exc:  # noqa: BLE001 -- reporting must survive
@@ -720,7 +726,7 @@ class RunExecutor:
                     ),
                 ),
                 campaigns_elapsed_start=campaigns_elapsed_start,
-                run_flags=tuple(getattr(session, "_run_flags", ()) or ()),
+                run_flags=execution_run_flags(),
                 campaign_stops=tuple(campaign_stops),
             )
 

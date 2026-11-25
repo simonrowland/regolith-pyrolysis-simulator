@@ -65,6 +65,7 @@ from simulator.runner import (
     RunnerError,
     _attach_diagnostic_gate_authority_notice,
     _attach_engine_commissioning_notice,
+    _attach_execution_diagnostics,
     _attach_high_t_melt_activity_fallback_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
@@ -2900,12 +2901,13 @@ def _available_runner_payload(
         metadata['refusal_diagnostic'] = copy.deepcopy(
             dict(refusal_diagnostic)
         )
-    run_flags = list(getattr(session, '_run_flags', ()) or ())
-    if run_flags:
-        metadata['run_flags'] = copy.deepcopy(run_flags)
+    run_flags = getattr(session, '_run_flags', ()) or ()
     campaign_stops = _campaign_stop_records_from_session(session)
-    if any(stop.get('flags') for stop in campaign_stops):
-        metadata['campaign_stops'] = copy.deepcopy(list(campaign_stops))
+    _attach_execution_diagnostics(
+        metadata,
+        run_flags=run_flags,
+        campaign_stops=campaign_stops,
+    )
     for attach_notice in (
         _attach_engine_commissioning_notice,
         _attach_diagnostic_gate_authority_notice,
