@@ -132,6 +132,7 @@ from simulator.pumping_cost import pumping_context_from_sim
 from simulator.run_executor import (
     RunExecution,
     RunExecutor,
+    _campaign_stops_for_trace,
     _json_safe,
     _safe_exception_text,
 )
@@ -148,7 +149,7 @@ from simulator.scalar_boundary import is_declared_real_scalar
 from simulator.session import (
     SimSession,
     SimSessionConfig,
-    _UNSET_RUN_FLAGS,
+    _merge_run_flags,
     _run_flags_for_export,
     _write_run_flags_to_metadata,
 )
@@ -1359,16 +1360,21 @@ class PyrolysisRun:
         execution: RunExecution,
     ) -> dict:
         if execution.envelope_detail_unavailable:
-            return self._minimal_failure_output(execution)
-        try:
-            return self._build_output_detail(execution)
-        except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
-            if execution.status not in {"failed", "refused"}:
-                raise
-            return self._minimal_failure_output(
-                execution,
-                detail=f"envelope detail unavailable: {_safe_exception_text(exc)}",
-            )
+            output = self._minimal_failure_output(execution)
+        else:
+            try:
+                output = self._build_output_detail(execution)
+            except Exception as exc:  # noqa: BLE001 -- failure reporting must survive
+                if execution.status not in {"failed", "refused"}:
+                    raise
+                output = self._minimal_failure_output(
+                    execution,
+                    detail=f"envelope detail unavailable: {_safe_exception_text(exc)}",
+                )
+        run_metadata = output.get("run_metadata")
+        if isinstance(run_metadata, dict):
+            _attach_execution_diagnostics(run_metadata, execution)
+        return output
 
     def _minimal_failure_output(
         self,
@@ -1505,7 +1511,6 @@ class PyrolysisRun:
         # the runner needing to know about it.
         for key, value in metadata_overrides.items():
             run_metadata[str(key)] = value
-        _attach_execution_diagnostics(run_metadata, execution)
         run_metadata["campaigns_elapsed"] = _safe_failure_value(
             lambda: float(execution.campaigns_elapsed),
             section="run_metadata.campaigns_elapsed",
@@ -5880,31 +5885,20 @@ def _execution_shadow_trace(execution: RunExecution | None) -> list[Any]:
 
 def _attach_execution_diagnostics(
     run_metadata: dict[str, Any],
-    execution: RunExecution | None = None,
-    *,
-    session: SimSession | None = None,
-    run_flags: Any = _UNSET_RUN_FLAGS,
-    campaign_stops: Sequence[Mapping[str, Any]] | None = None,
+    execution: RunExecution,
 ) -> None:
-    if execution is not None:
-        session = getattr(execution, "session", session)
-        campaign_stops = getattr(execution, "campaign_stops", ())
-    run_flags_were_explicit = run_flags is not _UNSET_RUN_FLAGS
-    stored_run_flags = run_metadata.get("run_flags", _UNSET_RUN_FLAGS)
-    if not run_flags_were_explicit:
-        run_flags = run_metadata.get("run_flags", [])
-    recorded_run_flags = run_flags
-    run_flags = _run_flags_for_export(session, run_flags)
-    if run_flags is not recorded_run_flags or (
-        run_flags_were_explicit and stored_run_flags is not recorded_run_flags
-    ):
+    session = getattr(execution, "session", None)
+    if getattr(session, "_sim", None) is None:
+        return
+    stored_run_flags = run_metadata.get("run_flags", [])
+    live_flags = _run_flags_for_export(session)
+    live_budget_flag = live_flags[0] if live_flags else None
+    run_flags = _merge_run_flags(stored_run_flags, live_budget_flag)
+    if run_flags is not stored_run_flags:
         _write_run_flags_to_metadata(run_metadata, run_flags)
-    campaign_stops = list(campaign_stops or ())
-    if any(
-        isinstance(stop, Mapping) and stop.get("flags")
-        for stop in campaign_stops
-    ):
-        run_metadata["campaign_stops"] = _json_safe(campaign_stops)
+    run_metadata["campaign_stops"] = _json_safe(
+        list(_campaign_stops_for_trace(execution))
+    )
 
 
 def _execution_pO2_enforcement_by_hour(
@@ -5982,7 +5976,6 @@ def _runner_failure_result(
     }
     for key, value in overrides.items():
         run_metadata[str(key)] = _json_safe(value)
-    _attach_execution_diagnostics(run_metadata, execution)
     run_metadata["campaigns_elapsed"] = _safe_failure_value(
         lambda: _json_safe(
             float(

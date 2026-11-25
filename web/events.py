@@ -59,13 +59,12 @@ from simulator.melt_backend.alphamelts import AlphaMELTSBackend
 from simulator.recipe import recipe_schema_version
 from simulator.physical_constants import CELSIUS_TO_KELVIN_OFFSET
 from simulator.recipe_io import RecipeIOError, normalize_recipe_patch
-from simulator.run_executor import RunExecutor, _campaign_stops_for_trace
+from simulator.run_executor import RunExecutor
 from simulator.runner import (
     PyrolysisRun,
     RunnerError,
     _attach_diagnostic_gate_authority_notice,
     _attach_engine_commissioning_notice,
-    _attach_execution_diagnostics,
     _attach_high_t_melt_activity_fallback_notice,
     _attach_rump_expectation_notice,
     _attach_sulfur_saturation_notice,
@@ -2833,15 +2832,6 @@ def _full_runner_payload(
         run_metadata = payload.get('run_metadata')
         had_run_metadata = isinstance(run_metadata, Mapping)
         run_metadata = dict(run_metadata) if had_run_metadata else {}
-        recorded_campaign_stops = run_metadata.get('campaign_stops')
-        _attach_execution_diagnostics(
-            run_metadata,
-            session=session,
-            campaign_stops=_campaign_stops_for_trace(
-                session,
-                recorded_campaign_stops=recorded_campaign_stops,
-            ),
-        )
         if had_run_metadata or run_metadata:
             payload['run_metadata'] = run_metadata
         recipe_snapshot = _recipe_snapshot_from_projector(projector)
@@ -2849,7 +2839,9 @@ def _full_runner_payload(
             payload['recipe_snapshot'] = recipe_snapshot
         return payload
 
-    sim = session.simulator
+    sim = getattr(session, '_sim', None)
+    if sim is None:
+        raise RuntimeError('web session has no live simulator')
     config = session._config
     if config is None:
         raise RuntimeError('web session has no runner configuration')
@@ -2860,7 +2852,6 @@ def _full_runner_payload(
         trace=PhysicsTrace.from_simulator(sim),
         per_hour=tuple(session.per_hour_summaries()),
         operator_decisions=tuple(session.operator_decisions()),
-        campaign_stops=_campaign_stops_for_trace(session),
         status=status,
         reason=reason,
         error_message=error_message,
@@ -2895,7 +2886,7 @@ def _available_runner_payload(
 ) -> dict[str, object]:
     """Return an honest reduced envelope when canonical projection is unavailable."""
     config = getattr(session, '_config', None)
-    sim = getattr(session, 'simulator', None)
+    sim = getattr(session, '_sim', None)
     metadata: dict[str, object] = {}
     if config is not None:
         metadata = {
@@ -2931,29 +2922,22 @@ def _available_runner_payload(
         else None
     )
     if (
-        isinstance(metadata_overrides, Mapping)
-        and 'run_flags' in metadata_overrides
-    ):
-        metadata['run_flags'] = copy.deepcopy(metadata_overrides['run_flags'])
-    elif (
         isinstance(recorded_metadata, Mapping)
         and 'run_flags' in recorded_metadata
     ):
         metadata['run_flags'] = copy.deepcopy(recorded_metadata['run_flags'])
-    recorded_campaign_stops = (
-        recorded_metadata.get('campaign_stops')
-        if isinstance(recorded_metadata, Mapping)
-        else None
-    )
-    campaign_stops = _campaign_stops_for_trace(
-        session,
-        recorded_campaign_stops=recorded_campaign_stops,
-    )
-    _attach_execution_diagnostics(
-        metadata,
-        session=session,
-        campaign_stops=campaign_stops,
-    )
+    elif (
+        isinstance(metadata_overrides, Mapping)
+        and 'run_flags' in metadata_overrides
+    ):
+        metadata['run_flags'] = copy.deepcopy(metadata_overrides['run_flags'])
+    if (
+        isinstance(recorded_metadata, Mapping)
+        and 'campaign_stops' in recorded_metadata
+    ):
+        metadata['campaign_stops'] = copy.deepcopy(
+            recorded_metadata['campaign_stops']
+        )
     for attach_notice in (
         _attach_engine_commissioning_notice,
         _attach_diagnostic_gate_authority_notice,

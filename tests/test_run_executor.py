@@ -871,20 +871,25 @@ def test_zero_hour_campaign_completion_exports_only_new_run_flags():
     )
 
 
-def test_result_document_factory_computes_live_flag_without_caching_it():
+def test_result_document_factory_passes_flags_through_without_merging():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     list(drive_auto_apply(session, 1))
+    stored_flags = [{
+        "kind": "run_diagnostic",
+        "code": "run_hour_budget_exhausted_mid_campaign",
+        "detail": {"campaign": "recorded"},
+    }, "legacy"]
     session._config = replace(
         session._config,
-        result_document_factory=lambda _active: {"status": "ok"},
+        result_document_factory=lambda _active: {
+            "status": "ok",
+            "run_metadata": {"run_flags": stored_flags},
+        },
     )
 
     document = session.result_document()
 
-    assert any(
-        flag["code"] == "run_hour_budget_exhausted_mid_campaign"
-        for flag in document["run_metadata"]["run_flags"]
-    )
+    assert document["run_metadata"]["run_flags"] is stored_flags
     assert session._result_document is None
 
 
@@ -899,7 +904,7 @@ def test_run_flag_export_preserves_legacy_entries_when_eligibility_fails(monkeyp
     metadata = {"run_flags": ["legacy notice"]}
     from simulator.runner import _attach_execution_diagnostics
 
-    _attach_execution_diagnostics(metadata, session=session)
+    _attach_execution_diagnostics(metadata, SimpleNamespace(session=session))
 
     assert metadata["run_flags"][0] == "legacy notice"
     assert metadata["run_flags"][1] == {
@@ -926,7 +931,7 @@ def test_non_sequence_run_flags_round_trip_without_coercion(legacy_flags):
     from simulator.runner import _attach_execution_diagnostics
 
     metadata = {"run_flags": legacy_flags}
-    _attach_execution_diagnostics(metadata, session=session)
+    _attach_execution_diagnostics(metadata, SimpleNamespace(session=session))
     assert metadata["run_flags"] == legacy_flags
 
 
@@ -973,28 +978,24 @@ def test_result_document_keeps_equal_non_list_budget_flag_unchanged():
     assert exported_flags is current_budget_flag
 
 
-def test_result_document_collapses_stale_budget_flags_at_first_position():
+def test_result_document_passes_stale_budget_flags_through_unchanged():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     current_budget_flag = _live_budget_flag(session)
     stale_budget_flag = {
         **current_budget_flag,
         "detail": {**current_budget_flag["detail"], "hours_run_in_campaign": 9},
     }
+    stored_flags = [current_budget_flag, "legacy", stale_budget_flag]
     session._set_result_document({
         "status": "ok",
         "run_metadata": {
-            "run_flags": [
-                current_budget_flag,
-                "legacy",
-                stale_budget_flag,
-            ],
+            "run_flags": stored_flags,
         },
     })
 
-    assert session.result_document()["run_metadata"]["run_flags"] == [
-        current_budget_flag,
-        "legacy",
-    ]
+    exported_flags = session.result_document()["run_metadata"]["run_flags"]
+    assert exported_flags is stored_flags
+    assert exported_flags == [current_budget_flag, "legacy", stale_budget_flag]
 
 
 @pytest.mark.parametrize("stored", [None, {"legacy": True}])
@@ -1089,7 +1090,7 @@ def test_offline_run_flag_values_survive_result_and_runner_projection(
     from simulator.runner import _attach_execution_diagnostics
 
     metadata = {"run_flags": legacy_flags}
-    _attach_execution_diagnostics(metadata)
+    _attach_execution_diagnostics(metadata, SimpleNamespace(session=session))
     assert metadata["run_flags"] == legacy_flags
 
 
@@ -1109,8 +1110,8 @@ def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
     }
     from simulator.runner import _attach_execution_diagnostics
 
-    metadata = {}
-    _attach_execution_diagnostics(metadata, run_flags=[flag])
+    metadata = {"run_flags": [flag]}
+    _attach_execution_diagnostics(metadata, SimpleNamespace(session=session))
     assert metadata["run_flags"][0]["detail"] == flag["detail"]
 
 
@@ -1136,6 +1137,11 @@ def test_resumed_execution_campaign_stops_include_only_new_stops():
 
     assert not any(
         stop["campaign"] == "C4" for stop in resumed_execution.campaign_stops
+    )
+    payload = run._build_output(resumed_execution)
+    assert any(
+        stop["campaign"] == "C4"
+        for stop in payload["run_metadata"]["campaign_stops"]
     )
 
 

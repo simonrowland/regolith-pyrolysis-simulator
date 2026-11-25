@@ -42,7 +42,6 @@ from simulator.state import (
 
 _ALLOWED_SESSION_TRACKS = frozenset({"pyrolysis", "mre_baseline"})
 _RUN_HOUR_BUDGET_FLAG_CODE = "run_hour_budget_exhausted_mid_campaign"
-_UNSET_RUN_FLAGS = object()
 
 
 def _canonical_runtime_campaign_overrides(
@@ -814,19 +813,8 @@ class SimSession:
             return document
         payload = dict(document)
         run_metadata = payload.get("run_metadata")
-        has_run_metadata = isinstance(run_metadata, Mapping)
-        recorded_flags = (
-            run_metadata.get("run_flags", [])
-            if has_run_metadata
-            else []
-        )
-        run_flags = _run_flags_for_export(self, recorded_flags)
-        if not has_run_metadata and not run_flags:
-            return payload
-        run_metadata = dict(run_metadata) if has_run_metadata else {}
-        if run_flags is not recorded_flags:
-            _write_run_flags_to_metadata(run_metadata, run_flags)
-        payload["run_metadata"] = run_metadata
+        if isinstance(run_metadata, Mapping):
+            payload["run_metadata"] = dict(run_metadata)
         return payload
 
     def per_hour_summaries(self) -> list[dict[str, Any]]:
@@ -917,12 +905,9 @@ def _merge_run_flags(
 
 def _run_flags_for_export(
     session: Any,
-    recorded_flags: Any = _UNSET_RUN_FLAGS,
-) -> Any:
-    """Merge recorded run flags with the live d-473 fact at read time."""
+) -> list[dict[str, Any]]:
+    """Return the live d-473 fact without merging recorded metadata."""
 
-    if recorded_flags is _UNSET_RUN_FLAGS:
-        recorded_flags = []
     sim = getattr(session, "_sim", None)
     pending_decision: dict[str, Any] | None = None
     should_add_budget_flag = False
@@ -1007,7 +992,7 @@ def _run_flags_for_export(
                 "code": _RUN_HOUR_BUDGET_FLAG_CODE,
                 "detail": unresolved_detail,
             }
-    return _merge_run_flags(recorded_flags, budget_flag)
+    return [budget_flag] if budget_flag is not None else []
 
 
 def _write_run_flags_to_metadata(

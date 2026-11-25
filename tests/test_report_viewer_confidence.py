@@ -242,3 +242,14 @@ def test_run_and_campaign_flags_render_as_text_content() -> None:
     )[0]
     assert "item.textContent =" in body
     assert "item.innerHTML =" not in body
+
+
+def test_non_list_run_flag_renders_as_one_text_content_row() -> None:
+    artifact = _minimal_artifact()
+    stored_flag = {"legacy": "<script>text</script>"}
+    artifact["terminal"]["run_metadata"] = {"run_flags": stored_flag}
+
+    rendered = _render_diagnostics(artifact)
+
+    assert rendered["lines"] == [json.dumps(stored_flag, separators=(",", ":"))]
+    assert rendered["itemChildCounts"] == [0]
