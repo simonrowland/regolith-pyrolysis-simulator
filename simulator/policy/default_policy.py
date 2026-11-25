@@ -198,6 +198,36 @@ def _resolved_value(
         return Decimal(str(DP_019_VACUUM_BOUNDARY_BAR)) * Decimal(
             str(PA_PER_BAR)
         )
+    if policy_id == "DP-004":
+        if context.get("regime_only") is True:
+            if "in_cell_total_pressure_pa" in context:
+                raise ValueError(
+                    "DP-004 regime-only resolution cannot include a total"
+                )
+            return "P_total(cell) = sum of measured partial pressures"
+        if "in_cell_total_pressure_pa" not in context:
+            raise ValueError(
+                "DP-004 requires the total from its owning partial-pressure sum"
+            )
+        pressure = _decimal(
+            context["in_cell_total_pressure_pa"],
+            context_name="DP-004 in-cell total pressure in Pa",
+        )
+        if pressure <= 0:
+            raise ValueError("DP-004 in-cell total pressure must be positive")
+        return pressure
+    if policy_id == "DP-108":
+        if "predicted_total_pressure_pa" not in context:
+            raise ValueError(
+                "DP-108 requires its owning predicted partial-pressure sum"
+            )
+        pressure = _decimal(
+            context["predicted_total_pressure_pa"],
+            context_name="DP-108 predicted total pressure in Pa",
+        )
+        if pressure <= 0:
+            raise ValueError("DP-108 predicted total pressure must be positive")
+        return pressure
     if policy_id == "DP-114":
         if "low" not in context or "high" not in context:
             raise ValueError("DP-114 requires the owning printed pressure interval")

@@ -27813,39 +27813,38 @@ class _FlaggedStratumAccumulator:
             for notice in (row.get("notices") or ())
             if isinstance(notice, Mapping)
         )
-        for stratum in _flagged_payload_strata(row):
-            for policy_id, policy_status in _policies_for_stratum(
-                notices, stratum
-            ):
-                key = (stratum, rail, engine, policy_id, policy_status)
-                self.counts[key] += 1
-                if self.hulls is not None:
-                    from simulator.battery.compilation_tier import reference_observation
+        for stratum, policy_id, policy_status in _flagged_census_bindings(
+            notices, _flagged_payload_strata(row)
+        ):
+            key = (stratum, rail, engine, policy_id, policy_status)
+            self.counts[key] += 1
+            if self.hulls is not None:
+                from simulator.battery.compilation_tier import reference_observation
 
-                    reference = str(row.get("reference") or "")
-                    hull_key = (
-                        f"flagged:{stratum}"
-                        if policy_id is None
-                        else (
-                            f"flagged:{stratum}:policy={policy_id}"
-                            f":status={policy_status}"
-                        )
+                reference = str(row.get("reference") or "")
+                hull_key = (
+                    f"flagged:{stratum}"
+                    if policy_id is None
+                    else (
+                        f"flagged:{stratum}:policy={policy_id}"
+                        f":status={policy_status}"
                     )
-                    self.hulls.setdefault(
-                        (hull_key, rail, engine), _ConditionHull()
-                    ).add(
-                        reference,
-                        reference_observation(self.observations, reference),
-                    )
-                if numeric.get("operation") != MetricOperation.DEX.value:
-                    continue
-                dex = numeric.get("value")
-                if dex is None:
-                    continue
-                try:
-                    self.dex_values[key].append(as_decimal(dex))
-                except (TypeError, ValueError, ArithmeticError):
-                    continue
+                )
+                self.hulls.setdefault(
+                    (hull_key, rail, engine), _ConditionHull()
+                ).add(
+                    reference,
+                    reference_observation(self.observations, reference),
+                )
+            if numeric.get("operation") != MetricOperation.DEX.value:
+                continue
+            dex = numeric.get("value")
+            if dex is None:
+                continue
+            try:
+                self.dex_values[key].append(as_decimal(dex))
+            except (TypeError, ValueError, ArithmeticError):
+                continue
 
     def records(self) -> list[dict[str, object]]:
         rows: list[dict[str, object]] = []

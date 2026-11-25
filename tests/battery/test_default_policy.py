@@ -261,7 +261,7 @@ def test_method_implied_notice_requires_policy_metadata() -> None:
 
 def test_formula_results_must_come_from_the_named_owner() -> None:
     ambient_fo2 = resolve(
-        "DP-010", resolved_fo2_log10_bar=Decimal("-0.672")
+        "DP-010", formula_result=Decimal("-0.672")
     )
     assert ambient_fo2.value == Decimal("-0.672")
     assert ambient_fo2.payload["policy"]["value"] == "-0.672"
@@ -301,7 +301,7 @@ def test_formula_results_must_come_from_the_named_owner() -> None:
     (
         (
             "DP-010",
-            {"resolved_fo2_log10_bar": Decimal("-0.672064092852")},
+            {"formula_result": Decimal("-0.672064092852")},
             Quantity.FE3_FE2_RATIO,
             "redox",
         ),
