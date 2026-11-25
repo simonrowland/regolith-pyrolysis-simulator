@@ -1526,7 +1526,8 @@ def _make_residue_pressure_model(
             internal_analytical_residue_vapor_pressure,
             _new_internal_analytical_core,
         )
-        from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable, _oxygen_atom_partial_pressure_bar
+        from simulator.chemistry.offgas_fo2 import OffgasFO2Unavailable
+        from simulator.surface_oxygen import surface_oxygen_partial_pressures_Pa
         from simulator.vapour_rail.nasa_cea import NasaCeaError
 
         analytical_core = _new_internal_analytical_core()
@@ -1576,16 +1577,28 @@ def _make_residue_pressure_model(
                 pressures[formula] = float(pressure)
             required = {str(species) for species, _reaction in gas_channels}
             pO2_bar = 10.0**float(log10_pO2_bar)
-            if "O2" in required and "O2" not in pressures:
-                pressures["O2"] = pO2_bar * PA_PER_BAR
-            if "O" in required and "O" not in pressures:
+            oxygen_needed = tuple(
+                name
+                for name in ("O2", "O")
+                if name in required and name not in pressures
+            )
+            if oxygen_needed:
                 try:
-                    pressures["O"] = _oxygen_atom_partial_pressure_bar(
-                        temperature_K, pO2_bar,
-                        extract_path=Path(__file__).resolve().parents[2] / "data/literature/extracts/nasa-cea-thermo.yaml",
-                    ) * PA_PER_BAR
+                    pressures.update(
+                        surface_oxygen_partial_pressures_Pa(
+                            temperature_K,
+                            pO2_bar,
+                            extract_path=(
+                                Path(__file__).resolve().parents[2]
+                                / "data/literature/extracts/nasa-cea-thermo.yaml"
+                            ),
+                            species=oxygen_needed,
+                        )
+                    )
                 except (OffgasFO2Unavailable, NasaCeaError, OSError) as exc:
-                    raise ResidueInventoryRefusal("residue_oxygen_pressure_unavailable", str(exc)) from exc
+                    raise ResidueInventoryRefusal(
+                        "residue_oxygen_pressure_unavailable", str(exc)
+                    ) from exc
             _translate_recorded_pressure_omissions(
                 pressures,
                 response,

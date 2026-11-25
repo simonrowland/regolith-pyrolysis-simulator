@@ -675,56 +675,70 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
     assert provenance["openimcc_model_id"] is None
 
 
-def test_hashimoto_internal_probe_diagnostic_does_not_survive_channel_refusal(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
-    from types import SimpleNamespace
+def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
+    """One real Hashimoto run on internal-analytical, with no pressure mock."""
 
-    from simulator.diagnostic_helpers import binary_pot_battery
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+
     import simulator.battery.residue as residue
+    from simulator.evaporation import _load_evaporation_alpha_by_species
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
 
-    detail = {
-        "reason": "melt_dissociation_pO2_floor_inverted_through_mass_action",
-        "pO2_bar_used": 0.25,
-        "certified_band": {"pO2_bar": [0.1, 1.0]},
-    }
-    diagnostic_calls = []
-
-    def report_floor_diagnostic(**kwargs):
-        diagnostic_calls.append(kwargs)
-        return SimpleNamespace(
-            vapor_pressures_Pa={},
-            diagnostics={
-                "vapor_pressure_diagnostic": {
-                    "pO2_floor_inversion_notices_by_species": {"Mg": detail}
-                }
-            },
-        )
-
-    monkeypatch.setattr(
-        binary_pot_battery, "_new_internal_analytical_core", lambda: object()
-    )
-    monkeypatch.setattr(
-        binary_pot_battery,
-        "_internal_analytical_vapor_pressure_adapter",
-        report_floor_diagnostic,
-    )
     experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    experiment = next(
+        item
+        for item in experiments
+        if item["experiment_id"] == "hashimoto-1983-run-17c3-2"
+    )
     catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    legacy_catalog = vapor_pressure_legacy_view(catalog)
+    setup = residue._hashimoto_run_setup(
+        experiment,
+        gas_pack=load_gas_datapack(),
+        catalog_rows=residue._residue_catalog_rows(legacy_catalog),
+        alpha_specs=_load_evaporation_alpha_by_species(legacy_catalog),
+        preform_dimensions_mm=preform_dimensions_mm,
+        engine="internal-analytical",
+        engine_metadata={},
+        reference_printed_wt_pct=experiments[0]["sample"]["printed_composition"][
+            "state"
+        ]["value"],
+    )
+    integration = residue._hashimoto_integrate_geometry(
+        setup.initial_inventory_mol,
+        setup.common_channels,
+        setup.pressure_model,
+        temperature_K=setup.temperature_K,
+        duration_s=setup.duration_s,
+        steps=setup.steps,
+        geometry_policy_id=_HASHIMOTO_PRIMARY_GEOMETRY,
+        initial_area_m2=setup.geometry_areas[_HASHIMOTO_PRIMARY_GEOMETRY],
+    )
 
-    with pytest.raises(residue.ResidueInventoryRefusal) as exc_info:
-        residue._predict_hashimoto_residue_cohort(
-            experiments,
-            catalog,
-            preform_dimensions_mm=preform_dimensions_mm,
-            engine="internal-analytical",
+    assert integration.refusal is None
+    composition = integration.composition_wt_pct
+    assert set(OXIDES) <= set(composition)
+    assert all(math.isfinite(float(composition[oxide])) for oxide in OXIDES)
+    evaporated = integration.evaporated_mol
+    oxygen_atoms_lost = float(evaporated.get("O", 0.0)) + 2.0 * float(
+        evaporated.get("O2", 0.0)
+    )
+    metal_oxygen = math.fsum(
+        float(evaporated.get(term.source.species, 0.0))
+        * (
+            term.parent_oxygen_demand
+            - term.atom_counts.get("O", 0.0)
         )
-
-    assert exc_info.value.reason == "hashimoto_internal_analytical_channels_missing"
-    assert diagnostic_calls
-    assert all(call["include_diagnostic_shadows"] is False for call in diagnostic_calls)
-    refusal_detail = json.loads(exc_info.value.detail)
-    assert refusal_detail["engine_floor_inversion_diagnostics"] == []
+        for term in residue._channel_terms(setup.common_channels)
+        if term.source.species not in {"O", "O2"}
+    )
+    assert oxygen_atoms_lost == pytest.approx(metal_oxygen, abs=1.0e-9, rel=0.0)
+    assert oxygen_atoms_lost > 0.0
+    assert all(
+        math.isfinite(float(residual)) and abs(float(residual)) <= 1.0e-9
+        for residual in integration.atom_closure.values()
+    )
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
