@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import math
 import sys
+import warnings
 from collections import Counter
 from pathlib import Path
 
@@ -65,12 +66,13 @@ _DT_S = 30.0
 
 
 def _emit(text: str) -> None:
-    """The gate profile refuses pytest ``-s``, so a captured print never
-    reaches the receipt. The census lines go to the original stdout.
+    """The gate profile refuses pytest ``-s``, and xdist does not forward
+    a worker's original stdout. The warning summary does travel.
     """
 
     sys.__stdout__.write(text + "\n")
     sys.__stdout__.flush()
+    warnings.warn(text, UserWarning, stacklevel=2)
 
 
 def _preset() -> dict:
