@@ -1424,12 +1424,38 @@ def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -
 _LEDGER_POSITIVE_SPECIES_KG = 1.0e-12
 
 
+def _iron_oxide_mass_kg(
+    inventory: Mapping[str, float], oxides: tuple[str, ...]
+) -> float | None:
+    """Return the named iron-oxide mass in kg, or None if a count is unusable."""
+
+    mass_kg = 0.0
+    for oxide in oxides:
+        if oxide not in inventory:
+            continue
+        try:
+            moles = float(inventory[oxide])
+        except (TypeError, ValueError):
+            return None
+        if not math.isfinite(moles) or moles < 0.0:
+            return None
+        if moles == 0.0:
+            continue
+        mass_kg += moles * _formula_terms(oxide)[1]
+    return mass_kg
+
+
 def _supply_iron_gas_absent_from_melt_account(
     pressures: dict[str, float],
     inventory: Mapping[str, float],
     required: set[str],
+    *,
+    starting_inventory: Mapping[str, float] | None,
+    step: int | None,
+    notices: list[Any],
+    noticed_step: list[int | None],
 ) -> None:
-    """Publish 0 Pa for Fe and FeO when the melt account contains no iron oxide.
+    """Publish 0 Pa for Fe and FeO after the run itself exhausts printed FeO.
 
     Premise: the vapor adapter loads the residue inventory through
     ``_positive_species_kg``, which drops every species with mass
@@ -1437,18 +1463,28 @@ def _supply_iron_gas_absent_from_melt_account(
     has no FeOt, and the existing Fe(g) and FeO(g) evaluations publish
     neither channel and record no below-threshold omission.
 
-    Algebra: m = n_FeO * M_FeO + n_Fe2O3 * M_Fe2O3, with M from the
+    The published iron law is P_Fe = K(T) * a_FeO * pO2^(-1/2) at the
+    parent activity the vapour path used. Algebra: as a_FeO -> 0,
+    P_Fe -> 0. FeO(g) is the association channel of the same parent, so
+    it goes to 0 with that parent. The ledger is the numerical form of
+    that limit. m = n_FeO * M_FeO + n_Fe2O3 * M_Fe2O3, with M from the
     formula parser in kg/mol. The account is iron-free when m <= 1e-12 kg.
     FeO's molar mass is 0.071844 kg/mol, so the FeO-only floor is
     n = 1e-12 / 0.071844 = 1.392e-11 mol.
 
-    The vacuum oxygen balance still requires both gas channels. No iron
-    oxide in the account means no Fe(g) and no FeO(g), so each missing
-    pressure is 0 Pa. This is not a new pressure fit, and it does not
-    change the Fe pO2 exponent or the activity standard state.
+    This fill runs only when three facts are known together. The printed
+    starting inventory contained FeO heavier than the ledger floor, so
+    FeO was loaded and then removed by the integration. The current
+    iron-oxide mass is at or below that floor. The integrator has marked
+    this call with a step number >= 1. A starting composition that never
+    printed FeO, an unknown start, a non-finite inventory, or a call
+    outside an integration step stays a typed missing-channel refusal.
+    The zero is not a new pressure fit, and it does not change the Fe
+    pO2 exponent or the activity standard state.
 
-    Limiting case: n_FeO = 0 gives m = 0 and both pressures are 0 Pa.
-    A Hashimoto charge (~4.9e-4 mol FeO) stays on the published path.
+    Limiting case: n_FeO = 0 after a charge that started with FeO gives
+    m = 0, so both pressures are 0 Pa. A Hashimoto charge (~4.9e-4 mol
+    FeO) stays on the published path until the integrator exhausts it.
     """
 
     missing = [
@@ -1458,22 +1494,39 @@ def _supply_iron_gas_absent_from_melt_account(
     ]
     if not missing:
         return
-    iron_mass_kg = 0.0
-    for oxide in ("FeO", "Fe2O3"):
-        moles = inventory.get(oxide, 0.0)
-        try:
-            moles = float(moles)
-        except (TypeError, ValueError):
-            return
-        if not math.isfinite(moles) or moles < 0.0:
-            return
-        if moles == 0.0:
-            continue
-        iron_mass_kg += moles * _formula_terms(oxide)[1]
-    if iron_mass_kg > _LEDGER_POSITIVE_SPECIES_KG:
+    # bool is a subclass of int; a flag is not a step number.
+    if isinstance(step, bool) or not isinstance(step, int) or step < 1:
+        return
+    if starting_inventory is None:
+        return
+    starting_feo_kg = _iron_oxide_mass_kg(starting_inventory, ("FeO",))
+    if (
+        starting_feo_kg is None
+        or starting_feo_kg <= _LEDGER_POSITIVE_SPECIES_KG
+    ):
+        return
+    current_iron_kg = _iron_oxide_mass_kg(inventory, ("FeO", "Fe2O3"))
+    if current_iron_kg is None or current_iron_kg > _LEDGER_POSITIVE_SPECIES_KG:
         return
     for name in missing:
         pressures[name] = 0.0
+    if noticed_step[0] == step:
+        return
+    noticed_step[0] = step
+    from simulator.battery.enums import NoticeKind, Quantity
+    from simulator.battery.records import Notice
+
+    notices.append(
+        Notice(
+            kind=NoticeKind.ENGINE_MODEL_CAVEAT,
+            affected_quantities=(Quantity.RESIDUE_COMPONENT_COMPOSITION,),
+            reason=(
+                "parent_oxide_exhausted_zero_vapour: "
+                f"species={','.join(missing)}; step={step}; parent=FeO"
+            ),
+            origin="internal-analytical residue pressure model",
+        )
+    )
 
 
 def _make_residue_pressure_model(
@@ -1488,6 +1541,7 @@ def _make_residue_pressure_model(
     missing_channels_reason: str,
     caller: str,
     floor_inversion_diagnostics: dict[str, dict[str, object]] | None = None,
+    starting_inventory_mol: Mapping[str, float] | None = None,
 ) -> Callable[[Mapping[str, float], float], Mapping[str, float]]:
     """Build the engine pressure closure shared by the residue cohorts."""
     pressure_exponents = {
@@ -1603,6 +1657,11 @@ def _make_residue_pressure_model(
         omission_notices: list[Any] = []
         omission_records: dict[str, dict[str, Any]] = {}
         noticed_omissions: set[str] = set()
+        evaluation_step: list[int | None] = [None]
+        noticed_exhaustion_step: list[int | None] = [None]
+
+        def set_residue_evaluation_step(step: int | None) -> None:
+            evaluation_step[0] = step
 
         def pressure_model(
             inventory: Mapping[str, float], log10_pO2_bar: float
@@ -1665,7 +1724,13 @@ def _make_residue_pressure_model(
                 noticed_omissions,
             )
             _supply_iron_gas_absent_from_melt_account(
-                pressures, inventory, required
+                pressures,
+                inventory,
+                required,
+                starting_inventory=starting_inventory_mol,
+                step=evaluation_step[0],
+                notices=omission_notices,
+                noticed_step=noticed_exhaustion_step,
             )
             if floor_inversion_diagnostics is not None:
                 vapor_diagnostic = response.diagnostics.get(
@@ -1726,6 +1791,7 @@ def _make_residue_pressure_model(
             pressure_model._on_accepted_evaluation = accept_pressure_diagnostics
         pressure_model.below_threshold_omission_notices = omission_notices
         pressure_model.below_threshold_omission_records = omission_records
+        pressure_model.set_residue_evaluation_step = set_residue_evaluation_step
         return pressure_model
 
     raise ResidueInventoryRefusal(
@@ -2458,6 +2524,7 @@ def predict_mass_loss_fraction(
             total_pressure_Pa=total_pressure_Pa, engine_metadata=metadata,
             engine_flags=flags, missing_channels_reason="residue_pressure_channels_missing",
             caller="Mass-loss residue prediction",
+            starting_inventory_mol=initial_inventory_mol,
         )
         def measure(incoming, active_channels, area, duration):
             bounds, corners = _mass_loss_corner_bounds(
@@ -2797,16 +2864,23 @@ def _hashimoto_integrate_geometry(
             or channel.parent_oxide not in exhausted_mol
         )
         area_m2 = area_for_current_inventory()
-        step = integrate_residue_inventory(
-            inventory,
-            active_channels,
-            pressure_model,
-            temperature_K=temperature_K,
-            duration_s=duration,
-            area_evolution_m2=(area_m2,),
-            **({"background_pressure_Pa": background_pressure_Pa}
-               if background_pressure_Pa else {}),
-        )
+        set_step = getattr(pressure_model, "set_residue_evaluation_step", None)
+        if callable(set_step):
+            set_step(step_number)
+        try:
+            step = integrate_residue_inventory(
+                inventory,
+                active_channels,
+                pressure_model,
+                temperature_K=temperature_K,
+                duration_s=duration,
+                area_evolution_m2=(area_m2,),
+                **({"background_pressure_Pa": background_pressure_Pa}
+                   if background_pressure_Pa else {}),
+            )
+        finally:
+            if callable(set_step):
+                set_step(None)
         if on_step is not None:
             on_step(inventory, active_channels, area_m2, duration)
         inventory = dict(step.residue_mol)
@@ -3038,6 +3112,7 @@ def _hashimoto_run_setup(
             if engine == "internal-analytical"
             else None
         ),
+        starting_inventory_mol=initial_inventory_mol,
     )
     return _HashimotoRunSetup(
         experiment_id=experiment_id,

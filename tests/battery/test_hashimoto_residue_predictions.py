@@ -675,47 +675,7 @@ def test_hashimoto_without_melt_pack_identity_has_no_sf04_fallback(
     assert provenance["openimcc_model_id"] is None
 
 
-def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
-    """One real Hashimoto run on internal-analytical, with no pressure mock."""
-
-    pytest.importorskip("openimcc")
-    from openimcc import load_gas_datapack
-
-    import simulator.battery.residue as residue
-    from simulator.evaporation import _load_evaporation_alpha_by_species
-    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
-
-    experiments, _measured_rows, preform_dimensions_mm = _source_data()
-    experiment = next(
-        item
-        for item in experiments
-        if item["experiment_id"] == "hashimoto-1983-run-17c3-2"
-    )
-    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
-    legacy_catalog = vapor_pressure_legacy_view(catalog)
-    setup = residue._hashimoto_run_setup(
-        experiment,
-        gas_pack=load_gas_datapack(),
-        catalog_rows=residue._residue_catalog_rows(legacy_catalog),
-        alpha_specs=_load_evaporation_alpha_by_species(legacy_catalog),
-        preform_dimensions_mm=preform_dimensions_mm,
-        engine="internal-analytical",
-        engine_metadata={},
-        reference_printed_wt_pct=experiments[0]["sample"]["printed_composition"][
-            "state"
-        ]["value"],
-    )
-    integration = residue._hashimoto_integrate_geometry(
-        setup.initial_inventory_mol,
-        setup.common_channels,
-        setup.pressure_model,
-        temperature_K=setup.temperature_K,
-        duration_s=setup.duration_s,
-        steps=setup.steps,
-        geometry_policy_id=_HASHIMOTO_PRIMARY_GEOMETRY,
-        initial_area_m2=setup.geometry_areas[_HASHIMOTO_PRIMARY_GEOMETRY],
-    )
-
+def _assert_hashimoto_oxygen_balance(residue, setup, integration) -> None:
     assert integration.refusal is None
     composition = integration.composition_wt_pct
     assert set(OXIDES) <= set(composition)
@@ -739,16 +699,126 @@ def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
         math.isfinite(float(residual)) and abs(float(residual)) <= 1.0e-9
         for residual in integration.atom_closure.values()
     )
-    # FeO mass at or below the 1e-12 kg ledger floor is not loaded, so the
-    # published Fe and FeO paths are absent. The balance still needs 0 Pa.
+
+
+def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
+    """Real Hashimoto runs on internal-analytical, with no pressure mock."""
+
+    pytest.importorskip("openimcc")
+    from openimcc import load_gas_datapack
+
+    import simulator.battery.residue as residue
+    from simulator.evaporation import _load_evaporation_alpha_by_species
+    from simulator.vapour_rail.catalog import vapor_pressure_legacy_view
+
+    # Outside an integration step, or when the start never printed FeO,
+    # a missing Fe channel stays missing. 0 Pa is only the exhausted-parent limit.
+    notices: list = []
+    noticed_step: list[int | None] = [None]
+    pressures: dict[str, float] = {}
+    residue._supply_iron_gas_absent_from_melt_account(
+        pressures,
+        {"SiO2": 1.0},
+        {"Fe", "FeO"},
+        starting_inventory={"FeO": 1.0e-4},
+        step=None,
+        notices=notices,
+        noticed_step=noticed_step,
+    )
+    residue._supply_iron_gas_absent_from_melt_account(
+        pressures,
+        {"SiO2": 1.0},
+        {"Fe", "FeO"},
+        starting_inventory={"SiO2": 1.0},
+        step=1,
+        notices=notices,
+        noticed_step=noticed_step,
+    )
+    assert pressures == {}
+    assert notices == []
+    residue._supply_iron_gas_absent_from_melt_account(
+        pressures,
+        {"SiO2": 1.0},
+        {"Fe", "FeO"},
+        starting_inventory={"FeO": 1.0e-4},
+        step=4,
+        notices=notices,
+        noticed_step=noticed_step,
+    )
+    assert pressures == {"Fe": 0.0, "FeO": 0.0}
+    assert len(notices) == 1
+    assert notices[0].reason == (
+        "parent_oxide_exhausted_zero_vapour: species=Fe,FeO; step=4; parent=FeO"
+    )
+    assert notices[0].kind.value == "engine_model_caveat"
+
+    experiments, _measured_rows, preform_dimensions_mm = _source_data()
+    catalog = yaml.safe_load((ROOT / "data/vapor_pressures.yaml").read_text())
+    legacy_catalog = vapor_pressure_legacy_view(catalog)
+    gas_pack = load_gas_datapack()
+    catalog_rows = residue._residue_catalog_rows(legacy_catalog)
+    alpha_specs = _load_evaporation_alpha_by_species(legacy_catalog)
+    reference_printed_wt_pct = experiments[0]["sample"]["printed_composition"][
+        "state"
+    ]["value"]
+
+    def integrate(experiment_id: str):
+        experiment = next(
+            item
+            for item in experiments
+            if item["experiment_id"] == experiment_id
+        )
+        setup = residue._hashimoto_run_setup(
+            experiment,
+            gas_pack=gas_pack,
+            catalog_rows=catalog_rows,
+            alpha_specs=alpha_specs,
+            preform_dimensions_mm=preform_dimensions_mm,
+            engine="internal-analytical",
+            engine_metadata={},
+            reference_printed_wt_pct=reference_printed_wt_pct,
+        )
+        integration = residue._hashimoto_integrate_geometry(
+            setup.initial_inventory_mol,
+            setup.common_channels,
+            setup.pressure_model,
+            temperature_K=setup.temperature_K,
+            duration_s=setup.duration_s,
+            steps=setup.steps,
+            geometry_policy_id=_HASHIMOTO_PRIMARY_GEOMETRY,
+            initial_area_m2=setup.geometry_areas[_HASHIMOTO_PRIMARY_GEOMETRY],
+        )
+        return setup, integration
+
+    setup, integration = integrate("hashimoto-1983-run-17c3-2")
+    _assert_hashimoto_oxygen_balance(residue, setup, integration)
+    # The integrator clears the step when the call returns. A later direct
+    # call is not "depleted by the integration", so Fe stays a typed refusal.
     depleted = dict(setup.initial_inventory_mol)
     depleted["FeO"] = 0.0
-    depleted_pressures = setup.pressure_model(depleted, -6.0)
-    assert depleted_pressures["Fe"] == 0.0
-    assert depleted_pressures["FeO"] == 0.0
+    with pytest.raises(residue.ResidueInventoryRefusal) as caught:
+        setup.pressure_model(depleted, -6.0)
+    assert caught.value.reason == "hashimoto_internal_analytical_channels_missing"
+
+    # 17d2 is long enough that printed FeO is exhausted before the last step.
+    # Later steps publish 0 Pa and a typed notice. 20b6 reaches FeO = 0 only
+    # in the post-loop inventory cleanup, so it never re-enters the pressure model.
+    long_setup, long_run = integrate("hashimoto-1983-run-17d2")
+    _assert_hashimoto_oxygen_balance(residue, long_setup, long_run)
+    assert float(long_run.composition_wt_pct["FeO"]) == 0.0
+    exhausted = [
+        notice.reason
+        for notice in long_setup.pressure_model.below_threshold_omission_notices
+        if notice.reason.startswith("parent_oxide_exhausted_zero_vapour:")
+    ]
+    assert exhausted
     assert all(
-        math.isfinite(float(value)) and float(value) >= 0.0
-        for value in depleted_pressures.values()
+        reason.startswith(
+            "parent_oxide_exhausted_zero_vapour: species=Fe,FeO; step="
+        )
+        and reason.endswith("; parent=FeO")
+        and int(reason.split("step=", 1)[1].split(";", 1)[0]) >= 1
+        for reason in exhausted
     )
 
 
