@@ -8604,6 +8604,34 @@ def test_ranking_trace_keeps_each_step_stop_reason() -> None:
     assert refused["detail"] == "c6_hold_target_not_acquired"
 
 
+def test_campaign_stop_trace_reconstructs_session_history_exactly() -> None:
+    campaign_flag = {
+        "kind": "campaign_stop",
+        "code": "campaign_time_cap_unconverged",
+        "detail": {"duration_h": 62.0},
+    }
+    session = SimpleNamespace(
+        _step_results=(SimpleNamespace(
+            campaign_summary={
+                "campaign": "C4",
+                "stop_reason": "time_cap",
+                "duration_h": 62.0,
+                "stop_detail": "max_hold_no_signal",
+                "flags": [campaign_flag],
+            },
+        ),),
+    )
+    execution = SimpleNamespace(session=session, campaign_stops=())
+
+    assert evaluate_module._campaign_stops_for_trace(execution) == ({
+        "campaign": "C4",
+        "stop_reason": "time_cap",
+        "duration_h": 62.0,
+        "detail": "max_hold_no_signal",
+        "flags": [campaign_flag],
+    },)
+
+
 def _stop_reasons(stops) -> list[str]:
     return [str(stop["stop_reason"]) for stop in stops]
 

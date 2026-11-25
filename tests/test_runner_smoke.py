@@ -156,6 +156,20 @@ def test_json_safe_mapping_proxy_keeps_serialized_order_and_shape():
     )
 
 
+def test_json_safe_campaign_diagnostic_shape_is_stable():
+    safe = _json_safe({
+        "campaign": "C4",
+        "configured_limits": {"setpoint_max_hold_hr": 160.0},
+        "flags": [{"kind": "campaign_stop", "duration_h": float("inf")}],
+    })
+
+    assert safe == {
+        "campaign": "C4",
+        "configured_limits": {"setpoint_max_hold_hr": 160.0},
+        "flags": [{"kind": "campaign_stop", "duration_h": None}],
+    }
+
+
 def test_plain_diagnostic_values_keep_serialized_payload_bytes():
     payload = {
         "message": "ok",
