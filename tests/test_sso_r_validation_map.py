@@ -27,18 +27,20 @@ CONFIGURED_GOLDEN_PATH = Path(
 CONFIGLESS_GOLDEN_PATH = Path(
     "tests/goldens/sso_r_validation_map_lunar_mare_low_ti_configless.json"
 )
-# Pool/escape anchors confirmed inside pytest on Mac-Studio-256-2 at green pins;
-# the c3 route-dependent receipt is derived below.
+# Configured owner row from studio request bc0cc882 on 962d6125e6
+# (Mac-Studio-256-2). Pool, tap, escape, and SiO flux are that row.
+# Vapor, stage-3 Fe, and SiO pO2 matched these literals inside the
+# receipt's 1e-9 band. The c3 route-dependent receipt is derived below.
 CONFIGURED_OWNER_PN2_ANCHORS = {
-    "native_fe_pool_mol": 1572.6800886957762,
-    "native_fe_tap_mol": 1570.5846976173568,
+    "native_fe_pool_mol": 786.3400448197306,
+    "native_fe_tap_mol": 784.2446537413111,
     "native_fe_vapor_mol": 2.095391078419451,
-    "native_fe_vapor_escape_fraction_of_pool": 0.0013323695603962018,
+    "native_fe_vapor_escape_fraction_of_pool": 0.00266473911919343,
     # c3: the exposed native-Fe parcel arrives first; the subsequent alkali-rich
     # SiO parcel is refused, leaving a Fe-only receipt (100 wt%, no SiO2).
     "stage_3_Fe_wt_pct": 100.0,
     "SiO_provider_pO2_bar": 1e-09,
-    "SiO_flux_kg_hr": 0.0279267607515389,
+    "SiO_flux_kg_hr": 0.02310574860646939,
 }
 # Configless fallback, not canonical. Used when the consumed curve did not
 # come from the gate liquid-fraction path.

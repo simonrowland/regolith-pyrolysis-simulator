@@ -58,17 +58,19 @@ METAL_PHASE_FE_ACCOUNTS = (
 # 2026-07-21 B1 wall-gate fix: with the melt at the effervescence cap the
 # staged C2A segment-wall sum was zero. The intentional cold-segment
 # case still lives in test_intentional_pipe_cold_spot_flags_and_changes_wall_deposit.
-# 2026-11-25 d-472 amended remeasure (studio 09c22d2f): congruent
-# evaporation has no fO2 tangent, so melt fO2 stays on the Fe metal line
-# instead of log10(P_total). Metal-vapour p ∝ fO2^(-n), and this sum
-# (SiO + Si + SiO2 + FeSi over the pipe-segment wall accounts) is the
-# measured load. Each species is pinned on its own below. The dominant
-# species and its segment are filled from this tree's staged receipt.
-STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.14929136844379295
+# 2026-11-25 d-472 amended remeasure (studio 4c2bf77b, tree 962d6125e6):
+# congruent evaporation has no fO2 tangent, so melt fO2 stays on the Fe
+# metal line instead of log10(P_total). Metal-vapour p ∝ fO2^(-n).
+# The pipe-segment wall sum is SiO2 only; Si, SiO, and FeSi are zero.
+# SiO2 is heaviest on stage_0_to_stage_1, 0.0748163532630087 kg at
+# 1500 C. That pipe enters stage 1, upstream of the stage-3 SiO
+# condenser, so the deposit is a hot-wall violation. Nothing was tuned
+# to shrink it.
+STAGED_REACTIVE_SIO_WALL_DEPOSIT_KG = 0.14929136844379298
 STAGED_WALL_DEPOSIT_KG_BY_SPECIES = {
     "SiO": 0.0,
     "Si": 0.0,
-    "SiO2": 0.0,
+    "SiO2": 0.14929136844379298,
     "FeSi": 0.0,
 }
 _WALL_DEPOSIT_SPECIES = tuple(STAGED_WALL_DEPOSIT_KG_BY_SPECIES)
@@ -301,9 +303,14 @@ def test_c2a_staged_is_deterministic_and_keeps_sio_stage_capture():
     # silica 0.06935019686949548 -> 0.06889793680807693 and product SiO
     # 0.0077315513914454756 -> 0.007681113790282872 (-0.652%). The current
     # pins match the Studio report emitted from this same _run_staged helper.
-    assert staged_silica == pytest.approx(0.006596004558853442, rel=1e-9)
+    # Studio 4c2bf77b on 962d6125e6: stage-3 Si + SiO2 is 0. That mass is
+    # the upstream SiO2 wall deposit pinned below, not stage-3 capture.
+    assert staged_silica == pytest.approx(0.0, abs=1e-15), staged_sio_stage
     assert continuous_silica == pytest.approx(0.0, abs=1.0e-15)
-    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}
+    assert set(staged_sio_stage) == {"Si", "SiO2", "Fe"}, ", ".join(
+        f"{species}={kg!r}"
+        for species, kg in sorted(staged_sio_stage.items())
+    )
     assert staged_sio_stage["Fe"] > 0.0
     assert staged_sio_stage["Si"] + staged_sio_stage["SiO2"] == pytest.approx(
         staged_silica, rel=1e-12
@@ -412,8 +419,9 @@ def test_c2a_staged_pipework_flags_upstream_cold_spots():
     # 2026-06-30 cold-wall SiO uses the grounded Pound 1972 unity condensation
     # gate below the Wetzel/Gail evaporation-Arrhenius validity floor.
     # 2026-07-01 C4b stores the wall deposit as Si/SiO2/FeSi products, not SiO.
-    # Species pins and the dominant segment are the measured fouling mass.
-    # The dominant-species sentence is written from this tree's receipt.
+    # Studio 4c2bf77b: SiO2 is the whole mass and dominates on
+    # stage_0_to_stage_1 at 1500 C. That segment is upstream of the
+    # stage-3 SiO condenser, a hot-wall violation.
     assert by_species == pytest.approx(
         STAGED_WALL_DEPOSIT_KG_BY_SPECIES,
         abs=1e-15,
