@@ -1282,6 +1282,7 @@ _SESSION_BACKEND_LOCK = threading.Lock()
 
 def session_warm_enabled() -> bool:
     """True when process-scoped VapoRock warm-boot sharing is requested."""
+    # Private test/diagnostic worker reuse switch.
     raw = os.environ.get(SESSION_WARM_ENV, '').strip().lower()
     return raw in ('1', 'true', 'yes', 'on')
 

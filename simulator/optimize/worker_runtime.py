@@ -35,6 +35,7 @@ class WorkerEvalContext:
 
 
 def warm_workers_enabled() -> bool:
+    # Private performance control for internal optimizer worker reuse.
     raw = os.environ.get(WARM_WORKERS_ENV, "1")
     return raw.strip().lower() not in _DISABLED_VALUES
 

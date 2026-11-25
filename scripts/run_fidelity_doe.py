@@ -55,6 +55,7 @@ TOP_K = (2,)                # HARD
 def _diagnostic_internal_analytical_high_from_env(
     environ: Mapping[str, str],
 ) -> bool:
+    # Private harness switches select a diagnostic comparison backend.
     return any(
         environ.get(name) == "1"
         for name in (
@@ -74,6 +75,7 @@ def _high_backend_from_env(
         if diagnostic_internal_analytical_high
         else "alphamelts"
     )
+    # Private harness selection; this is not an application backend setting.
     return canonical_backend_name(environ.get("FIDELITY_HIGH_BACKEND", default))
 
 
@@ -101,6 +103,7 @@ HIGH_BACKEND = _high_backend_from_env(
     os.environ,
     diagnostic_internal_analytical_high=DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH,
 )
+# Private fidelity-harness duration control.
 HIGH_HOURS = int(os.environ.get("FIDELITY_HIGH_HOURS", "1"))
 # /tmp (non-Dropbox) avoids a CloudStorage sync race that can zero artifact files
 # mid-run; the constraint explicitly permits temp/ or /tmp.
@@ -198,7 +201,7 @@ def main() -> int:
 
     # Honor the profile's study_constraints selector (same resolver as study.py).
     # Stock profiles omit the selector and default to physics constraints.
-    # Set FIDELITY_SKIP_PROFILE_CONSTRAINTS=1 only to exercise evaluate() defaults.
+    # Private harness switch: bypass profile constraints only to exercise evaluate() defaults.
     eval_kwargs: dict = {}
     if os.environ.get("FIDELITY_SKIP_PROFILE_CONSTRAINTS") != "1":
         from simulator.optimize.study import _constraints_for_profile

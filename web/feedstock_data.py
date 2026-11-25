@@ -24,6 +24,7 @@ def _env_flag(name: str) -> bool:
 
 def debug_feedstocks_enabled() -> bool:
     return (
+        # Private development-only visibility for debug feedstock fixtures.
         _env_flag('REGOLITH_DEBUG_FEEDSTOCKS')
         or _env_flag('REGOLITH_FLASK_DEBUG')
     )

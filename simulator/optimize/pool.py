@@ -595,6 +595,7 @@ def _evaluate_tasks_serial(
     per_eval_timeout_seconds: float | None,
 ) -> tuple[ScoredResult, ...]:
     env_names = _serial_fallback_env_names()
+    # Preserve launcher thread settings and the private worker output handoff.
     env_snapshot = {name: os.environ.get(name) for name in env_names}
     warm_runtime_spec = _warm_runtime_spec(tasks)
     try:
@@ -742,6 +743,7 @@ def _evaluate_pool_task(
     output_dir = Path(task.output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
     child_pid_log = task.child_pid_log or str(_child_pid_log_path(task))
+    # Private worker output and PID-log paths are passed through child env state.
     previous_output = os.environ.get(_WORKER_OUTPUT_ENV)
     previous_pid_log = os.environ.get(_CHILD_PID_LOG_ENV)
     os.environ[_WORKER_OUTPUT_ENV] = str(output_dir)
@@ -1597,6 +1599,7 @@ def _install_child_pid_tracking() -> Callable[[], None]:
         # class's GenericAlias, not this subclass.
         def __init__(self, *args: Any, **kwargs: Any) -> None:
             super().__init__(*args, **kwargs)
+            # Private worker diagnostic path used to track child PIDs.
             log_path = os.environ.get(_CHILD_PID_LOG_ENV)
             if log_path:
                 _append_child_pid(log_path, int(self.pid))

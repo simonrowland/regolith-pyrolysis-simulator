@@ -101,6 +101,7 @@ MELTS_FAMILY_ENGINES: tuple[str, ...] = ("alphamelts", "thermoengine")
 
 def _hostname() -> str:
     environment = os.environ
+    # Private harness labels identify internal diagnostic output only.
     env_name = environment.get("GOALFLIGHT_HOSTNAME") or environment.get("HOSTNAME")
     if env_name:
         return str(env_name)

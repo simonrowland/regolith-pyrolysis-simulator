@@ -925,6 +925,7 @@ def read_scores(
     stamp: Mapping[str, Any] | None = None
 
     if scratch_dir is None:
+        # Private scratch override for this internal scoring report.
         configured_tmp = os.environ.get("TMPDIR")
         scratch_dir = Path(configured_tmp) if configured_tmp else None
     if scratch_dir is not None:
@@ -5467,6 +5468,7 @@ def render_hero_collection(
     observable_rails = {rail for rail, _label in observables}
     render_date = render_date or datetime.now(timezone.utc).date().isoformat()
     output_dir.mkdir(parents=True, exist_ok=True)
+    # Private scratch override for this internal collection report.
     scratch = os.environ.get("TMPDIR")
     with tempfile.TemporaryDirectory(
         prefix="battery-hero-collection-",

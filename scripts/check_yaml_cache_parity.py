@@ -39,9 +39,11 @@ def _check_store(root: Path) -> int:
 
     failures: list[str] = []
     checked = 0
+    # Private harness scratch location for the disposable YAML cache.
     with TemporaryDirectory(
         prefix="yaml-cache-parity-", dir=os.environ.get("TMPDIR")
     ) as cache_dir:
+        # Private cache controls isolate this parity probe from normal cache state.
         os.environ["REGOLITH_PARSED_YAML_CACHE_DIR"] = cache_dir
         os.environ.pop("REGOLITH_PARSED_YAML_CACHE", None)
         for path in paths:

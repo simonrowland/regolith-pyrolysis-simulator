@@ -33,9 +33,13 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 if str(REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(REPO_ROOT))
 
+# Private profiler scratch and cache roots; these do not configure the simulator.
 _CACHE_ROOT = Path(os.environ.get("TMPDIR", "/tmp")) / "regolith-eval-hotpath"
+# Private matplotlib cache for this profiling harness.
 os.environ.setdefault("MPLCONFIGDIR", str(_CACHE_ROOT / "matplotlib"))
+# Private XDG cache root for this profiling harness.
 os.environ.setdefault("XDG_CACHE_HOME", str(_CACHE_ROOT / "xdg-cache"))
+# Read back the private cache paths selected above.
 Path(os.environ["MPLCONFIGDIR"]).mkdir(parents=True, exist_ok=True)
 Path(os.environ["XDG_CACHE_HOME"]).mkdir(parents=True, exist_ok=True)
 

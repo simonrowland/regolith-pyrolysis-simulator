@@ -1035,6 +1035,7 @@ def _cache_environment_setting(
     name: str,
     default: str | None = None,
 ) -> str | None:
+    # Shared read site for operator cache settings and private diagnostics.
     return os.environ.get(name, default)
 
 
@@ -3494,6 +3495,7 @@ def cached_engine_call(engine_id: str, request: Any, solve: Any) -> Any:
             counts["misses"] += 1
             counts["not_stored:double"] = counts.get("not_stored:double", 0) + 1
         return live_hot(solve())
+    # Private source-box label for internal engine-cache diagnostics.
     source_box = _cache_environment_setting("REGOLITH_ENGINE_CACHE_BOX", "") or ""
     if not readonly:
         if not source_box.strip():

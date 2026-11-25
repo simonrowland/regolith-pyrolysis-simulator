@@ -1023,6 +1023,7 @@ def main(argv=None):
     args = parser.parse_args(argv)
     out = args.output_dir.resolve()
     out.mkdir(parents=True, exist_ok=True)
+    # Private matplotlib cache for this calibration harness run.
     os.environ.setdefault("MPLCONFIGDIR", str(out / "mpl"))
     manifest = {"engine_head": subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip(),
                 "command": shlex.join([sys.executable, *sys.argv]), "datasets": args.datasets,

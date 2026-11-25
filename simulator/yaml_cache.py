@@ -269,11 +269,13 @@ def load_cached_safe_yaml(
 
 
 def _cache_enabled() -> bool:
+    # Private implementation switch; operators use the documented byte cap.
     value = _cache_setting(_CACHE_ENABLED_ENV, "").strip().casefold()
     return value not in {"0", "false", "no", "off"}
 
 
 def _cache_setting(name: str, default: str | None = None) -> str | None:
+    # Shared environment read for the cache's registered controls.
     return os.environ.get(name, default)
 
 
@@ -320,6 +322,7 @@ def _cache_path(
 
 
 def _cache_root() -> Path | None:
+    # Private implementation override for the parsed-YAML cache directory.
     override = os.environ.get(_CACHE_ENV)
     if override:
         try:
@@ -329,6 +332,7 @@ def _cache_root() -> Path | None:
         except (OSError, RuntimeError, ValueError):
             pass
 
+    # Private cache plumbing follows the process's XDG cache root.
     xdg_cache = os.environ.get("XDG_CACHE_HOME")
     if xdg_cache:
         try:

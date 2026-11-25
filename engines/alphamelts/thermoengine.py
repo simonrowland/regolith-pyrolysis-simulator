@@ -921,6 +921,7 @@ def thermoengine_diagnostic_log_path(
     log_dir: str | os.PathLike[str] | None = None,
 ) -> Path:
     """Return the aggregate, append-only ThermoEngine diagnostic log path."""
+    # Private diagnostic log routing for the native engine harness.
     configured_dir = log_dir or os.environ.get(_THERMOENGINE_LOG_DIR_ENV)
     directory = Path(configured_dir) if configured_dir else Path(
         tempfile.gettempdir(), 'regolith-pyrolysis-simulator')

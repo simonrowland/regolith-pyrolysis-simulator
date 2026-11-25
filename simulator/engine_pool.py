@@ -60,7 +60,7 @@ ENGINE_WORKER_STOP_PAIR_JOIN_S = 0.1 + 1.0
 # — that is the publish-before-start path.
 ENGINE_WORKER_SPAWN_SLACK_S = 1.0
 
-# Env-gated lifecycle trace (2026-07-24): the recursive-spawn churn class
+# Private env-gated lifecycle trace (2026-07-24): the recursive-spawn churn class
 # was invisible because every failure path was silently absorbed into
 # engine fallbacks. REGOLITH_ENGINE_POOL_DEBUG=1 prints starts, ready
 # latencies, and every discard with its reason to stderr.
@@ -269,6 +269,7 @@ def _signal_worker_process(process: Any, signum: int) -> None:
     pid = _process_pid(process)
     if pid is None:
         return
+    # Private child-process handoff flag; it controls worker cleanup only.
     if os.environ.get(INHERIT_PROCESS_GROUP_ENV) != '1':
         try:
             os.killpg(pid, signum)
@@ -444,6 +445,7 @@ def _run_engine_worker(
         os.dup2(native_output_fd, 1)
         os.dup2(native_output_fd, 2)
         native_output_connection.close()
+    # Private child-process handoff flag; it controls worker session setup only.
     if os.environ.get(INHERIT_PROCESS_GROUP_ENV) != '1':
         try:
             os.setsid()

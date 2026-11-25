@@ -21,7 +21,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PRODUCTION_ROOTS = ("simulator/", "engines/", "web/", "tools/", "scripts/")
 PRODUCTION_FILES = ("app.py",)
-OPERATOR_DOC = ROOT / "docs" / "configuration.md"
+ENVIRONMENT_DOC = ROOT / "docs" / "configuration.md"
 # t-1747 adds two reviewed sites to the 94-token count after removing two
 # local-alias tokens from scripts/grind_home.py. Removing the YAML cache's
 # per-process root assignment leaves 94 + 2 - 1 = 95.
@@ -33,39 +33,6 @@ OPERATOR_DOC = ROOT / "docs" / "configuration.md"
 # proposer and two mutation-script subprocesses no longer read environ.
 ENV_ACCESS_TOKEN_CEILING = 96
 ENV_ACCESS_TOKEN = re.compile(r"\b(?:environ|getenv)\b")
-
-# Internal means a probe, diagnostic, debug switch, or harness control. Keep
-# each reason short and specific: these names are not normal app configuration.
-KNOWN_INTERNAL_ENV = {
-    "FIDELITY_DIAGNOSTIC_INTERNAL_ANALYTICAL_HIGH": "Enables internal analytical-model comparison in the fidelity diagnostic harness.",
-    "FIDELITY_DIAGNOSTIC_STUB_HIGH": "Legacy alias used only by the fidelity diagnostic harness.",
-    "FIDELITY_HIGH_BACKEND": "Selects a backend for the fidelity DOE harness.",
-    "FIDELITY_HIGH_HOURS": "Sets run duration in the fidelity DOE harness.",
-    "FIDELITY_SKIP_PROFILE_CONSTRAINTS": "Disables profile constraints in the fidelity DOE harness.",
-    "DISPLAY": "Removed from MAGEMin subprocess environments to prevent display discovery.",
-    "GOALFLIGHT_HOSTNAME": "Supplies a host label to an internal battery diagnostic.",
-    "HOSTNAME": "Fallback host label for an internal battery diagnostic.",
-    "MAGEMIN_PROBE_BINARY": "Selects the binary for a targeted MAGEMin hang probe.",
-    "MAGEMIN_PROBE_OUTPUT_DIR": "Routes output from a targeted MAGEMin hang probe.",
-    "MAGEMIN_PROBE_SCAN_ID": "Labels output from a targeted MAGEMin hang probe.",
-    "MPLCONFIGDIR": "Selects a matplotlib cache for an internal profiling script.",
-    "REGOLITH_DEBUG_FEEDSTOCKS": "Exposes debug-only feedstocks in the development UI.",
-    "REGOLITH_ENGINE_CACHE_BOX": "Labels cache rows with a source box for internal engine-cache diagnostics.",
-    "REGOLITH_ENGINE_POOL_DEBUG": "Prints internal engine-worker lifecycle diagnostics.",
-    "REGOLITH_ENGINE_WORKER_INHERIT_PROCESS_GROUP": "Internal worker lifecycle handoff flag.",
-    "REGOLITH_OPTIMIZER_CHILD_PID_LOG": "Internal child-process tracking log path.",
-    "REGOLITH_OPTIMIZER_WARM_WORKERS": "Controls optimizer worker reuse, an internal performance setting.",
-    "REGOLITH_OPTIMIZER_WORKER_OUTPUT_DIR": "Internal worker output handoff path.",
-    "REGOLITH_PARSED_YAML_CACHE_DIR": "Selects the implementation cache directory for parsed YAML.",
-    "REGOLITH_PARSED_YAML_CACHE": "Toggles the process-shared parsed-YAML disk cache in simulator.yaml_cache; enabled by default.",
-    "REGOLITH_REPO_ROOT": "Overrides the repository path for an internal cache validation script.",
-    "REGOLITH_STUDIO_HOST": "Labels the Studio host in an internal battery scoring report.",
-    "REGOLITH_THERMOENGINE_LOG_DIR": "Routes native engine diagnostics to a log directory.",
-    "REGOLITH_VAPOROCK_SESSION_WARM": "Enables internal VapoRock worker reuse for test and diagnostic workloads.",
-    "TMPDIR": "Selects temporary files for internal scripts and subprocesses.",
-    "XDG_CACHE_HOME": "Selects XDG cache storage for the parsed-YAML cache and a profiling script.",
-}
-
 
 def _literal(node: ast.AST, names: dict[str, object]) -> object | None:
     if isinstance(node, ast.Constant) and isinstance(node.value, str):
@@ -500,20 +467,40 @@ def _production_env_reads() -> set[str]:
 
 
 def _operator_doc_names() -> set[str]:
-    names: set[str] = set()
-    for line in OPERATOR_DOC.read_text(encoding="utf-8").splitlines():
+    return set(_environment_registry()[0])
+
+
+def _environment_registry() -> tuple[dict[str, str], dict[str, str]]:
+    sections = {
+        "Operator knobs": {},
+        "Harness (not for operators)": {},
+    }
+    section = ""
+    for line in ENVIRONMENT_DOC.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## "):
+            section = line[3:].strip()
+            continue
         if not line.startswith("|"):
             continue
-        first = line.split("|", 2)[1].strip().strip("`")
-        if first and first not in {"Name", "---"} and not set(first) <= {"-", ":"}:
-            names.add(first)
-    return names
+        cells = [cell.strip() for cell in line.split("|")[1:-1]]
+        if len(cells) < 2 or section not in sections:
+            continue
+        name = cells[0].strip("`")
+        if name and name != "Name" and not set(name) <= {"-", ":"}:
+            sections[section][name] = cells[1]
+    return sections["Operator knobs"], sections["Harness (not for operators)"]
 
 
-def _unregistered(reads: set[str], operator_names: set[str], internal: dict[str, str]):
-    overlap = operator_names & internal.keys()
-    unregistered = reads - operator_names - internal.keys()
-    stale = (operator_names | internal.keys()) - reads
+def _harness_doc_reasons() -> dict[str, str]:
+    return _environment_registry()[1]
+
+
+def _unregistered(
+    reads: set[str], operator_names: set[str], harness_names: dict[str, str]
+):
+    overlap = operator_names & harness_names.keys()
+    unregistered = reads - operator_names - harness_names.keys()
+    stale = (operator_names | harness_names.keys()) - reads
     return overlap, unregistered, stale
 
 
@@ -538,12 +525,12 @@ def _scratch_scan(
 
 def test_production_environment_reads_are_registered():
     reads = _production_env_reads()
-    operator_names = _operator_doc_names()
-    overlap, unregistered, stale = _unregistered(reads, operator_names, KNOWN_INTERNAL_ENV)
+    operator_names, harness_names = _environment_registry()
+    overlap, unregistered, stale = _unregistered(reads, operator_names, harness_names)
     assert not overlap, f"environment names are both operator and internal: {sorted(overlap)}"
     assert not unregistered, f"undocumented environment reads: {sorted(unregistered)}"
     assert not stale, f"stale environment registry entries: {sorted(stale)}"
-    assert all(reason.strip() for reason in KNOWN_INTERNAL_ENV.values())
+    assert all(reason.strip() for reason in harness_names.values())
 
 
 def test_environment_access_token_backstop():
@@ -571,7 +558,7 @@ def _runtime_environment_fingerprint(identity):
     assert _unregistered(
         reads,
         _operator_doc_names() - {"LD_LIBRARY_PATH"},
-        KNOWN_INTERNAL_ENV,
+        _harness_doc_reasons(),
     )[1] == {"LD_LIBRARY_PATH"}
 
 

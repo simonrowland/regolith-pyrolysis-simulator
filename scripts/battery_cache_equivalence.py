@@ -33,14 +33,17 @@ from simulator.engine_cache import _engine_cache_path_scope  # noqa: E402
 
 
 def _environment_setting(name: str) -> str | None:
+    # Private harness lookups provide a report label or scratch path.
     return os.environ.get(name)
 
 
 def _studio_host() -> str | None:
+    # Private report label for an internal Studio comparison run.
     return _environment_setting("REGOLITH_STUDIO_HOST")
 
 
 def _dispatch_scratch_directory() -> str | None:
+    # Private scratch routing for the internal score comparison harness.
     return _environment_setting("TMPDIR")
 
 

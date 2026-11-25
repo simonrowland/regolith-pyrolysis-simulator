@@ -16,6 +16,7 @@ from typing import Any
 from urllib.parse import quote
 
 
+# Private harness override for validation runs against a selected repo root.
 _repo_root_env = os.environ.get("REGOLITH_REPO_ROOT")
 REPO_ROOT = (
     Path(_repo_root_env)

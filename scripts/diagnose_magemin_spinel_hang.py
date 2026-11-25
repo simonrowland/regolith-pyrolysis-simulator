@@ -76,11 +76,13 @@ def _emit(payload: Mapping[str, Any]) -> None:
 
 
 def _append_event(filename: str, payload: Mapping[str, Any]) -> None:
+    # Private probe controls route and label this diagnostic's output.
     output_dir = os.environ.get('MAGEMIN_PROBE_OUTPUT_DIR')
     if not output_dir:
         return
     event = dict(payload)
     event.setdefault('pid', os.getpid())
+    # The private scan id separates concurrent probe output.
     event.setdefault('scan_id', os.environ.get('MAGEMIN_PROBE_SCAN_ID'))
     encoded = (json.dumps(event, sort_keys=True, default=str) + '\n').encode()
     path = Path(output_dir) / filename
@@ -139,6 +141,7 @@ def _timed_subprocess_slot(timeout_s: float) -> Iterator[None]:
             max(0.0, time.perf_counter() - started - state['slot_wait_s'])
             if state.get('slot_acquired') else 0.0
         )
+        # Private probe id keeps each diagnostic scan's event file distinct.
         _append_event(
             f"native-{os.environ.get('MAGEMIN_PROBE_SCAN_ID', 'unknown')}.jsonl",
             state,
@@ -147,6 +150,7 @@ def _timed_subprocess_slot(timeout_s: float) -> Iterator[None]:
 
 
 def _timed_subprocess_run(args: Any, *positional: Any, **keywords: Any) -> Any:
+    # Private probe binary selector; it only instruments this diagnostic run.
     binary = os.environ.get('MAGEMIN_PROBE_BINARY')
     is_magemin = bool(
         binary

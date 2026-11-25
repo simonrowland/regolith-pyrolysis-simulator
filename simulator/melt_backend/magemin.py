@@ -241,6 +241,7 @@ def _magemin_subprocess_env() -> Dict[str, str]:
         'HWLOC_COMPONENTS': '-opencl',
         'MPLBACKEND': 'Agg',
     })
+    # Private headless subprocess adjustment; the GUI display is not inherited.
     env.pop('DISPLAY', None)
     return env
 
