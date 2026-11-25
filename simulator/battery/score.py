@@ -2530,6 +2530,13 @@ def _classify_flagged_notice_facts(
         strata.append(FLAGGED_STRATUM_RESIDUE_REDOX)
     if (NoticeKind.ENGINE_MODEL_CAVEAT.value, TRACE_TAIL_BELOW_LOADER_CUTOFF) in notices:
         strata.append(TRACE_TAIL_BELOW_LOADER_CUTOFF)
+    if any(
+        kind == NoticeKind.ENGINE_MODEL_CAVEAT.value
+        and isinstance(reason, str)
+        and reason.startswith(f"{NON_EQUILIBRIUM_RUN_CAVEAT}:")
+        for kind, reason in notices
+    ):
+        strata.append(NON_EQUILIBRIUM_RUN_CAVEAT)
     if NoticeKind.IMCC_COMPLEX_SATURATION.value in kinds:
         strata.append(FLAGGED_STRATUM_IMCC_COMPLEX_SATURATION)
     if any(

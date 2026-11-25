@@ -68,10 +68,13 @@ def test_kennedy_table2_runs_migrate_with_printed_conditions_and_composition():
     result = _migrate_extract()
     assert len(result.observations) == 22
     assert result.registry_issues == []
-    assert len(result.queue) == 1
-    assert result.queue[0].axes == ["phase"]
-    assert result.queue[0].why == "missing phase"
+    assert result.queue == []
     observations = list(result.observations.values())
+    assert any(
+        notice.kind is NoticeKind.PHASE_INFERRED
+        for observation in observations
+        for notice in observation.notices
+    )
     assert all(o.identity.quantity.value is Quantity.FE3_FE2_RATIO for o in observations)
     assert all(o.value.kind.value == "point" for o in observations)
     assert all(o.identity.temperature_K.is_value for o in observations)
