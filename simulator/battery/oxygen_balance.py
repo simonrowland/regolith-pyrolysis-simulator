@@ -369,6 +369,7 @@ def _solve_vacuum_oxygen_balance(
     root_q = None if root_q is None else float(root_q)
     pressure_law_exponent_diagnostics: dict[str, dict[str, object]] = {}
     pressure_law_diagnostics: list[PressureLawChannelDiagnostic] = []
+    fixed_activities = bool(getattr(pressure_model, "declares_fixed_activities", False))
     redox_active = bool(getattr(pressure_model, "declares_redox_active", False))
     if bracket_boundary != "lower":
         probe_low = max(low, root - 0.1)
@@ -458,7 +459,27 @@ def _solve_vacuum_oxygen_balance(
                 "corrected_fixed_parent_activity_slope": corrected_slope,
                 "parent_activity_reported": parent_activity_reported,
             }
-            if redox_active:
+            # d-474 corrects the slope when this vapour path reports the
+            # parent activity it used. Without that value, fixed or undeclared
+            # laws keep b274's raw hard check; for non-fixed redox laws, b274's
+            # Kress slope lives only inside P, so diagnose and flag it instead
+            # of treating that slope as a stoichiometric exponent failure.
+            if parent_activity_reported:
+                if abs(corrected_slope - channel.pO2_exponent) > 1.0e-6:
+                    raise PressureLawExponentMismatch(
+                        f"pressure law exponent mismatch for {channel.species!r}: "
+                        f"declared {channel.pO2_exponent}, "
+                        f"observed {corrected_slope} "
+                        f"(raw total slope {raw_total_slope})"
+                    )
+            elif fixed_activities or not redox_active:
+                if abs(raw_total_slope - channel.pO2_exponent) > 1.0e-6:
+                    raise PressureLawExponentMismatch(
+                        f"pressure law exponent mismatch for {channel.species!r}: "
+                        f"declared {channel.pO2_exponent}, "
+                        f"observed {raw_total_slope}"
+                    )
+            else:
                 expected_exponent = channel.pO2_exponent
                 if channel.oxygen_per_metal_atom is not None and root_q is not None:
                     from simulator.fe_redox import KRESS91_LN_FO2_COEFFICIENT
@@ -476,13 +497,6 @@ def _solve_vacuum_oxygen_balance(
                 flags = getattr(pressure_model, "engine_flags", None)
                 if isinstance(flags, set):
                     flags.add(RESIDUE_PRESSURE_LAW_REDOX_ACTIVE)
-            if abs(corrected_slope - channel.pO2_exponent) > 1.0e-6:
-                raise PressureLawExponentMismatch(
-                    f"pressure law exponent mismatch for {channel.species!r}: "
-                    f"declared {channel.pO2_exponent}, "
-                    f"observed {corrected_slope} "
-                    f"(raw total slope {raw_total_slope})"
-                )
     if on_accepted_evaluation is not None:
         on_accepted_evaluation(root)
 
