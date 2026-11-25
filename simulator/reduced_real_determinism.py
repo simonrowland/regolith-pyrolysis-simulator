@@ -269,22 +269,40 @@ def _decode_payload_for_admission(
                 return None
         return curve
     if artifact == "equilibrium_post_record":
+        equilibrium_result = payload.get("equilibrium_result")
+        if not isinstance(equilibrium_result, Mapping) or any(
+            field_name not in equilibrium_result
+            for field_name in (
+                "vapor_pressures_Pa",
+                "vapor_pressures_source",
+                "warnings",
+            )
+        ):
+            return None
         try:
             decoded = _decode_equilibrium_replay_payload(payload)
         except Exception:
             return None
-        equilibrium_result = payload.get("equilibrium_result")
-        diagnostics = (
-            equilibrium_result.get("diagnostics")
-            if isinstance(equilibrium_result, Mapping)
-            else None
-        )
+        diagnostics = equilibrium_result.get("diagnostics")
         feo_activity = (
             diagnostics.get("a_FeO_calphad")
             if isinstance(diagnostics, Mapping)
             else None
         )
         if isinstance(feo_activity, Mapping) and "notices" in feo_activity:
+            return None
+        provenance = decoded.vapor_pressure_diagnostic.get(
+            "vapor_pressure_numerator_provenance"
+        )
+        if "vapor_pressure_numerator_provenance" in decoded.vapor_pressure_diagnostic and (
+            not isinstance(provenance, Mapping)
+            or any(
+                not isinstance(species, str)
+                or not isinstance(species_provenance, Mapping)
+                or any(not isinstance(field, str) for field in species_provenance)
+                for species, species_provenance in provenance.items()
+            )
+        ):
             return None
         return decoded
     return None
@@ -1934,7 +1952,19 @@ class PT0DeterminismStore:
             raise PT0CacheCollision(
                 f"PT-0 stored key bytes mismatch for {artifact}: {key_hash}"
             )
-        payload_bytes = canonical_json_bytes(entry["payload"])
+        try:
+            payload_bytes = canonical_json_bytes(entry["payload"])
+        except PT0NonFinitePayload:
+            if _decode_payload_for_admission(
+                artifact,
+                entry.get("payload"),
+                payload_codec_version=entry.get("payload_codec_version"),
+                keys=(key,),
+            ) is None:
+                return
+            raise PT0CacheCollision(
+                f"PT-0 stored payload is non-finite for {artifact}: {key_hash}"
+            )
         if entry.get("payload_hash") != _sha256(payload_bytes):
             raise PT0CacheCollision(
                 f"PT-0 stored payload bytes mismatch for {artifact}: {key_hash}"
@@ -2948,7 +2978,23 @@ class PT1PersistentEquilibriumStore:
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical request bytes: {key_hash}"
             )
-        if canonical_json_bytes(row_payload) != row_payload_bytes:
+        try:
+            canonical_payload_bytes = canonical_json_bytes(row_payload)
+        except PT0NonFinitePayload:
+            if _decode_payload_for_admission(
+                artifact,
+                row_payload,
+                payload_codec_version=row["payload_codec_version"],
+                keys=(row_key,),
+            ) is not None:
+                raise PT1PersistentStoreCorrupt(
+                    f"PT-1 row has non-finite payload values: {key_hash}"
+                )
+            canonical_payload_bytes = None
+        if (
+            canonical_payload_bytes is not None
+            and canonical_payload_bytes != row_payload_bytes
+        ):
             raise PT1PersistentStoreCorrupt(
                 f"PT-1 row non-canonical payload bytes: {key_hash}"
             )

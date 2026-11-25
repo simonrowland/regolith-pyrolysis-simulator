@@ -1931,6 +1931,9 @@ def _put_c3a_payload(db_path: Path, key: dict, label: str) -> None:
             "liquid_fraction": 0.5,
             "phase_assemblage_available": True,
             "liquidus_T_C": 1300.0,
+            "vapor_pressures_Pa": {},
+            "vapor_pressures_source": {},
+            "warnings": [],
         },
         "last_vapor_pressures_source": {},
         "last_vapor_pressure_diagnostic": {},
@@ -5076,7 +5079,15 @@ def _store_raw_replay_payload(
     law_disclosures=(),
 ) -> None:
     key_bytes = rrd.canonical_json_bytes(key)
-    payload_bytes = rrd.canonical_json_bytes(payload)
+    try:
+        payload_bytes = rrd.canonical_json_bytes(payload)
+    except rrd.PT0NonFinitePayload:
+        payload_bytes = json.dumps(
+            payload,
+            sort_keys=True,
+            separators=(",", ":"),
+            allow_nan=True,
+        ).encode("utf-8")
     store.persistent_store.put(
         artifact=artifact,
         key=key,
@@ -5098,12 +5109,22 @@ def _store_unadmitted_test_payload(
     law_disclosures=(),
 ) -> None:
     if store.persistent_store is None:
-        store._store(
-            artifact,
-            key,
-            payload,
-            law_disclosures=law_disclosures,
-        )
+        try:
+            store._store(
+                artifact,
+                key,
+                payload,
+                law_disclosures=law_disclosures,
+            )
+        except rrd.PT0NonFinitePayload:
+            finite_payload = _replace_nonfinite_test_values(payload)
+            store._store(
+                artifact,
+                key,
+                finite_payload,
+                law_disclosures=law_disclosures,
+            )
+            store._entries[_key_hash(key)]["payload"] = copy.deepcopy(payload)
     else:
         _store_raw_replay_payload(
             store,
@@ -5112,6 +5133,85 @@ def _store_unadmitted_test_payload(
             payload,
             law_disclosures=law_disclosures,
         )
+
+
+def _replace_nonfinite_test_values(value: Any) -> Any:
+    if isinstance(value, Mapping):
+        return {
+            key: _replace_nonfinite_test_values(item)
+            for key, item in value.items()
+        }
+    if isinstance(value, (list, tuple)):
+        return [_replace_nonfinite_test_values(item) for item in value]
+    if isinstance(value, float) and not math.isfinite(value):
+        return 0.0
+    return value
+
+
+def _assert_corrupt_cache_row_misses_and_replaces(
+    capture: PT0DeterminismStore,
+    *,
+    artifact: str,
+    key: dict,
+    corrupt_payload: dict,
+    current_payload: dict,
+    persistent: bool,
+    db_path: Path | None,
+    monkeypatch: pytest.MonkeyPatch,
+    sim: Any = None,
+) -> None:
+    from simulator.vapour_rail import run_disclosure
+
+    disclosure_calls: list[None] = []
+    original_accept = run_disclosure.accept_stored_memo
+
+    def record_disclosure(*args: Any, **kwargs: Any) -> Any:
+        disclosure_calls.append(None)
+        return original_accept(*args, **kwargs)
+
+    monkeypatch.setattr(run_disclosure, "accept_stored_memo", record_disclosure)
+    _store_unadmitted_test_payload(
+        capture,
+        artifact,
+        key,
+        corrupt_payload,
+        law_disclosures=[],
+    )
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
+    with pytest.raises(PT0CacheMiss):
+        replay._lookup(artifact, key, sim=sim)
+    assert replay.hits == 0
+    assert disclosure_calls == []
+
+    capture._store(artifact, key, current_payload, law_disclosures=[])
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
+    assert replay._lookup(artifact, key, sim=sim) == current_payload
+    assert replay.hits == 1
+
+
+def _valid_test_gate_payload() -> dict[str, Any]:
+    return {
+        "curve": rrd._curve_payload(
+            {
+                "source": "gate_liquid_fraction",
+                "solidus_T_C": 1200.0,
+                "liquidus_T_C": 1300.0,
+                "path": (
+                    (1200.0, 0.0),
+                    (1300.0, 1.0),
+                ),
+                "is_liquidus_floor": False,
+            }
+        ),
+    }
 
 
 def test_pt0_gate_curve_codec_misses_floor_rows_without_magemin_source(
@@ -5640,97 +5740,103 @@ def test_projected_magemin_step_down_replay_keeps_d447_feo_flag(
 def test_decoder_unreadable_gate_row_misses_before_hit_and_is_replaceable(
     tmp_path: Path,
     persistent: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "unreadable-gate-row.sqlite" if persistent else None
     capture = PT0DeterminismStore("capture", db_path=db_path)
     key = _freeze_gate_key()
-    current_payload = {
-        "curve": {
-            "source": "gate_liquid_fraction",
-            "solidus_T_C": 1200.0,
-            "liquidus_T_C": 1300.0,
-            "path": [
-                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
-                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
-            ],
-            "is_liquidus_floor": False,
-        },
-    }
+    current_payload = _valid_test_gate_payload()
     unreadable_payload = copy.deepcopy(current_payload)
     unreadable_payload["curve"].pop("liquidus_T_C")
-    _store_unadmitted_test_payload(
+    _assert_corrupt_cache_row_misses_and_replaces(
         capture,
-        "freeze_gate_curve",
-        key,
-        unreadable_payload,
-        law_disclosures=[],
+        artifact="freeze_gate_curve",
+        key=key,
+        corrupt_payload=unreadable_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
     )
-
-    replay = (
-        PT0DeterminismStore("replay", db_path=db_path)
-        if persistent
-        else capture
-    )
-    with pytest.raises(PT0CacheMiss):
-        replay._lookup("freeze_gate_curve", key)
-    assert replay.hits == 0
-
-    capture._store(
-        "freeze_gate_curve",
-        key,
-        current_payload,
-        law_disclosures=[],
-    )
-    replay = (
-        PT0DeterminismStore("replay", db_path=db_path)
-        if persistent
-        else capture
-    )
-    assert replay._lookup("freeze_gate_curve", key) == current_payload
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
 def test_empty_gate_curve_path_misses_and_is_replaceable(
     tmp_path: Path,
     persistent: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "empty-gate-path.sqlite" if persistent else None
     capture = PT0DeterminismStore("capture", db_path=db_path)
     key = _freeze_gate_key()
-    current_payload = {
+    current_payload = _valid_test_gate_payload()
+    empty_path_payload = copy.deepcopy(current_payload)
+    empty_path_payload["curve"]["path"] = []
+    _assert_corrupt_cache_row_misses_and_replaces(
+        capture,
+        artifact="freeze_gate_curve",
+        key=key,
+        corrupt_payload=empty_path_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+    )
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_omitted_gate_curve_path_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "omitted-gate-path.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    current_payload = _valid_test_gate_payload()
+    omitted_path_payload = copy.deepcopy(current_payload)
+    omitted_path_payload["curve"].pop("path")
+
+    _assert_corrupt_cache_row_misses_and_replaces(
+        capture,
+        artifact="freeze_gate_curve",
+        key=key,
+        corrupt_payload=omitted_path_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+    )
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_fixture_style_gate_row_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "fixture-style-gate-row.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    key = _freeze_gate_key()
+    current_payload = _valid_test_gate_payload()
+    fixture_payload = {
         "curve": {
-            "source": "gate_liquid_fraction",
-            "solidus_T_C": 1200.0,
-            "liquidus_T_C": 1300.0,
-            "path": [
-                {"temperature_C": 1200.0, "liquid_fraction": 0.0},
-                {"temperature_C": 1300.0, "liquid_fraction": 1.0},
-            ],
+            "status": "ok",
+            "tag": "fixture-only",
             "is_liquidus_floor": False,
         },
     }
-    empty_path_payload = copy.deepcopy(current_payload)
-    empty_path_payload["curve"]["path"] = []
-    _store_unadmitted_test_payload(
+
+    _assert_corrupt_cache_row_misses_and_replaces(
         capture,
-        "freeze_gate_curve",
-        key,
-        empty_path_payload,
-        law_disclosures=[],
+        artifact="freeze_gate_curve",
+        key=key,
+        corrupt_payload=fixture_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
     )
-
-    with pytest.raises(PT0CacheMiss):
-        capture._lookup("freeze_gate_curve", key)
-    assert capture.hits == 0
-
-    capture._store(
-        "freeze_gate_curve",
-        key,
-        current_payload,
-        law_disclosures=[],
-    )
-    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
-    assert replay._lookup("freeze_gate_curve", key) == current_payload
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
@@ -5950,9 +6056,31 @@ def test_equilibrium_codec_row_version_misses_and_is_replaceable(
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+def test_current_equilibrium_capture_hits_after_admission(
+    tmp_path: Path,
+    persistent: bool,
+) -> None:
+    db_path = tmp_path / "current-equilibrium-hit.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    capture.capture_equilibrium(sim, result)
+    key = capture._equilibrium_key(sim)
+    current_payload = capture._entries[_key_hash(key)]["payload"]
+
+    replay = (
+        PT0DeterminismStore("replay", db_path=db_path)
+        if persistent
+        else capture
+    )
+    assert replay._lookup("equilibrium_post_record", key, sim=sim) == current_payload
+    assert replay.hits == 1
+
+
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
 def test_unreadable_equilibrium_replay_side_row_misses_and_is_replaceable(
     tmp_path: Path,
     persistent: bool,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "unreadable-equilibrium.sqlite" if persistent else None
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -5963,38 +6091,73 @@ def test_unreadable_equilibrium_replay_side_row_misses_and_is_replaceable(
     )
     unreadable_payload = copy.deepcopy(current_payload)
     unreadable_payload["last_vapor_pressure_diagnostic"] = 7
-    _store_unadmitted_test_payload(
+    _assert_corrupt_cache_row_misses_and_replaces(
         capture,
-        "equilibrium_post_record",
-        key,
-        unreadable_payload,
-        law_disclosures=[],
+        artifact="equilibrium_post_record",
+        key=key,
+        corrupt_payload=unreadable_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+        sim=sim,
     )
 
-    with pytest.raises(PT0CacheMiss):
-        capture._lookup("equilibrium_post_record", key)
-    assert capture.hits == 0
 
-    capture._store(
-        "equilibrium_post_record",
-        key,
-        current_payload,
-        law_disclosures=[],
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "bad_value",
+    (7, None, {"SiO": 7}),
+    ids=("scalar", "null", "non-mapping-species-value"),
+)
+def test_nested_equilibrium_vapor_provenance_must_be_a_mapping(
+    tmp_path: Path,
+    persistent: bool,
+    bad_value: Any,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "nested-equilibrium-provenance.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
     )
-    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
-    assert replay._lookup("equilibrium_post_record", key) == current_payload
+    corrupt_payload = copy.deepcopy(current_payload)
+    corrupt_payload["last_vapor_pressure_diagnostic"][
+        "vapor_pressure_numerator_provenance"
+    ] = bad_value
+
+    _assert_corrupt_cache_row_misses_and_replaces(
+        capture,
+        artifact="equilibrium_post_record",
+        key=key,
+        corrupt_payload=corrupt_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+        sim=sim,
+    )
 
 
 @pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
 @pytest.mark.parametrize(
     ("field", "bad_value"),
-    (("vapor_pressures_Pa", 7), ("warnings", 7)),
+    (
+        ("vapor_pressures_Pa", 7),
+        ("vapor_pressures_Pa", {"SiO": float("nan")}),
+        ("vapor_pressures_Pa", {"SiO": float("inf")}),
+        ("warnings", 7),
+        ("warnings", ["valid warning", 7]),
+    ),
 )
 def test_unreadable_equilibrium_result_field_misses_and_is_replaceable(
     tmp_path: Path,
     persistent: bool,
     field: str,
     bad_value: Any,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     db_path = tmp_path / "unreadable-equilibrium-result.sqlite" if persistent else None
     capture = PT0DeterminismStore("capture", db_path=db_path)
@@ -6005,26 +6168,51 @@ def test_unreadable_equilibrium_result_field_misses_and_is_replaceable(
     )
     unreadable_payload = copy.deepcopy(current_payload)
     unreadable_payload["equilibrium_result"][field] = bad_value
-    _store_unadmitted_test_payload(
+    _assert_corrupt_cache_row_misses_and_replaces(
         capture,
-        "equilibrium_post_record",
-        key,
-        unreadable_payload,
-        law_disclosures=[],
+        artifact="equilibrium_post_record",
+        key=key,
+        corrupt_payload=unreadable_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+        sim=sim,
     )
 
-    with pytest.raises(PT0CacheMiss):
-        capture._lookup("equilibrium_post_record", key)
-    assert capture.hits == 0
 
-    capture._store(
-        "equilibrium_post_record",
-        key,
-        current_payload,
-        law_disclosures=[],
+@pytest.mark.parametrize("persistent", (False, True), ids=("memory", "pt1"))
+@pytest.mark.parametrize(
+    "field",
+    ("vapor_pressures_Pa", "vapor_pressures_source", "warnings"),
+)
+def test_missing_equilibrium_replay_field_misses_and_is_replaceable(
+    tmp_path: Path,
+    persistent: bool,
+    field: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    db_path = tmp_path / "missing-equilibrium-field.sqlite" if persistent else None
+    capture = PT0DeterminismStore("capture", db_path=db_path)
+    sim, result = _pt0_equilibrium_capture_context(capture)
+    key = capture._equilibrium_key(sim)
+    current_payload = rrd.canonical_replay_output_projection(
+        "equilibrium_post_record", sim, result
     )
-    replay = PT0DeterminismStore("replay", db_path=db_path) if persistent else capture
-    assert replay._lookup("equilibrium_post_record", key) == current_payload
+    corrupt_payload = copy.deepcopy(current_payload)
+    corrupt_payload["equilibrium_result"].pop(field)
+
+    _assert_corrupt_cache_row_misses_and_replaces(
+        capture,
+        artifact="equilibrium_post_record",
+        key=key,
+        corrupt_payload=corrupt_payload,
+        current_payload=current_payload,
+        persistent=persistent,
+        db_path=db_path,
+        monkeypatch=monkeypatch,
+        sim=sim,
+    )
 
 
 def test_equilibrium_replay_result_is_deep_copied_from_cached_payload() -> None:
