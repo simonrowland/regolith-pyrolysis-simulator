@@ -37,6 +37,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     _at_stage0_exit as _session_at_stage0_exit,
+    _drive_session_with_budget_intent,
     drive_session,
 )
 from simulator.scalar_boundary import is_declared_real_scalar
@@ -353,10 +354,12 @@ class RunExecutor:
         try:
             if initial_refusal is not None:
                 raise initial_refusal
-            driver = iter(drive_session(
+            driver = iter(_drive_session_with_budget_intent(
                 session,
                 hours,
                 DecisionPolicy.AUTO_APPLY,
+                driver=drive_session,
+                finite_budget=hours > 0,
                 operator_decisions=operator_decisions,
                 stop_at_stage0_exit=bool(stop_at_stage0_exit),
                 until_campaign_complete=until_campaign_complete,

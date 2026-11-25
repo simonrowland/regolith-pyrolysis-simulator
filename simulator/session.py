@@ -864,13 +864,39 @@ def drive_auto_apply(
 ) -> Iterable[StepResult]:
     """AUTO_APPLY driver loop for batch-runner surfaces."""
 
-    return drive_session(
+    return _drive_session_with_budget_intent(
         session,
         hours,
         DecisionPolicy.AUTO_APPLY,
+        driver=drive_session,
+        finite_budget=True,
         operator_decisions=operator_decisions,
         stop_at_stage0_exit=stop_at_stage0_exit,
     )
+
+
+def _drive_session_with_budget_intent(
+    session: SimSession,
+    hours: int,
+    policy: DecisionPolicy,
+    *,
+    driver: Any,
+    finite_budget: bool,
+    **kwargs: Any,
+) -> Iterable[StepResult]:
+    """Pass execution budget intent through the existing public driver."""
+
+    missing = object()
+    previous = getattr(session, "_finite_budget_intent", missing)
+    session._finite_budget_intent = finite_budget
+    try:
+        yield from driver(session, hours, policy, **kwargs)
+    finally:
+        if previous is missing:
+            if hasattr(session, "_finite_budget_intent"):
+                delattr(session, "_finite_budget_intent")
+        else:
+            session._finite_budget_intent = previous
 
 
 def _refuse_phase_without_an_end(session: SimSession) -> None:
@@ -904,11 +930,17 @@ def drive_session(
 
     if not is_declared_real_scalar(hours, allow_numeric_str=True):
         raise TypeError(f"hours must be numeric, not {type(hours).__name__}")
+    config = getattr(session, "_config", None)
+    budget_intent = getattr(session, "_finite_budget_intent", None)
+    if budget_intent is None:
+        finite_budget = int(getattr(config, "hours", 0) or 0) > 0
+    else:
+        finite_budget = bool(budget_intent)
+        delattr(session, "_finite_budget_intent")
     step_index = 0
     while True:
         if not until_campaign_complete and step_index >= int(hours):
-            config = getattr(session, "_config", None)
-            if step_index > 0 and int(getattr(config, "hours", 0) or 0) > 0:
+            if step_index > 0 and finite_budget:
                 run_flag = _hour_budget_exhausted_flag(session)
                 if run_flag is not None:
                     session._run_flags.append(run_flag)
@@ -989,18 +1021,39 @@ def _operator_decision_event(
     }
 
 
+class _ConfiguredCampaignWalkCycle(RuntimeError):
+    """The configured transition walk repeated routing state or exceeded its bound."""
+
+
 def _configured_campaign_walk(
     campaign_manager: Any,
     campaign: CampaignPhase,
     record: Any,
+    *,
+    c5_enabled: bool,
 ) -> tuple[CampaignPhase, ...]:
     """Walk configured AUTO_APPLY successors without touching live state."""
 
     manager = copy.deepcopy(campaign_manager)
+    manager.c5_enabled = c5_enabled
     walk_record = copy.deepcopy(record)
     phases: list[CampaignPhase] = []
+    seen: set[tuple[CampaignPhase, str, str, str]] = set()
     current: CampaignPhase | None = campaign
-    while current is not None and current is not CampaignPhase.COMPLETE:
+    for _ in range(len(CampaignPhase) * 2):
+        if current is None or current is CampaignPhase.COMPLETE:
+            return tuple(phases)
+        route_state = (
+            current,
+            str(walk_record.track),
+            str(walk_record.path),
+            str(walk_record.branch),
+        )
+        if route_state in seen:
+            raise _ConfiguredCampaignWalkCycle(
+                "configured campaign walk repeated routing state"
+            )
+        seen.add(route_state)
         phases.append(current)
         next_campaign = manager.get_next_campaign(current, walk_record)
         if next_campaign is None:
@@ -1011,15 +1064,19 @@ def _configured_campaign_walk(
             next_campaign, updates, complete = decision_successor(
                 decision.decision_type,
                 choice,
-                c5_enabled=bool(manager.c5_enabled),
+                c5_enabled=c5_enabled,
             )
             for field_name, field_value in updates.items():
                 setattr(walk_record, field_name, field_value)
             if complete or next_campaign is None:
                 break
         if next_campaign is CampaignPhase.COMPLETE:
-            break
+            return tuple(phases)
         current = next_campaign
+    if current is not None and current is not CampaignPhase.COMPLETE:
+        raise _ConfiguredCampaignWalkCycle(
+            "configured campaign walk exceeded its phase bound"
+        )
     return tuple(phases)
 
 
@@ -1056,22 +1113,14 @@ def _hour_budget_exhausted_flag(session: SimSession) -> dict[str, Any] | None:
             sim.campaign_mgr,
             campaign,
             sim.record,
+            c5_enabled=bool(sim.melt.c5_enabled),
         )
         if not at_campaign_boundary or just_completed_campaign == campaign_name:
             phases = phases[1:]
 
         manager = sim.campaign_mgr
         campaign_config = manager._campaign_config(campaign)
-        runtime_overrides = getattr(
-            getattr(session, "_config", None),
-            "runtime_campaign_overrides",
-            {},
-        ) or {}
-        campaign_overrides: dict[str, Any] = {}
-        for key in (manager._campaign_config_key(campaign), campaign_name):
-            raw_override = runtime_overrides.get(key, {})
-            if isinstance(raw_override, Mapping):
-                campaign_overrides.update(raw_override)
+        campaign_overrides = manager._campaign_overrides(campaign)
         configured_limits: dict[str, Any] = {}
         if "max_hold_hr" in campaign_config:
             configured_limits["setpoint_max_hold_hr"] = copy.deepcopy(

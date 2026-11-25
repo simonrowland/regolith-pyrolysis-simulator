@@ -82,6 +82,18 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     )
 
     payload = deterministic_gate_payload(run._build_output(execution))
+    payload_without_diagnostics = deepcopy(payload)
+    run_metadata_without_diagnostics = payload_without_diagnostics["run_metadata"]
+    run_metadata_without_diagnostics.pop("run_flags", None)
+    run_metadata_without_diagnostics.pop("campaign_stops", None)
+    payload_without_diagnostics_bytes = (
+        json.dumps(
+            payload_without_diagnostics,
+            sort_keys=True,
+            indent=2,
+            allow_nan=False,
+        ) + "\n"
+    ).encode("utf-8")
     payload_bytes = (
         json.dumps(payload, sort_keys=True, indent=2, allow_nan=False) + "\n"
     ).encode("utf-8")
@@ -120,6 +132,10 @@ def test_short_run_payload_and_ledger_match_rollback_baseline_golden():
     # Studio-3 actual for this Mars C2A 2 h payload (pins2 log, tree
     # 9666fc129 plus the de32c69ca runner regen). Mars runs diverge between
     # the laptop and studio-3, so this digest is not a laptop re-run.
+    # The new diagnostics are the only intended difference from green.
+    assert hashlib.sha256(payload_without_diagnostics_bytes).hexdigest() == (
+        "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
+    )
     # constack merge: repin on gate box
     assert hashlib.sha256(payload_bytes).hexdigest() == (
         "718ffcf58809ccc9d85d8f125a7e418b19e711a61d8b6f22ec9279b251d4c751"
@@ -435,7 +451,6 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
         campaign="C4",
         hours=1,
         additives_kg={},
-        runtime_campaign_overrides={"C2A": {"max_hours": 7}},
     )
     session = _started_internal_session(run)
     sim = session.simulator
@@ -477,7 +492,7 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
     assert detail["at_campaign_boundary"] is True
     assert detail["just_completed_campaign"] == "C4"
     assert detail["successors_not_reached"][0] == "C2A"
-    assert detail["configured_limits"]["max_hours_override"] == 7
+    assert detail["configured_limits"]["max_hours_override"] == 160.0
     assert detail["configured_limits"]["setpoint_max_hold_hr"] == (
         sim.campaign_mgr._campaign_config(CampaignPhase.C2A)["max_hold_hr"]
     )
@@ -498,11 +513,31 @@ def test_c4_time_cap_and_exact_boundary_flags_reach_batch_artifact():
     assert artifact["terminal"]["run_metadata"]["campaign_stops"]
 
 
+def test_budget_flag_uses_live_campaign_adjustment():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session.adjust(
+        "campaign_override",
+        23,
+        campaign="C2A",
+        field="max_hours",
+    )
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    flag = next(
+        flag for flag in execution.run_flags
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    assert flag["detail"]["configured_limits"]["max_hours_override"] == 23
+    assert not hasattr(session, "_finite_budget_intent")
+
+
 def test_hour_budget_flag_keeps_repeated_configured_successors():
     run = _run(campaign="C2A", hours=1)
     session = _started_internal_session(run)
     session.simulator.record.path = "A"
     session.simulator.record.branch = "two"
+    session.simulator.campaign_mgr.c5_enabled = True
 
     execution = RunExecutor().execute_session(session, hours=1)
 
@@ -563,9 +598,9 @@ def test_budget_flag_records_pending_decision_before_chain_lookahead(monkeypatch
 
     real_walk = session_module._configured_campaign_walk
 
-    def checked_walk(*args):
+    def checked_walk(*args, **kwargs):
         calls.append("chain_walk")
-        return real_walk(*args)
+        return real_walk(*args, **kwargs)
 
     monkeypatch.setattr(session, "pending_decision", pending_decision)
     monkeypatch.setattr(session_module, "_configured_campaign_walk", checked_walk)
@@ -588,7 +623,7 @@ def test_budget_flag_exception_is_typed_without_exception_text(monkeypatch):
     )
     monkeypatch.setattr(session, "pending_decision", lambda: pending)
 
-    def fail_walk(*_args):
+    def fail_walk(*_args, **_kwargs):
         raise RuntimeError("do not serialize this message")
 
     from simulator import session as session_module
@@ -617,7 +652,7 @@ def test_budget_flag_does_not_catch_base_exception(monkeypatch):
     class FatalDiagnostic(BaseException):
         pass
 
-    def abort_walk(*_args):
+    def abort_walk(*_args, **_kwargs):
         raise FatalDiagnostic()
 
     from simulator import session as session_module
@@ -626,6 +661,47 @@ def test_budget_flag_does_not_catch_base_exception(monkeypatch):
 
     with pytest.raises(FatalDiagnostic):
         _hour_budget_exhausted_flag(session)
+
+
+def test_budget_flag_reports_configured_campaign_cycle_as_unresolved(monkeypatch):
+    session = _started_internal_session(_run(campaign="C0", hours=1))
+    monkeypatch.setattr(
+        session.simulator.campaign_mgr,
+        "get_next_campaign",
+        lambda current, _record: current,
+    )
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    assert flag["detail"] == {
+        "unresolved": True,
+        "error_type": "_ConfiguredCampaignWalkCycle",
+    }
+
+
+def test_budget_flag_bounds_nonrepeating_configured_walk(monkeypatch):
+    session = _started_internal_session(_run(campaign="C0", hours=1))
+    calls = 0
+
+    def keep_routing(current, record):
+        nonlocal calls
+        calls += 1
+        record.path = str(calls)
+        return current
+
+    monkeypatch.setattr(
+        session.simulator.campaign_mgr,
+        "get_next_campaign",
+        keep_routing,
+    )
+
+    flag = _hour_budget_exhausted_flag(session)
+
+    assert calls == len(CampaignPhase) * 2
+    assert flag["detail"] == {
+        "unresolved": True,
+        "error_type": "_ConfiguredCampaignWalkCycle",
+    }
 
 
 def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:

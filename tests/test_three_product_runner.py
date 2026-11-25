@@ -22,6 +22,7 @@ import pytest
 
 from simulator.three_product_runner import (
     SUPPORTED_FORMATS,
+    _run_with_provenance,
     main,
     run,
 )
@@ -67,6 +68,22 @@ def test_run_with_zero_hours_returns_well_formed_baseline():
     )
     assert result['metals_plus_O2']['class_total_kg'] >= 0.0
     assert result['pure_silica_glass']['class_total_kg'] >= 0.0
+
+
+def test_finite_three_product_execution_carries_budget_flag():
+    _, provenance = _run_with_provenance(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        mass_kg=1000.0,
+    )
+
+    budget_flag = next(
+        flag for flag in provenance["run_metadata"]["run_flags"]
+        if flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    )
+    assert budget_flag["detail"]["campaign"] == "C2A"
+    assert budget_flag["detail"]["hours_run_in_campaign"] == 1
 
 
 def test_cli_writes_markdown_report_to_file(tmp_path):
