@@ -351,6 +351,65 @@ def evaporation_flux_refusal_from_configuration_error(
     )
 
 
+def _scale_condensation_moles(payload: Any, scale: float) -> Any:
+    """Scale route mole fields onto this step.
+
+    A rate-flux booking is per hour. ``condensed_kg`` is this step.
+    Temperatures, fractions, and identifiers stay put. A scale of 1
+    returns the same object.
+    """
+
+    if scale == 1.0 or not isinstance(payload, Mapping):
+        return payload
+    mol_maps = {
+        "baffle_products_mol",
+        "products_mol",
+    }
+    nested_mol_maps = {
+        "baffle_products_mol_by_stage",
+        "wall_products_mol_by_account",
+    }
+    mol_scalars = {
+        "baffle_oxygen_debit_mol",
+        "baffle_oxygen_credit_mol",
+        "wall_oxygen_debit_mol",
+        "wall_oxygen_credit_mol",
+        "uptake_mol",
+        "oxygen_debit_mol",
+        "oxide_product_mol",
+        "vapour_mol",
+    }
+
+    def _mapped(raw: Any) -> dict[str, float]:
+        return {
+            str(key): float(value) * scale
+            for key, value in dict(raw or {}).items()
+        }
+
+    scaled: dict[str, Any] = {}
+    for key, value in payload.items():
+        if key in mol_maps and isinstance(value, Mapping):
+            scaled[key] = _mapped(value)
+        elif key in nested_mol_maps and isinstance(value, Mapping):
+            scaled[key] = {
+                str(outer): _mapped(inner)
+                for outer, inner in value.items()
+                if isinstance(inner, Mapping)
+            }
+        elif key in mol_scalars:
+            scaled[key] = float(value) * scale
+        elif key == "reaction_legs" and isinstance(value, (list, tuple)):
+            scaled[key] = [
+                _scale_condensation_moles(leg, scale)
+                if isinstance(leg, Mapping)
+                else leg
+                for leg in value
+            ]
+        else:
+            scaled[key] = value
+    return scaled
+
+
 def _vapour_debit_floor_kg_hr() -> float:
     """Publisher nontrivial-flux threshold, the melt-debit floor.
 
@@ -6044,6 +6103,7 @@ class EvaporationMixin:
         )
         credited_condensed_kg = self._dispatch_condensation_route(
             species, condensed_kg, sp_data, route_result,
+            booking_scale=dt_hr,
         )
         self._project_routed_condensate(
             route_result, species, credited_condensed_kg, sp_data,
@@ -6199,6 +6259,7 @@ class EvaporationMixin:
         condensed_kg: float,
         sp_data: dict,
         route_result,
+        booking_scale: float = 1.0,
     ) -> float:
         """Dispatch CONDENSATION_ROUTE through the kernel + commit.
 
@@ -6227,6 +6288,26 @@ class EvaporationMixin:
             wall_deposit_fraction = 0.0
             wall_deposit_account_fractions = {}
 
+        # The route books moles from the flux it was given. A rate flux
+        # is per hour. condensed_kg is this step. Scale only when the
+        # caller says so. A step-mass caller leaves the scale at 1.
+        # The dispatch also sends the real dt_hr, and the provider does
+        # not apply it, so this scale is the one that keeps the credit
+        # on the debit.
+        booking = None
+        if species in route_result.wall_reaction_booking_by_species:
+            booking = _scale_condensation_moles(
+                copy.deepcopy(
+                    route_result.wall_reaction_booking_by_species[species]
+                ),
+                booking_scale,
+            )
+        stage3 = None
+        if species in route_result.stage3_reactive_alkali_by_species:
+            stage3 = _scale_condensation_moles(
+                dict(route_result.stage3_reactive_alkali_by_species[species]),
+                booking_scale,
+            )
         kernel_result = self._dispatch_and_commit(
             ChemistryIntent.CONDENSATION_ROUTE,
             transition_meta={
@@ -6234,23 +6315,15 @@ class EvaporationMixin:
                     getattr(route_result, 'condensation_authority_by_species', {})
                     .get(species, {})
                 ),
-                **({'wall_reaction_booking': copy.deepcopy(
-                    route_result.wall_reaction_booking_by_species[species])}
-                   if species in route_result.wall_reaction_booking_by_species else {}),
-                **({'stage3_reactive_alkali': dict(
-                    route_result.stage3_reactive_alkali_by_species[species])}
-                   if species in route_result.stage3_reactive_alkali_by_species else {}),
+                **({'wall_reaction_booking': booking} if booking is not None else {}),
+                **({'stage3_reactive_alkali': stage3} if stage3 is not None else {}),
             },
             control_inputs={
                 'species': species,
                 'condensed_kg': float(condensed_kg),
                 'sp_data': dict(sp_data or {}),
-                **({'stage3_reactive_alkali': dict(
-                    route_result.stage3_reactive_alkali_by_species[species])}
-                   if species in route_result.stage3_reactive_alkali_by_species else {}),
-                **({'wall_reaction_booking': copy.deepcopy(
-                    route_result.wall_reaction_booking_by_species[species])}
-                   if species in route_result.wall_reaction_booking_by_species else {}),
+                **({'stage3_reactive_alkali': stage3} if stage3 is not None else {}),
+                **({'wall_reaction_booking': booking} if booking is not None else {}),
                 'wall_deposit_fraction': wall_deposit_fraction,
                 'wall_deposit_account_fractions': wall_deposit_account_fractions,
                 'wall_temperature_K': (
