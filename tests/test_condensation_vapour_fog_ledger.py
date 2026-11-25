@@ -23,17 +23,16 @@ from simulator.runner import PyrolysisRun, RunnerError
 from tests.test_optimizer_evalspec import _c2a_window_profile
 
 # sha256 of float.hex kg_by_account plus product_ledger. Re-read from the
-# production runs after the approved condenser stack (film temperature,
-# every-species cold capture, e-NTU, the freeze-out cartridge, and the
-# 14.7388 m2 area). Those moves change ledger bytes. This pin is not a
-# with/without check of the fog flag; the history assertion below is.
+# production runs after d-383 switched pure-Fe P_sat to JANAF Fe-008; its
+# lower vapour pressure changes the downstream condenser ledger bytes. This
+# pin is not a with/without check of the fog flag; the history assertion below is.
 _LEDGER_DIGEST = {
-    "lunar_c2a_18h": "bb88aafd93b3022d1692d30004c8e087ff554a0ed347314b962fd4a014730f14",
+    "lunar_c2a_18h": "db2797de357b2c11d698e6ef2daed7c8bb928e0acd7dd70c12cb1ebfc8ffd6b9",
     "mars_c2a_18h_declared_carbon": (
-        "ac611224a755ad99d474794ccc36c5ef73ea47748e75d6e3affd574c15207d9c"
+        "fa1525c6a1893f280563f748cbe1f7ed3fa05985380f07e27bbc39965279c500"
     ),
-    "ci_c2a_18h": "4a46c2783fa6027b1a70d5c8283ce74c98e5c0e492f87d7221af1d87cedcd748",
-    "lunar_c0_24h": "4cc08d07f14f337cf710ebe4dce80dffa4f46ae9f68193fd0dd1d70b2ad74038",
+    "ci_c2a_18h": "da02fce0611ca96261583536d050eb5ccd50870ddee25684acff5c152cdfd473",
+    "lunar_c0_24h": "442afe1d49d5ffeacd1a4bc92d85e7107a1e036a4ab12bbca2c7d0456def0659",
 }
 
 
