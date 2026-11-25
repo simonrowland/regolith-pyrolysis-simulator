@@ -891,6 +891,7 @@ def test_zero_exponent_carrier_ignores_stale_parent_activity(monkeypatch):
         total_pressure_Pa=0.0,
         engine_metadata={},
         engine_flags=set(),
+        starting_inventory={"FeO": 1.0},
         missing_channels_reason="residue_pressure_channels_missing",
         caller="zero-exponent cache regression",
         floor_inversion_diagnostics={},
