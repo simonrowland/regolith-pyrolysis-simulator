@@ -34,6 +34,9 @@ KEMS_137_SOURCE_ID = "kems-137-bischof-2023"
 B677_SOURCE_ID = "pankratz-1984-usbm-b677"
 B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
 B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
+JIN_2022_SOURCE_ID = "jin-2022-cl-cr-sulfur-glass-solubility"
+JIN_BASELINE_STARTING_COMPOSITION = "baseline_starting_composition"
+JIN_TABLE4_MEASURED_PRODUCT_COMPOSITION = "table4_measured_product_composition"
 SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
     SF04_WORKBOOK_SOURCE_ID: {
         "sf04_workbook": SourceRule(
@@ -129,6 +132,16 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
         "printed_basis_protocol": SourceRule(
             "b2131",
             "Robie & Hemingway (1995), USGS Bulletin 2131",
+        ),
+    },
+    JIN_2022_SOURCE_ID: {
+        JIN_BASELINE_STARTING_COMPOSITION: SourceRule(
+            True,
+            "Jin et al. (2022) Table 1 prints the nominal 161SAS batch used for the baseline BL glass",
+        ),
+        JIN_TABLE4_MEASURED_PRODUCT_COMPOSITION: SourceRule(
+            True,
+            "Jin et al. (2022) Table 2 compositions are analyzed post-saturation glass products, not Table 4 run inputs",
         ),
     },
     "janaf": {

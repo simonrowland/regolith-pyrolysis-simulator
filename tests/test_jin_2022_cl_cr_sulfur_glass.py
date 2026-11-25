@@ -15,6 +15,7 @@ from simulator.battery.enums import (
     ValenceValueForm,
 )
 from simulator.battery.migrate import Migrator, wt_pct_to_mole_fraction
+from simulator.battery.input_provenance import PRINTED_STARTING_BULK
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -70,8 +71,14 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         assert row.identity.quantity.value is Quantity.VALENCE_RATIO
         assert row.identity.species.formula == "Cr"
         assert row.identity.temperature_K.value == Decimal("1423.15")
-        assert row.identity.composition.is_value
-        assert "ZnO" in row.identity.composition.value.as_map()
+        assert row.identity.composition.is_unknown
+        assert row.identity.composition.reason == (
+            "Jin et al. (2022) Table 2 compositions are analyzed post-saturation "
+            "glass products, not Table 4 run inputs"
+        )
+        product_composition = row.point_conditions["composition"]
+        assert product_composition.state.is_value
+        assert product_composition.locator.table == "2"
         assert row.identity.valence_basis.value.value_form is ValenceValueForm.FRACTION
         assert row.evidence.class_.value is EvidenceClass.MEASURED_REDUCED
         assert row.derivation is not None
@@ -79,6 +86,8 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         assert row.derivation.raw_inputs is not None
         assert row.derivation.raw_inputs.state.value.value == "not_printed"
         assert row.point_conditions["atmosphere"].state.value == "air"
+        assert row.identity.total_pressure_Pa is None or row.identity.total_pressure_Pa.is_unknown
+        assert row.identity.fO2_Pa is None or row.identity.fO2_Pa.is_unknown
         assert row.point_conditions["quench"].state.value == "water quench"
         # The source states air but no total pressure; do not infer 1 atm.
         oxygen_log = row.point_conditions["fO2_log"]
@@ -152,10 +161,16 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         assert len(cells) == len(table_headers)
 
     expected_identity_composition = wt_pct_to_mole_fraction(printed_composition)
-    assert s75_point.identity.composition.value.amount_basis is AmountBasis.MOLE_FRACTION
-    assert s75_point.identity.composition.value.as_map() == expected_identity_composition.as_map()
-    assert s75_point.point_conditions["composition"].locator.page == 15
-    assert s75_point.point_conditions["composition"].locator.table == "2"
+    assert s75_point.identity.composition.is_unknown
+    assert s75_point.identity.composition.reason.endswith(
+        "not Table 4 run inputs"
+    )
+    measured_product = s75_point.point_conditions["composition"]
+    assert measured_product.state.is_value
+    assert measured_product.state.value.amount_basis is AmountBasis.MOLE_FRACTION
+    assert measured_product.state.value.as_map() == expected_identity_composition.as_map()
+    assert measured_product.locator.page == 15
+    assert measured_product.locator.table == "2"
     typed_rows = [
         row for row in migrated_rows
         if row.identity.quantity.value is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
@@ -274,6 +289,10 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
         assert condition.locator.page == 14
         assert condition.locator.table == "1"
         assert "nominal_as_printed" in condition.locator.note
+        assert row.identity.composition.is_value
+        assert row.identity.composition.value.amount_basis is AmountBasis.MOLE_FRACTION
+        assert row.identity.composition.value.as_map() == expected_baseline_start.as_map()
+        assert row.identity.composition.value.input_provenance == PRINTED_STARTING_BULK
 
     salt_point = next(
         point for point in table2["values"]["points"]
@@ -285,6 +304,7 @@ def test_table4_cr_vi_percentages_migrate_as_reduced_fraction_points() -> None:
     assert salt_composition["locator"]["page"] == 4
     assert salt_composition["locator"]["section"] == "2.3 Preparation of Salt-Saturated Glass"
     assert all(row.point_conditions["composition"].state.is_unknown for row in salted_rows)
+    assert all(row.identity.composition.is_unknown for row in salted_rows)
     assert all(
         row.point_conditions["T_C"].locator.section == "2.2 Preparation of Baseline Glass"
         for row in baseline_rows
