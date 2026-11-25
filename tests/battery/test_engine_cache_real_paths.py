@@ -2553,12 +2553,13 @@ def test_openimcc_cache_settings_use_selected_opener_pack() -> None:
     )
 
 
-def test_openimcc_gas_nondefault_pack_bypasses_cache_but_default_hits(
+def test_non_default_openimcc_gas_pack_is_not_cached(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    from types import ModuleType
+
     from simulator import engine_cache
-    from simulator.melt_backend import openimcc_bridge
     from simulator.melt_backend.openimcc_bridge import evaluate_gas
 
     monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "gas-cache.sqlite"))
@@ -2576,17 +2577,28 @@ def test_openimcc_gas_nondefault_pack_bypasses_cache_but_default_hits(
         calls += 1
         return {"CO(g)": float(gas_pack.value)}
 
-    monkeypatch.setitem(
-        sys.modules,
-        "openimcc",
-        SimpleNamespace(evaluate_gas=fake_evaluate_gas),
+    fake_openimcc = SimpleNamespace(evaluate_gas=fake_evaluate_gas)
+    unavailable_error = type("FakeGasDataUnavailableError", (Exception,), {})
+    gas_module = ModuleType("openimcc.gas")
+    gas_module.ImccGasDataUnavailableError = unavailable_error
+    gas_module._packaged_pressure_signatures = lambda: (
+        "packaged-gas",
+        "packaged-condensate",
+        frozenset(),
+        frozenset(),
     )
-    default_pack = SimpleNamespace(value=1.0)
-    nondefault_pack = SimpleNamespace(value=2.0)
-    monkeypatch.setattr(
-        openimcc_bridge,
-        "_load_gas_pack",
-        lambda selection: default_pack,
+    fake_openimcc.gas = gas_module
+    monkeypatch.setitem(sys.modules, "openimcc", fake_openimcc)
+    monkeypatch.setitem(sys.modules, "openimcc.gas", gas_module)
+    default_pack = SimpleNamespace(
+        value=1.0,
+        gas_table_digest="packaged-gas",
+        condensate_table_digest="packaged-condensate",
+    )
+    nondefault_pack = SimpleNamespace(
+        value=2.0,
+        gas_table_digest="alternate-gas",
+        condensate_table_digest="alternate-condensate",
     )
     common = ({"SiO2": 0.5}, 1700.0, 1.0e-6)
     first = evaluate_gas(*common, default_pack)
@@ -2613,33 +2625,51 @@ def test_openimcc_gas_nondefault_pack_bypasses_cache_but_default_hits(
 
 
 def test_openimcc_explicit_nondefault_melt_pack_bypasses_cache(
+    tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     from simulator import engine_cache
     from simulator.melt_backend import openimcc_bridge
 
-    cache_calls = []
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE", str(tmp_path / "melt-cache.sqlite"))
+    engine_cache._MEMORY_CACHE.clear()
+    engine_cache.engine_cache_counters(reset=True)
+    calls = 0
 
-    def cached_engine_call(engine, request, solve):
-        cache_calls.append((engine, request))
-        return solve()
+    def fake_evaluate_uncached(**_kwargs: Any) -> Any:
+        nonlocal calls
+        calls += 1
+        result = {"result": calls}
+        return SimpleNamespace(to_hot=lambda: result)
 
-    monkeypatch.setattr(engine_cache, "cached_engine_call", cached_engine_call)
     monkeypatch.setattr(
         openimcc_bridge,
         "_evaluate_uncached",
-        lambda **_kwargs: SimpleNamespace(to_hot=lambda: {"result": "solved"}),
+        fake_evaluate_uncached,
     )
     monkeypatch.setattr(openimcc_bridge.OpenImccBridgeResult, "from_hot", lambda value: value)
 
-    nondefault = openimcc_bridge._evaluate_with_timeout(
+    nondefault_first = openimcc_bridge._evaluate_with_timeout(
         {"SiO2": 1.0}, 1800.0, pack="published-ext"
     )
-    default = openimcc_bridge._evaluate_with_timeout({"SiO2": 1.0}, 1800.0)
+    nondefault_second = openimcc_bridge._evaluate_with_timeout(
+        {"SiO2": 1.0}, 1800.0, pack="published-ext"
+    )
+    default_first = openimcc_bridge._evaluate_with_timeout({"SiO2": 1.0}, 1800.0)
+    default_hit = openimcc_bridge._evaluate_with_timeout({"SiO2": 1.0}, 1800.0)
 
-    assert nondefault == {"result": "solved"}
-    assert default == {"result": "solved"}
-    assert [request["pack"] for _, request in cache_calls] == ["default"]
+    assert nondefault_first == {"result": 1}
+    assert nondefault_second == {"result": 2}
+    assert default_first == default_hit == {"result": 3}
+    assert calls == 3
+    assert engine_cache.engine_cache_counters(reset=True)["openimcc"] == {
+        "hits": 1,
+        "misses": 1,
+        "stores": 1,
+        "store_error": 0,
+        "read_error": 0,
+        "conflicts": 0,
+    }
 
 
 def test_runtime_identity_is_captured_once_when_each_engine_opens(

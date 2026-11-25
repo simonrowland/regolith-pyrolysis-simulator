@@ -1668,13 +1668,14 @@ def test_openimcc_invalid_fo2_refusal_hits_after_disk_round_trip(
         return original(*args, **kwargs)
 
     monkeypatch.setattr(openimcc, "evaluate_gas", wrapped)
+    gas_pack = openimcc.load_gas_datapack()
 
     def run():
         return evaluate_gas(
             {"SiO2": 1.0},
             1600.0,
             0.0,
-            object(),
+            gas_pack,
         )
 
     with pytest.raises(ImccGasInvalidFugacityError) as first:

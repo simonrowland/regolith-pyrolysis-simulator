@@ -416,3 +416,36 @@ def test_prune_cli_dry_run_prints_per_engine_counts(tmp_path, monkeypatch, capsy
     assert report["matched_by_engine"]["openimcc"] == 1
     assert report["deleted_by_engine"]["openimcc"] == 0
     assert len(rows(path)) == 1
+
+
+def test_prune_apply_deletes_only_rows_with_superseded_chemistry_version(
+    tmp_path, monkeypatch, capsys
+):
+    path = tmp_path / "prune-apply.sqlite"
+    monkeypatch.setenv("REGOLITH_ENGINE_CACHE_BOX", "s1")
+    old_request = {"request": "superseded"}
+    current_request = {"request": "current"}
+    original_insert = cache._insert_cache_row_if_absent
+
+    def insert_stale_metadata(*args, **kwargs):
+        return original_insert(*args[:4], "0", *args[5:], **kwargs)
+
+    with monkeypatch.context() as mutation:
+        mutation.setattr(
+            cache, "_insert_cache_row_if_absent", insert_stale_metadata
+        )
+        with cache._engine_cache_path_scope(path):
+            cache.cached_engine_call("openimcc", old_request, lambda: {"answer": 1})
+    with cache._engine_cache_path_scope(path):
+        cache.cached_engine_call(
+            "openimcc", current_request, lambda: {"answer": 2}
+        )
+    cache._close_connections()
+
+    report = invoke(capsys, "prune", path, "--apply")
+
+    remaining = rows(path)
+    assert report["deleted_by_engine"]["openimcc"] == 1
+    assert report["vacuumed"] is True
+    assert len(remaining) == 1
+    assert remaining[0][3] == str(cache.ENGINE_CHEMISTRY_VERSION["openimcc"])
