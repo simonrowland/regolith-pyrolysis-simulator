@@ -7717,6 +7717,23 @@ def _source_composition_projection_derivation(
     )
 
 
+def _composition_projection_source_row_locator_key(
+    raw_locator: object,
+) -> tuple[str, str] | None:
+    if not isinstance(raw_locator, Mapping):
+        return None
+    table = str(raw_locator.get("table") or "")
+    row = raw_locator.get("row")
+    if isinstance(row, (str, int)) and str(row).strip():
+        return table, str(row).strip()
+    record = raw_locator.get("record")
+    if isinstance(record, str):
+        cell = re.search(r"\bcell\s+[A-Z]+(\d+)\b", record, re.IGNORECASE)
+        if cell is not None:
+            return table, cell.group(1)
+    return None
+
+
 def _project_source_declared_composition(
     source_id: str,
     obs: Mapping[str, Any],
@@ -7754,6 +7771,9 @@ def _project_source_declared_composition(
     elemental_projection_locator: Locator | None = None
     elemental_oxygen_locator: Locator | None = None
     if elemental_projection:
+        current_row_locator = _composition_projection_source_row_locator_key(
+            obs.get("locator")
+        )
         sample_id = values.get("sample_id_as_published")
         analysis_id = values.get("analysis_id_as_published")
         if (
@@ -7778,6 +7798,16 @@ def _project_source_declared_composition(
             ):
                 continue
             _species_formula, source_row = candidate
+            candidate_row_locator = _composition_projection_source_row_locator_key(
+                source_row.get("locator")
+            )
+            # Supplementary tables can reuse an analysis filename for multiple
+            # rows of one sample; the physical source row is the analytical unit.
+            if (
+                current_row_locator is not None
+                and candidate_row_locator != current_row_locator
+            ):
+                continue
             source_values = source_row.get("values")
             if not isinstance(source_values, Mapping):
                 continue
