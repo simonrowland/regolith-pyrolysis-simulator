@@ -28,7 +28,6 @@ class CompositionProjectionRule:
     ]
     reason: str
     applies_to_quantities: tuple[str, ...]
-    source_valences: tuple[tuple[str, int], ...] = ()
     default_valences: tuple[tuple[str, int], ...] = ()
     element_aliases: tuple[tuple[str, str], ...] = ()
     required_elements: tuple[str, ...] = ()
