@@ -5089,8 +5089,12 @@ def fusion_comparison_reference(
 ) -> Observation:
     """Single owner of reference-state selection for the scorer and the melt benchmark.
 
-    Crystal activities move onto the liquid endmember by the JANAF fusion
-    energy. Ban-ya Fe_tO activities use the source's Fe_tO(l) -> FeO(R.S.)
+    Crystal activities move onto the liquid endmember by exp(-ΔG_fus/RT),
+    with ΔG_fus = G_liquid - G_solid. JANAF supplies that Gibbs energy when
+    it covers the phase and the temperature. When it does not,
+    located_fusion_when_janaf_does_not_cover may supply a located solid and
+    liquid Gibbs function. This function does not choose among those sources.
+    Ban-ya Fe_tO activities use the source's Fe_tO(l) -> FeO(R.S.)
     relation. Other iron-saturated Fe(1-x)O(l) activities, including Distin's
     oxygen ratio, use the Darken & Gurry factor f to reach stoichiometric
     FeO(l) (a_FeO = a_measured * f, f = exp((mu_w - mu_FeO)/RT)). N0
@@ -5234,6 +5238,10 @@ def fusion_comparison_reference(
         _janaf_fusion_energy_for_pair,
         janaf_fusion_energy,
     )
+    from simulator.reference_data.solid_liquid_fusion import (
+        LocatedFusionEnergy,
+        located_fusion_when_janaf_does_not_cover,
+    )
     from simulator.battery.generators.janaf import (
         JANAF_R_J_PER_MOL_K,
         JANAFFusionPolymorphUnavailable,
@@ -5245,11 +5253,22 @@ def fusion_comparison_reference(
     # crystal stable at T. polymorph is None is not that record — the
     # melt-activity benchmark's pure-solid identity never set the axis, and
     # ``_fusion_energy_when_polymorph_absent`` still converts it.
-    if (
+    # A JANAF phase or temperature gap is not that decision. The located
+    # owner is asked first, and only a miss falls through to the JANAF
+    # polymorph inference. MAGEMin is not asked: MnO has no native melt
+    # activity, and skipping the refusal would return the solid value
+    # with no notice.
+    polymorph_unspecified = (
         observed_reference_phase is Phase.CR
         and standard_state.endmember.polymorph is not None
         and _source_polymorph_is_unspecified(standard_state.endmember.polymorph)
-    ):
+    )
+    located_fusion = None
+    if polymorph_unspecified and engine is not Engine.MAGEMIN:
+        located_fusion = located_fusion_when_janaf_does_not_cover(
+            formula, temperature_K
+        )
+    if located_fusion is None and polymorph_unspecified:
         updated, refusal = _decide_omitted_reference_polymorph(
             reference, identity, standard_state, formula, temperature_K
         )
@@ -5311,38 +5330,50 @@ def fusion_comparison_reference(
         )
 
     inferred_reference_notice: Notice | None = None
-    try:
-        if engine is Engine.MAGEMIN:
-            # The MAGEMin adapter resolves the source and target crystal
-            # tables itself and reads only this oxide's liquid table. A liquid
-            # reference names no crystal polymorph, so the source-named lookup
-            # cannot supply that table.
-            fusion = janaf_fusion_energy(formula, temperature_K)
-        elif standard_state.endmember.polymorph is None:
-            (
-                reference,
-                fusion,
-                absent_polymorph_refusal,
-                inferred_reference_notice,
-            ) = _fusion_energy_when_polymorph_absent(
-                reference, formula, temperature_K
-            )
-            if absent_polymorph_refusal is not None:
-                extra = (absent_polymorph_refusal,)
-                if inferred_reference_notice is not None:
-                    extra = (inferred_reference_notice, absent_polymorph_refusal)
-                return replace(
+    if located_fusion is not None:
+        fusion = located_fusion
+    else:
+        try:
+            if engine is Engine.MAGEMIN:
+                # The MAGEMin adapter resolves the source and target crystal
+                # tables itself and reads only this oxide's liquid table. A liquid
+                # reference names no crystal polymorph, so the source-named lookup
+                # cannot supply that table.
+                fusion = janaf_fusion_energy(formula, temperature_K)
+            elif standard_state.endmember.polymorph is None:
+                (
                     reference,
-                    notices=union_notices(reference.notices, extra),
+                    fusion,
+                    absent_polymorph_refusal,
+                    inferred_reference_notice,
+                ) = _fusion_energy_when_polymorph_absent(
+                    reference, formula, temperature_K
                 )
-        else:
-            fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
-    except ValueError as exc:
-        reason = str(exc)
-        notice = fusion_missing_input_notice(reason)
-        if notice is None:
-            raise
-        return replace(reference, notices=union_notices(reference.notices, (notice,)))
+                if absent_polymorph_refusal is not None:
+                    extra = (absent_polymorph_refusal,)
+                    if inferred_reference_notice is not None:
+                        extra = (inferred_reference_notice, absent_polymorph_refusal)
+                    return replace(
+                        reference,
+                        notices=union_notices(reference.notices, extra),
+                    )
+            else:
+                fusion = _janaf_fusion_energy_for_reference(reference, temperature_K)
+        except ValueError as exc:
+            reason = str(exc)
+            notice = fusion_missing_input_notice(reason)
+            if notice is None:
+                raise
+            fallback = None
+            if engine is not Engine.MAGEMIN:
+                fallback = located_fusion_when_janaf_does_not_cover(
+                    formula, temperature_K
+                )
+            if fallback is None:
+                return replace(
+                    reference, notices=union_notices(reference.notices, (notice,))
+                )
+            fusion = fallback
 
     if engine is Engine.MAGEMIN:
         assert magemin_target_polymorph is not None
@@ -5589,6 +5620,8 @@ def fusion_comparison_reference(
     # move it to liquid. Since μ=G°+RT ln(a), each step multiplies activity
     # by exp(−ΔG/RT). B1259's common printed H/S grid ends at 2000 K; its edge
     # H/S are held beyond that limit (dCp=0) and the notice marks extrapolation.
+    located_energy = fusion if isinstance(fusion, LocatedFusionEnergy) else None
+    tm_name = located_energy.source_name if located_energy is not None else "JANAF"
     magemin_above_crossing_notice: Notice | None = None
     if (
         temperature_K >= fusion.melting_temperature_K
@@ -5602,14 +5635,14 @@ def fusion_comparison_reference(
                 affected_quantities=(Quantity.ACTIVITY,),
                 reason=(
                     f"solid reference recorded at T={temperature_K} K >= "
-                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    f"{tm_name} T_fus={fusion.melting_temperature_K} K; "
                     "MAGEMin native solid-reference activity converted numerically; "
                     "its explicit polymorph table supplies the source standard; "
                     "liquid is natural"
                 ),
                 origin=reference.observation_id,
                 band=(
-                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"{tm_name} fusion crossing {fusion.melting_temperature_K} K; "
                     f"tables={fusion.crystal_table}/{fusion.liquid_table}"
                 ),
             )
@@ -5619,12 +5652,12 @@ def fusion_comparison_reference(
                 affected_quantities=(Quantity.ACTIVITY,),
                 reason=(
                     f"solid reference recorded at T={temperature_K} K >= "
-                    f"JANAF T_fus={fusion.melting_temperature_K} K; "
+                    f"{tm_name} T_fus={fusion.melting_temperature_K} K; "
                     "no numeric reference-state conversion applied because liquid is natural"
                 ),
                 origin=reference.observation_id,
                 band=(
-                    f"JANAF fusion crossing {fusion.melting_temperature_K} K; "
+                    f"{tm_name} fusion crossing {fusion.melting_temperature_K} K; "
                     f"tables={fusion.crystal_table}/{fusion.liquid_table}"
                 ),
             )
@@ -5648,42 +5681,106 @@ def fusion_comparison_reference(
     # 1823 and 1873 K, hence shifts -0.96857 and -0.90911 dex. Sanity check:
     # DeltaH_fus(1-T/Tm), with the JANAF crossing Tm=3200 K, gives 34.208 and
     # 32.966 kJ/mol at those temperatures.
+    # A non-JANAF located pair uses this same sign: DeltaG = G_l - G_s in
+    # J/mol, and a_l = a_s*exp(-DeltaG/RT). Barin 1995 MnO at 1673.15 K is
+    # DeltaG_fus = 9.100 kJ/mol, so log10(a_l/a_s) = -0.284 dex. No printed
+    # Turkdogan MnO solid/liquid Gibbs at 1673 K was located. The anchors and
+    # the constant-Cp derivation live in reference_data/solid_liquid_fusion.py.
     converted_activity = reference.value.point * (
         -delta_g_fus_J_per_mol / (JANAF_R_J_PER_MOL_K * temperature_K)
         + tridymite_offset_dex * Decimal(10).ln()
     ).exp()
     mismatch_K = fusion.melting_temperature_K - fusion.accepted_melting_temperature_K
     extrapolation_K = fusion.melting_temperature_K - temperature_K
-    if temperature_K >= fusion.melting_temperature_K:
-        fusion_distance = (
-            f"distance_above_JANAF_Tm={temperature_K - fusion.melting_temperature_K} K"
+    if located_energy is None:
+        if temperature_K >= fusion.melting_temperature_K:
+            fusion_distance = (
+                f"distance_above_JANAF_Tm={temperature_K - fusion.melting_temperature_K} K"
+            )
+            fusion_reference_note = "liquid is stable above the JANAF fusion crossing"
+        else:
+            fusion_distance = f"distance_below_JANAF_Tm={extrapolation_K} K"
+            fusion_reference_note = (
+                "table/accepted melting-point mismatch adds uncertainty to the "
+                "metastable-liquid reference"
+            )
+        notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
+                "reference-state conversion (not model error); "
+                f"oxide={formula}; source_activity_solid={reference.value.point}; "
+                f"converted_activity_liquid={converted_activity}; "
+                f"offset_dex=+{offset_dex}; "
+                f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
+                f"JANAF_Tm={fusion.melting_temperature_K} K; {fusion_distance}; "
+                f"accepted_Tm~{fusion.accepted_melting_temperature_K} K; "
+                f"JANAF_minus_accepted_Tm={mismatch_K} K; "
+                f"{fusion_reference_note}; tables={fusion.crystal_table}/"
+                f"{fusion.liquid_table}; source_sha256={fusion.source_sha256[0]}/"
+                f"{fusion.source_sha256[1]}"
+            ),
+            origin=reference.observation_id,
         )
-        fusion_reference_note = "liquid is stable above the JANAF fusion crossing"
+        evidence_text = (
+            "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
+        )
     else:
-        fusion_distance = f"distance_below_JANAF_Tm={extrapolation_K} K"
-        fusion_reference_note = (
-            "table/accepted melting-point mismatch adds uncertainty to the "
-            "metastable-liquid reference"
+        authority = {
+            "certified": Authority.CERTIFIED,
+            "bridge": Authority.BRIDGE,
+            "extrapolated": Authority.EXTRAPOLATED,
+            "derived": Authority.DERIVED,
+        }.get(located_energy.authority)
+        if authority is None:
+            raise ValueError(
+                "located fusion authority "
+                f"{located_energy.authority!r} is not a scoring authority"
+            )
+        if temperature_K >= fusion.melting_temperature_K:
+            fusion_distance = (
+                f"distance_above_Tm={temperature_K - fusion.melting_temperature_K} K"
+            )
+            fusion_reference_note = (
+                f"liquid is at or above the {located_energy.source_name} fusion temperature"
+            )
+        else:
+            fusion_distance = f"distance_below_Tm={extrapolation_K} K"
+            fusion_reference_note = (
+                "liquid Gibbs below the printed fusion temperature continues "
+                "the source constant heat capacity"
+            )
+        notice = Notice(
+            kind=NoticeKind.DERIVATION_USES_COMPILATION,
+            affected_quantities=(Quantity.ACTIVITY,),
+            reason=(
+                f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
+                "reference-state conversion (not model error); "
+                f"oxide={formula}; source={located_energy.source_name}; "
+                f"authority={authority.value}; "
+                f"certified_band={located_energy.certified_band}; "
+                f"source_activity_solid={reference.value.point}; "
+                f"converted_activity_liquid={converted_activity}; "
+                f"offset_dex=+{offset_dex}; "
+                f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; "
+                f"T={temperature_K} K; "
+                f"Tm={fusion.melting_temperature_K} K; {fusion_distance}; "
+                f"{fusion_reference_note}; "
+                f"tables={fusion.crystal_table}/{fusion.liquid_table}"
+            ),
+            origin=reference.observation_id,
+            band=located_energy.certified_band,
+            authority=authority,
+            certification=(
+                f"{located_energy.source_name} solid and liquid Gibbs functions; "
+                "DeltaG_fus = G_liquid - G_solid"
+            ),
         )
-    notice = Notice(
-        kind=NoticeKind.DERIVATION_USES_COMPILATION,
-        affected_quantities=(Quantity.ACTIVITY,),
-        reason=(
-            f"{FLAGGED_STRATUM_REFERENCE_CONVERTED_VIA_FUSION}; "
-            "reference-state conversion (not model error); "
-            f"oxide={formula}; source_activity_solid={reference.value.point}; "
-            f"converted_activity_liquid={converted_activity}; "
-            f"offset_dex=+{offset_dex}; "
-            f"DeltaG_fus={fusion.delta_g_fus_kJ_per_mol} kJ/mol; T={temperature_K} K; "
-            f"JANAF_Tm={fusion.melting_temperature_K} K; {fusion_distance}; "
-            f"accepted_Tm~{fusion.accepted_melting_temperature_K} K; "
-            f"JANAF_minus_accepted_Tm={mismatch_K} K; "
-            f"{fusion_reference_note}; tables={fusion.crystal_table}/"
-            f"{fusion.liquid_table}; source_sha256={fusion.source_sha256[0]}/"
-            f"{fusion.source_sha256[1]}"
-        ),
-        origin=reference.observation_id,
-    )
+        evidence_text = (
+            "activity converted from a solid to liquid reference with "
+            f"{located_energy.source_name} fusion Gibbs energy"
+        )
     notices = (notice,)
     if inferred_reference_notice is not None:
         notices = (inferred_reference_notice,) + notices
@@ -5699,9 +5796,7 @@ def fusion_comparison_reference(
         value=replace(reference.value, point=converted_activity),
         evidence=replace(
             reference.evidence,
-            class_=State.unknown(
-                "activity converted from a solid to liquid reference with JANAF fusion Gibbs energy"
-            ),
+            class_=State.unknown(evidence_text),
         ),
         notices=union_notices(reference.notices, notices),
     )
