@@ -2126,10 +2126,12 @@ def _time_forward_thermal_segments(
     if math.isclose(celsius, 1200.0, abs_tol=1e-7):
         ramp(start_K, at_1200_K)
         segments.append((at_1200_K, 300.0))
-        segments.append((temperature_K, duration_min * 60.0))
+        if duration_min > 0.0:
+            segments.append((temperature_K, duration_min * 60.0))
     else:
         ramp(start_K, temperature_K)
-        segments.append((temperature_K, duration_min * 60.0))
+        if duration_min > 0.0:
+            segments.append((temperature_K, duration_min * 60.0))
     return tuple(segments)
 
 

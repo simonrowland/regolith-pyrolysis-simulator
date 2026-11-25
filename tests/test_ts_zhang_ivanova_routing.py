@@ -121,8 +121,53 @@ def test_zhang_zero_time_path_applies_the_printed_hold_only_at_1200c() -> None:
         for at_K, seconds in path_1200
     )
     assert not any(seconds >= 300.0 for _at_K, seconds in path_1400)
-    assert round(path_1400[-1][0] - 273.15, 6) == 1400.0
-    assert path_1400[-1][1] == 0.0
+    assert 0.0 < path_1400[-1][1] <= 60.0
+    assert 1375.0 < path_1400[-1][0] - 273.15 < 1400.0
+
+
+def test_zhang_zero_time_segments_run_through_geometry_integrator() -> None:
+    source_id = "zhang-2021-acsesc-si"
+    _context, observations, _experiments, _source_observations = _residue_context(
+        source_id
+    )
+    zero_time_by_temperature = {
+        round(float(observation.identity.temperature_K.value) - 273.15, 6): observation
+        for observation in observations.values()
+        if float(observation.point_conditions["time_min"].state.value) == 0.0
+    }
+    channel = ResidueChannel(
+        "O2", "O2", None, 1.0, "zero-time schedule test"
+    )
+    for celsius in (1200.0, 1400.0):
+        observation = zero_time_by_temperature[celsius]
+        segments = _time_forward_thermal_segments(
+            source_id,
+            observation,
+            float(observation.identity.temperature_K.value),
+        )
+        assert segments
+        assert all(seconds > 0.0 for _at_K, seconds in segments)
+        inventory = {"MgO": 1.0}
+        final_step = None
+        for at_K, seconds in segments:
+            final_step = _hashimoto_integrate_geometry(
+                inventory,
+                (channel,),
+                lambda _inventory, _log10_pO2_bar: {},
+                temperature_K=at_K,
+                duration_s=seconds,
+                steps=1,
+                geometry_policy_id="sphere_constant",
+                initial_area_m2=1.0e-4,
+            )
+            inventory = dict(final_step.inventory_mol)
+        assert final_step is not None
+        assert final_step.inventory_mol == {"MgO": 1.0}
+        if celsius == 1200.0:
+            assert segments[-1] == (1200.0 + 273.15, 300.0)
+        else:
+            assert segments[-1][1] > 0.0
+            assert segments[-1][0] < 1400.0 + 273.15
 
 
 def test_dp116_notice_uses_the_melt_density_fallback_owner() -> None:
