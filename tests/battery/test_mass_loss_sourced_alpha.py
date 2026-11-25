@@ -10,10 +10,10 @@ from types import SimpleNamespace
 import pytest
 
 import simulator.battery.score as score_module
-from simulator.battery.enums import Engine, Quantity, RefusalReason
+from simulator.battery.enums import Engine, NoticeKind, Quantity, RefusalReason
 from simulator.battery.migrate import LITERATURE, Migrator
 from simulator.battery.residue import ResidueInventoryRefusal, _mass_loss_sourced_alphas
-from simulator.battery.score import predict_with_engine, quantity_token
+from simulator.battery.score import flagged_strata, predict_with_engine, quantity_token
 
 
 @pytest.fixture
@@ -1304,6 +1304,8 @@ def test_real_r11_defaults_missing_alphas_and_reports_loss_bound(
         if notice.reason.startswith("mass_loss_alpha_default:")
     ]
     assert alpha_defaults
+    assert all(notice.kind is NoticeKind.ALPHA_ASSUMED for notice in alpha_defaults)
+    assert NoticeKind.ALPHA_ASSUMED.value in flagged_strata(prediction.notices)
     assert any("AlO2=1.0" in notice.reason for notice in alpha_defaults)
     bound_notice = next(
         notice for notice in prediction.notices

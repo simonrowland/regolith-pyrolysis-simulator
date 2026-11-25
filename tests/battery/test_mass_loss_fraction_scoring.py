@@ -45,8 +45,10 @@ from simulator.battery.residue import (
     predict_knudsen_residue_composition,
 )
 from simulator.battery.score import (
+    FLAGGED_STRATUM_KNOB_DEFAULTED,
     QUANTITY_METRIC,
     compile_residual,
+    flagged_strata,
     load_score_context,
     predict_with_engine,
     quantity_token,
@@ -815,7 +817,7 @@ def test_richter_rows_default_unprinted_evaporation_coefficients_with_flag(
 
     assert prediction.value is not None
     assert any(
-        notice.kind is NoticeKind.FALLBACK
+        notice.kind is NoticeKind.ALPHA_ASSUMED
         and notice.reason.startswith("mass_loss_alpha_default:")
         for notice in prediction.notices
     )
@@ -967,7 +969,7 @@ def test_richter_catalogue_sibling_keeps_initial_through_finalization(
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=migrated)
     assert prediction.value is not None
     assert any(
-        notice.kind is NoticeKind.FALLBACK
+        notice.kind is NoticeKind.ALPHA_ASSUMED
         and notice.reason.startswith("mass_loss_alpha_default:")
         for notice in prediction.notices
     )
@@ -1021,7 +1023,7 @@ def test_richter_rep5_row_scores_with_flagged_alpha_default(
 
     assert prediction.value is not None
     assert any(
-        notice.kind is NoticeKind.FALLBACK
+        notice.kind is NoticeKind.ALPHA_ASSUMED
         and notice.reason.startswith("mass_loss_alpha_default:")
         for notice in prediction.notices
     )
@@ -1043,10 +1045,49 @@ def test_richter_rep5_row_scores_with_flagged_alpha_default(
     assert scored.status is not ResidualStatus.REFUSED
     assert scored.numeric is not None
     assert any(
-        notice.kind is NoticeKind.FALLBACK
+        notice.kind is NoticeKind.ALPHA_ASSUMED
         and notice.reason.startswith("mass_loss_alpha_default:")
         for notice in scored.notices
     )
+    assert NoticeKind.ALPHA_ASSUMED.value in flagged_strata(scored.notices)
+    assert FLAGGED_STRATUM_KNOB_DEFAULTED in flagged_strata(scored.notices)
+
+
+@pytest.mark.usefixtures("without_sourced_alpha_context")
+def test_legacy_fallback_notice_mutation_breaks_headline_exclusion(
+    mass_loss_rows, monkeypatch,
+) -> None:
+    richter, experiment, *_rest = mass_loss_rows
+    current_predictor = score_module._predict_mass_loss_with_residue
+
+    def legacy_fallback_notices(*args, **kwargs):
+        prediction = current_predictor(*args, **kwargs)
+        return replace(
+            prediction,
+            notices=tuple(
+                replace(notice, kind=NoticeKind.FALLBACK)
+                if notice.reason.startswith((
+                    "mass_loss_alpha_default:", "mass_loss_area_",
+                ))
+                else notice
+                for notice in prediction.notices
+            ),
+        )
+
+    monkeypatch.setattr(
+        score_module,
+        "_predict_mass_loss_with_residue",
+        legacy_fallback_notices,
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        richter,
+        experiment=_richter_rep5_run(experiment),
+    )
+
+    assert prediction.value is not None
+    with pytest.raises(AssertionError):
+        assert NoticeKind.ALPHA_ASSUMED.value in flagged_strata(prediction.notices)
 
 
 def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
@@ -1111,10 +1152,31 @@ def test_richter_row_routes_table_area_when_experiment_area_is_missing(mass_loss
 
     assert prediction.value is not None
     assert any(
-        notice.kind is NoticeKind.FALLBACK
+        notice.kind is NoticeKind.KNOB_DEFAULTED
         and notice.reason.startswith("mass_loss_area_self_similarity_default:")
         for notice in prediction.notices
     )
+    assert FLAGGED_STRATUM_KNOB_DEFAULTED in flagged_strata(prediction.notices)
+
+
+def test_richter_falsified_area_default_stays_in_flagged_stratum(mass_loss_rows) -> None:
+    richter, experiment, *_rest = mass_loss_rows
+    falsified = replace(
+        richter,
+        value=Value(ValueKind.POINT, point=Decimal("0.6")),
+    )
+
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, falsified, experiment=experiment,
+    )
+
+    mismatch = [
+        notice for notice in prediction.notices
+        if notice.reason.startswith("mass_loss_area_endpoint_mismatch_default:")
+    ]
+    assert len(mismatch) == 1
+    assert mismatch[0].kind is NoticeKind.KNOB_DEFAULTED
+    assert FLAGGED_STRATUM_KNOB_DEFAULTED in flagged_strata(prediction.notices)
 
 
 def test_richter_area_route_mutation_restoring_old_gate_refuses(mass_loss_rows, monkeypatch) -> None:

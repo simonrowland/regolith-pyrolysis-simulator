@@ -13480,6 +13480,10 @@ def _predict_mass_loss_with_residue(
             kind=(NoticeKind.OUT_OF_CERTIFIED_BAND if (
                 "paper-demonstrated-window" in flag or flag == "openimcc_extrapolated"
                 or flag.startswith("alpha_extrapolated:")
+            ) else NoticeKind.ALPHA_ASSUMED if (
+                flag.startswith("mass_loss_alpha_default:")
+            ) else NoticeKind.KNOB_DEFAULTED if (
+                flag.startswith("mass_loss_area_")
             ) else NoticeKind.FALLBACK),
             affected_quantities=(Quantity.MASS_LOSS_FRACTION,),
             reason=flag,
