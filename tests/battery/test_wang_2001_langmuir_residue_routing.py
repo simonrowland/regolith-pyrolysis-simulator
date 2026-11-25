@@ -506,9 +506,13 @@ def test_wang_starting_aggregate_notice_tracks_located_extract_cell(monkeypatch)
         located_aggregate.locator.page,
         located_aggregate.locator.published_page,
         located_aggregate.locator.table,
-        located_aggregate.locator.row,
-        located_aggregate.locator.column,
-    ) == (4, 482, "1", "Starting comp.", "b")
+        located_aggregate.locator.note,
+    ) == (
+        4,
+        482,
+        "1",
+        "Table 1 starting ΣLn2O3 aggregate in column b.",
+    )
     changed_aggregate = replace(
         located_aggregate, state=State.of(Decimal("0.143"))
     )
