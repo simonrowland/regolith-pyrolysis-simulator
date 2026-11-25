@@ -14670,7 +14670,6 @@ def _predict_with_engine(
         from simulator.battery.records import Composition as OxideComposition
         from simulator.chemistry.melt_activity import (
             MELT_OXIDE_CATIONS_PER_FORMULA,
-            MELT_OXIDE_IDEAL_SOLUTION_MODEL,
         )
 
         if (
@@ -14825,24 +14824,6 @@ def _predict_with_engine(
                             authority=Authority.EXTRAPOLATED,
                         )
                     )
-            elif activity.activity_model == MELT_OXIDE_IDEAL_SOLUTION_MODEL:
-                from simulator.battery.residue import (
-                    _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
-                )
-
-                notices.append(
-                    Notice(
-                        kind=NoticeKind.FALLBACK,
-                        affected_quantities=(Quantity.ACTIVITY,),
-                        reason=_IDEAL_MELT_ACTIVITY_DEFAULT_FLAG,
-                        origin=(
-                            "simulator.chemistry.melt_activity.melt_oxide_activity"
-                        ),
-                        source="no measured parent-oxide activity",
-                        destination="Raoultian gamma=1 ideal-activity convention",
-                        authority=Authority.CONVENTION,
-                    )
-                )
             elif activity.evidence_tier == "UNCERTIFIED" or activity.warning:
                 notices.append(
                     Notice(
@@ -14855,8 +14836,8 @@ def _predict_with_engine(
                         origin=(
                             "simulator.chemistry.melt_activity.melt_oxide_activity"
                         ),
-                        source="certified melt-activity evidence",
-                        destination="uncertified melt-activity bridge result",
+                        source="no measured parent-oxide activity",
+                        destination="Raoultian gamma=1 ideal-activity convention",
                         authority=Authority.BRIDGE,
                     )
                 )
@@ -17327,6 +17308,13 @@ def _sossi_residue_prediction(
             ),
         ]
         activity_extensions = provenance.get("melt_activity_extensions")
+        has_ideal_activity_default = isinstance(
+            activity_extensions, Mapping
+        ) and any(
+            isinstance(extension, Mapping)
+            and extension.get("flag") == _IDEAL_MELT_ACTIVITY_DEFAULT_FLAG
+            for extension in activity_extensions.values()
+        )
         if isinstance(activity_extensions, Mapping):
             for parent_oxide, extension in activity_extensions.items():
                 if not isinstance(extension, Mapping):
@@ -17423,6 +17411,9 @@ def _sossi_residue_prediction(
             ),
             value=Decimal(str(value)),
             unit=QUANTITY_UNITS[reported_quantity],
+            authority=(
+                Authority.CONVENTION if has_ideal_activity_default else None
+            ),
             coefficient_sources=sources,
             lineage_complete=False,
             notices=tuple(notices),

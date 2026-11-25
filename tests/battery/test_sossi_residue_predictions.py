@@ -636,6 +636,7 @@ def test_sossi_scorer_projects_trace_species_and_flags_ideal_activity(monkeypatc
     assert len(ideal_notices) == 2
     assert all(notice.kind is NoticeKind.FALLBACK for notice in ideal_notices)
     assert all(notice.authority is Authority.CONVENTION for notice in ideal_notices)
+    assert gadolinium_prediction.authority is ideal_notices[0].authority
     assert all(
         notice.source == "no measured parent-oxide activity"
         for notice in ideal_notices

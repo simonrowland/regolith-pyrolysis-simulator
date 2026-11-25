@@ -459,7 +459,6 @@ def test_prediction_refusal_reports_unknown_composition_component() -> None:
 
 
 def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None:
-    from simulator.battery.score import FLAGGED_STRATUM_FALLBACK
     from simulator.battery.validate import _check_notice
     from simulator.chemistry.melt_activity import MeltOxideActivity
     import simulator.chemistry.melt_activity as melt_activity
@@ -498,8 +497,8 @@ def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None
         for notice in prediction.notices
         if notice.kind is NoticeKind.FALLBACK
     )
-    assert notice.source == "certified melt-activity evidence"
-    assert notice.destination == "uncertified melt-activity bridge result"
+    assert notice.source == "no measured parent-oxide activity"
+    assert notice.destination == "Raoultian gamma=1 ideal-activity convention"
     assert score_mod.flagged_strata((notice,)) == ()
     issues = []
     _check_notice("activity-fallback", notice, issues)
@@ -509,7 +508,10 @@ def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None
         activity,
         activity_model=melt_activity.MELT_OXIDE_IDEAL_SOLUTION_MODEL,
         evidence_tier=melt_activity.MELT_OXIDE_IDEAL_ASSERTION_TIER,
-        warning="declared ideal-solution assertion",
+        warning=(
+            "declared_ideal_solution_activity_assertion: parent_oxide=NaO0.5 "
+            "gamma=1.0 evidence_tier=ASSUMED_IDEAL_SOLUTION"
+        ),
     )
     monkeypatch.setattr(
         melt_activity,
@@ -527,13 +529,11 @@ def test_activity_fallback_notice_has_validated_from_and_to(monkeypatch) -> None
         for notice in ideal_prediction.notices
         if notice.kind is NoticeKind.FALLBACK
     )
-    assert ideal_notice.reason == "melt_activity_default_ideal"
+    assert ideal_notice.reason == ideal_activity.warning
     assert ideal_notice.source == "no measured parent-oxide activity"
     assert ideal_notice.destination == "Raoultian gamma=1 ideal-activity convention"
-    assert ideal_notice.authority is Authority.CONVENTION
-    assert score_mod.flagged_strata((ideal_notice,)) == (
-        FLAGGED_STRATUM_FALLBACK,
-    )
+    assert ideal_notice.authority is Authority.BRIDGE
+    assert score_mod.flagged_strata((ideal_notice,)) == ()
     ideal_issues = []
     _check_notice("activity-ideal-default", ideal_notice, ideal_issues)
     assert ideal_issues == []
