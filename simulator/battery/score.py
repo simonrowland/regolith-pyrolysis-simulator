@@ -16525,6 +16525,26 @@ def _hashimoto_engine_floor_inversion_notices(
     return tuple(notices)
 
 
+def _with_role_engine_decision(
+    detail: dict[str, object],
+    exc: BaseException,
+    row_provenance: object,
+) -> dict[str, object]:
+    """Copy a decision the row or the exception already has. Absent stays absent."""
+
+    carried = getattr(exc, "provenance", None)
+    decision = (
+        carried.get("role_engine_decision")
+        if isinstance(carried, Mapping)
+        else None
+    )
+    if decision is None and isinstance(row_provenance, Mapping):
+        decision = row_provenance.get("role_engine_decision")
+    if isinstance(decision, Mapping) and decision:
+        detail["role_engine_decision"] = dict(decision)
+    return detail
+
+
 def _hashimoto_residue_prediction(
     context: ScoreContext,
     reference: Observation,
@@ -16859,18 +16879,10 @@ def _hashimoto_residue_prediction(
         if getattr(exc, "detail", None):
             detail["detail"] = str(exc.detail)
         # The cohort already stored the decision on the row, and a refusal
-        # raised from that row drops the row. Copy it onto the scored detail.
+        # raised from that row drops the row. An incompatible pin carries the
+        # chosen tokens on the exception instead, because no row exists yet.
         # Unpinned rows have no decision, so the detail keys stay as they were.
-        carried = getattr(exc, "provenance", None)
-        decision = (
-            carried.get("role_engine_decision")
-            if isinstance(carried, Mapping)
-            else None
-        )
-        if decision is None and isinstance(primary_provenance, Mapping):
-            decision = primary_provenance.get("role_engine_decision")
-        if isinstance(decision, Mapping) and decision:
-            detail["role_engine_decision"] = dict(decision)
+        detail = _with_role_engine_decision(detail, exc, primary_provenance)
         engine_floor_diagnostics: object = ()
         if getattr(exc, "reason", None) == "hashimoto_internal_analytical_channels_missing":
             try:
@@ -17095,6 +17107,7 @@ def _sossi_residue_prediction(
         cache, _SOSSI_SOURCE_ID, engine, cohort_selection,
         role_override=role_override,
     )
+    sossi_row_provenance = None
     try:
         from simulator.battery.residue import (
             ResidueInventoryRefusal,
@@ -17201,6 +17214,9 @@ def _sossi_residue_prediction(
         prediction = cohort.get(short_id)
         if prediction is None:
             raise ValueError("sossi_prediction_row_missing")
+        row_provenance = getattr(prediction, "provenance", None)
+        if isinstance(row_provenance, Mapping):
+            sossi_row_provenance = row_provenance
         run_refusal = prediction.provenance.get("run_refusal")
         if isinstance(run_refusal, Mapping):
             raise ResidueInventoryRefusal(
@@ -17400,13 +17416,17 @@ def _sossi_residue_prediction(
             ),
             coefficient_sources=sources,
             refusal_reason=refusal,
-            refusal_detail={
-                "reason": str(reason),
-                "engine": engine.value,
-                "source_id": reference.source_id,
-                "experiment_id": reference.experiment_id,
-                "detail": str(getattr(exc, "detail", "")),
-            },
+            refusal_detail=_with_role_engine_decision(
+                {
+                    "reason": str(reason),
+                    "engine": engine.value,
+                    "source_id": reference.source_id,
+                    "experiment_id": reference.experiment_id,
+                    "detail": str(getattr(exc, "detail", "")),
+                },
+                exc,
+                sossi_row_provenance,
+            ),
             identity=reference.identity,
         )
 

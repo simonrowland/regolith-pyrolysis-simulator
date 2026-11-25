@@ -284,6 +284,12 @@ def test_override_that_creates_the_cross_basis_pair_is_refused() -> None:
             },
         )
     assert caught.value.code == "role_engines_incompatible"
+    assert caught.value.role_engine_decision == {
+        "phase_equilibrium": "liquid_only",
+        "melt_activity": "constant_gamma",
+        "vapour": "openimcc",
+        "redox": "source_oxygen",
+    }
 
 
 def test_residue_kress_pin_is_unsupported() -> None:
@@ -481,12 +487,15 @@ def test_handoff_checks_notice_and_do_not_change_values() -> None:
 
 
 def test_analytical_handoff_fires_on_the_response_crossing(monkeypatch) -> None:
-    """Mismatch, fO2, and solids come from the analytical response, not a second inventory."""
+    """Mismatch and fO2 come from the analytical response, not a second inventory.
+
+    The production adapter returns liquid_fraction=None and no solid fraction.
+    This caller must not invent one, so the solids notice stays absent.
+    """
 
     response = SimpleNamespace(
         vapor_pressures_Pa={"SiO": 12.5},
-        liquid_fraction=0.4,
-        solid_fraction=0.6,
+        liquid_fraction=None,
         diagnostics={
             "vapor_pressure_diagnostic": {
                 "activities_standard_state": {
@@ -529,7 +538,7 @@ def test_analytical_handoff_fires_on_the_response_crossing(monkeypatch) -> None:
     codes = _notice_codes(model.handoff_notices)
     assert "handoff_activity_standard_state_mismatch" in codes
     assert "handoff_fo2_overwritten" in codes
-    assert "handoff_liquid_only_downstream_of_solids" in codes
+    assert "handoff_liquid_only_downstream_of_solids" not in codes
     assert "handoff_formula_unparsed" not in codes
     assert "handoff_element_not_conserved" not in codes
     assert "handoff_mass_not_conserved" not in codes
@@ -606,5 +615,170 @@ def test_hashimoto_refusal_keeps_the_role_decision() -> None:
     assert pinned.refusal_detail["role_engine_decision"] == decision
     assert pinned.refusal_detail["reason"] == "residue_pressure_law_exponent_mismatch"
     unpinned = predict(refusal, None)
+    assert "role_engine_decision" not in unpinned.refusal_detail
+    assert unpinned.refusal_detail["reason"] == "residue_pressure_law_exponent_mismatch"
+
+
+def test_hashimoto_incompatible_pin_refusal_carries_the_chosen_roles() -> None:
+    """A constant_gamma pin above the switch raises, and the refusal carries the tokens.
+
+    The cache is empty, so this is the raise from resolve_role_engines, not a
+    finished row that already stored the mapping.
+    """
+
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.identity import Identity
+    from simulator.battery.score import (
+        _HASHIMOTO_SOURCE_ID,
+        _hashimoto_residue_prediction,
+    )
+
+    temperature_K = 1973.15
+    assert temperature_K > BUILTIN_VAPOUR_CHANNEL_SWITCH_K
+    experiment_id = "hashimoto-1983-run-17c1"
+    experiment = {
+        "experiment_id": experiment_id,
+        "sample": {
+            "mass_kg": {
+                "state": {
+                    "tag": "value",
+                    "value": {"kind": "point", "point": "0.0001"},
+                },
+            },
+            "printed_composition": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "SiO2": 35.43,
+                        "Al2O3": 3.16,
+                        "FeO": 35.04,
+                        "MgO": 23.84,
+                        "CaO": 2.53,
+                    },
+                },
+            },
+        },
+        "pressure_environment": {
+            "total_pressure_Pa": {
+                "state": {
+                    "tag": "value",
+                    "value": {
+                        "kind": "point",
+                        "point": "0.013332236842105263",
+                        "approximate": True,
+                    },
+                },
+            },
+        },
+        "conditions": {
+            "temperature_K": {
+                "state": {"tag": "value", "value": str(temperature_K)},
+            },
+        },
+        "thermal_schedule": {
+            "total_duration_s": {
+                "state": {
+                    "tag": "value",
+                    "value": {"kind": "point", "point": "600"},
+                },
+            },
+        },
+    }
+    identity = Identity(
+        quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        species=None,
+    )
+    context = SimpleNamespace(
+        observations={
+            "cell": SimpleNamespace(
+                source_id=_HASHIMOTO_SOURCE_ID,
+                observation_id=f"{_HASHIMOTO_SOURCE_ID}::cell",
+                experiment_id=experiment_id,
+                identity=identity,
+            ),
+        },
+        experiments={experiment_id: experiment},
+    )
+    reference = SimpleNamespace(
+        identity=identity,
+        observation_id="obs",
+        source_id=_HASHIMOTO_SOURCE_ID,
+        experiment_id=experiment_id,
+        locator=None,
+        read_from=None,
+    )
+    prediction = _hashimoto_residue_prediction(
+        context,
+        reference,
+        Engine.OPENIMCC,
+        {},
+        test_experiment_ids=frozenset({experiment_id}),
+        role_override={"melt_activity": "constant_gamma"},
+    )
+    assert prediction.refusal_detail["reason"] == "role_engines_incompatible"
+    assert prediction.refusal_detail["role_engine_decision"] == {
+        "phase_equilibrium": "liquid_only",
+        "melt_activity": "constant_gamma",
+        "vapour": "openimcc",
+        "redox": "source_oxygen",
+    }
+
+
+def test_sossi_refusal_keeps_the_row_role_decision() -> None:
+    """A Sossi row that already stored the decision keeps it on the scored refusal."""
+
+    from simulator.battery.enums import Engine, Quantity
+    from simulator.battery.score import (
+        _SOSSI_SOURCE_ID,
+        _residue_prediction_cache_entry,
+        _sossi_residue_prediction,
+    )
+
+    decision = {
+        "phase_equilibrium": "liquid_only",
+        "melt_activity": "constant_gamma",
+        "vapour": "internal-analytical",
+        "redox": "source_oxygen",
+    }
+    experiment_id = "S-1"
+    reference = SimpleNamespace(
+        identity=SimpleNamespace(
+            quantity=Quantity.RESIDUE_COMPONENT_COMPOSITION,
+            species=SimpleNamespace(formula="Mn"),
+        ),
+        observation_id="obs",
+        source_id=_SOSSI_SOURCE_ID,
+        experiment_id=experiment_id,
+        locator=None,
+        read_from=None,
+    )
+    engine = Engine.INTERNAL_ANALYTICAL
+    refusal = {"reason": "residue_pressure_law_exponent_mismatch"}
+
+    def predict(provenance: dict[str, object], role_override):
+        cache: dict = {}
+        _residue_prediction_cache_entry(
+            cache,
+            _SOSSI_SOURCE_ID,
+            engine,
+            None,
+            value={experiment_id: SimpleNamespace(provenance=provenance)},
+            role_override=role_override,
+        )
+        return _sossi_residue_prediction(
+            None,
+            reference,
+            engine,
+            cache,
+            role_override=role_override,
+        )
+
+    pinned = predict(
+        {"run_refusal": refusal, "role_engine_decision": decision},
+        {"melt_activity": "constant_gamma"},
+    )
+    assert pinned.refusal_detail["role_engine_decision"] == decision
+    assert pinned.refusal_detail["reason"] == "residue_pressure_law_exponent_mismatch"
+    unpinned = predict({"run_refusal": refusal}, None)
     assert "role_engine_decision" not in unpinned.refusal_detail
     assert unpinned.refusal_detail["reason"] == "residue_pressure_law_exponent_mismatch"

@@ -41,9 +41,19 @@ _STANDARD_STATE_KEYS = ("convention", "phase", "component_basis")
 class RoleEngineRefusal(ValueError):
     """A role pin names a role or an engine the surface cannot call."""
 
-    def __init__(self, code: str, detail: str = "") -> None:
+    def __init__(
+        self,
+        code: str,
+        detail: str = "",
+        *,
+        role_engine_decision: Mapping[str, str] | None = None,
+    ) -> None:
         self.code = code
         self.detail = detail or code
+        # Only the cross-basis refusal has already chosen every role token.
+        self.role_engine_decision = (
+            None if not role_engine_decision else dict(role_engine_decision)
+        )
         super().__init__(self.detail if detail == "" else f"{code}: {detail}")
 
 
@@ -172,6 +182,12 @@ def resolve_role_engines(
             "role_engines_incompatible",
             "constant_gamma activities are single-cation Raoultian; "
             "openimcc vapour consumes parent-oxide activities",
+            role_engine_decision={
+                "phase_equilibrium": phase,
+                "melt_activity": melt,
+                "vapour": vapour,
+                "redox": redox,
+            },
         )
     if surface == "residue" and vapour == "openimcc" and melt == "":
         # The evaluate_gas branch always consumes parent activities.

@@ -1429,11 +1429,11 @@ def _analytical_handoff_fields(
     Mapping[str, object] | None,
     dict[str, float] | None,
     float | None,
-    float | None,
 ]:
-    """Read the activity, fO2, and phase fields a vapour response already carries.
+    """Read the activity and fO2 fields a vapour response already carries.
 
     The pressure model is the second caller. This reader does not recompute them.
+    The analytical adapter returns ``liquid_fraction=None`` and no solid fraction.
     """
 
     diagnostic: Mapping[str, object] = {}
@@ -1459,16 +1459,7 @@ def _analytical_handoff_fields(
     ):
         extra_fo2 = {"vapour": float(vapour_fo2)}
     liquid = getattr(response, "liquid_fraction", None)
-    solid = getattr(response, "solid_fraction", None)
-    if (
-        isinstance(solid, bool)
-        or not isinstance(solid, (int, float))
-        or not math.isfinite(float(solid))
-    ):
-        solid = None
-    else:
-        solid = float(solid)
-    return producer_state, consumer_state, extra_fo2, liquid, solid
+    return producer_state, consumer_state, extra_fo2, liquid
 
 
 def _record_residue_handoff(
@@ -1483,14 +1474,14 @@ def _record_residue_handoff(
     consumer_inventory: Mapping[str, float] | None = None,
     fo2_log10_by_role: Mapping[str, float] | None = None,
     liquid_fraction: float | None = None,
-    solid_fraction: float | None = None,
 ) -> None:
     """Append handoff findings. Callers pass only a crossing that exists.
 
     Oxide moles are passed only when the activity role handed the vapour
     role a different inventory. Activity values are not moles, and the same
-    inventory on both sides is not a crossing. ``solid_fraction`` is passed
-    only when the response carries one. Pressures are not an input.
+    inventory on both sides is not a crossing. The vapour responses do not
+    carry a solid fraction, so this wrapper does not claim one. Pressures
+    are not an input.
     """
 
     from simulator.battery.enums import NoticeKind, Quantity
@@ -1509,7 +1500,6 @@ def _record_residue_handoff(
         consumer_standard_state=consumer_standard_state,
         fo2_log10_by_role=fo2,
         liquid_fraction=liquid_fraction,
-        solid_fraction=solid_fraction,
         consumer_assumes_liquid_only=True,
         phase_engine_requested=decision.phase_equilibrium,
         phase_engine_applied=decision.phase_equilibrium == "liquid_only",
@@ -1551,7 +1541,11 @@ def _residue_role_decision(
             load_activity_domain_low_K=lambda: openimcc_bridge._temperature_domain_K()[0],
         )
     except RoleEngineRefusal as exc:
-        raise ResidueInventoryRefusal(exc.code, exc.detail) from exc
+        refusal = ResidueInventoryRefusal(exc.code, exc.detail)
+        chosen = getattr(exc, "role_engine_decision", None)
+        if isinstance(chosen, Mapping) and chosen:
+            refusal.provenance = {"role_engine_decision": dict(chosen)}
+        raise refusal from exc
 
 
 def _apply_analytical_core_pin(
@@ -1834,7 +1828,6 @@ def _make_residue_pressure_model(
                     consumer_state,
                     extra_fo2,
                     liquid_fraction,
-                    solid_fraction,
                 ) = _analytical_handoff_fields(response)
                 _record_residue_handoff(
                     handoff_bucket,
@@ -1845,7 +1838,6 @@ def _make_residue_pressure_model(
                     consumer_standard_state=consumer_state,
                     fo2_log10_by_role=extra_fo2,
                     liquid_fraction=liquid_fraction,
-                    solid_fraction=solid_fraction,
                 )
             return reported
 
@@ -4337,7 +4329,6 @@ def _predict_sossi_residue_cohort(
                         consumer_state,
                         extra_fo2,
                         liquid_fraction,
-                        solid_fraction,
                     ) = _analytical_handoff_fields(response)
                     _record_residue_handoff(
                         handoff_bucket,
@@ -4348,7 +4339,6 @@ def _predict_sossi_residue_cohort(
                         consumer_standard_state=consumer_state,
                         fo2_log10_by_role=extra_fo2,
                         liquid_fraction=liquid_fraction,
-                        solid_fraction=solid_fraction,
                     )
                 return pressures
 
