@@ -794,9 +794,12 @@ def test_finalize_never_promotes_untyped_observation_map_to_initial(
     assert prediction.refusal_detail["reason"] == "initial_composition_not_stated"
 
 
-@pytest.mark.parametrize("sample_id", ("R-11", "R-14"))
+@pytest.mark.parametrize(
+    "sample_id",
+    ("R-11", "R-14", "R3-12", "R-16", "R-6", "R2-21", "R3-2"),
+)
 @pytest.mark.usefixtures("without_sourced_alpha_context")
-def test_richter_rows_refuse_unsourced_evaporation_coefficients(
+def test_richter_rows_default_unprinted_evaporation_coefficients_with_flag(
     fresh_mass_loss_extracts, sample_id
 ) -> None:
     richter_result, _markova_result = fresh_mass_loss_extracts
@@ -810,7 +813,38 @@ def test_richter_rows_refuse_unsourced_evaporation_coefficients(
 
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
 
-    _assert_evaporation_coefficients_not_sourced(prediction)
+    assert prediction.value is not None
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason.startswith("mass_loss_alpha_default:")
+        for notice in prediction.notices
+    )
+
+
+def test_richter_table1_area_reaches_apparatus_gate_for_all_mass_loss_rows(
+    fresh_mass_loss_extracts,
+) -> None:
+    from simulator.battery.validity import underdetermined_apparatus
+
+    richter_result, _markova_result = fresh_mass_loss_extracts
+    rows = [
+        row
+        for row in richter_result.observations.values()
+        if quantity_token(row.identity) is Quantity.MASS_LOSS_FRACTION
+    ]
+    assert len(rows) == 50
+    for row in rows:
+        experiment = richter_result.experiments[row.experiment_id]
+        geometry = experiment.apparatus.geometry
+        area = geometry.exposed_area_m2
+        assert area is not None and area.state.is_value
+        assert area.locator is not None
+        outcome = underdetermined_apparatus(
+            experiment,
+            Quantity.MASS_LOSS_FRACTION,
+            observation=row,
+        )
+        assert outcome.passed, (row.observation_id, outcome)
 
 
 @pytest.mark.parametrize(
@@ -931,7 +965,12 @@ def test_richter_catalogue_sibling_keeps_initial_through_finalization(
     )
 
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=migrated)
-    _assert_evaporation_coefficients_not_sourced(prediction)
+    assert prediction.value is not None
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason.startswith("mass_loss_alpha_default:")
+        for notice in prediction.notices
+    )
 
 
 def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
@@ -967,7 +1006,7 @@ def test_mendybaev_func5_keeps_serialization_equivalent_table1_start() -> None:
 
 
 @pytest.mark.usefixtures("without_sourced_alpha_context")
-def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
+def test_richter_rep5_row_scores_with_flagged_alpha_default(
     mass_loss_rows,
 ) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
@@ -980,8 +1019,12 @@ def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
         experiment=_richter_rep5_run(experiment),
     )
 
-    _assert_evaporation_coefficients_not_sourced(prediction)
-    assert prediction.notices == ()
+    assert prediction.value is not None
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason.startswith("mass_loss_alpha_default:")
+        for notice in prediction.notices
+    )
     context = load_score_context(sources=("kems-010-richter-2007",))
     context = replace(
         context,
@@ -997,11 +1040,13 @@ def test_richter_rep5_row_refuses_unsourced_evaporation_coefficients(
         prediction=prediction,
         comparison_ids={richter.observation_id},
     )
-    assert scored.status is ResidualStatus.REFUSED
-    assert scored.numeric is None
-    assert scored.refusal is not None
-    assert scored.refusal.reason is RefusalReason.UNDERDETERMINED_APPARATUS
-    assert scored.refusal.detail["reason"] == "evaporation_coefficients_not_sourced"
+    assert scored.status is not ResidualStatus.REFUSED
+    assert scored.numeric is not None
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason.startswith("mass_loss_alpha_default:")
+        for notice in scored.notices
+    )
 
 
 def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
@@ -1047,7 +1092,7 @@ def test_richter_rep5_table1_inputs_migrate_to_sample_mass_and_area() -> None:
     assert Decimal(exposed_area) == Decimal("0.0000913")
 
 
-def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
+def test_richter_row_routes_table_area_when_experiment_area_is_missing(mass_loss_rows) -> None:
     richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
         mass_loss_rows
     )
@@ -1064,9 +1109,73 @@ def test_richter_row_without_exposed_area_refuses(mass_loss_rows) -> None:
         experiment=missing_geometry,
     )
 
-    assert prediction.refusal_reason is RefusalReason.IDENTITY_INCOMPLETE
-    assert prediction.refusal_detail["reason"] == "sample_geometry_not_stated"
+    assert prediction.value is not None
+    assert any(
+        notice.kind is NoticeKind.FALLBACK
+        and notice.reason.startswith("mass_loss_area_self_similarity_default:")
+        for notice in prediction.notices
+    )
+
+
+def test_richter_area_route_mutation_restoring_old_gate_refuses(mass_loss_rows, monkeypatch) -> None:
+    import simulator.battery.residue as residue_module
+
+    richter, experiment, _markova, _markova_experiment, _r14, _r14_experiment = (
+        mass_loss_rows
+    )
+    enriched = _richter_rep5_run(experiment)
+    missing_geometry = replace(
+        enriched,
+        apparatus=replace(
+            enriched.apparatus,
+            geometry=replace(enriched.apparatus.geometry, exposed_area_m2=None),
+        ),
+    )
+    current_predictor = residue_module.predict_mass_loss_fraction
+
+    def old_experiment_area_gate(engine, experiment, **kwargs):
+        geometry = getattr(getattr(experiment, "apparatus", None), "geometry", None)
+        area = None if geometry is None else getattr(geometry, "exposed_area_m2", None)
+        state = getattr(area, "state", None)
+        if area is None or not getattr(state, "is_value", False):
+            raise ResidueInventoryRefusal("sample_geometry_not_stated")
+        return current_predictor(engine, experiment, **kwargs)
+
+    # Mutation probe: reinstate the old experiment-only gate in the real scorer
+    # call path. It must block the located Table 1 area from being consumed.
+    monkeypatch.setattr(
+        residue_module, "predict_mass_loss_fraction", old_experiment_area_gate
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC, richter, experiment=missing_geometry,
+    )
     assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == "sample_geometry_not_stated"
+
+
+def test_non_richter_row_without_experiment_area_keeps_prior_refusal(
+    mass_loss_rows,
+) -> None:
+    (
+        _richter,
+        _richter_experiment,
+        markova,
+        experiment,
+        _richter_r14,
+        _richter_r14_experiment,
+    ) = mass_loss_rows
+    apparatus = replace(
+        experiment.apparatus,
+        geometry=replace(experiment.apparatus.geometry, exposed_area_m2=None),
+    )
+    prediction = predict_with_engine(
+        Engine.OPENIMCC,
+        markova,
+        experiment=replace(experiment, apparatus=apparatus),
+    )
+
+    assert prediction.value is None
+    assert prediction.refusal_detail["reason"] == "sample_geometry_not_stated"
 
 
 def test_engine_without_residue_capability_refuses_with_engine_name(mass_loss_rows) -> None:

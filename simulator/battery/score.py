@@ -18011,7 +18011,10 @@ def _extent_residue_method(reference, experiment, quantity) -> MethodToken | Non
     if (
         experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
         and quantity is Quantity.RESIDUE_COMPONENT_COMPOSITION
-        and reference.source_id == "mendybaev-2013-fun-cai-evaporation"
+        and reference.source_id in {
+            "mendybaev-2013-fun-cai-evaporation",
+            "richter-mendybaev-christensen-etal-2011-olivine-chondrule-evaporation",
+        }
         and _declared_residue_predictor(reference.source_id) is None
     ):
         return MethodToken.LANGMUIR_FREE_EVAPORATION

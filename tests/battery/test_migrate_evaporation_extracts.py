@@ -7,7 +7,9 @@ from pathlib import Path
 import yaml
 
 from simulator.battery.enums import (
+    Engine,
     EvidenceClass,
+    MethodToken,
     Quantity,
     UncertaintyKind,
     ValueKind,
@@ -464,6 +466,94 @@ def test_richter11_residue_rows_migrate_temperature_and_time_conditions(
         assert all(
             condition.locator is not None
             for condition in row.point_conditions.values()
+        )
+
+
+def test_richter11_residue_series_routes_through_langmuir_owner(
+    tmp_path: Path, monkeypatch,
+) -> None:
+    import pytest
+
+    import simulator.battery.migrate as migrate_module
+    import simulator.battery.score as score_module
+    from simulator.battery.score_run import _residue_adapter_kinds
+
+    source = yaml.safe_load(
+        (ROOT / "data/literature/extracts" / RICHTER11_EXTRACT).read_text(
+            encoding="utf-8"
+        )
+    )
+    raw_residue_rows = [
+        row
+        for _formula, row in migrate_module.iter_extract_observations(source)
+        if (row.get("values") or {}).get("quantity")
+        == "residue_composition_vs_time"
+    ]
+    assert len(raw_residue_rows) == 325
+    censored = next(
+        row for row in raw_residue_rows
+        if row["observation_id"] == "richter_2011_table1_iiab1-3_residue_na2o"
+    )
+    assert censored["values"]["series"][0]["Na2O_wt_pct"] == "<0.01"
+
+    result = _migrate_real_extract(tmp_path, RICHTER11_EXTRACT)
+    residues = [
+        row
+        for row in result.observations.values()
+        if row.source_id == RICHTER11_SID
+        and row.identity.quantity.is_value
+        and row.identity.quantity.value is Quantity.RESIDUE_COMPONENT_COMPOSITION
+    ]
+    # The 325th printed cell is the censored <0.01 Na2O value above; the
+    # existing numeric selector keeps that cell typed-refused.
+    assert len(residues) == 324
+    routed = []
+    for row in residues:
+        experiment = result.experiments[row.experiment_id]
+        adapters = _residue_adapter_kinds(
+            row, Engine.OPENIMCC, experiment,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
+        )
+        if (
+            experiment.method.is_value
+            and experiment.method.value is MethodToken.LANGMUIR_FREE_EVAPORATION
+        ):
+            assert adapters == (MethodToken.LANGMUIR_FREE_EVAPORATION,)
+            routed.append(row)
+        else:
+            # The one-bar flowing-gas records retain their printed unknown
+            # method; they need a source/science ruling before using the
+            # vacuum Langmuir model.
+            assert not adapters
+    assert routed
+
+    context = score_module.ScoreContext(
+        {}, dict(result.experiments), dict(result.observations), root=ROOT
+    )
+    owner_prediction = score_module._extent_residue_prediction(
+        context, routed[0], Engine.OPENIMCC
+    )
+    assert owner_prediction is not None
+    assert owner_prediction.refusal_detail["reason"] == (
+        "measured_mass_loss_fraction_missing_or_invalid"
+    )
+
+    # Mutation probe: restore the previous source-locked selector and show the
+    # real score-run caller loses this located residue series.
+    previous_selector = score_module._extent_residue_method
+
+    def old_source_lock(reference, experiment, quantity):
+        if reference.source_id == RICHTER11_SID:
+            return None
+        return previous_selector(reference, experiment, quantity)
+
+    monkeypatch.setattr(score_module, "_extent_residue_method", old_source_lock)
+    row = routed[0]
+    experiment = result.experiments[row.experiment_id]
+    with pytest.raises(AssertionError):
+        assert MethodToken.LANGMUIR_FREE_EVAPORATION in _residue_adapter_kinds(
+            row, Engine.OPENIMCC, experiment,
+            Quantity.RESIDUE_COMPONENT_COMPOSITION,
         )
 
 

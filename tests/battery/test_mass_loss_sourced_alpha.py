@@ -936,9 +936,9 @@ def test_r11_area_shape_and_documented_schedule(fig3_source, r11_inputs):
     from simulator.battery.residue import _mass_loss_area_inputs, _mass_loss_thermal_segments
 
     row, experiment = r11_inputs
-    assert _mass_loss_area_inputs(experiment, row, fig3_source) == pytest.approx(
-        (0.0000913, 0.0000800, 0.10)
-    )
+    area_inputs = _mass_loss_area_inputs(experiment, row, fig3_source)
+    assert area_inputs[:3] == pytest.approx((0.0000913, 0.0000800, 0.10))
+    assert area_inputs[3] is None
     maximum, duration, segments = _mass_loss_thermal_segments(experiment, 2073.15)
     assert (maximum, duration) == (1173.15, 3600.0)
     assert sum(seconds for _, seconds in segments) == pytest.approx(9300.0)
@@ -946,13 +946,22 @@ def test_r11_area_shape_and_documented_schedule(fig3_source, r11_inputs):
     assert segments[-1] == (2073.15, 5400.0)
 
 
-def test_area_outside_printed_uncertainty_refuses(fig3_source, r11_inputs):
+def test_area_outside_printed_uncertainty_uses_flagged_shape_default(
+    fig3_source, r11_inputs,
+):
     from simulator.battery.residue import _mass_loss_area_inputs
 
     row, experiment = r11_inputs
     fig3_source["species"]["Mg"]["observations"][0]["equipment"]["sample_surface_area"]["value"][0]["final_area_mm2"] = 50
+    area_inputs = _mass_loss_area_inputs(experiment, row, fig3_source)
+    assert area_inputs[:3] == pytest.approx((0.0000913, 0.0000500, 0.10))
+    assert area_inputs[3]["default"] == "sphere_shrinking"
+    assert "outside the self-similar area uncertainty" in area_inputs[3]["reason"]
     with pytest.raises(ResidueInventoryRefusal) as failure:
-        _mass_loss_area_inputs(experiment, row, fig3_source)
+        _mass_loss_area_inputs(
+            experiment, replace(row, source_id="kems-026-markova-1984"),
+            fig3_source,
+        )
     assert failure.value.reason == "area_shape_not_self_similar"
 
 
@@ -990,7 +999,7 @@ def test_r11_hand_computed_hkl_and_shrinking_area(fig3_source, r11_inputs):
     inventory = {oxide: m0 * amount / sum(wt.values()) / _formula_terms(oxide)[1]
                  for oxide, amount in wt.items()}
     alpha = _mass_loss_sourced_alphas(experiment, fig3_source, 2073.15)["Mg"]["alpha"]
-    area, _, _ = _mass_loss_area_inputs(experiment, row, fig3_source)
+    area, _, _, _ = _mass_loss_area_inputs(experiment, row, fig3_source)
     channels = (
         ResidueChannel("Mg", "Mg", "MgO", alpha, "Richter Fig. 3"),
         ResidueChannel("O2", "O2", None, 1.0, "stoichiometric coproduct"),
@@ -1135,9 +1144,11 @@ def test_redox_fallback_flag_reaches_mass_loss_prediction(
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_full_prediction_refuses_non_negligible_unsourced_channel(
-    r11_inputs, prescribed_pressure_engine,
+    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
 ):
     row, experiment = r11_inputs
+    monkeypatch.setattr(score_module, "load_yaml", lambda _path: fig3_source)
+    row = replace(row, source_id="kems-026-markova-1984")
     prescribed_pressure_engine["unsourced_ca"] = True
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
     assert prediction.value is None
@@ -1177,7 +1188,7 @@ def test_full_prediction_refuses_non_negligible_unsourced_channel(
 
 @pytest.mark.engine_cache_off
 def test_corner_counter_oracle_rejects_dropped_step_callback(
-    r11_inputs, prescribed_pressure_engine, monkeypatch,
+    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
 ):
     """Mutation probe: a lost integration callback must fail the fixture oracle."""
     import simulator.battery.residue as residue
@@ -1202,7 +1213,7 @@ def test_corner_counter_oracle_rejects_dropped_step_callback(
     monkeypatch.setattr(residue, "_hashimoto_integrate_geometry", drop_first_step_callback)
     with pytest.raises(AssertionError):
         test_full_prediction_refuses_non_negligible_unsourced_channel(
-            r11_inputs, prescribed_pressure_engine
+            r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch
         )
     assert dropped_callback
 
@@ -1221,6 +1232,7 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     from simulator.diagnostic_helpers import binary_pot_battery
 
     row, experiment = r11_inputs
+    row = replace(row, source_id="kems-026-markova-1984")
     # One mol of CaO, with its mass from the production formula resolver,
     # independently of the corner helper or its per-step substitutions.
     ceiling = float(parse_formula("CaO").molar_mass_kg_per_mol())
@@ -1276,7 +1288,9 @@ def test_inventory_ceiling_is_shared_across_steps_segments_preheat_and_gases(
     )
 
 
-def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch):
+def test_real_r11_defaults_missing_alphas_and_reports_loss_bound(
+    fig3_source, r11_inputs, monkeypatch,
+):
     pytest.importorskip("openimcc")
     row, experiment = r11_inputs
     original = score_module.load_yaml
@@ -1284,13 +1298,24 @@ def test_real_r11_corner_bounds_reach_gate(fig3_source, r11_inputs, monkeypatch)
         deepcopy(fig3_source) if path.name == "kems-010-richter-2007.yaml" else original(path)
     ))
     prediction = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
-    assert prediction.refusal_detail["reason"] == "alpha_not_sourced", prediction.refusal_detail
-    bound = json.loads(prediction.refusal_detail["detail"])
+    assert prediction.value is not None, prediction.refusal_detail
+    alpha_defaults = [
+        notice for notice in prediction.notices
+        if notice.reason.startswith("mass_loss_alpha_default:")
+    ]
+    assert alpha_defaults
+    assert any("AlO2=1.0" in notice.reason for notice in alpha_defaults)
+    bound_notice = next(
+        notice for notice in prediction.notices
+        if notice.reason.startswith("mass_loss_bound:")
+    )
+    bound = json.loads(bound_notice.reason.removeprefix("mass_loss_bound:"))
     assert bound["point_loss_kg"] > 0.0
-    assert bound["bound_fraction"] > 0.01
     assert bound["corner_ordering_verified"]
-    assert bound["corner_steps"] > 0
-    assert bound["unsourced_bound_kg_by_channel"]["AlO2"] > 0.0
+    # All measured-point alphas are now explicit flagged defaults, so only the
+    # separate preheat envelope runs corner bounds; there are no point corners.
+    assert bound["corner_steps"] == 0
+    assert bound["unsourced_bound_kg_by_channel"] == {}
     assert bound["inventory_bound_kg_by_parent"] == {}
     assert bound["preheat_bound_kg"] > 0.0
     assert bound["joint_arm_loss_kg_non_gating"] is not None
@@ -1383,9 +1408,11 @@ def test_reproduction_arrhenius_numeric_pin_before_owner_move(form, alpha_hex, s
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.
 @pytest.mark.engine_cache_off
 def test_small_unsourced_bound_passes_without_entering_point_loss(
-    r11_inputs, prescribed_pressure_engine,
+    r11_inputs, prescribed_pressure_engine, fig3_source, monkeypatch,
 ):
     row, experiment = r11_inputs
+    monkeypatch.setattr(score_module, "load_yaml", lambda _path: fig3_source)
+    row = replace(row, source_id="kems-026-markova-1984")
     sourced_only = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
     prescribed_pressure_engine.update(unsourced_ca=True, ca_coefficient=1e-10)
     small_bound = predict_with_engine(Engine.OPENIMCC, row, experiment=experiment)
