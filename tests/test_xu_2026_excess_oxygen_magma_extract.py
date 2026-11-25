@@ -209,11 +209,8 @@ def test_typed_glass_components_migrate_with_exact_samples_conditions_and_points
         observation = observations[row["observation_id"]]
         raw_values = raw_observations[row["observation_id"]]["values"]
         assert raw_values["oxygen_source_as_published"] == row["oxygen_source"]
-        assert (
-            raw_observations[row["observation_id"]]["point_conditions"][
-                "composition"
-            ]["state"]["tag"]
-            == "value"
+        assert "composition" not in (
+            raw_observations[row["observation_id"]].get("point_conditions") or {}
         )
         assert observation.identity.composition.is_value
         composition = observation.identity.composition.value

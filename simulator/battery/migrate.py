@@ -131,6 +131,7 @@ from simulator.battery.composition import (
     ELEMENT_WT_PERCENT_FEO_T_BASIS,
     SLAG_METAL_CHARGE_BASIS,
     ElementMassFractionRedox,
+    _element_wt_percent_stoichiometric_oxide_projection,
     canonical_element_symbol,
     element_mass_fraction_redox,
     element_wt_percent_map_from_row,
@@ -7746,7 +7747,81 @@ def _project_source_declared_composition(
     component_values: dict[str, Decimal] = {}
     component_rows: list[tuple[str, str]] = []
     invalid_components: list[str] = []
-    if (
+    elemental_projection = (
+        rule.source_basis == "elemental wt %"
+        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    )
+    elemental_projection_locator: Locator | None = None
+    if elemental_projection:
+        sample_id = values.get("sample_id_as_published")
+        analysis_id = values.get("analysis_id_as_published")
+        if (
+            not isinstance(sample_id, str)
+            or not sample_id.strip()
+            or not isinstance(analysis_id, str)
+            or not analysis_id.strip()
+        ):
+            return Located(
+                State.unknown(
+                    "elemental run composition lacks its printed sample or analysis identity"
+                ),
+                locator=locator,
+            )
+        aliases = dict(rule.element_aliases)
+        for candidate in source_rows:
+            if (
+                not isinstance(candidate, tuple)
+                or len(candidate) != 2
+                or not isinstance(candidate[0], str)
+                or not isinstance(candidate[1], Mapping)
+            ):
+                continue
+            _species_formula, source_row = candidate
+            source_values = source_row.get("values")
+            if not isinstance(source_values, Mapping):
+                continue
+            if (
+                source_values.get("quantity")
+                != Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+            ):
+                continue
+            if (
+                source_row.get("experiment"),
+                source_values.get("sample_id_as_published"),
+                source_values.get("analysis_id_as_published"),
+            ) != (experiment, sample_id, analysis_id):
+                continue
+            raw_name = (
+                source_values.get("formula")
+                or source_values.get("component_as_published")
+                or _species_formula
+            )
+            name = aliases.get(str(raw_name).strip(), str(raw_name).strip())
+            raw_amount = source_values.get("component_amount")
+            if raw_amount is None:
+                raw_amount = source_values.get("component_amount_as_published")
+            amount = _as_dec_or_none(raw_amount)
+            if amount is None:
+                invalid_components.append(name)
+                continue
+            previous = component_values.get(name)
+            if previous is not None and previous != amount:
+                invalid_components.append(name)
+                continue
+            component_values[name] = amount
+            source_locator = locator_from_mapping(source_row.get("locator"))
+            if (
+                canonical_element_symbol(name) == "Si"
+                and elemental_projection_locator is None
+            ):
+                elemental_projection_locator = source_locator
+            component_rows.append(
+                (
+                    str(source_row.get("observation_id") or name),
+                    source_locator.record if source_locator is not None else "",
+                )
+            )
+    elif (
         rule.source_basis == "partial oxide analysis with Cl/S/F"
         and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
     ):
@@ -7803,7 +7878,11 @@ def _project_source_declared_composition(
     if direct_map is not None:
         declared_maps.append(direct_map)
     declared_map: Mapping[str, Any] | None = None
-    projection_mode = "printed composition map"
+    projection_mode = (
+        "same-analysis located elemental component observations"
+        if elemental_projection
+        else "printed composition map"
+    )
     if declared_maps:
         vectors = [dict(candidate) for candidate in declared_maps]
         if any(vector != vectors[0] for vector in vectors[1:]):
@@ -7825,7 +7904,11 @@ def _project_source_declared_composition(
             )
     elif component_values:
         declared_map = component_values
-        projection_mode = "same-experiment located component observations"
+        projection_mode = (
+            "same-analysis located elemental component observations"
+            if elemental_projection
+            else "same-experiment located component observations"
+        )
     if declared_map is None:
         if quantity is Quantity.CHLORIDE_CAPACITY:
             return None
@@ -7833,12 +7916,47 @@ def _project_source_declared_composition(
             State.unknown("source run composition is not printed in this extract"),
             locator=locator,
         )
-    missing_required = tuple(
-        name
-        for name in rule.required_components
-        if name not in declared_map
-        or _as_dec_or_none(declared_map.get(name)) is None
-    )
+    if elemental_projection:
+        aliases = dict(rule.element_aliases)
+        normalized_elements: dict[str, Any] = {}
+        for raw_name, amount in declared_map.items():
+            name = aliases.get(str(raw_name), str(raw_name))
+            previous = normalized_elements.get(name)
+            if (
+                previous is not None
+                and _as_dec_or_none(previous) != _as_dec_or_none(amount)
+            ):
+                return Located(
+                    State.unknown(
+                        f"source elemental aliases disagree for component {name}"
+                    ),
+                    locator=locator,
+                )
+            normalized_elements[name] = amount
+        declared_map = normalized_elements
+    if elemental_projection:
+        aliases = dict(rule.element_aliases)
+        available_elements = {
+            canonical_element_symbol(aliases.get(str(name), str(name)))
+            for name in declared_map
+        }
+        missing_required = tuple(
+            name
+            for name in rule.required_elements
+            if canonical_element_symbol(aliases.get(name, name))
+            not in available_elements
+            or _as_dec_or_none(
+                declared_map.get(aliases.get(name, name))
+            )
+            is None
+        )
+    else:
+        missing_required = tuple(
+            name
+            for name in rule.required_components
+            if name not in declared_map
+            or _as_dec_or_none(declared_map.get(name)) is None
+        )
     if missing_required or invalid_components:
         missing_detail = ", ".join(missing_required or tuple(invalid_components))
         return Located(
@@ -7849,6 +7967,8 @@ def _project_source_declared_composition(
             locator=locator,
         )
     projection_locator = _locator_from_plain(values.get("composition_locator"))
+    if elemental_projection and elemental_projection_locator is not None:
+        projection_locator = projection_locator or elemental_projection_locator
     if projection_locator is None:
         for candidate in source_rows:
             if (
@@ -7868,7 +7988,11 @@ def _project_source_declared_composition(
     )
     source_references = (
         tuple(f"{row_id}: {record}" for row_id, record in component_rows)
-        if projection_mode == "same-experiment located component observations"
+        if projection_mode
+        in {
+            "same-experiment located component observations",
+            "same-analysis located elemental component observations",
+        }
         else (f"source composition vector: {projection_locator.record}",)
     )
     wt = {
@@ -7876,6 +8000,63 @@ def _project_source_declared_composition(
         for name, raw_amount in declared_map.items()
         if (amount := _as_dec_or_none(raw_amount)) is not None
     }
+    if elemental_projection:
+        valences = dict(rule.default_valences)
+        valences.update(dict(rule.source_valences))
+        try:
+            projected = _element_wt_percent_stoichiometric_oxide_projection(
+                declared_map,
+                valence_by_element=valences,
+                retained_components=rule.retained_components,
+            )
+        except (ArithmeticError, ValueError) as exc:
+            return Located(
+                State.unknown(
+                    f"elemental run composition cannot be projected: {exc}"
+                ),
+                locator=projection_locator,
+            )
+        parameters: list[tuple[str, Located[Decimal]]] = []
+        for name, valence in valences.items():
+            parameter_name = (
+                f"assumed_valence_{name}"
+                if name == "Fe"
+                else f"source_formula_valence_{name}"
+            )
+            parameters.append(
+                (
+                    parameter_name,
+                    Located(State.of(Decimal(valence)), locator=projection_locator),
+                )
+            )
+        if projected.oxygen_closure_residual_wt_percent is not None:
+            parameters.append(
+                (
+                    "oxygen_closure_residual_wt_percent",
+                    Located(
+                        State.of(projected.oxygen_closure_residual_wt_percent),
+                        locator=projection_locator,
+                    ),
+                )
+            )
+        derivation = Derivation(
+            relation="element_wt_percent_stoichiometric_oxide_projection",
+            inputs=tuple(row_id for row_id, _record in component_rows),
+            parameters=tuple(parameters),
+            output_unit="mole_fraction",
+            references=tuple(source_references),
+        )
+        return Located(
+            State.of(
+                Composition(
+                    basis="stoichiometric_oxide_projection",
+                    components=projected.components,
+                    amount_basis=AmountBasis.MOLE_FRACTION,
+                )
+            ),
+            locator=projection_locator,
+            inference=derivation,
+        )
     return _mass_percent_composition_located(
         wt,
         basis="printed_oxides",

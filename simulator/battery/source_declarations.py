@@ -51,6 +51,7 @@ B677_SOURCE_ID = "pankratz-1984-usbm-b677"
 B592_SOURCE_ID = "kelley-king-1961-usbm-b592"
 B2131_SOURCE_ID = "robie-hemingway-1995-usgs-b2131"
 RUSIECKA_SOURCE_ID = "rusiecka-2026-chlorine-data"
+XU_SOURCE_ID = "xu-2026-excess-oxygen-magma"
 SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
     RUSIECKA_SOURCE_ID: {
         "composition_projection": SourceRule(
@@ -77,6 +78,44 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
                 retained_components=("Cl", "S", "F"),
             ),
             "Project a located Rusiecka run analysis at migration",
+        ),
+    },
+    XU_SOURCE_ID: {
+        "composition_projection": SourceRule(
+            CompositionProjectionRule(
+                source_basis="elemental wt %",
+                reason=(
+                    "Xu 2026 prints elemental wt% including measured O; the Table 1 "
+                    "redox cell is blank, and the paper's excess-oxygen calculation "
+                    "assumes all experimental Fe is trivalent"
+                ),
+                applies_to_quantities=("equilibrium_phase_composition",),
+                default_valences=(
+                    ("Si", 4),
+                    ("Ti", 4),
+                    ("Al", 3),
+                    ("Fe", 3),
+                    ("Mg", 2),
+                    ("Ca", 2),
+                    ("Na", 1),
+                    ("K", 1),
+                    ("Pt", 4),
+                ),
+                element_aliases=(("FeT", "Fe"),),
+                required_elements=(
+                    "Si",
+                    "Ti",
+                    "Al",
+                    "Fe",
+                    "Mg",
+                    "Ca",
+                    "Na",
+                    "K",
+                    "O",
+                ),
+                retained_components=("Cl", "CO2", "H2O"),
+            ),
+            "Project a located Xu elemental run analysis at migration",
         ),
     },
     SF04_WORKBOOK_SOURCE_ID: {

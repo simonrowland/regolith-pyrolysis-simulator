@@ -691,24 +691,31 @@ def _element_wt_percent_stoichiometric_oxide_projection(
 ) -> _ElementWtOxideProjection:
     """Project elemental wt% to oxide mole fractions with an O closure check.
 
-    For each cation, ``n_E = w_E / M_E`` and a valence ``z+`` gives the
-    smallest neutral oxide ``E_(2/g)O_(z/g)``, where ``g = gcd(z, 2)``.
-    Thus Si4+ -> SiO2, Fe3+ -> Fe2O3, Mg2+ -> MgO and Na+ -> Na2O.
-    Formula-unit moles are ``n_E / (2/g)``; oxygen demand is ``n_E*z/2``.
-    Retained components such as Cl, CO2 and H2O remain their own formula
-    units. The oxide mass factor is ``M(E_(2/g)O_(z/g)) / ((2/g) * M(E))``;
-    for Fe2+ it is ``71.844 / 55.845`` g FeO per g Fe. The residual is measured
+    Premise: a printed ``w_E`` wt% is ``w_E`` grams of element per 100 g of
+    assay, and charge balance assigns ``n_cation`` cations of valence ``z``
+    to each neutral oxide formula. Algebra: element moles are ``w_E/M_E``;
+    oxide moles are ``w_E/(n_cation*M_E)``; multiplying by ``M_oxide`` gives
+    ``oxide_wt = element_wt * (M_oxide / (n_cation * M_element))``. The
+    valence chooses the oxide formula, such as Si4+ -> SiO2, Fe3+ -> Fe2O3,
+    Mg2+ -> MgO and Na+ -> Na2O. A source-specific declared valence is used
+    when the source does not print one.
+
+    For cation valence ``z+``, the smallest neutral oxide is
+    ``E_(2/g)O_(z/g)``, where ``g = gcd(z, 2)``. Formula-unit moles are
+    ``n_E / (2/g)`` and oxygen demand is ``n_E*z/2``. Retained components such
+    as Cl, CO2 and H2O remain their own formula units. The residual is measured
     O wt% minus oxygen in these oxides and retained compounds. It is a check
     only: measured O never enters the component moles or their normalization,
     and Cl contributes no oxygen correction.
 
-    Unit check: wt% is g per 100 g, so ``w_E/M_E`` and oxygen demand are
-    mol per 100 g; multiplying the residual oxygen moles by ``M_O`` returns
-    wt% on that same 100 g basis. Sanity: 42.5 g Fe at the typed Fe2+
-    assumption is 42.5/55.845 mol Fe and therefore the same moles of FeO,
-    about 54.68 g FeO per 100 g assay. Independently, 28.085 g Si is 1 mol Si,
-    so SiO2 requires 2 mol O = 31.998 g; measured O of 31.998 g gives zero
-    residual.
+    Unit check: ``g/100 g * (g/mol)/(g/mol)`` is g oxide per 100 g assay;
+    ``w_E/M_E`` and oxygen demand are mol per 100 g, and multiplying residual
+    oxygen moles by ``M_O`` returns wt% on that same basis. Worked example:
+    for Si4+, ``M(SiO2)/M(Si) = 60.0843/28.0855``; 28.0855 g Si therefore
+    projects to 60.0843 g SiO2 per 100 g assay. The oxide contains 31.9988 g
+    oxygen, so a measured 31.9988 wt% O gives zero residual. Measured O never
+    enters the composition normalization and is never reassigned to Fe or
+    another species.
     """
 
     retained = tuple(str(name).strip() for name in retained_components)
