@@ -739,6 +739,17 @@ def test_hashimoto_internal_analytical_residue_closes_oxygen_balance() -> None:
         math.isfinite(float(residual)) and abs(float(residual)) <= 1.0e-9
         for residual in integration.atom_closure.values()
     )
+    # FeO mass at or below the 1e-12 kg ledger floor is not loaded, so the
+    # published Fe and FeO paths are absent. The balance still needs 0 Pa.
+    depleted = dict(setup.initial_inventory_mol)
+    depleted["FeO"] = 0.0
+    depleted_pressures = setup.pressure_model(depleted, -6.0)
+    assert depleted_pressures["Fe"] == 0.0
+    assert depleted_pressures["FeO"] == 0.0
+    assert all(
+        math.isfinite(float(value)) and float(value) >= 0.0
+        for value in depleted_pressures.values()
+    )
 
 
 # engine_cache_off: patches an engines/melt_backend/openimcc solve dependency the outer double check does not see.

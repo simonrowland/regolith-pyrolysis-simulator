@@ -1419,6 +1419,63 @@ def _append_omission_notices(notices: list[Any], callbacks: Mapping[Any, Any]) -
                 notices.append(notice)
 
 
+# Same bound as PyrolysisSimulator._positive_species_kg: the cleaned-melt
+# account is built only from species heavier than this mass.
+_LEDGER_POSITIVE_SPECIES_KG = 1.0e-12
+
+
+def _supply_iron_gas_absent_from_melt_account(
+    pressures: dict[str, float],
+    inventory: Mapping[str, float],
+    required: set[str],
+) -> None:
+    """Publish 0 Pa for Fe and FeO when the melt account contains no iron oxide.
+
+    Premise: the vapor adapter loads the residue inventory through
+    ``_positive_species_kg``, which drops every species with mass
+    <= 1e-12 kg. With no FeO and no Fe2O3 above that floor the account
+    has no FeOt, and the existing Fe(g) and FeO(g) evaluations publish
+    neither channel and record no below-threshold omission.
+
+    Algebra: m = n_FeO * M_FeO + n_Fe2O3 * M_Fe2O3, with M from the
+    formula parser in kg/mol. The account is iron-free when m <= 1e-12 kg.
+    FeO's molar mass is 0.071844 kg/mol, so the FeO-only floor is
+    n = 1e-12 / 0.071844 = 1.392e-11 mol.
+
+    The vacuum oxygen balance still requires both gas channels. No iron
+    oxide in the account means no Fe(g) and no FeO(g), so each missing
+    pressure is 0 Pa. This is not a new pressure fit, and it does not
+    change the Fe pO2 exponent or the activity standard state.
+
+    Limiting case: n_FeO = 0 gives m = 0 and both pressures are 0 Pa.
+    A Hashimoto charge (~4.9e-4 mol FeO) stays on the published path.
+    """
+
+    missing = [
+        name
+        for name in ("Fe", "FeO")
+        if name in required and name not in pressures
+    ]
+    if not missing:
+        return
+    iron_mass_kg = 0.0
+    for oxide in ("FeO", "Fe2O3"):
+        moles = inventory.get(oxide, 0.0)
+        try:
+            moles = float(moles)
+        except (TypeError, ValueError):
+            return
+        if not math.isfinite(moles) or moles < 0.0:
+            return
+        if moles == 0.0:
+            continue
+        iron_mass_kg += moles * _formula_terms(oxide)[1]
+    if iron_mass_kg > _LEDGER_POSITIVE_SPECIES_KG:
+        return
+    for name in missing:
+        pressures[name] = 0.0
+
+
 def _make_residue_pressure_model(
     engine: str,
     gas_channels: Sequence[tuple[str, Sequence[Any]]],
@@ -1606,6 +1663,9 @@ def _make_residue_pressure_model(
                 omission_notices,
                 omission_records,
                 noticed_omissions,
+            )
+            _supply_iron_gas_absent_from_melt_account(
+                pressures, inventory, required
             )
             if floor_inversion_diagnostics is not None:
                 vapor_diagnostic = response.diagnostics.get(
