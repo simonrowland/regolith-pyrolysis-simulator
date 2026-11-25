@@ -10,12 +10,11 @@ from dataclasses import asdict, dataclass, is_dataclass
 from typing import Any, Mapping, Sequence
 
 from simulator.diagnostic_helpers.timeseries_concordance import trapezoid_integral
-
-
-STANDARD_MOLAR_VOLUME_L_PER_MOL = 22.414
-O2_RELEASE_RATE_DEPENDENCY = (
-    "w1119dt, review/w1119dt @ 7fce7ebce (not yet landed)"
+from simulator.gas_phase_o2 import (
+    STANDARD_MOLAR_VOLUME_L_PER_MOL,
+    analyzer_visible_ppm,
 )
+from simulator.gas_phase_o2 import OWNER_NAME as O2_RELEASE_RATE_DEPENDENCY
 
 COMPARISON_STATUSES = frozenset(
     {
@@ -235,7 +234,10 @@ def o2_release_molar_flow_to_ppm(
     *,
     argon_flow_nl_min: float,
 ) -> float:
-    """Convert released O2 molar flow to ppm by mole in the Ar carrier."""
+    """Convert released O2 molar flow to ppm by mole in the Ar carrier.
+
+    The mole fraction has one owner, ``o2_mole_fraction_in_carrier``.
+    """
 
     if o2_release_mol_min is None:
         raise TimeSeriesComparisonRefusal(
@@ -243,19 +245,13 @@ def o2_release_molar_flow_to_ppm(
             "runtime has no per-step O2 release molar-flow sample",
             dependency=O2_RELEASE_RATE_DEPENDENCY,
         )
-    o2_rate = float(o2_release_mol_min)
-    argon_flow = float(argon_flow_nl_min)
-    if not math.isfinite(o2_rate) or o2_rate < 0.0:
-        raise ValueError("O2 release molar flow must be finite and non-negative")
-    if not math.isfinite(argon_flow) or argon_flow <= 0.0:
-        raise ValueError("argon NL/min flow must be finite and positive")
-
-    # The Robinot preset supplies 0.3 NL/min Ar; at 0 °C and 1 atm,
-    # n_dot_Ar = 0.3 / 22.414 mol/min. With both outlet streams in mol/min,
-    # x_O2 = n_dot_O2 / (n_dot_Ar + n_dot_O2), and ppm = x_O2 * 1e6.
-    n_dot_ar = argon_flow / STANDARD_MOLAR_VOLUME_L_PER_MOL
-    x_o2 = o2_rate / (n_dot_ar + o2_rate)
-    return x_o2 * 1_000_000.0
+    try:
+        return analyzer_visible_ppm(
+            o2_release_mol_min,
+            carrier_flow_nl_min=argon_flow_nl_min,
+        )
+    except (TypeError, ValueError) as exc:
+        raise ValueError(str(exc)) from exc
 
 
 def compare_o2_release_time_series(

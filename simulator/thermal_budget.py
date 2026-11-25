@@ -1839,6 +1839,17 @@ def _optional_positive_length(
     return number
 
 
+def furnace_power_trace_last_sample_s(trace: Mapping[str, Any]) -> float:
+    """Seconds of the last measured power sample.
+
+    The runner stops at the last sample it can bracket. It does not
+    hold the final wattage past the trace.
+    """
+
+    curve = _power_trace_curve_s(trace)
+    return float(curve[-1][0])
+
+
 def sample_furnace_power_W(trace: Mapping[str, Any], time_s: float) -> float:
     """Watts at ``time_s`` from the existing bracketing interpolator.
 

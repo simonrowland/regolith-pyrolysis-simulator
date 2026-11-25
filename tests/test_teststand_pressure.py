@@ -14,6 +14,7 @@ import pytest
 import yaml
 
 from simulator.physical_constants import GAS_CONSTANT
+from simulator.thermal_budget import pellet_face_areas_m2
 from simulator.state import CampaignPhase
 from simulator.teststand import (
     TeststandRefusal,
@@ -574,7 +575,9 @@ def test_every_vacuum_preset_declares_imposed_pressure() -> None:
         assert parsed.pressure_driver == "imposed"
         assert parsed.pump is None or parsed.pump.nominal_speed_m3_s is None
     sample = robinot["lab_geometry"]["sample"]
-    assert sample["exposed_melt_area_m2"] is None
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        pellet_face_areas_m2(0.013, 0.010)["top"]
+    )
     assert sample["pellet_diameter_mm"] == 13
     assert sample["pellet_height_mm"] == 10
     assert sample["mass_g"] == pytest.approx(3.38)

@@ -19,6 +19,7 @@ from simulator.diagnostic_helpers.vacuum_pyrolysis import (
     COMPARISON_SCHEMA_VERSION,
 )
 from simulator.lab_geometry import LAB_GEOMETRY_SCALE, LabGeometryError
+from simulator.thermal_budget import pellet_face_areas_m2
 from simulator.runner import PyrolysisRun
 from simulator.session import SimSession
 from tests.test_runner_smoke import _assert_schema_shape
@@ -308,7 +309,7 @@ def _gram_lab_run(preset: dict, *, campaign: str) -> PyrolysisRun:
 
 
 def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
-    for name in ("robinot_2026.yaml", "sesko_2024.yaml"):
+    for name in ("sesko_2024.yaml",):
         preset = _vacuum_preset(name)
         assert preset["lab_geometry"]["sample"].get("exposed_melt_area_m2") in (
             None,
@@ -326,6 +327,14 @@ def test_null_exposed_melt_area_refuses_sized_crucible_face() -> None:
         assert sim.melt.melt_surface_area_m2 != pytest.approx(crucible_area_m2)
 
     robinot = _vacuum_preset("robinot_2026.yaml")
+    sample = robinot["lab_geometry"]["sample"]
+    assert sample["exposed_melt_area_m2"] == pytest.approx(
+        pellet_face_areas_m2(0.013, 0.010)["top"]
+    )
+    notice = sample["exposed_melt_area_notice"]
+    assert notice["kind"] == "typed_unknown"
+    assert notice["reason"] == "exposed_melt_area_not_printed"
+    assert "exposed_melt_area_m2" not in sample["named_missing_fields"]
     printed = copy.deepcopy(robinot)
     printed["lab_geometry"]["sample"]["exposed_melt_area_m2"] = 0.000123
     printed_run = _gram_lab_run(printed, campaign="C2A")

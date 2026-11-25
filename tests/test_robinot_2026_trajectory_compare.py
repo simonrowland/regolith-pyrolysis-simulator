@@ -448,7 +448,7 @@ def test_o2_release_rates_map_to_ppm_and_missing_rates_name_timestep_dependency(
         )
     assert refusal.value.reason_code == "o2_release_rate_series_missing"
     assert refusal.value.dependency == O2_RELEASE_RATE_DEPENDENCY
-    assert "w1119dt" in str(refusal.value)
+    assert "gas_phase_o2_trajectory" in refusal.value.dependency
 
 
 def _series_rows(path: Path) -> dict[str, list[dict[str, float]]]:
