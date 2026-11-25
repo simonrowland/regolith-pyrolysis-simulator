@@ -5852,11 +5852,22 @@ def _execution_run_flags(execution: RunExecution | None) -> list[Any]:
     if execution is None:
         return []
     return _safe_failure_value(
-        lambda: _json_safe([
-            dict(flag)
-            for flag in (getattr(execution, "run_flags", ()) or ())
-            if isinstance(flag, Mapping)
-        ]),
+        lambda: _json_safe(
+            [
+                dict(flag)
+                for flag in (getattr(execution, "run_flags", ()) or ())
+                if isinstance(flag, Mapping)
+            ]
+            + [
+                dict(flag)
+                for stop in (
+                    getattr(execution, "campaign_stops", ()) or ()
+                )
+                if isinstance(stop, Mapping)
+                for flag in (stop.get("flags", ()) or ())
+                if isinstance(flag, Mapping)
+            ]
+        ),
         section="run_metadata.run_flags",
     )
 

@@ -217,6 +217,12 @@ class CampaignSetpointMissingRefusal(ValueError):
         )
 
 
+class CampaignMaxHoursRefusal(CampaignSetpointMissingRefusal):
+    """Typed refusal for a malformed runtime campaign hour cap."""
+
+    reason = 'campaign_max_hours_invalid'
+
+
 def decision_successor(
     decision_type: DecisionType,
     choice: str,
@@ -638,6 +644,7 @@ class CampaignManager:
         self._materialized_target_T_C_by_phase: dict[CampaignPhase, float] = {}
         self.last_c4_termination: dict[str, object] | None = None
         self.last_campaign_stop: dict[str, object] | None = None
+        self.last_endpoint_cap: dict[str, object] | None = None
 
     _CONFIG_KEY_BY_PHASE = {
         CampaignPhase.C0B: 'C0b_p_cleanup',
@@ -1358,8 +1365,8 @@ class CampaignManager:
         if not path:
             ovr = self._campaign_overrides(campaign)
             if 'max_hours' in ovr:
-                max_hours = self._float(ovr.get('max_hours'), 0.0)
-                if max_hours <= 0.0:
+                max_hours = self._campaign_max_hours_override(campaign)
+                if max_hours is None:
                     return self._configured_max_hold_hr(campaign, *path)
                 return max_hours
             if 'hold_time_h' in ovr:
@@ -1397,20 +1404,65 @@ class CampaignManager:
         if 'max_hours' not in overrides:
             return None
         raw_max_hours = overrides['max_hours']
-        if not is_declared_real_scalar(
-            raw_max_hours,
-            allow_numeric_str=True,
-        ):
-            raise ValueError("max_hours override must be numeric")
-        max_hours = float(raw_max_hours)
+        try:
+            if not is_declared_real_scalar(
+                raw_max_hours,
+                allow_numeric_str=True,
+            ):
+                raise ValueError("max_hours override must be numeric")
+            max_hours = float(raw_max_hours)
+            if not math.isfinite(max_hours):
+                raise ValueError("max_hours override must be finite")
+        except (OverflowError, TypeError, ValueError) as exc:
+            raise CampaignMaxHoursRefusal({
+                'campaign': self._campaign_config_key(campaign),
+                'field': 'max_hours',
+                'value': str(raw_max_hours),
+                'detail': str(exc),
+            }) from exc
         return max_hours if max_hours > 0.0 else None
+
+    def _campaign_progress_denominator_hr(
+        self,
+        campaign: CampaignPhase,
+        record: BatchRecord,
+    ) -> float:
+        """Return the green progress denominator for one active campaign.
+
+        Progress normalization intentionally uses the configured C5 branch
+        cap and the exact staged-duration override. The endpoint diagnostic
+        has separate semantics and records the limit checked by check_endpoint.
+        """
+        if campaign == CampaignPhase.C2A_STAGED:
+            return self._configured_staged_max_hold_hr(campaign)
+        if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
+            path = self._active_campaign_hold_path(campaign, record)
+            duration = self._configured_max_hold_hr(campaign, *path)
+            if path[-1] == 'A_staged':
+                staged_duration = self._campaign_overrides(campaign).get(
+                    'staged_duration_h'
+                )
+                if staged_duration is not None:
+                    return float(staged_duration)
+            return duration
+        if campaign == CampaignPhase.C5:
+            return self._configured_max_hold_hr(
+                campaign, *self._active_campaign_hold_path(campaign, record)
+            )
+        return self._max_hold_hr(campaign)
 
     def _active_campaign_max_hold_hr(
         self,
         campaign: CampaignPhase,
         record: BatchRecord,
+        melt: MeltState,
     ) -> float:
-        """Resolve the active campaign's effective finite hour ceiling."""
+        """Read the active endpoint limit for an unevaluated boundary successor.
+
+        Mid-campaign truncation uses ``last_endpoint_cap`` recorded by
+        ``check_endpoint``. This read-only path is only for a successor queued
+        at the exact budget boundary, before its first endpoint check.
+        """
         if campaign not in (
             CampaignPhase.C0,
             CampaignPhase.C4,
@@ -1422,28 +1474,57 @@ class CampaignManager:
         if campaign == CampaignPhase.C2A_STAGED:
             return self._configured_staged_max_hold_hr(campaign)
         if campaign in (CampaignPhase.C3_K, CampaignPhase.C3_NA):
-            path = self._active_campaign_hold_path(campaign, record)
-            if path[-1] == 'A_staged':
-                staged_duration = self._campaign_overrides(campaign).get(
-                    'staged_duration_h'
-                )
-                if staged_duration is not None:
-                    return float(staged_duration)
-            return self._configured_max_hold_hr(campaign, *path)
+            endpoint_path = self._active_campaign_hold_path(
+                campaign, record, endpoint_fallback=True
+            )
+            max_hold_hr = self._configured_max_hold_hr(
+                campaign, *endpoint_path
+            )
+            if record.path == 'A_staged':
+                staged_hours = int(self._float(
+                    self._campaign_overrides(campaign).get(
+                        'staged_duration_h'
+                    ),
+                    self._configured_max_hold_hr(
+                        campaign,
+                        *self._active_campaign_hold_path(campaign, record),
+                    ),
+                ))
+                return min(float(max(1, staged_hours)), max_hold_hr)
+            return max_hold_hr
         if campaign == CampaignPhase.C5:
             return self._configured_max_hold_hr(
                 campaign, *self._active_campaign_hold_path(campaign, record)
             )
+        if campaign == CampaignPhase.C4:
+            window_low_C, window_high_C = self._c4_temperature_window()
+            acquired = float(melt.temperature_C) >= window_low_C or any(
+                snapshot.campaign == CampaignPhase.C4
+                and float(snapshot.temperature_C) >= window_low_C
+                for snapshot in record.snapshots
+            )
+            if not acquired:
+                return self._c4_target_acquisition_limit()[0]
+            if window_low_C <= float(melt.temperature_C) <= window_high_C:
+                return self._max_hold_hr(campaign)
+            return self._c4_process_wall_clock_limit()[0]
+        if campaign == CampaignPhase.C6:
+            hold_target_C, _ = self.get_temp_target(
+                campaign, melt.campaign_hour, melt
+            )
+            if self.c6_at_hold_target(hold_target_C, melt.temperature_C):
+                hold_limit = self._configured_max_hold_hr(campaign)
+                operator_limit = self._campaign_max_hours_override(campaign)
+                return min(hold_limit, operator_limit) if (
+                    operator_limit is not None
+                ) else hold_limit
+            return self._c6_target_acquisition_limit()[0]
         return self._max_hold_hr(campaign)
 
     def _c6_target_acquisition_limit(self) -> tuple[float, str]:
-        ovr = self._campaign_overrides(CampaignPhase.C6)
-        if 'max_hours' in ovr:
-            max_hours = self._float(ovr.get('max_hours'), 0.0)
-            if not math.isfinite(max_hours):
-                raise ValueError('C6.max_hours must be finite')
-            if max_hours > 0.0:
-                return max_hours, 'operator_override:C6.max_hours'
+        max_hours = self._campaign_max_hours_override(CampaignPhase.C6)
+        if max_hours is not None:
+            return max_hours, 'operator_override:C6.max_hours'
         value = self._campaign_config(CampaignPhase.C6).get(
             'max_target_acquisition_hr'
         )
@@ -2930,6 +3011,21 @@ class CampaignManager:
         self.last_campaign_stop = record
         return True
 
+    def _record_endpoint_cap(
+        self,
+        campaign: CampaignPhase,
+        hours: float,
+        *,
+        clock: str = 'campaign',
+    ) -> None:
+        """Record the first effective limit selected by check_endpoint."""
+        if self.last_endpoint_cap is None:
+            self.last_endpoint_cap = {
+                'campaign': campaign.name,
+                'hours': float(hours),
+                'clock': clock,
+            }
+
     def check_endpoint(self, melt: MeltState,
                        evap_flux: EvaporationFlux,
                        train: CondensationTrain,
@@ -2973,6 +3069,7 @@ class CampaignManager:
         ``CampaignEndCapMissing`` rather than ending or continuing silently.
         """
         campaign = melt.campaign
+        self.last_endpoint_cap = None
         completed_campaign_hour = self._completed_campaign_hour_for_endpoint(melt)
 
         # Check user-specified max_hours override first. C6 handles this as a
@@ -2986,6 +3083,10 @@ class CampaignManager:
             CampaignPhase.C0,
         ) and 'max_hours' in ovr:
             max_hours = self._campaign_max_hours_override(campaign)
+            if max_hours is not None:
+                self._record_endpoint_cap(
+                    campaign, max_hours, clock='max_hours'
+                )
             if (
                 max_hours is not None
                 and completed_campaign_hour >= max_hours
@@ -3070,6 +3171,7 @@ class CampaignManager:
                     return self._end_at("endpoint_met", detail="computed_exit")
 
             max_hold_hr = self._max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             if completed_campaign_hour >= max_hold_hr:
                 _target_T, ramp_C_per_hr = self.get_temp_target(
                     campaign, int(melt.campaign_hour), melt)
@@ -3088,6 +3190,7 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C0B:
             max_hold_hr = self._max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             if completed_campaign_hour >= max_hold_hr:
                 return self._end_at("endpoint_met", detail="max_hold")
             return False
@@ -3103,6 +3206,7 @@ class CampaignManager:
                 self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
             )
             max_hold_hr = self._max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             total_rate = float(evap_flux.total_kg_hr)
             # SC-109: soft depletion requires affirmative high-flux arming
             # (C4 signal_armed pattern). Continuous sub-threshold / never-
@@ -3127,6 +3231,7 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C2A_STAGED:
             max_hold_hr = self._configured_staged_max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             legacy_fraction = self._c2a_staged_depletion_flux_decay_fraction()
             stages = self._c2a_staged_enabled_stages()
             has_log_slope_depletion = self._c2a_staged_has_log_slope_depletion(stages)
@@ -3267,6 +3372,7 @@ class CampaignManager:
                 self._endpoint_float(campaign, soft, 'threshold_kg_hr'),
             )
             max_hold_hr = self._max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             species = str(soft.get('species', ''))
             if not species:
                 raise ValueError('C2B.soft_endpoint.species is required')
@@ -3294,6 +3400,7 @@ class CampaignManager:
             return False
 
         elif campaign == CampaignPhase.C3_K:
+            staged_hours: int | None = None
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),
@@ -3308,6 +3415,18 @@ class CampaignManager:
                 campaign,
                 *self._active_campaign_hold_path(
                     campaign, record, endpoint_fallback=True
+                ),
+            )
+            effective_cap = min(max(1, staged_hours), max_hold_hr) if (
+                staged_hours is not None
+            ) else max_hold_hr
+            self._record_endpoint_cap(
+                campaign,
+                effective_cap,
+                clock=(
+                    'staged_duration'
+                    if staged_hours is not None and effective_cap == max(1, staged_hours)
+                    else 'campaign'
                 ),
             )
             if completed_campaign_hour >= max_hold_hr:
@@ -3327,6 +3446,7 @@ class CampaignManager:
             # default 35 hours instead of the intended ~3-hour cool
             # cleanup.  Mirror the C3_K handling so the staged endpoint
             # is honored at its configured value.
+            staged_hours: int | None = None
             if record.path == 'A_staged':
                 staged_hours = int(self._float(
                     self._campaign_overrides(campaign).get('staged_duration_h'),
@@ -3341,6 +3461,18 @@ class CampaignManager:
                 campaign,
                 *self._active_campaign_hold_path(
                     campaign, record, endpoint_fallback=True
+                ),
+            )
+            effective_cap = min(max(1, staged_hours), max_hold_hr) if (
+                staged_hours is not None
+            ) else max_hold_hr
+            self._record_endpoint_cap(
+                campaign,
+                effective_cap,
+                clock=(
+                    'staged_duration'
+                    if staged_hours is not None and effective_cap == max(1, staged_hours)
+                    else 'campaign'
                 ),
             )
             if completed_campaign_hour >= max_hold_hr:
@@ -3500,6 +3632,9 @@ class CampaignManager:
             ]
             current_acquired = float(melt.temperature_C) >= window_low_C
             if not prior_acquisition_indexes and not current_acquired:
+                self._record_endpoint_cap(
+                    campaign, acquisition_limit_hr, clock='acquisition'
+                )
                 # Acquisition budget is preheat *opportunity*, not wall clock
                 # while Loop-3 zeros the ramp for overhead-holdup drain
                 # (see _c4_acquisition_opportunity_hr). Wall campaign hours
@@ -3582,6 +3717,11 @@ class CampaignManager:
                 window_low_C
                 <= float(melt.temperature_C)
                 <= window_high_C
+            )
+            self._record_endpoint_cap(
+                campaign,
+                max_hold_hr if current_in_window else process_limit_hr,
+                clock='hold' if current_in_window else 'process',
             )
             prior_in_window = [
                 snapshot
@@ -3700,6 +3840,7 @@ class CampaignManager:
                 )
                 default_cap_V = self._float(branch_cfg.get('max_voltage_V'), 2.5)
             max_hold_hr = self._configured_max_hold_hr(campaign, *hold_path)
+            self._record_endpoint_cap(campaign, max_hold_hr, clock='hold')
             configured_cap_V = (
                 mre_ladder.coerce_mre_decomposition_voltage(
                     getattr(melt, 'mre_max_voltage_V', 0.0)
@@ -3771,6 +3912,28 @@ class CampaignManager:
             acquisition_limit_hr, limit_source = (
                 self._c6_target_acquisition_limit()
             )
+            if not at_hold_target:
+                self._record_endpoint_cap(
+                    campaign, acquisition_limit_hr, clock='acquisition'
+                )
+            else:
+                hold_limit_hr = self._configured_max_hold_hr(campaign)
+                active_limit_hr = min(
+                    hold_limit_hr,
+                    acquisition_limit_hr,
+                ) if limit_source == 'operator_override:C6.max_hours' else (
+                    hold_limit_hr
+                )
+                self._record_endpoint_cap(
+                    campaign,
+                    active_limit_hr,
+                    clock=(
+                        'max_hours'
+                        if active_limit_hr == acquisition_limit_hr
+                        and limit_source == 'operator_override:C6.max_hours'
+                        else 'hold'
+                    ),
+                )
             if completed_campaign_hour >= acquisition_limit_hr:
                 if not at_hold_target:
                     diagnostic = {
@@ -3809,6 +3972,7 @@ class CampaignManager:
             threshold_wt_pct = self._endpoint_float(
                 campaign, composition_endpoint, 'threshold_wt_pct')
             max_hold_hr = self._configured_max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr, clock='hold')
             comp = melt.composition_wt_pct()
             refractory_pct = sum(comp.get(str(name), 0.0) for name in species)
             if completed_hold_hr >= min_hold_hr and refractory_pct < threshold_wt_pct:
@@ -3819,6 +3983,7 @@ class CampaignManager:
 
         elif campaign == CampaignPhase.C7_CA_ALUMINOTHERMIC:
             max_hold_hr = self._max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             if completed_campaign_hour >= max_hold_hr:
                 return self._end_at("endpoint_met", detail="max_hold")
             return False
@@ -3831,6 +3996,7 @@ class CampaignManager:
             consecutive_hours = int(self._endpoint_float(
                 campaign, soft, 'consecutive_hours'))
             max_hold_hr = self._configured_max_hold_hr(campaign)
+            self._record_endpoint_cap(campaign, max_hold_hr)
             # SC-109: low-current consecutive hours require prior peak arming.
             signal_armed = self._mre_current_signal_armed(
                 record,

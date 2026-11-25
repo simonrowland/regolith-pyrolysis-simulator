@@ -11,6 +11,7 @@ import pytest
 from simulator.accounting.ledger import AtomLedger, snapshot_atom_ledger
 from simulator.accounting.run_artifact import build_run_artifact
 from simulator.campaigns import (
+    CampaignMaxHoursRefusal,
     CampaignHoldTargetRefusal,
     CampaignPressureSetpointRefusal,
 )
@@ -92,9 +93,7 @@ def test_hour_budget_mid_campaign_records_typed_run_truncation_flag():
     detail = flag["detail"]
     assert detail["active_campaign"] == "C2A"
     assert detail["hours_run_in_campaign"] == 1
-    assert detail["campaign_cap_hours"] == (
-        execution.simulator.campaign_mgr._max_hold_hr(CampaignPhase.C2A)
-    )
+    assert detail["campaign_cap_hours"] == 3.0
     assert detail["successors_not_reached"] == [
         "C3_K",
         "C3_NA",
@@ -144,6 +143,64 @@ def test_hour_budget_lookahead_records_route_conflict_without_failing_run():
     ]
 
 
+def test_hour_budget_lookahead_failure_is_reported_without_failing_run():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A_STAGED",
+        hours=1,
+        additives_kg={},
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C2A_STAGED
+    sim.campaign_mgr.setpoints["campaigns"]["C2A_staged"][
+        "na_shuttle_stage"
+    ]["duration_h"] = "malformed-duration"
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert len(execution.run_flags) == 1
+    unresolved, = execution.run_flags[0]["detail"]["unresolved_successors"]
+    assert unresolved["kind"] == "campaign_sequence"
+    assert unresolved["status"] == "unresolved"
+    assert unresolved["code"] == "campaign_successor_lookahead_failed"
+    assert unresolved["reason"].startswith("ValueError:")
+    assert execution.run_flags[0]["detail"]["campaign_cap_hours"] > 0.0
+
+
+def test_configured_path_a_successors_preserve_the_post_c4_c2a_repeat():
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            additives_kg={},
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.record.path = "A"
+    sim.record.branch = "two"
+
+    phases, unresolved = sim.campaign_mgr._configured_auto_apply_sequence(
+        CampaignPhase.C2A,
+        deepcopy(sim.record),
+    )
+
+    assert [phase.name for phase in phases] == [
+        "C2A",
+        "C3_K",
+        "C3_NA",
+        "C4",
+        "C2A",
+        "C6",
+    ]
+    assert unresolved == ()
+
+
 def test_hour_budget_reports_c5_max_hours_override_as_active_cap():
     run = _run(
         feedstock_id="lunar_mare_low_ti",
@@ -153,12 +210,143 @@ def test_hour_budget_reports_c5_max_hours_override_as_active_cap():
         runtime_campaign_overrides={"C5": {"max_hours": 3}},
     )
 
-    execution = RunExecutor().execute(run._session_config())
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C5
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C5"]["max_hold_hr"] = {
+        "branch_two": 800.0,
+        "branch_one": 400.0,
+    }
+    execution = RunExecutor().execute_session(session, hours=1)
 
     assert execution.status == "ok"
     flag = execution.run_flags[0]
     assert flag["detail"]["active_campaign"] == "C5"
     assert flag["detail"]["campaign_cap_hours"] == 3.0
+    assert sim.campaign_mgr.last_endpoint_cap == {
+        "campaign": "C5",
+        "hours": 3.0,
+        "clock": "max_hours",
+    }
+
+
+def test_hour_budget_reports_c3_staged_endpoint_integer_cap():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C3_K",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C3": {"staged_duration_h": 3.9}},
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    session.simulator.melt.campaign = CampaignPhase.C3_K
+    session.simulator.record.path = "A_staged"
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert execution.run_flags[0]["detail"]["campaign_cap_hours"] == 3.0
+    assert session.simulator.campaign_mgr.last_endpoint_cap == {
+        "campaign": "C3_K",
+        "hours": 3.0,
+        "clock": "staged_duration",
+    }
+
+
+@pytest.mark.parametrize(
+    ("campaign", "at_hold", "expected_cap", "expected_clock"),
+    [
+        ("C4", False, 120.0, "acquisition"),
+        ("C4", True, 20.0, "hold"),
+        ("C6", False, 120.0, "acquisition"),
+        ("C6", True, 20.0, "hold"),
+    ],
+)
+def test_hour_budget_cap_matches_c4_and_c6_active_endpoint_clock(
+    campaign, at_hold, expected_cap, expected_clock
+):
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign=campaign,
+        hours=1,
+        additives_kg={},
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase[campaign]
+    sim.record.branch = "two"
+    if at_hold and campaign == "C4":
+        low_C, high_C = sim.campaign_mgr._c4_temperature_window()
+        sim.melt.temperature_C = (low_C + high_C) / 2.0
+    elif at_hold and campaign == "C6":
+        hold_target_C, _ = sim.campaign_mgr.get_temp_target(
+            CampaignPhase.C6, sim.melt.campaign_hour, sim.melt
+        )
+        sim.melt.temperature_C = hold_target_C
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "ok"
+    assert execution.run_flags[0]["detail"]["campaign_cap_hours"] == (
+        expected_cap
+    )
+    assert sim.campaign_mgr.last_endpoint_cap["campaign"] == campaign
+    assert sim.campaign_mgr.last_endpoint_cap["hours"] == expected_cap
+    assert sim.campaign_mgr.last_endpoint_cap["clock"] == expected_clock
+
+
+@pytest.mark.parametrize(
+    "resolver",
+    ["_campaign_max_hours_override", "_max_hold_hr", "_c6_target_acquisition_limit"],
+)
+def test_malformed_max_hours_uses_one_typed_refusal(resolver):
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C6" if resolver == "_c6_target_acquisition_limit" else "C5",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={
+            "C6" if resolver == "_c6_target_acquisition_limit" else "C5": {
+                "max_hours": "not-a-number",
+            },
+        },
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    manager = session.simulator.campaign_mgr
+    campaign = (
+        CampaignPhase.C6
+        if resolver == "_c6_target_acquisition_limit"
+        else CampaignPhase.C5
+    )
+    session.simulator.melt.campaign = campaign
+
+    with pytest.raises(CampaignMaxHoursRefusal) as caught:
+        if resolver == "_campaign_max_hours_override":
+            manager._campaign_max_hours_override(campaign)
+        elif resolver == "_max_hold_hr":
+            manager._max_hold_hr(campaign)
+        else:
+            manager._c6_target_acquisition_limit()
+
+    assert caught.value.reason == "campaign_max_hours_invalid"
+    assert caught.value.diagnostic["field"] == "max_hours"
+
+    execution = RunExecutor().execute_session(session, hours=1)
+    assert execution.status == "refused"
+    assert execution.reason == "campaign_max_hours_invalid"
 
 
 def test_hour_budget_does_not_flag_a_completed_terminal_campaign():
@@ -407,21 +595,21 @@ def test_campaign_count_resolves_structured_c5_branch_max_hold():
 
 
 @pytest.mark.parametrize(
-    ("phase", "path", "branch", "cap_path"),
+    ("phase", "path", "branch", "expected_cap"),
     [
-        (CampaignPhase.C3_K, "A_staged", "", ("C3_K", "A_staged")),
-        (CampaignPhase.C3_K, "A", "", ("C3_K", "A")),
-        (CampaignPhase.C3_K, "B", "", ("C3_K", "default")),
-        (CampaignPhase.C3_NA, "A_staged", "", ("C3_NA", "A_staged")),
-        (CampaignPhase.C3_NA, "A", "", ("C3_NA", "A")),
-        (CampaignPhase.C3_NA, "B", "", ("C3_NA", "default")),
-        (CampaignPhase.C5, "", "two", ("branch_two",)),
-        (CampaignPhase.C5, "", "one", ("branch_one",)),
-        (CampaignPhase.C5, "", "", ("branch_one",)),
+        (CampaignPhase.C3_K, "A_staged", "", 3.0),
+        (CampaignPhase.C3_K, "A", "", 12.0),
+        (CampaignPhase.C3_K, "B", "", 25.0),
+        (CampaignPhase.C3_NA, "A_staged", "", 3.0),
+        (CampaignPhase.C3_NA, "A", "", 18.0),
+        (CampaignPhase.C3_NA, "B", "", 35.0),
+        (CampaignPhase.C5, "", "two", 800.0),
+        (CampaignPhase.C5, "", "one", 400.0),
+        (CampaignPhase.C5, "", "", 400.0),
     ],
 )
 def test_campaign_count_uses_real_manager_structured_campaign_caps(
-    phase, path, branch, cap_path
+    phase, path, branch, expected_cap
 ):
     session = SimSession().start(
         _run(
@@ -436,14 +624,17 @@ def test_campaign_count_uses_real_manager_structured_campaign_caps(
     sim.record.path = path
     sim.record.branch = branch
     session._step_results = [SimpleNamespace(campaign_summary=None)]
-
-    campaign_cap = sim.campaign_mgr._configured_max_hold_hr(phase, *cap_path)
+    if phase == CampaignPhase.C5:
+        sim.campaign_mgr.campaigns["C5"]["max_hold_hr"] = {
+            "branch_two": 800.0,
+            "branch_one": 400.0,
+        }
     campaigns_elapsed = _campaigns_elapsed_from_session_history(
         session,
         fallback=99.0,
     )
 
-    assert campaigns_elapsed == pytest.approx(1.0 / campaign_cap)
+    assert campaigns_elapsed == pytest.approx(1.0 / expected_cap)
 
 
 def test_campaign_count_uses_real_c3_staged_duration_override():
@@ -463,15 +654,12 @@ def test_campaign_count_uses_real_c3_staged_duration_override():
     sim.record.path = "A_staged"
     session._step_results = [SimpleNamespace(campaign_summary=None)]
 
-    campaign_cap = sim.campaign_mgr._campaign_overrides(
-        CampaignPhase.C3_NA
-    )["staged_duration_h"]
     campaigns_elapsed = _campaigns_elapsed_from_session_history(
         session,
         fallback=99.0,
     )
 
-    assert campaigns_elapsed == pytest.approx(1.0 / campaign_cap)
+    assert campaigns_elapsed == pytest.approx(1.0 / 2.0)
 
 
 def test_campaign_count_combines_completed_campaigns_with_real_c5_cap():
@@ -492,15 +680,74 @@ def test_campaign_count_combines_completed_campaigns_with_real_c5_cap():
         SimpleNamespace(campaign_summary=None),
     ]
 
-    campaign_cap = sim.campaign_mgr._configured_max_hold_hr(
-        CampaignPhase.C5, "branch_two"
-    )
     campaigns_elapsed = _campaigns_elapsed_from_session_history(
         session,
         fallback=99.0,
     )
 
-    assert campaigns_elapsed == pytest.approx(1.0 + 2.0 / campaign_cap)
+    assert campaigns_elapsed == pytest.approx(1.0 + 2.0 / 800.0)
+
+
+def test_campaign_count_keeps_green_c5_denominator_with_max_hours_override():
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C5",
+            hours=1,
+            additives_kg={},
+            runtime_campaign_overrides={"C5": {"max_hours": 3}},
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C5
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C5"]["max_hold_hr"] = {
+        "branch_two": 800.0,
+        "branch_one": 400.0,
+    }
+    session._step_results = [
+        SimpleNamespace(campaign_summary=None),
+        SimpleNamespace(campaign_summary=None),
+    ]
+
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(2.0 / 800.0)
+
+
+@pytest.mark.parametrize(
+    ("phase", "override_key", "path", "expected_cap"),
+    [
+        (CampaignPhase.C2A_STAGED, "C2A_staged", "", 9.0),
+        (CampaignPhase.C3_K, "C3", "A", 12.0),
+    ],
+)
+def test_campaign_count_keeps_green_denominators_with_max_hours_override(
+    phase, override_key, path, expected_cap
+):
+    session = SimSession().start(
+        _run(
+            feedstock_id="lunar_mare_low_ti",
+            campaign="C2A",
+            hours=1,
+            additives_kg={},
+            runtime_campaign_overrides={override_key: {"max_hours": 3}},
+        )._session_config()
+    )
+    sim = session.simulator
+    sim.melt.campaign = phase
+    sim.record.path = path
+    session._step_results = [SimpleNamespace(campaign_summary=None)]
+
+    campaigns_elapsed = _campaigns_elapsed_from_session_history(
+        session,
+        fallback=99.0,
+    )
+
+    assert campaigns_elapsed == pytest.approx(1.0 / expected_cap)
 
 
 def test_run_metadata_projects_execution_campaign_count_over_override():
@@ -668,6 +915,7 @@ def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel
     assert truncation_detail["hours_run_in_campaign"] == 0
     assert truncation_detail["at_campaign_boundary"] is True
     assert truncation_detail["just_completed_campaign"] == "C4"
+    assert truncation_detail["campaign_cap_hours"] == 160.0
     na_flag = next(
         flag for flag in c4_stop["flags"]
         if flag["code"] == "c4_time_capped_without_na_endpoint"
@@ -680,15 +928,44 @@ def test_run_executor_advances_after_c4_acquisition_time_cap_without_c6_mislabel
     )
 
 
+def test_budget_pending_c6_decision_still_records_truncation():
+    run = _run(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+        additives_kg={},
+        runtime_campaign_overrides={"C2A": {"max_hours": 1}},
+    )
+    session = SimSession()
+    backend = InternalAnalyticalBackend()
+    backend.initialize({})
+    session.start(run._session_config(), backend=backend)
+    sim = session.simulator
+    sim.melt.campaign = CampaignPhase.C2A
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+
+    execution = RunExecutor().execute_session(session, hours=1)
+
+    assert execution.status == "partial"
+    assert execution.reason == "pending_decision"
+    assert session.pending_decision().decision_type is DecisionType.C6_PROCEED
+    flag, = execution.run_flags
+    assert flag["code"] == "run_hour_budget_exhausted_mid_campaign"
+    assert flag["detail"]["pending_decision"] == "C6_PROCEED"
+    assert flag["detail"]["successors_not_reached"] == ["C6"]
+
+
 def test_auto_apply_c4_time_cap_runs_c2a_and_c6_then_flags_terminal_cap():
-    config = _run(
+    run = _run(
         feedstock_id="lunar_mare_low_ti",
         campaign="C4",
         hours=1,
         additives_kg={},
         until_campaign_complete=True,
         runtime_campaign_overrides={"C6": {"max_hours": 1}},
-    )._session_config()
+    )
+    config = run._session_config()
     backend = InternalAnalyticalBackend()
     backend.initialize({})
     session = SimSession()
@@ -716,6 +993,32 @@ def test_auto_apply_c4_time_cap_runs_c2a_and_c6_then_flags_terminal_cap():
     assert terminal_flag["kind"] == "campaign_stop"
     assert terminal_flag["detail"]["successor"] is None
     assert terminal_flag["detail"]["ruling"] == "d-471"
+
+    runner_payload = run._build_output(execution)
+    artifact = build_run_artifact(
+        runner_payload,
+        run_id="campaign-time-cap-flags",
+    )
+    saved_flags = artifact["terminal"]["run_metadata"]["run_flags"]
+    saved_c4_flag = next(
+        flag for flag in saved_flags
+        if flag["code"] == "campaign_time_cap_unconverged"
+        and flag["detail"]["campaign"] == "C4"
+    )
+    saved_c4_na_flag = next(
+        flag for flag in saved_flags
+        if flag["code"] == "c4_time_capped_without_na_endpoint"
+    )
+    c4_stop_flags = stop_by_campaign["C4"]["flags"]
+    assert saved_c4_flag == next(
+        flag for flag in c4_stop_flags
+        if flag["code"] == "campaign_time_cap_unconverged"
+    )
+    assert saved_c4_na_flag == next(
+        flag for flag in c4_stop_flags
+        if flag["code"] == "c4_time_capped_without_na_endpoint"
+    )
+    assert saved_c4_na_flag["detail"]["na_endpoint_threshold_atom_mol"] > 0.0
 
 
 def test_c4_refusal_is_non_resumable_under_auto_apply_and_decide() -> None:

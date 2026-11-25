@@ -176,6 +176,14 @@ def test_run_truncation_flag_is_rendered_as_text_in_artifact_provenance() -> Non
             "ruling": "d-473",
             "untrusted_text": "<script>not markup</script>",
         },
+    }, {
+        "kind": "campaign_stop",
+        "code": "c4_time_capped_without_na_endpoint",
+        "detail": {
+            "residual_Na_kg": 0.25,
+            "na_endpoint_threshold_atom_mol": 0.004,
+            "ruling": "d-471",
+        },
     }]
 
     rendered = _render_surfaces(artifact)
@@ -184,6 +192,9 @@ def test_run_truncation_flag_is_rendered_as_text_in_artifact_provenance() -> Non
     assert "run_hour_budget_exhausted_mid_campaign" in rendered["runFlagText"]
     assert '"campaign_cap_hours":160' in rendered["runFlagText"]
     assert '"successors_not_reached":["C6"]' in rendered["runFlagText"]
+    assert "c4_time_capped_without_na_endpoint" in rendered["runFlagText"]
+    assert '"residual_Na_kg":0.25' in rendered["runFlagText"]
+    assert '"na_endpoint_threshold_atom_mol":0.004' in rendered["runFlagText"]
     assert "<script>not markup</script>" in rendered["runFlagText"]
     assert "<script>not markup</script>" not in rendered["provenance"]
 

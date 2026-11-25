@@ -918,63 +918,105 @@ def drive_session(
             if (
                 step_index > 0
                 and not session.is_complete()
-                and session.pending_decision() is None
             ):
                 sim = session.simulator
                 phase = sim.melt.campaign
                 if phase not in (CampaignPhase.IDLE, CampaignPhase.COMPLETE):
                     campaign_mgr = sim.campaign_mgr
-                    configured_phases, unresolved_routes = (
-                        copy.copy(campaign_mgr)._configured_auto_apply_sequence(
-                            phase,
-                            copy.deepcopy(sim.record),
-                        )
-                    )
-                    last_campaign_summary = None
-                    if session._step_results:
-                        candidate_summary = getattr(
-                            session._step_results[-1],
-                            "campaign_summary",
-                            None,
-                        )
-                        if isinstance(candidate_summary, Mapping):
-                            last_campaign_summary = candidate_summary
-                    just_completed_campaign = str(
-                        (last_campaign_summary or {}).get("campaign") or ""
-                    )
-                    at_campaign_boundary = bool(
-                        just_completed_campaign
-                        and just_completed_campaign != phase.name
-                    )
-                    not_reached_start = 0 if at_campaign_boundary else 1
                     detail: dict[str, Any] = {
                         "active_campaign": phase.name,
-                        "hours_run_in_campaign": int(
+                        "hours_run_in_campaign": 0,
+                        "campaign_cap_hours": None,
+                        "successors_not_reached": [],
+                        "at_campaign_boundary": False,
+                        "ruling": "d-473",
+                    }
+                    try:
+                        detail["hours_run_in_campaign"] = int(
                             sim.melt.campaign_hour
-                        ),
-                        "campaign_cap_hours": float(
-                            campaign_mgr._active_campaign_max_hold_hr(
-                                phase,
-                                sim.record,
+                        )
+                        last_campaign_summary = None
+                        if session._step_results:
+                            candidate_summary = getattr(
+                                session._step_results[-1],
+                                "campaign_summary",
+                                None,
                             )
-                        ),
-                        "successors_not_reached": [
+                            if isinstance(candidate_summary, Mapping):
+                                last_campaign_summary = candidate_summary
+                        just_completed_campaign = str(
+                            (last_campaign_summary or {}).get("campaign") or ""
+                        )
+                        at_campaign_boundary = bool(
+                            just_completed_campaign
+                            and just_completed_campaign != phase.name
+                        )
+                        not_reached_start = 0 if at_campaign_boundary else 1
+                        detail["at_campaign_boundary"] = at_campaign_boundary
+                        if at_campaign_boundary:
+                            detail["just_completed_campaign"] = (
+                                just_completed_campaign
+                            )
+
+                        endpoint_cap = getattr(
+                            campaign_mgr, "last_endpoint_cap", None
+                        )
+                        if (
+                            isinstance(endpoint_cap, Mapping)
+                            and endpoint_cap.get("campaign") == phase.name
+                        ):
+                            detail["campaign_cap_hours"] = float(
+                                endpoint_cap["hours"]
+                            )
+                        elif at_campaign_boundary:
+                            detail["campaign_cap_hours"] = float(
+                                campaign_mgr._active_campaign_max_hold_hr(
+                                    phase,
+                                    sim.record,
+                                    sim.melt,
+                                )
+                            )
+
+                        pending_decision = session.pending_decision()
+                        configured_phases, unresolved_routes = (
+                            copy.copy(
+                                campaign_mgr
+                            )._configured_auto_apply_sequence(
+                                phase,
+                                copy.deepcopy(sim.record),
+                            )
+                        )
+                        detail["successors_not_reached"] = [
                             successor.name
                             for successor in configured_phases[
                                 not_reached_start:
                             ]
-                        ],
-                        "at_campaign_boundary": at_campaign_boundary,
-                        "ruling": "d-473",
-                    }
-                    if at_campaign_boundary:
-                        detail["just_completed_campaign"] = (
-                            just_completed_campaign
-                        )
-                    if unresolved_routes:
-                        detail["unresolved_successors"] = [
-                            dict(route) for route in unresolved_routes
                         ]
+                        if unresolved_routes:
+                            detail["unresolved_successors"] = [
+                                dict(route) for route in unresolved_routes
+                            ]
+                        if pending_decision is not None:
+                            decision_type = getattr(
+                                pending_decision, "decision_type", None
+                            )
+                            detail["pending_decision"] = str(
+                                getattr(
+                                    decision_type,
+                                    "name",
+                                    decision_type or "unknown",
+                                )
+                            )
+                    except Exception as exc:
+                        # d-473 is diagnostic only: a malformed future route
+                        # cannot turn a completed hour into a failed run.
+                        detail["unresolved_successors"] = [{
+                            "campaign": phase.name,
+                            "kind": "campaign_sequence",
+                            "status": "unresolved",
+                            "code": "campaign_successor_lookahead_failed",
+                            "reason": f"{type(exc).__name__}: {exc}",
+                        }]
                     session._run_flags = [{
                         "kind": "run_truncation",
                         "code": "run_hour_budget_exhausted_mid_campaign",

@@ -6197,6 +6197,62 @@ def test_web_runner_projection_preserves_existing_run_flags_at_zero_hours():
     assert payload["run_metadata"]["run_flags"] == [flag]
 
 
+def test_zero_hour_web_session_uses_real_pacing_without_run_flags(
+    monkeypatch,
+):
+    def force_internal_analytical_backend(_backend_name):
+        backend = InternalAnalyticalBackend()
+        backend.initialize({})
+        return backend
+
+    def run_background_task(target, *args, **kwargs):
+        target(*args, **kwargs)
+        return {"completed_inline": True}
+
+    monkeypatch.setattr(
+        web_events, "_get_backend", force_internal_analytical_backend
+    )
+    monkeypatch.setattr(
+        app_module.socketio,
+        "start_background_task",
+        run_background_task,
+    )
+    app = app_module.create_app()
+    client = _identified_socket_client(app)
+    client.get_received()
+    before = set(_simulations)
+
+    try:
+        client.emit(
+            "start_simulation",
+            {
+                "backend": "internal-analytical",
+                "feedstock": "lunar_mare_low_ti",
+                "mass_kg": 1000,
+                "speed": 0,
+                "track": "pyrolysis",
+            },
+        )
+        events = client.get_received()
+        new_sids = set(_simulations) - before
+        assert len(new_sids) == 1
+        sid = new_sids.pop()
+        session = _simulations[sid]["session"]
+
+        assert session._config.hours == 0
+        assert session.run_flags == ()
+        assert any(event["name"] == "simulation_tick" for event in events)
+        assert all(
+            "run_flags" not in event["args"][0]
+            for event in events
+            if event["args"] and isinstance(event["args"][0], dict)
+        )
+    finally:
+        client.disconnect()
+        for sid in set(_simulations) - before:
+            _clear_simulation_state(sid)
+
+
 class RaisingCleanedMeltLedger:
     def project_account_kg(self, account):
         assert account == "process.cleaned_melt"

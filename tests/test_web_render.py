@@ -1084,7 +1084,7 @@ def test_campaign_summary_renders_typed_stop_flags_as_text():
             {
                 "event": "campaign_complete_summary",
                 "payload": {
-                    "campaign": "C0",
+                    "campaign": "C4",
                     "duration_h": 1,
                     "start_mass_kg": 1000.0,
                     "end_mass_kg": 999.0,
@@ -1099,8 +1099,17 @@ def test_campaign_summary_renders_typed_stop_flags_as_text():
                             "kind": "campaign_stop",
                             "code": "campaign_time_cap_unconverged",
                             "detail": {
-                                "campaign": "C0",
-                                "successor": "C0B",
+                                "campaign": "C4",
+                                "successor": "C2A",
+                                "ruling": "d-471",
+                            },
+                        },
+                        {
+                            "kind": "campaign_stop",
+                            "code": "c4_time_capped_without_na_endpoint",
+                            "detail": {
+                                "residual_Na_kg": 0.25,
+                                "na_endpoint_threshold_atom_mol": 0.004,
                                 "ruling": "d-471",
                             },
                         },
@@ -1125,7 +1134,10 @@ def test_campaign_summary_renders_typed_stop_flags_as_text():
     summary_text = rendered["steps"][0]["campaignSummaryText"]
 
     assert "campaign_time_cap_unconverged" in summary_text
-    assert '"successor":"C0B"' in summary_text
+    assert '"successor":"C2A"' in summary_text
+    assert "c4_time_capped_without_na_endpoint" in summary_text
+    assert '"residual_Na_kg":0.25' in summary_text
+    assert '"na_endpoint_threshold_atom_mol":0.004' in summary_text
     assert "run_hour_budget_exhausted_mid_campaign" in summary_text
     assert '"campaign_cap_hours":3' in summary_text
     assert '"successors_not_reached":["C6"]' in summary_text
