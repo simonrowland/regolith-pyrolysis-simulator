@@ -391,7 +391,11 @@ def test_openimcc_sossi_aithala_redox_residuals_remain_bit_identical():
         and notice.policy is not None
         and notice.policy.id == "DP-010"
     )
-    encoded = json.dumps(values, separators=(",", ":"), ensure_ascii=False).encode()
+    encoded = json.dumps(
+        [residual_to_plain(residual) for residual in values],
+        separators=(",", ":"),
+        ensure_ascii=False,
+    ).encode()
     # Provisional pin; regenerate at the final integration pin.
     assert hashlib.sha256(encoded).hexdigest() == (
         "cdbef7d7303e5c0dea58ff312dbdfa59dcaff988cb5417b1a11db2d825cea011"
@@ -2019,7 +2023,7 @@ def test_kress_table1_redox_rows_score_at_ambient_furnace_pressure():
         and residual.numeric.decision_band is None
         and residual.status is ResidualStatus.NO_BAND
         for residual in residuals
-    )
+    ), [(residual.key, residual.refusal, residual.status) for residual in residuals]
 
 
 def _borisov_row4():

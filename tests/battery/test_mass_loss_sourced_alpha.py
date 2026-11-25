@@ -14,7 +14,6 @@ from simulator.battery.enums import Engine, Quantity, RefusalReason
 from simulator.battery.migrate import LITERATURE, Migrator
 from simulator.battery.residue import (
     ResidueInventoryRefusal,
-    ResiduePressureResult,
     _mass_loss_sourced_alphas,
 )
 from simulator.battery.score import predict_with_engine, quantity_token
@@ -1787,8 +1786,9 @@ def test_mass_loss_keeps_provider_recorded_omission_on_produced_and_refused_pred
         "internal-analytical", experiment, temperature_K=temperature_K,
         source_document=fig3_source, observation=row,
     )
-    assert isinstance(callback_results[0], ResiduePressureResult), callback_results[0]
-    assert callback_results[0].notices, callback_results[0]
+    assert isinstance(callback_results[0], dict), callback_results[0]
+    assert set(callback_results[0]) == {"Mg", "Al", "O2"}, callback_results[0]
+    assert result.pressure_notices, result.pressure_notices
     assert any(
         notice["reason"] == "scoped Mg pressure test"
         and notice["affected_species"] == ["Mg"]
