@@ -32,6 +32,7 @@ class CompositionProjectionRule:
     default_valences: tuple[tuple[str, int], ...] = ()
     element_aliases: tuple[tuple[str, str], ...] = ()
     required_elements: tuple[str, ...] = ()
+    required_components: tuple[str, ...] = ()
     retained_components: tuple[str, ...] = ()
 
 
@@ -62,6 +63,16 @@ SOURCE_DECLARATIONS: dict[str, dict[str, SourceRule]] = {
                 applies_to_quantities=(
                     "equilibrium_phase_composition",
                     "chloride_capacity",
+                ),
+                required_components=(
+                    "SiO2",
+                    "TiO2",
+                    "Al2O3",
+                    "FeOT",
+                    "MgO",
+                    "CaO",
+                    "Na2O",
+                    "K2O",
                 ),
                 retained_components=("Cl", "S", "F"),
             ),

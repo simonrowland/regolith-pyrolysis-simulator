@@ -89,6 +89,7 @@ from simulator.battery import schema_gap as sg
 from simulator.battery.source_declarations import (
     B677_SOURCE_ID,
     B2131_SOURCE_ID as _B2131_SOURCE_ID,
+    CompositionProjectionRule,
     KEMS_137_SOURCE_ID as _KEMS_137_SOURCE_ID,
     SOURCE_DECLARATIONS,
     composition_projection_rule,
@@ -5815,10 +5816,11 @@ def _composition_projection_notice(
         or quantity is None
     ):
         return None
+    inference = composition.inference
     detail = next(
         (
             item.split(": ", 1)[1]
-            for item in composition.inference.inputs
+            for item in inference.inputs
             if item.startswith(
                 "projected trace components omitted from engine composition: "
             )
@@ -5828,7 +5830,7 @@ def _composition_projection_notice(
     mass_fraction = next(
         (
             _as_dec_or_none(item.split(": ", 1)[1])
-            for item in composition.inference.inputs
+            for item in inference.inputs
             if item.startswith("projected trace mass fraction: ")
         ),
         None,
@@ -7610,6 +7612,9 @@ def _mass_percent_composition_located(
     locator: Locator | None,
     closure_context: object = None,
     declared_component_map: Mapping[str, Any] | None = None,
+    source_projection_rule: CompositionProjectionRule | None = None,
+    source_projection_mode: str | None = None,
+    source_projection_references: Sequence[str] = (),
 ) -> Located[Composition]:
     source_map = declared_component_map or wt
     component_vocabulary: Literal["oxide", "elemental"] = "oxide"
@@ -7651,7 +7656,64 @@ def _mass_percent_composition_located(
                 locator,
                 closure_result=closure_result,
             )
+        if source_projection_rule is not None:
+            inference = _source_composition_projection_derivation(
+                inference,
+                source_projection_rule,
+                closure_result=closure_result,
+                locator=locator,
+                projection_mode=source_projection_mode,
+                references=source_projection_references,
+            )
     return Located(state, locator=locator, inference=inference)
+
+
+def _source_composition_projection_derivation(
+    base: Derivation | None,
+    rule: CompositionProjectionRule,
+    *,
+    closure_result: _MassPercentClosureResult,
+    locator: Locator | None,
+    projection_mode: str | None,
+    references: Sequence[str],
+) -> Derivation | None:
+    if base is None:
+        return None
+    renormalized = any(
+        "renormalized to 100 wt%" in item for item in base.inputs
+    )
+    assumptions = (
+        f"source basis: {rule.source_basis}",
+        f"source row interpretation: {projection_mode or 'printed composition'}",
+        "printed oxide amounts are retained; absent components are never filled",
+        "Cl/S/F are retained when printed; an engine excludes unsupported components with a typed wt% notice",
+        f"weight-percent renormalized: {str(renormalized).lower()}",
+        "output mole fractions are normalized by the shared mass-percent resolver",
+    )
+    parameters = list(base.parameters)
+    original_total = closure_result.printed_analysis_total
+    if original_total is not None:
+        parameters.append(
+            (
+                "original_analytical_total_wt_pct",
+                Located(State.of(original_total), locator=locator),
+            )
+        )
+    for name, amount in closure_result.dropped_components:
+        parameters.append(
+            (
+                f"excluded_component_{name}_wt_pct",
+                Located(State.of(amount), locator=locator),
+            )
+        )
+    return replace(
+        base,
+        relation="source_composition_projection",
+        inputs=tuple(dict.fromkeys((*base.inputs, *assumptions))),
+        parameters=tuple(parameters),
+        method=Located(State.of(rule.source_basis), locator=locator),
+        references=tuple(dict.fromkeys((*base.references, *references))),
+    )
 
 
 def _project_source_declared_composition(
@@ -7660,13 +7722,13 @@ def _project_source_declared_composition(
     *,
     quantity: Quantity | None,
     locator: Locator | None,
+    source_rows: Sequence[object] = (),
 ) -> Located[Composition] | None:
-    """Resolve a source's printed run map through the shared composition path."""
+    """Resolve all located source composition alternatives through one owner."""
 
     rule = composition_projection_rule(source_id)
     if (
         rule is None
-        or rule.source_basis != "partial oxide analysis with Cl/S/F"
         or quantity is None
         or quantity.value not in rule.applies_to_quantities
     ):
@@ -7679,14 +7741,135 @@ def _project_source_declared_composition(
         dict(raw_conditions) if isinstance(raw_conditions, Mapping) else {}
     )
     payload = {**values, "point_conditions": point_conditions}
-    declared_map = _named_printed_composition_map(payload) or (
+    experiment = obs.get("experiment")
+    declared_maps: list[Mapping[str, Any]] = []
+    component_values: dict[str, Decimal] = {}
+    component_rows: list[tuple[str, str]] = []
+    invalid_components: list[str] = []
+    if (
+        rule.source_basis == "partial oxide analysis with Cl/S/F"
+        and quantity is Quantity.EQUILIBRIUM_PHASE_COMPOSITION
+    ):
+        for candidate in source_rows:
+            if (
+                not isinstance(candidate, tuple)
+                or len(candidate) != 2
+                or not isinstance(candidate[0], str)
+                or not isinstance(candidate[1], Mapping)
+            ):
+                continue
+            component_formula, source_row = candidate
+            if source_row.get("experiment") != experiment:
+                continue
+            source_values = source_row.get("values")
+            if not isinstance(source_values, Mapping):
+                continue
+            source_payload = {
+                **source_values,
+                "point_conditions": source_row.get("point_conditions", {}),
+            }
+            candidate_map = _named_printed_composition_map(source_payload) or (
+                _declared_printed_composition_map(source_payload)
+            )
+            if candidate_map is not None:
+                declared_maps.append(candidate_map)
+            if (
+                source_values.get("quantity")
+                != Quantity.EQUILIBRIUM_PHASE_COMPOSITION.value
+            ):
+                continue
+            raw_amount = source_values.get("component_amount")
+            if raw_amount is None:
+                continue
+            amount = _as_dec_or_none(raw_amount)
+            if amount is None:
+                invalid_components.append(component_formula)
+                continue
+            previous = component_values.get(component_formula)
+            if previous is not None and previous != amount:
+                invalid_components.append(component_formula)
+                continue
+            component_values[component_formula] = amount
+            source_locator = locator_from_mapping(source_row.get("locator"))
+            component_rows.append(
+                (
+                    str(source_row.get("observation_id") or component_formula),
+                    source_locator.record if source_locator is not None else "",
+                )
+            )
+    direct_map = _named_printed_composition_map(payload) or (
         _declared_printed_composition_map(payload)
     )
+    if direct_map is not None:
+        declared_maps.append(direct_map)
+    declared_map: Mapping[str, Any] | None = None
+    projection_mode = "printed composition map"
+    if declared_maps:
+        vectors = [dict(candidate) for candidate in declared_maps]
+        if any(vector != vectors[0] for vector in vectors[1:]):
+            return Located(
+                State.unknown("source composition vectors disagree within the run"),
+                locator=locator,
+            )
+        declared_map = vectors[0]
+        if component_values and any(
+            component_values.get(name) != _as_dec_or_none(raw_amount)
+            for name, raw_amount in declared_map.items()
+            if name in component_values
+        ):
+            return Located(
+                State.unknown(
+                    "printed composition vector conflicts with located component observations"
+                ),
+                locator=locator,
+            )
+    elif component_values:
+        declared_map = component_values
+        projection_mode = "same-experiment located component observations"
     if declared_map is None:
-        return None
-    projection_locator = (
-        _locator_from_plain(values.get("composition_locator"))
-        or _composition_source_locator(payload, fallback=locator)
+        if quantity is Quantity.CHLORIDE_CAPACITY:
+            return None
+        return Located(
+            State.unknown("source run composition is not printed in this extract"),
+            locator=locator,
+        )
+    missing_required = tuple(
+        name
+        for name in rule.required_components
+        if name not in declared_map
+        or _as_dec_or_none(declared_map.get(name)) is None
+    )
+    if missing_required or invalid_components:
+        missing_detail = ", ".join(missing_required or tuple(invalid_components))
+        return Located(
+            State.unknown(
+                "source run composition is incomplete; required printed component(s) missing or invalid: "
+                + missing_detail
+            ),
+            locator=locator,
+        )
+    projection_locator = _locator_from_plain(values.get("composition_locator"))
+    if projection_locator is None:
+        for candidate in source_rows:
+            if (
+                isinstance(candidate, tuple)
+                and len(candidate) == 2
+                and candidate[0] == "SiO2"
+                and isinstance(candidate[1], Mapping)
+                and candidate[1].get("experiment") == experiment
+            ):
+                projection_locator = locator_from_mapping(
+                    candidate[1].get("locator")
+                )
+                if projection_locator is not None:
+                    break
+    projection_locator = projection_locator or _composition_source_locator(
+        payload, fallback=locator
+    )
+    source_references = (
+        tuple(f"{row_id}: {record}" for row_id, record in component_rows)
+        if projection_mode == "same-experiment located component observations"
+        else (f"source composition vector: {projection_locator.record}",)
     )
     wt = {
         str(name): amount
@@ -7697,8 +7880,15 @@ def _project_source_declared_composition(
         wt,
         basis="printed_oxides",
         locator=projection_locator,
-        closure_context=payload,
+        closure_context={
+            **payload,
+            "quantity": quantity.value,
+            "composition_wt_pct": declared_map,
+        },
         declared_component_map=declared_map,
+        source_projection_rule=rule,
+        source_projection_mode=projection_mode,
+        source_projection_references=source_references,
     )
 
 
@@ -26384,6 +26574,7 @@ class Migrator:
                     phase_analysis_parent_ids.add(f"{source_id}::{record_id}")
         source_context = dict(pressure_identity_context or {})
         source_context = sg.attach_extract_declarations(source_context, doc)
+        source_context["composition_projection_rows"] = tuple(rows)
         source_context["experiment_source_rows"] = experiment_source_rows
         source_context["printed_atmospheres_for_set"] = (
             printed_atmospheres_for_set
@@ -28230,6 +28421,11 @@ class Migrator:
             obs,
             quantity=q_token if isinstance(q_token, Quantity) else None,
             locator=locator,
+            source_rows=(
+                context.get("composition_projection_rows", ())
+                if isinstance(context.get("composition_projection_rows", ()), Sequence)
+                else ()
+            ),
         )
         if source_projection is not None:
             point_conditions = {
@@ -28264,6 +28460,8 @@ class Migrator:
             ident_kwargs["composition"] = explicit_composition.state
         elif explicit_composition_refusal is not None:
             ident_kwargs["composition"] = explicit_composition_refusal
+        elif source_projection is not None:
+            ident_kwargs["composition"] = source_projection.state
         elif composition_located is not None:
             point_conditions = {
                 **(point_conditions or {}),
@@ -28760,6 +28958,12 @@ class Migrator:
                 values.get("point_conditions")
             )
         if explicit_conditions:
+            if source_projection is not None:
+                explicit_conditions = {
+                    name: condition
+                    for name, condition in explicit_conditions.items()
+                    if name != "composition"
+                }
             point_conditions = {
                 **(point_conditions or {}),
                 **explicit_conditions,

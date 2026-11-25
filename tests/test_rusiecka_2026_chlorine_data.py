@@ -14,6 +14,7 @@ import yaml
 
 from simulator.battery.enums import (
     AmountBasis,
+    Engine,
     MethodToken,
     NoticeKind,
     Phase,
@@ -21,7 +22,16 @@ from simulator.battery.enums import (
     Quantity,
     ValueKind,
 )
+from simulator.battery.composition import (
+    composition_wt_pct,
+    excluded_component_notice_reason,
+    partition_engine_components,
+)
 from simulator.battery.migrate import _mass_percent_composition_located
+from simulator.battery.score import (
+    _COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
+    _engine_bulk_component_names,
+)
 from tests.battery.test_migrate import REPO_ROOT, _migrate_real_extract
 from tests.helpers.corpus_paths import regolith_corpus_root
 
@@ -71,6 +81,21 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
     assert len(mapped) == 1241
     assert len(mapped_rows) == 73
 
+    phase_rows = [
+        (formula, source)
+        for formula, container in doc["species"].items()
+        for source in container.get("observations", [])
+        if source.get("values", {}).get("quantity")
+        == "equilibrium_phase_composition"
+    ]
+    assert len(phase_rows) == 1785
+    refused_ids = [
+        source["observation_id"]
+        for _formula, source in phase_rows
+        if not migrated[source["observation_id"]].identity.composition.is_value
+    ]
+    assert len(refused_ids) == 34, refused_ids
+
     for row_number, source, row in mapped:
         source_components = source["values"]["composition_wt_pct"]
         point_composition = row.point_conditions["composition"]
@@ -102,7 +127,7 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             assert "no mole-fraction normalization was applied" in notices[0].reason
             continue
 
-        assert row.identity.composition.is_value
+        assert row.identity.composition.is_value, row.observation_id
         composition = row.identity.composition.value
         assert composition.basis == "printed_oxides"
         assert composition.amount_basis is AmountBasis.MOLE_FRACTION
@@ -115,9 +140,17 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
             f"sheet data, cells B{row_number}:R{row_number}"
         )
         assert point_composition.inference is not None
-        assert point_composition.inference.relation == "wt_pct_to_mole_fraction"
+        assert point_composition.inference.relation == "source_composition_projection", row.observation_id
         assert point_composition.inference.output_unit == "mole_fraction"
         assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in point_composition.inference.inputs
+        assert point_composition.inference.method is not None
+        assert point_composition.inference.method.state.value == (
+            "partial oxide analysis with Cl/S/F"
+        )
+        assert any(
+            name == "original_analytical_total_wt_pct"
+            for name, _value in point_composition.inference.parameters
+        )
         assert any(
             name == "original_Cl_wt_pct"
             for name, _value in point_composition.inference.parameters
@@ -137,6 +170,18 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
     mutated_components = mutated_si["values"]["composition_wt_pct"]
     assert mutated_components is mutated_si["point_conditions"]["composition"]["state"]["value"]["components"]
     mutated_components["Cl"] = "0.92"
+    for container in mutated_doc["species"].values():
+        for observation in container.get("observations", []):
+            if (
+                observation.get("experiment") == "worksheet-row-6"
+                and observation.get("values", {}).get("quantity")
+                == "equilibrium_phase_composition"
+                and observation.get("values", {}).get(
+                    "source_column_header_as_printed"
+                )
+                == "Cl"
+            ):
+                observation["values"]["component_amount"] = "0.92"
     mutated_result = _migrate_real_extract(
         tmp_path / "chloride-mutated", EXTRACT_NAME, extract_doc=mutated_doc
     )
@@ -156,7 +201,7 @@ def _assert_projected_compositions_without_workbook(doc: dict, result, tmp_path:
 def test_row6_projection_components_match_current_mass_percent_resolver(
     tmp_path: Path,
 ) -> None:
-    """Pin current Rusiecka oxide mole fractions before flag ownership moves."""
+    """Keep the source projection numerically aligned with the shared resolver."""
 
     doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
     source = next(
@@ -185,6 +230,89 @@ def test_row6_projection_components_match_current_mass_percent_resolver(
     assert dict(row.identity.composition.value.components) == dict(
         expected.state.value.components
     )
+
+
+def test_row97_links_located_component_rows_and_flags_cl_without_filling_s_or_f(
+    tmp_path: Path,
+) -> None:
+    """Rebuild an omitted duplicate vector from its complete located row."""
+
+    doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    row_sources = [
+        (formula, observation)
+        for formula, container in doc["species"].items()
+        for observation in container.get("observations", [])
+        if observation.get("experiment") == "worksheet-row-97"
+        and observation.get("values", {}).get("quantity")
+        == "equilibrium_phase_composition"
+    ]
+    assert len(row_sources) == 17
+    assert all("composition_wt_pct" not in source["values"] for _, source in row_sources)
+    expected_wt = {
+        formula: Decimal(source["values"]["component_amount"])
+        for formula, source in row_sources
+    }
+    result = _migrate_real_extract(
+        tmp_path / "row97-linked-projection", EXTRACT_NAME, extract_doc=doc
+    )
+    row = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith("::rusiecka_2026_data_row97_sio2")
+    )
+    assert row.identity.composition.is_value
+    projected = dict(row.identity.composition.value.components)
+    assert projected["Cl"] > 0
+    assert "S" not in projected
+    assert "F" not in projected
+    wt_percent = composition_wt_pct(row.identity.composition.value)
+    assert wt_percent is not None
+    kept, excluded = partition_engine_components(
+        wt_percent,
+        engine_components=_engine_bulk_component_names(Engine.OPENIMCC),
+        retain_components=_COMPOSITION_COMPONENTS_RETAINED_BY_DEFAULT,
+    )
+    assert "Cl" not in dict(kept)
+    assert dict(excluded)["Cl"] > 0
+    excluded_reason = excluded_component_notice_reason(excluded, unit="wt%")
+    assert "Cl " in excluded_reason
+    assert "wt%" in excluded_reason
+    located = row.point_conditions["composition"]
+    assert located.inference is not None
+    assert located.inference.relation == "source_composition_projection"
+    assert located.inference.method is not None
+    assert located.inference.method.state.value == "partial oxide analysis with Cl/S/F"
+    assert (
+        "source row interpretation: same-experiment located component observations"
+        in located.inference.inputs
+    )
+    total_flag = dict(located.inference.parameters)[
+        "original_analytical_total_wt_pct"
+    ]
+    assert total_flag.state.value == sum(expected_wt.values(), Decimal("0"))
+    assert total_flag.locator == located.locator
+    assert any(name == "original_Cl_wt_pct" for name, _ in located.inference.parameters)
+
+
+def test_rusiecka_refuses_when_required_silica_observation_is_missing(
+    tmp_path: Path,
+) -> None:
+    doc = yaml.safe_load(EXTRACT_PATH.read_text(encoding="utf-8"))
+    for container in doc["species"].values():
+        container["observations"] = [
+            observation
+            for observation in container.get("observations", [])
+            if observation.get("observation_id") != "rusiecka_2026_data_row97_sio2"
+        ]
+    result = _migrate_real_extract(
+        tmp_path / "row97-missing-silica", EXTRACT_NAME, extract_doc=doc
+    )
+    row = next(
+        observation
+        for observation in result.observations.values()
+        if observation.observation_id.endswith("::rusiecka_2026_data_row97_al2o3")
+    )
+    assert row.identity.composition.is_unknown
 
 
 def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
@@ -381,7 +509,7 @@ def test_corrected_rows_migrate_and_pin_workbook_cells(tmp_path: Path) -> None:
         assert located.locator is not None
         assert located.locator.record == f"sheet data, cells B{row_number}:R{row_number}"
         assert located.inference is not None
-        assert located.inference.relation == "wt_pct_to_mole_fraction"
+        assert located.inference.relation == "source_composition_projection"
         assert located.inference.output_unit == "mole_fraction"
         assert "x_i = (w_i / M_i) / Σ_j (w_j / M_j)" in located.inference.inputs
         assert any(name == "original_Cl_wt_pct" for name, _value in located.inference.parameters)
