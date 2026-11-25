@@ -1470,7 +1470,11 @@ def test_g1_absence_audit_catches_same_row_species_phase_mutation(
         "species": {
             "Fe": {
                 "observations": [
-                    {"observation_id": "row", "phase": "liquid"},
+                    {
+                        "observation_id": "row",
+                        "phase": "liquid",
+                        "method": "wet chemistry, as compiled",
+                    },
                 ]
             }
         },
@@ -1480,6 +1484,19 @@ def test_g1_absence_audit_catches_same_row_species_phase_mutation(
             {
                 "observation_id": "fixture-phase-mutation::row",
                 "source_id": "fixture-phase-mutation",
+                "notices": [
+                    {
+                        "kind": "method_unstated",
+                        "reason": "method_unstated: default=unspecified; original_reason=source does not state method",
+                        "policy": {
+                            "id": "DP-106",
+                            "version": 1,
+                            "status": "proposed",
+                            "value": "unspecified",
+                            "units": "method token",
+                        },
+                    }
+                ],
                 "identity": {
                     "species": {
                         "formula": "Fe",
@@ -1500,10 +1517,15 @@ def test_g1_absence_audit_catches_same_row_species_phase_mutation(
     judged, bad = absence_audit([store_path])
 
     assert judged["fixture-phase-mutation"] == 1
-    assert len(bad) == 1
-    assert bad[0][1] == "fixture-phase-mutation::row"
-    assert bad[0][2] == "identity.species.phase.reason"
-    assert bad[0][4] == ["phase"]
+    assert len(bad) == 2
+    by_path = {item[2]: item for item in bad}
+    assert set(by_path) == {
+        "notices[0].reason",
+        "identity.species.phase.reason",
+    }
+    assert all(item[1] == "fixture-phase-mutation::row" for item in bad)
+    assert by_path["notices[0].reason"][4] == ["method"]
+    assert by_path["identity.species.phase.reason"][4] == ["phase"]
 
 
 def test_g1_current_stolyarova_source_migrates_without_context_observation(

@@ -178,7 +178,75 @@ def test_real_inventory_and_foreign_keys(store, source, count):
             for entry in entries
             if (resolved := resolve_path(scope, entry["ref"])) != entry["resolved"]
         ]
-        assert not stale_entries, (source, run["card_id"], stale_entries)
+        phase_refresh_observation = (
+            {
+                "hashimoto-1983-run-17c1": (
+                    "kems-015-hashimoto-1983::"
+                    "hashimoto_1983_table4_phase_compositions__run_17c1"
+                ),
+                "hashimoto-1983-run-18b6-1": (
+                    "kems-015-hashimoto-1983::"
+                    "hashimoto_1983_table4_phase_compositions__run_18b6-1"
+                ),
+            }.get(run["card_id"])
+            if source == "kems-015-hashimoto-1983"
+            else None
+        )
+        expected_phase_refresh = phase_refresh_observation is not None
+        if expected_phase_refresh:
+            assert len(stale_entries) == 1, (source, run["card_id"], stale_entries)
+            ref, reviewed, migrated = stale_entries[0]
+            observation_id = phase_refresh_observation
+            assert ref == ["observations", observation_id]
+            assert reviewed["identity"]["species"]["phase"] == {
+                "tag": "unknown",
+                "reason": (
+                    "phase string 'quench_minerals_in_FCMAS_residue' is not "
+                    "in the closed automatic map"
+                ),
+            }
+            assert migrated["identity"]["species"]["phase"] == {
+                "tag": "value",
+                "value": "unspecified",
+            }
+            assert reviewed["identity"]["species"]["polymorph"] == {
+                "tag": "unknown",
+                "reason": "phase unknown; polymorph unresolved",
+                "rejection_kind": "omitted",
+            }
+            assert migrated["identity"]["species"]["polymorph"] == {
+                "tag": "not_applicable",
+                "reason": "not crystal",
+            }
+            assert migrated["notices"] == [
+                {
+                    "kind": NoticeKind.PHASE_INFERRED.value,
+                    "affected_quantities": [],
+                    "reason": (
+                        "phase_inferred: value=unspecified; evidence=row physics "
+                        "does not identify one phase; original_reason=phase string "
+                        "'quench_minerals_in_FCMAS_residue' is not in the closed "
+                        "automatic map"
+                    ),
+                    "origin": observation_id,
+                    "policy": {
+                        "id": "DP-016",
+                        "version": 1,
+                        "status": "canonical",
+                        "value": "unspecified",
+                        "units": "phase token",
+                    },
+                }
+            ]
+            reviewed_current = deepcopy(reviewed)
+            migrated_current = deepcopy(migrated)
+            for snapshot in (reviewed_current, migrated_current):
+                snapshot["identity"]["species"].pop("phase")
+                snapshot["identity"]["species"].pop("polymorph")
+                snapshot.pop("notices")
+            assert reviewed_current == migrated_current
+        else:
+            assert not stale_entries, (source, run["card_id"], stale_entries)
         for eid in run["experiment_ids"]:
             selected_paths = {tuple(entry["ref"][2:]) for entry in entries
                               if entry["ref"][:2] == ["experiments", eid]}
@@ -190,7 +258,10 @@ def test_real_inventory_and_foreign_keys(store, source, count):
         assert receipt["verdict"] == "NOT_PASS"
         assert receipt["rms_band"] is None
         assert receipt["n_required_groups"] == len(run["outcomes"])
-        assert not any(c["cause"] == "review_stale" for c in receipt["causes"])
+        if expected_phase_refresh:
+            assert sum(c["cause"] == "review_stale" for c in receipt["causes"]) == 1
+        else:
+            assert not any(c["cause"] == "review_stale" for c in receipt["causes"])
     expected = {oid for oid, obs in store[2].items()
                 if obs.source_id == source and obs.admission.status.value == "admitted"
                 and obs.identity.quantity.is_value
