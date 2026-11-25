@@ -813,22 +813,20 @@ class SimSession:
             return document
         payload = dict(document)
         run_metadata = payload.get("run_metadata")
+        has_run_metadata = isinstance(run_metadata, Mapping)
         recorded_flags = (
             run_metadata.get("run_flags", ())
-            if isinstance(run_metadata, Mapping)
-            else None
+            if has_run_metadata
+            else ()
         )
         run_flags = _run_flags_for_export(self, recorded_flags)
-        if isinstance(run_metadata, Mapping):
+        if has_run_metadata:
             run_metadata = dict(run_metadata)
-        elif run_flags:
+        elif isinstance(run_flags, (list, tuple)) and run_flags:
             run_metadata = {}
         else:
             return payload
-        if run_flags:
-            run_metadata["run_flags"] = list(run_flags)
-        else:
-            run_metadata.pop("run_flags", None)
+        _write_run_flags_to_metadata(run_metadata, run_flags)
         payload["run_metadata"] = run_metadata
         return payload
 
@@ -849,13 +847,11 @@ class SimSession:
         run_metadata = payload.get("run_metadata")
         if isinstance(run_metadata, Mapping):
             run_metadata = dict(run_metadata)
-            run_flags = _recorded_run_flags_without_budget(
-                run_metadata.get("run_flags", ())
-            )
-            if run_flags:
-                run_metadata["run_flags"] = list(run_flags)
-            else:
-                run_metadata.pop("run_flags", None)
+            if "run_flags" in run_metadata:
+                run_flags = _recorded_run_flags_without_budget(
+                    run_metadata["run_flags"]
+                )
+                _write_run_flags_to_metadata(run_metadata, run_flags)
             payload["run_metadata"] = run_metadata
         self._result_document = payload
 
@@ -897,17 +893,20 @@ class SimSession:
 
 def _run_flags_for_export(
     session: Any,
-    recorded_flags: Iterable[Any] | None = None,
-) -> tuple[Any, ...]:
+    recorded_flags: Any = (),
+) -> Any:
     """Preserve offline records and derive the live budget flag on read."""
 
-    run_flags = tuple(recorded_flags or ())
+    run_flags = recorded_flags
     sim = getattr(session, "_sim", None)
-    if sim is None:
-        return run_flags
-    run_flags = _recorded_run_flags_without_budget(run_flags)
     pending_decision: dict[str, Any] | None = None
     try:
+        if not isinstance(recorded_flags, (list, tuple)):
+            return recorded_flags
+        run_flags = tuple(recorded_flags)
+        if sim is None:
+            return run_flags
+        run_flags = _recorded_run_flags_without_budget(run_flags)
         if (
             getattr(session, "_last_drive_stop", None) != "hour_budget"
             or sim.is_complete()
@@ -980,6 +979,8 @@ def _run_flags_for_export(
         }
         if pending_decision is not None:
             unresolved_detail["pending_decision"] = pending_decision
+        if not isinstance(run_flags, tuple):
+            return run_flags
         return (*run_flags, {
             "kind": "run_diagnostic",
             "code": _RUN_HOUR_BUDGET_FLAG_CODE,
@@ -988,16 +989,31 @@ def _run_flags_for_export(
 
 
 def _recorded_run_flags_without_budget(
-    recorded_flags: Iterable[Any] | None,
-) -> tuple[Any, ...]:
+    recorded_flags: Any,
+) -> Any:
+    if not isinstance(recorded_flags, (list, tuple)):
+        return recorded_flags
     return tuple(
         flag
-        for flag in (recorded_flags or ())
+        for flag in recorded_flags
         if not (
             isinstance(flag, Mapping)
             and flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
         )
     )
+
+
+def _write_run_flags_to_metadata(
+    run_metadata: dict[str, Any],
+    run_flags: Any,
+) -> None:
+    if isinstance(run_flags, (list, tuple)):
+        if run_flags:
+            run_metadata["run_flags"] = list(run_flags)
+        else:
+            run_metadata.pop("run_flags", None)
+    else:
+        run_metadata["run_flags"] = run_flags
 
 
 def drive_auto_apply(

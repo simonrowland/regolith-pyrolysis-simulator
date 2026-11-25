@@ -149,6 +149,7 @@ from simulator.session import (
     SimSession,
     SimSessionConfig,
     _run_flags_for_export,
+    _write_run_flags_to_metadata,
 )
 from simulator.state import (
     Atmosphere,
@@ -5881,7 +5882,7 @@ def _attach_execution_diagnostics(
     execution: RunExecution | None = None,
     *,
     session: SimSession | None = None,
-    run_flags: Sequence[Any] | None = None,
+    run_flags: Any = None,
     campaign_stops: Sequence[Mapping[str, Any]] | None = None,
 ) -> None:
     if execution is not None:
@@ -5889,11 +5890,10 @@ def _attach_execution_diagnostics(
         campaign_stops = getattr(execution, "campaign_stops", ())
     if run_flags is None:
         run_flags = run_metadata.get("run_flags", ())
-    run_flags = list(_run_flags_for_export(session, run_flags))
-    if run_flags:
-        run_metadata["run_flags"] = _json_safe(run_flags)
-    else:
-        run_metadata.pop("run_flags", None)
+    run_flags = _run_flags_for_export(session, run_flags)
+    if isinstance(run_flags, (list, tuple)):
+        run_flags = _json_safe(list(run_flags))
+    _write_run_flags_to_metadata(run_metadata, run_flags)
     campaign_stops = list(campaign_stops or ())
     if any(
         isinstance(stop, Mapping) and stop.get("flags")

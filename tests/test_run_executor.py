@@ -908,6 +908,27 @@ def test_run_flag_export_preserves_legacy_entries_when_eligibility_fails(monkeyp
     }
 
 
+@pytest.mark.parametrize(
+    "legacy_flags",
+    [1, "legacy", {"legacy": True}],
+)
+def test_non_sequence_run_flags_round_trip_without_coercion(legacy_flags):
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": legacy_flags},
+    })
+
+    assert session._result_document["run_metadata"]["run_flags"] == legacy_flags
+    assert session.result_document()["run_metadata"]["run_flags"] == legacy_flags
+
+    from simulator.runner import _attach_execution_diagnostics
+
+    metadata = {"run_flags": legacy_flags}
+    _attach_execution_diagnostics(metadata, session=session)
+    assert metadata["run_flags"] == legacy_flags
+
+
 def test_budget_flag_contains_json_safe_unresolved_cyclic_limit():
     session = _started_internal_session(_run(campaign="C2A", hours=1))
     cyclic_limit = []

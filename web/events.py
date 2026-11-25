@@ -2833,7 +2833,11 @@ def _full_runner_payload(
         run_metadata = payload.get('run_metadata')
         had_run_metadata = isinstance(run_metadata, Mapping)
         run_metadata = dict(run_metadata) if had_run_metadata else {}
-        _attach_execution_diagnostics(run_metadata, session=session)
+        _attach_execution_diagnostics(
+            run_metadata,
+            session=session,
+            campaign_stops=_campaign_stops_for_trace(session),
+        )
         if had_run_metadata or run_metadata:
             payload['run_metadata'] = run_metadata
         recipe_snapshot = _recipe_snapshot_from_projector(projector)

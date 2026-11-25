@@ -4,6 +4,7 @@ import re
 import subprocess
 import sys
 import threading
+from dataclasses import replace
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -4463,6 +4464,40 @@ def test_recorded_web_projection_adds_live_flag_without_recorded_metadata(
         flag["code"] == "run_hour_budget_exhausted_mid_campaign"
         for flag in payload["run_metadata"]["run_flags"]
     )
+
+
+def test_recorded_web_projection_keeps_c4_stop_flags_without_metadata():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C4",
+        hours=1,
+        additives_kg={},
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C4"]["max_target_acquisition_hr"] = 1.0
+    session._config = replace(
+        session._config,
+        result_document_factory=lambda _active: {"status": "ok"},
+    )
+    runner_module.RunExecutor().execute_session(session, hours=1)
+
+    payload = web_events._full_runner_payload(
+        session,
+        projector=run,
+        status="ok",
+    )
+
+    c4_stop = next(
+        stop for stop in payload["run_metadata"]["campaign_stops"]
+        if stop["campaign"] == "C4"
+    )
+    codes = {flag["code"] for flag in c4_stop["flags"]}
+    assert codes >= {
+        "campaign_time_cap_unconverged",
+        "c4_time_capped_without_na_endpoint",
+    }
 
 
 def test_recorded_web_projection_drops_budget_flag_after_c6_no():
