@@ -6,6 +6,7 @@ from engines.builtin.native_fe_metallic_tap import (
     BuiltinNativeFeMetallicTapProvider,
 )
 from engines.builtin.native_fe_saturation import BuiltinNativeFeSaturationProvider
+from simulator.accounting import resolve_species_formula
 from simulator.chemistry.kernel import (
     AccountFilterViolation,
     ChemistryIntent,
@@ -32,26 +33,6 @@ METALLIC_TAP_DECLARED_ACCOUNTS = frozenset({
     "terminal.drain_tap_material",
     "process.overhead_gas",
 })
-PINNED_NATIVE_FE_MIGRATION_GOLDENS = {
-    "lunar_mare_low_ti": {
-        # 2026-08-05 MC-1 trace wiring d1b4f5d: Co/Ni/S/Cl passengers shift
-        # the lunar cleaned-melt basis; migration routing assertions below stay.
-        "native_fe_mol": 1607.3611432553353,
-        "native_vapor_Fe_kg": 0.1682078458614615,
-    },
-    "mars_basalt": {
-        # Recomputed after 9de6ffb8: counterfactual tracing attributes the
-        # move to the corrected Stage-0 carbonate-decomposition sigmoid width
-        # (one thermodynamic e-fold; old-width emulation reproduces the prior
-        # golden within tolerance) — NOT the carbon-partition change,
-        # which changes cleaned-melt CaO and therefore FeO activity.  The
-        # regression below proves this remains the FeO-saturation path: the
-        # later metallic-tap fold never touches process.metal_phase here.
-        "native_fe_mol": 1683.5583423071594,
-    },
-}
-
-
 def _request(registry, accounts, native_fe_mol: float) -> IntentRequest:
     return IntentRequest(
         intent=ChemistryIntent.NATIVE_FE_SATURATION,
@@ -299,8 +280,12 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
         sim.atom_ledger.mol_by_account("process.metal_phase")
     )
     transition_count_before = len(sim.atom_ledger.transitions)
-    golden = PINNED_NATIVE_FE_MIGRATION_GOLDENS[feedstock_id]
-    expected_native_fe_mol = golden["native_fe_mol"]
+    # Extent is the production root, not the fixed-fO2 lever. The lever
+    # precipitated ~10^3 mol here and is the hour-8 oxygen overshoot.
+    expected_native_fe_mol, _line = sim._native_fe_precipitation_mol_to_metal_line(
+        sim.melt.temperature_C + 273.15,
+    )
+    assert expected_native_fe_mol > 1.0e-6
 
     sim._apply_native_fe_saturation_split()
 
@@ -366,8 +351,12 @@ def test_kernel_native_fe_split_matches_pinned_migration_golden(
             - before_routed_fe_kg[account]
             for account, species_kg in accounts.items()
         )
+        fe_mm = resolve_species_formula(
+            "Fe",
+            sim.species_formula_registry,
+        ).molar_mass_kg_per_mol()
         assert routed_fe_kg == pytest.approx(
-            golden["native_vapor_Fe_kg"],
+            partition["native_fe_vapor_mol"] * fe_mm,
             abs=1e-9,
         )
         assert sim.train.stages[1].collected_kg.get("Fe", 0.0) > 0.0

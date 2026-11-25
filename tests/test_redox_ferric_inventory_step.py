@@ -149,6 +149,42 @@ def test_in_inventory_reducing_source_step_is_demand_over_capacity(
     assert _oxygen_atoms(sim) == pytest.approx(before_atoms, abs=1.0e-9)
 
 
+def test_locked_oxidizing_tangent_books_the_ledger_not_the_ceiling(
+    sim: PyrolysisSimulator,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A discarded ceiling predictor must not stay in the hour's fO2 sum.
+
+    The ferric lock republishes the ledger after the tangent. The delta
+    is that remaining change. Booking the ceiling landing is how a melt
+    on the metal line reports a tens-of-dex oxidizing jump.
+    """
+
+    planted = -12.0
+    _pin_tangent(sim, monkeypatch, fe2o3_mol=0.0, base_log=planted)
+    sim._ferric_tangent_exhausted = True
+    ceiling = sim._melt_redox_fO2_upper_bound_log()
+    past_ceiling_mol = (
+        (ceiling - planted) * _CAPACITY_MOL_PER_LN * math.log(10.0)
+    ) + 1.0e-3
+
+    reservoir = sim._apply_oxygen_reservoir_redox_source_terms(
+        {"redox_source:test_oxidizing_locked": past_ceiling_mol},
+        temperature_K=_TEMPERATURE_K,
+    )
+
+    published = reservoir.melt_intrinsic_fO2_log
+    ceiling_delta_ln = (ceiling - planted) * math.log(10.0)
+    assert published < ceiling - 1.0
+    assert published == pytest.approx(
+        sim._ledger_consistent_melt_fO2_log(_TEMPERATURE_K),
+    )
+    assert reservoir.redox_source_delta_ln_fO2 == pytest.approx(
+        (published - planted) * math.log(10.0),
+    )
+    assert reservoir.redox_source_delta_ln_fO2 != pytest.approx(ceiling_delta_ln)
+
+
 def test_oxidizing_source_step_is_demand_over_capacity(
     sim: PyrolysisSimulator,
     monkeypatch: pytest.MonkeyPatch,
@@ -633,11 +669,15 @@ def test_exchange_credit_does_not_clear_the_ferric_lock(
         source="test headspace O2 for an exchange credit after exhaustion",
         material_origin="feedstock",
     )
-    drive_pO2 = sim._overhead_exchange_drive_pO2_bar()
-    log_drive_pO2 = max(drive_pO2, sim._oxygen_numerical_floor_bar())
-    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = (
-        math.log10(log_drive_pO2) - 1.0
-    )
+    # Premise: the credit is a melt below the headspace target, and the
+    # target cannot exceed log10(P_total). One mol of O2 in the 1000 kg
+    # headspace (0.08538 m^3) at 1873.15 K is nRT/V = 1.824 bar, log10
+    # 0.261. The old plant, that log minus 1 dex, is -0.739. At 10 mbar
+    # the cap is log10(0.01) = -2, so -0.739 is above the target and the
+    # exchange is not a credit. Half a dex under the cap is -2.5, still
+    # below the capped target, and the 1 mol inventory is what moves.
+    cap_log = sim._melt_redox_fO2_upper_bound_log()
+    sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = cap_log - 0.5
     sim.melt.oxygen_reservoir.reference_T_K = _TEMPERATURE_K
     sim._sync_oxygen_reservoir_mirror()
 

@@ -218,16 +218,10 @@ def test_native_fe_authoritative_extent_ignores_diagnostic_payload(
     sim.melt.oxygen_reservoir.melt_intrinsic_fO2_log = -10.0
     sim.melt.fO2_log = -10.0
     sim.melt.melt_fO2_log = -10.0
-    pre_poison_split = sim._compute_fe_redox_split_diagnostic()
-    native_frac = max(
-        0.0,
-        float(pre_poison_split.get("native_fe_frac", 0.0) or 0.0),
-    )
-    cleaned_melt_mol = sim.atom_ledger.mol_by_account("process.cleaned_melt")
-    feo_mol = max(0.0, float(cleaned_melt_mol.get("FeO", 0.0) or 0.0))
-    expected_native_fe_mol = min(
-        feo_mol,
-        sim._cleaned_melt_fe_atom_mol() * native_frac,
+    # The debit is the root that reaches the Fe line, computed before
+    # the diagnostic is replaced. A poisoned payload must not change it.
+    expected_native_fe_mol, _line = sim._native_fe_precipitation_mol_to_metal_line(
+        sim.melt.temperature_C + 273.15,
     )
     assert expected_native_fe_mol > 0.0
 
