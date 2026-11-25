@@ -2917,6 +2917,25 @@ def _available_runner_payload(
         and 'run_flags' in metadata_overrides
     ):
         metadata['run_flags'] = copy.deepcopy(metadata_overrides['run_flags'])
+    else:
+        recorded_document_getter = getattr(session, 'result_document', None)
+        if callable(recorded_document_getter):
+            try:
+                recorded_document = recorded_document_getter()
+            except Exception:
+                recorded_document = None
+            recorded_metadata = (
+                recorded_document.get('run_metadata')
+                if isinstance(recorded_document, Mapping)
+                else None
+            )
+            if (
+                isinstance(recorded_metadata, Mapping)
+                and 'run_flags' in recorded_metadata
+            ):
+                metadata['run_flags'] = copy.deepcopy(
+                    recorded_metadata['run_flags']
+                )
     campaign_stops = _campaign_stops_for_trace(session)
     _attach_execution_diagnostics(
         metadata,

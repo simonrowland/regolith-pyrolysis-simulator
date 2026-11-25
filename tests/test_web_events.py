@@ -4394,7 +4394,7 @@ def test_web_projection_preserves_recorded_flags_without_live_session():
     run_flag = {
         "kind": "run_diagnostic",
         "code": "already_recorded_run_flag",
-        "detail": {"source": "stored artifact", "value": float("nan")},
+        "detail": {"source": "stored artifact", "value": 0.125},
     }
     recorded = _terminal_runner_document("ok")
     recorded["run_metadata"]["run_flags"] = [run_flag]
@@ -4409,10 +4409,7 @@ def test_web_projection_preserves_recorded_flags_without_live_session():
         status="ok",
     )
 
-    assert payload["run_metadata"]["run_flags"] == [{
-        **run_flag,
-        "detail": {"source": "stored artifact", "value": None},
-    }]
+    assert payload["run_metadata"]["run_flags"] == [run_flag]
 
     fallback = web_events._available_runner_payload(
         SimpleNamespace(
@@ -4429,9 +4426,7 @@ def test_web_projection_preserves_recorded_flags_without_live_session():
         refusal_diagnostic=None,
     )
 
-    assert fallback["run_metadata"]["run_flags"] == payload[
-        "run_metadata"
-    ]["run_flags"]
+    assert fallback["run_metadata"]["run_flags"] == [run_flag]
 
 
 @pytest.mark.parametrize("legacy_flags", [[], None])
@@ -4452,6 +4447,37 @@ def test_reduced_projection_preserves_empty_and_null_run_flags(legacy_flags):
     )
 
     assert payload["run_metadata"]["run_flags"] == legacy_flags
+
+
+def test_reduced_projection_reads_recorded_flags_when_overrides_omit_them():
+    run = PyrolysisRun(
+        feedstock_id="lunar_mare_low_ti",
+        campaign="C2A",
+        hours=1,
+    )
+    session = run._start_session()
+    sim = session.simulator
+    sim.record.path = "A_post_mg_boiloff"
+    sim.record.branch = "two"
+    sim.campaign_mgr.campaigns["C2A_continuous"]["max_hold_hr"] = 1
+    runner_module.RunExecutor().execute_session(session, hours=1)
+    session._set_result_document({
+        "status": "ok",
+        "run_metadata": {"run_flags": ["legacy from recorded document"]},
+    })
+
+    payload = web_events._available_runner_payload(
+        session,
+        projector=SimpleNamespace(run_metadata_overrides={}),
+        status="ok",
+        reason="",
+        error_message="",
+        refusal_diagnostic=None,
+    )
+
+    run_flags = payload["run_metadata"]["run_flags"]
+    assert run_flags[0] == "legacy from recorded document"
+    assert run_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
 
 
 def test_recorded_web_projection_adds_live_flag_without_recorded_metadata(

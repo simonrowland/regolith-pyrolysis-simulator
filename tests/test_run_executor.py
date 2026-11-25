@@ -944,6 +944,17 @@ def test_batch_budget_flag_is_appended_to_legacy_scalar_override():
     assert run_flags[1]["code"] == "run_hour_budget_exhausted_mid_campaign"
 
 
+def test_equal_budget_flag_keeps_its_recorded_position():
+    session = _started_internal_session(_run(campaign="C2A", hours=1))
+    current_budget_flag = _live_budget_flag(session)
+    stored_flags = [current_budget_flag, "legacy notice"]
+
+    exported_flags = _run_flags_for_export(session, stored_flags)
+
+    assert exported_flags is stored_flags
+    assert exported_flags == [current_budget_flag, "legacy notice"]
+
+
 @pytest.mark.parametrize("legacy_flags", [[], None])
 def test_offline_run_flag_values_survive_result_and_runner_projection(
     legacy_flags,

@@ -985,10 +985,18 @@ def _run_flags_for_export(
             "detail": unresolved_detail,
         }
     if isinstance(run_flags, list):
-        base_flags = _recorded_run_flags_without_budget(run_flags)
-    else:
-        base_flags = [run_flags]
-    return [*base_flags, budget_flag]
+        for index, recorded_flag in enumerate(run_flags):
+            if (
+                isinstance(recorded_flag, Mapping)
+                and recorded_flag.get("code") == _RUN_HOUR_BUDGET_FLAG_CODE
+            ):
+                if recorded_flag == budget_flag:
+                    return run_flags
+                updated_flags = list(run_flags)
+                updated_flags[index] = budget_flag
+                return updated_flags
+        return [*run_flags, budget_flag]
+    return [run_flags, budget_flag]
 
 
 def _recorded_run_flags_without_budget(
